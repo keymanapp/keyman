@@ -22,9 +22,10 @@ export * as KvksFile from './types/kvks/kvks-file.js';
 
 export { TouchLayoutFileReader } from './types/keyman-touch-layout/keyman-touch-layout-file-reader.js';
 export { TouchLayoutFileWriter, TouchLayoutFileWriterOptions } from './types/keyman-touch-layout/keyman-touch-layout-file-writer.js';
+export { specialKeyCaps } from './types/keyman-touch-layout/special-key-caps.js';
 
 export { default as KMXBuilder } from './types/kmx/kmx-builder.js';
-export { default as KMXPlusBuilder}  from './types/kmx/kmx-plus-builder/kmx-plus-builder.js';
+export { default as KMXPlusBuilder, SectionBuilders } from './types/kmx/kmx-plus-builder/kmx-plus-builder.js';
 
 export * as LDMLKeyboard from './types/ldml-keyboard/ldml-keyboard-xml.js';
 export { LDMLKeyboardTestDataXMLSourceFile } from './types/ldml-keyboard/ldml-keyboard-testdata-xml.js';

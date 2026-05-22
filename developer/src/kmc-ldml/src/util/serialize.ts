@@ -177,11 +177,11 @@ export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
   }
 
   function getLayers() {
-    if (!layr?.lists?.length) {
+    if (!layr?.forms?.length) {
       return {};
     }
     return {
-      layers: layr.lists.map(({ hardware, minDeviceWidth, layers }) => ({
+      layers: layr.forms.map(({ hardware, minDeviceWidth, layers }) => ({
         ...stringToAttr('formId', hardware),
         ...numberToAttr('minDeviceWidth', minDeviceWidth),
         layer: layers.map(({ id, mod, rows }) => ({

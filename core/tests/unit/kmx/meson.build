@@ -1,97 +1,76 @@
-# Copyright:    © 2018 SIL International.
-# Description:  Cross platform build script to compile libkeymancore API unit tests.
-# Create Date:  19 Oct 2018
-# Authors:      Marc Durdin, Tim Eves (TSE)
-# History:      19  Oct 2018 - TSE - Added test for context API functions.
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# Created by Tim Eves (TSE) on 2018-10-19
+#
+# Cross platform build script to compile kmx processor unit tests.
 #
 
-# TODO -- why are these differing from the standard.meson.build flags?
-if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
-  warns = [
-     '-Wno-missing-field-initializers',
-     '-Wno-unused-parameter'
-  ]
-else
-  warns = []
-endif
+kmx_test_path = meson.current_build_dir()
 
-source_path = meson.current_source_dir()
-test_path = meson.current_build_dir()
-tests_flags = []
-common_test_keyboards_baseline = source_path / '../../../../common/test/keyboards/baseline'
-
-if cpp_compiler.get_id() == 'emscripten'
-  # TODO: we will move the tests to ES6 in the future
-  # '-sMODULARIZE', '-sEXPORT_ES6',
-  tests_flags += ['-lnodefs.js', wasm_exported_runtime_methods]
-endif
-
-kmx = executable('kmx',
-    ['kmx.cpp', common_test_files],
-    cpp_args: defns + warns,
-    include_directories: [inc, libsrc, '../../kmx_test_source'],
-    link_args: links + tests_flags,
-    dependencies: [icu_uc, icu_i18n],
+kmx_tests_executable = executable('kmx_tests',
+    ['kmx.tests.cpp', common_test_files_without_main],
+    cpp_args: defns + test_warns,
+    include_directories: [test_includes, '../../kmx_test_source'],
+    link_args: links + test_link_args,
+    dependencies: test_dependencies,
     objects: [lib.extract_all_objects(recursive: false), kmx_test_source_lib.extract_all_objects(recursive: false)])
 
-tests = [
-  'k_000___null_keyboard',
-  'k_001___basic_input_unicodei',
-  'k_002___basic_input_unicode',
-  'k_003___nul',
-  'k_004___basic_input__shift_2_',
-  'k_005___nul_with_initial_context',
-  'k_006___vkey_input__shift_ctrl_',
-  'k_007___vkey_input__ctrl_alt_',
-  'k_008___vkey_input__ctrl_alt_2_',
-  'k_012___ralt',
-  'k_013___deadkeys',
-  'k_014___groups_and_virtual_keys',
-  'k_015___ralt_2',
-  'k_017___space_mnemonic_kbd',
-  'k_018___nul_testing',
-  'k_019___multiple_deadkeys',
-  'k_020___deadkeys_and_backspace',
-  'k_021___options',
-  'k_022___options_with_preset',
-  'k_023___options_with_save',
-  'k_024___options_with_save_and_preset',
-  'k_025___options_with_reset',
-  'k_026___system_stores',
-  'k_027___system_stores_2',
-  'k_028___smp',
-  'k_029___beep',
-  'k_030___multiple_groups',
-  'k_031___caps_lock',
-  'k_032___caps_control',
-  'k_033___caps_always_off',
-  'k_034___options_double_set_reset',
-  'k_035___options_double_set_staged',
-  'k_036___options___double_reset_staged',
-  'k_037___options___double_reset',
-  'k_038___punctkeys',
-  'k_039___generic_ctrlalt',
-  'k_040___long_context',
-  'k_041___long_context_and_deadkeys',
-  'k_042___long_context_and_split_deadkeys',
-  'k_043___output_and_keystroke',
-  'k_044___if_and_context',
-  'k_045___deadkey_and_context',
-  'k_046___deadkey_and_contextex',
-  'k_047___caps_always_off_initially_on',
-  'k_048___modifier_keys_keep_context',
-  'k_049___enter_invalidates_context',
-  'k_050___nul_and_context',
-  'k_051___if_and_context',
-  'k_052___nul_and_index',
-  'k_053___if_and_index',
-  'k_054___nul_and_contextex',
+kmx_tests = [
+  'k_0000___null_keyboard',
+  'k_0001___nul',
+  'k_0002___nul_with_initial_context',
+  'k_0003___nul_testing',
+  'k_0004___space_mnemonic_kbd',
+  'k_0005___beep',
+  'k_0100___basic_input_unicodei',
+  'k_0101___basic_input_unicode',
+  'k_0102___basic_input__shift_2_',
+  'k_0103___vkey_input__shift_ctrl_',
+  'k_0104___vkey_input__ctrl_alt_',
+  'k_0105___vkey_input__ctrl_alt_2_',
+  'k_0106___smp',
+  'k_0107___punctkeys',
+  'k_0200___ralt',
+  'k_0201___ralt_2',
+  'k_0202___alt',
+  'k_0203___generic_ctrlalt',
+  'k_0300___deadkeys',
+  'k_0301___multiple_deadkeys',
+  'k_0302___deadkeys_and_backspace',
+  'k_0400___groups_and_virtual_keys',
+  'k_0401___multiple_groups',
+  'k_0402___output_and_keystroke',
+  'k_0500___options',
+  'k_0501___options_with_preset',
+  'k_0502___options_with_save',
+  'k_0503___options_with_save_and_preset',
+  'k_0504___options_with_reset',
+  'k_0505___options_double_set_reset',
+  'k_0506___options_double_set_staged',
+  'k_0507___options___double_reset_staged',
+  'k_0508___options___double_reset',
+  'k_0600___system_stores',
+  'k_0601___system_stores_2',
+  'k_0700___caps_lock',
+  'k_0701___caps_control',
+  'k_0702___caps_always_off',
+  'k_0703___caps_always_off_initially_on',
+  'k_0800___long_context',
+  'k_0801___long_context_and_deadkeys',
+  'k_0802___long_context_and_split_deadkeys',
+  'k_0803___if_and_context',
+  'k_0804___deadkey_and_context',
+  'k_0805___deadkey_and_contextex',
+  'k_0806___modifier_keys_keep_context',
+  'k_0807___enter_invalidates_context',
+  'k_0808___nul_and_context',
+  'k_0809___if_and_context',
+  'k_0810___nul_and_index',
+  'k_0811___if_and_index',
+  'k_0812___nul_and_contextex',
+  # TODO-web-core: Skipped: 'k_0813___deadkey_cancelled_by_arrow',
 ]
-
-node = find_program('node', required: true)
-
-kmc_root = meson.current_source_dir() / '../../../../developer/src/kmc/build/src/kmc.js'
-kmc_cmd = [node, '--enable-source-maps', kmc_root]
 
 if build_machine.system() == 'windows'
   cat_cmd = [find_program(meson.current_source_dir() / 'cat.bat', required: true)]
@@ -101,7 +80,7 @@ endif
 
 test_keyboards_kpj = ''
 test_keyboards_kmp_json = ''
-foreach kbd : tests
+foreach kbd : kmx_tests
   if test_keyboards_kmp_json.startswith('{')
     test_keyboards_kmp_json += ''',
   '''
@@ -152,12 +131,12 @@ keyboards_kpj = configure_file(
 
 all_keyboards = custom_target('all_keyboards',
   input: keyboards_kpj,
-  output: [tests[0]+'.kmp'],
+  output: [kmx_tests[0]+'.kmp'],
   depfile: 'keyboards.dep',
   command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@']
 )
 
-foreach kbd : tests
+foreach kbd : kmx_tests
   kbd_src_path = common_test_keyboards_baseline / kbd + '.kmn'
 
   content = run_command(
@@ -189,73 +168,11 @@ foreach kbd : tests
   )
 endforeach
 
-foreach kbd : tests
-  test(kbd, kmx, depends: [all_keyboards], args: [test_path / kbd + '.kmn', test_path / kbd + '.kmx'])
+foreach kbd : kmx_tests
+  test('kmx/' + kbd, kmx_tests_executable, depends: [all_keyboards], args: [kmx_test_path / kbd + '.kmn', kmx_test_path / kbd + '.kmx'], suite: 'kmx', protocol: 'gtest')
 endforeach
 
 # binary file unit tests
 
 subdir('fixtures')
 
-# test for km_core_keyboard_get_key_list
-
-# For following tests, we need to be copying from source_path,
-# not build_path, so we'll just update test_path accordingly. This
-# should work for Linux, macOS, and WASM.
-test_path = source_path
-
-key_e = executable('key_list_tests', ['kmx_key_list.tests.cpp', common_test_files],
-                cpp_args: defns + warns,
-                include_directories: [inc, libsrc],
-                link_args: links + tests_flags,
-                dependencies: [icu_uc, icu_i18n],
-                objects: lib.extract_all_objects(recursive: false))
-test_kbd = 'kmx_key_list'
-
-kbd_src = files(test_kbd + '.kmn')
-kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
-kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
-  output: test_kbd + '.log',
-  input: kbd_src,
-  command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
-)
-test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
-
-# test for imx list
-
-imx_e = executable('imx_list_tests', ['kmx_imx.tests.cpp', common_test_files],
-                cpp_args: defns + warns,
-                include_directories: [inc, libsrc],
-                link_args: links + tests_flags,
-                dependencies: [icu_uc, icu_i18n],
-                objects: lib.extract_all_objects(recursive: false))
-
-test_kbd = 'kmx_imsample'
-
-kbd_src = files(test_kbd + '.kmn')
-kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
-kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
-  output: test_kbd + '.log',
-  input: kbd_src,
-  command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
-)
-test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
-
-external_e = executable('ext_event_tests', ['kmx_external_event.tests.cpp', common_test_files],
-                cpp_args: defns + warns,
-                include_directories: [inc, libsrc],
-                link_args: links + tests_flags,
-                dependencies: [icu_uc, icu_i18n],
-                objects: lib.extract_all_objects(recursive: false))
-
-test_kbd = 'k_033___caps_always_off'
-
-
-kbd_src = common_test_keyboards_baseline + '/' + test_kbd + '.kmn'
-kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
-kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
-  output: test_kbd + '.log',
-  input: kbd_src,
-  command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
-)
-test('ext_event', external_e,  depends: kbd_log, args: [kbd_obj] )

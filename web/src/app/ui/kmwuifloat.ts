@@ -1,7 +1,6 @@
-/***
-   KeymanWeb 17.0
-   Copyright 2019-2023 SIL International
-***/
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 
 import type { KeymanEngine, UIModule } from 'keyman/app/browser';
 
@@ -450,7 +449,7 @@ if(!keymanweb) {
        * @param       {Object}    e       event
        * Description  Change active keyboard in response to user selection event
        */
-      private readonly SelectKeyboardChange = async (e: Event) => {
+      private readonly SelectKeyboardChange = async (e: Event): Promise<void> => {
         keymanweb.activatingUI(true);
 
         if(this.KeyboardSelector.value != '-') {

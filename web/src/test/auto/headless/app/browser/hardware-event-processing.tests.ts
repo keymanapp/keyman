@@ -1,13 +1,14 @@
 import { assert } from 'chai';
 
-import { preprocessKeyboardEvent } from 'keyman/app/browser';
+import { unitTestEndPoints } from 'keyman/app/browser';
 import { processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { PhysicalInputEventSpec } from '@keymanapp/recorder-core';
-import { DeviceSpec } from '@keymanapp/web-utils';
-import { Codes, Keyboard, KeyEvent } from 'keyman/engine/keyboard';
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { Codes, JSKeyboard, KeyEvent } from 'keyman/engine/keyboard';
 
 const ModifierCodes = Codes.modifierCodes;
 const KeyCodes = Codes.keyCodes;
+const preprocessKeyboardEvent = unitTestEndPoints.preprocessKeyboardEvent;
 
 const DUMMY_DEVICE = new DeviceSpec('chrome', 'desktop', 'windows', false);
 
@@ -24,7 +25,7 @@ describe("app/browser: hardware event processing", () => {
           modifierSet: PhysicalInputEventSpec.modifierCodes.Shift,
           location: 1
         }) as any as KeyboardEvent, {
-          activeKeyboard: new Keyboard({ KM: 0 }),
+          activeKeyboard: new JSKeyboard({ KM: 0 }),
           modStateFlags: 0,
           baseLayout: 'us'
         },
@@ -46,7 +47,7 @@ describe("app/browser: hardware event processing", () => {
           keyCode: KeyCodes.K_A,
           modifierSet: 0
         }) as any as KeyboardEvent, {
-          activeKeyboard: new Keyboard({ KM: 0 }),
+          activeKeyboard: new JSKeyboard({ KM: 0 }),
           modStateFlags: 0,
           baseLayout: 'us'
         },
@@ -66,7 +67,7 @@ describe("app/browser: hardware event processing", () => {
           location: 1
         }) as any as KeyboardEvent, {
           // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new Keyboard({KM: 0}),
+          activeKeyboard: new JSKeyboard({KM: 0}),
           modStateFlags: 0,
           baseLayout: 'us'
         },
@@ -86,7 +87,7 @@ describe("app/browser: hardware event processing", () => {
           location: 1
         }) as any as KeyboardEvent, {
           // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new Keyboard({KM: 0}),
+          activeKeyboard: new JSKeyboard({KM: 0}),
           modStateFlags: ModifierCodes.ALT,
           baseLayout: 'us'
         },
@@ -108,7 +109,7 @@ describe("app/browser: hardware event processing", () => {
           location: 1
         }) as any as KeyboardEvent, {
           // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new Keyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+          activeKeyboard: new JSKeyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
           modStateFlags: 0,
           baseLayout: 'us'
         },
@@ -127,7 +128,7 @@ describe("app/browser: hardware event processing", () => {
           modifierSet: 0
         }) as any as KeyboardEvent, {
           // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new Keyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+          activeKeyboard: new JSKeyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
           modStateFlags: 0,
           baseLayout: 'us'
         },
@@ -147,7 +148,7 @@ describe("app/browser: hardware event processing", () => {
           location: 1
         }) as any as KeyboardEvent, {
           // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new Keyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+          activeKeyboard: new JSKeyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
           modStateFlags: 0,
           baseLayout: 'us'
         },
@@ -167,7 +168,7 @@ describe("app/browser: hardware event processing", () => {
           location: 1
         }) as any as KeyboardEvent, {
           // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new Keyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+          activeKeyboard: new JSKeyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
           modStateFlags: ModifierCodes.LALT,
           baseLayout: 'us'
         },
@@ -188,7 +189,7 @@ describe("app/browser: hardware event processing", () => {
           modifierSet: PhysicalInputEventSpec.modifierCodes.Shift,
           location: 1
         }) as any as KeyboardEvent, {
-          activeKeyboard: new Keyboard({ KM: 1 }),
+          activeKeyboard: new JSKeyboard({ KM: 1 }),
           modStateFlags: 0,
           baseLayout: 'us'
         },
@@ -206,7 +207,7 @@ describe("app/browser: hardware event processing", () => {
           keyCode: KeyCodes.K_A,
           modifierSet: 0
         }) as any as KeyboardEvent, {
-          activeKeyboard: new Keyboard({ KM: 1 }),
+          activeKeyboard: new JSKeyboard({ KM: 1 }),
           modStateFlags: 0,
           baseLayout: 'us'
         },
@@ -227,7 +228,7 @@ describe("app/browser: hardware event processing", () => {
           modifierSet: PhysicalInputEventSpec.modifierCodes.Shift,
           location: 1
         }) as any as KeyboardEvent, {
-          activeKeyboard: new Keyboard({ KM: undefined }),
+          activeKeyboard: new JSKeyboard({ KM: undefined }),
           modStateFlags: 0,
           baseLayout: 'us'
         },
@@ -245,7 +246,7 @@ describe("app/browser: hardware event processing", () => {
           keyCode: KeyCodes.K_A,
           modifierSet: 0
         }) as any as KeyboardEvent, {
-          activeKeyboard: new Keyboard({ KM: undefined }),
+          activeKeyboard: new JSKeyboard({ KM: undefined }),
           modStateFlags: 0,
           baseLayout: 'us'
         },
@@ -264,7 +265,7 @@ describe("app/browser: hardware event processing", () => {
           modifierSet: PhysicalInputEventSpec.modifierCodes.Alt,
           location: 0
         }) as any as KeyboardEvent, {
-          activeKeyboard: new Keyboard({ KM: undefined }),
+          activeKeyboard: new JSKeyboard({ KM: undefined }),
           // Internally assumes that the ALT-press event was previously handled, with this as
           // the resulting modifier state at the time of key-press.
           modStateFlags: ModifierCodes.LALT,
@@ -298,7 +299,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM: 0}),
+          new JSKeyboard({KM: 0}),
           'us'
         );
 
@@ -317,7 +318,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM: 0}),
+          new JSKeyboard({KM: 0}),
           'us'
         );
 
@@ -336,7 +337,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM: 0}),
+          new JSKeyboard({KM: 0}),
           'us'
         );
 
@@ -355,7 +356,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM: 0}),
+          new JSKeyboard({KM: 0}),
           'us'
         );
 
@@ -376,7 +377,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+          new JSKeyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
           'us'
         );
 
@@ -395,7 +396,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+          new JSKeyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
           'us'
         );
 
@@ -414,7 +415,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+          new JSKeyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
           'us'
         );
 
@@ -433,7 +434,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+          new JSKeyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
           'us'
         );
 
@@ -454,7 +455,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM:1}),
+          new JSKeyboard({KM:1}),
           'us'
         );
 
@@ -477,7 +478,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM:1}),
+          new JSKeyboard({KM:1}),
           'us'
         );
 
@@ -503,7 +504,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM:undefined}),
+          new JSKeyboard({KM:undefined}),
           'us'
         );
 
@@ -527,7 +528,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM:undefined}),
+          new JSKeyboard({KM:undefined}),
           'us'
         );
 
@@ -551,7 +552,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM:undefined}),
+          new JSKeyboard({KM:undefined}),
           'us'
         );
 
@@ -578,7 +579,7 @@ describe("app/browser: hardware event processing", () => {
 
         const finalKeyEvent = processForMnemonicsAndLegacy(
           baseKeyEvent,
-          new Keyboard({KM:undefined}),
+          new JSKeyboard({KM:undefined}),
           'us'
         );
 
