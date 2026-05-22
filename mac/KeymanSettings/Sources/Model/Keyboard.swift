@@ -88,7 +88,7 @@ public class Keyboard: Identifiable, Hashable, Equatable {
     return settingsKey
   }
   
-  // TODO: "throw/handle error if no kmx file found in directory
+  // TODO-MAC-CONFIG: "throw/handle error if no kmx file found in directory
   /**
    * validate whether a corresponding kmx file exists for this keyboard
    */

@@ -72,7 +72,7 @@ public class SettingsContainer : ObservableObject {
     self.installedPackages = []
   }
   
-  // TODO: delete test code
+  // TODO-MAC-CONFIG: delete test code
   public func debug() {
     self.installedPackages .forEach { package in
       package.keyboards.forEach { keyboard in

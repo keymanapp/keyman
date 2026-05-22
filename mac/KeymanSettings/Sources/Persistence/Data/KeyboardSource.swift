@@ -30,8 +30,9 @@ public struct KeyboardSource: Identifiable, Decodable, Hashable, Equatable {
     
     let name = try container.decodeIfPresent(String.self, forKey: .name)
     let id = try container.decodeIfPresent(String.self, forKey: .id)
-    
-    // Invalidation: name & id required and non-empty
+    let version = try container.decodeIfPresent(String.self, forKey: .version)
+
+    // Invalidation: name, id and version required and non-empty
     guard let validName = name, !validName.isEmpty else {
       throw DecodingError.dataCorruptedError(
         forKey: .name,
@@ -47,10 +48,18 @@ public struct KeyboardSource: Identifiable, Decodable, Hashable, Equatable {
         debugDescription: "Keyboard.id is required and cannot be empty."
       )
     }
-    
+ 
+    guard let validVersion = version, !validVersion.isEmpty else {
+      throw DecodingError.dataCorruptedError(
+        forKey: .version,
+        in: container,
+        debugDescription: "Keyboard.version is required and cannot be empty."
+      )
+    }
+
     self.name = validName
     self.id = validId
-    self.version = try container.decodeIfPresent(String.self, forKey: .version)
+    self.version = validVersion
     self.oskFont = try container.decodeIfPresent(String.self, forKey: .oskFont)
     self.displayFont = try container.decodeIfPresent(String.self, forKey: .displayFont)
     self.languages = try container.decodeIfPresent([LanguageSource].self, forKey: .languages)

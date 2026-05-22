@@ -74,7 +74,7 @@ public class PackageRepository: PackageRepo {
     }
   }
   
-  // TODO: delete
+  // TODO-MAC-CONFIG: delete
   /**
    * for group container testing purposes to check directory access
    */

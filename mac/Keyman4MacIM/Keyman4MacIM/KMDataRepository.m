@@ -10,10 +10,11 @@
 
 #import "KMDataRepository.h"
 #import "KMLogs.h"
-
-// the name of the app group shared by the Keyman input method and the Keyman configuration app
-// an iOS-style app group of this name is defined for Keyman on developer.apple.com and linked
-// to the each app's provisioning profile
+/**
+ * the name of the iOS-style app group shared by the Keyman input method and the Keyman configuration app
+ * (Mac apps are now using iOS-style app groups that begin with 'group')
+ * It is defined for Keyman on developer.apple.com and linked to the provisioning profile for both apps.
+ */
 NSString *const kKeymanGroupId = @"group.com.keyman";
 
 @interface KMDataRepository ()

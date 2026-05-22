@@ -20,12 +20,17 @@
  * Only one of these keyboards can be selected at a time, and the selected keyboard is the one that
  * is actively being applied by Keyman with each keystroke.
  */
+// the list of keyboards displayed in the Keyman keyboards menu, Keyman 18 and earlier
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
+// the list of keyboards displayed in the Keyman keyboards menu, as of Keyman 19
 NSString *const kEnabledKeyboardsKey = @"KMEnabledKeyboardsKey";
-
+// the single keyboard Keyman is currently using to process each keydown event
 NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
+// the maps of options saved for each keyboard
 NSString *const kPersistedOptionsKey = @"KMPersistedOptionsKey";
+// whether the OSK should be displayed when Keyman is activated
 NSString *const kShowOskOnActivate = @"KMShowOskOnActivate";
+// internal flag used for testing Sentry
 NSString *const kForceSentryError = @"KMForceSentryError";
 
 /**
@@ -191,7 +196,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   }
 }
 
-// TODO: remove if obsolete
+// TODO-MAC-CONFIG: remove if obsolete
 /**
  * If the selectedKeyboard has not been set, then the settings have not been saved in the UserDefaults.
  * If this method is called after applicationDidFinishLaunching, then it will always return true.

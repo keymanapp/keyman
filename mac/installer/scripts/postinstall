@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "executed postinstall"
+echo "Keyman for Mac: postinstall script"
 
 # Get the actual user currently logged into the console
 # This works even if the installer is run with sudo or as root

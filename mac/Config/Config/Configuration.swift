@@ -11,7 +11,7 @@ import SwiftUI
 import Combine
 import KeymanSettings
 
-// TODO: delete after adding installation class
+// TODO-MAC-CONFIG: delete after adding installation class
 
 public class Configuration : ObservableObject {
   //@Published public var keyboardPackages: [KeymanPackage]

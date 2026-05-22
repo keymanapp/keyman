@@ -11,8 +11,6 @@ import KeymanSettings
 
 struct ConfigView: View {
   @EnvironmentObject var settings: SettingsContainer
-  // selectedItem cannot be used with .enumerated
-  //@State private var selectedItem: KeymanPackage?
   
   var body: some View {
     VStack {
