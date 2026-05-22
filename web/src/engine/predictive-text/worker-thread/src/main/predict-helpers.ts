@@ -202,7 +202,8 @@ export function determineTraversallessCorrectionSequences(
   const tokenization = tokenizer(context); // issue at present if no tokens exist!
   const tokenMapper = (t: models.Token) => {
     return {
-      exampleInput: t.text
+      exampleInput: t.text,
+      codepointLength: KMWString.length(t.text)
     } as ContextTokenLike;
   }
 

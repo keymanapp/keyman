@@ -46,9 +46,9 @@ const testModel = new DummyModel({
 });
 
 describe('determineTraversallessCorrectionSequences', () => {
-  it(`creates an 'exact'-match suggestion based on primary input and current context`, () => {
+  it(`processes standard-case corrections correctly - text appended to existing token`, () => {
     const context: Context = {
-      left: 'iphon',
+      left: 'I want an iPhon',
       right: '',
       startOfBuffer: true,
       endOfBuffer: true
@@ -72,7 +72,7 @@ describe('determineTraversallessCorrectionSequences', () => {
         ...entry.rootContext, casingForm: entry.rootContext.casingForm ?? undefined
       }, {
         casingForm: undefined,
-        left: '',
+        left: 'I want an ',
         right: '',
         startOfBuffer: true,
         endOfBuffer: true
@@ -81,7 +81,7 @@ describe('determineTraversallessCorrectionSequences', () => {
 
     assert.deepEqual(entry.tokenizedCorrection, [{
       sample: {
-        insert: 'iphone',
+        insert: 'iPhone',
         deleteLeft: 0
       },
       p: 1
