@@ -1,6 +1,4 @@
 
-#include "pch.h"
-
 #define CRC32_POLYNOMIAL 0xEDB88320
 
 unsigned long CRCTable[256];
