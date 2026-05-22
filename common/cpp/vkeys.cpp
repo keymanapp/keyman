@@ -16,8 +16,11 @@
   History:          22 Mar 2010 - mcdurdin - Compiler fixup - tidy up
 */
 
-#include "pch.h"
 #include "../include/vkeys.h"
+
+#ifndef USE_CHAR16_T
+#define lpuch(x) x
+#endif
 
 const VKEY_CHAR* VKeyNames[256] = {
 // Key Codes

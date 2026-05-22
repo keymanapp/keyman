@@ -66,11 +66,11 @@ const
   URLPath_Community = '/go/'+SKeymanVersion+'/community';
 
   // Keyboard download and installation
-  URLPath_RegEx_MatchKeyboardsInstall = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.local)?/keyboards/install/([^?/]+)(?:\?(.+))?$';
+  URLPath_RegEx_MatchKeyboardsInstall = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.localhost)?/keyboards/install/([^?/]+)(?:\?(.+))?$';
                                   // e.g. https://keyman.com/keyboards/install/foo
-  UrlPath_RegEx_MatchKeyboardsRoot = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.local)?/keyboards([/?].*)?$';
-                               // e.g. http://keyman.com.local/keyboards/foo
-  UrlPath_RegEx_MatchKeyboardsGo = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.local)?/go/windows/[^/]+/download-keyboards';
+  UrlPath_RegEx_MatchKeyboardsRoot = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.localhost)?/keyboards([/?].*)?$';
+                               // e.g. http://keyman.com.localhost/keyboards/foo
+  UrlPath_RegEx_MatchKeyboardsGo = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.localhost)?/go/windows/[^/]+/download-keyboards';
                              // e.g. https://keyman-staging.com/go/windows/14.0/download-keyboards?version=14.0.146.0
 
   // Cloning keyboards - Keyman Developer
