@@ -174,6 +174,7 @@ function phaseSentryDsymUpload() {
 function logScriptsToFile() {
   local SCRIPT_LOG="$KEYMAN_ROOT/xcodebuild-scripts.log"
   exec >> "$SCRIPT_LOG" 2>&1
+  echo "Logging xcode build phase script to $KEYMAN_ROOT/xcodebuild-scripts.log"
 }
 
 logScriptsToFile

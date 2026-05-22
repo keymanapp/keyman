@@ -6,7 +6,7 @@
  * Abstraction for XML reading and writing
  */
 
-import { XMLParser, XMLBuilder, XMLMetaData, X2jOptions, XmlBuilderOptions } from 'fast-xml-parser';
+import { XMLParser, XMLBuilder, XMLMetaData, X2jOptions, XmlBuilderOptions, JPathOrMatcher } from 'fast-xml-parser';
 import { SymbolUtils } from "./symbol-utils.js";
 
 /** Symbol giving the start offset, in chars, of the node */
@@ -33,9 +33,9 @@ const PARSER_COMMON_OPTIONS: X2jOptions = {
   ignoreAttributes: false,
   ignorePiTags: true,
   numberParseOptions: { // TODO: query is this option really necessary?
-    eNotation: null,
-    hex: null,
-    leadingZeros: null,
+    eNotation: false,
+    hex: false,
+    leadingZeros: false,
     skipLike: /(?:)/, // parse numbers as strings
   },
   textNodeName: '_',
@@ -47,7 +47,7 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     attributeNamePrefix: '@__', // We'll use this to convert attributes to strings and subobjects to arrays, when empty.
     htmlEntities: true,
     ignoreAttributes: false, // We'd like attributes, please
-    tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
+    tagValueProcessor: (_tagName: string, tagValue: string /*, _jPathOrMatcher: JPathOrMatcher, _hasAttributes: boolean, _isLeafNode: boolean*/) => {
       // since trimValues: false, we need to zap any element values that would be trimmed.
       // currently, the LDML spec doesn't have any element values, but this
       // future-proofs us a little in that element values are allowed, just trimmed.
@@ -73,11 +73,11 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
   },
   'kvks': {
     ...PARSER_COMMON_OPTIONS,
-    tagValueProcessor: (_tagName: string, tagValue: string, _jPath: string, _hasAttributes: boolean, isLeafNode: boolean) : string | undefined => {
+    tagValueProcessor: (_tagName: string, tagValue: string, _jPathOrMatcher: JPathOrMatcher, _hasAttributes: boolean, isLeafNode: boolean) : unknown => {
       if (!isLeafNode) {
         return tagValue?.trim(); // trimmed value
       } else {
-        return null;  // no change to leaf nodes
+        return undefined;  // no change to leaf nodes
       }
     },
     trimValues: false, // preserve spaces
