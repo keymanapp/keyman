@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.237 alpha 2026-05-22
+
+* fix(windows): Ensure default locale always appears in list of locales (#15984)
+* chore(ios): update First Voices distribution certificate (#15993)
+
 ## 19.0.236 alpha 2026-05-21
 
 * docs(developer): write up basic internal docs on kmc modules (#15982)
