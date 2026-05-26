@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.238 alpha 2026-05-26
+
+* maint(linux): Don't block merge if source verification check fails (#16010)
+* maint(linux): fix Linux source tarball (#16011)
+
 ## 19.0.237 alpha 2026-05-22
 
 * fix(windows): Ensure default locale always appears in list of locales (#15984)
