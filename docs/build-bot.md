@@ -138,10 +138,11 @@ well).
 It is important to note that the Build-bot trailers are read when builds are
 triggered, which happens within 2 minutes of a PR being opened or commits being
 pushed. Editing the PR body after the build trigger has run will have no effect
-on existing builds, until another commit is pushed, or the test build trigger is
-run manually from TeamCity. Thus, do not rely on editing the PR body after PR
-creation to control the build bot; either include your build bot trailers in
-commit messages, or include them in the PR body submitted when creating the PR.
+on existing builds, until another commit is pushed, or the "Trigger Test Builds"
+build configuration is run manually from TeamCity. Thus, do not rely on editing
+the PR body after PR creation to control the build bot; either include your
+build bot trailers in commit messages, or include them in the PR body submitted
+when creating the PR.
 
 ## Interactions with Test Bot
 

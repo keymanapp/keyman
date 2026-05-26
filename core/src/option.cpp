@@ -39,3 +39,18 @@ option::release() {
   value = nullptr;
   return opt;
 }
+
+km_core_option_item *
+km::core::clone_options(km_core_option_item const *src) {
+  if (!src) {
+    return nullptr;
+  }
+  size_t count = km_core_options_list_size(src);
+  km_core_option_item *result = new km_core_option_item[count + 1];
+  for (size_t i = 0; i < count; ++i) {
+    km::core::option opt(static_cast<km_core_option_scope>(src[i].scope), src[i].key, src[i].value);
+    result[i] = opt.release();
+  }
+  result[count] = KM_CORE_OPTIONS_END;
+  return result;
+}

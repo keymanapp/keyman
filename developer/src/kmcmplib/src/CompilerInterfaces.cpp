@@ -2,8 +2,10 @@
 #include <kmcmplibapi.h>
 #include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
-#include "../../../../common/windows/cpp/include/ConvertUTF.h"
 #include "CompileKeyboardBuffer.h"
+
+#define UTF8Sig "\xEF\xBB\xBF"
+#define UTF16Sig "\xFF\xFE"
 
 EXTERN bool kmcmp_CompileKeyboard(
   const char* pszInfile,
