@@ -34,6 +34,7 @@ import { MAX_EDIT_THRESHOLD_FACTOR } from "./search-quotient-spur.js";
 export type TokenResult = {
   matchString: string,
   inputSamplingCost: number,
+  inputCount: number,
   knownCost: number,
   totalCost: number
 }
@@ -196,6 +197,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
       this._generatedTokenResults.set(uncorrectable.spaceId, {
         matchString: lockedResult.text,
         inputSamplingCost: -Math.log(lockedResult.p),
+        inputCount: uncorrectable.inputCount,
         knownCost: 0,
         totalCost: -Math.log(lockedResult.p)
       });
@@ -300,6 +302,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
         this._generatedTokenResults.set(correctableToUpdate.spaceId, {
           matchString: lockedResult.text,
           inputSamplingCost: -Math.log(lockedResult.p),
+          inputCount: correctableToUpdate.inputCount,
           knownCost: MAX_EDIT_THRESHOLD_FACTOR, // we'll use the same threshold at which further search is terminated.
           totalCost: -Math.log(lockedResult.p) + MAX_EDIT_THRESHOLD_FACTOR * EDIT_DISTANCE_COST_SCALE
         });

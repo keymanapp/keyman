@@ -197,7 +197,6 @@ export function determineTraversallessCorrectionSequences(
   let returnedPredictionData: PredictionParameters[] = [];
 
   const tokenizer = determineModelTokenizer(lexicalModel);
-  const wordbreak = determineModelWordbreaker(lexicalModel);
 
   const tokenization = tokenizer(context); // issue at present if no tokens exist!
   const tokenMapper = (t: models.Token) => {
@@ -216,14 +215,25 @@ export function determineTraversallessCorrectionSequences(
     const postTokenization = tokenizer(postContext);
 
     const transitionEffects = determineSuggestionRange(tokenization.left.map(tokenMapper), postTokenization.left.map(tokenMapper), (a, b) => a.exampleInput == b.exampleInput);
-    const match: TokenResult = {
-      matchString: wordbreak(postContext),
-      inputSamplingCost: -Math.log(correction.p),
-      knownCost: 0,
-      totalCost: -Math.log(correction.p)
-    };
+    transitionEffects.transitionId = correction.sample.id;
 
-    const suggestionParams = buildCorrectionSequence(transitionEffects, context, match, 1);
+    // Build _multiple_ tokens to function as fake `TokenizationCorrector`
+    // results in order to generate a correction-root sequence.
+    const correctionRoots = transitionEffects.tokensToPredict.map((token, index) => {
+      const match: TokenResult = {
+        matchString: token.exampleInput,
+        // Key part:  should be > 1 if the token is longer than just the most recent insert.
+        // Any extra tokens are only affected by the current input.
+        inputCount: index == 0 ? Math.max(1, KMWString.length(token.exampleInput) + 1 - KMWString.length(correction.sample.insert)) : 1,
+        inputSamplingCost: -Math.log(correction.p),
+        knownCost: 0,
+        totalCost: -Math.log(correction.p)
+      };
+
+      return match;
+    });
+
+    const suggestionParams = buildCorrectionSequence(transitionEffects, context, correctionRoots[correctionRoots.length - 1]);
 
     const tokenizationMapping = mapWhitespacedTokenization(tokenization.left.map((t) => { return {exampleInput: t.text, codepointLength: KMWString.length(t.text)} }), lexicalModel, correction.sample);
     const tokenizedCorrection = tokenizationMapping.tokenizedTransform;
@@ -449,7 +459,6 @@ export function buildCorrectionSequence(
   transitionEffects: ReturnType<typeof determineSuggestionRange>,
   context: Context,
   match: Readonly<TokenResult>,
-  costFactor: number
 ) {
   const { deleteLeft } = transitionEffects;
 
@@ -460,6 +469,21 @@ export function buildCorrectionSequence(
     insert: match.matchString,  // insert correction string
     deleteLeft: 0,
   }
+
+  /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
+    * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+    * there are significantly more likely words.  We only need this to allow very minor fat-finger
+    * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+    * key borders.
+    *
+    * Technically, the probabilities this produces won't be normalized as-is... but there's no
+    * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+    * to apply it could become tricky, so it's simpler to leave out.
+    *
+    * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+    * is needed in the future.
+    */
+  const costFactor = (match.inputCount <= 1) ? ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT : 1;
 
   const rootCost = match.totalCost;
   const predictionRoot = {
@@ -483,20 +507,17 @@ export function buildCorrectionSequence(
  * generated.
  * @param match         The generated correction itself - the correction string
  * and its cost
- * @param costFactor    A multiplicative factor used to adjust the cost when
- * building prediction probabilities.
  * @returns
  */
 export function determineTokenizedCorrectionSequence(
   transition: ContextTransition,
   tokenization: ContextTokenization,
-  match: Readonly<TokenResult>,
-  costFactor: number
+  match: Readonly<TokenResult>
 ): PredictionParameters {
   const applicationTarget = transition.base.displayTokenization;
   const transitionParams = determineSuggestionRange(applicationTarget.tokens, tokenization.tokens, (a, b) => a.spaceId == b.spaceId);
 
-  const suggestionParams = buildCorrectionSequence(transitionParams, transition.base.context, match, costFactor);
+  const suggestionParams = buildCorrectionSequence(transitionParams, transition.base.context, match);
 
   // The correction should always be based on the most recent external
   // transform/transcription ID.
@@ -620,28 +641,13 @@ export async function correctAndEnumerate(
       continue;
     }
 
-    /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
-     * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
-     * there are significantly more likely words.  We only need this to allow very minor fat-finger
-     * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
-     * key borders.
-     *
-     * Technically, the probabilities this produces won't be normalized as-is... but there's no
-     * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
-     * to apply it could become tricky, so it's simpler to leave out.
-     *
-     * Worst-case, it's possible to temporarily add normalization if a code deep-dive
-     * is needed in the future.
-     */
-    const costFactor = (tokenization.tail.inputCount <= 1) ? ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT : 1;
-
-    const predictionPrep = determineTokenizedCorrectionSequence(transition, tokenization, match, costFactor);
+    const predictionPrep = determineTokenizedCorrectionSequence(transition, tokenization, match);
     const predictions = predictFromCorrectionSequence(lexicalModel, predictionPrep.tokenizedCorrection, predictionPrep.rootContext, transition.transitionId);
     predictions.forEach((p) => predictionPrep.applyInPost(p));
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
-    if(predictions.length > 0 && bestCorrectionCost === undefined) {
-      bestCorrectionCost = match.totalCost * costFactor;
+    if(predictions.length > 0 && (bestCorrectionCost === undefined || bestCorrectionCost > match.totalCost)) {
+      bestCorrectionCost = match.totalCost;
     }
 
     // If we're getting the same prediction again, it's lower-cost.  Update!
