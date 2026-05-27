@@ -16,28 +16,24 @@ mac_verify_on_mac
 
 ### SET PATHS ###
 
-IM_NAME="Keyman4MacIM"
-CONFIGAPP_NAME="Keyman Configuration"
-XCODE_PROJ_EXT=".xcodeproj"
+INPUT_METHOD_DIR_NAME="Keyman4MacIM"
 XCODE_WORKSPACE_EXT=".xcworkspace"
 PRODUCT_NAME="Keyman"
 
-KEYMAN_MAC_BASE_PATH="${KEYMAN_ROOT}/mac"
-KM4MIM_BASE_PATH="${KEYMAN_MAC_BASE_PATH}/${IM_NAME}"
+KEYMAN_BUILD_PATH="${KEYMAN_ROOT}/mac/build"
+INPUT_METHOD_BASE_PATH="${KEYMAN_ROOT}/mac/${INPUT_METHOD_DIR_NAME}"
 
-KMIM_WORKSPACE_PATH="${KM4MIM_BASE_PATH}/${IM_NAME}${XCODE_WORKSPACE_EXT}"
-KEYMAN_WORKSPACE_PATH="${KEYMAN_MAC_BASE_PATH}/${PRODUCT_NAME}${XCODE_WORKSPACE_EXT}"
+KEYMAN_WORKSPACE_PATH="${KEYMAN_ROOT}/mac/${PRODUCT_NAME}${XCODE_WORKSPACE_EXT}"
+INPUT_METHOD_WORKSPACE_PATH="${INPUT_METHOD_BASE_PATH}/${INPUT_METHOD_DIR_NAME}${XCODE_WORKSPACE_EXT}"
 
-# --- Configuration ---
-#INPUT_METHOD_NAME="Keyman.app"
-INSTALL_IM_BUNDLE_ID="com.keyman.im.installer"
-INSTALL_CONFIG_BUNDLE_ID="com.keyman.config.installer"
-
-# publish to path similar to that for .dmg so teamcity will show in artifacts
-#OUTPUT_DIRECTORY_PATH="${KEYMAN_MAC_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
-OUTPUT_DIRECTORY_PATH="${KM4MIM_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
+# publish the package to the same path as the original .dmg so teamcity will show in artifacts
+OUTPUT_DIRECTORY_PATH="${INPUT_METHOD_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
 PACKAGE_NAME="Keyman-${KEYMAN_VERSION_FOR_FILENAME}.pkg"
 OUTPUT_PACKAGE_PATH="${OUTPUT_DIRECTORY_PATH}/${PACKAGE_NAME}"
+
+# bundle IDs for installer packages
+INSTALL_INPUT_METHOD_BUNDLE_ID="com.keyman.im.installer"
+INSTALL_CONFIG_BUNDLE_ID="com.keyman.config.installer"
 
 # ---------------------
 
@@ -49,12 +45,23 @@ function do_build() {
   builder_echo "build and package of Keyman installer complete"
 }
 
+function do_clean() {
+  builder_echo "cleaning Keyman installer..."
+  rm -rf "${KEYMAN_BUILD_PATH}/Config.xcarchive"
+  rm -rf "${KEYMAN_BUILD_PATH}/Keyman.xcarchive"
+  rm -rf "${KEYMAN_BUILD_PATH}/ConfigExport"
+  rm -rf "${KEYMAN_BUILD_PATH}/KeymanExport"
+  rm -rf "${KEYMAN_BUILD_PATH}/keyman-config.pkg"
+  rm -rf "${KEYMAN_BUILD_PATH}/keyman-input-method.pkg"
+  rm -rf "${INPUT_METHOD_BASE_PATH}/output/"
+}
+
 function archive_apps() {
   # xcodebuild for x86_64 and arm64 (universal binary)
-  mac_xcodebuild archive -workspace "$KMIM_WORKSPACE_PATH" \
+  mac_xcodebuild archive -workspace "$INPUT_METHOD_WORKSPACE_PATH" \
           -scheme Keyman \
           -configuration Release \
-          -archivePath ../build/Keyman.xcarchive \
+          -archivePath "${KEYMAN_BUILD_PATH}/Keyman.xcarchive" \
           ARCHS=\"arm64 x86_64\" \
           ONLY_ACTIVE_ARCH=NO
 
@@ -62,37 +69,37 @@ function archive_apps() {
   mac_xcodebuild archive -workspace "$KEYMAN_WORKSPACE_PATH" \
           -scheme Config \
           -configuration Release \
-          -archivePath ../build/Config.xcarchive \
+          -archivePath "${KEYMAN_BUILD_PATH}/Config.xcarchive" \
           ARCHS=\"arm64 x86_64\" \
           ONLY_ACTIVE_ARCH=NO
 }
 
 function export_apps() {
-  mac_xcodebuild -exportArchive -archivePath ../build/Keyman.xcarchive \
+  mac_xcodebuild -exportArchive -archivePath "${KEYMAN_BUILD_PATH}/Keyman.xcarchive" \
       -exportOptionsPlist ./ExportOptions.plist \
-      -exportPath ../build/KeymanExport
+      -exportPath "${KEYMAN_BUILD_PATH}/KeymanExport"
 
-  mac_xcodebuild -exportArchive -archivePath ../build/Config.xcarchive \
+  mac_xcodebuild -exportArchive -archivePath "${KEYMAN_BUILD_PATH}/Config.xcarchive" \
       -exportOptionsPlist ./ExportOptions.plist \
-      -exportPath ../build/ConfigExport
+      -exportPath "${KEYMAN_BUILD_PATH}/ConfigExport"
 }
 
 function create_packages() {
   builder_echo "packaging Keyman input method"
 
-  pkgbuild --component ../build/KeymanExport/Keyman.app \
+  pkgbuild --component "${KEYMAN_BUILD_PATH}/KeymanExport/Keyman.app" \
       --install-location /tmp \
-      --identifier "$INSTALL_IM_BUNDLE_ID" \
+      --identifier "$INSTALL_INPUT_METHOD_BUNDLE_ID" \
       --scripts ./scripts \
       --version "$KEYMAN_VERSION" \
-      ../build/keyman-input-method.pkg
+      "${KEYMAN_BUILD_PATH}/keyman-input-method.pkg"
 
   builder_echo "packaging Keyman Configuration app"
-  pkgbuild --component "../build/ConfigExport/$CONFIGAPP_NAME.app" \
+  pkgbuild --component "${KEYMAN_BUILD_PATH}/ConfigExport/Keyman Configuration.app" \
       --install-location /Applications \
       --identifier "$INSTALL_CONFIG_BUNDLE_ID" \
       --version "$KEYMAN_VERSION" \
-      ../build/keyman-config.pkg
+      "${KEYMAN_BUILD_PATH}/keyman-config.pkg"
 }
 
 function combine_packages() {
@@ -100,8 +107,8 @@ function combine_packages() {
 
   mkdir -p "$OUTPUT_DIRECTORY_PATH"
 
-  productbuild --package ../build/keyman-input-method.pkg \
-      --package ../build/keyman-config.pkg \
+  productbuild --package "${KEYMAN_BUILD_PATH}/keyman-input-method.pkg" \
+      --package "${KEYMAN_BUILD_PATH}/keyman-config.pkg" \
       --version "$KEYMAN_VERSION" \
       --sign 5FCED4988F27D172C5628A16DBA4AE6CA0015D11 \
       "$OUTPUT_PACKAGE_PATH"
@@ -113,7 +120,7 @@ function combine_packages() {
   xcrun stapler staple "$OUTPUT_PACKAGE_PATH" || builder_die "stapler failed"
 }
 
-# builder_run_action clean ...
-# builder_run_action configure ...
+builder_run_action clean do_clean
+# builder_run_action configure
 builder_run_action build do_build
-# builder_run_action test ...
+# builder_run_action test

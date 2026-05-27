@@ -125,6 +125,7 @@ execBuildCommand() {
 }
 
 do_clean ( ) {
+  builder_launch /mac/installer/build.sh clean
   rm -rf "$KME4M_BASE_PATH/build"
   rm -rf "$KM4MIM_BASE_PATH/build"
   rm -rf "$KMTESTAPP_BASE_PATH/build"
@@ -401,7 +402,7 @@ do_publish() {
 do_create_installer() {
   builder_heading "Creating installer package..."
 
-  ./installer/build.sh build
+  builder_launch /mac/installer/build.sh build
 }
 
 do_publish_installer() {
