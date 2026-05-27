@@ -345,7 +345,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/addKeyboards
    */
-  public addKeyboards(...args: any[]): Promise<(KeyboardStub|ErrorStub)[]> {
+  public async addKeyboards(...args: any[]): Promise<(KeyboardStub|ErrorStub)[]> {
     return this.config.deferForInitialization.then(() => {
       if (!args || !args[0] || args[0].length == 0) {
         // Get the cloud keyboard catalog
@@ -373,7 +373,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/addKeyboardsForLanguage
    **/
-  public addKeyboardsForLanguage(arg: string[]|string) : Promise<(KeyboardStub|ErrorStub)[]> {
+  public async addKeyboardsForLanguage(arg: string[]|string) : Promise<(KeyboardStub|ErrorStub)[]> {
     return this.config.deferForInitialization.then(() => {
       if (typeof arg === 'string') {
         return this.keyboardRequisitioner.addLanguageKeyboards(arg.split(',').map(item => item.trim()));
@@ -497,7 +497,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/removeKeyboards
    */
-  public removeKeyboards(...x: string[]) {
+  public removeKeyboards(...x: string[]): boolean {
     for(let i=0; i < x.length; i++) {
       // This will completely forget the keyboard, requiring an async load operation to restore it again.
       // `true` is responsible for this & is required to pass a variable-store unit test.

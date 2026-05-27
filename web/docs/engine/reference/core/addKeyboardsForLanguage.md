@@ -4,12 +4,13 @@ title: addKeyboardsForLanguage function
 
 ## Summary
 
-Add default or all keyboards for a given language to KeymanWeb.
+Add default or all keyboards for a given language to KeymanWeb. Note that this is an asynchronous
+operation.
 
 ## Syntax
 
 ```js
-keyman.addKeyboardsForLanguage(spec[, spec...])
+async keyman.addKeyboardsForLanguage(spec[, spec...])
 ```
 
 ### Parameters
@@ -31,6 +32,7 @@ The promise is an array containing the following:
 
 * successfully registered keyboard objects which define some or all of these
   [properties](../keyboard_properties)
+* [ErrorStub](../keyboard_registration_errors) objects for keyboards that failed to register
 
 ## Description
 
