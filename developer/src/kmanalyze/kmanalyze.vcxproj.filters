@@ -24,7 +24,7 @@
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\delphi\ext\sentry\sentry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\vkeys.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\include\vkeys.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -41,7 +41,7 @@
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keymansentry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\vkeys.cpp">
+    <ClCompile Include="$(KEYMAN_ROOT)\common\cpp\vkeys.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

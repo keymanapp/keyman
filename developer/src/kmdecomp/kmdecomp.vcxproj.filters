@@ -24,7 +24,7 @@
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keymansentry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\common\windows\cpp\src\vkeys.cpp">
+    <ClCompile Include="..\..\..\common\cpp\vkeys.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
@@ -37,7 +37,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\common\windows\cpp\include\vkeys.h">
+    <ClInclude Include="..\..\..\common\include\vkeys.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">

@@ -4,8 +4,7 @@
 #include <km_types.h>
 #define VKEY_CHAR KMX_UCHAR
 #else
-#define VKEY_CHAR WCHAR
-#define lpuch(x) L ## x
+#define VKEY_CHAR char
 #endif
 
 extern const VKEY_CHAR* VKeyNames[256];
