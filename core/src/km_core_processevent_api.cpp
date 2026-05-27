@@ -37,8 +37,8 @@ km_core_event(
       return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
 
-  km_core_status status = <km_core_state*>(state)->processor().external_event(<km_core_state*>(state), event, data);
-  state->apply_actions_and_merge_app_context();
+  km_core_status status = const_cast<km_core_state*>(state)->processor().external_event(const_cast<km_core_state*>(state), event, data);
+  const_cast<km_core_state*>(state)->apply_actions_and_merge_app_context();
   return status;
 }
 
