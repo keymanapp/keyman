@@ -2,7 +2,7 @@
 
 import { ContextWindow } from "./contextWindow.js";
 import { LanguageProcessor }  from "./languageProcessor.js";
-import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
+import type { ModelSpec, PathConfiguration, PredictionContext }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec, isEmptyTransform } from "keyman/common/web-utils";
 
 import { CoreKeyboardProcessor } from 'keyman/engine/core-processor';
@@ -19,16 +19,28 @@ import {
   type Alternate,
   type KeyEvent,
   KeyboardProcessor,
+  TextTransform,
   VariableStoreSerializer
 } from "keyman/engine/keyboard";
 import {
   JSKeyboardProcessor,
   type ProcessorInitOptions,
+
 } from 'keyman/engine/js-processor';
 
 import { TranscriptionCache } from "./transcriptionCache.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { WorkerFactory } from "@keymanapp/lexical-model-layer";
+
+// Only consider raw-insertion transforms.  Delete-left and delete-right disqualify an
+// incoming transform from reverting post-suggestion whitespace (or similar).
+const transformMatchesPattern = (transform: TextTransform, breakingMarks: string[]) => {
+  if(transform.deleteLeft || transform.deleteRight) {
+    return false;
+  }
+
+  return breakingMarks.find((pattern) => transform.insert == pattern);
+}
 
 export class InputProcessor {
   /**
@@ -104,10 +116,12 @@ export class InputProcessor {
    *
    * @param       {Object}      keyEvent      The abstracted KeyEvent to use for keystroke processing
    * @param       {Object}      textStore  The TextStore receiving the KeyEvent
+   * @param       {Object}      predictionContext  Context for the state of all predictive-text
+   *                                               interactions associated with `outputTarget`
    * @returns     {Object}                    A ProcessorAction object describing the cumulative effects of
    *                                          all matched keyboard rules.
    */
-  processKeyEvent(keyEvent: KeyEvent, textStore: TextStore): ProcessorAction {
+  processKeyEvent(keyEvent: KeyEvent, textStore: TextStore, predictionContext: PredictionContext): ProcessorAction {
     const kbdMismatch = keyEvent.srcKeyboard && this.activeKeyboard != keyEvent.srcKeyboard;
     const trueActiveKeyboard = this.activeKeyboard;
 
@@ -122,6 +136,7 @@ export class InputProcessor {
       if(keyEvent.baseTranscriptionToken) {
         const transcription = this.contextCache.get(keyEvent.baseTranscriptionToken);
         if(transcription) {
+          this.contextCache.rewindTo(keyEvent.baseTranscriptionToken);
           // Has there been a context change at any point during the multitap?  If so, we need
           // to revert it.  If not, we assume it's a layer-change multitap, in which case
           // no such reset is needed.
@@ -143,7 +158,7 @@ export class InputProcessor {
         }
       }
 
-      return this._processKeyEvent(keyEvent, textStore);
+      return this._processKeyEvent(keyEvent, textStore, predictionContext);
     } finally {
       if(kbdMismatch) {
         // Restore our "current" activeKeyboard to its setting before the mismatching KeyEvent.
@@ -159,7 +174,7 @@ export class InputProcessor {
    * @param textStore
    * @returns
    */
-  private _processKeyEvent(keyEvent: KeyEvent, textStore: TextStore): ProcessorAction {
+  private _processKeyEvent(keyEvent: KeyEvent, textStore: TextStore, predictionContext: PredictionContext): ProcessorAction {
     const formFactor = keyEvent.device.formFactor;
 
     // The default OSK layout for desktop devices does not include nextlayer info, relying on
@@ -186,21 +201,6 @@ export class InputProcessor {
       return new ProcessorAction();
     }
 
-    // If suggestions exist AND space is pressed, accept the suggestion and do not process the keystroke.
-    // If a suggestion was just accepted AND backspace is pressed, revert the change and do not process the backspace.
-    // We check the first condition here, while the prediction UI handles the second through the try__() methods below.
-    if(this.languageProcessor.isActive) {
-      // The following code relies on JS's logical operator "short-circuit" properties to prevent unwanted triggering of the second condition.
-
-      // Can the suggestion UI revert a recent suggestion?  If so, do that and swallow the backspace.
-      if((keyEvent.kName == "K_BKSP" || keyEvent.Lcode == Codes.keyCodes["K_BKSP"]) && this.languageProcessor.tryRevertSuggestion()) {
-        return new ProcessorAction();
-        // Can the suggestion UI accept an existing suggestion?  If so, do that and swallow the space character.
-      } else if((keyEvent.kName == "K_SPACE" || keyEvent.Lcode == Codes.keyCodes["K_SPACE"]) && this.languageProcessor.tryAcceptSuggestion('space')) {
-        return new ProcessorAction();
-      }
-    }
-
     // // ...end I3363 (Build 301)
 
     // Create a backup of the current textStore in its pre-input state.
@@ -212,6 +212,11 @@ export class InputProcessor {
     // We presently need the true keystroke to run on the FULL context.  That index is still
     // needed for some indexing operations when comparing two different textStores.
     let processorAction = this.keyboardProcessor.processKeystroke(keyEvent, textStore);
+
+    // Check to see if the incoming keystroke should revert the appended component of an
+    // immediately-preceding applied Suggestion.
+    const autoBreakingProcessorAction = this.doPredictiveAutoBreaking(processorAction, textStore, predictionContext);
+    processorAction = autoBreakingProcessorAction ?? processorAction;
 
     // Swap layer as appropriate.
     if(keyEvent.kNextLayer) {
@@ -285,6 +290,14 @@ export class InputProcessor {
     // Yes, even for processorAction.triggersDefaultCommand.  Those tend to change the context.
     processorAction.predictionPromise = this.languageProcessor.predict(processorAction.transcription, this.keyboardProcessor.layerId);
 
+    if(autoBreakingProcessorAction) {
+      // We need a separate prediction request for this case; we don't want to
+      // replace the results of a appended-transform that auto-accepted a
+      // suggestion.  New suggestions should be done from the current state,
+      // without affecting the results of this keystroke.
+      this.languageProcessor.predictFromTarget(textStore, this.keyboardProcessor.layerId);
+    }
+
     // Text did not change (thus, no text "input") if we tabbed or merely moved the caret.
     if(!processorAction.triggersDefaultCommand) {
       // For DOM-aware textStores, this will trigger a DOM event page designers may listen for.
@@ -342,9 +355,6 @@ export class InputProcessor {
         // Reasoning for the selected value may be seen there.  Short version - keystrokes
         // that _appear_ very precise may otherwise not even consider directly-neighboring keys.
         const KEYSTROKE_EPSILON = Math.exp(-5);
-
-        // Sort the distribution into probability-descending order.
-        keyDistribution.sort((a, b) => b.p - a.p);
 
         alternates = [];
 

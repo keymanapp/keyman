@@ -15,14 +15,22 @@ import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { getKeymanRoot } from 'keyman/test/resources';
 
 const KEYMAN_ROOT = getKeymanRoot();
+import { ModelSpec } from 'keyman/engine/interfaces';
+import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+
+declare global {
+  var keyman: typeof MinimalKeymanGlobal;
+}
 
 // Required initialization setup.
-global.keyman = {}; // So that keyboard-based checks against the global `keyman` succeed.
-                    // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
+//
+// So that keyboard-based checks against the global `keyman` succeed. 10.0+
+// dependent keyboards, like khmer_angkor, will otherwise fail to load.
+global.keyman = MinimalKeymanGlobal;
 
 // Test the JSKeyboardProcessor interface.
 describe('LanguageProcessor', function() {
-  let languageProcessor;
+  let languageProcessor: LanguageProcessor;
   const callbacks = new TestCompilerCallbacks(this);
 
   beforeEach(function() {
@@ -57,19 +65,18 @@ describe('LanguageProcessor', function() {
     it('has expected default values after initialization', function () {
       // These checks are lifted from the keyboard init checks found in
       // web/src/test/auto/headless/engine/js-processor/basic-init.js.
-      assert.isDefined(languageProcessor.lmEngine);
       assert.isUndefined(languageProcessor.activeModel);
       assert.isFalse(languageProcessor.isActive);
       assert.isTrue(languageProcessor.mayPredict);
 
       // Some aspects of initialization must wait until after construction and overall
       // load of the core.  See /web/source/kmwbase.ts, in the final IIFE.
-      assert.isOk(languageProcessor.lmEngine);
+      assert.isTrue(languageProcessor.canEnable);
     });
   });
 
   describe('.predict', function() {
-    let compiler = null;
+    let compiler: LexicalModelCompiler = null;
 
     this.beforeAll(async function() {
       compiler = new LexicalModelCompiler();
@@ -82,7 +89,8 @@ describe('LanguageProcessor', function() {
     const PATH = path.join(`${KEYMAN_ROOT}/developer/src/kmc-model/test/fixtures`, MODEL_ID);
 
     describe('using angle brackets for quotes', function() {
-      let modelCode = null, modelSpec = null;
+      let modelCode: string = null;
+      let modelSpec: ModelSpec = null;
       this.beforeAll(function() {
         modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
           format: 'trie-1.0',
@@ -114,12 +122,14 @@ describe('LanguageProcessor', function() {
         let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
         languageProcessor.loadModel(modelSpec).then(function() {
-          languageProcessor.predict(transcription).then(function(suggestions) {
+          languageProcessor.predict(transcription, 'default').then(function(suggestions) {
             assert.isOk(suggestions);
             assert.equal(suggestions[0].displayAs, '«li»');
-            assert.equal(suggestions[0].transform.insert, 'li ');
+            assert.equal(suggestions[0].transform.insert, 'li');
+            assert.equal(suggestions[0].appendedTransform.insert, ' ');
             assert.equal(suggestions[1].displayAs, 'like');
-            assert.equal(suggestions[1].transform.insert, 'like ');
+            assert.equal(suggestions[1].transform.insert, 'like');
+            assert.equal(suggestions[1].appendedTransform.insert, ' ');
             done();
           }).catch(done);
         }).catch(function() {
@@ -129,7 +139,8 @@ describe('LanguageProcessor', function() {
       });
 
       describe('properly cases generated suggestions', function() {
-        let modelCode = null, modelSpec = null;
+      let modelCode: string = null;
+      let modelSpec: ModelSpec = null;
         this.beforeAll(function () {
           modelCode = compiler.generateLexicalModelCode(MODEL_ID, {
             format: 'trie-1.0',
@@ -151,10 +162,11 @@ describe('LanguageProcessor', function() {
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
-              languageProcessor.predict(transcription).then(function(suggestions) {
+              languageProcessor.predict(transcription, 'default').then(function(suggestions) {
                 assert.isOk(suggestions);
                 assert.equal(suggestions[1].displayAs, 'like');
-                assert.equal(suggestions[1].transform.insert, 'like ');
+                assert.equal(suggestions[1].transform.insert, 'like');
+                assert.equal(suggestions[1].appendedTransform.insert, ' ');
                 done();
               }).catch(done);
             }).catch(function() {
@@ -168,11 +180,12 @@ describe('LanguageProcessor', function() {
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
-              languageProcessor.predict(transcription).then(function(suggestions) {
+              languageProcessor.predict(transcription, 'default').then(function(suggestions) {
                 // The source suggestion is simply 'like'.
                 assert.isOk(suggestions);
                 assert.equal(suggestions[1].displayAs, 'like');
-                assert.equal(suggestions[1].transform.insert, 'like ');
+                assert.equal(suggestions[1].transform.insert, 'like');
+                assert.equal(suggestions[1].appendedTransform.insert, ' ');
                 done();
               }).catch(done);
             }).catch(function() {
@@ -186,10 +199,11 @@ describe('LanguageProcessor', function() {
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
-              languageProcessor.predict(transcription).then(function(suggestions) {
+              languageProcessor.predict(transcription, 'default').then(function(suggestions) {
                 assert.isOk(suggestions);
                 assert.equal(suggestions[1].displayAs, 'I');
-                assert.equal(suggestions[1].transform.insert, 'I ');
+                assert.equal(suggestions[1].transform.insert, 'I');
+                assert.equal(suggestions[1].appendedTransform.insert, ' ');
                 done();
               }).catch(done);
             }).catch(function() {
@@ -205,11 +219,12 @@ describe('LanguageProcessor', function() {
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
-              languageProcessor.predict(transcription).then(function(suggestions) {
+              languageProcessor.predict(transcription, 'default').then(function(suggestions) {
                 // The source suggestion is simply 'like'.
                 assert.isOk(suggestions);
                 assert.equal(suggestions[1].displayAs, 'LIKE');
-                assert.equal(suggestions[1].transform.insert, 'LIKE ');
+                assert.equal(suggestions[1].transform.insert, 'LIKE');
+                assert.equal(suggestions[1].appendedTransform.insert, ' ');
                 done();
               }).catch(done);
             }).catch(function() {
@@ -223,10 +238,11 @@ describe('LanguageProcessor', function() {
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
-              languageProcessor.predict(transcription).then(function(suggestions) {
+              languageProcessor.predict(transcription, 'default').then(function(suggestions) {
                 assert.isOk(suggestions);
                 assert.equal(suggestions[0].displayAs, 'I');
-                assert.equal(suggestions[0].transform.insert, 'I ');
+                assert.equal(suggestions[0].transform.insert, 'I');
+                assert.equal(suggestions[0].appendedTransform.insert, ' ');
                 done();
               }).catch(done);
             }).catch(function() {
@@ -243,11 +259,12 @@ describe('LanguageProcessor', function() {
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
               languageProcessor.loadModel(modelSpec).then(function() {
-                languageProcessor.predict(transcription).then(function(suggestions) {
+                languageProcessor.predict(transcription, 'default').then(function(suggestions) {
                   // The source suggestion is simply 'like'.
                   assert.isOk(suggestions);
                   assert.equal(suggestions[1].displayAs, 'Like');
-                  assert.equal(suggestions[1].transform.insert, 'Like ');
+                  assert.equal(suggestions[1].transform.insert, 'Like');
+                assert.equal(suggestions[1].appendedTransform.insert, ' ');
                   done();
                 }).catch(done);
               }).catch(function() {
@@ -263,11 +280,12 @@ describe('LanguageProcessor', function() {
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
               languageProcessor.loadModel(modelSpec).then(function() {
-                languageProcessor.predict(transcription).then(function(suggestions) {
+                languageProcessor.predict(transcription, 'default').then(function(suggestions) {
                   // The source suggestion is simply 'like'.
                   assert.isOk(suggestions);
                   assert.equal(suggestions[1].displayAs, 'Like');
-                  assert.equal(suggestions[1].transform.insert, 'Like ');
+                  assert.equal(suggestions[1].transform.insert, 'Like');
+                  assert.equal(suggestions[1].appendedTransform.insert, ' ');
                   done();
                 }).catch(done);
               }).catch(function() {
