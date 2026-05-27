@@ -401,7 +401,7 @@ do_publish() {
 do_create_installer() {
   builder_heading "Creating installer package..."
 
-  ./installer/build-installer.sh
+  ./installer/build.sh build
 }
 
 do_publish_installer() {
