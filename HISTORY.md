@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.239 alpha 2026-05-27
+
+* chore(web): remove obsolete file (#16013)
+
 ## 19.0.238 alpha 2026-05-26
 
 * maint(linux): Don't block merge if source verification check fails (#16010)
