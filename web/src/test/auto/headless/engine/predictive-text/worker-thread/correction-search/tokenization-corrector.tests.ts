@@ -283,7 +283,7 @@ describe('TokenizationCorrector', () => {
   });
 
   describe('handleNextNode', () => {
-    it.skip('finds corrections for a single correctable token', () => {
+    it('finds corrections for a single correctable token', () => {
       const fixture = buildFixture_therefore();
 
       const tokenization = fixture.theref;
