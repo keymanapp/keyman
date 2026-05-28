@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.240 alpha 2026-05-28
+
+* chore(web): add filename to link text of manual web tests (#16019)
+* docs(web): reformat and small fixes (#16021)
+
 ## 19.0.239 alpha 2026-05-27
 
 * chore(web): remove obsolete file (#16013)
