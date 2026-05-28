@@ -22,8 +22,7 @@ keyman.addKeyboards(spec[, spec...])
 
 ### Return Value
 
-`Promise`: A [JavaScript
-Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+`Promise`: A [JavaScript Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 fulfilled upon adding keyboards.
 
 The promise is an array containing a combination of the following:
@@ -38,8 +37,8 @@ The keyboard spec can be a string or an object. Multiple keyboard specs can be
 specified in a single call, which can reduce the round-trip cost of multiple
 calls to Keyman Cloud servers (when using Keyman Cloud).
 
-For general information and example uses of this method, please see the [Adding
-Keyboards](../../guide/adding-keyboards) page from the guide section.
+For general information and example uses of this method, please see the
+[Adding Keyboards](../../guide/adding-keyboards) page from the guide section.
 
 ### Using a `string`
 
