@@ -1,3 +1,12 @@
+/**
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-03-10
+ *
+ * This file validates that the fixture corresponding to the quotient-graph-doc examples
+ * meets certain expectations and properties relied upon in other unit tests.
+ */
+
 import { assert } from "chai";
 
 import { buildQuotientDocFixture } from "./buildQuotientDocFixture.js";
