@@ -57,7 +57,6 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     self.graphicImage = KeymanPackage.loadImage(imageUrl: self.graphicFileUrl)
     
     self.keyboards = KeymanPackage.buildKeyboardsArray(packageSource: packageSource)
-    print("package created for: \(packageSource.packageName)")
   }
   
   /**
@@ -99,11 +98,9 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     var enabled = false
     if let keyboard = self.keyboards.first(where: { $0.keyboardKey == keyboardKey }) {
       let akeyboard = keyboard
-      print("keyboard: \(akeyboard.keyboardKey) is enabled: \(keyboard.enabled)")
       enabled = keyboard.enabled
     }
     
-    print("returning: \(enabled)")
     return enabled
   }
   

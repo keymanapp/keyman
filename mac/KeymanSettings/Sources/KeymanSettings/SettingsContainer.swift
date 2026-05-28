@@ -139,7 +139,7 @@ public class SettingsContainer : ObservableObject {
     }
     
     let enabled = package.isKeyboardEnabled(keyboardKey: keyboardKey)
-    print ("isEnabled for \(keyboardKey) returning with \(enabled)")
+//    print ("isEnabled for \(keyboardKey) returning with \(enabled)")
     
     return enabled
   }
@@ -248,9 +248,7 @@ public class SettingsContainer : ObservableObject {
     self.installedPackages.forEach { $0.keyboards.forEach
       {
         let keyboard = $0
-        print("before keyboard \(keyboard.name) has enabled status: \(keyboard.enabled)")
         $0.enabled = enabledKeyboards.contains($0.keyboardKey)
-        print("after keyboard \(keyboard.name) has enabled status: \(keyboard.enabled)")
       }
     }
   }

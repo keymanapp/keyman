@@ -34,27 +34,15 @@ public struct KeyboardSource: Identifiable, Decodable, Hashable, Equatable {
 
     // Invalidation: name, id and version required and non-empty
     guard let validName = name, !validName.isEmpty else {
-      throw DecodingError.dataCorruptedError(
-        forKey: .name,
-        in: container,
-        debugDescription: "Keyboard.name is required and cannot be empty."
-      )
+      throw LoadPackageError.missingKeyboardName
     }
     
     guard let validId = id, !validId.isEmpty else {
-      throw DecodingError.dataCorruptedError(
-        forKey: .id,
-        in: container,
-        debugDescription: "Keyboard.id is required and cannot be empty."
-      )
+      throw LoadPackageError.missingKeyboardId
     }
  
     guard let validVersion = version, !validVersion.isEmpty else {
-      throw DecodingError.dataCorruptedError(
-        forKey: .version,
-        in: container,
-        debugDescription: "Keyboard.version is required and cannot be empty."
-      )
+      throw LoadPackageError.missingKeyboardVersion
     }
 
     self.name = validName

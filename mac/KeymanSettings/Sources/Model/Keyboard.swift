@@ -35,7 +35,7 @@ public class Keyboard: Identifiable, Hashable, Equatable {
     self.kmxFileUrl = Keyboard.deriveKmxFileUrl(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
     self.keyboardKey = Keyboard.deriveKeyboardSettingsKey(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
     
-    print("keyboard created for: \(keyboardSource.id) \r   with kmxFileUrl: \(self.kmxFileUrl) \r   and settingsKey: \(self.keyboardKey)")
+//    print("keyboard created for: \(keyboardSource.id) \r   with kmxFileUrl: \(self.kmxFileUrl) \r   and settingsKey: \(self.keyboardKey)")
   }
   
   /**
@@ -83,7 +83,6 @@ public class Keyboard: Identifiable, Hashable, Equatable {
     let kmxFilename = "\(keyboardId).kmx"
     
     let settingsKey = "/\(parentDirectoryName)/\(kmxFilename)"
-    print("settingsKey: \(settingsKey)")
     
     return settingsKey
   }
