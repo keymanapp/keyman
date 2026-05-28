@@ -259,7 +259,7 @@ export async function correctAndEnumerateWithoutTraversals(
         id: pr.sample.id
       },
       p: pr.p
-    }], rootContext);
+    }], rootContext, pr.sample.id);
     results.forEach((r) => rawPredictions.push(r));
   })
 
@@ -459,9 +459,8 @@ export function buildAndMapPredictions(
   const model = transition.final.model;
 
   const applicationTarget = transition.base.displayTokenization;
-  const { tokensToRemove, tokensToPredict } = determineSuggestionRange(applicationTarget.tokens, tokenization.tokens, (a, b) => a.spaceId == b.spaceId);
+  const { deleteLeft } = determineSuggestionRange(applicationTarget.tokens, tokenization.tokens, (a, b) => a.spaceId == b.spaceId);
 
-  const deleteLeft = tokensToPredict.length > 1 ? 0 : tokensToRemove.reduce((prev, curr) => prev + curr.searchModule.codepointLength, 0);
   const rootContext = models.applyTransform({insert: '', deleteLeft}, transition.base.context);
 
   // Replace the existing context with the correction.
@@ -477,7 +476,7 @@ export function buildAndMapPredictions(
     p: Math.exp(-rootCost * costFactor)
   };
 
-  const predictions = predictFromCorrectionSequence(model, [predictionRoot], rootContext);
+  const predictions = predictFromCorrectionSequence(model, [predictionRoot], rootContext, transition.transitionId);
   predictions.forEach((entry) => {
     entry.preservationTransform = tokenization.taillessTrueKeystroke;
     // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
@@ -669,14 +668,17 @@ export function shouldStopSearchingEarly(
  * @param lexicalModel
  * @param corrections Each `correction` should insert a full token's text to be
  * appended to the context resulting from all preceding corrections.
- * @param rootContext This context should represent all portions of the post-context
- * not represented by the entries of the `corrections` array.
+ * @param rootContext This context should represent all portions of the
+ * post-context not represented by the entries of the `corrections` array.
+ * @param transitionId Indicates the unique ID of the transition that triggered
+ * prediction generation.
  * @returns
  */
 export function predictFromCorrectionSequence(
   lexicalModel: LexicalModel,
   corrections: ProbabilityMass<Transform>[],
-  rootContext: Context
+  rootContext: Context,
+  transitionId: number
 ): CorrectionPredictionTuple[] {
   let predictionPrefixSequence: ProbabilityMass<Suggestion>[] = [];
   let tailPredictions: ProbabilityMass<Suggestion>[];
@@ -746,10 +748,9 @@ export function predictFromCorrectionSequence(
       }
     }, {sample: '', p: 1})
 
-    const transformId = p.sample.transform.id;
-    if(transformId) {
-      fullPrediction.sample.transform.id = transformId;
-      fullPrediction.sample.transformId = transformId;
+    if(transitionId) {
+      fullPrediction.sample.transform.id = transitionId;
+      fullPrediction.sample.transformId = transitionId;
     }
 
     return {
