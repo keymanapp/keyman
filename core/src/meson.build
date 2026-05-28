@@ -209,7 +209,7 @@ if cpp_compiler.get_id() == 'emscripten'
     name_suffix: 'mjs')
 
   if get_option('buildtype') == 'release'
-    # TODO: #12888
+    # TODO-WEB-CORE
     # Split debug symbols into separate wasm file for release builds only
     # as the release symbols will be uploaded to sentry
     # custom_target('core.wasm',
