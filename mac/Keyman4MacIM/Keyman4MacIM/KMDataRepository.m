@@ -81,11 +81,10 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
 }
 
 /**
- * Returns true if the directory is empty
+ * Returns true if the directory exists
  */
 + (BOOL)isExistingDirectory:(NSURL *)directoryUrl {
   NSFileManager *fileManager = [NSFileManager defaultManager];
-  BOOL nonEmptyDirectoryExists = false;
   BOOL isDirectory;
   BOOL urlExists = ([fileManager fileExistsAtPath:directoryUrl.path isDirectory:&isDirectory]);
   return urlExists && isDirectory;
@@ -302,9 +301,9 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
                                       toURL:destinationDirectory
                                       error:&moveError];
   if (moveError) {
-    os_log_error([KMLogs dataLog], "data migration failed: '%{public}@'", moveError.localizedDescription);
+    os_log_error([KMLogs dataLog], "data migration failed with error: '%{public}@', source: '%{public}@', destination: '%{public}@'", moveError.localizedDescription, sourceDirectory.path, destinationDirectory.path);
   } else {
-    os_log_info([KMLogs dataLog], "data migrated successfully to: '%{public}@'", destinationDirectory.path);
+    os_log_info([KMLogs dataLog], "data migrated successfully, source: '%{public}@' destination: '%{public}@'", sourceDirectory.path, destinationDirectory.path);
   }
   return didMoveData;
 }
@@ -318,7 +317,7 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
   BOOL didMoveData = NO;
   NSFileManager *fileManager = [NSFileManager defaultManager];
   BOOL dataExistsInOldLocation = [self keyboardsExistInInputMethodDataDirectory];
-  os_log_debug([KMLogs dataLog], "keyman 18 keyboards directory exists: %@", dataExistsInOldLocation?@"YES":@"NO");
+  os_log_debug([KMLogs dataLog], "keyman 18 keyboards directory exists: %{public}@", dataExistsInOldLocation?@"YES":@"NO");
 
   // only move data if there is something to move
   if (dataExistsInOldLocation) {
@@ -331,9 +330,9 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
     
     if (error == nil) {
       didMoveData = YES;
-      os_log_debug([KMLogs dataLog], "data migrated for keyman 19");
+      os_log_debug([KMLogs dataLog], "data migrated for keyman 19, source: '%{public}@' destination: '%{public}@'", [self keyman18KeyboardsDirectory], [self keyman19KeyboardsDirectory]);
     } else {
-      os_log_error([KMLogs dataLog], "error attempting to migrate data for keyman 19: %@", [error localizedDescription]);
+      os_log_error([KMLogs dataLog], "error attempting to migrate data for keyman 19: '%{public}@', source: '%{public}@', destination: '%{public}@'", [error localizedDescription], [self keyman18KeyboardsDirectory], [self keyman19KeyboardsDirectory]);
     }
   }
   

@@ -138,9 +138,7 @@ public class SettingsContainer : ObservableObject {
       return false
     }
     
-    let enabled = package.isKeyboardEnabled(keyboardKey: keyboardKey)
-//    print ("isEnabled for \(keyboardKey) returning with \(enabled)")
-    
+    let enabled = package.isKeyboardEnabled(keyboardKey: keyboardKey)    
     return enabled
   }
   

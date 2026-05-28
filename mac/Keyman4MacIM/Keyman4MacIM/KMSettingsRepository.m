@@ -61,7 +61,7 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
  * directory instead of in the Documents directory.
  */
 NSString *const kDataModelVersion = @"KMDataModelVersion";
-NSInteger const kVersionStoreDataInLibraryDirectory = 1; // introduced with Keyman 18
+NSInteger const kVersionStoreDataInLibraryDirectory = 1; // introduced with Keyman 18, obsolete in Keyman 19
 NSInteger const kVersionStoreDataInGroupContainer = 2; // introduced with Keyman 19
 NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContainer;
 
@@ -88,6 +88,8 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   self.groupDefaults = [[NSUserDefaults alloc] initWithSuiteName:kKeymanGroupId];
   return self;
 }
+
+// TODO-MAC-CONFIG: add support for migration from Keyman 18 and earlier to Keyman 19
 
 /**
  * Determines whether the keyboard data needs to be moved from pre-Keyman-18 location to the Keyman 18 location
