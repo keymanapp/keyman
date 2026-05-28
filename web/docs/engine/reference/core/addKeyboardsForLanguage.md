@@ -10,7 +10,7 @@ operation.
 ## Syntax
 
 ```js
-async keyman.addKeyboardsForLanguage(spec[, spec...])
+await keyman.addKeyboardsForLanguage(spec[, spec...])
 ```
 
 ### Parameters

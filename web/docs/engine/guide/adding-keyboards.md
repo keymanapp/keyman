@@ -63,7 +63,7 @@ await keyman.addKeyboards({
     id: 'en',                // A BCP 47 code uniquely identifying the language.
     name: 'English (US)'     // The language's name.
   },
-  filename: './us-1.0.js'    // A valid path to the compiled *.js file representing the keyboard.
+  filename: './us.js'    // A valid path to the compiled *.js file representing the keyboard.
 });
 ```
 
@@ -75,7 +75,7 @@ languages:{
   name:'Lao',
   font:{
     family:'LaoWeb',
-    source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']
+    source:['../font/saysettha_web.ttf','../font/saysettha_web.woff']
   }
 }
 ```

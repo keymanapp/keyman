@@ -9,7 +9,7 @@ Adds keyboards to KeymanWeb. Note that this is an asynchronous operation.
 ## Syntax
 
 ```js
-async keyman.addKeyboards(spec[, spec...])
+await keyman.addKeyboards(spec[, spec...])
 ```
 
 ### Parameters
