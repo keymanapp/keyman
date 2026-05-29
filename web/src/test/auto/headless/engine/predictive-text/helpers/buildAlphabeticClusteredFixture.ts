@@ -163,10 +163,8 @@ export const buildAlphabeticClusterFixtures = () => {
         distrib_c3_i2d0
       }
     },
+    root: rootPath,
     paths: {
-      0: {
-        rootPath
-      },
       1: {
         path_k1c1_i1d0,
         path_k1c2_i2d0,

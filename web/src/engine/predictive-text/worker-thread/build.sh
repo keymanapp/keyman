@@ -24,6 +24,7 @@ SRCMAP_CLEANER="${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js"
 ################################ Main script ################################
 
 SUBPROJECT_NAME=engine/predictive-text/worker-thread
+SUBPROJECT_HELPERS=engine/predictive-text/helpers
 
 builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
@@ -103,6 +104,7 @@ function do_test() {
     WTR_INSPECT=" --manual"
   fi
 
+  test-headless-typescript $SUBPROJECT_HELPERS
   test-headless-typescript $SUBPROJECT_NAME
 
   web-test-runner --config ./src/tests/test-runner/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_INSPECT}

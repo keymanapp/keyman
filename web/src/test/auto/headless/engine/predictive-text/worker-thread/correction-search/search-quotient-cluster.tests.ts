@@ -808,7 +808,7 @@ describe('SearchQuotientCluster', () => {
 
       const mergeResult = baseCluster.merge(new LegacyQuotientSpur(
         // Is (and mocks) the head result from `path_k4c4_i1.split(3)`.
-        fixture.paths[0].rootPath,
+        fixture.root,
         // Mocks the tail result from `path_k4c4_i1.split(3)`.
         fixture.distributions[4].distrib_c2_i1d0, {
           segment: {
