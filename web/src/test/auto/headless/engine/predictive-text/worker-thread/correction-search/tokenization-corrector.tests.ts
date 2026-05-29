@@ -33,6 +33,7 @@ import {
 } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import TrieModel = models.TrieModel;
 import Transform = LexicalModelTypes.Transform;
 
@@ -282,7 +283,7 @@ describe('TokenizationCorrector', () => {
   });
 
   describe('handleNextNode', () => {
-    it.skip('finds corrections for a single correctable token', () => {
+    it('finds corrections for a single correctable token', () => {
       const fixture = buildFixture_therefore();
 
       const tokenization = fixture.theref;
@@ -323,6 +324,70 @@ describe('TokenizationCorrector', () => {
 
       // However, no other valid results are within correction range
       // while rooted on 6 input transforms.
+      assert.equal(searchResult.type, 'none');
+    });
+
+    it('finds a default correction for a single correctable token without a model match', () => {
+      const fixture = buildFixture_therefore();
+
+      const theref = fixture.theref.tail;
+      const xInput: ProbabilityMass<Transform> = {
+        sample: {
+          insert: 'x',
+          deleteLeft: 0,
+          id: 123
+        },
+        p: 1
+      }
+      const therefx = new SubstitutionQuotientSpur(theref.searchModule, [xInput], xInput);
+      const yInput: ProbabilityMass<Transform> = {
+        sample: {
+          insert: 'y',
+          deleteLeft: 0,
+          id: 124
+        },
+        p: 1
+      }
+      const therefxy = new SubstitutionQuotientSpur(therefx, [yInput], yInput);
+      const zInput: ProbabilityMass<Transform> = {
+        sample: {
+          insert: 'z',
+          deleteLeft: 0,
+          id: 125
+        },
+        p: 1
+      }
+      const therefxyz = new ContextToken(new SubstitutionQuotientSpur(therefxy, [zInput], zInput));
+      const therefxyzTokenization = new ContextTokenization([therefxyz], null, null);
+
+      const instance = new TokenizationCorrector(
+        therefxyzTokenization,
+        1,
+        fixture.filter
+      );
+
+      let searchResult: PathResult<TokenizationResultMapping>;
+      do {
+        searchResult = instance.handleNextNode();
+      } while(searchResult.type == 'intermediate');
+
+      assert.equal(searchResult.type, 'complete');
+      if(searchResult.type == 'complete') {
+        const mapping = searchResult.mapping;
+        const tokenResults = mapping.matchedResult;
+        assert.isNotNaN(searchResult.cost);
+        assert.equal(searchResult.cost, searchResult.mapping.totalCost);
+        assert.equal(tokenResults.length, 1);
+        assert.sameOrderedMembers(tokenResults.map((r) => r.matchString), ['therefxyz']);
+
+        // Now that an entry has been found, verify the corrector's state.
+        assert.isNotOk(instance.predictableToken); // should become an uncorrectable.
+        assert.isTrue(instance.generatedTokenResults.has(therefxyz));
+        assert.equal(instance.generatedTokenResults.get(therefxyz), tokenResults[0]);
+      }
+
+      // There should be no further possible suggestions.
+      searchResult = instance.handleNextNode();
       assert.equal(searchResult.type, 'none');
     });
 
