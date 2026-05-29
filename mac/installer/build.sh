@@ -26,8 +26,7 @@ INPUT_METHOD_BASE_PATH="${KEYMAN_ROOT}/mac/${INPUT_METHOD_DIR_NAME}"
 KEYMAN_WORKSPACE_PATH="${KEYMAN_ROOT}/mac/${PRODUCT_NAME}${XCODE_WORKSPACE_EXT}"
 INPUT_METHOD_WORKSPACE_PATH="${INPUT_METHOD_BASE_PATH}/${INPUT_METHOD_DIR_NAME}${XCODE_WORKSPACE_EXT}"
 
-# publish the package to the same path as the original .dmg so teamcity will show in artifacts
-OUTPUT_DIRECTORY_PATH="${INPUT_METHOD_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
+OUTPUT_DIRECTORY_PATH="${KEYMAN_BUILD_PATH}/upload/${KEYMAN_VERSION}"
 PACKAGE_NAME="Keyman-${KEYMAN_VERSION_FOR_FILENAME}.pkg"
 OUTPUT_PACKAGE_PATH="${OUTPUT_DIRECTORY_PATH}/${PACKAGE_NAME}"
 
@@ -53,7 +52,7 @@ function do_clean() {
   rm -rf "${KEYMAN_BUILD_PATH}/KeymanExport"
   rm -rf "${KEYMAN_BUILD_PATH}/keyman-config.pkg"
   rm -rf "${KEYMAN_BUILD_PATH}/keyman-input-method.pkg"
-  rm -rf "${INPUT_METHOD_BASE_PATH}/output/"
+  rm -rf "${KEYMAN_BUILD_PATH}/upload/"
 }
 
 function archive_apps() {
