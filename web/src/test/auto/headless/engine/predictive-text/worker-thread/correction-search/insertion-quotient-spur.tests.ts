@@ -11,6 +11,7 @@ import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import {
+  DeletionQuotientSpur,
   InsertionQuotientSpur,
   models,
   SearchQuotientRoot,
@@ -166,8 +167,26 @@ describe('InsertionQuotientSpur', () => {
       assert.isEmpty(analysis.foundWithDuplicates);
     });
 
-    it.skip('does not output results when immediately following a deletion spur edit', () => {
+    it('does not output results when immediately following a deletion spur edit', () => {
+      const caPath = buildCantLinearFixture().paths[2];
+      const distrib = buildCantLinearFixture().distributions[2]; // for the third entry.
+      const deletionPath = new DeletionQuotientSpur(caPath, distrib, distrib[0]);
 
+      const followingInsert = new InsertionQuotientSpur(deletionPath);
+
+      for(
+        let searchResult = followingInsert.handleNextNode();
+        searchResult.type != 'none';
+        searchResult = followingInsert.handleNextNode()
+      ) {
+        // While the insertion quotient node will forward results from the deletion version,
+        // it should never actually build search routes that go delete -> insert directly.
+        if(searchResult.type == 'complete') {
+          assert.notEqual(searchResult.mapping.lastEdgeType, 'insertion');
+          assert.notEqual(searchResult.mapping.spaceId, followingInsert.spaceId);
+        }
+      }
+      // We should reach the end of the loop without once processing an actual 'insert' case.
     });
   });
 });
