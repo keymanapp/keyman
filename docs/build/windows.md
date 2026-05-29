@@ -257,6 +257,11 @@ of appropriate node versions during builds.
     for a short time. (We are actively working to remove Delphi dependencies
     given the licensing issues with using it.)
 
+  * If you only have access to **Delphi 12 Community Edition**, see
+    [windows-d12.md](windows-d12.md) for an IDE-based workflow that papers over
+    the missing command-line compiler. The patches and helper scripts described
+    there are local-only and not required for the standard 10.3 / Pro flow.
+
   Start Delphi IDE once after installation as it will create various environment
   files and take you through required registration.
 

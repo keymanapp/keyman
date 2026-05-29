@@ -19,6 +19,7 @@
 /windows/src/**/*.identcache
 /windows/src/**/*.vcxproj.user
 /windows/src/**/version.res
+/windows/src/**/version*.res
 /windows/src/**/*.pch
 /windows/src/**/*.wixobj
 /windows/src/**/*.sbr
@@ -186,3 +187,16 @@ lcov.info
 
 # flag file for build script
 .configured
+
+# Local artifacts from the Delphi 12 CE dev workflow (see docs/build/windows-d12.md)
+/delphi-library-paths.backup*.reg
+/local-delphi-12-patches.patch
+/configure.log
+/core-build.log
+/cpp-engine-build.log
+/install-build-env.log
+/kmcmplib-build.log
+/web-build.log
+
+# Meson wrap dependency lock files
+**/subprojects/.wraplock
