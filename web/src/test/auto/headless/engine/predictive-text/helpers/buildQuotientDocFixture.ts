@@ -15,6 +15,7 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 
 import {
   generateSubsetId,
+  InsertionQuotientSpur,
   models,
   SearchQuotientCluster,
   SearchQuotientRoot,
@@ -48,8 +49,8 @@ export function buildQuotientDocFixture() {
     { sample: { insert: 'cd', deleteLeft: 0, id: key1Id }, p: .2 }
   ];
 
-  // const sc1 = new InsertionQuotientSpur(searchRoot);
-  // const sc2 = new InsertionQuotientSpur(sc1);
+  const sc1 = new InsertionQuotientSpur(searchRoot);
+  const sc2 = new InsertionQuotientSpur(sc1);
 
   // // K1C0
   // const k1c0 = new DeletionQuotientSpur(searchRoot, abDistrib.concat(cdDistrib), {
@@ -93,15 +94,15 @@ export function buildQuotientDocFixture() {
   //   subsetId: generateSubsetId(),
   //   bestProbFromSet: abDistrib[0].p
   // });
-  // const k1c2_ab = new SubstitutionQuotientSpur(sc1, abDistrib, {
-  //   segment: {
-  //     transitionId: key1Id,
-  //     start: 0
-  //   },
-  //   // Deletions always get their own unique subset ID.
-  //   subsetId: generateSubsetId(),
-  //   bestProbFromSet: abDistrib[0].p
-  // });
+  const k1c2_ab = new SubstitutionQuotientSpur(sc1, abDistrib, {
+    segment: {
+      transitionId: key1Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: abDistrib[0].p
+  });
   const k1c2_cd = new SubstitutionQuotientSpur(searchRoot, cdDistrib, {
     segment: {
       transitionId: key1Id,
@@ -111,29 +112,29 @@ export function buildQuotientDocFixture() {
     subsetId: generateSubsetId(),
     bestProbFromSet: abDistrib[0].p
   });
-  // const k1c2_ins = new InsertionQuotientSpur(k1c1);
-  const k1c2 = new SearchQuotientCluster([/*k1c2_del, k1c2_ab, */ k1c2_cd, /*k1c2_ins*/]);
+  const k1c2_ins = new InsertionQuotientSpur(k1c1);
+  const k1c2 = new SearchQuotientCluster([/*k1c2_del, */ k1c2_ab, k1c2_cd, k1c2_ins]);
 
-  // const k1c3_ab = new SubstitutionQuotientSpur(sc2, abDistrib, {
-  //   segment: {
-  //     transitionId: key1Id,
-  //     start: 0
-  //   },
-  //   // Deletions always get their own unique subset ID.
-  //   subsetId: generateSubsetId(),
-  //   bestProbFromSet: abDistrib[0].p
-  // });
-  // const k1c3_cd = new SubstitutionQuotientSpur(sc1, cdDistrib, {
-  //   segment: {
-  //     transitionId: key1Id,
-  //     start: 0
-  //   },
-  //   // Deletions always get their own unique subset ID.
-  //   subsetId: generateSubsetId(),
-  //   bestProbFromSet: abDistrib[0].p
-  // });
-  // const k1c3_ins = new InsertionQuotientSpur(k1c2);
-  // const k1c3 = new SearchQuotientCluster([k1c3_ab, k1c3_cd, k1c3_ins]);
+  const k1c3_ab = new SubstitutionQuotientSpur(sc2, abDistrib, {
+    segment: {
+      transitionId: key1Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: abDistrib[0].p
+  });
+  const k1c3_cd = new SubstitutionQuotientSpur(sc1, cdDistrib, {
+    segment: {
+      transitionId: key1Id,
+      start: 0
+    },
+    // Deletions always get their own unique subset ID.
+    subsetId: generateSubsetId(),
+    bestProbFromSet: abDistrib[0].p
+  });
+  const k1c3_ins = new InsertionQuotientSpur(k1c2);
+  const k1c3 = new SearchQuotientCluster([k1c3_ab, k1c3_cd, k1c3_ins]);
 
   // Onto keystroke 2.
 
@@ -235,12 +236,12 @@ export function buildQuotientDocFixture() {
     subsetId: generateSubsetId(),
     bestProbFromSet: efDistrib[0].p
   });
-  // const k2c3_ins = new InsertionQuotientSpur(k2c2);
-  const k2c3 = new SearchQuotientCluster([/*k2c3_del, */ k2c3_ef, k2c3_gh, /*k2c3_ins*/]);
+  const k2c3_ins = new InsertionQuotientSpur(k2c2);
+  const k2c3 = new SearchQuotientCluster([/*k2c3_del, */ k2c3_ef, k2c3_gh, k2c3_ins]);
 
   return {
     searchRoot,
-    spurs: {/*sc1, sc2,*/ k1c1_ab, /*k1c2_ab,*/ k1c2_cd, /*k1c2_ins, k1c3_ab, k1c3_cd, k1c3_ins,*/ k2c2_ef, k2c3_ef, k2c3_gh /*, k2c3_ins*/},
-    nodes: {/* sc1, sc2, k1c0, */ k1c1, k1c2, /* k1c3, k2c0, k2c1, */ k2c2, k2c3}
+    spurs: {sc1, sc2, k1c1_ab, k1c2_ab, k1c2_cd, k1c2_ins, k1c3_ab, k1c3_cd, k1c3_ins, k2c2_ef, k2c3_ef, k2c3_gh, k2c3_ins},
+    nodes: {sc1, sc2, /* k1c0, */ k1c1, k1c2, k1c3, /* k2c0, k2c1, */ k2c2, k2c3}
   };
 }
