@@ -18,6 +18,7 @@ enum LoadPackageError: Error {
   case missingKeyboardName
   case missingKeyboardId
   case missingKeyboardVersion
+  case missingKmxFile
 }
 
 // Conform to LocalizedError to provide the description
@@ -38,6 +39,8 @@ extension LoadPackageError: LocalizedError {
       return NSLocalizedString("A keyboard in the package has no id", comment: "")
     case .missingKeyboardVersion:
       return NSLocalizedString("A keyboard in the package has no version", comment: "")
+    case .missingKmxFile:
+      return NSLocalizedString("A keyboard in the package has no corresponding KMX file", comment: "")
     }
   }
 }
@@ -51,7 +54,9 @@ public class PackageRepository: PackageRepo {
   }
   
   /**
-   * after reading the Keyman packages from disk, wrap each package as a `KeymanPackage` object
+   * Load the Keyman packages from disk and wrap each package as a `KeymanPackage` object
+   * If the `KeymanPackage` passes validation, then add it to the `installedPackages` array.
+   *
    */
   public func loadPackages() -> [KeymanPackage] {
     var installedPackages: [KeymanPackage] = []
@@ -60,11 +65,13 @@ public class PackageRepository: PackageRepo {
     // create a KeymanPackage object for each PackageSource object and insert it in the array if it is valid
     for source in packageSourceArray {
       let package = KeymanPackage(packageSource: source)
-      if (package.validate()) {
-        installedPackages.append(package)
-      } else {
-        print("package '\(source.packageName)' is not valid")
+      do {
+        try package.validate()
+      } catch {
+        print("** package '\(source.packageName)' is not valid: \(error.localizedDescription)")
       }
+      // only install packages that pass validation
+      installedPackages.append(package)
     }
     
     return installedPackages
@@ -106,7 +113,7 @@ public class PackageRepository: PackageRepo {
     }
   }
   
-  // TODO-MAC-CONFIG: delete
+  // MAC-CONFIG-TODO: delete
   /**
    * for group container testing purposes to check directory access
    */
@@ -199,7 +206,6 @@ public class PackageRepository: PackageRepo {
    */
   func readPackageFromDirectory(packageDirectoryUrl: URL) throws -> PackageSource? {
     var packageSource: PackageSource? = nil
-    let lastPathComponent = packageDirectoryUrl.lastPathComponent
     let kmpJsonFileUrl = packageDirectoryUrl.appendingPathComponent(packageFileName)
     
     if !FileManager.default.fileExists(atPath: kmpJsonFileUrl.path) {

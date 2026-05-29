@@ -765,7 +765,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   // if this is a fresh install, then create the shared directories
   [KMDataRepository.shared createKeyman19SharedDirectoriesIfNecessary];
   
-  // TODO-MAC-CONFIG: are settings created for fresh install?
+  // MAC-CONFIG-TODO: are settings created for fresh install?
 }
 
 - (void)setDefaultKeymanMenuItems {

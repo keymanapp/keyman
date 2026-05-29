@@ -72,7 +72,7 @@ public class SettingsContainer : ObservableObject {
     self.installedPackages = []
   }
   
-  // TODO-MAC-CONFIG: delete test code
+  // MAC-CONFIG-TODO: delete test code
   public func debug() {
     self.installedPackages .forEach { package in
       package.keyboards.forEach { keyboard in
@@ -245,7 +245,6 @@ public class SettingsContainer : ObservableObject {
     // set enabled flag if the keyboard is contained in the set of enabledKeyboards
     self.installedPackages.forEach { $0.keyboards.forEach
       {
-        let keyboard = $0
         $0.enabled = enabledKeyboards.contains($0.keyboardKey)
       }
     }

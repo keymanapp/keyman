@@ -297,6 +297,7 @@ do_build_testapp() {
 # In case both install & publish actions are specified, we should still only notarize once.
 DID_NOTARIZE=false
 
+# MAC-CONFIG-TODO: delete this if we only ever notarize installer package
 do_notarize() {
   if [[ $DID_NOTARIZE == false ]]; then
     ### Validate notarization environment variables ###
@@ -383,6 +384,7 @@ do_install() {
   "$KEYMAN_MAC_BASE_PATH/local-deploy.sh" "$KM4MIM_APP_BASE_PATH" "$KM4_CONFIG_APP_BASE_PATH"
 }
 
+# MAC-CONFIG-TODO: delete this and everything else related to building .dmg
 do_publish() {
   builder_if_release_build_level do_notarize
 

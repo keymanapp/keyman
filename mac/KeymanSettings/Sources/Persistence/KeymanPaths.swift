@@ -226,7 +226,7 @@ public struct KeymanPaths {
     }
   }
   
-  // TODO-MAC-CONFIG: remove
+  // MAC-CONFIG-TODO: remove
   fileprivate func checkContainerUrl() -> Bool {
     var containerValid = false
     let sharedFileManager = FileManager.default

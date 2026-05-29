@@ -89,7 +89,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   return self;
 }
 
-// TODO-MAC-CONFIG: add support for migration from Keyman 18 and earlier to Keyman 19
+// MAC-CONFIG-TODO: add support for migration from Keyman 18 and earlier to Keyman 19
 
 /**
  * Determines whether the keyboard data needs to be moved from pre-Keyman-18 location to the Keyman 18 location
@@ -198,7 +198,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   }
 }
 
-// TODO-MAC-CONFIG: remove if obsolete
+// MAC-CONFIG-TODO: remove if obsolete
 /**
  * If the selectedKeyboard has not been set, then the settings have not been saved in the UserDefaults.
  * If this method is called after applicationDidFinishLaunching, then it will always return true.

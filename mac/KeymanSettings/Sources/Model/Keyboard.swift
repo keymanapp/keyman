@@ -87,17 +87,13 @@ public class Keyboard: Identifiable, Hashable, Equatable {
     return settingsKey
   }
   
-  // TODO-MAC-CONFIG: "throw/handle error if no kmx file found in directory
   /**
    * validate whether a corresponding kmx file exists for this keyboard
    */
-  public func validateKmxFile() -> Bool {
-    let fileManager = FileManager.default
-    if fileManager.fileExists(atPath: self.kmxFileUrl.path) {
-      return true
-    } else {
-      print("   *** Error: could not find kmx file \(self.kmxFileUrl.path)")
-      return false
+  public func validateKmxFile() throws {
+    if !FileManager.default.fileExists(atPath: self.kmxFileUrl.path) {
+      print("** error: could not find kmx file \(self.kmxFileUrl.path)")
+      throw LoadPackageError.missingKmxFile
     }
   }
 }
