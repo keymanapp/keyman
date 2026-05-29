@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
 
-echo "executed postinstall"
+# input parameters to this script
+# $1 - full path of installer package
+# $2 - path to the target installation folder
+# $3 - root mountpoint of the destination drive receiving the installation ("/" for current startup disk)
+# $4 - path to the root directory of the currently booted OS
+
+echo "Keyman for Mac: postinstall script"
 
 # Get the actual user currently logged into the console
 # This works even if the installer is run with sudo or as root
@@ -12,8 +19,11 @@ USER_HOME=$(eval echo "~$CONSOLE_USER")
 echo "user home directory is: $USER_HOME"
 
 # Define the source file path within the package payload
+# the input method, Keyman.app, is added to /tmp when building the installer
 # $3 is the target volume mount point, e.g., "/"
-SOURCE_FILE="$3/tmp/Keyman.app"
+
+SOURCE_FILE="$3tmp/Keyman.app"
+echo "source file is: $SOURCE_FILE"
 
 # Define the path to the Input Methods directory in the user's Library
 DEST_DIR="$USER_HOME/Library/Input Methods"
@@ -32,7 +42,7 @@ fi
 cp -R "$SOURCE_FILE" "$DEST_DIR/"
 
 # Set the user as owner
-chown "$CONSOLE_USER":staff "$DEST_DIR/Keyman.app"
+chown -R "$CONSOLE_USER":staff "$DEST_DIR/Keyman.app"
 
 # TODO: add code here to extract keyboard name from package path
 echo "The installer package name is: $PACKAGE_PATH"

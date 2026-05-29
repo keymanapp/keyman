@@ -20,12 +20,17 @@
  * Only one of these keyboards can be selected at a time, and the selected keyboard is the one that
  * is actively being applied by Keyman with each keystroke.
  */
+// the list of keyboards displayed in the Keyman keyboards menu, Keyman 18 and earlier
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
+// the list of keyboards displayed in the Keyman keyboards menu, as of Keyman 19
 NSString *const kEnabledKeyboardsKey = @"KMEnabledKeyboardsKey";
-
+// the single keyboard Keyman is currently using to process each keydown event
 NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
+// the maps of options saved for each keyboard
 NSString *const kPersistedOptionsKey = @"KMPersistedOptionsKey";
+// whether the OSK should be displayed when Keyman is activated
 NSString *const kShowOskOnActivate = @"KMShowOskOnActivate";
+// internal flag used for testing Sentry
 NSString *const kForceSentryError = @"KMForceSentryError";
 
 /**
@@ -56,7 +61,7 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
  * directory instead of in the Documents directory.
  */
 NSString *const kDataModelVersion = @"KMDataModelVersion";
-NSInteger const kVersionStoreDataInLibraryDirectory = 1; // introduced with Keyman 18
+NSInteger const kVersionStoreDataInLibraryDirectory = 1; // introduced with Keyman 18, obsolete in Keyman 19
 NSInteger const kVersionStoreDataInGroupContainer = 2; // introduced with Keyman 19
 NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContainer;
 
@@ -83,6 +88,8 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   self.groupDefaults = [[NSUserDefaults alloc] initWithSuiteName:kKeymanGroupId];
   return self;
 }
+
+// MAC-CONFIG-TODO: add support for migration from Keyman 18 and earlier to Keyman 19
 
 /**
  * Determines whether the keyboard data needs to be moved from pre-Keyman-18 location to the Keyman 18 location
@@ -191,7 +198,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   }
 }
 
-// TODO: remove if obsolete
+// MAC-CONFIG-TODO: remove if obsolete
 /**
  * If the selectedKeyboard has not been set, then the settings have not been saved in the UserDefaults.
  * If this method is called after applicationDidFinishLaunching, then it will always return true.

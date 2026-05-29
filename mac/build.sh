@@ -125,6 +125,7 @@ execBuildCommand() {
 }
 
 do_clean ( ) {
+  builder_launch /mac/installer/build.sh clean
   rm -rf "$KME4M_BASE_PATH/build"
   rm -rf "$KM4MIM_BASE_PATH/build"
   rm -rf "$KMTESTAPP_BASE_PATH/build"
@@ -191,12 +192,12 @@ do_build_app ( ) {
 
   builder_heading "Building Keyman.app"
 
-# no provisioning with codesigning suppressed
-#execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
-# without codesigning suppression, provisioning profile is included but no application ID??
-execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+  # no provisioning with codesigning suppressed
+  #execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+  # without codesigning suppression, provisioning profile is included but no application ID??
+  execBuildCommand $IM_NAME "xcodebuild -workspace \"$KMIM_WORKSPACE_PATH\" $BUILD_OPTIONS $BUILD_ACTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
 
-#check_code_sign_status
+  #check_code_sign_status
 }
 
 do_build_settings_package ( ) {
@@ -296,6 +297,7 @@ do_build_testapp() {
 # In case both install & publish actions are specified, we should still only notarize once.
 DID_NOTARIZE=false
 
+# MAC-CONFIG-TODO: delete this if we only ever notarize installer package
 do_notarize() {
   if [[ $DID_NOTARIZE == false ]]; then
     ### Validate notarization environment variables ###
@@ -382,6 +384,7 @@ do_install() {
   "$KEYMAN_MAC_BASE_PATH/local-deploy.sh" "$KM4MIM_APP_BASE_PATH" "$KM4_CONFIG_APP_BASE_PATH"
 }
 
+# MAC-CONFIG-TODO: delete this and everything else related to building .dmg
 do_publish() {
   builder_if_release_build_level do_notarize
 
@@ -401,7 +404,7 @@ do_publish() {
 do_create_installer() {
   builder_heading "Creating installer package..."
 
-  ./installer/build-installer.sh
+  builder_launch /mac/installer/build.sh build
 }
 
 do_publish_installer() {
@@ -409,9 +412,7 @@ do_publish_installer() {
 
   if builder_is_ci_build && builder_is_ci_build_level_release; then
     builder_echo info "writing download info for Keyman installer..."
-    # keep upload path similar to that for .dmg so teamcity will show in artifacts
-    #local UPLOAD_PATH="${KEYMAN_MAC_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
-    local UPLOAD_PATH="${KM4MIM_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
+    local UPLOAD_PATH="${KEYMAN_MAC_BASE_PATH}/build/upload/${KEYMAN_VERSION}"
     write_download_info "${UPLOAD_PATH}" "Keyman-${KEYMAN_VERSION_FOR_FILENAME}.pkg" "Keyman Installer Package" pkg mac
   else
     builder_echo info "not writing download info because we are not on a CI build..."

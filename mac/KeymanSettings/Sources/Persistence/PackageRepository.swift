@@ -10,6 +10,41 @@
 
 import Foundation
 
+enum LoadPackageError: Error {
+  case containsNoFiles
+  case containsNoKeyboards
+  case kmpJsonFileUnreadable
+  case kmpJsonFileNotFound
+  case missingKeyboardName
+  case missingKeyboardId
+  case missingKeyboardVersion
+  case missingKmxFile
+}
+
+// Conform to LocalizedError to provide the description
+extension LoadPackageError: LocalizedError {
+  var errorDescription: String? {
+    switch self {
+    case .containsNoFiles:
+      return NSLocalizedString("The package contains no files.", comment: "")
+    case .containsNoKeyboards:
+      return NSLocalizedString("The package contains no keyboards", comment: "")
+    case .kmpJsonFileUnreadable:
+      return NSLocalizedString("The package's kmp.json file could not be parsed", comment: "")
+    case .kmpJsonFileNotFound:
+      return NSLocalizedString("The package's kmp.json file was not found", comment: "")
+    case .missingKeyboardName:
+      return NSLocalizedString("A keyboard in the package has no name", comment: "")
+    case .missingKeyboardId:
+      return NSLocalizedString("A keyboard in the package has no id", comment: "")
+    case .missingKeyboardVersion:
+      return NSLocalizedString("A keyboard in the package has no version", comment: "")
+    case .missingKmxFile:
+      return NSLocalizedString("A keyboard in the package has no corresponding KMX file", comment: "")
+    }
+  }
+}
+
 public class PackageRepository: PackageRepo {
   fileprivate let packageFileName = "kmp.json"
   fileprivate let pathUtil: KeymanPaths
@@ -19,7 +54,9 @@ public class PackageRepository: PackageRepo {
   }
   
   /**
-   * after reading the Keyman packages from disk, wrap each package as a `KeymanPackage` object
+   * Load the Keyman packages from disk and wrap each package as a `KeymanPackage` object
+   * If the `KeymanPackage` passes validation, then add it to the `installedPackages` array.
+   *
    */
   public func loadPackages() -> [KeymanPackage] {
     var installedPackages: [KeymanPackage] = []
@@ -28,11 +65,13 @@ public class PackageRepository: PackageRepo {
     // create a KeymanPackage object for each PackageSource object and insert it in the array if it is valid
     for source in packageSourceArray {
       let package = KeymanPackage(packageSource: source)
-      if (package.validate()) {
-        installedPackages.append(package)
-      } else {
-        print("package '\(source.packageName)' is not valid")
+      do {
+        try package.validate()
+      } catch {
+        print("** package '\(source.packageName)' is not valid: \(error.localizedDescription)")
       }
+      // only install packages that pass validation
+      installedPackages.append(package)
     }
     
     return installedPackages
@@ -74,7 +113,7 @@ public class PackageRepository: PackageRepo {
     }
   }
   
-  // TODO: delete
+  // MAC-CONFIG-TODO: delete
   /**
    * for group container testing purposes to check directory access
    */
@@ -145,8 +184,12 @@ public class PackageRepository: PackageRepo {
       for itemUrl in directoryContents {
         // if the item is a directory, then attempt to read it as a keyboard package
         if (itemUrl.hasDirectoryPath) {
-          if let packageSource =  readPackageFromDirectory(packageDirectoryUrl: itemUrl) {
-            packages.append(packageSource)
+          do {
+            if let packageSource =  try readPackageFromDirectory(packageDirectoryUrl: itemUrl) {
+              packages.append(packageSource)
+            }
+          } catch let error as LoadPackageError {
+            print("** package at \(itemUrl) could not be loaded: \(error.localizedDescription)")
           }
         }
       }
@@ -161,17 +204,18 @@ public class PackageRepository: PackageRepo {
   /**
    * check the specified directory for the kmp.json file and read it if it exists
    */
-  func readPackageFromDirectory(packageDirectoryUrl: URL) -> PackageSource? {
-    var packageSource: PackageSource?
-    let lastPathComponent = packageDirectoryUrl.lastPathComponent
+  func readPackageFromDirectory(packageDirectoryUrl: URL) throws -> PackageSource? {
+    var packageSource: PackageSource? = nil
     let kmpJsonFileUrl = packageDirectoryUrl.appendingPathComponent(packageFileName)
     
-    if FileManager.default.fileExists(atPath: kmpJsonFileUrl.path) {
-      if let source = readPackage(packageDirectoryUrl: packageDirectoryUrl, kmpFileUrl: kmpJsonFileUrl) {
-        packageSource = source
-      }
-    } else {
-      print(" ** the package directory \(lastPathComponent) does not contain the file 'kmp.json')")
+    if !FileManager.default.fileExists(atPath: kmpJsonFileUrl.path) {
+      throw LoadPackageError.kmpJsonFileNotFound
+    }
+    
+    // use try without do block
+    // if an error occurs, it will not be handled but propagated to caller
+    if let source = try readPackage(packageDirectoryUrl: packageDirectoryUrl, kmpFileUrl: kmpJsonFileUrl) {
+      packageSource = source
     }
     
     return packageSource
@@ -180,19 +224,24 @@ public class PackageRepository: PackageRepo {
   /**
    * read and parse the kmp.json file at the specified URL
    */
-  func readPackage(packageDirectoryUrl: URL, kmpFileUrl: URL) -> PackageSource? {
+  func readPackage(packageDirectoryUrl: URL, kmpFileUrl: URL) throws -> PackageSource? {
     var packageSource: PackageSource?
     do {
       let jsonData = try Data(contentsOf: kmpFileUrl, options: .mappedIfSafe)
       var source: PackageSource = try JSONDecoder().decode(PackageSource.self, from: jsonData)
       
-      print("package name: \(source.packageName)")
+      print("readPackage, packageName: \(source.packageName)")
       // save the keyboard directory and path of the kmp.json for this keyboard
       source.directoryUrl = packageDirectoryUrl
       source.kmpJsonFileUrl = kmpFileUrl
       packageSource = source
+    } catch let error as LoadPackageError {
+      // if we encounter a LoadPackageError, propagate it
+      throw error
     } catch {
-      print("\(error.localizedDescription)")
+      // otherwise convert the error to a LoadPackageError error
+      print("readPackage error: \(error.localizedDescription)")
+      throw LoadPackageError.kmpJsonFileUnreadable
     }
     return packageSource
   }

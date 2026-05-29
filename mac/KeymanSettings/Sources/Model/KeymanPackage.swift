@@ -57,7 +57,6 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     self.graphicImage = KeymanPackage.loadImage(imageUrl: self.graphicFileUrl)
     
     self.keyboards = KeymanPackage.buildKeyboardsArray(packageSource: packageSource)
-    print("package created for: \(packageSource.packageName)")
   }
   
   /**
@@ -98,12 +97,9 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   public func isKeyboardEnabled(keyboardKey: String) -> Bool {
     var enabled = false
     if let keyboard = self.keyboards.first(where: { $0.keyboardKey == keyboardKey }) {
-      let akeyboard = keyboard
-      print("keyboard: \(akeyboard.keyboardKey) is enabled: \(keyboard.enabled)")
       enabled = keyboard.enabled
     }
     
-    print("returning: \(enabled)")
     return enabled
   }
   
@@ -135,16 +131,11 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   /**
    * validate whether the package contain a kmx file for each of its keyboards
    */
-  public func validate() -> Bool {
-    var validKeyboards = self.keyboards.isEmpty == false
-    
-    self.keyboards.forEach { keyboard in
-      if (validKeyboards && !keyboard.validateKmxFile()) {
-        validKeyboards = false
-      }
+  public func validate() throws {
+    // if validateKmxFile throws an error, then the loop is stopped and the error is propagated
+    try self.keyboards.forEach { keyboard in
+      try keyboard.validateKmxFile()
     }
-    
-    return validKeyboards
   }
   
   /**

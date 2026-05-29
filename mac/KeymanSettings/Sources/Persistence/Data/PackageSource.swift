@@ -68,14 +68,12 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
     self.options = try container.decodeIfPresent(Options.self, forKey: .options)
     self.files = try container.decodeIfPresent([PackageFile].self, forKey: .files)
     
-    // Invalidation: must contain files or keyboards
-    if files == nil && keyboards == nil {
-      throw DecodingError.dataCorrupted(
-        .init(
-          codingPath: decoder.codingPath,
-          debugDescription: "KeymanPackage must contain either 'files' or 'keyboards'."
-        )
-      )
+    if files?.isEmpty ?? true {
+      throw LoadPackageError.containsNoFiles
+    }
+
+    if keyboards?.isEmpty ?? true {
+      throw LoadPackageError.containsNoKeyboards
     }
   }
   

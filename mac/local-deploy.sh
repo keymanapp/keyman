@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# MAC-CONFIG-TODO: change to builder script and find a way to deploy locally with shared data support
+
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" != "darwin"* ]]; then
   echo "This build script will only run in a Mac environment."
