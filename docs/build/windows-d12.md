@@ -229,33 +229,41 @@ must be reverted before any PR.
 > to drop the `inst\` segment or move the file. See section 3.3 and the
 > `[[delphi-12-local-patches]]` memory.
 
-### 3.1 Build-script: select Delphi version via `KEYMAN_DELPHI_VERSION`
+### 3.1 Build-script: select Delphi version and enable CE interactive mode
 
-This branch makes the Delphi version configurable via the
-`KEYMAN_DELPHI_VERSION` environment variable. It defaults to `20.0`
-(Delphi 10.3, the CI target) so default builds are unaffected. For
-Delphi 12 set the env var to `23.0`:
+Set both environment variables for Delphi 12 CE:
 
 ```powershell
 # PowerShell (persistent for your user)
 [Environment]::SetEnvironmentVariable('KEYMAN_DELPHI_VERSION', '23.0', 'User')
+[Environment]::SetEnvironmentVariable('KEYMAN_DELPHI_CE', '1', 'User')
 ```
 
 ```bash
 # Git Bash (per-shell)
 export KEYMAN_DELPHI_VERSION=23.0
+export KEYMAN_DELPHI_CE=1
 ```
 
-Without this override, `build.sh` flows that *prepare* the Delphi
-environment (without invoking `dcc32`) look for
-`C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\rsvars.bat`, which
-does not exist on a Delphi-12-only machine.
+`KEYMAN_DELPHI_VERSION` selects which Delphi installation `build.sh` looks for
+(defaults to `20.0` / Delphi 10.3). Without this override, `build.sh` looks for
+`C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\rsvars.bat`, which does not
+exist on a Delphi-12-only machine.
 
-This env-var approach is backwards-compatible with the existing Delphi
-10.3 CI: when `KEYMAN_DELPHI_VERSION` is unset, both
-`resources/build/win/configure_environment.inc.sh` and
-`resources/build/win/delphi_environment.inc.sh` fall through to the
-historical default of `20.0`.
+`KEYMAN_DELPHI_CE=1` switches `delphi_msbuild` into interactive mode. Instead of
+invoking `msbuild.exe`, the script pauses and prompts:
+
+```
+Delphi CE: CLI compilation is not available.
+Please build <project.dproj> in the Delphi IDE now, then press Enter to continue.
+```
+
+This means you use the same `build.sh` commands as a Professional Delphi user; the
+scripts orchestrate pre-build steps (rc compilation, codegen) and post-build steps
+(binary copying) around your IDE builds automatically.
+
+Both variables are backwards-compatible: when unset or `KEYMAN_DELPHI_CE=0`, all
+behavior is identical to the historical Delphi 10.3 CI defaults.
 
 ### 3.2 keyman.exe uiAccess strip (LOCAL ONLY, not committed)
 
@@ -270,10 +278,11 @@ $f = 'C:\Projects\keyman\keyman\windows\src\engine\keyman\manifest.in'
 (Get-Content $f) -replace 'uiAccess="true"', 'uiAccess="false"' | Set-Content $f -Encoding UTF8
 ```
 
-Then regenerate manifest.xml / manifest.res via
-`scripts/preflight-resources.ps1`, do a **Clean + Build** of keyman.dproj
-in Delphi IDE (see [[delphi-incremental-build-res-cache]] — Build alone
-won't re-link the new manifest.res), and run overlay-dev-builds.ps1.
+Then re-run `build.sh build` for `windows/src/engine/keyman` (the pre-build
+`build_manifest.res` step regenerates manifest.xml / manifest.res before prompting
+for the IDE build), do a **Clean + Build** of keyman.dproj in Delphi IDE
+(see [[delphi-incremental-build-res-cache]] — Build alone won't re-link the
+new manifest.res), and run `windows/src/engine/build.sh install` elevated (section 5.3).
 
 **Why:** Windows refuses to launch any unsigned binary that declares
 `uiAccess="true"`, returning `Access is denied` (error 8235). The overlay
@@ -603,7 +612,7 @@ dev kmshell shows "Keyman failed to start" when enabling a keyboard.
 `kmcomapi.dll` exposes the COM objects kmshell instantiates at startup.
 Without registration, `CoCreateInstance` returns `REGDB_E_CLASSNOTREG`
 (`Class not registered`) and kmshell dies before its main form appears.
-`overlay-dev-builds.ps1` does this automatically; see section 7.
+`windows/src/engine/build.sh install` handles this automatically (section 5.3).
 
 ### The canonical build order
 
@@ -612,170 +621,88 @@ For a clean checkout, this is the order that actually works:
 1. CLI build everything CLI-buildable: `./core/build.sh build`,
    `./developer/src/kmcmplib/build.sh build`, TypeScript modules,
    KeymanWeb. The C++ engine pieces can wait.
-2. Open `common/windows/delphi/tools/devtools/devtools.dproj`, build (Win32).
-3. Open `common/windows/delphi/tools/build_standards_data/build_standards_data.dproj`,
-   build (Win32).
-4. Run the codegen helper script (section 5.2).
-5. Open `engine.groupproj`. Build tsysinfox64 first, run the
-   tsysinfox64-bin / `tsysinfo_x64.res` step from (c), then build everything
-   else in the group.
-6. Open `desktop.groupproj`. Build kmcomapi (if not already), then setup,
-   insthelp, kmconfig, kmbrowserhost, kmshell.
-7. Open `developer.groupproj`. Build TIKE, kmconvert, setup.
-8. Run `overlay-dev-builds.ps1` (elevated) to copy the dev binaries over
-   the installed Keyman 19.
+2. Build devtools: `cd common/windows/delphi/tools/devtools && ./build.sh build`
+   (prompted to build `devtools.dproj` in IDE; press Enter when done).
+3. Build build_standards_data: `cd common/windows/delphi/tools/build_standards_data && ./build.sh build`
+   (prompted to build `build_standards_data.dproj` in IDE; after Enter, the script
+   automatically runs all five codegen invocations).
+4. Build engine components: `cd windows/src/engine && ./build.sh build`
+   (prompted for each Delphi project in dependency order; `tsysinfo.dproj` is
+   prompted after `tsysinfox64.dproj` because `build.sh` handles the dependency).
+5. Build desktop components: `cd windows/src/desktop && ./build.sh build`
+   (prompted for each desktop Delphi project).
+6. Build developer components: `cd developer/src && ./build.sh build`
+   (prompted for TIKE, kmconvert, and developer setup).
+7. Overlay dev builds (elevated Git Bash): `cd windows/src/engine && ./build.sh install`
+   then `cd windows/src/desktop && ./build.sh install` (section 5.3).
 
-## 5. Helper scripts
+## 5. Shell-based CE workflow
 
-Three scripts in the checkout paper over what `build.sh` would normally do
-on a Professional Delphi machine. None are committed (they're untracked
-local-only files).
+With `KEYMAN_DELPHI_CE=1` set (section 3.1), the existing `build.sh` scripts
+handle the CE constraint interactively. At each step that would normally invoke
+`msbuild` through Delphi, the script pauses and prints:
 
-### 5.1 `scripts/preflight-resources.ps1`
-
-Runs `rc.exe` over every `.rc` file in every Delphi project, producing the
-`.res` files that the `.dpr` files `{$R}` reference. Equivalent to the
-`build.sh` `_prebuild_resources` phase.
-
-`rc.exe` lives at
-`C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\rc.exe`.
-
-Per-project mapping (paths under `windows\src\`):
-
-| Project | .rc files |
-| --- | --- |
-| `engine\keyman\` | version, manifest, icons, keymanmenuitem, osktoolbar, langswitch\langswitchmanager |
-| `engine\kmcomapi\` | version, manifest, dialogs (needs SDK includes), kbd_noicon |
-| `engine\insthelper\` | version |
-| `engine\tsysinfo\` | version, manifest, tsysinfo_x64 (after build order step c) |
-| `engine\tsysinfox64\` | version, manifest |
-| `desktop\kmshell\` | version, manifest, icons |
-| `desktop\kmbrowserhost\` | version, manifest |
-| `desktop\kmconfig\` | version, manifest |
-| `desktop\insthelp\` | version, manifest |
-| `desktop\setup\` | version, manifest, icons (needs SDK includes) |
-
-> [!NOTE]
-> `mcompile` (`windows\src\engine\mcompile\mcompile.vcxproj`) and the other
-> C++ engine components -- `keyman32`, `kmtip`, `keymanhp`, `kmrefresh`,
-> `testhost` -- are NOT Delphi projects and don't need this preflight step.
-> They build via msbuild (driven through their own `build.sh` chain) and
-> their `.rc` files are compiled by msbuild as part of the C++ build.
-
-For `.rc` files that `#include <windows.h>` (kmcomapi `dialogs.rc`, setup
-`icons.rc`, engine `testhost.rc`), pass the Windows SDK include paths:
-
-```powershell
-& $rc /nologo `
-  /I "C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\um" `
-  /I "C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\shared" `
-  /I "C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\winrt" `
-  dialogs.rc
+```
+Delphi CE: CLI compilation is not available.
+Please build <project.dproj> in the Delphi IDE now, then press Enter to continue (or Ctrl-C to abort).
 ```
 
-`manifest.rc` references `manifest.xml`, which the script generates from
-`manifest.in` by substituting `$VersionWin` with the four-part version from
-`VERSION.md`:
+Pre-build steps (rc compilation, manifest generation) and post-build steps
+(binary copying, codegen) run automatically around your IDE builds.
 
-```powershell
-# Four-part version is the contents of VERSION.md with '.0' appended
-# (e.g. if VERSION.md is 19.0.241, $ver becomes 19.0.241.0).
-$ver = "$((Get-Content C:\Projects\keyman\keyman\VERSION.md).Trim()).0"
-$content = (Get-Content manifest.in -Raw) -replace '\$VersionWin', $ver
-# Write WITHOUT BOM -- rc.exe / Delphi tolerate it but the preflight script
-# does it this way and it avoids surprise diffs.
-[System.IO.File]::WriteAllText(
-  (Join-Path (Get-Location) 'manifest.xml'),
-  $content,
-  (New-Object System.Text.UTF8Encoding $false))
-& $rc /nologo manifest.rc
-```
+### 5.1 Pre-build resource compilation
 
-> [!NOTE]
-> Prefer running `scripts/preflight-resources.ps1` (section 5.1 below)
-> rather than the snippet above -- it already does the no-BOM write
-> correctly for every project. The snippet is documentation, not a
-> recommended workflow.
+`build_version.res()` and `build_manifest.res()` use `rc.exe` from the Visual
+Studio environment -- they work on CE without modification. They run inside each
+project's `build.sh build` before the IDE prompt appears.
 
 > [!IMPORTANT]
-> After regenerating any `.res`, in Delphi: **right-click the project ->
-> Clean, then Build**. An incremental Build silently embeds the stale
-> cached `.res` and you'll spend an hour wondering why your icon didn't
-> update.
+> After building in the IDE following a resource change, use **right-click →
+> Clean, then Build** in Delphi. An incremental Build silently embeds the stale
+> cached `.res`.
 
-### 5.2 `scripts/run-codegen.ps1`
+### 5.2 Codegen (devtools.exe, build_standards_data.exe)
 
-Drives `devtools.exe` and `build_standards_data.exe` to produce the
-generated `.pas` files that `engine.groupproj`, `desktop.groupproj`, and
-`developer.groupproj` depend on. Must be run after step 3 in section 4 and
-before step 5.
+Build the tools first via their `build.sh` scripts, which prompt for the IDE build
+then run codegen automatically:
 
-```powershell
-$DEVTOOLS = 'C:\Projects\keyman\keyman\common\windows\delphi\tools\devtools\bin\Win32\Debug\devtools.exe'
+```bash
+# Git Bash (KEYMAN_DELPHI_CE=1 and KEYMAN_DELPHI_VERSION=23.0 must be exported)
 
-# (a) MessageIdentifierConsts.pas -- engine/desktop dependency
-& $DEVTOOLS -buildmessageconstants `
-  C:\Projects\keyman\keyman\windows\src\desktop\kmshell\xml\strings.xml `
-  C:\Projects\keyman\keyman\windows\src\global\delphi\cust\MessageIdentifierConsts.pas
+# Build devtools: prompted to build devtools.dproj in IDE, then exits
+cd "$KEYMAN_ROOT/common/windows/delphi/tools/devtools"
+./build.sh build
 
-# (b) Per-locale Pascal files for setup.dpr
-# Trailing backslashes on both args are required (mirrors
-# windows/src/desktop/setup/build.sh:37)
-Push-Location C:\Projects\keyman\keyman\windows\src\desktop\setup
-& $DEVTOOLS -buildsetupstrings 'locale\' '.\'
-Pop-Location
-
-# (c) Locale index for kmshell support data overlay
-& $DEVTOOLS -buildlocaleindex `
-  C:\Projects\keyman\keyman\windows\src\desktop\kmshell\locale `
-  C:\Projects\keyman\keyman\windows\src\desktop\kmshell\locale\index.xml
+# Build build_standards_data: prompted for IDE build, then auto-runs all five
+# build_standards_data.exe invocations to generate the registry .pas files
+cd "$KEYMAN_ROOT/common/windows/delphi/tools/build_standards_data"
+./build.sh build
 ```
 
-```powershell
-$BSD  = 'C:\Projects\keyman\keyman\common\windows\delphi\tools\build_standards_data\bin\Win32\Debug\build_standards_data.exe'
-$DATA = 'C:\Projects\keyman\keyman\resources\standards-data'
-$OUT  = 'C:\Projects\keyman\keyman\common\windows\delphi\standards'
+The `-buildmessageconstants`, `-buildsetupstrings`, and `-buildlocaleindex` codegen
+steps run automatically when you build their dependent projects
+(`windows/src/global/delphi`, `windows/src/desktop/setup`, `windows/src/desktop/kmshell`).
 
-# Five invocations -- mirrors
-# common/windows/delphi/tools/build_standards_data/build.sh:41-45
-& $BSD iso6393  "$DATA\iso639-3\iso639-3.tab" `
-                "$OUT\Keyman.System.Standards.ISO6393ToBCP47Registry.pas"
-& $BSD suppress "$DATA\language-subtag-registry\language-subtag-registry" `
-                "$OUT\Keyman.System.Standards.BCP47SuppressScriptRegistry.pas"
-& $BSD subtag   "$DATA\language-subtag-registry\language-subtag-registry" `
-                "$OUT\Keyman.System.Standards.BCP47SubtagRegistry.pas"
-& $BSD lcid     "$DATA\windows-lcid-to-bcp-47\map_clean_win.txt" `
-                "$OUT\Keyman.System.Standards.LCIDToBCP47Registry.pas"
-& $BSD langtags "$DATA\langtags\langtags.json" `
-                "$OUT\Keyman.System.Standards.LangTagsRegistry.pas"
+All generated `.pas` files are `.gitignored` and must be regenerated after `git clean -fdx`.
+
+### 5.3 Overlay dev builds
+
+From an **elevated** Git Bash (right-click Git Bash → Run as administrator):
+
+```bash
+cd "$KEYMAN_ROOT/windows/src/engine"
+./build.sh install
+
+cd "$KEYMAN_ROOT/windows/src/desktop"
+./build.sh install
 ```
 
-All outputs are `.gitignored` and must be re-run after `git clean -fdx`.
+`windows/src/engine/kmcomapi/build.sh install` re-registers `kmcomapi.dll` via
+`regsvr32` automatically.
 
-### 5.3 `overlay-dev-builds.ps1`
-
-Copies the freshly-built dev binaries from the source tree over the
-installed Keyman 19 in `Program Files`, then re-runs
-`regsvr32 kmcomapi.dll` so the COM CLSIDs point at the new DLL.
-
-Because section 3.2 patches `manifest.in` to set `uiAccess="false"`, the
-unsigned dev `keyman.exe` is launchable from `Program Files` and the
-overlay script **does** copy the dev `keyman.exe` over the installed one
-(the `keyman.exe` copy line in `overlay-dev-builds.ps1` is active, not
-commented out). The list of overlaid binaries: `kmshell.exe`, `keyman.exe`,
-`kmcomapi.dll`, plus any DLLs in the source `windows\bin\` tree that exist
-in the corresponding install dir.
-
-Run **elevated** after each dev build cycle. The final `regsvr32` step is at
-lines 87-91 of the script:
-
-```powershell
-& regsvr32 /s 'C:\Program Files (x86)\Common Files\Keyman\Keyman Engine\kmcomapi.dll'
-```
-
-After overlay, launch Keyman via the Start Menu (or the installed
-`kmshell.exe` path) -- not from the dev tree -- so the install-time
-`TKeymanPaths` lookup finds support files.
+After overlay, launch Keyman via the Start Menu (or the installed `kmshell.exe`
+path) -- not from the dev tree -- so `TKeymanPaths.KeymanDesktopInstallPath()`
+finds the support files.
 
 > [!NOTE]
 > An alternative workflow -- keep `uiAccess="true"` in `manifest.in` (i.e.
@@ -790,10 +717,10 @@ After overlay, launch Keyman via the Start Menu (or the installed
 Because of `TKeymanPaths.KeymanDesktopInstallPath()`, the dev workflow is:
 
 1. Install Keyman 19 official from keyman.com (once).
-2. Build dev binaries in the Delphi IDE (per section 4).
-3. Run `scripts/preflight-resources.ps1` if any `.rc` content changed.
-4. Run `overlay-dev-builds.ps1` from elevated PowerShell.
-5. Launch Keyman from the Start Menu.
+2. Build dev binaries via `build.sh build` with `KEYMAN_DELPHI_CE=1` (per section 4).
+3. From an elevated Git Bash: `cd windows/src/engine && ./build.sh install`, then
+   `cd windows/src/desktop && ./build.sh install` (section 5.3).
+4. Launch Keyman from the Start Menu.
 
 If launching keyman.exe (the engine) directly from the dev `bin\` folder
 returns `Could not find keyman.exe (error=8235)`, check that section 3.2's
@@ -862,8 +789,9 @@ then build tsysinfo. See section 4 (c).
 
 ### `F1026 File not found: 'version.res'` or `'manifest.res'`
 
-Preflight resources weren't compiled. Run `scripts/preflight-resources.ps1`
-or invoke `rc.exe` manually for the project.
+Pre-build resource compilation didn't run. Re-run `build.sh build` for the
+project (which calls `build_version.res` / `build_manifest.res` before the IDE
+prompt), or invoke `rc.exe` manually from the project directory.
 
 ### `F1026 File not found: 'jvcl.inc'` / `'jedi/jedi.inc'` / `'jcl.inc'`
 
@@ -914,20 +842,24 @@ an aborted dev experiment). Install Keyman 19 official from keyman.com.
 
 ### `Class not registered ClassID {CF46549D-...}` on kmshell launch
 
-`kmcomapi.dll` isn't registered. Run elevated:
+`kmcomapi.dll` isn't registered. From an elevated Git Bash:
+
+```bash
+cd "$KEYMAN_ROOT/windows/src/engine/kmcomapi"
+./build.sh install
+```
+
+This re-registers the DLL automatically. If you want to run `regsvr32` directly:
 
 ```powershell
 & regsvr32 /s 'C:\Program Files (x86)\Common Files\Keyman\Keyman Engine\kmcomapi.dll'
 ```
 
-`overlay-dev-builds.ps1` does this automatically; if you bypassed the
-overlay, do it by hand.
-
 ### `Could not find keyman.exe (error=8235)`
 
 Windows blocked launch of an unsigned `uiAccess="true"` binary. Patch
 `windows/src/engine/keyman/manifest.in` per section 3.2, Clean + rebuild
-`keyman.dproj`, re-run `overlay-dev-builds.ps1`.
+`keyman.dproj`, then re-run `windows/src/engine/build.sh install` elevated.
 
 ---
 
@@ -942,6 +874,8 @@ unset):**
 
 * `resources/build/win/configure_environment.inc.sh` + `delphi_environment.inc.sh`
   -- `KEYMAN_DELPHI_VERSION` env-var override (default preserves 10.3 behavior).
+* `resources/build/win/environment.inc.sh` -- `KEYMAN_DELPHI_CE=1` interactive
+  mode for `delphi_msbuild` (no-op when unset).
 * `common/windows/delphi/tools/devtools/SourceRootPath.pas` -- VER350/VER360
   cases for `DelphiMajorVersion`.
 * `common/windows/delphi/web/Keyman.System.HttpServer.Base.pas` -- extend
