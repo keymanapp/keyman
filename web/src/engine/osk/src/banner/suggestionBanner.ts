@@ -667,10 +667,15 @@ export class SuggestionBanner extends Banner {
           // Invalidate the suggestions internally, but don't visually update;
           // this will avoid banner-flicker.
           this.currentSuggestions = [];
-          this.predictionContext.accept(suggestion.suggestion).then(() => {
-            // Reset the scroll state
-            this.container.scrollLeft = this.isRTL ? this.container.scrollWidth : 0;
-          });
+          this.predictionContext.accept(suggestion.suggestion);
+          // Trigger new predictions, as no input exists to trigger new ones otherwise.
+          // Reversions will re-use old suggestions, though.
+          if(suggestion.suggestion.tag != 'revert') {
+            this.predictionContext.triggerPredictions();
+          }
+
+          // Reset the scroll state
+          this.container.scrollLeft = this.isRTL ? this.container.scrollWidth : 0;
         }
 
         this.scrollState = null;
@@ -773,11 +778,10 @@ export class SuggestionBanner extends Banner {
       if(suggestions.length > i) {
         const suggestion = suggestions[i];
         d.update(suggestion, optionFormat);
-        if(this.predictionContext.selected == suggestion) {
-          d.highlight(true);
-        }
+        d.highlight(this.predictionContext.selected == suggestion)
       } else {
         d.update(null, optionFormat);
+        d.highlight(false);
       }
     }
 
