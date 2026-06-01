@@ -135,7 +135,7 @@ protected:
 public:
     state(core::abstract_processor & kb, km_core_option_item const *env);
 
-    state(state const &) = default;
+    state(state const &other);
     state(state const &&) = delete;
 
     ~state();
