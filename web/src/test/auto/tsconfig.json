@@ -5,6 +5,11 @@
     "outDir": "../../../build/test",
     "tsBuildInfoFile": "../../../build/test/tsconfig.tsbuildinfo",
     "rootDir": ".",
+    "types": [
+      "mocha",
+      "chai",
+      "node"
+    ],
   },
 
   "include": [
