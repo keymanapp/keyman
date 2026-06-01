@@ -229,28 +229,34 @@ must be reverted before any PR.
 > to drop the `inst\` segment or move the file. See section 3.3 and the
 > `[[delphi-12-local-patches]]` memory.
 
-### 3.1 Build-script: select Delphi version and enable CE interactive mode
+### 3.1 Build-script: select Delphi version
 
-Set both environment variables for Delphi 12 CE:
+`KEYMAN_DELPHI_VERSION` selects which Delphi installation `build.sh` and the
+builder tool-detection look for. It defaults to `20.0` (Delphi 10.3, the CI
+target), so unset == existing CI behavior.
+
+For any Delphi 12 installation (Professional or CE), set it to `23.0`:
 
 ```powershell
 # PowerShell (persistent for your user)
 [Environment]::SetEnvironmentVariable('KEYMAN_DELPHI_VERSION', '23.0', 'User')
-[Environment]::SetEnvironmentVariable('KEYMAN_DELPHI_CE', '1', 'User')
 ```
 
 ```bash
 # Git Bash (per-shell)
 export KEYMAN_DELPHI_VERSION=23.0
-export KEYMAN_DELPHI_CE=1
 ```
 
-`KEYMAN_DELPHI_VERSION` selects which Delphi installation `build.sh` looks for
-(defaults to `20.0` / Delphi 10.3). Without this override, `build.sh` looks for
-`C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\rsvars.bat`, which does not
-exist on a Delphi-12-only machine.
+Without this, `build.sh` looks for
+`C:\Program Files (x86)\Embarcadero\Studio\20.0\bin\rsvars.bat` and the builder
+platform system looks for `Studio\20.0\bin\dcc32.exe` to decide whether to include
+`win,delphi`-gated targets -- both fail silently on a Delphi-12-only machine.
 
-`KEYMAN_DELPHI_CE=1` switches `delphi_msbuild` into interactive mode. Instead of
+**Delphi 12 Professional** — setting `KEYMAN_DELPHI_VERSION=23.0` is sufficient.
+CLI compilation works normally; `build.sh` targets run end-to-end.
+
+**Delphi 12 Community Edition** — additionally set `KEYMAN_DELPHI_CE=1`. CE blocks
+CLI compilation, so `delphi_msbuild` switches to interactive mode: instead of
 invoking `msbuild.exe`, the script pauses and prompts:
 
 ```
@@ -258,12 +264,13 @@ Delphi CE: CLI compilation is not available.
 Please build <project.dproj> in the Delphi IDE now, then press Enter to continue.
 ```
 
-This means you use the same `build.sh` commands as a Professional Delphi user; the
-scripts orchestrate pre-build steps (rc compilation, codegen) and post-build steps
-(binary copying) around your IDE builds automatically.
+```powershell
+[Environment]::SetEnvironmentVariable('KEYMAN_DELPHI_CE', '1', 'User')
+```
 
-Both variables are backwards-compatible: when unset or `KEYMAN_DELPHI_CE=0`, all
-behavior is identical to the historical Delphi 10.3 CI defaults.
+```bash
+export KEYMAN_DELPHI_CE=1
+```
 
 ### 3.2 keyman.exe uiAccess strip (LOCAL ONLY, not committed)
 
