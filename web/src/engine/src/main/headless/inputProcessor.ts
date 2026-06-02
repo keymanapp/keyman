@@ -5,6 +5,8 @@ import { LanguageProcessor }  from "./languageProcessor.js";
 import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec, isEmptyTransform } from "keyman/common/web-utils";
 
+import { CoreKeyboardProcessor } from 'keyman/engine/core-processor';
+
 import {
   Codes,
   JSKeyboard, // required to be able to distinguish between JS and Core kbd processor
@@ -36,6 +38,7 @@ export class InputProcessor {
    */
   private contextDevice: DeviceSpec;
   private jsKbdProcessor: JSKeyboardProcessor;
+  private coreKbdProcessor: CoreKeyboardProcessor;
   private _keyboardProcessor: KeyboardProcessor;
   private _languageProcessor: LanguageProcessor;
 
@@ -55,6 +58,7 @@ export class InputProcessor {
   }
 
   public async init(paths: PathConfiguration, storeSerializer: VariableStoreSerializer): Promise<void> {
+    await this.coreKbdProcessor.init(paths.basePath, storeSerializer);
   }
 
   public get languageProcessor(): LanguageProcessor {
