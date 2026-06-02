@@ -52,7 +52,11 @@ begin
   begin
     builder := TStringBuilder.Create;
     try
+{$IF Defined(VER350) or Defined(VER360)}
+      obj.ToChars(builder, []);
+{$ELSE}
       obj.ToChars(builder);
+{$IFEND}
       Result := builder.ToString;
     finally
       builder.Free;
