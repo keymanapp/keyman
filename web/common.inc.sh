@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 #
 
-LIB_BUNDLER="${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
-
 # Compiles all build products corresponding to the specified target.
 # This should be called from the working directory of a child project's
 # build script.
@@ -19,7 +17,7 @@ LIB_BUNDLER="${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
 #   compile engine/main
 # ```
 function compile() {
-  if [ $# -lt 1 ]; then
+  if [[ $# -lt 1 ]]; then
     builder_die "Scripting error: insufficient argument count!"
   fi
 
@@ -29,10 +27,10 @@ function compile() {
   local SRC_DIR=${2:-"${KEYMAN_ROOT}/web/src"}
   local BUILD_DIR=${3:-"${KEYMAN_ROOT}/web/build"}
 
-  tsc -b "${SRC_DIR}/$COMPILE_TARGET"
+  tsc -b "${SRC_DIR}/${COMPILE_TARGET}"
 
   # So... tsc does declaration-bundling on its own pretty well, at least for local development.
-  tsc --emitDeclarationOnly --outFile "${BUILD_DIR}/$COMPILE_TARGET/lib/index.d.ts" -p "${SRC_DIR}/$COMPILE_TARGET"
+  tsc --emitDeclarationOnly --outFile "${BUILD_DIR}/${COMPILE_TARGET}/lib/index.d.ts" -p "${SRC_DIR}/${COMPILE_TARGET}"
 }
 
 function _copy_dir_if_exists() {
@@ -90,28 +88,36 @@ function prepare() {
 #   test-headless engine/osk
 # ```
 function test-headless() {
-  TEST_FOLDER=$1
-  TEST_BASE="${KEYMAN_ROOT}/web/src/test/auto/headless/"
-  TEST_EXTENSIONS=${2:-}
-  if [ ! -z "${2:-}" ]; then
+  local TEST_FOLDER=$1
+  local TEST_BASE="${KEYMAN_ROOT}/web/src/test/auto/headless/"
+  local TEST_EXTENSIONS=${2:-}
+  shift $(( $# < 2 ? $# : 2 ))
+
+  if [[ ! -z "${TEST_EXTENSIONS}" ]]; then
     TEST_BASE="${KEYMAN_ROOT}/web/build/test/headless/"
 
     # Ensure the compiled tests are available.
     tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
   fi
 
-  TEST_OPTS=()
+  local TEST_OPTS=()
   if builder_is_running_on_teamcity; then
     TEST_OPTS+=(--reporter "${KEYMAN_ROOT}/common/test/resources/mocha-teamcity-reporter/teamcity.cjs" --reporter-options parentFlowId="unit_tests")
     echo "##teamcity[flowStarted flowId='unit_tests']"
   fi
   if [[ -n "${TEST_EXTENSIONS}" ]]; then
+    # file extension of test files
     TEST_OPTS+=(--extension "${TEST_EXTENSIONS}")
   fi
 
-  if [[ -e .c8rc.json ]]; then
+  # Add any remaining arguments directly to Mocha.
+  TEST_OPTS+=("$@")
+
+  if [[ -e .c8rc.json && -z "${SKIP_C8:-}" ]]; then
+    builder_echo '> ' c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
     c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
   else
+    builder_echo '> ' mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
     mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
   fi
 

@@ -9,7 +9,7 @@
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;

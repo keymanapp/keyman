@@ -225,7 +225,6 @@
   <string name="SKCouldNotPrintKeyboard" comment="/FormatString: ">ကီးဘုတ်ို အောင်မြင်စွာ ပရင့် ထုတ်လို့မရပါ။ ဝက်ဘ်စာမျက်နှာမှာသိမ်းဆည်းပြီး ထုတ်ယူပါ</string>
   <string name="SKDamagedKeyboard" comment="/FormatString: ">&lt;ကီးဘုတ်ထိခိုက်ခြင်း&gt;	</string>
   <string name="SKDebuggingWarning" comment="/FormatString: ">Keyman debug information will be stored in a text file called keymanlog\system.log on your desktop. You should exit Keyman before reading or deleting this file. WARNING: This file can grow large very quickly. Enabling debugging will slow down your system and should only be done if advised by Tavultesoft support. PRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type. You should only turn on the debug log for the duration of a debugging or diagnostic session, and delete the [desktop]\keymanlog\system.log file as soon as possible</string>
-  <string name="SKDefaultLanguageCode" comment="/FormatString: ">en</string>
   <string name="SKDialogSelectLanguage" comment="/FormatString: ">သုံးစွဲသူအတွက်ဘာသာစကားကို ရွေးချယ်ပါ</string>
   <string name="SKDialogUILanguageCreateTranslation" comment="/FormatString: ">အွန်လိုင်းဘာသာပြန်မှုအသစ်ကို ဖန်တီးပါ</string>
   <string name="SKDownloadProgress_Title" comment="/FormatString: ">ဖိုင်ကိုဒေါင်းလုဒ်ဆွဲနေသည်</string>
