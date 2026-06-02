@@ -10,10 +10,7 @@
 cmpfiles = ['-c', 'import sys; a = open(sys.argv[1], \'r\').read(); b = open(sys.argv[2], \'r\').read(); sys.exit(not (a==b))']
 stnds = join_paths(meson.current_source_dir(), 'standards')
 
-libsrc = include_directories(
-  '../src',
-  '../../common/include'
-)
+libsrc = include_directories('../src')
 
 # kmx_test_source is required for linux builds, so always enable it even when we
 # disable all other tests
