@@ -32,7 +32,7 @@ function downloadSource() {
   cd ..
   mv "keyman-${version}" "${KEYMAN_ROOT}/linux/${packageDir}"
   mv "keyman_${version}.orig.tar.xz" "${KEYMAN_ROOT}/linux/${packageDir}"
-  mv "keyman_${version}.pkg.tar.xz" "${KEYMAN_ROOT}/linux/${packageDir}"
+  mv "keyman-${version}.tar.xz" "${KEYMAN_ROOT}/linux/${packageDir}"
   mv "keyman"*.asc "${KEYMAN_ROOT}/linux/${packageDir}"
   rm "keyman"*.debian.tar.xz
   cd "${KEYMAN_ROOT}/linux/${packageDir}" || exit
