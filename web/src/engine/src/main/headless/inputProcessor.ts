@@ -79,7 +79,13 @@ export class InputProcessor {
 
   public set activeKeyboard(keyboard: Keyboard) {
 
-    this._keyboardProcessor = this.jsKbdProcessor;
+    // TODO-web-core if (keyboard instanceof JSKeyboard || keyboard == null) {
+      // TODO-web-core: consider keyboard==null scenario; which keyboardProcessor should be active?
+      this._keyboardProcessor = this.jsKbdProcessor;
+    // TODO-web-core } else {
+      // TODO-web-core this._keyboardProcessor = this.coreKbdProcessor;
+    // TODO-web-core }
+
     this.keyboardInterface.activeKeyboard = keyboard;
 
     // All old deadkeys and keyboard-specific cache should immediately be invalidated
