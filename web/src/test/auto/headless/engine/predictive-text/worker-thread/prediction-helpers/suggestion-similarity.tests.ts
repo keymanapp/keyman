@@ -277,6 +277,46 @@ describe('processSimilarity', () => {
     assert.deepEqual(it_is.components.prediction, keep_it_is);
   });
 
+  it('operates properly when no transition in context occurs', () => {
+    const transformId = 314159;
+
+    const context: Context = {
+      left: 'appl',
+      right: '',
+      startOfBuffer: true,
+      endOfBuffer: true
+    };
+
+    const distribution: IntermediateCompositedPrediction[] = [
+      {
+        components: {
+          prediction: {
+            transform: {
+              insert: 'apple',
+              deleteLeft: 4,
+              id: transformId
+            },
+            transformId,
+            displayAs: 'apple'
+          },
+          correction: 'appl'
+        },
+        metadata: {
+          probabilities: {
+            prediction: 1,
+            correction: 1,
+            total: 1
+          },
+          autoSelectable: true
+        }
+      }
+    ];
+
+    const result = processSimilarity(testModelWithCasing, distribution, context, context);
+    assert.isFalse(result);
+    assert.equal(distribution[0].metadata.matchLevel, SuggestionSimilarity.none);
+  });
+
   describe('with casing', () => {
     // If we ever add a mode that can force lowercase for certain words even
     // when the context is title-cased or upper-cased, this scenario would be

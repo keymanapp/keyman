@@ -203,6 +203,12 @@ export class ModelCompositor {
       }
     }
 
+    if(suggestions.filter((s) => s.tag == 'keep').length > 1) {
+      throw new Error(`Unexpected state:  multiple keep suggestions exist: ${JSON.stringify(suggestions.filter((s) => s.tag == 'keep'))}`);
+    } else if(suggestions.filter((s) => s.tag == 'revert').length > 1) {
+      throw new Error(`Unexpected state:  multiple revert suggestions exist! ${JSON.stringify(suggestions.filter((s) => s.tag == 'revert'))}`);
+    }
+
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
     if(postContextState) {
