@@ -8,7 +8,7 @@ import {
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 import { DeviceSpec } from 'keyman/common/web-utils';
-import { JSKeyboard, Keyboard, KMXKeyboard } from "keyman/engine/keyboard";
+import { JSKeyboard, Keyboard } from "keyman/engine/keyboard";
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import * as views from './viewsAnchorpoint.js';
@@ -680,10 +680,6 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
   ): HTMLElement {
     const PKbd = (PInternalName != null ? this.keyboardRequisitioner.cache.getKeyboard(PInternalName) : null) || this.core.activeKeyboard;
 
-    if (PKbd instanceof KMXKeyboard) {
-      // TODO-embed-osk-in-kmx: implement for KMX keyboards
-      return null;
-    }
     const jsKbd = PKbd as JSKeyboard;
     const Pstub = this.keyboardRequisitioner.cache.getStub(jsKbd);
 

@@ -1,5 +1,3 @@
-import { KM_Core, KM_CORE_STATUS } from 'keyman/engine/core-adapter';
-import { KMXKeyboard } from './kmxKeyboard.js';
 import { KeyboardHarness } from "./keyboardHarness.js";
 import { KeyboardProperties } from "./keyboardProperties.js";
 import { KeyboardLoadErrorBuilder, StubBasedErrorBuilder, UriBasedErrorBuilder } from './keyboardLoadError.js';
@@ -59,12 +57,8 @@ export abstract class KeyboardLoaderBase {
 
     if (this.isKMXKeyboard(byteArray)) {
       // KMX or LDML (KMX+) keyboard
-      const name = this.extractIdFromUrl(uri);
-      const result = KM_Core.instance.keyboard_load_from_blob(name, byteArray);
-      if (result.status == KM_CORE_STATUS.OK) {
-        return new KMXKeyboard(result.object);
-      }
-      throw errorBuilder.invalidKeyboard(new Error(`Loading KMX keyboard from ${uri} failed with status ${result.status}`));
+      // For version 19, disable loading of .kmx keyboards
+      throw new Error("TODO: .kmx files are not currently supported");
     }
 
     let script: string;
@@ -76,11 +70,6 @@ export abstract class KeyboardLoaderBase {
 
     // .js keyboard
     return await this.loadKeyboardFromScript(script, errorBuilder);
-  }
-
-  private extractIdFromUrl(uri: string): string {
-    // Extract filename without extension from the URL
-    return uri.split('/').pop().replace(/\.[^/.]+$/, '');
   }
 
   protected abstract loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array>;

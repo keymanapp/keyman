@@ -17,16 +17,6 @@
       "types": "./build/engine/obj/attachment/index.d.ts",
       "import": "./build/engine/obj/attachment/index.js"
     },
-    "./engine/core-adapter": {
-      "es6-bundling": "./src/engine/src/core-adapter/index.ts",
-      "types": "./build/engine/obj/core-adapter/index.d.ts",
-      "import": "./build/engine/obj/core-adapter/index.js"
-    },
-    "./engine/core-processor": {
-      "es6-bundling": "./src/engine/src/core-processor/index.ts",
-      "types": "./build/engine/obj/core-processor/index.d.ts",
-      "import": "./build/engine/obj/core-processor/index.js"
-    },
     "./engine/dom-utils": {
       "es6-bundling": "./src/engine/src/dom-utils/index.ts",
       "types": "./build/engine/obj/dom-utils/index.d.ts",
