@@ -3,7 +3,8 @@ import { ModifierKeyConstants } from '../consts/modifier-key-constants.js';
 
 /* Definitions from kmx_file.h. Must be kept in sync */
 
-// TODO: split kmx-file from kmx in-memory, similar to what I've done for kvk (keep restructure decl + BUILDER_ interfaces together)
+// TODO-embed-osk-in-kmx: split kmx-file from kmx in-memory, similar to what I've done for kvk (keep restructure decl + BUILDER_ interfaces together)
+// this will make it possible to use these declarations in KeymanWeb
 
 // In memory representations of KMX structures
 // kmx-builder will transform these to the corresponding COMP_xxxx

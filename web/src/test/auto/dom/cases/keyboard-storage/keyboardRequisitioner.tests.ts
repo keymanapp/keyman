@@ -2,10 +2,10 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';
+import { DOMKeyboardLoader } from 'keyman/engine/keyboard';
 import { PathConfiguration } from 'keyman/engine/interfaces';
 import { CloudQueryEngine, KeyboardRequisitioner, type KeyboardStub } from 'keyman/engine/keyboard-storage';
-import DOMCloudRequester from 'keyman/engine/keyboard-storage/dom-requester';
+import { DOMCloudRequester } from 'keyman/engine/keyboard-storage';
 
 const pathConfig = new PathConfiguration({
   root: '',
