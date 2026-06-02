@@ -86,3 +86,7 @@ _node_select_version_with_nvm() {
     builder_die "Attempted to select node.js version $REQUIRED_NODE_VERSION but found $CURRENT_NODE_VERSION instead"
   fi
 }
+
+node_es_bundle() {
+  node "${KEYMAN_ROOT}/common/tools/es-bundling/build/common-bundle.mjs" "$@"
+}
