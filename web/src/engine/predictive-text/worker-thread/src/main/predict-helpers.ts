@@ -308,6 +308,10 @@ export function determineTraversallessCorrectionSequences(
 
     // But, for now, only actually use the last one.
     const suggestionParams = buildCorrectionSequence(transitionEffects, context, new TokenizationResultMapping([correctionRoots[correctionRoots.length - 1]], null));
+    if(transformId !== undefined) {
+      suggestionParams.tokens.forEach((token) => token.correction.sample.id = transformId);
+    }
+
     const tokenizationMapping = mapWhitespacedTokenization(tokenization.left.map((t) => { return {exampleInput: t.text, codepointLength: KMWString.length(t.text)} }), lexicalModel, correction.sample);
     const tokenizedCorrection = tokenizationMapping.tokenizedTransform;
     const tokenizedCorrectionEntries = [...tokenizedCorrection.values()];
@@ -322,9 +326,6 @@ export function determineTraversallessCorrectionSequences(
       ...suggestionParams,
       applyInPost: (p) => {
         p.metadata.preservationTransform = preservationTransform;
-        if(transformId !== undefined) {
-          p.components.forEach((entry) => entry.prediction.transformId = transformId);
-        }
       }
     })
   }
@@ -675,7 +676,6 @@ export async function correctAndEnumerate(
     return {
       rawPredictions: predictionData.flatMap((entry) => {
         const predictions = predictFromCorrectionSequence(lexicalModel, entry);
-        predictions.forEach((p) => entry.applyInPost(p));
         return predictions;
       })
     };
@@ -736,7 +736,6 @@ export async function correctAndEnumerate(
     const predictionPrep = determineTokenizedCorrectionSequence(transition, tokenization, new TokenizationResultMapping([match], corrector));
 
     const predictions = predictFromCorrectionSequence(lexicalModel, predictionPrep);
-    predictions.forEach((p) => predictionPrep.applyInPost(p));
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && (bestCorrectionCost === undefined || bestCorrectionCost > match.totalCost)) {
@@ -907,6 +906,8 @@ export function predictFromCorrectionSequence(
 
     return returnVal;
   });
+
+  completePredictionTuples.forEach((pt) => predictionPrep.applyInPost(pt));
 
   return completePredictionTuples;
 }
@@ -1147,6 +1148,7 @@ export function createDefaultKeep(
   let keepOption = toAnnotatedSuggestion(lexicalModel, keepSuggestion, 'keep');
   if(inputTransform.id !== undefined) {
     keepOption.transformId = inputTransform.id;
+    keepOption.transform.id = inputTransform.id;
   }
   keepOption.matchesModel = false;
 
