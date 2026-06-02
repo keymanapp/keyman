@@ -262,6 +262,12 @@ of appropriate node versions during builds.
     Delphi 11, `23.0` for Delphi 12 — before running `build.sh`. The default
     (`20.0`, Delphi 10.3) is preserved when the variable is unset.
 
+  * If you only have access to a **Delphi Community Edition** (e.g. Delphi 12 CE),
+    see [windows-delphi-ce.md](windows-delphi-ce.md) for an IDE-based workflow
+    that papers over the missing command-line compiler. The shell-script knob
+    (`KEYMAN_DELPHI_CE=1`) described there is local-only and not required for
+    the standard 10.3 / Pro flow.
+
   Start Delphi IDE once after installation as it will create various environment
   files and take you through required registration.
 
