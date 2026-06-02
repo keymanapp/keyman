@@ -275,35 +275,34 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
   }
 
   /**
-   * Function     setKeyboardForControl
-   * Scope        Public
-   * @param       {Element}    Pelem    Control element
-   * @param       {string|null=}    Pkbd     JSKeyboard (Clears the set keyboard if set to null.)
-   * @param       {string|null=}     Plc      Language Code
-   * Description  Set default keyboard for the control
+   * Associate control with independent keyboard settings initialized to a specific keyboard.
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/setKeyboardForControl
+   *
+   * @param       {Element}       elem          The control element to be managed manually
+   * @param       {string|null=}  keyboard      JSKeyboard (Clears the set keyboard if set to null)
+   * @param       {string|null=}  languageCode  Language Code
    */
-  public setKeyboardForControl(Pelem: HTMLElement, Pkbd?: string, Plc?: string): void {
-    if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
+  public setKeyboardForControl(elem: HTMLElement, keyboard?: string, languageCode?: string): void {
+    if(elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
     }
 
-    if(!this.isAttached(Pelem)) {
-      console.error("KeymanWeb is not attached to element " + Pelem);
+    if(!this.isAttached(elem)) {
+      console.error("KeymanWeb is not attached to element " + elem);
       return;
     }
 
     let stub = null;
-    if(Pkbd) {
-      stub = this.keyboardRequisitioner.cache.getStub(Pkbd, Plc);
+    if(keyboard) {
+      stub = this.keyboardRequisitioner.cache.getStub(keyboard, languageCode);
       if(!stub) {
-        throw new Error(`No keyboard has been registered with id ${Pkbd} and language code ${Plc}.`);
+        throw new Error(`No keyboard has been registered with id ${keyboard} and language code ${languageCode}.`);
       }
     }
 
-    this.contextManager.setKeyboardForTextStore(Pelem._kmwAttachment.textStore, Pkbd, Plc);
+    this.contextManager.setKeyboardForTextStore(elem._kmwAttachment.textStore, keyboard, languageCode);
   }
 
   /**
