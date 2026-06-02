@@ -542,8 +542,18 @@ if(!keymanweb) {
         }
 
         // Highlight the last active keyboard
-        const sk=keymanweb.getSavedKeyboard().split(':');
-        this.updateMenu(sk[0],sk[1]);
+        let activeKeyboard = keymanweb.getActiveKeyboard();
+        let activeLanguage = '';
+        if (activeKeyboard) {
+          activeLanguage = keymanweb.getActiveLanguage();
+        } else {
+          // savedKeyboard is only correct if we use global keyboard settings,
+          // otherwise it's set to the first keyboard in the list
+          const savedKeyboard = keymanweb.getSavedKeyboard().split(':');
+          activeKeyboard = savedKeyboard[0];
+          activeLanguage = savedKeyboard[1];
+        }
+        this.updateMenu(activeKeyboard, activeLanguage);
       }
 
       /* ----------------------------------------

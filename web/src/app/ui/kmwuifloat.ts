@@ -261,12 +261,19 @@ if(!keymanweb) {
         }
         this.updateList = false;
 
-        // Set the menu selector to the currently saved keyboard
-        const sk = keymanweb.getSavedKeyboard().split(':');
-        if(sk.length < 2) {
-          sk[1] = '';
+        // Set the menu selector to the last active keyboard
+        let activeKeyboard = keymanweb.getActiveKeyboard();
+        let activeLanguage = '';
+        if (activeKeyboard) {
+          activeLanguage = keymanweb.getActiveLanguage();
+        } else {
+          // savedKeyboard is only correct if we use global keyboard settings,
+          // otherwise it's set to the first keyboard in the list
+          const savedKeyboard = keymanweb.getSavedKeyboard().split(':');
+          activeKeyboard = savedKeyboard[0];
+          activeLanguage = savedKeyboard.length < 2 ? '' : savedKeyboard[1];
         }
-        this.updateMenu(sk[0],sk[1]);
+        this.updateMenu(activeKeyboard, activeLanguage);
 
         // Redisplay the UI to correct width for any new language entries
         if(keymanweb.getLastActiveElement()) {
