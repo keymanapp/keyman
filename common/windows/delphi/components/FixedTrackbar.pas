@@ -70,7 +70,11 @@ end;
 {$MESSAGE WARN 'Not yet checked against Delphi 10.4'}
 {$IFNDEF VER330}
 {$IFNDEF VER320}
+{$IFNDEF VER350}
+{$IFNDEF VER360}
 {$MESSAGE ERROR 'Check that this fix is still applicable for a new version of Delphi. Checked against Delphi 10.2, 10.3' }
+{$ENDIF}
+{$ENDIF}
 {$ENDIF}
 {$ENDIF}
 {$ENDIF}

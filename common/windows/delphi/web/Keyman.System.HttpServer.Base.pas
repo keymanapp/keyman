@@ -46,7 +46,13 @@ begin
   // Indy's UTF8 handling of URLs is *completely* broken.
   // We may need to check this with updated versions of Delphi
 {$IFNDEF VER330}
+{$IFNDEF VER340}
+{$IFNDEF VER350}
+{$IFNDEF VER360}
   ERROR! Check if this is still needed with Delphi update
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
 {$ENDIF}
 
   SetLength(s, p.Length);
