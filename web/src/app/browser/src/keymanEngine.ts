@@ -400,7 +400,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    */
   // TODO-web-core: check each property of Lstub for KMXKeyboard availability
   private _GetKeyboardDetail(Lstub: KeyboardStub, Lkbd: Keyboard): KeyboardDetails { // I2078 - Full keyboard detail
-   return {
+   return Lstub && {
       Name: Lstub.KN,
       InternalName: Lstub.KI,
       LanguageName: Lstub.KL,  // I1300 - Add support for language names
@@ -461,12 +461,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     const stub = this.keyboardRequisitioner.cache.getStub(id, langCode);
     const keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(stub);
 
-    if (keyboard instanceof JSKeyboard) {
-      return stub && this._GetKeyboardDetail(stub, keyboard);
-    } else {
-      // TODO-web-core: do this work in _GetKeyboardDetail (implement for KMX keyboards)
-      return null;
-    }
+    return this._GetKeyboardDetail(stub, keyboard);
   }
 
   /**
@@ -483,11 +478,9 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     const keyboardStubs = cache.getStubList()
     for (const stub of keyboardStubs) {
       const keyboard = cache.getKeyboardForStub(stub);
-      if (keyboard instanceof JSKeyboard) {
-        const keyboardDetails = this._GetKeyboardDetail(stub, keyboard);
+      const keyboardDetails = this._GetKeyboardDetail(stub, keyboard);
+      if (keyboardDetails) {
         detailsForAllKeyboards.push(keyboardDetails);
-      } else {
-        // TODO-web-core:  do this work in _GetKeyboardDetail (implement for KMX keyboards if needed)
       }
     }
     return detailsForAllKeyboards;
