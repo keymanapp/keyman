@@ -6,7 +6,7 @@ export { KeyboardMinimalInterface } from './keyboards/keyboardMinimalInterface.j
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
 export { NotifyEventCode, KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
 export { KeyboardLoadErrorBuilder, KeyboardMissingError, KeyboardScriptError, KeyboardDownloadError, InvalidKeyboardError } from './keyboards/keyboardLoadError.js'
-export { BeepHandler, EventMap, KeyboardProcessor } from "./keyboards/keyboardProcessor.js";
+export { AbstractKeyboardProcessor, BeepHandler, EventMap, KeyboardProcessor } from "./keyboards/keyboardProcessor.js";
 export {
   CloudKeyboardFont,
   internalizeFont,
