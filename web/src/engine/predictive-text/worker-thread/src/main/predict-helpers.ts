@@ -748,7 +748,7 @@ export function predictFromCorrectionSequence(
       }
     }, {sample: '', p: 1})
 
-    if(transitionId) {
+    if(transitionId !== undefined) {
       fullPrediction.sample.transform.id = transitionId;
       fullPrediction.sample.transformId = transitionId;
     }

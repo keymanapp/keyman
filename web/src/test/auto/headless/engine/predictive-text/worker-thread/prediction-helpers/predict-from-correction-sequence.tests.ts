@@ -191,6 +191,53 @@ describe('predictFromCorrectionSequence', () => {
       assert.approximately(predictions[1].totalProb, 0.02 * 0.6, 0.00001);
       predictions.forEach((prediction) => assert.equal(prediction.prediction.sample.transformId, transitionID));
     });
+
+    it('constructs suggestions without input (as if after a context reset)', () => {
+      const context: Context = {
+        left: 'appl',
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      const correctionDistribution: Distribution<Transform> = [{
+          sample: {
+            insert: 'appl',
+            deleteLeft: 4
+          },
+          p: 1
+        }
+      ];
+
+      const dummied_suggestions: Outcome<Suggestion>[] = [
+        {
+          transform: {
+            insert: "apple",
+            deleteLeft: 4
+          },
+          displayAs: "apple",
+          p: 0.5
+        }
+      ];
+
+      const model = new DummyModel({
+        ...DUMMY_MODEL_CONFIG,
+        futureSuggestions: [ dummied_suggestions ]
+      });
+
+      const transitionID = 12345;
+      const predictions = predictFromCorrectionSequence(model, correctionDistribution, context, transitionID);
+      predictions.forEach((entry) => assert.equal(entry.correction.sample, 'appl'));
+      predictions.forEach((entry) => assert.equal(entry.correction.p, 1));
+      predictions.sort(tupleDisplayOrderSort);
+
+      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions.map((s) => {
+        delete s.p;
+        s.transformId = transitionID;
+        s.transform.id = transitionID;
+        return s;
+      }));
+    });
   });
 
   describe('on a sequence of corrections', () => {
