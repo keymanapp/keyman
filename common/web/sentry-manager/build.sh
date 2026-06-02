@@ -11,7 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe "Sentry error reporting module for embedded Keyman Engine for Web" \
   "@/common/tools/es-bundling" \
   "@/common/web/keyman-version" \
-  clean configure build
+  clean configure build test
 
 builder_describe_outputs \
   configure          /node_modules \
@@ -22,7 +22,7 @@ builder_parse "$@"
 # ---------------------------------------------------------------------------------
 
 function do_build() {
-  tsc --build "./tsconfig.json"
+  tsc --build
 
   node_es_bundle "${KEYMAN_ROOT}/common/web/sentry-manager/build/obj/src/index.js" \
     --out        "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/index.js" \
