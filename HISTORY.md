@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.241 alpha 2026-06-02
+
+* chore(web): web-core preflight - strip core references (#16040)
+* docs: add note on how to use composer on dockerized websites (#16029)
+* fix(web): fix race displaying active keyboard in menu (#16042)
+
 ## 19.0.240 alpha 2026-05-28
 
 * chore(web): add filename to link text of manual web tests (#16019)
