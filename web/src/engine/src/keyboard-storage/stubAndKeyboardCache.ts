@@ -1,4 +1,4 @@
-import { Keyboard, JSKeyboard, KeyboardLoaderBase as KeyboardLoader } from "keyman/engine/keyboard";
+import { Keyboard, JSKeyboard, KeyboardLoaderBase as KeyboardLoader, KMXKeyboard } from "keyman/engine/keyboard";
 import { EventEmitter } from "eventemitter3";
 
 import { KeyboardStub } from "./keyboardStub.js";
@@ -49,6 +49,13 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
   }
 
   shutdown(): void {
+    for (const kbdId in this.keyboardTable) {
+      const kbd = this.keyboardTable[kbdId];
+      if (kbd instanceof KMXKeyboard) {
+        (kbd as KMXKeyboard).shutdown();
+      }
+      // TODO-web-core: do we have to do something if instanceof Promise?
+    }
   }
 
   getKeyboardForStub(stub: KeyboardStub): Keyboard {
@@ -196,7 +203,7 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
     let keyboardID: string;
     const languageID = arg1 || '---';
 
-    if (arg0 instanceof JSKeyboard) {
+    if (arg0 instanceof JSKeyboard || arg0 instanceof KMXKeyboard) {
       keyboardID = arg0.id;
     } else {
       keyboardID = arg0 as string;
@@ -228,7 +235,7 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
    *              If `false`, only forgets the metadata (stubs).
    */
   forgetKeyboard(keyboard: string | Keyboard, purge: boolean = false) {
-    const id: string = (keyboard instanceof JSKeyboard) ? keyboard.id : toPrefixedKeyboardId(keyboard as string);
+    const id: string = (keyboard instanceof JSKeyboard || keyboard instanceof KMXKeyboard) ? keyboard.id : toPrefixedKeyboardId(keyboard as string);
 
     if(this.stubSetTable[id]) {
       delete this.stubSetTable[id];
