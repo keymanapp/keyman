@@ -79,7 +79,7 @@ test.describe('Baseline tests', () => {
 
   // Find all k_*.kmn files in testDir
   const files = fs.readdirSync(KeymanRoot() + testDir).filter(f => f.match(/^k_.*\.kmn$/));
-  for (const ext of ['.js']) {
+  for (const ext of ['.kmx', '.js']) {
     test.describe(`${ext} tests`, () => {
       for (const file of files) {
         test(file, async ({ page }) => {
