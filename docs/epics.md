@@ -5,6 +5,7 @@ This document lists epics in the Keyman project.
  Name                  | Lead      | Target release | Spec
 -----------------------|-----------|----------------|--------------------
  epic/embed-osk-in-kmx | @mcdurdin | 19.0           | [embed-osk-in-kmx]
+ epic/kmc-test         | @mcdurdin | 20.0           |
 
 
 Note: when establishing a new epic branch, add the details of the epic to this
