@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.242 alpha 2026-06-03
+
+* fix(web): fix displaying of keyboard menu (#16061)
+
 ## 19.0.241 alpha 2026-06-02
 
 * chore(web): web-core preflight - strip core references (#16040)
