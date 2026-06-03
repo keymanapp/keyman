@@ -23,8 +23,7 @@ Include the following script in the HEAD of your page:
   }
 
   /* KWControlClick: Called when user clicks on the KWControl IMG */
-  function KWControlClick()
-  {
+  function KWControlClick() {
     if(keyman.osk.isEnabled()) {
       keyman.osk.hide();
     } else {
@@ -61,9 +60,11 @@ And finally, include the control img for KeymanWeb:
 ## API References
 
 On programmatically setting the keyboard:
+
 - [`keyman.setActiveKeyboard()`](../../reference/core/setActiveKeyboard).
 
 On managing the visibility of the OSK:
+
 - [`keyman.osk.hide()`](../../reference/osk/hide)
 - [`keyman.osk.show()`](../../reference/osk/show).
 
