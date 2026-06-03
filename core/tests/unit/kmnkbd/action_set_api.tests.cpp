@@ -68,7 +68,7 @@ void setup(const char *keyboard, const km_core_cu* context) {
 }
 
 void run_test(km_core_action_item const * action_items, const km_core_actions &actions) {
-  setup("k_000___null_keyboard.kmx", u"");
+  setup("k_0000___null_keyboard.kmx", u"");
   test_state->set_actions(actions);
   auto set_actions = test_state->actions();
 

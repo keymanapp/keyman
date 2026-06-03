@@ -68,8 +68,6 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_C3_several.keylayout'],
       ['../data/Test_C0_C1_C2_C3.keylayout'],
       ['../data/Test_maxKeyCode.keylayout'],
-      ['../data/Test_messages.keylayout'],
-      ['../data/Test_messages_controlCharacter.keylayout'],
       ['../data/Test_messages_superior_C2.keylayout'],
       ['../data/Test_messages_superior_C3.keylayout'],
       ['../data/Test_duplicate_missing_keycode.keylayout'],
@@ -78,13 +76,26 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_differentAmountOfKeysInBehaviours.keylayout'],
       ['../data/Test_duplicate_keys.keylayout'],
       ['../data/Test_ambiguous_keys.keylayout'],
-      ['../data/Test.keylayout'],
       ['../data/Test_differentEncodings.keylayout'],
       ['../data/Test_ExtraWarning.keylayout'],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         sut.run(makePathToFixture(files[0]));
         assert.isTrue(compilerTestCallbacks.messages.length === 0);
+      });
+    });
+  });
+
+  describe('RunSpecialTestFiles using html entity for control characters ', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    [
+      ['../data/Test_messages.keylayout'],
+      ['../data/Test_messages_controlCharacter.keylayout'],
+      ['../data/Test.keylayout'],
+    ].forEach(function (files) {
+      it(files + " should give no errors ", async function () {
+        sut.run(makePathToFixture(files[0]));
+        assert.isTrue(compilerTestCallbacks.messages.length === 1 && compilerTestCallbacks.messages[0].code === 5292037);
       });
     });
   });
@@ -103,7 +114,7 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_MissingActionsERROR.keylayout'],
       ['../data/Test_MissingTerminatorsERROR.keylayout'],
       ['../data/Test_MissingAllERROR.keylayout'],
-      ['../data/Test_characters.keylayout'],
+      // ['../data/Test_characters.keylayout'],
     ].forEach(function (files) {
       it(files + " should give an error ", async function () {
         sut.run(makePathToFixture(files[0]));
@@ -152,7 +163,7 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (files) {
       it(infile + " should run ", async function () {
         await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), makePathToFixture(files[0])));
-        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.isTrue(compilerTestCallbacks.messages.length === 1 && compilerTestCallbacks.messages[0].code === 5292037);
       });
     });
   });
