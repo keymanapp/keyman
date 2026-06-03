@@ -41,8 +41,6 @@ Also include the following HTML code:
          // example without detailing paths precisely in the init() call's parameter.-->
 </head>
 
-
-<!-- When the page has finished loading, advise KeymanWeb of control settings, see above -->
 <body>
 ```
 

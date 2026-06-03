@@ -29,8 +29,6 @@ In this example, we use only the LaoKey keyboard. Please click [this link](./__a
 </head>
 ```
 
-As you can see above, the second line in the code snippet above references the LaoKey keyboard loader JavaScript file. This is a small stub file, typically less than 200 bytes, that defines the name and actual location of the real keyboard file (in this case, **laokeys.js**). When a page may reference many keyboards, this saves downloading potentially hundreds of kilobytes of unused Javascript keyboards - the keyboard is downloaded when it is first selected by the user.
-
 ## API References
 
 On initialization: [`keyman.init()`](../../reference/core/init).
