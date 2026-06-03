@@ -10,28 +10,23 @@ Include the following script in the HEAD of your page:
 
 ```js
 <script type="text/javascript">
-  function SetupDocument() {
-    keyman.init({
-      root: './',  // Note - if drawing the latest version of KeymanWeb from the CDN, this will
-                   // default to the source folder on our servers.
-      ui: 'toggle',
-      resources: './'
-    }).then(function() {
-      // Load the keyboards of your choice here.
-      loadKeyboards();
+  keyman.init({
+    root: './',  // Note - if drawing the latest version of KeymanWeb from the CDN, this will
+                  // default to the source folder on our servers.
+    ui: 'toggle',
+    resources: './'
+  }).then(async function() {
+    // Load the keyboards of your choice here.
+    await loadKeyboards();
 
-      /* Disable KeymanWeb interaction on the 'Email to' TEXT control */
-      keyman.disableControl(document.f.address);
-      /* Set the default keyboard for the 'Subject' TEXT control to 'off' (i.e. default browser keyboard) */
-      /* As KeymanWeb relies on the on-screen keyboard to change languages for touch-based devices, this will
-       * not work for them and will default to the first language added to KeymanWeb after initialization. */
-      keyman.setKeyboardForControl(document.f.subject, '', '');
-      /* Set the default keyboard for the 'Message body' TEXTAREA to the LaoKeys keyboard */
-      keyman.setKeyboardForControl(document.f.text, 'Keyboard_laokeys', 'lo');
-    });
-  }
-
-  window.addEventListener( 'load' , SetupDocument );
+    // Disable KeymanWeb interaction on the 'Email to' TEXT control
+    keyman.disableControl(document.f.address);
+    // Set the default keyboard for the 'Subject' TEXT control to 'off' (i.e. default
+    // browser keyboard)
+    keyman.setKeyboardForControl(document.f.subject, '', '');
+    // Set the default keyboard for the 'Message body' TEXTAREA to the LaoKeys keyboard
+    keyman.setKeyboardForControl(document.f.text, 'Keyboard_laokeys', 'lo');
+  });
 </script>
 ```
 
@@ -48,8 +43,9 @@ Also include the following HTML code:
 
 
 <!-- When the page has finished loading, advise KeymanWeb of control settings, see above -->
-<body onload="SetupDocument()">
+<body>
 ```
+
 ---
 **Note:** In this example we disabled the first element (`document.f.address`) by API call. A later API call can re-enable KeymanWeb for this control should it fit the page's design. Alternatively, this can be done by instead adding the class `'kmw-disabled'` to the control. This will permanently block KeymanWeb from handling its input.
 

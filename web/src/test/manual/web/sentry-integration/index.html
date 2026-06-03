@@ -40,9 +40,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType:'auto'
+      }).then(function () {
+        loadKeyboards(1);
       });
 
       var sentryManager = new KeymanSentryManager();
@@ -55,7 +56,7 @@
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards(1);'>
+  <body>
     <h2>KeymanWeb Sample Page - Sentry Setup test host</h2>
 
     <div>

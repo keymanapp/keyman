@@ -36,8 +36,7 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         root: '..',
         // Operates from the configured root set above - the 'root' folder for this sample.
         resources: '/resources',
@@ -74,7 +73,7 @@
         // 1. keyboard name ('french'),
         // 2. keyboard name and language code ('sil_euro_latin@no,sv'),
         // 3. or just the BCP-47 language code ('@he').
-        kmw.addKeyboards('french', 'sil_euro_latin@no,sv', '@he');
+        keyman.addKeyboards('french', 'sil_euro_latin@no,sv', '@he');
 
         // Add a keyboard by language name.  Note that the name must be spelled
         // correctly, or the keyboard will not be found.  (Using BCP-47 codes is

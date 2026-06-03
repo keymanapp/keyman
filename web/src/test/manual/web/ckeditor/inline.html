@@ -30,9 +30,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-  var kmw=window.keyman;
-  kmw.init({
+  keyman.init({
     attachType: 'auto'
+  }).then(function () {
+    loadKeyboards();
   });
     </script>
 
@@ -44,7 +45,7 @@
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards();'>
+  <body>
     <h2>KeymanWeb Sample Page - Test CKEditor Integration</h2>
 
     <p>Test CKEditor Integration</p>

@@ -10,17 +10,10 @@ Include the following script in the HEAD of your page:
 
 ```js
 <script>
-  /* SetupDocument: Called when the page finishes loading */
-  function SetupDocument()
-  {
-    /* Make sure that Keyman is initialized (we can't guarantee initialization order) */
-    keyman.init().then(function () {
-      /* Prevents automatic display of the onscreen keyboard. (default automatic) */
-      keyman.osk.hide();
-      /* Select the LaoKeys keyboard */
+    keyman.init().then(function() {
       keyman.setActiveKeyboard('laokeys');
+      keyman.osk.hide();
     });
-  }
 
   /* KWControlClick: Called when user clicks on the KWControl IMG */
   function KWControlClick()
@@ -46,7 +39,7 @@ Also include the following HTML code:
 </head>
 
 <!-- When the page has finished loading, activate the LaoKeys keyboard, see above -->
-<body onload="SetupDocument()">
+<body>
 ```
 
 - File: [laokeys_load.js](js/laokeys_load.js)

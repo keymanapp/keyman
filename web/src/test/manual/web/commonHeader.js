@@ -74,8 +74,6 @@
 
   function loadKeyboards(nestLevel)
   {
-    var kmw=keyman;
-
     var base_prefix = '../';
     var prefix = './'; // The default - when prefix == 0.
 
@@ -133,8 +131,8 @@
     // The following two optional calls should be delayed until language menus are fully loaded:
     //  (a) a specific mapped input element input is focused, to ensure that the OSK appears
     //  (b) a specific keyboard is loaded, rather than the keyboard last used.
-    //window.setTimeout(function(){kmw.setActiveElement('ta1',true);},2500);
-    //window.setTimeout(function(){kmw.setActiveKeyboard('Keyboard_french','fr');},3000);
+    //window.setTimeout(function(){keyman.setActiveElement('ta1',true);},2500);
+    //window.setTimeout(function(){keyman.setActiveKeyboard('Keyboard_french','fr');},3000);
 
     // Note that locally specified keyboards will be listed before keyboards
     // requested from the remote server by user interfaces that do not order
@@ -144,7 +142,7 @@
   // Script to allow a user to add any keyboard to the keyboard menu
   function addKeyboard(n)
   {
-    var sKbd,kmw=keyman;
+    var sKbd;
     switch(n)
     {
       case 1:

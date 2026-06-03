@@ -36,12 +36,12 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType:'auto'
-      });
-      kmw.addKeyboards({
-        id:'issue266',name:'Issue 266',languages:{id:'en',name:'English'}, filename:'./issue266.js'
+      }).then(function() {
+        keyman.addKeyboards({
+          id:'issue266',name:'Issue 266',languages:{id:'en',name:'English'}, filename:'./issue266.js'
+        });
       });
     </script>
 

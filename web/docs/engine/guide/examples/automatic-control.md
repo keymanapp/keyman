@@ -13,17 +13,15 @@ In this example, we use only the LaoKey keyboard. Please click [this link](./__a
   <!-- Start of Code -->
   <script src="js/keymanweb.js" type="text/javascript"></script>
   <script>
-    window.addEventListener('load', function () {
-      keyman.init().then(function() {
-        keyman.addKeyboards({
-          id:'laokeys',
-          name:'Lao (Phonetic)',
-          languages:{
-            id:'lo',
-            name:'Lao'
-          },
-          filename:'./js/laokeys.js'
-        });
+    keyman.init().then(function() {
+      keyman.addKeyboards({
+        id:'laokeys',
+        name:'Lao (Phonetic)',
+        languages:{
+          id:'lo',
+          name:'Lao'
+        },
+        filename:'./js/laokeys.js'
       });
     });
   </script>

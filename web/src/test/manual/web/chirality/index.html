@@ -36,9 +36,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-  var kmw=window.keyman;
-  kmw.init({
+  keyman.init({
     attachType: 'auto'
+  }).then(function() {
+    loadKeyboards();
   });
     </script>
 
@@ -51,7 +52,7 @@
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards();'>
+  <body>
     <h2>KeymanWeb Sample Page - Chirality Testing</h2>
   <p>This page is designed to stress-test the new support for chiral modifiers and state keys.</p>
   <p>Be sure to reference the developer console for additional feedback.  </p>

@@ -72,9 +72,7 @@
     });
   }
 
-  function loadKeyboards(nestLevel) {
-    var kmw=keyman;
-
+  async function loadKeyboards(nestLevel) {
     var base_prefix = '../';
     var prefix = './'; // The default - when prefix == 0.
 
@@ -88,22 +86,22 @@
     // The first keyboard added will be the default keyboard for touch devices.
     // For faster loading, it may be best for the default keyboard to be
     // locally sourced.
-    doAddKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'},
+    await doAddKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'},
       filename:(prefix + 'us-1.0.js')});
 
     // Add more keyboards to the language menu by:
     // 1. keyboard name ('french'),
     // 2. keyboard name and language code ('sil_euro_latin@no,sv'),
     // 3. or just the BCP-47 language code ('@he').
-    kmw.addKeyboards('french', 'sil_euro_latin@no,sv', '@he');
+    await keyman.addKeyboards('french', 'sil_euro_latin@no,sv', '@he');
 
     // Add a keyboard by language name.  Note that the name must be spelled
     // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
     // usually easier.)
-    doAddKeyboardsForLanguage('Dzongkha');
+    await doAddKeyboardsForLanguage('Dzongkha');
 
     // Add a fully-specified, locally-sourced, keyboard with custom font
-    doAddKeyboards({
+    await doAddKeyboards({
       id:'lao_2008_basic',
       name:'Lao Basic',
       languages: {
