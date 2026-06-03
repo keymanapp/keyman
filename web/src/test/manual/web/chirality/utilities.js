@@ -9,7 +9,7 @@ function loadKeyboards()
     },
     filename:'../../../../../build/test-resources/keyboards/chirality.js'
   });
-    
+
   // A testing keyboard using 10.0 format and the KLS layout specifier
   // without the 'shift' layer properly defined.
   // Add a fully-specified, locally-sourced, keyboard with custom font  

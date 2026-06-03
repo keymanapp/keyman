@@ -2,7 +2,10 @@
 title: Control-by-Control Example
 ---
 
-In this example, a simulated webmail form, the default and permissible keyboard for each control is managed by the web page. We use the automatic mode for simplicity of demonstration. We also link to the CDN for KeymanWeb in this example. Please click [this link](__control-by-control.html) to open the test page.
+In this example, a simulated webmail form, the default and permissible keyboard for each control
+is managed by the web page. We use the automatic mode for simplicity of demonstration. We also
+link to the CDN for KeymanWeb in this example. Please click [this link](__control-by-control.html)
+to open the test page.
 
 ## Code Walkthrough
 
@@ -51,7 +54,10 @@ Also include the following HTML code:
 <body onload="SetupDocument()">
 ```
 ---
-**Note:** In this example we disabled the first element (`document.f.address`) by API call. A later API call can re-enable KeymanWeb for this control should it fit the page's design. Alternatively, this can be done by instead adding the class `'kmw-disabled'` to the control. This will permanently block KeymanWeb from handling its input.
+**Note:** In this example we disabled the first element (`document.f.address`) by API call. A
+later API call can re-enable KeymanWeb for this control should it fit the page's design.
+Alternatively, this can be done by instead adding the class `'kmw-disabled'` to the control. This
+will permanently block KeymanWeb from handling its input.
 
 ---
 
