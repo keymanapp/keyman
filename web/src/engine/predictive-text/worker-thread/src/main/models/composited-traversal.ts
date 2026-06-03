@@ -2,7 +2,7 @@ import { LexicalModelTypes } from "@keymanapp/common-types";
 import Distribution = LexicalModelTypes.Distribution;
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 import TextWithProbability = LexicalModelTypes.TextWithProbability;
-import { PriorityQueue } from "@keymanapp/web-utils";
+import { PriorityQueue } from "keyman/common/web-utils";
 
 type ChildEdge = { char: string; p: number, traversal: () => LexiconTraversal };
 
@@ -211,7 +211,9 @@ export class CompositedTraversal implements LexiconTraversal {
     //     setup is 4 * 26 = 104.  That's not "terrible"; fairly low to be
     //     considering big-O optimizations.
     //   - +1 multiplier due to the following `filter` block.
-    const childBuckets: Record<string, { p?: number, pMax: number, char: string }> = {};
+
+    type BlendingRecord = { p?: number, pMax: number, char: string };
+    const childBuckets: Record<string, BlendingRecord> = {};
     const entryBuckets: Record<string, number> = {};
     this.componentTraversals.forEach((entry) => {
       const weight = entry.p;
@@ -244,7 +246,7 @@ export class CompositedTraversal implements LexiconTraversal {
     let bestProb = Math.max(bestUnblendedProb, bestBlendedEntry);
     // May have zero entries if no blended path can exceed the best non-blended path's probability.
     // (Assumption:  this is the common case.)
-    const queue = new PriorityQueue((a, b) => b.pMax - a.pMax, potentialBlendedChildren);
+    const queue = new PriorityQueue<BlendingRecord>((a, b) => b.pMax - a.pMax, potentialBlendedChildren);
 
     while(queue.peek()?.pMax > bestProb) {
       const entry = queue.dequeue();

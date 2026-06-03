@@ -80,7 +80,7 @@ export interface TrieModelOptions {
  * prefix searches within words, however they are not very good
  * at predicting the next word.
  */
-export default class TrieModel extends TraversalModel implements LexicalModel {
+export class TrieModel extends TraversalModel implements LexicalModel {
   configuration?: Configuration;
   public readonly trie: Trie;
   readonly punctuation?: LexicalModelPunctuation;

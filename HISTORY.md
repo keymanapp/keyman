@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 19.0.240 alpha 2026-05-28
+
+* chore(web): add filename to link text of manual web tests (#16019)
+* docs(web): reformat and small fixes (#16021)
+
+## 19.0.239 alpha 2026-05-27
+
+* chore(web): remove obsolete file (#16013)
+
+## 19.0.238 alpha 2026-05-26
+
+* maint(linux): Don't block merge if source verification check fails (#16010)
+* maint(linux): fix Linux source tarball (#16011)
+
+## 19.0.237 alpha 2026-05-22
+
+* fix(windows): Ensure default locale always appears in list of locales (#15984)
+* chore(ios): update First Voices distribution certificate (#15993)
+
 ## 19.0.236 alpha 2026-05-21
 
 * docs(developer): write up basic internal docs on kmc modules (#15982)

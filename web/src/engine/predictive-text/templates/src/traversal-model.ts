@@ -23,7 +23,7 @@
  */
 
 // Allows the kmwstring bindings to resolve.
-import { KMWString, PriorityQueue } from "@keymanapp/web-utils";
+import { KMWString, PriorityQueue } from "keyman/common/web-utils";
 import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, SearchKey, transformToSuggestion, Wordform2Key } from "./common.js";

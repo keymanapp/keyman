@@ -1,23 +1,19 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { assert } from 'chai';
-import sinon from 'sinon';
-import fs from 'fs';
-
-import { KeyboardHarness, ManagedPromise, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
-import {
-  KeyboardRequisitioner,
-  toPrefixedKeyboardId as prefixed
-} from 'keyman/engine/keyboard-storage';
-import { PathConfiguration } from 'keyman/engine/interfaces';
-import NodeCloudRequester from 'keyman/engine/keyboard-storage/node-requester';
-
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 import { createRequire } from 'module';
+import sinon from 'sinon';
+
+import { ManagedPromise } from 'keyman/common/web-utils';
+import { PathConfiguration } from 'keyman/engine/interfaces';
+import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { KeyboardRequisitioner, toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
+import { NodeCloudRequester, NodeKeyboardLoader, getWebTestResourcesPath } from 'keyman/test/resources';
+
 const require = createRequire(import.meta.url);
 
 let commonResourcesPackage = '@keymanapp/common-test-resources';
@@ -160,7 +156,7 @@ describe("KeyboardRequisitioner", () => {
       });
 
       it('drops requests for already fetched stubs', async () => {
-        let setupDB = mockedSetup(`${__dirname}/../../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
+        let setupDB = mockedSetup(`${getWebTestResourcesPath()}/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
         let promise = setupDB.addKeyboardArray(['sil_euro_latin@no,sv']);
 
         const setupStubs = await promise;
@@ -190,14 +186,14 @@ describe("KeyboardRequisitioner", () => {
 
     describe('Stub fetching', () => {
       it('sil_euro_latin@no,sv', async () => {
-        const keyboardRequisitioner = mockedSetup(`${__dirname}/../../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
+        const keyboardRequisitioner = mockedSetup(`${getWebTestResourcesPath()}/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
         const promise = keyboardRequisitioner.addKeyboardArray(['sil_euro_latin@no,sv']);
 
         const stubs = await promise;
 
         assert.equal(stubs.length, 2);
         for(let stub of stubs) {
-          assert.equal(stub.KI, prefixed('sil_euro_latin'));
+          assert.equal(stub.KI, toPrefixedKeyboardId('sil_euro_latin'));
           assert.equal(stub.KN, "EuroLatin (SIL)");
         }
 
@@ -209,14 +205,14 @@ describe("KeyboardRequisitioner", () => {
       });
 
       it('sil_cameroon_azerty', async () => {
-        const keyboardRequisitioner = mockedSetup(`${__dirname}/../../../resources/query-mock-results/sil_cameroon_azerty.js.fixture`);
+        const keyboardRequisitioner = mockedSetup(`${getWebTestResourcesPath()}/query-mock-results/sil_cameroon_azerty.js.fixture`);
         const promise = keyboardRequisitioner.addKeyboardArray(['sil_cameroon_azerty']);
 
         const stubs = await promise;
 
         assert.equal(stubs.length, 278);
         for(let stub of stubs) {
-          assert.equal(stub.KI, prefixed('sil_cameroon_azerty'));
+          assert.equal(stub.KI, toPrefixedKeyboardId('sil_cameroon_azerty'));
           assert.equal(stub.KN, "Cameroon AZERTY");
         }
 
@@ -227,7 +223,7 @@ describe("KeyboardRequisitioner", () => {
       });
 
       it('@dz', async () => {
-        const keyboardRequisitioner = mockedSetup(`${__dirname}/../../../resources/query-mock-results/@dz.js.fixture`);
+        const keyboardRequisitioner = mockedSetup(`${getWebTestResourcesPath()}/query-mock-results/@dz.js.fixture`);
         const promise = keyboardRequisitioner.addKeyboardArray(['@dz']);
 
         const stubs = await promise;
@@ -244,12 +240,12 @@ describe("KeyboardRequisitioner", () => {
       });
 
       it('drops requests for already fetched stubs', async () => {
-        let setupDB = mockedSetup(`${__dirname}/../../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
+        let setupDB = mockedSetup(`${getWebTestResourcesPath()}/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
         let promise = setupDB.addKeyboardArray(['sil_euro_latin@no,sv']);
 
         const setupStubs = await promise;
 
-        const precachedRequisitioner = mockedSetup(`${__dirname}/../../../resources/query-mock-results/@dz.js.fixture`);
+        const precachedRequisitioner = mockedSetup(`${getWebTestResourcesPath()}/query-mock-results/@dz.js.fixture`);
         // Pre-load our 'setup' stubs into the query manager class before running the query.
         for(let stub of setupStubs) {
           precachedRequisitioner.cache.addStub(stub);
@@ -271,7 +267,7 @@ describe("KeyboardRequisitioner", () => {
 
   describe('addLanguageKeyboards', function() {
     it('awaits the language list fetch + constructs a query for the requested language', async () => {
-      const keyboardRequisitioner = mockedSetup(`${__dirname}/../../../resources/query-mock-results/languages.js.fixture`);
+      const keyboardRequisitioner = mockedSetup(`${getWebTestResourcesPath()}/query-mock-results/languages.js.fixture`);
       const mockedRequester = keyboardRequisitioner.cloudQueryEngine.requestEngine;
       const originalRequest = mockedRequester.request;
       let swapFake = sinon.fake((query) => {
@@ -307,7 +303,7 @@ describe("KeyboardRequisitioner", () => {
     // https://api.keyman.com/cloud/4.0/keyboards?jsonp=keyman.register&languageidtype=bcp47&version=17.0&keyboardid=khmer_angkor&timerid=49.
     //
     // The edits are minimal and notated within the fixture file.
-    const keyboardRequisitioner = mockedSetup(`${__dirname}/../../../resources/query-mock-results/khmer_angkor.hand-edited.js.fixture`);
+    const keyboardRequisitioner = mockedSetup(`${getWebTestResourcesPath()}/query-mock-results/khmer_angkor.hand-edited.js.fixture`);
 
     const cache = keyboardRequisitioner.cache;
     const [stub] = await keyboardRequisitioner.addKeyboardArray(['khmer_angkor']);
