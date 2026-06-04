@@ -942,7 +942,8 @@ export class KmnFileWriter {
 
         resultWarnings.warningMessage_1 = "unavailable modifier : ";
         resultWarnings.hasWarning_1 = true;
-        resultWarnings.warningMessage_2 = "unavailable superior rule ( [" + rule[index].modifierDeadkey + " "
+        resultWarnings.warningMessage_2 = "unavailable superior rule ( ["
+          + rule[index].modifierDeadkey + " "
           + rule[index].deadkey
           + "]  >  dk(A"
           + rule[index].idDeadkey
