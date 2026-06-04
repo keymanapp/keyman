@@ -13,15 +13,14 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
-. "$KEYMAN_ROOT/web/common.inc.sh"
 
 ################################ Main script ################################
 
 builder_describe "Builds the lm-layer module" \
-  "@/common/web/keyman-version" \
-  "@/common/web/types" \
-  "@/web/src/tools/es-bundling" \
-  "@/web/src/engine/predictive-text/worker-thread" \
+  "@/common/tools/es-bundling   build" \
+  "@/common/web/keyman-version  build" \
+  "@/common/web/types           build" \
+  "@/web/src/engine/predictive-text/worker-thread  build" \
   "clean" \
   "configure" \
   "build" \
@@ -46,8 +45,8 @@ function do_build() {
   tsc -b ./tsconfig.all.json
 
   # esbuild-bundled products at this level are not intended to be used for anything but testing.
-  node "$LIB_BUNDLER"    "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/obj/web/index.js" \
-    --out                "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
+  node_es_bundle "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/obj/web/index.js" \
+    --out        "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
     --format esm
 }
 
@@ -57,7 +56,7 @@ function do_test() {
   ./unit_tests/test.sh test:headless test:browser
 }
 
-builder_run_action configure  do_configure
 builder_run_action clean      rm -rf build/
+builder_run_action configure  do_configure
 builder_run_action build      do_build
 builder_run_action test       do_test

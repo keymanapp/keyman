@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { PathSegmenter, Segment } from '@keymanapp/gesture-recognizer';
+import { PathSegmenter, Segment } from 'keyman/engine/gesture-processor';
 
 /**
  * Defines common assertions for loosely comparing reproduced segments to their original counterparts.

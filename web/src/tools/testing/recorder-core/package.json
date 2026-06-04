@@ -18,11 +18,6 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
-  "dependencies": {
-    "@keymanapp/common-types": "*",
-    "@keymanapp/keyman-version": "*",
-    "@keymanapp/web-utils": "*"
-  },
   "devDependencies": {
     "typescript": "^5.4.5"
   }
