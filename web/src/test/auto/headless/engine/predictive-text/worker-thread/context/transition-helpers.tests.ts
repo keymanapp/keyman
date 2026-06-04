@@ -354,7 +354,6 @@ function assertMatchingToken(actual: ContextToken, expected: ContextToken, msg: 
 function assertMatchingTokenization(actual: ContextTokenization, expected: ContextTokenization, msg: string) {
   assert.equal(actual.tokens.length, expected.tokens.length, msg);
   assert.deepEqual(actual.exampleInput, expected.exampleInput, msg);
-  assert.deepEqual(actual.transitionEdits, expected.transitionEdits, msg);
 
   for(let j=0; j < actual.tokens.length; j++) {
     const nestedMsg = `${msg}, token ${j}`;

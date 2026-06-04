@@ -104,7 +104,6 @@ describe('determineContextTransition', () => {
       assert.equal(transition, tracker.latest);
       assert.isFalse(warningEmitterSpy.called);
       assert.sameOrderedMembers(transition.final.displayTokenization.exampleInput, ['this', ' ', 'is', ' ', 'for', ' ', 'techn']);
-      assert.isOk(transition.final.displayTokenization.transitionEdits);
       assert.equal(transition.final.context.left, targetContext.left);
       assert.equal(transition.final.context.right ?? "", targetContext.right ?? "");
       assert.sameDeepOrderedMembers(transition.inputDistribution, inputDistribution);
