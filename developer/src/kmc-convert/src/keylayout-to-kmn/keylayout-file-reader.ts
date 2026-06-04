@@ -18,9 +18,9 @@ export class KeylayoutFileReader {
   constructor(private callbacks: CompilerCallbacks /*,private options: CompilerOptions*/) { };
 
   /**
-   * @brief  helper function to check if a specific keyMap index exists in a keyMapSet
-   * neccessary because the amount of  <keyMap index> must correspond to
-   * the amount of <keyMapSelect mapIndex>
+   * @brief  Helper function to check if a specific keyMap index exists in a keyMapSet.
+   * This is neccessary because the amount of <keyMap index> must correspond to
+   * the amount of <keyMapSelect mapIndex>.
    * @param  jsonObj the read keylayout data to be checked
    * @param  keyMapSelect the keyMapSelect element to find in keyMapSet
    * @return true if the keyMapSet element is found, false if not
@@ -37,9 +37,9 @@ export class KeylayoutFileReader {
   }
 
   /**
-   * @brief  helper function to check if a specific keyMapSelect index exists in a modifierMap
-   * neccessary because the amount of <keyMap index> must correspond to
-   * the amount of <keyMapSelect mapIndex>
+   * @brief Helper function to check if a specific keyMapSelect index exists in a modifierMap.
+   * This is neccessary because the amount of <keyMap index> must correspond to
+   * the amount of <keyMapSelect mapIndex>.
    * @param  jsonObj the read keylayout data to be checked
    * @param  keyMap the keyMap element to find in modifierMap
    * @return true if the keyMap element is found, false if not

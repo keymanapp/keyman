@@ -64,7 +64,8 @@ describe('KmnFileWriter', function () {
 
     it(('writeKmnFileHeader should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
       const writtenCorrectName = sutW.writeKmnFileHeader(converted);
-      assert.equal(writtenCorrectName, (outExpectedFirst + (converted?.keylayoutFilename ?? "") + outExpectedLast));
+      assert.isNotNull(converted);
+      assert.equal(writtenCorrectName, (outExpectedFirst + (converted.keylayoutFilename ?? "") + outExpectedLast));
     });
     it(('writeKmnFileHeader should return no text with null filename ').padEnd(62, " ") + 'on correct input', async function () {
       const writtenEmptytName = sutW.writeKmnFileHeader(null);
@@ -120,34 +121,42 @@ describe('KmnFileWriter', function () {
     });
   });
 
-  describe('writeCharacterOrUnicode ', function () {
+  describe('writeCharacterOrUnicode and return values', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
-      ["A", "Msg", "A", "Msg"],
-      ["ሴ", "Msg", "ሴ", "Msg"],
-      ["😀", "Msg", "😀", "Msg"],
-      ["ẘ", "Msg", "ẘ", "Msg"],
-      ["U+0001", "Msg", "U+0001", "Msg; Use of a control character "],
-      ["U+0061", "Msg", "a", "Msg"],
-      ["&#x0002;", "Msg", "U+0002", "Msg; Use of a control character "],
-      ["&#x1234;", "Msg", 'ሴ', "Msg",],
-      ["&#0003;", "Msg", "U+0003", "Msg; Use of a control character "],
-      ["&#4666;", "Msg", "ሺ", "Msg",],
-      [null, "Msg", null, null],
-      [undefined, "Msg", null, null],
-      ["", "Msg", null, null],
-      ["", "Msg", "U+0006", "Msg; Use of a control character "],
+      ["A", "A", "Msg"],
+      ["ሴ", "ሴ", "Msg"],
+      ["😀", "😀", "Msg"],
+      ["ẘ", "ẘ", "Msg"],
+      ["U+0001", "U+0001", "Msg; Use of a control character "],
+      ["U+0061", "a", "Msg"],
+      ["&#x0002;", "U+0002", "Msg; Use of a control character "],
+      ["&#x1234;", 'ሴ', "Msg"],
+      ["&#0003;", "U+0003", "Msg; Use of a control character "],
+      ["&#4666;", "ሺ", "Msg"],
+      ["", "U+0006", "Msg; Use of a control character "],
     ].forEach(function (values) {
-      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[2] + '"', async function () {
-        const result = sutW.writeCharacterOrUnicode(values[0] as string, values[1] as string);
-        if (result) {
-          assert.equal(result.character, values[2]);
-          assert.equal(result.message, values[3]);
-        }
-        else {
-          assert.isNull(values[2]);
-          assert.isNull(values[3]);
-        }
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg");
+        assert.isNotNull(result);
+        assert.equal(result.character, values[1]);
+        assert.equal(result.message, values[2]);
+      });
+    });
+  });
+
+  describe('writeCharacterOrUnicode and return empty string for result.message and result.character', function () {
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    [
+      [null, '', ''],
+      [undefined,'', ''],
+      ['', '', ''],
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg");
+        assert.isNotNull(result);
+        assert.equal(result.character, values[1]);
+        assert.equal(result.message, values[2]);
       });
     });
   });
@@ -488,14 +497,14 @@ describe('KmnFileWriter', function () {
           rules: values[0] as Rule[]
         };
         const result1 = sutW.writeDataRules(data);
-        assert.isTrue(result1 === values[1][0]);
+        assert.equal(result1, values[1][0]);
       });
 
     });
     it(('null should create empty string '), async function () {
-        const result1 = sutW.writeDataRules(null);
-        assert.isTrue(result1 === '');
-      });
+      const result1 = sutW.writeDataRules(null);
+      assert.equal(result1, '');
+    });
   });
 
 });

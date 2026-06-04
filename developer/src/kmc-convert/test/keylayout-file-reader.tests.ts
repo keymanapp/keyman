@@ -157,7 +157,7 @@ describe('KeylayoutFileReader', function () {
       it(("findMapIndexinKeymap(keyMapSelect.mapIndex = '" + values[0] + "')").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
         keyMapSelect.mapIndex = values[0] as string;
         const result = sutR.findMapIndexinKeymap(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMapSelect);
-        assert.isTrue(result === values[1]);
+        assert.equal(result, values[1]);
       });
     });
   });
@@ -187,7 +187,7 @@ describe('KeylayoutFileReader', function () {
       it(("findIndexinKeymapSelect(keyMap.index = '" + values[0] + "')").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
         keyMap.index = values[0] as string;
         const result = sutR.findIndexinKeymapSelect(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMap);
-        assert.isTrue(result === values[1]);
+        assert.equal(result, values[1]);
       });
     });
   });
@@ -204,7 +204,7 @@ describe('KeylayoutFileReader', function () {
       it(("checkForCorrespondingElements in " + values[0]).padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
         const jsonO: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(makePathToFixture(values[0] as string)));
         const result = sutR.checkForCorrespondingElements(jsonO as Keylayout.KeylayoutXMLSourceFile);
-        assert.isTrue(result === values[1]);
+        assert.equal(result, values[1]);
       });
     });
   });
@@ -219,7 +219,7 @@ describe('KeylayoutFileReader', function () {
       const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(binaryData);
 
       assert.isNotNull(result);
-      assert.isTrue(result.keyboard !== null);
+      assert.notEqual(result.keyboard, null);
 
       for (let i = 0; i < result.keyboard.layouts.length; i++) {
         assert.isTrue(result.keyboard.layouts[i].layout.length > 0);
@@ -231,8 +231,8 @@ describe('KeylayoutFileReader', function () {
         for (let j = 0; j < result.keyboard.keyMapSet[i].keyMap.length; j++) {
           assert.isTrue(result.keyboard.keyMapSet[i].keyMap[j].key.length > 0);
           for (let k = 0; k < result.keyboard.keyMapSet[i].keyMap[j].key.length; k++) {
-            assert.isTrue(result.keyboard.keyMapSet[i].keyMap[j].key[k]['action'] !== null
-              || result.keyboard.keyMapSet[i].keyMap[j].key[k]['output'] !== null);
+            assert.isNotNull(result.keyboard.keyMapSet[i].keyMap[j].key[k]['action']);
+            assert.isNotNull(result.keyboard.keyMapSet[i].keyMap[j].key[k]['output']);
           }
         }
       }
@@ -247,8 +247,8 @@ describe('KeylayoutFileReader', function () {
       for (let i = 0; i < result.keyboard.modifierMap.length; i++) {
         assert.isTrue(result.keyboard.modifierMap[i].keyMapSelect.length > 0);
         for (let j = 0; j < result.keyboard.keyMapSet.length; j++) {
-          assert.isTrue(result.keyboard.keyMapSet[j].keyMap.length
-            === result.keyboard.modifierMap[i].keyMapSelect.length);
+          assert.equal(result.keyboard.keyMapSet[j].keyMap.length,
+            result.keyboard.modifierMap[i].keyMapSelect.length);
         }
       }
     });

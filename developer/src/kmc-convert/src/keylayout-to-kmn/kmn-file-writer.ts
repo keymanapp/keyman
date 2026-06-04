@@ -149,7 +149,6 @@ export class KmnFileWriter {
 
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        let versionOutputCharacter;
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
@@ -157,16 +156,9 @@ export class KmnFileWriter {
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
-        // in case writeCharacterOrUnicode() returns null, the fallback is empty strings for characterMessage.character
-        // and characterMessage.message. Then versionOutputCharacter could be "" and would be written into the kmn file
-        // as ... > '', producing an invalid kmn rule.
-        if ((outputCharacter !== undefined) && (outputCharacter !== "")) {
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-
-          versionOutputCharacter = characterMessage?.character ?? "";
-          warnText[2] = characterMessage?.message ?? "";
-
-        }
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        const versionOutputCharacter = characterMessage.character;
+        warnText[2] = characterMessage.message;
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -219,7 +211,6 @@ export class KmnFileWriter {
 
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        let versionOutputCharacter;
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
@@ -227,14 +218,9 @@ export class KmnFileWriter {
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
-        // in case writeCharacterOrUnicode() returns null, the fallback is empty strings for characterMessage.character
-        // and characterMessage.message. Then versionOutputCharacter could be "" and would be written into the kmn file
-        // as ... > '', producing an invalid kmn rule.
-        if ((outputCharacter !== undefined) && (outputCharacter !== "")) {
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          versionOutputCharacter = characterMessage?.character ?? "";
-          warnText[2] = characterMessage?.message ?? "";
-        }
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        const versionOutputCharacter = characterMessage.character;
+        warnText[2] = characterMessage.message;
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -309,20 +295,14 @@ export class KmnFileWriter {
 
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        let versionOutputCharacter;
 
         const warnText = this.reviewRules(uniqueDataRules, k);
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
 
-        // in case writeCharacterOrUnicode() returns null, the fallback is empty strings for characterMessage.character
-        // and characterMessage.message. Then versionOutputCharacter could be "" and would be written into the kmn file
-        // as ... > '', producing an invalid kmn rule.
-        if ((outputCharacter !== undefined) && (outputCharacter !== "")) {
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          versionOutputCharacter = characterMessage?.character ?? "";
-          warnText[2] = characterMessage?.message ?? "";
-        }
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        const versionOutputCharacter = characterMessage.character;
+        warnText[2] = characterMessage.message;
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -1636,10 +1616,10 @@ export class KmnFileWriter {
   *         a non-control character will be written as itself ( 'A', '1', '፩', '😎')
   *         null in case of an empty string or null or undefined input
   */
-  public writeCharacterOrUnicode(ctr: string, msg: string = ""): MessageCharacter | null {
+  public writeCharacterOrUnicode(ctr: string, msg: string = ""): MessageCharacter {
 
     if ((ctr === null) || (ctr === undefined) || (ctr.length === 0)) {
-      return null;
+      return { character: '', message: '' };
     }
 
     let versionOutputCharacter;
@@ -1653,8 +1633,14 @@ export class KmnFileWriter {
     const m_dec = /^&#([0-9]{1,7});$/.exec(ctr);
 
     // find the value of output character which may be specified in unicode, html hex or html dec format ( e.g. U+1234 -> 1234; &#x1234; -> 1234; &#4660; -> 1234)
-    const ctr_val = ((m_uni || m_hex || m_dec) ?
-      m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : m_dec ? parseInt(m_dec[1], 10) : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
+    const ctr_val = (
+      m_uni
+        ? parseInt(m_uni[1], 16)
+        : m_hex
+          ? parseInt(m_hex[1], 16)
+          : m_dec
+            ? parseInt(m_dec[1], 10)
+            : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
     );
 
     // for control characters in 'U+...', '&#x...' or '&#...' format as well as in "" format
@@ -1693,8 +1679,7 @@ export class KmnFileWriter {
    */
   public convertToUnicodeCharacter(inputString: string): string | undefined {
 
-
-    // null, undefined will later be refused for conversion
+    // null, undefined will later be treated as '' in conversion
     if (inputString == null || inputString == undefined) {
       return undefined;
     }
