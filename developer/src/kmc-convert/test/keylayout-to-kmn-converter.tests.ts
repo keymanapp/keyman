@@ -95,7 +95,8 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         sut.run(makePathToFixture(files[0]));
-        assert.isTrue(compilerTestCallbacks.messages.length === 1 && compilerTestCallbacks.messages[0].code === 5292037);
+       // assert.isTrue(compilerTestCallbacks.messages.length === 1 && compilerTestCallbacks.messages[0].code === 5292037);
+        assert.isTrue(compilerTestCallbacks.messages.length === 0);
       });
     });
   });
@@ -163,7 +164,8 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (files) {
       it(infile + " should run ", async function () {
         await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), makePathToFixture(files[0])));
-        assert.isTrue(compilerTestCallbacks.messages.length === 1 && compilerTestCallbacks.messages[0].code === 5292037);
+       // assert.isTrue(compilerTestCallbacks.messages.length === 1 && compilerTestCallbacks.messages[0].code === 5292037);
+        assert.isTrue(compilerTestCallbacks.messages.length === 0);
       });
     });
   });
