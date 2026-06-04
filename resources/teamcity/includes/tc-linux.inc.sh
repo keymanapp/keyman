@@ -67,13 +67,25 @@ ba_linux_install_emscripten() {
     # shellcheck disable=SC2154
     . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
 
+    local EMSDK_DIR
+    if [[ ! -z "${EMSCRIPTEN_BASE:-}" ]] && [[ -d "${EMSCRIPTEN_BASE}" ]]; then
+      # EMSCRIPTEN_BASE points to emsdk/upstream/emscripten
+      EMSDK_DIR="$(realpath "${EMSCRIPTEN_BASE}/../..")"
+    else
+      EMSDK_DIR="${HOME}/emsdk"
+    fi
+
     builder_echo "Installing emscripten version ${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
     export EMSDK_KEEP_DOWNLOADS=1
+    if [[ -d "${EMSDK_DIR}" ]]; then
+      builder_echo "emsdk directory already exists at ${EMSDK_DIR}, skipping clone"
+    else
+      # shellcheck disable=SC2164
+      cd "$(dirname "${EMSDK_DIR}")"
+      git clone https://github.com/emscripten-core/emsdk.git
+    fi
     # shellcheck disable=SC2164
-    cd "${HOME}"
-    git clone https://github.com/emscripten-core/emsdk.git
-    # shellcheck disable=SC2164
-    cd emsdk
+    cd "${EMSDK_DIR}"
     ./emsdk install "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
     ./emsdk activate "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
   fi

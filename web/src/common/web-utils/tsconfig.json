@@ -1,0 +1,17 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../../../build/common/web-utils/obj/tsconfig.tsbuildinfo",
+    "outDir": "../../../build/common/web-utils/obj/",
+    "rootDir": "./src"
+  },
+  "references": [
+    { "path": "../../../../common/web/keyman-version" },
+  ],
+  "include": [
+    "src/*.ts"
+  ],
+  "exclude": [
+    "src/tests/**/*.js"
+  ]
+}
