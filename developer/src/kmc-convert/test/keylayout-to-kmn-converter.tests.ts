@@ -42,6 +42,7 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_ambiguous_keys.keylayout'],
       ['../data/Test_differentEncodings.keylayout'],
       ['../data/Test_ExtraWarning.keylayout'],
+      ['../data/Test_characters.keylayout'],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         await sut.run(makePathToFixture(files[0]));
@@ -61,10 +62,11 @@ describe('KeylayoutToKmnConverter', function () {
         sut.run(makePathToFixture(files[0]));
        // assert.isTrue(compilerTestCallbacks.messages.length === 1 && compilerTestCallbacks.messages[0].code === 5292037);
         assert.isTrue(compilerTestCallbacks.messages.length === 0);
-      });
-    });
-  });
-
+        await sut.run(makePathToFixture(files[0]));
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+       });
+     });
+   });
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -79,7 +81,6 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_MissingActionsERROR.keylayout'],
       ['../data/Test_MissingTerminatorsERROR.keylayout'],
       ['../data/Test_MissingAllERROR.keylayout'],
-      // ['../data/Test_characters.keylayout'],
     ].forEach(function (files) {
       it(files + " should give an error ", async function () {
         await sut.run(makePathToFixture(files[0]));
@@ -95,7 +96,7 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_undefinedAction.keylayout'],
     ].forEach(function (files) {
       it(files + " should give Error: undefined action detected", async function () {
-        await sut.run(makePathToFixture(files[0]));
+         sut.run(makePathToFixture(files[0]));
         assert.equal(compilerTestCallbacks.messages.length, 1);
         assert.equal(compilerTestCallbacks.messages[0].code, 5292040);
       });

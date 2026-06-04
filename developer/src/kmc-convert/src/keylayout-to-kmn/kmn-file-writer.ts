@@ -96,14 +96,15 @@ export class KmnFileWriter {
     // (e.g. when in a keylayout file the same modifiers occur in several behaviors thus producing the same rules).
     // This is to filter out those duplicate Rule objects
     const uniqueDataRules: Rule[] = dataUkelele.rules.filter((curr) => {
-      return (!(curr.output.length === 0 || curr.output === undefined)
+      return (!(curr.output === undefined)
         && (curr.key !== "")
         && ((curr.ruleType === "C0")
           || (curr.ruleType === "C1")
           || (curr.ruleType === "C2" && (curr.deadkey !== ""))
           || (curr.ruleType === "C3" && (curr.deadkey !== "") && (curr.prevDeadkey !== "")))
       );
-    }).reduce<Rule[]>((unique, o) => {
+    }).reduce((unique, o) => {
+
       if (!unique.some((obj: Rule) =>
         new TextDecoder().decode(obj.output) === new TextDecoder().decode(o.output)
 
@@ -1619,10 +1620,12 @@ export class KmnFileWriter {
   */
   public writeCharacterOrUnicode(ctr: string, msg: string = ""): MessageCharacter {
 
-    if ((ctr === null) || (ctr === undefined) || (ctr.length === 0)) {
-      return { character: '', message: '' };
+    if ((ctr === null) || (ctr === undefined)) {
+      return null;
     }
 
+    let msg_control = '';
+    let msg_entity = '';
     let versionOutputCharacter;
     const out: MessageCharacter = {
       message: msg,
@@ -1644,6 +1647,10 @@ export class KmnFileWriter {
             : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
     );
 
+    if (ctr.length === 0) {
+      msg_entity = "empty output or unsupported numerical html entity: ";
+    }
+
     // for control characters in 'U+...', '&#x...' or '&#...' format as well as in "" format
     if ((ctr_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) || (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
 
@@ -1658,17 +1665,21 @@ export class KmnFileWriter {
       if (versionOutputCharacter)
         out.character = versionOutputCharacter;
 
-      // add a warning message
-      if (msg == "") {
-        out.message = "c WARNING: use of a control character ";
-      }
-      else {
-        out.message = msg + "; Use of a control character ";
-      }
+      msg_control = "Use of a control character ";
     }
     else {
       out.character = this.convertToUnicodeCharacter(ctr) ?? "";
     }
+
+    // add a warning message
+    if (msg !== "") {
+      msg = msg + msg_control + msg_entity;
+    }
+    if ((msg === "") && (msg_entity !== "" || msg_control !== "")) {
+      msg = "c WARNING: " + msg_entity + msg_control;
+    }
+    out.message = msg;
+
     return out;
   }
 

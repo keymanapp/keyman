@@ -7,7 +7,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const Namespace = CompilerErrorNamespace.Converter;
 //const SevInfo = CompilerErrorSeverity.Info | Namespace;
-// const SevHint = CompilerErrorSeverity.Hint | Namespace;
+ const SevHint = CompilerErrorSeverity.Hint | Namespace;
 const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 // const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
@@ -81,6 +81,11 @@ export class ConverterMessages {
   static Warn_EmptyOutput =(o: { keymapIndex: string, key: string, KeyName: string; }) => m(
     this.WARN_EmptyOutput,
     `Key has empty output (possibly caused by use of html entity) at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
+  );
+  static HINT_EmptyOutput = SevHint | 0x000E;
+  static Hint_EmptyOutput =(o: { keymapIndex: string, key: string, KeyName: string; }) => m(
+    this.HINT_EmptyOutput,
+    `Key has empty output at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)}) possibly caused by use of html entity `
   );
 
 }
