@@ -137,7 +137,7 @@ describe('KmnFileWriter', function () {
       ["", "U+0006", "Msg; Use of a control character "],
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg; ");
+        const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg");
         assert.isNotNull(result);
         assert.equal(result.character, values[1]);
         assert.equal(result.message, values[2]);
@@ -153,7 +153,7 @@ describe('KmnFileWriter', function () {
       ['', '', ''],
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg; ");
+        const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg");
         assert.isNotNull(result);
         assert.equal(result.character, values[1]);
         assert.equal(result.message, values[2]);

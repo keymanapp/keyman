@@ -1673,7 +1673,7 @@ export class KmnFileWriter {
 
     // add a warning message
     if (msg !== "") {
-      msg = msg + msg_control + msg_entity;
+      msg = msg + "; " + msg_control + msg_entity;
     }
     if ((msg === "") && (msg_entity !== "" || msg_control !== "")) {
       msg = "c WARNING: " + msg_entity + msg_control;
