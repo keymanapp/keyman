@@ -107,7 +107,6 @@ describe('determineContextTransition', () => {
       assert.equal(transition.final.context.left, targetContext.left);
       assert.equal(transition.final.context.right ?? "", targetContext.right ?? "");
       assert.sameDeepOrderedMembers(transition.inputDistribution, inputDistribution);
-      assert.isNotOk(transition.final.displayTokenization.taillessTrueKeystroke);
       assert.equal(transition.transitionId, 1);
     } finally {
       warningEmitterSpy.restore();

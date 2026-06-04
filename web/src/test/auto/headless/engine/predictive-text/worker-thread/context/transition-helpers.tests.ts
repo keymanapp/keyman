@@ -175,11 +175,7 @@ function generateFixtureForTokenizationOutboundTransition (
 
     // CURRENTLY NOT DONE:  adding new or replacement tokens for text to be placed after 'quotientNodeToExtend'.
 
-    const transitionedTokenization = new ContextTokenization(
-      srcTokenization.tokens.slice(0, srcTokenization.tokens.length - 1 + relativeTailIndex).concat(token),
-      tokenizationEdge,
-      null
-    );
+    const transitionedTokenization = new ContextTokenization(srcTokenization.tokens.slice(0, srcTokenization.tokens.length - 1 + relativeTailIndex).concat(token));
 
     return {
       /**
