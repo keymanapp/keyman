@@ -24,6 +24,7 @@ describe('KeylayoutToKmnConverter', function () {
   describe('RunSpecialTestFiles', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
+      ['../data/Test_mixedEncodings.keylayout'],
       ['../data/Test_C0.keylayout'],
       ['../data/Test_C1.keylayout'],
       ['../data/Test_C2.keylayout'],
