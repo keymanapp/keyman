@@ -229,14 +229,12 @@ export class KeylayoutToKmnConverter {
           // ...............................................................................................................................
 
           if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] === "") {
-            /* this.callbacks.reportMessage(ConverterMessages.Warn_EmptyOutput({
+             this.callbacks.reportMessage(ConverterMessages.Hint_EmptyOutput({
              keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['index'],
              key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code'],
              KeyName: this.mapUkeleleKeycodeToVK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code']))
            }));
-           return null;*/
-            console.log('Empty output');
-
+           // console.log('Empty output');
           }
           else if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] !== undefined) {
 
