@@ -11,15 +11,14 @@
 import Foundation
 
 public protocol DefaultsRepo {
-  func readInstallationState() -> String
-  func writeInstallationState(_ state: String)
+  func installationStateExists() -> Bool
+  func readInstallationState() -> Dictionary<String, Any>?
+  func writeInstallationState(_ dictionary: Dictionary<String, Any>)
+  func deleteInstallationState()
   func readEnabledKeyboards() -> Set<String>
   func writeEnabledKeyboards(enabledKeyboardsArray: [String])
   func readSelectedKeyboard() -> String
   func writeSelectedKeyboard(keyboardName: String)
-  func clearRestartRequestTime()
-  func readRestartRequestTime() -> Date?
-  func writeRestartRequestTime(_ date: Date)
   func logDefaults()
   func clearDefaults()
 }

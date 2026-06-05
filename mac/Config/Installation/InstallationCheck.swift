@@ -1,0 +1,118 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Shawn Schantz on 2026-06-01
+ *
+ * Class for evaluating the current state of Keyman to determine
+ * whether installation is complete or in need of repair
+ * and what remaining tasks are needed to complete the installation.
+ */
+
+import Foundation
+import KeymanSettings
+
+public class InstallationCheck {
+  fileprivate let keymanVersion: String
+  fileprivate let defaultsRepository: DefaultsRepo
+  fileprivate let inputMethodUtil: InputMethodUtil
+  
+  public init(version: String, defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil) {
+    self.keymanVersion = version
+    self.defaultsRepository = defaultsRepo
+    self.inputMethodUtil = inputMethodUtil
+  }
+  
+  public func evaluate() -> InstallationState {
+    var installationState: InstallationState
+    
+    if let savedInstallationState = readInstallationState() {
+      // check whether the installation requires repair
+      if let repairInstallationState = self.createRepairInstallationState(savedInstallationState: savedInstallationState) {
+        installationState = repairInstallationState
+        self.defaultsRepository.writeInstallationState(installationState.toUserDefaultsDictionary())
+      } else {
+        installationState = savedInstallationState
+      }
+    } else
+    {
+      // if installation could not be read, then
+      installationState = self.createInstallationStateForNewInstallation()
+    }
+    
+    return installationState
+  }
+  
+  /**
+   * Read the currently saved installation state as an object
+   */
+  func readInstallationState() -> InstallationState? {
+    guard let installationMap = self.defaultsRepository.readInstallationState() else {
+      return nil
+    }
+    
+    return InstallationState(from: installationMap)
+  }
+  
+
+  /**
+   * Check the version number to see if this is a new installation
+   */
+  func checkForNewInstallation() {
+    // MAC-CONFIG-TODO: impelement version checks
+  }
+  
+  /**
+   * Check the version number to see if this is a new installation
+   */
+  func createInstallationStateForNewInstallation() -> InstallationState {
+    let installationState = InstallationState(version: self.keymanVersion, tasks: self.createNewInstallationTasks())
+    self.defaultsRepository.writeInstallationState(installationState.toUserDefaultsDictionary())
+
+    return installationState
+  }
+
+  func createNewInstallationTasks() -> Set<InstallationTask> {
+    var taskList = Set<InstallationTask>()
+    taskList.insert(InstallationTask(task: .migrateData, completed: false))
+    taskList.insert(InstallationTask(task: .enableInputMethod, completed: false))
+    taskList.insert(InstallationTask(task: .requestAccess, completed: false))
+    taskList.insert(InstallationTask(task: .restartMac, completed: false))
+    return taskList
+  }
+
+  /**
+   * Check the installation to see of it is valid -- something may have been tampered with after installation was completed.
+   * If the installation needs repair, create the info needed for repairing the installation
+   */
+  func createRepairInstallationState(savedInstallationState: InstallationState) -> InstallationState? {
+    var repairInstallationState: InstallationState? = nil
+    var repairTasks = Set<InstallationTask>()
+    
+    guard savedInstallationState.isComplete else {
+      // do not attempt to repair if the installation is still in progress
+      return nil
+    }
+    
+    // MAC-CONFIG-TODO: maybe this should not be a task as we can only notify the user to re-install -- maybe throw an error elsewhere?
+    if !self.inputMethodUtil.isKeymanInputMethodCurrent() {
+      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .verifyInputMethod))
+    }
+    
+    if !self.inputMethodUtil.isKeymanInputMethodEnabled() {
+      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .enableInputMethod))
+      
+      // also need to restart after enabling the input method
+      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .restartMac))
+    }
+    
+    if !self.inputMethodUtil.invokeKeymanInputMethodCheckAccess() {
+      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .requestAccess))
+    }
+    
+    if !repairTasks.isEmpty {
+      repairInstallationState = InstallationState(version: self.keymanVersion, tasks: repairTasks)
+    }
+    
+    return repairInstallationState
+  }
+}

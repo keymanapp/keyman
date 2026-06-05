@@ -17,11 +17,13 @@ struct InstallView: View {
         Image(systemName: "gear")
           .imageScale(.large)
           .foregroundColor(.accentColor)
-        Text("Installation State = \(installation.state)")
+        if let nextTask = installation.nextTask() {
+          Text("Next task = \(nextTask.taskType.rawValue)")
+        }
       }
       HStack {
         Button("Next...") {
-          installation.executeNextInstallationStep()
+          installation.executeNextInstallationTask()
         }
         Button("Migrate Data") {
           _ = installation.migrateData()
@@ -36,10 +38,10 @@ struct InstallView: View {
           _ = installation.selectKeymanInputMethod()
         }
         Button("Check Permission") {
-          installation.checkAccessibilityPermission()
+          _ = installation.isAccessibilityGranted()
         }
         Button("Request Permission") {
-          _ = installation.requestAccessibilityPermission()
+          _ = installation.requestAccessibility()
         }
         Spacer()
       }

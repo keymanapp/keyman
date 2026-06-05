@@ -14,16 +14,6 @@ public enum UserDefaultsError: Error {
   case unknownSuite
 }
 
-// TODO: replace with enum
-public let kNewInstall = "new-installation"
-public let kMigrationComplete = "migration-complete"
-public let kInputMethodRegistered = "input-method-registered"
-public let kInputMethodSelected = "input-method-selected"
-public let kInputMethodEnabled = "input-method-enabled"
-public let kAccessGranted = "access-granted"
-public let kRestartRequired = "restart-required"
-public let kInstallComplete = "install-complete"
-
 public class DefaultsRepository: DefaultsRepo {
   fileprivate let pathUtil: KeymanPaths
   let defaultsSuiteName: String
@@ -35,7 +25,9 @@ public class DefaultsRepository: DefaultsRepo {
   let kDataModelVersionKey = "KMDataModelVersion"
   let kShowOskOnActivateKey = "KMShowOskOnActivate"
   let kForceSentryErrorKey = "KMForceSentryError"
+  
   let kInstallationState = "KMInstallationState"
+  
   let kTimeRestartRequested = "KMTimeRestartRequested"
 
   public init(suiteName: String) throws(Error) {
@@ -50,22 +42,32 @@ public class DefaultsRepository: DefaultsRepo {
     self.groupDefaults = userDefaults
   }
   
-  /**
-   * read the current state of the installation
-   * if the value is not found, then return kNewInstall
-   */
-  public func readInstallationState() -> String {
-    return self.groupDefaults.string(forKey: kInstallationState) ?? kNewInstall
+  public func installationStateExists() -> Bool {
+    return self.groupDefaults.object(forKey: "kInstallationState") != nil
   }
   
   /**
-   * write the state of the installation
+   * read the dictionary of the installation info from the UserDefaults
    */
-  public func writeInstallationState(_ state: String) {
-    self.groupDefaults.set(state, forKey: kInstallationState)
+  public func readInstallationState() -> Dictionary<String, Any>? {
+    return self.groupDefaults.dictionary(forKey: kInstallationState)
   }
   
   /**
+   * write the dictionary of the installation info to the UserDefaults
+   */
+  public func writeInstallationState(_ dictionary: Dictionary<String, Any>) {
+    self.groupDefaults.set(dictionary, forKey: kInstallationState)
+  }
+  
+  /**
+   * delete the dictionary of the installation info to the UserDefaults
+   */
+  public func deleteInstallationState() {
+    self.groupDefaults.removeObject(forKey: kInstallationState)
+  }
+
+ /**
    * get the list of enabled keyboards from the UserDefaults
    * The enabled keyboards are those that are shown in the Keyman menu
    * when it is selected from the System Input Source menu.
@@ -120,27 +122,6 @@ public class DefaultsRepository: DefaultsRepo {
   }
   
   /**
-   * read the date/time that the restart was requested
-   */
-  public func readRestartRequestTime() -> Date? {
-    return self.groupDefaults.object(forKey: kTimeRestartRequested) as? Date
-  }
-  
-  /**
-   * write the date/time that the restart was requested
-   */
-  public func writeRestartRequestTime(_ date: Date) {
-    self.groupDefaults.set(date, forKey: kTimeRestartRequested)
-  }
-
-  /**
-   * delete the value that the date/time that the restart was requested
-   */
-  public func clearRestartRequestTime() {
-    self.groupDefaults.removeObject(forKey: kTimeRestartRequested)
-  }
-
-  /**
    * read the boolean value that indicates whether the OSK is opened when the input method is activated
    * There may be no need to read this from with the config app.
    */
@@ -173,8 +154,7 @@ public class DefaultsRepository: DefaultsRepo {
     print("\(kShowOskOnActivateKey): \(self.readShowOskOnActivate())")
     print("\(kEnabledKeyboardsKey): \(self.readEnabledKeyboards())")
     print("\(kPersistedOptionsKey): \(self.readPersistedOptions())")
-    print("\(kInstallationState): \(self.readInstallationState())")
-    print("\(kTimeRestartRequested): \(self.readRestartRequestTime(), default: "none")")
+    print("\(kInstallationState): \(self.readInstallationState()?.description ?? "nil")")
   }
   
   /**

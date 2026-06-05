@@ -31,6 +31,7 @@ import Foundation
  */
 
 public struct KeymanPaths {
+  // MAC-CONFIG-TODO: move to input method util?
   static public let keymanBundleId = "keyman.inputmethod.Keyman"
   static public let configBundleId = "com.keyman.config"
   static public let groupId = "group.com.keyman"
