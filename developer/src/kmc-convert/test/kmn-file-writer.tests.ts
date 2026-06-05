@@ -11,6 +11,7 @@ import 'mocha';
 import { assert } from 'chai';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
+import { KeylayoutXMLSourceFile } from '../../common/web/utils/src/types/keylayout/keylayout-xml.js';
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
@@ -27,7 +28,7 @@ describe('KmnFileWriter', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.unitTestEndpoints.convert(read as KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     it('writeDataRules() should return true (no error) if written', async function () {
       const result = sutW.writeDataRules(converted);
@@ -42,7 +43,7 @@ describe('KmnFileWriter', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.unitTestEndpoints.convert(read as KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     const outExpectedFirst: string =
       "c ..................................................................................................................\n"
@@ -63,8 +64,15 @@ describe('KmnFileWriter', function () {
 
     it(('writeKmnFileHeader should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
       const writtenCorrectName = sutW.writeKmnFileHeader(converted);
-      assert.equal(writtenCorrectName, (outExpectedFirst + converted.keylayoutFilename + outExpectedLast));
+      assert.isNotNull(converted);
+      assert.equal(writtenCorrectName, (outExpectedFirst + (converted.keylayoutFilename ?? "") + outExpectedLast));
     });
+    it(('writeKmnFileHeader should return no text with null filename ').padEnd(62, " ") + 'on correct input', async function () {
+      const writtenEmptytName = sutW.writeKmnFileHeader(null);
+      assert.equal(writtenEmptytName, '');
+    });
+
+
   });
 
   describe('convertToUnicodeCharacter ', function () {
@@ -95,12 +103,59 @@ describe('KmnFileWriter', function () {
       ["␤", '␤'],
       ["␕", '␕'],
       ["", ''],
-      [undefined, undefined],
-      [null, undefined]
+      [null, undefined],
+      ["&lt;", '<'],
+      ["&Gt", undefined],
+      ["U+D801", undefined],
+      ["&#xD801;", undefined],
+      ["&#55297;", undefined],
+      ["&#55297;", undefined],
+      ["U+D801", undefined],
+      ["&#xmmm;", undefined],
+      ["&#x11FFFF;", undefined],
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
         const result = sutW.convertToUnicodeCharacter(values[0] as string);
         assert.equal(result, values[1]);
+      });
+    });
+  });
+
+  describe('writeCharacterOrUnicode and return values', function () {
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    [
+      ["A", "A", "Msg; "],
+      ["ሴ", "ሴ", "Msg; "],
+      ["😀", "😀", "Msg; "],
+      ["ẘ", "ẘ", "Msg; "],
+      ["U+0001", "U+0001", "Msg; Use of a control character "],
+      ["U+0061", "a", "Msg; "],
+      ["&#x0002;", "U+0002", "Msg; Use of a control character "],
+      ["&#x1234;", 'ሴ', "Msg; "],
+      ["&#0003;", "U+0003", "Msg; Use of a control character "],
+      ["&#4666;", "ሺ", "Msg; "],
+      ["", "U+0006", "Msg; Use of a control character "],
+      ['', '', 'Msg; empty output or unsupported numerical html entity: '],
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg");
+        assert.isNotNull(result);
+        assert.equal(result.character, values[1]);
+        assert.equal(result.message, values[2]);
+      });
+    });
+  });
+
+  describe('writeCharacterOrUnicode and return null for result.message and result.character', function () {
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    [
+      [null, null],
+      [undefined, null],
+
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sutW.writeCharacterOrUnicode(values[0], "");
+        assert.isNull(result);
       });
     });
   });
@@ -441,8 +496,13 @@ describe('KmnFileWriter', function () {
           rules: values[0] as Rule[]
         };
         const result1 = sutW.writeDataRules(data);
-        assert.isTrue(result1 === values[1][0]);
+        assert.equal(result1, values[1][0]);
       });
+
+    });
+    it(('null should create empty string '), async function () {
+      const result1 = sutW.writeDataRules(null);
+      assert.equal(result1, '');
     });
   });
 
