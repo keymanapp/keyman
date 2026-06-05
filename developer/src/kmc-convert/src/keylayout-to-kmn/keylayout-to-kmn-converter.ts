@@ -234,7 +234,7 @@ export class KeylayoutToKmnConverter {
           // ...............e. g. <key code="1" output="s"/> ...............................................................................
           // ...............................................................................................................................
 
-         if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] !== undefined) {
+          if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] !== undefined) {
 
             // loop modifiers
             for (let l = 0; l < dataUkelele.modifiers[i].length; l++) {
