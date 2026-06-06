@@ -1907,10 +1907,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         : KMManager.KMDefault_LanguageID;
     boolean matchingModel = false;
 
-    for(int i=0; i<lexicalModelsInstalled.size(); i++) {
-      HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
-      if(lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
-    if(matchingModel) {
+    for (int i = 0; i < lexicalModelsInstalled.size(); i++) {
+      HashMap<String, String> lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
+      if (lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
+        matchingModel = true;
+      }
       KMManager.addLexicalModel(this, lexicalModelInfo);
     }
 
