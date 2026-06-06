@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) SIL International. MIT License.
+ * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Output artifacts available from kmc-convert
  */
