@@ -97,8 +97,6 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import androidx.drawerlayout.widget.DrawerLayout;
-
 import androidx.core.content.ContextCompat;
 
 import android.provider.Settings;
@@ -125,15 +123,10 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.core.view.GravityCompat;
 
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import com.google.android.material.navigation.NavigationView;
-import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import android.view.MenuItem;
 import androidx.appcompat.widget.AppCompatCheckBox;
 
 import io.sentry.android.core.SentryAndroid;
@@ -187,7 +180,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     AppCompatDelegate.setDefaultNightMode(savedMode);
     getDelegate().applyDayNight();
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
     context = this;
 
     checkSendCrashReport();
@@ -254,14 +246,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle(null);
-
-    getSupportActionBar().setDisplayUseLogoEnabled(true);
-    getSupportActionBar().setDisplayShowHomeEnabled(true);
-    getSupportActionBar().setDisplayShowTitleEnabled(true);
-    getSupportActionBar().setLogo(R.drawable.keyman_logo);
-
-    getSupportActionBar().setDisplayUseLogoEnabled(false);
-    getSupportActionBar().setDisplayShowHomeEnabled(false);
 
     getSupportActionBar().setDisplayUseLogoEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -404,6 +388,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       return;
     } else {
       ClipData userdata = returnIntent.getClipData();
+      if (userdata == null) {
+        checkGetStarted();
+        return;
+      }
       int len = userdata.getItemCount();
       for (int i = 0; i < len; i++) {
         Uri fileUri = userdata.getItemAt(i).getUri();
@@ -554,7 +542,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     SharedPreferences.Editor editor = prefs.edit();
     editor.putString(userTextKey, textView.getText().toString());
     editor.putInt(userTextSizeKey, textSize);
-    editor.commit();
+    editor.apply();
   }
 
   @Override
@@ -1353,6 +1341,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       openThemeDialog();
     } else if (id == R.id.nav_about_current_keyboard || id == R.id.nav_help_active_keyboard) {
       showCurrentKeyboardSettings();
+    } else {
+      return false;
     }
 
     return true;
@@ -1774,7 +1764,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (progressDialog != null && progressDialog.isShowing()) {
       progressDialog.dismiss();
     }
-    ;
     progressDialog = null;
   }
 

@@ -43,10 +43,6 @@
         <item name="android:windowBackground">#424242</item>
     </style>
 
-<!--    <style name="AppTheme.BrandedLaunch" parent="Theme.AppCompat.NoActionBar">-->
-<!--        <item name="android:windowBackground">@drawable/branded_logo_dark_mode</item>-->
-<!--    </style>-->
-
     <style name="Theme.App.Starting" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/branded_logo_dark_mode</item>
     </style>

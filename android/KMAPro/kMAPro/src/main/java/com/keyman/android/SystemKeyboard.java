@@ -1,3 +1,7 @@
+/**
+ * Copyright (C) 2017 SIL International. All rights reserved.
+ */
+
 package com.keyman.android;
 
 import com.keyman.engine.util.DownloadFileUtils;
@@ -36,12 +40,7 @@ import android.content.Intent;
 import io.sentry.android.core.SentryAndroid;
 import io.sentry.Sentry;
 
-
-  /**
-   * Copyright (C) 2017 SIL International. All rights reserved.
-   */
-
-  public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
+public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 
     private static View inputView = null;
     private KMHardwareKeyboardInterpreter interpreter = null;

@@ -309,4 +309,7 @@
 
   <!-- Context: anywhere -->
   <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+  
+  <!-- Context: Menu title -->
+  <string name="menu_title" comment="Title for overflow/menu button">Menu</string>
 </resources>
