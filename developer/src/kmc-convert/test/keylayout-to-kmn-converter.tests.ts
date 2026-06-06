@@ -43,6 +43,7 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_differentEncodings.keylayout'],
       ['../data/Test_ExtraWarning.keylayout'],
       ['../data/Test_characters.keylayout'],
+      ['../data/Test_mixedEncodings.keylayout'],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         await sut.run(makePathToFixture(files[0]));
