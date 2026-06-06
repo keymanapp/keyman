@@ -195,7 +195,6 @@ public class GetStartedActivity extends BaseActivity {
       String two = String.valueOf(R.drawable.ic_looks_two);
       String three = String.valueOf(R.drawable.ic_looks_three);
       String checkbox_on = String.valueOf(R.drawable.ic_checkbox);
-//      String checkbox_on = String.valueOf(android.R.drawable.checkbox_on_background);
       String info = String.valueOf(R.drawable.ic_info_outline);
 
       List<Keyboard> kbList = KMManager.getKeyboardsList(this);

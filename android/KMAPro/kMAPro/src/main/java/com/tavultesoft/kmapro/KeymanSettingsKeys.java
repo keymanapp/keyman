@@ -1,3 +1,6 @@
+/**
+ * Copyright (C) 2017 SIL International. All rights reserved.
+ */
 package com.tavultesoft.kmapro;
 
 public final class KeymanSettingsKeys {

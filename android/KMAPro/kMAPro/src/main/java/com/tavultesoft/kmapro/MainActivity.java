@@ -97,6 +97,8 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import androidx.core.content.ContextCompat;
 
 import android.provider.Settings;
@@ -123,10 +125,15 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.core.view.GravityCompat;
 
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import android.view.MenuItem;
 import androidx.appcompat.widget.AppCompatCheckBox;
 
 import io.sentry.android.core.SentryAndroid;
@@ -148,7 +155,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private ConstraintLayout constraintLayout;
   private KMTextView textView;
-  private View keyboardToolbarToggleButton;
+  private View textPopupToggleButton;
   private View keyboardToolbarContainer;
   private boolean isKeyboardToolbarExpanded = false;
   private boolean suppressOutsideCloseForCurrentTouch = false;
@@ -180,6 +187,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     AppCompatDelegate.setDefaultNightMode(savedMode);
     getDelegate().applyDayNight();
     super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
     context = this;
 
     checkSendCrashReport();
@@ -246,6 +254,14 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle(null);
+
+    getSupportActionBar().setDisplayUseLogoEnabled(true);
+    getSupportActionBar().setDisplayShowHomeEnabled(true);
+    getSupportActionBar().setDisplayShowTitleEnabled(true);
+    getSupportActionBar().setLogo(R.drawable.keyman_logo);
+
+    getSupportActionBar().setDisplayUseLogoEnabled(false);
+    getSupportActionBar().setDisplayShowHomeEnabled(false);
 
     getSupportActionBar().setDisplayUseLogoEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -388,10 +404,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       return;
     } else {
       ClipData userdata = returnIntent.getClipData();
-      if (userdata == null) {
-        checkGetStarted();
-        return;
-      }
       int len = userdata.getItemCount();
       for (int i = 0; i < len; i++) {
         Uri fileUri = userdata.getItemAt(i).getUri();
@@ -406,13 +418,13 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             inputStream.close();
           } else if (FileUtils.hasJavaScriptExtension(filename) || FileUtils.hasFontExtension(filename)) {
             File packagesDir = new File(getDir("data", Context.MODE_PRIVATE) + File.separator +
-                KMManager.KMDefault_AssetPackages);
+              KMManager.KMDefault_AssetPackages);
             if (!packagesDir.exists()) {
               packagesDir.mkdir();
             }
 
             File undefinedPackageDir = new File(getDir("data", Context.MODE_PRIVATE) +
-                File.separator + KMManager.KMDefault_UndefinedPackageID);
+              File.separator + KMManager.KMDefault_UndefinedPackageID);
             if (!undefinedPackageDir.exists()) {
               undefinedPackageDir.mkdir();
             }
@@ -489,8 +501,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             CheckPermissions.requestPermission(this, context);
           }
           break;
-        case "http":
-        case "https":
+        case "http" :
+        case "https" :
           // Might need to modify link like KMPBrowserActivity
           if (KMPLink.isKeymanInstallLink(link)) {
             loadingIntentUri = KMPLink.getKeyboardDownloadLink(link);
@@ -499,7 +511,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           KMLog.LogBreadcrumb(TAG, "Installing via HTTPS intent: " + link, true);
           downloadKMP(loadingIntentUri, KmpInstallMode.Full);
           break;
-        case "keyman":
+        case "keyman" :
           // TODO: Only accept download links from Keyman browser activities when
           // universal links work
           KMLog.LogBreadcrumb(TAG, "Installing via keyman-link intent: " + link, true);
@@ -542,7 +554,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     SharedPreferences.Editor editor = prefs.edit();
     editor.putString(userTextKey, textView.getText().toString());
     editor.putInt(userTextSizeKey, textSize);
-    editor.apply();
+    editor.commit();
   }
 
   @Override
@@ -571,24 +583,25 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
   }
 
-  private void updateUpdateCountIndicator(MenuItem theItem, int anUpdateCount, boolean aHideMenuitem) {
+  private void updateUpdateCountIndicator(MenuItem theItem, int anUpdateCount, boolean aHideMenuitem)
+  {
     final ViewGroup _rootView = (ViewGroup) theItem.getActionView();
 
-    if (anUpdateCount == 0) {
-      if (aHideMenuitem) {
+    if(anUpdateCount==0) {
+      if(aHideMenuitem) {
         theItem.setVisible(false);
       } else if (_rootView != null) {
         _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
       }
     } else {
-      if (aHideMenuitem) {
+      if(aHideMenuitem) {
         theItem.setVisible(true);
-      } else if (_rootView != null) {
+      } else if(_rootView!=null) {
         _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.VISIBLE);
       }
     }
 
-    if (_rootView == null) {
+    if(_rootView==null) {
       return;
     }
 
@@ -673,8 +686,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   public boolean dispatchTouchEvent(MotionEvent ev) {
     int action = ev.getActionMasked();
+    // Collapse the keyboard toolbar when the user taps outside of it
     if (action == MotionEvent.ACTION_DOWN && isKeyboardToolbarExpanded && !suppressOutsideCloseForCurrentTouch) {
-      boolean touchOnToggle = isTouchInsideView(ev, keyboardToolbarToggleButton);
+      boolean touchOnToggle = isTouchInsideView(ev, textPopupToggleButton);
       if (touchOnToggle) {
         return super.dispatchTouchEvent(ev);
       }
@@ -718,8 +732,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_INAPP);
     resizeTextView(true);
     updateKeyboardToolbarPosition();
-    if (keyboardToolbarToggleButton != null) {
-      keyboardToolbarToggleButton.setVisibility(View.VISIBLE);
+    if (textPopupToggleButton != null) {
+      textPopupToggleButton.setVisibility(View.VISIBLE);
     }
   }
 
@@ -727,22 +741,22 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   public void onKeyboardDismissed() {
     resizeTextView(false);
     setKeyboardToolbarExpanded(false, false);
-    if (keyboardToolbarToggleButton != null) {
-      keyboardToolbarToggleButton.setVisibility(View.GONE);
+    if (textPopupToggleButton != null) {
+      textPopupToggleButton.setVisibility(View.GONE);
     }
   }
 
   private void initializeKeyboardToolbar() {
-    keyboardToolbarToggleButton = findViewById(R.id.keyboardToolbarToggleButton);
+    textPopupToggleButton = findViewById(R.id.keyboardToolbarToggleButton);
     keyboardToolbarContainer = findViewById(R.id.keyboardToolbarContainer);
 
-    if (keyboardToolbarToggleButton == null || keyboardToolbarContainer == null) {
+    if (textPopupToggleButton == null || keyboardToolbarContainer == null) {
       reportKeyboardToolbarLayoutIssue("Keyboard toolbar layout is missing required views.");
       return;
     }
 
     setKeyboardToolbarExpanded(false, false);
-    keyboardToolbarToggleButton.setOnTouchListener((v, event) -> {
+    textPopupToggleButton.setOnTouchListener((v, event) -> {
       int action = event.getActionMasked();
       if (action == MotionEvent.ACTION_DOWN) {
         suppressOutsideCloseForCurrentTouch = true;
@@ -751,7 +765,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       }
       return false;
     });
-    keyboardToolbarToggleButton.setOnClickListener(v -> setKeyboardToolbarExpanded(!isKeyboardToolbarExpanded, true));
+    textPopupToggleButton.setOnClickListener(v -> setKeyboardToolbarExpanded(!isKeyboardToolbarExpanded, true));
 
     View shareButton = findViewById(R.id.keyboardToolbarShareButton);
     if (shareButton != null) {
@@ -792,7 +806,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void setKeyboardToolbarExpanded(boolean expanded, boolean animateRotation) {
-    if (keyboardToolbarContainer == null || keyboardToolbarToggleButton == null) {
+    if (keyboardToolbarContainer == null || textPopupToggleButton == null) {
       return;
     }
 
@@ -801,16 +815,16 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     float targetRotation = expanded ? 0f : 180f;
     if (animateRotation) {
-      keyboardToolbarToggleButton.animate().rotation(targetRotation).setDuration(180).start();
+      textPopupToggleButton.animate().rotation(targetRotation).setDuration(180).start();
     } else {
-      keyboardToolbarToggleButton.setRotation(targetRotation);
+      textPopupToggleButton.setRotation(targetRotation);
     }
   }
 
   private void updateKeyboardToolbarPosition() {
     int keyboardTopOffset = KMManager.getKeyboardHeight(this) + KMManager.getBannerHeight(this)
         + getResources().getDimensionPixelSize(R.dimen.keyboard_toolbar_keyboard_gap);
-    updateBottomMargin(keyboardToolbarToggleButton, keyboardTopOffset);
+    updateBottomMargin(textPopupToggleButton, keyboardTopOffset);
     updateBottomMargin(keyboardToolbarContainer,
         getResources().getDimensionPixelSize(R.dimen.keyboard_toolbar_container_bottom_margin));
   }
@@ -1341,8 +1355,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       openThemeDialog();
     } else if (id == R.id.nav_about_current_keyboard || id == R.id.nav_help_active_keyboard) {
       showCurrentKeyboardSettings();
-    } else {
-      return false;
     }
 
     return true;
@@ -1764,6 +1776,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (progressDialog != null && progressDialog.isShowing()) {
       progressDialog.dismiss();
     }
+    
     progressDialog = null;
   }
 
@@ -1894,11 +1907,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         : KMManager.KMDefault_LanguageID;
     boolean matchingModel = false;
 
-    for (int i = 0; i < lexicalModelsInstalled.size(); i++) {
-      HashMap<String, String> lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
-      if (lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
-        matchingModel = true;
-      }
+    for(int i=0; i<lexicalModelsInstalled.size(); i++) {
+      HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
+      if(lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
+    if(matchingModel) {
       KMManager.addLexicalModel(this, lexicalModelInfo);
     }
 
