@@ -13,5 +13,6 @@
   "references": [
     { "path": "../../../common/web/keyman-version" },
     { "path": "../../../common/web/types" },
+    { "path": "../../../web/src/engine/predictive-text/templates/" },
   ]
 }
