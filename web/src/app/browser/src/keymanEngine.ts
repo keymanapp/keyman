@@ -257,7 +257,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *                activationPending (bool):   KMW being activated
    *                activated         (bool):   KMW active
    *
-   * See https://help.keyman.com/developer/engine/web/16.0/reference/core/getUIState
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getUIState
    */
   public getUIState(): FocusStateAPIObject {
     return this.contextManager.focusAssistant.getUIState();
@@ -266,7 +266,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
   /**
    * Set or clear the IsActivatingKeymanWebUI flag (exposed function)
    *
-   * See https://help.keyman.com/developer/engine/web/16.0/reference/core/activatingUI
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/activatingUI
    *
    * @param       {(boolean|number)}  state  Activate (true,false)
    */
@@ -276,12 +276,19 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
   /**
    * Associate control with independent keyboard settings initialized to a specific keyboard.
+   * The pair of `keyboard` and `languageCode` (if not `null`) must refer to a
+   * registered keyboard stub.
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/setKeyboardForControl
    *
    * @param       {Element}       elem          The control element to be managed manually
-   * @param       {string|null=}  keyboard      JSKeyboard (Clears the set keyboard if set to null)
-   * @param       {string|null=}  languageCode  Language Code
+   * @param       {string|null=}  keyboard      The id of a keyboard, consisting of the word
+   *                                            `Keyboard_` followed by the internal keyboard
+   *                                            name. For a keyboard with the internal name
+   *                                            `laokeys` this would be `Keyboard_laokeys`.
+   *                                            If `null` clears the set keyboard.
+   * @param       {string|null=}  languageCode  A BCP47 language code which was used when
+   *                                            registering the keyboard stub.
    */
   public setKeyboardForControl(elem: HTMLElement, keyboard?: string, languageCode?: string): void {
     if(elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) {

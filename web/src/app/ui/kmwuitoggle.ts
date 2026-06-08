@@ -569,7 +569,7 @@ if(!keymanweb) {
        * Description  Select a keyboard from the drop down menu
        **/
       private async selectKbd(kbdIndex: number): Promise<boolean> {
-        let name, languageCode;
+        let name: string, languageCode: string;
         if (kbdIndex < 0) {
           name = '';
           languageCode = '';
