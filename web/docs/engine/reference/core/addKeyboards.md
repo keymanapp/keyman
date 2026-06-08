@@ -9,7 +9,7 @@ Adds keyboards to KeymanWeb.
 ## Syntax
 
 ```js
-keyman.addKeyboards(spec[, spec...])
+await keyman.addKeyboards([spec...])
 ```
 
 ### Parameters
@@ -179,3 +179,13 @@ The `spec.languages.font` object contains the following members:
 : `string` <span class="optional">optional</span>
 
   Font size (in CSS dimensions). If not specified, then `1em` is used.
+
+### Not passing any parameter
+
+Not passing any parameter will obtain the Keyman keyboards for English
+from the CDN, i.e. these two functions calls are identical:
+
+```js
+await keyman.addKeyboards();
+await keyman.addKeyboards('@en');
+```

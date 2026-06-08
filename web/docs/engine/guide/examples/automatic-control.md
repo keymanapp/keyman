@@ -13,8 +13,8 @@ In this example, we use only the LaoKey keyboard. Please click [this link](./__a
   <!-- Start of Code -->
   <script src="js/keymanweb.js" type="text/javascript"></script>
   <script>
-    keyman.init().then(function() {
-      keyman.addKeyboards({
+    keyman.init().then(async function() {
+      await keyman.addKeyboards({
         id:'laokeys',
         name:'Lao (Phonetic)',
         languages:{

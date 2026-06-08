@@ -8,8 +8,8 @@ There are multiple ways to add and install keyboards into your KeymanWeb install
 
 The most efficient way to utilize a keyboard is to obtain a local copy of it and place this copy in a static location on your website. Once this is done, it can be directly linked into KeymanWeb as follows.
 
-```c
-keyman.addKeyboards({
+```typescript
+await keyman.addKeyboards({
     id:'us',                  // The keyboard's unique identification code.
     name:'English',           // The keyboard's user-readable name.
     language:{
@@ -22,7 +22,7 @@ keyman.addKeyboards({
 
 Custom fonts may also be utilized via the `language.font` property. For example:
 
-```c
+```typescript
 font:{
     family:'LaoWeb',
     source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']
@@ -33,16 +33,16 @@ font:{
 
 To obtain the default Keyman keyboard for a given language, call the following function.
 
-```c
-keyman.addKeyboardsForLanguage('Dzongkha');
+```typescript
+await keyman.addKeyboardsForLanguage('Dzongkha');
 ```
 
 This example would find the default keyboard for the Dzongkha language. This method will fail if the name doesn't perfectly match any language found in the CDN's repository.
 
 Alternatively, languages may be looked up via their BCP 47 language code as follows:
 
-```c
-keyman.addKeyboards('@he')
+```typescript
+await keyman.addKeyboards('@he')
 ```
 
 The `@` prefix indicates the use of the BCP 47 language code, which in this case corresponds with Hebrew.
@@ -51,8 +51,8 @@ The `@` prefix indicates the use of the BCP 47 language code, which in this case
 
 To obtain a specific keyboard by name or by keyboard name and language code as a pair, see the following:
 
-```c
-keyman.addKeyboards('french','sil_euro_latin@sv','sil_euro_latin@no')
+```typescript
+await keyman.addKeyboards('french','sil_euro_latin@sv','sil_euro_latin@no')
 ```
 
 This will install three keyboards - one for French (named, quite simply, "French") and two copies of the EuroLatin keyboard - one for Swedish and one for Norwegian.

@@ -43,9 +43,9 @@
   function errToString(err) {
     // Painful?  Kinda.  But needed on un-updated Android API 21!
     if(Array.isArray(err)) {
-      var result = '';
-      for(var i = 0; i < err.length; i++) {
-        var e = err[i];
+      let result = '';
+      for(let i = 0; i < err.length; i++) {
+        const e = err[i];
         if(e.error instanceof Error) {
           result += e.error.message + '\n';
         } else {
@@ -73,13 +73,13 @@
   }
 
   async function loadKeyboards(nestLevel) {
-    var base_prefix = '../';
-    var prefix = './'; // The default - when prefix == 0.
+    const base_prefix = '../';
+    let prefix = './'; // The default - when prefix == 0.
 
     if(nestLevel !== undefined && nestLevel > 0) {
       prefix = '';
-      for(var i=0; i < nestLevel; i++) {
-        prefix = prefix + base_prefix;
+      for(let i=0; i < nestLevel; i++) {
+        prefix += base_prefix;
       }
     }
 
@@ -116,29 +116,31 @@
   }
 
   // Script to allow a user to add any keyboard to the keyboard menu
-  function addKeyboard(n) {
-    var sKbd;
+  async function addKeyboard(n) {
+    let sKbd;
     switch(n) {
       case 1:
         sKbd=document.getElementById('kbd_id1').value;
-        doAddKeyboards(sKbd);
+        await doAddKeyboards(sKbd);
         break;
       case 2:
         sKbd=document.getElementById('kbd_id2').value.toLowerCase();
-        doAddKeyboards('@'+sKbd);
+        await doAddKeyboards('@'+sKbd);
         break;
       case 3:
         // Add keyboard for comma-separated language name(s)
         sKbd=document.getElementById('kbd_id3').value;
-        doAddKeyboardsForLanguage(sKbd);
+        await doAddKeyboardsForLanguage(sKbd);
         break;
     }
   }
 
   // Add keyboard on Enter (as well as pressing button)
-  function clickOnEnter(e,id)
+  async function clickOnEnter(e,id)
   {
     e = e || window.event;
-    if(e.keyCode == 13) addKeyboard(id);
+    if (e.keyCode == 13) {
+      await addKeyboard(id);
+    }
   }
 
