@@ -18,8 +18,7 @@ Include the following script in the HEAD of your page:
 
     KWControl = document.getElementById('KWControl');
     var kbds = keyman.getKeyboards();
-    for(var kbd in kbds)
-    {
+    for(var kbd in kbds) {
       var opt = document.createElement('OPTION');
       opt.value = kbds[kbd].InternalName + "$$" + kbds[kbd].LanguageCode;
       opt.innerHTML = kbds[kbd].Name;
