@@ -33,13 +33,10 @@ Also include the following HTML code:
 ```html
 <head>
     <!-- Load the KeymanWeb engine -->
-    <script src="keymanweb.js" type="text/javascript"></script>
+    <script src="https://s.keyman.com/kmw/engine/17.0.331/keymanweb.js" type="text/javascript"></script>
     <!-- Load the LaoKeys keyboard stub -->
     <script src="laokeys_load.js" type="text/javascript"></script>
 </head>
-
-<!-- When the page has finished loading, activate the LaoKeys keyboard, see above -->
-<body>
 ```
 
 - File: [laokeys_load.js](js/laokeys_load.js)

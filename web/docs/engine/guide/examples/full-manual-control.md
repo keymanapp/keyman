@@ -47,14 +47,11 @@ Also include the following HTML code:
 ```html
 <head>
     <!-- Load the KeymanWeb engine -->
-    <script src="keymanweb.js" type="text/javascript"></script>
+    <script src="https://s.keyman.com/kmw/engine/17.0.331/keymanweb.js" type="text/javascript"></script>
     <!-- Load the your keyboard stubs here -->
     <script src="unified_loader.js" type="text/javascript"></script>
     <!-- ... -->
 </head>
-
-<!-- When the page has finished loading, populate the keyboard selector, see above -->
-<body>
 ```
 
 - File: [unified_loader.js](js/unified_loader.js)
