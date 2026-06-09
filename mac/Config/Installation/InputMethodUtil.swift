@@ -13,11 +13,24 @@ import Carbon.HIToolbox
 import AppKit
 import KeymanSettings
 
+extension Notification.Name {
+    static let accessCheck = Notification.Name("com.keyman.accessibility.state")
+}
+
+public enum KeymanInvocationError: Error {
+  case inputMethodNotFound
+  case inputMethodCouldNotBeInvoked
+}
+
 public class InputMethodUtil {
   public let keymanInputMethodApplicationName = "Keyman.app"
+  public var requestAccessGranted: Bool = false
   fileprivate let pathUtil: KeymanPaths
   fileprivate var inputMethodProccesId: pid_t = 0
-  
+  fileprivate var observer: NSObjectProtocol?
+
+  let kAccessGrantedMessage = "granted"
+
   let kMigrateCommand = "migrate"
   let kAccessCommand = "access"
   let kCheckCommand = "check"
@@ -58,9 +71,8 @@ public class InputMethodUtil {
   /**
    * launch the Keyman input method
    */
-  public func runKeymanInputMethod() -> Bool {
-    let success = self.launchKeymanInputMethodAsSeparateProcess() == 0
-    return success
+  public func runKeymanInputMethod() throws {
+    try self.launchKeymanInputMethodAsSeparateProcess()
   }
   
   /**
@@ -166,14 +178,29 @@ public class InputMethodUtil {
     return self.invokeKeymanInputMethodAsSubProcess(argument: kMigrateCommand) == 0
   }
   
-  func invokeKeymanInputMethodGrantAccess() -> Bool {
-    print("invokeKeymanInputMethodGrantAccess()")
-    return self.launchKeymanInputMethodAsSeparateProcess(argument: kAccessCommand) == 0
+  func invokeKeymanInputMethodRequestAccess() -> Bool {
+    var success = false
+    do {
+      print("invokeKeymanInputMethodRequestAccess()")
+      try self.launchKeymanInputMethodAsSeparateProcess(argument: kAccessCommand)
+      success = true
+    } catch {
+      print("error requesting access: \(error)")
+    }
+    
+    return success
   }
   
-  func invokeKeymanInputMethodCheckAccess() -> Bool {
+  /**
+   * Calls Keyman input to check whether it has accessibility permission granted.
+   * The actual result is not returned from Keyman when called as a separate process.
+   * After this function is called, listen to the `NotificationCenter` for the notification named
+   * `com.keyman.accessibility.state`
+   * It contains a message with a value of `granted` or `not-granted`
+   */
+  func invokeKeymanInputMethodCheckAccess() throws {
     print("invokeKeymanInputMethodCheckAccess()")
-    return self.launchKeymanInputMethodAsSeparateProcess(argument: kCheckCommand) == 0
+    try self.launchKeymanInputMethodAsSeparateProcess(argument: kCheckCommand)
   }
   
   /**
@@ -209,7 +236,7 @@ public class InputMethodUtil {
   /**
    * launches the Keyman input method as an independent process with the specifed argument and return the result
    */
-  func launchKeymanInputMethodAsSeparateProcess(argument: String = "") -> Int {
+  func launchKeymanInputMethodAsSeparateProcess(argument: String = "") throws {
     let openConfig = NSWorkspace.OpenConfiguration()
     if !argument.isEmpty {
       openConfig.arguments = [argument]
@@ -219,18 +246,70 @@ public class InputMethodUtil {
     
     guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
       print("launchKeymanInputMethodAsSeparateProcess, failed to create input method url")
-      return 1
+      throw KeymanInvocationError.inputMethodNotFound
     }
     
     NSWorkspace.shared.openApplication(at: inputMethodUrl, configuration: openConfig) { (app, error) in
       if let error = error {
         print("Could not launch Keyman input method: \(error.localizedDescription)")
-      } else if let runningApp = app {
-        print("application: \(runningApp.localizedName ?? "unknown"), isActive: \(runningApp.isActive), isTerminated: \(runningApp.isTerminated)")
-        print("bundleId: \(runningApp.bundleIdentifier ?? "unknown") processID: \(runningApp.processIdentifier)")
       }
     }
-    return 0
+  }
+ 
+  /**
+   * Special care is needed with this code because `processAccessCheckResult(with:)` is bound to the Main Actor,
+   * but it is called from a closure which may not run on the Main Actor.
+   * DistributedNotificationCenter is not fully updated for concurrency, so specifying `.main` for the `OperationQueue`
+   * does not ensure that the closure is running on the main actor.
+   * To ensure this, a Task is defined around the call to  `processAccessCheckResult`.
+   */
+  func doAsyncAccessCheck() {
+    do {
+      try self.invokeKeymanInputMethodCheckAccess()
+    } catch {
+      print("invoking Keyman failed: \(error.localizedDescription)")
+    }
+
+    let timeStyle = Date.FormatStyle()
+      .hour(.twoDigits(amPM: Date.FormatStyle.Symbol.Hour.AMPMStyle.abbreviated))
+      .minute(.twoDigits)
+      .second(.twoDigits)
+      .secondFraction(.fractional(3))
+    print("doAsyncAccessCheck, listening across process boundaries, time: \(Date().formatted(timeStyle))")
+    
+    // register to listen to system-wide notification sent from Keyman input method
+    observer = DistributedNotificationCenter.default().addObserver(
+      forName: .accessCheck,
+      object: nil, // nil to listen for this notification from any sender
+      queue: .main
+    ) { [weak self] notification in
+      
+      // in DistributedNotificationCenter, the string message is passed as the object
+      if let receivedString = notification.object as? String {
+        Task { @MainActor [weak self] in
+            self?.processAccessCheckResult(with: receivedString)
+        }
+      } else {
+        print("notification received, but object was not a String.")
+      }
+    }
+  }
+  
+  private func processAccessCheckResult(with message: String) {
+    let timeStyle = Date.FormatStyle()
+      .hour(.twoDigits(amPM: Date.FormatStyle.Symbol.Hour.AMPMStyle.abbreviated))
+      .minute(.twoDigits)
+      .second(.twoDigits)
+      .secondFraction(.fractional(3))
+    print("processAccessCheckResult received message: \(message), time: \(Date().formatted(timeStyle))")
+    
+    // if the message indicates that access was granted, then set as true
+    self.requestAccessGranted = message == kAccessGrantedMessage
+
+    // Clean up the observer immediately so it only fires once
+    if let observer = observer {
+      DistributedNotificationCenter.default().removeObserver(observer)
+    }
   }
   
   /**
@@ -408,11 +487,6 @@ public class InputMethodUtil {
       return nil
     }
     
-    //    // Get the input source ID
-    //    if let inputSourceId = TISGetInputSourceProperty(inputSource, kTISPropertyInputSourceID) {
-    //      ConfigLogger.shared.testLogger.debug("Input Source ID: \(String(describing: inputSourceId))")
-    //    }
-    //
     let inputSourceValue = TISGetInputSourceProperty(inputSource, kTISPropertyInputSourceID)
     if let cfType = inputSourceValue {
       // Bridge the CFTypeRef to an Unmanaged<AnyObject> and then to a Swift String

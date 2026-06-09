@@ -11,6 +11,7 @@
 import Foundation
 import KeymanSettings
 
+
 public class InstallationCheck {
   fileprivate let keymanVersion: String
   fileprivate let defaultsRepository: DefaultsRepo
@@ -62,7 +63,7 @@ public class InstallationCheck {
   }
   
   /**
-   * Check the version number to see if this is a new installation
+   * Creates a InstallationState object describing a new installation
    */
   func createInstallationStateForNewInstallation() -> InstallationState {
     let installationState = InstallationState(version: self.keymanVersion, tasks: self.createNewInstallationTasks())
@@ -104,8 +105,9 @@ public class InstallationCheck {
       // also need to restart after enabling the input method
       repairTasks.insert(InstallationTask.createNewInstallationTask(type: .restartMac))
     }
-    
-    if !self.inputMethodUtil.invokeKeymanInputMethodCheckAccess() {
+        
+    self.inputMethodUtil.doAsyncAccessCheck()
+    if !self.inputMethodUtil.requestAccessGranted {
       repairTasks.insert(InstallationTask.createNewInstallationTask(type: .requestAccess))
     }
     

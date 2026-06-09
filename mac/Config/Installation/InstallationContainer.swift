@@ -11,6 +11,7 @@ import SwiftUI
 import Combine
 import KeymanSettings
 
+@MainActor // run on the main actor since data is published directly to the UI
 public class InstallationContainer : ObservableObject {
   @Published public var installationState: InstallationState
   
@@ -35,8 +36,58 @@ public class InstallationContainer : ObservableObject {
     notificationCenter = DistributedNotificationCenter.default()
         
     self.installationState = InstallationCheck(version: "1.0.0", defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil).evaluate()
+    
+    self.registerObservers()
   }
   
+  
+  public func accessIsGranted() -> Bool {
+    self.inputMethodUtil.requestAccessGranted
+  }
+
+  func registerObservers() {
+    DispatchQueue.main.async {
+      // Register for the distributed notification
+      DistributedNotificationCenter.default().addObserver(
+        self,
+        selector: #selector(self.handleCheckAccess(_:)),
+        name: NSNotification.Name("com.keyman.accessibility.state.ignore"),
+//        name: .accessCheck,
+        object: nil // Observe notifications from any sender
+      )
+      
+      DistributedNotificationCenter.default().addObserver(
+        self,
+        selector: #selector(self.handleRequestAccess(_:)),
+        name: NSNotification.Name("com.activeoyster.test"),
+        object: nil // Observe notifications from any sender
+      )
+    }
+  }
+
+  @objc func handleCheckAccess(_ notification: Notification) {
+    let details:String
+    // extract message from the notification if available
+//    if let userInfo = notification.userInfo as? [String: Any],
+//       let message = userInfo["message"] as? String {
+    if let message = notification.object as? String {
+      details = message
+    } else {
+      details = "no data included."
+    }
+    print("Notification received by handleCheckAccess: \(details)")
+  }
+
+  @objc func handleRequestAccess(_ notification: Notification) {
+    let details:String
+    if let message = notification.object as? String {
+      details = message
+    } else {
+      details = "no data included."
+    }
+    print("Notification received by handleRequestAccess: \(details)")
+  }
+
   /**
    * return trues if every installation task is incomplete
    */
@@ -151,23 +202,17 @@ public class InstallationContainer : ObservableObject {
       if let mostRecentStartupTime = self.getMostRecentRestartTime() {
         hasRestarted = mostRecentStartupTime > timeRestartRequested
         print("mostRecentStartupTime: \(mostRecentStartupTime), timeRestartRequested: \(timeRestartRequested)")
-        self.markInstallationComplete()
       }
     }
     print("validateRestarted: \(hasRestarted)")
     return hasRestarted
   }
   
+  /**
+   * for testing purposes, replace the InstallationState with a new object set for a new installation
+   */
   func resetInstallation() {
-//    self.state = kNewInstall
-//    self.defaultsRepository.writeInstallationState(kNewInstall)
-//    self.defaultsRepository.clearRestartRequestTime()
-  }
-  
-  func markInstallationComplete() {
-//    self.state = kInstallComplete
-//    self.defaultsRepository.writeInstallationState(kInstallComplete)
-//    self.defaultsRepository.clearRestartRequestTime()
+    self.installationState = InstallationCheck(version: "1.0.0", defaultsRepo: self.defaultsRepository, inputMethodUtil: self.inputMethodUtil).createInstallationStateForNewInstallation()
   }
   
   /**
@@ -188,15 +233,12 @@ public class InstallationContainer : ObservableObject {
     }
   }
   
-  //  if let bootDate = getLastRestartTime() {
-  //      print("Last restart time: \(bootDate)")
-  //  }
-  
   public func debug() {
     let version = inputMethodUtil.getKeymanInputMethodVersion()
     let enabled = inputMethodUtil.isKeymanInputMethodEnabled()
     let running = inputMethodUtil.isKeymanInputMethodRunning()
-    print("Keyman status, version: \(version ?? ""), enabled: \(enabled), running: \(running)")
+    let accessGranted = self.accessIsGranted()
+    print("Keyman status, version: \(version ?? ""), enabled: \(enabled), running: \(running), accessGranted: \(accessGranted)")
   }
   
 
@@ -257,16 +299,17 @@ public class InstallationContainer : ObservableObject {
    * listen for message from Keyman to indicate the result
    */
   public func isAccessibilityGranted() -> Bool {
+    var hasAccess = false
+    
     if (inputMethodUtil.isKeymanInputMethodRunning()) {
       let killed = self.inputMethodUtil.killKeymanInputMethod()
       print("checkAccessibilityPermission, Keyman input method killed: \(killed)")
     } else {
       print("checkAccessibilityPermission, Keyman input method not running")
     }
-    
-    let hasAccess = self.inputMethodUtil.invokeKeymanInputMethodCheckAccess()
-    print("checkAccessibilityPermission, Keyman input method has permission: \(hasAccess)")
-    
+ 
+    self.inputMethodUtil.doAsyncAccessCheck()
+
     return hasAccess
   }
   
@@ -277,17 +320,19 @@ public class InstallationContainer : ObservableObject {
    */
   // MAC-CONFIG-TODO: do we get an accurate message from Keyman Input Method
   public func requestAccessibility() -> Bool {
+    var requested = false
+    
     if (inputMethodUtil.isKeymanInputMethodRunning()) {
       let killed = self.inputMethodUtil.killKeymanInputMethod()
-      print("checkAccessibilityPermission, Keyman input method killed: \(killed)")
+      print("requestAccessibility, Keyman input method killed: \(killed)")
     } else {
-      print("checkAccessibilityPermission, Keyman input method not running")
+      print("requestAccessibility, Keyman input method not running")
     }
 
-    let grantedAccess = self.inputMethodUtil.invokeKeymanInputMethodGrantAccess()
-    print("requestAccess suceeded: \(grantedAccess)")
+    requested = self.inputMethodUtil.invokeKeymanInputMethodRequestAccess()
+    print("requestAccessibility called, requested: \(requested)")
     
-    return grantedAccess
+    return requested
   }
 
   
@@ -295,7 +340,13 @@ public class InstallationContainer : ObservableObject {
    * run Keyman as a separate process with its full Input Method functionality
    */
   public func runKeymanInputMethod() -> Bool {
-    return self.inputMethodUtil.runKeymanInputMethod()
+    do {
+      try self.inputMethodUtil.runKeymanInputMethod()
+      return true
+    } catch {
+      print("runKeymanInputMethod error: \(error)")
+      return false
+    }
   }
   
   /**

@@ -1,10 +1,9 @@
-//
-//  main.m
-//  Keyman4MacIM
-//
-//  Created by Serkan Kurt on 28/01/2015.
-//  Copyright (c) 2017 SIL International. All rights reserved.
-//
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Serkan Kurt on 2015-01-28
+ *
+ */
 
 #import <Cocoa/Cocoa.h>
 #import <InputMethodKit/InputMethodKit.h>
@@ -14,10 +13,17 @@
 #import "KMLogs.h"
 
 const NSString *kConnectionName = @"Keyman_Input_Connection";
+IMKServer *server;
+
+// command strings passed from Keyman Configuration
 NSString *kMigrateCommand = @"migrate";
 NSString *kAccessCommand = @"access";
 NSString *kCheckCommand = @"check";
-IMKServer *server;
+
+// notification messages sent to Keyman Configuration
+NSString *kAccessGrantedMessage = @"granted";
+NSString *kAccessNotGrantedMessage = @"not-granted";
+
 
 void runAsInputMethod(void) {
   os_log_info([KMLogs startupLog], "main runAsInputMethod");
@@ -51,15 +57,20 @@ int doAccessibility(void) {
 
 int checkAccessibility(void) {
   BOOL hasAccess = NO;
+  NSString *message = kAccessNotGrantedMessage;
+  
   hasAccess = [PrivacyConsent.shared checkPostEventAccess];
   os_log_info([KMLogs startupLog], "checkAccessibility hasAccess: %{public}@", hasAccess?@"YES":@"NO");
   
   if (hasAccess) {
     hasAccess = 0;
+    message = kAccessGrantedMessage;
   } else {
     hasAccess = 1;
   }
-  
+
+  [[NSDistributedNotificationCenter defaultCenter] postNotificationName:@"com.keyman.accessibility.state" object:message userInfo:nil deliverImmediately:YES];
+
   return hasAccess;
 }
 
