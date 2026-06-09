@@ -14,27 +14,22 @@ Include the following script in the HEAD of your page:
 <script>
   var KWControl = null;
 
-  /* SetupDocument: Called when the page finishes loading */
-  function SetupDocument()
-  {
-    keyman.init().then(function(){
-      // Load the keyboards of your choice here.
-      loadKeyboards();
+  keyman.init().then(async function() {
+    // Load the keyboards of your choice here.
+    await loadKeyboards();
 
-      KWControl = document.getElementById('KWControl');
-      var kbds = keyman.getKeyboards();
-      for(var kbd in kbds)
-      {
-        var opt = document.createElement('OPTION');
-        opt.value = kbds[kbd].InternalName + "$$" + kbds[kbd].LanguageCode;
-        opt.innerHTML = kbds[kbd].Name;
-        KWControl.appendChild(opt);
-      }
-      document.f.multilingual.focus();
+    KWControl = document.getElementById('KWControl');
+    var kbds = keyman.getKeyboards();
+    for(var kbd in kbds) {
+      var opt = document.createElement('OPTION');
+      opt.value = kbds[kbd].InternalName + "$$" + kbds[kbd].LanguageCode;
+      opt.innerHTML = kbds[kbd].Name;
+      KWControl.appendChild(opt);
+    }
+    document.f.multilingual.focus();
 
-      keyman.setActiveKeyboard('', '');
-    });
-  }
+    keyman.setActiveKeyboard('', '');
+  });
 
   /* KWControlChange: Called when user selects an item in the KWControl SELECT */
   function KWControlChange() {
@@ -53,14 +48,11 @@ Also include the following HTML code:
 ```html
 <head>
     <!-- Load the KeymanWeb engine -->
-    <script src="keymanweb.js" type="text/javascript"></script>
+    <script src="https://s.keyman.com/kmw/engine/17.0.331/keymanweb.js" type="text/javascript"></script>
     <!-- Load the your keyboard stubs here -->
     <script src="unified_loader.js" type="text/javascript"></script>
     <!-- ... -->
 </head>
-
-<!-- When the page has finished loading, populate the keyboard selector, see above -->
-<body onload="SetupDocument()">
 ```
 
 - File: [unified_loader.js](js/unified_loader.js)

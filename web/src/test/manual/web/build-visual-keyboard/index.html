@@ -37,8 +37,6 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-
       var platform = 'desktop';
 
       keyman.getOskWidth = function() {
@@ -95,7 +93,8 @@
         shadowfy(container);
       }
 
-      kmw.init().then(async function() {
+      keyman.init().then(async function() {
+        await loadKeyboards(1);
         await documentKeyboard("gff_amharic", "am", "phone", "default");
         await documentKeyboard("sil_euro_latin", "no", "phone", "shift");
         await documentKeyboard("lao_2008_basic", "lo", "tablet", "default");
@@ -111,7 +110,7 @@
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards(1);'>
+  <body>
     <h2>KeymanWeb:  Keyboard documentation rendering</h2>
 
     <div id='DynamicTextboxes'>
