@@ -152,12 +152,12 @@ if(!keymanweb) {
         }
 
         osk.addEventListener('show', (oskPosition) => {
-            // Ensure that the ui.controller is visible if help is displayed
-            this.controller.style.display = 'block';
-            this.oskButton._setSelected(true);
+          // Ensure that the ui.controller is visible if help is displayed
+          this.controller.style.display = 'block';
+          this.oskButton._setSelected(true);
 
-            return oskPosition;
-          });
+          return oskPosition;
+        });
 
         osk.addEventListener('hide', (byUser) => {
           if(byUser['HiddenByUser']) {
@@ -565,24 +565,24 @@ if(!keymanweb) {
       /**
        * Function     selecKbd
        * Scope        Private
-       * @param       {number}  _kbd
+       * @param       {number}  kbdIndex
        * Description  Select a keyboard from the drop down menu
        **/
-      private async selectKbd(_kbd: number): Promise<boolean> {
-        let _name,_lgCode;
-        if(_kbd < 0) {
-          _name = '';
-          _lgCode='';
+      private async selectKbd(kbdIndex: number): Promise<boolean> {
+        let name: string, languageCode: string;
+        if (kbdIndex < 0) {
+          name = '';
+          languageCode = '';
         } else {
-          _name = this.keyboards[_kbd]._InternalName;
-          _lgCode = this.keyboards[_kbd]._LanguageCode;
+          name = this.keyboards[kbdIndex]._InternalName;
+          languageCode = this.keyboards[kbdIndex]._LanguageCode;
         }
 
-        await keymanweb.setActiveKeyboard(_name,_lgCode);
+        await keymanweb.setActiveKeyboard(name, languageCode);
         keymanweb.focusLastActiveElement();
-        this.kbdButton._setSelected(_name != '');
-        if(_kbd >= 0) {
-          this.lastActiveKeyboard = _kbd;
+        this.kbdButton._setSelected(name != '');
+        if (kbdIndex >= 0) {
+          this.lastActiveKeyboard = kbdIndex;
         }
 
         return false;
@@ -697,6 +697,22 @@ if(!keymanweb) {
 `;
       }
 
+      private createMenuItem(index: number, id: string, name: string, isSelected: boolean): { li: HTMLLIElement, a: HTMLAnchorElement } {
+        const li = util.createElement('li');
+        const a = util.createElement('a');
+        a.innerHTML = name;
+        a.href = "#";
+        a.onclick = ((x) => {
+          return () => this.selectKbd(x);
+        })(index);
+        a.id = id;
+        if (isSelected) {
+          a.className = 'selected';
+        }
+        li.appendChild(a);
+        return { li, a };
+      }
+
       /**
        * Function     createMenu
        * Scope        Private
@@ -711,38 +727,29 @@ if(!keymanweb) {
           this.keyboardMenu.innerHTML = '';  // I2403 - Allow toggle design to be loaded twice
         }
 
-        const _li = util.createElement('li');
-        const _a = util.createElement('a');
-        _a.innerHTML='(System keyboard)';
-        _a.href="#";
-        _a.onclick = () => {
-          return this.selectKbd(-1);
-        };
-        _a.id='KMWSel_$';
-        _a.className='selected';
-        _li.appendChild(_a);
+        // Add the default (system) keyboard as the first entry in the menu
+        const { li, a } = this.createMenuItem(-1, 'KMWSel_$', '(System keyboard)', true);
+        this.selectedMenuItem = a;
+        this.keyboardMenu.appendChild(li);
 
-        this.selectedMenuItem=_a;
-        this.keyboardMenu.appendChild(_li);
-
-        const _kbds=keymanweb.getKeyboards(), _added: Record<string, number> = {};
+        // Add loaded keyboards to the menu
         this.keyboards = [];
-        for(let _kbd = 0; _kbd < _kbds.length; _kbd++) {
-          const _li1=util.createElement('li');
-          const _a1=util.createElement('a');
-          _a1.innerHTML=_kbds[_kbd].LanguageName + ' - ' + _kbds[_kbd].Name;
-          if(!_added[_kbds[_kbd].InternalName]) _added[_kbds[_kbd].InternalName]=0;
-          _added[_kbds[_kbd].InternalName]++;
+        const keyboards = keymanweb.getKeyboards();
+        const added: Record<string, number> = {};
+        for (let kbdIndex = 0; kbdIndex < keyboards.length; kbdIndex++) {
+          if (!added[keyboards[kbdIndex].InternalName]) {
+            added[keyboards[kbdIndex].InternalName] = 0;
+          }
+          added[keyboards[kbdIndex].InternalName]++;
 
-          const _n=_added[_kbds[_kbd].InternalName];
-          this.keyboards.push({_InternalName: _kbds[_kbd].InternalName, _LanguageCode:_kbds[_kbd].LanguageCode, _Index: _n});
+          const kbdInstanceCount = added[keyboards[kbdIndex].InternalName];
+          this.keyboards.push({ _InternalName: keyboards[kbdIndex].InternalName, _LanguageCode: keyboards[kbdIndex].LanguageCode, _Index: kbdInstanceCount });
 
-          _a1.href="#";
-          _a1.onclick = ((x) => { return () => this.selectKbd(x); })(this.keyboards.length-1);
-          _a1.id='KMWSel_'+_kbds[_kbd].InternalName+'$'+_n;
-
-          _li1.appendChild(_a1);
-          this.keyboardMenu.appendChild(_li1);
+          const { li } = this.createMenuItem(this.keyboards.length - 1,
+            `KMWSel_${keyboards[kbdIndex].InternalName}\$${kbdInstanceCount}`,
+            `${keyboards[kbdIndex].LanguageName} - ${keyboards[kbdIndex].Name}`,
+            false);
+          this.keyboardMenu.appendChild(li);
         }
 
         //if(!ui.initialized) // I2403 - Allow toggle design to be loaded twice
@@ -750,7 +757,6 @@ if(!keymanweb) {
           this.kbdButton.getElem().appendChild(this.keyboardMenu);
         }
       };
-
     }
 
 
