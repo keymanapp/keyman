@@ -42,8 +42,8 @@
     <script>
       keyman.init({
         attachType:'auto'
-      }).then(function () {
-        loadKeyboards(1);
+      }).then(async function () {
+        await loadKeyboards();
       });
 
       var sentryManager = new KeymanSentryManager();

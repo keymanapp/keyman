@@ -1,16 +1,16 @@
-// JavaScript Document samplehdr.js: Keyboard management for KeymanWeb demonstration pages
-
 /*
-    This script is designed to test KeymanWeb error message handling.
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * This script is designed to test KeymanWeb error message handling.
 */
 
-function loadKeyboards() {
+async function loadKeyboards() {
   // We start by adding a keyboard correctly.  It's best to include a 'control' in our experiment.
-  keyman.addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'},
+  await keyman.addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'},
     filename:'../us-1.0.js'});
 
   // Insert a keyboard that cannot be found.
-  keyman.addKeyboards({id:'lao_2008_basic',name:'wrong-filename',
+  await keyman.addKeyboards({id:'lao_2008_basic',name:'wrong-filename',
     languages:{
       id:'lo',name:'debugging',region:'Asia',
       font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
@@ -19,7 +19,7 @@ function loadKeyboards() {
     });
 
   // Insert a keyboard that is unparsable
-  keyman.addKeyboards({id:'unparsable',name:'non-parsable',
+  await keyman.addKeyboards({id:'unparsable',name:'non-parsable',
     languages:{
       id:'lo',name:'debugging',region:'Asia',
       font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
@@ -29,7 +29,7 @@ function loadKeyboards() {
     });
 
 // Insert a keyboard that will generate a timing error.
-  keyman.addKeyboards({id:'timeout',name:'timeout',
+  await keyman.addKeyboards({id:'timeout',name:'timeout',
     languages:{
       id:'lo',name:'debugging',region:'Asia',
       font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
@@ -38,13 +38,13 @@ function loadKeyboards() {
     });
 }
 
-function badStubRequest(entry) {
+async function badStubRequest(entry) {
   switch(entry) {
     case 1:
-      keyman.addKeyboards('1nval1d5tub@reque5t');
+      await keyman.addKeyboards('1nval1d5tub@reque5t');
       break;
     case 2:
-      keyman.addKeyboardsForLanguage(['PigLatn','1337sp34k']);
+      await keyman.addKeyboardsForLanguage(['PigLatn','1337sp34k']);
       break;
   }
 }
