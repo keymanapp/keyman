@@ -182,10 +182,4 @@ The `spec.languages.font` object contains the following members:
 
 ### Not passing any parameter
 
-Not passing any parameter will obtain the Keyman keyboards for English
-from the CDN, i.e. these two functions calls are identical:
-
-```js
-await keyman.addKeyboards();
-await keyman.addKeyboards('@en');
-```
+Not passing any parameter will obtain all Keyman keyboards from the CDN.
