@@ -17,8 +17,6 @@ import { PredictionContext } from 'keyman/engine/interfaces';
 import { DEFAULT_PROCESSOR_INIT_OPTIONS, NodeKeyboardLoader } from 'keyman/test/resources';
 import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 
-
-
 import Context = LexicalModelTypes.Context;
 import Suggestion = LexicalModelTypes.Suggestion;
 
@@ -135,6 +133,10 @@ describe('InputProcessor', function() {
     });
 
     describe('without fat-fingering', function() {
+      beforeEach(() => {
+        KMWString.enableSupplementaryPlane(false);
+      });
+
       it('with minimal context (no fat-fingers)', function() {
         this.timeout(32); // ms
         let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
@@ -170,6 +172,10 @@ describe('InputProcessor', function() {
     });
 
     describe('with fat-fingering', function() {
+      beforeEach(() => {
+        KMWString.enableSupplementaryPlane(false);
+      });
+
       it('with minimal context (with fat-fingers)', function() {
         this.timeout(32); // ms
         let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
