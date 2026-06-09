@@ -42,7 +42,7 @@ This example would find the default keyboard for the Dzongkha language. This met
 Alternatively, languages may be looked up via their BCP 47 language code as follows:
 
 ```typescript
-await keyman.addKeyboards('@he')
+await keyman.addKeyboards('@he');
 ```
 
 The `@` prefix indicates the use of the BCP 47 language code, which in this case corresponds with Hebrew.
@@ -52,7 +52,7 @@ The `@` prefix indicates the use of the BCP 47 language code, which in this case
 To obtain a specific keyboard by name or by keyboard name and language code as a pair, see the following:
 
 ```typescript
-await keyman.addKeyboards('french','sil_euro_latin@sv','sil_euro_latin@no')
+await keyman.addKeyboards('french', 'sil_euro_latin@sv', 'sil_euro_latin@no');
 ```
 
 This will install three keyboards - one for French (named, quite simply, "French") and two copies of the EuroLatin keyboard - one for Swedish and one for Norwegian.
