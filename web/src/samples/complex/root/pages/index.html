@@ -44,9 +44,9 @@
         // KMW will look for them here - two folders up from root, which is the base sample directory.
         keyboards: '/../../',
         attachType:'auto'
-      }).then(function() {
+      }).then(async function() {
         // Loads keyboards from the base sample folder
-        keyman.addKeyboards({
+        await keyman.addKeyboards({
           id:'us',
           name:'English',
           languages: {
@@ -57,7 +57,7 @@
           filename: 'us-1.0.js'
         });
         // For contrast:
-        keyman.addKeyboards({
+        await keyman.addKeyboards({
           id:'lao_2008_basic',
           name:'Lao Basic',
           languages: {
@@ -73,12 +73,12 @@
         // 1. keyboard name ('french'),
         // 2. keyboard name and language code ('sil_euro_latin@no,sv'),
         // 3. or just the BCP-47 language code ('@he').
-        keyman.addKeyboards('french', 'sil_euro_latin@no,sv', '@he');
+        await keyman.addKeyboards('french', 'sil_euro_latin@no,sv', '@he');
 
         // Add a keyboard by language name.  Note that the name must be spelled
         // correctly, or the keyboard will not be found.  (Using BCP-47 codes is
         // usually easier.)
-        doAddKeyboardsForLanguage('Dzongkha');
+        await doAddKeyboardsForLanguage('Dzongkha');
       });
     </script>
 

@@ -75,8 +75,8 @@
 
         const container = document.createElement('div');
 
-        await kmw.addKeyboards(`${kbdid}@${langid}`);
-        await kmw.setActiveKeyboard(kbdid, langid);
+        await keyman.addKeyboards(`${kbdid}@${langid}`);
+        await keyman.setActiveKeyboard(kbdid, langid);
         docBase = keyman.BuildVisualKeyboard(kbdid, 1, formFactor, layer);
 
         label.textContent = `${keyman.getKeyboard(kbdid).Name} - ${formFactor} - ${layer} layer`;
@@ -94,6 +94,7 @@
       }
 
       keyman.init().then(async function() {
+        await loadKeyboards(1);
         await documentKeyboard("gff_amharic", "am", "phone", "default");
         await documentKeyboard("sil_euro_latin", "no", "phone", "shift");
         await documentKeyboard("lao_2008_basic", "lo", "tablet", "default");

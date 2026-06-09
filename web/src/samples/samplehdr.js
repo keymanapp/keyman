@@ -1,51 +1,62 @@
-// JavaScript Document samplehdr.js: Keyboard management for KeymanWeb demonstration pages
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Keyboard management for KeymanWeb demonstration pages
+ */
 
 /*
-    The keyboard name and/or BCP-47 language code must be specified for each keyboard that is to be available.
-    If the same keyboard is used for several languages, it must be listed for each
-    language, but the keyboard itself will only be loaded once.
-    If two (or more) keyboards are to be available for a given language, both must be listed.
-    Any number of keyboards may be specified in one or more calls.
-    Keyboard paths may be absolute (with respect to the server root) or relative to the keyboards option path.
-    The actual keyboard object will be downloaded asynchronously when first selected for use.
+    The keyboard name and/or BCP-47 language code must be specified for
+    each keyboard that is to be available. If the same keyboard is used
+    for several languages, it must be listed for each language, but the
+    keyboard itself will only be loaded once. If two (or more) keyboards
+    are to be available for a given language, both must be listed. Any
+    number of keyboards may be specified in one or more calls. Keyboard
+    paths may be absolute (with respect to the server root) or relative
+    to the keyboards option path. The actual keyboard object will be
+    downloaded asynchronously when first selected for use.
 
-    Each argument to addKeyboards() is a string, for example:
-      european2         loads the current version of the Eurolatin 2 keyboard (for its default language)
-      european2@fr      loads the current version of the Eurolatin 2 keyboard for French
-      european2@fr@1.2  loads version 1.2 of the Eurolatin 2 keyboard for French
+    Each argument to addKeyboards() is a string, for example: european2
+    loads the current version of the Eurolatin 2 keyboard (for its
+    default language) european2@fr      loads the current version of
+    the Eurolatin 2 keyboard for French european2@fr@1.2  loads
+    version 1.2 of the Eurolatin 2 keyboard for French
 
-    Argument syntax also supports the following extensions:
-      @fr               load the current version of the default keyboard for French
-      @fr$              load all available keyboards (current version) for French
+    Argument syntax also supports the following extensions: @fr
+    load the current version of the default keyboard for French @fr$
+    load all available keyboards (current version) for French
 
-    Each call to addKeyboards() requires a single call to the remote server,
-    (unless all keyboards listed are local and fully specified) so it is better
-    to use multiple arguments rather than separate function calls.
+    Each call to addKeyboards() requires a single call to the remote
+    server, (unless all keyboards listed are local and fully specified)
+    so it is better to use multiple arguments rather than separate
+    function calls.
 
-    Calling addKeyboards() with no arguments returns a list of *all* available keyboards.
-    The Toolbar (desktop browser) UI is best suited for allowing users to select
-    the appropriate language and keyboard in this case.
+    Calling addKeyboards() with no arguments returns a list of *all*
+    available keyboards. The Toolbar (desktop browser) UI is best suited
+    for allowing users to select the appropriate language and keyboard
+    in this case.
 
-    Keyboards may also be specified by language name using addKeyboardsForLanguage()
-    for example:
-      keymanweb.addKeyboardsForLanguage('Burmese');
+    Keyboards may also be specified by language name using
+    addKeyboardsForLanguage() for example:
+    keymanweb.addKeyboardsForLanguage('Burmese');
 
-    Appending $ to the language name will again cause all available keyboards for that
-    language to be loaded rather than the default keyboard.
+    Appending $ to the language name will again cause all available
+    keyboards for that language to be loaded rather than the default
+    keyboard.
 
-    The first call to addKeyboardsForLanguage() makes an additional call to the
-    keyman API to load the current list of keyboard/language associations.
+    The first call to addKeyboardsForLanguage() makes an additional call
+    to the keyman API to load the current list of keyboard/language
+    associations.
 
-    In this example, the following function loads the indicated keyboards,
-    and is called when the page loads.
+    In this example, the following function loads the indicated
+    keyboards, and is called when the page loads.
 */
 
   function errToString(err) {
     // Painful?  Kinda.  But needed on un-updated Android API 21!
     if(Array.isArray(err)) {
-      var result = '';
-      for(var i = 0; i < err.length; i++) {
-        var e = err[i];
+      let result = '';
+      for(let i = 0; i < err.length; i++) {
+        const e = err[i];
         if(e.error instanceof Error) {
           result += e.error.message + '\n';
         } else {
@@ -73,13 +84,13 @@
   }
 
   async function loadKeyboards(nestLevel) {
-    var base_prefix = '../';
-    var prefix = './'; // The default - when prefix == 0.
+    const base_prefix = '../';
+    let prefix = './'; // The default - when prefix == 0.
 
     if(nestLevel !== undefined && nestLevel > 0) {
       prefix = '';
-      for(var i=0; i < nestLevel; i++) {
-        prefix = prefix + base_prefix;
+      for(let i=0; i < nestLevel; i++) {
+        prefix += base_prefix;
       }
     }
 
@@ -102,12 +113,12 @@
 
     // Add a fully-specified, locally-sourced, keyboard with custom font
     await doAddKeyboards({
-      id:'lao_2008_basic',
-      name:'Lao Basic',
+      id: 'lao_2008_basic',
+      name: 'Lao Basic',
       languages: {
-        id:'lo',name:'Lao',region:'Asia',
+        id: 'lo', name: 'Lao', region: 'Asia'
       },
-      filename:(prefix + 'lao_2008_basic-1.2.js')
+      filename: (prefix + 'lao_2008_basic-1.2.js')
     });
 
     // Note that locally specified keyboards will be listed before keyboards
@@ -116,29 +127,31 @@
   }
 
   // Script to allow a user to add any keyboard to the keyboard menu
-  function addKeyboard(n) {
-    var sKbd;
+  async function addKeyboard(n) {
+    let sKbd;
     switch(n) {
       case 1:
         sKbd=document.getElementById('kbd_id1').value;
-        doAddKeyboards(sKbd);
+        await doAddKeyboards(sKbd);
         break;
       case 2:
         sKbd=document.getElementById('kbd_id2').value.toLowerCase();
-        doAddKeyboards('@'+sKbd);
+        await doAddKeyboards('@'+sKbd);
         break;
       case 3:
         // Add keyboard for comma-separated language name(s)
         sKbd=document.getElementById('kbd_id3').value;
-        doAddKeyboardsForLanguage(sKbd);
+        await doAddKeyboardsForLanguage(sKbd);
         break;
     }
   }
 
   // Add keyboard on Enter (as well as pressing button)
-  function clickOnEnter(e,id)
+  async function clickOnEnter(e,id)
   {
     e = e || window.event;
-    if(e.keyCode == 13) addKeyboard(id);
+    if (e.keyCode == 13) {
+      await addKeyboard(id);
+    }
   }
 

@@ -18,8 +18,7 @@ Include the following script in the HEAD of your page:
 
     KWControl = document.getElementById('KWControl');
     var kbds = keyman.getKeyboards();
-    for(var kbd in kbds)
-    {
+    for(var kbd in kbds) {
       var opt = document.createElement('OPTION');
       opt.value = kbds[kbd].InternalName + "$$" + kbds[kbd].LanguageCode;
       opt.innerHTML = kbds[kbd].Name;
@@ -48,14 +47,11 @@ Also include the following HTML code:
 ```html
 <head>
     <!-- Load the KeymanWeb engine -->
-    <script src="keymanweb.js" type="text/javascript"></script>
+    <script src="https://s.keyman.com/kmw/engine/17.0.331/keymanweb.js" type="text/javascript"></script>
     <!-- Load the your keyboard stubs here -->
     <script src="unified_loader.js" type="text/javascript"></script>
     <!-- ... -->
 </head>
-
-<!-- When the page has finished loading, populate the keyboard selector, see above -->
-<body>
 ```
 
 - File: [unified_loader.js](js/unified_loader.js)
