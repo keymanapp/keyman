@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.244 alpha 2026-06-09
+
+* refactor(web): extract function, rename variables (#16063)
+* refactor(web): reformatting of files (#16066)
+* chore(web): improve the KeymanWeb integration documentation (#16064)
+* chore(web): more improvements to documentation (#16070)
+
 ## 19.0.243 alpha 2026-06-08
 
 * fix(developer): reduce km_core_keyboard_attrs size to 12 (#16075)
