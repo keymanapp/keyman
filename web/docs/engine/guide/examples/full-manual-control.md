@@ -2,7 +2,9 @@
 title: Manual Control - Custom Interface
 ---
 
-In this example, the web page designer has opted for their own user interface instead of the KeymanWeb interface. The keyboards in the selector are populated from the KeymanWeb list of keyboards. Please click [this link](__full-manual-control.html) to open the test page.
+In this example, the web page designer has opted for their own user interface instead of the
+KeymanWeb interface. The keyboards in the selector are populated from the KeymanWeb list of
+keyboards. Please click [this link](__full-manual-control.html) to open the test page.
 
 ## Code Walkthrough
 
@@ -35,8 +37,7 @@ Include the following script in the HEAD of your page:
   }
 
   /* KWControlChange: Called when user selects an item in the KWControl SELECT */
-  function KWControlChange()
-  {
+  function KWControlChange() {
     /* Select the keyboard in KeymanWeb */
     var name = KWControl.value.substr(0, KWControl.value.indexOf("$$"));
     var languageCode = KWControl.value.substr(KWControl.value.indexOf("$$"+2));

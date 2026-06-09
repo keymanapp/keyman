@@ -2,9 +2,11 @@
 title: Automatic Mode Example
 ---
 
-This page shows how to include a local keyboard from an arbitrary location in your website's file structure.
+This page shows how to include a local keyboard from an arbitrary location
+in your website's file structure.
 
-In this example, we use only the LaoKey keyboard. Please click [this link](./__auto-control.html) to open the test page.
+In this example, we use only the LaoKey keyboard. Please click
+[this link](./__auto-control.html) to open the test page.
 
 ## Code Walkthrough
 
