@@ -10,7 +10,13 @@ Include the following script in the HEAD of your page:
 
 ```js
 <script>
-    keyman.init().then(function() {
+    keyman.init().then(async function() {
+      await keyman.addKeyboards({
+        id: "laokeys",
+        name: "Lao (Phonetic)",
+        languages:{id:'lo',name:'Lao'},
+        filename: "./js/laokeys.js"
+      });
       keyman.setActiveKeyboard('laokeys');
       keyman.osk.hide();
     });
@@ -33,12 +39,8 @@ Also include the following HTML code:
 <head>
     <!-- Load the KeymanWeb engine -->
     <script src="https://s.keyman.com/kmw/engine/17.0.331/keymanweb.js" type="text/javascript"></script>
-    <!-- Load the LaoKeys keyboard stub -->
-    <script src="laokeys_load.js" type="text/javascript"></script>
 </head>
 ```
-
-- File: [laokeys_load.js](js/laokeys_load.js)
 
 And finally, include the control img for KeymanWeb:
 

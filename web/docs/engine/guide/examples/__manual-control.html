@@ -3,10 +3,14 @@
 <head>
   <script src='https://s.keyman.com/kmw/engine/17.0.331/keymanweb.js'></script>
 
-  <script type='text/javascript' src='js/laokeys_load.js'></script>
-
   <script type="text/javascript">
-    keyman.init().then(function() {
+    keyman.init().then(async function() {
+      await keyman.addKeyboards({
+        id: "laokeys",
+        name: "Lao (Phonetic)",
+        languages: { id: 'lo', name: 'Lao' },
+        filename: "./js/laokeys.js"
+      });
       keyman.setActiveKeyboard('laokeys');
       keyman.osk.hide();
     });
