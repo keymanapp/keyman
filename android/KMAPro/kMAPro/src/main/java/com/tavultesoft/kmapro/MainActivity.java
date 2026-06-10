@@ -449,11 +449,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     // Reset keyboard picker Activity Task flag
     KMManager.closeParentAppOnShowKeyboardPicker();
 
-    // onConfigurationChanged() only triggers when device is rotated while app is in
-    // foreground
+    // onConfigurationChanged() only triggers when device is rotated while app is in foreground
     // This handles when device is rotated while app is in background
-    // using KMManager.getOrientation() since getConfiguration().orientation is
-    // unreliable #10241
+    // using KMManager.getOrientation() since getConfiguration().orientation is unreliable #10241
     int newOrientation = KMManager.getOrientation(context);
     if (newOrientation != lastOrientation) {
       lastOrientation = newOrientation;
@@ -498,17 +496,16 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           downloadKMP(loadingIntentUri, KmpInstallMode.Full);
           break;
         case "keyman" :
-          // TODO: Only accept download links from Keyman browser activities when
-          // universal links work
+          // TODO: Only accept download links from Keyman browser activities when universal links work
           KMLog.LogBreadcrumb(TAG, "Installing via keyman-link intent: " + link, true);
           if (KMPLink.isKeymanDownloadLink(loadingIntentUri.toString())) {
 
             // Convert opaque URI to hierarchical URI so the query parameters can be parsed
             Builder builder = new Uri.Builder();
             builder.scheme("https")
-                .authority("keyman.com")
-                .appendPath("keyboards")
-                .encodedQuery(loadingIntentUri.getEncodedQuery());
+              .authority("keyman.com")
+              .appendPath("keyboards")
+              .encodedQuery(loadingIntentUri.getEncodedQuery());
             loadingIntentUri = Uri.parse(builder.build().toString());
             downloadKMP(loadingIntentUri, KmpInstallMode.Full);
           } else if (KMPLink.isLegacyKeymanDownloadLink(loadingIntentUri.toString())) {
@@ -519,7 +516,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             KMLog.LogError(TAG, msg);
           }
           break;
-        default:
+        default :
           String msg = "Unrecognized scheme: " + scheme;
           KMLog.LogError(TAG, msg);
       }
@@ -574,7 +571,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     final ViewGroup _rootView = (ViewGroup) theItem.getActionView();
 
     if(anUpdateCount==0) {
-      if(aHideMenuitem) {
+      if (aHideMenuitem) {
         theItem.setVisible(false);
       } else if (_rootView != null) {
         _rootView.findViewById(R.id.update_count_indicator).setVisibility(View.GONE);
@@ -597,34 +594,42 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
+    // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main, menu);
     this.menu = menu;
 
-    KMManager.getUpdateTool().addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        if (!evt.getPropertyName().equals("updateCount"))
-          return;
-        updateUpdateCountIndicator(
-            evt.getNewValue() == null ? 0 : (Integer) evt.getNewValue());
+    KMManager.getUpdateTool().addPropertyChangeListener(new PropertyChangeListener() 
+      {
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+          if (!evt.getPropertyName().equals("updateCount"))
+            return;
+          updateUpdateCountIndicator(
+              evt.getNewValue() == null ? 0 : (Integer) evt.getNewValue());
+        }
       }
-    });
+    );
     updateUpdateCountIndicator(KMManager.getUpdateTool().getOpenUpdateCount());
     return true;
   }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
+    // Android Gradle 8.0 no longer declares resources final, so can't use switch statement here
     if (item.getItemId() == R.id.action_info) {
       showInfo();
       return true;
     } else if (item.getItemId() == R.id.action_share) {
       showShareDialog();
       return true;
+      /* Disable Web Browser to investigate Google sign-in
+    } else if ((item.getItemId() == R.id.action_web) {
+        showWebBrowser();
+        return true;*/
     } else if (item.getItemId() == R.id.action_text_size) {
       showTextSizeDialog();
       return true;
-    } else if (item.getItemId() == R.id.action_clear_text) {
+    } else if (item.getItemId() == R.id.action_clear_text){
       showClearTextDialog();
       return true;
     } else if (item.getItemId() == R.id.action_get_started) {
@@ -635,6 +640,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       return true;
     } else if (item.getItemId() == R.id.action_update_keyboards) {
       KMManager.getUpdateTool().executeOpenUpdates();
+      // Dismiss icon
       updateUpdateCountIndicator(0);
       final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
       if (_keyboardupdate != null && _keyboardupdate.isVisible()) {
@@ -833,39 +839,33 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   public void downloadKMP(String packageId, String bcp47, KmpInstallMode installMode) {
-    Uri downloadUri = bcp47 == null
-        ? Uri.parse(KMString.format("https://keyman.com/go/package/download/%s", new Object[] { packageId }))
-        : Uri.parse(
-            KMString.format("https://keyman.com/go/package/download/%s?bcp47=%s", new Object[] { packageId, bcp47 }));
+    Uri downloadUri = bcp47 == null ?
+      Uri.parse(KMString.format("https://keyman.com/go/package/download/%s", new Object[] { packageId })) : 
+      Uri.parse(KMString.format("https://keyman.com/go/package/download/%s?bcp47=%s", new Object[] { packageId, bcp47 }));
     downloadKMP(downloadUri, installMode);
   }
 
   /**
-   * Parse the URI data to determine the filename and URL for the .kmp keyboard
-   * package.
+   * Parse the URI data to determine the filename and URL for the .kmp keyboard package.
    * If URL is valid, download the kmp.
-   * 
    * @param packageUri  URI to download the package.
    * @param installMode KMP installation mode (silent, welcome only, or full)
-   *                    TODO: only ever pass packageId and bcp47 from callers, as
-   *                    KMPLink should be responsible for
-   *                    URL parsing, not this function.
+   * TODO: only ever pass packageId and bcp47 from callers, as KMPLink should be responsible for
+   *       URL parsing, not this function.
    */
   public void downloadKMP(Uri packageUri, KmpInstallMode installMode) {
     if (packageUri == null) {
-      KMLog.LogError(TAG, "null uri passed to downloadKmp");
+      KMLog.LogError(TAG,"null uri passed to downloadKmp");
       String message = "Download failed. Invalid URL.";
       Toast.makeText(getApplicationContext(), message,
-          Toast.LENGTH_SHORT).show();
+        Toast.LENGTH_SHORT).show();
       return;
     }
     try {
-      // Initial try with Keyman 13.0 download link, format
-      // keyman://localhost/install?url=...
+      // Initial try with Keyman 13.0 download link, format keyman://localhost/install?url=...
       String url = packageUri.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_URL);
       if (url == null) {
-        // Otherwise, Keyman 14+ download link is format
-        // https://keyman.com/go/package/download/<package>[?bcp47=<code>][&...]
+        // Otherwise, Keyman 14+ download link is format https://keyman.com/go/package/download/<package>[?bcp47=<code>][&...]
         url = packageUri.toString();
       }
       if (url != null) {
@@ -881,8 +881,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
         // Parse query for the BCP 47 language ID
         String languageID = packageUri.getQueryParameter(KMKeyboardDownloaderActivity.KMKey_BCP47);
-        // TODO: Using "tag" for now, but production will be
-        // KMKeyboardDownloaderActivity.KMKey_BCP47
+        // TODO: Using "tag" for now, but production will be KMKeyboardDownloaderActivity.KMKey_BCP47
         if (languageID == null) {
           languageID = packageUri.getQueryParameter("tag");
         }
@@ -916,18 +915,18 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         } catch (Exception e) {
           KMLog.LogException(TAG, "", e);
           cleanupPackageInstall();
-          return;// break;
+          return;//break;
         }
       } else {
         String message = "Download failed. Not a .kmp keyboard package.";
         Toast.makeText(getApplicationContext(), message,
-            Toast.LENGTH_SHORT).show();
+          Toast.LENGTH_SHORT).show();
       }
     } catch (UnsupportedOperationException e) {
       String message = "Download failed. Invalid URL.";
-      KMLog.LogException(TAG, message, e);
+      KMLog.LogException(TAG,  message, e);
       Toast.makeText(getApplicationContext(), message,
-          Toast.LENGTH_SHORT).show();
+        Toast.LENGTH_SHORT).show();
       cleanupPackageInstall();
     }
   }
@@ -947,8 +946,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     // Status bar height only used for portrait orientation
     int statusBarHeight = 0;
     if (lastOrientation == Configuration.ORIENTATION_PORTRAIT) {
-      // *** TO DO: Try to check if status bar is visible, set statusBarHeight to 0 if
-      // it is not visible ***
+      // *** TO DO: Try to check if status bar is visible, set statusBarHeight to 0 if it is not visible ***
       int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
       if (resourceId > 0) {
         statusBarHeight = getResources().getDimensionPixelSize(resourceId);
@@ -959,7 +957,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     Point size = KMManager.getWindowSize(context);
     int screenHeight = size.y;
     textView.setHeight(
-        screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight - navigationBarHeight);
+      screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight - navigationBarHeight);
   }
 
   private void showInfo() {
@@ -982,10 +980,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private void showShareDialog() {
     // Sharing text content via send intent
-    // Reference:
-    // https://developer.android.com/training/sharing/send#send-text-content
-    // Note: Sharing to Facebook removed in
-    // https://github.com/keymanapp/keyman/issues/156
+    // Reference: https://developer.android.com/training/sharing/send#send-text-content
+    // Note: Sharing to Facebook removed in https://github.com/keymanapp/keyman/issues/156
     // Users can copy text or use Keyman as system keyboard for typing into Facebook
     Intent sendIntent = new Intent(Intent.ACTION_SEND);
     sendIntent.setType("text/plain");
@@ -1060,10 +1056,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   /**
    * Combine a localized string for "Text Size" plus Arabic numerals
-   * 
    * @return String
    */
   private String getTextSizeString() {
+    // Instead of formatting the number, will truncate formatting and concat the actual textSize
     String label = getString(R.string.text_size).replace("%1$d", "");
     return label + KMString.format(" %d", textSize);
   }
@@ -1147,10 +1143,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void displayInstallWebView() {
-    TextView textView = (TextView) findViewById((R.id.kmWebViewChromeTextView));
+    TextView textView = (TextView)findViewById((R.id.kmWebViewChromeTextView));
     textView.setText(getString(R.string.body_install_webview));
 
-    Button button = (Button) findViewById(R.id.webViewChromeButton);
+    Button button = (Button)findViewById(R.id.webViewChromeButton);
     button.setText(getString(R.string.label_install_webview));
     button.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
@@ -1165,8 +1161,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             startActivity(intent);
           }
         } catch (android.content.ActivityNotFoundException e) {
-          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT)
-              .show();
+          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
         }
       }
     });
@@ -1176,16 +1171,16 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private void displayEnableWebView() {
-    TextView textView = (TextView) findViewById((R.id.kmWebViewChromeTextView));
+    TextView textView = (TextView)findViewById((R.id.kmWebViewChromeTextView));
     textView.setText(getString(R.string.body_enable_webview));
 
-    Button button = (Button) findViewById(R.id.webViewChromeButton);
+    Button button = (Button)findViewById(R.id.webViewChromeButton);
     button.setText(getString(R.string.label_enable_webview));
     button.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         // Application settings to enable WebView
         Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS",
-            Uri.parse("package:com.google.android.webview"));
+          Uri.parse("package:com.google.android.webview"));
 
         // Launch intent
         try {
@@ -1194,8 +1189,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
             startActivity(intent);
           }
         } catch (android.content.ActivityNotFoundException e) {
-          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT)
-              .show();
+          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
         }
       }
     });
@@ -1206,17 +1200,17 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private void displayUpdateChrome() {
     // TextView's default string is to update Chrome
-    TextView textView = (TextView) findViewById(R.id.kmWebViewChromeTextView);
+    TextView textView = (TextView)findViewById(R.id.kmWebViewChromeTextView);
     textView.setText(String.format(getString(R.string.text_require_chrome_version),
         WebViewUtils.KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME));
 
-    Button button = (Button) findViewById(R.id.webViewChromeButton);
+    Button button = (Button)findViewById(R.id.webViewChromeButton);
     button.setText(getString(R.string.button_update_chrome));
     button.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         // Primary Play Store link to install/update Chrome
         Intent intent = new Intent(Intent.ACTION_VIEW,
-            Uri.parse("market://details?id=com.android.chrome"));
+          Uri.parse("market://details?id=com.android.chrome"));
 
         try {
           PackageManager packageManager = context.getPackageManager();
@@ -1225,14 +1219,13 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           } else {
             // (alternate Play Store link to install/update Chrome)
             intent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
+              Uri.parse("https://play.google.com/store/apps/details?id=com.android.chrome"));
 
             intent.resolveActivity(packageManager);
             startActivity(intent);
           }
         } catch (android.content.ActivityNotFoundException e) {
-          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT)
-              .show();
+          Toast.makeText(getApplicationContext(), getString(R.string.unable_to_open_browser), Toast.LENGTH_SHORT).show();
         }
       }
     });
@@ -1279,8 +1272,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       return;
     } else if (!isKMP) {
       String noKeyboardsInstalledMessage = String.format(
-          context.getString(R.string.not_valid_package_file), filename,
-          context.getString(R.string.no_targets_to_install));
+        context.getString(R.string.not_valid_package_file), filename, context.getString(R.string.no_targets_to_install));
       Toast.makeText(context, noKeyboardsInstalledMessage, Toast.LENGTH_LONG).show();
       return;
     }
@@ -1761,8 +1753,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   public static void cleanupPackageInstall() {
     if (progressDialog != null && progressDialog.isShowing()) {
       progressDialog.dismiss();
-    }
-    
+    };
     progressDialog = null;
   }
 
@@ -1820,21 +1811,21 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       HashMap<String, String> hashMap = new HashMap<>(keyboardsInstalled.get(i));
       String languageID = hashMap.get(KMManager.KMKey_LanguageID);
       Keyboard keyboardInfo = new Keyboard(
-          hashMap.get(KMManager.KMKey_PackageID),
-          hashMap.get(KMManager.KMKey_KeyboardID),
-          hashMap.get(KMManager.KMKey_KeyboardName),
-          languageID,
-          hashMap.get(KMManager.KMKey_LanguageName),
-          hashMap.get(KMManager.KMKey_Version),
-          hashMap.get(KMManager.KMKey_CustomHelpLink),
-          hashMap.get(KMManager.KMKey_KMPLink),
-          true,
-          hashMap.get(KMManager.KMKey_Font),
-          hashMap.get(KMManager.KMKey_OskFont));
+        hashMap.get(KMManager.KMKey_PackageID),
+        hashMap.get(KMManager.KMKey_KeyboardID),
+        hashMap.get(KMManager.KMKey_KeyboardName),
+        languageID,
+        hashMap.get(KMManager.KMKey_LanguageName),
+        hashMap.get(KMManager.KMKey_Version),
+        hashMap.get(KMManager.KMKey_CustomHelpLink),
+        hashMap.get(KMManager.KMKey_KMPLink),
+        true,
+        hashMap.get(KMManager.KMKey_Font),
+        hashMap.get(KMManager.KMKey_OskFont));
 
-      if (hashMap.containsKey(KMManager.KMKey_KMPInstall_Mode)) {
-        installMode = KmpInstallMode.fromString(hashMap.get(KMManager.KMKey_KMPInstall_Mode));
-      }
+        if (hashMap.containsKey(KMManager.KMKey_KMPInstall_Mode)) {
+          installMode = KmpInstallMode.fromString(hashMap.get(KMManager.KMKey_KMPInstall_Mode));
+        }
       if (i == 0) {
         packageID = keyboardInfo.getPackageID();
         customHelpLink = keyboardInfo.getHelpLink();
@@ -1862,11 +1853,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           ArrayList<CloudApiTypes.CloudApiParam> aPreparedCloudApiParams = new ArrayList<>();
           String url = CloudRepository.prepareLexicalModelQuery(languageID);
           aPreparedCloudApiParams.add(new CloudApiTypes.CloudApiParam(
-              CloudApiTypes.ApiTarget.KeyboardLexicalModels, url).setType(CloudApiTypes.JSONType.Array));
+            CloudApiTypes.ApiTarget.KeyboardLexicalModels, url).setType(CloudApiTypes.JSONType.Array));
 
           CloudDownloadMgr.getInstance().executeAsDownload(
-              context, _downloadid, null, _callback,
-              aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
+            context, _downloadid, null, _callback,
+            aPreparedCloudApiParams.toArray(new CloudApiTypes.CloudApiParam[0]));
         }
       }
     }
@@ -1888,14 +1879,14 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   public void onLexicalModelInstalled(List<Map<String, String>> lexicalModelsInstalled) {
     cleanupPackageInstall();
 
-    String langId = (KMManager.getCurrentKeyboardInfo(this) != null)
-        ? KMManager.getCurrentKeyboardInfo(this).getLanguageID()
-        : KMManager.KMDefault_LanguageID;
+    String langId = (KMManager.getCurrentKeyboardInfo(this) != null) ?
+      KMManager.getCurrentKeyboardInfo(this).getLanguageID() :
+      KMManager.KMDefault_LanguageID;
     boolean matchingModel = false;
 
-    for (int i = 0; i < lexicalModelsInstalled.size(); i++) {
-      HashMap<String, String> lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
-      if (lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
+    for(int i=0; i<lexicalModelsInstalled.size(); i++) {
+      HashMap<String, String>lexicalModelInfo = new HashMap<>(lexicalModelsInstalled.get(i));
+      if(lexicalModelInfo.get(KMManager.KMKey_LanguageID).equals(langId)) {
         matchingModel = true;
       }
       KMManager.addLexicalModel(this, lexicalModelInfo);
@@ -1903,7 +1894,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     // We're on the main thread, so if the active keyboard's language code matches,
     // let's register the associated lexical model.
-    if (matchingModel) {
+    if(matchingModel) {
       KMManager.registerAssociatedLexicalModel(langId);
     }
   }
