@@ -200,12 +200,6 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
       }
     });
 
-    /*
-      Automatically does the following:
-        SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean(GetStartedActivity.showGetStartedKey, isChecked);
-      as part of the default onClick() used by SwitchPreference.
-     */
     SwitchPreference getStartedPreference = new SwitchPreference(context);
     getStartedPreference.setKey(GetStartedActivity.showGetStartedKey);
     getStartedPreference.setTitle(String.format(getString(R.string.show_get_started), getString(R.string.get_started)));
@@ -256,8 +250,11 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   public void onResume() {
     super.onResume();
 
-    // The host activity should call update() from onWindowFocusChanged because
-    // onResume is not sufficient after default-keyboard selection flows.
+    // The onResume() function isn't called after the default-keyboard selection and cannot fix that
+    // option, though it is sufficient for handling the system-keyboard enablement option.
+    //
+    // As a result, we rely on KeymanSettingsActivity.onWindowFocusChanged to call
+    // .update() on our behalf.
   }
 
   public void update() {
