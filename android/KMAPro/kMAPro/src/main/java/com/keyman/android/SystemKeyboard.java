@@ -7,7 +7,7 @@ package com.keyman.android;
 import com.keyman.engine.util.DownloadFileUtils;
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.DefaultLanguageResource;
-import com.tavultesoft.kmapro.KeymanSettingsActivity;
+import com.tavultesoft.kmapro.KeymanSettingsKeys;
 import com.tavultesoft.kmapro.PreferencesManager;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
@@ -43,7 +43,6 @@ import io.sentry.Sentry;
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
 
   private static View inputView = null;
-  private static ExtractedText exText = null;
   private KMHardwareKeyboardInterpreter interpreter = null;
   private int inputType = InputType.TYPE_NULL;
   private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
@@ -77,13 +76,13 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.setInputMethodService(this); // for HW interface
 
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
+    KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsKeys.SPACEBAR_TEXT, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
     // Set the system keyboard HTML banner
     BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
-    boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
+    boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsKeys.HAPTIC_FEEDBACK, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
 
     // Checking for updates should never be allowed to crash the keyboard.
@@ -204,10 +203,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         return value, so we test for that as well (#11479)
       */
       if (icText != null && icText.text != null) {
-        boolean didUpdateText = KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
-        boolean didUpdateSelection = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM);
-        if (!didUpdateText || !didUpdateSelection)
-          exText = icText;
+        // Update the text selection but ignore the returned statuses
+        KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
+        KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM);
       }
     }
 
@@ -278,10 +276,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      if (exText != null)
-        exText = null;
-    }
+    // Do nothing
   }
 
   @Override
@@ -314,7 +309,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
     Context context = getApplicationContext();
     SharedPreferences prefs = context.getSharedPreferences(PreferencesManager.kma_prefs_name, Context.MODE_PRIVATE);
-    boolean showOSK = prefs.getBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, false);
+    boolean showOSK = prefs.getBoolean(KeymanSettingsKeys.OSK_WITH_PHYSICAL_KEYBOARD, false);
     return showOSK;
   }
 
