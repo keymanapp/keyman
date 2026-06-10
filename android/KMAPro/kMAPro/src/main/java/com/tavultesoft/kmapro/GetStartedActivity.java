@@ -177,6 +177,17 @@ public class GetStartedActivity extends BaseActivity {
     super.onWindowFocusChanged(hasFocus);
     if (hasFocus) {
       if (openDefaultKeyboardPickerOnly) {
+      
+        // When the user taps 'Set Default Keyboard' from the drawer,   
+        // GetStartedActivity is launched in picker-only mode. But you 
+        // can't open the system keyboard picker directly from a menu 
+        // tap — it requires a window with focus. So we use 
+        // onWindowFocusChanged as the trigger point: first focus opens 
+        // the picker, and when the user dismisses it and focus returns 
+        // to this activity, we call finish() to close it. The activity 
+        // is essentially just a invisible bridge to show the system 
+        // picker.
+      
         if (!didAutoOpenDefaultKeyboardPicker) {
           didAutoOpenDefaultKeyboardPicker = true;
           InputMethodManager imManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
