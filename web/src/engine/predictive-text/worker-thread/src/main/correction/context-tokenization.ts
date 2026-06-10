@@ -70,7 +70,7 @@ export interface TransitionEdgeAlignment {
    * The edge window defining the potential range of tokenization adjustments
    * needed after applying the Transform
    */
-  edgeWindow: RetokenizedEdgeWindow;
+  edgeWindow: EdgeWindow;
 
   /**
    * The number of tokens deleted from the end, without being erased.
@@ -491,9 +491,13 @@ export class ContextTokenization {
   }
 
   get clusteringKey(): string {
-    // Note:  SENTINEL_CODE_UNIT is not leveraged by SearchPath.sourceRangeKey.
-    return this.tokens.map(t => `${t.sourceRangeKey}L${t.searchModule.codepointLength}`).join(SENTINEL_CODE_UNIT);
+    return determineClusteringKey(this.tokens);
   }
+}
+
+export function determineClusteringKey(tokens: ContextToken[]) {
+  // Note:  SENTINEL_CODE_UNIT is not leveraged by SearchPath.sourceRangeKey.
+  return tokens.map(t => `${t.sourceRangeKey}L${t.searchModule.codepointLength}`).join(SENTINEL_CODE_UNIT);
 }
 
 const appendText = (full: string, current: string) => full + current;
@@ -588,18 +592,6 @@ interface EdgeWindow {
 }
 
 /**
- * Represents the context edge to which an incoming `Transform` will be applied
- * and how it is retokenized given the `Transform` as input.
- */
-interface RetokenizedEdgeWindow extends EdgeWindow {
-  /**
-   * The new tokenization (and its implied boundaries) for the edge window's
-   * represented text.
-   */
-  retokenization: string[];
-}
-
-/**
  * Given an existing tokenization and an incoming input `Transform`, this
  * method precomputes how both the current, pre-application tokenization will
  * be altered and how the incoming Transform will be tokenized.
@@ -639,7 +631,7 @@ export function mapWhitespacedTokenization(
   // Do not mutate the original transform; it can cause unexpected assertion
   // effects in unit tests.
   const edgeTransform = {...transform, deleteRight: transform.deleteRight || 0};
-  const edgeWindow = buildEdgeWindow(tokens, edgeTransform, false, edgeOptions);
+  const edgeWindow = buildEdgeWindow(tokens, edgeTransform, false, edgeOptions); // does not do tokenization of its own.
   const {
     retokenizationText,
     editBoundary,
@@ -650,28 +642,17 @@ export function mapWhitespacedTokenization(
 
   const tokenize = determineModelTokenizer(lexicalModel);
   const postTokenization = tokenize({left: retokenizationText + transform.insert, startOfBuffer: true, endOfBuffer: true}).left.map(t => t.text);
+
   // TODO:  hmm, how to tokenize with Insert spur placeholders...
   // especially if some are at a word's RHS and some at the next word's LHS.
   // \uffe is wordbroken as its own char!  Yikes!
   // ... could do "deadkey-like' marking if needed?
+  //
+  // ... do we actually NEED the SENTINEL markers here?
   if(postTokenization.length == 0) {
     postTokenization.push('');
   }
   const { stackedInserts, firstInsertPostIndex } = traceInsertEdits(postTokenization, transform);
-
-  // What does the edge's retokenization look like when we remove the inserted portions?
-  const retokenizedEdge = postTokenization.slice(0, firstInsertPostIndex);
-  // TODO:  Make sure we preserve a '' boundary token if it existed!
-  const insertBoundaryToken = postTokenization[firstInsertPostIndex];
-
-  // Note:  requires that helpers have not mutated `stackedInserts`.
-  const uninsertedBoundaryToken = KMWString.substring(insertBoundaryToken, 0, KMWString.lastIndexOf(insertBoundaryToken, stackedInserts[0]));
-
-  // Do not preserve empty tokens here, even if tokenization normally would produce one.
-  // It's redundant and replaceable for tokenization batching efforts.
-  if(uninsertedBoundaryToken != '') {
-    retokenizedEdge.push(uninsertedBoundaryToken);
-  }
 
   // We've found the root token within the root context state to which deletes (and inserts)
   // may be applied.
@@ -719,15 +700,6 @@ export function mapWhitespacedTokenization(
   if(stackedDeletes[stackedDeletes.length - 1] == 0) {
     // the boundary indices found by both methods above differ
     if(lastEditedPreTokenIndex + mergeOffset != firstInsertPostIndex + splitOffset) {
-      // Uncommenting the following block actually breaks three tests at
-      // present without fixing the ones I'd hoped would be fixed.
-      //
-      // // Need to resolve this handling more precisely; it may only work in
-      // // select cases.  We probably do need something like it, though:
-      // // addition to whitespace vs start of new token.
-      // retokenizedEdge.push('');
-      // editBoundary.tokenIndex++;
-      // editBoundary.text = '';
       shiftDeletes = true;
     }
 
@@ -781,7 +753,7 @@ export function mapWhitespacedTokenization(
 
   return {
     alignment: {
-      edgeWindow: {...edgeWindow, retokenization: retokenizedEdge},
+      edgeWindow,
       merges,
       splits,
       unmappedEdits,

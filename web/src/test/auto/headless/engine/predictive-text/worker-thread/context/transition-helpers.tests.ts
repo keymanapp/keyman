@@ -54,16 +54,6 @@ function buildOutboundTransitionEdge (
   inputs: Distribution<Required<Transform>>,
   tokenizedInputs: Distribution<Map<number, Transform>>
 ): TransitionEdge {
-  const primaryTokenizedInput = tokenizedInputs[0].sample;
-  const relativeTailIndex = [...primaryTokenizedInput.keys()][0];
-
-  const tokens = baseTokenization.tokens;
-  const baseTexts = tokens.map((t) => t.exampleInput);
-  const tail = relativeTailIndex <= 0 ? tokens[tokens.length - 1 + relativeTailIndex] : ContextToken.fromRawText(plainModel, '', true);
-  // Do NOT include incoming 'insert' text - it's not "retokenized", as it
-  // wasn't in the original token.
-  const newTailText = tail.exampleInput.substring(0, tail.exampleInput.length - primaryTokenizedInput.get(relativeTailIndex).deleteLeft);
-
   const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputs[0].sample, false);
   return {
     alignment: {
@@ -72,7 +62,6 @@ function buildOutboundTransitionEdge (
       unmappedEdits: [],
       edgeWindow: {
         ...edgeWindow,
-        retokenization: baseTexts.slice(edgeWindow.sliceIndex, baseTexts.length - 1).concat(newTailText)
       },
       removedTokenCount: 0
     },

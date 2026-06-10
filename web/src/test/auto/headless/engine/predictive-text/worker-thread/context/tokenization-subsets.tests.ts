@@ -56,8 +56,7 @@ describe('precomputationSubsetKeyer', function() {
             tokenization.tokens,
             { insert: '', deleteLeft: 0, deleteRight: 0 },
             false
-          ),
-          retokenization: [...rawTextTokens]
+          )
         },
         removedTokenCount: 0
       },
@@ -86,8 +85,7 @@ describe('precomputationSubsetKeyer', function() {
             tokenization.tokens,
             { insert: '', deleteLeft: 0, deleteRight: 0 },
             false
-          ),
-          retokenization: [...rawTextTokens]
+          )
         },
         removedTokenCount: 0
       },
@@ -103,8 +101,7 @@ describe('precomputationSubsetKeyer', function() {
         tokenization.tokens,
         { insert: 's', deleteLeft: 0, deleteRight: 0 },
         false
-      ),
-      retokenization: [...rawTextTokens]
+      )
     };
     precomputation2.tokenizedTransform = (() => {
       const map = new Map<number, Transform>();
@@ -133,8 +130,7 @@ describe('precomputationSubsetKeyer', function() {
             tokenization.tokens,
             { insert: 's', deleteLeft: 0, deleteRight: 0 },
             false
-          ),
-          retokenization: [...rawTextTokens]
+          )
         },
         removedTokenCount: 0
       },
@@ -150,8 +146,7 @@ describe('precomputationSubsetKeyer', function() {
         tokenization.tokens,
         { insert: 'b', deleteLeft: 1, deleteRight: 0 },
         false
-      ),
-      retokenization: [...rawTextTokens]
+      )
     };
     precomputation2.tokenizedTransform = (() => {
       const map = new Map<number, Transform>();
@@ -189,8 +184,7 @@ describe('precomputationSubsetKeyer', function() {
           })()],
             { insert: 's', deleteLeft: 0, deleteRight: 0 },
             false
-          ),
-          retokenization: [...rawTextTokens]
+          )
         },
         removedTokenCount: 0
       },
@@ -216,8 +210,7 @@ describe('precomputationSubsetKeyer', function() {
           })()],
         { insert: 'es', deleteLeft: 0, deleteRight: 0, id: 14 },
         false
-      ),
-      retokenization: [...rawTextTokens]
+      )
     };
     precomputation2.tokenizedTransform = (() => {
       const map = new Map<number, Transform>();
@@ -259,8 +252,7 @@ describe('precomputationSubsetKeyer', function() {
             })()],
             { insert: 'e', deleteLeft: 1, deleteRight: 0, id: 14 },
             false
-          ),
-          retokenization: [...rawTextTokens]
+          )
         },
         removedTokenCount: 0
       },
@@ -289,8 +281,7 @@ describe('precomputationSubsetKeyer', function() {
         })()],
         { insert: 'e', deleteLeft: 0, deleteRight: 0, id: 14 },
         false
-      ),
-      retokenization: [...rawTextTokens]
+      )
     };
     precomputation2.tokenizedTransform = (() => {
       const map = new Map<number, Transform>();
@@ -365,8 +356,7 @@ describe('precomputationSubsetKeyer', function() {
         tokenization.tokens,
         { insert: 't', deleteLeft: 0, deleteRight: 0 },
         false
-      ),
-      retokenization: [...rawTextTokens]
+      )
     };
     const precomputation1: TokenizationTransitionEdits = {
       alignment: {
@@ -398,8 +388,7 @@ describe('precomputationSubsetKeyer', function() {
         tokenization.tokens,
         { insert: '.', deleteLeft: 0, deleteRight: 0 },
         false
-      ),
-      retokenization: [...rawTextTokens]
+      )
     };
     precomputation2.tokenizedTransform = (() => {
       const map = new Map<number, Transform>();
@@ -445,8 +434,7 @@ describe('precomputationSubsetKeyer', function() {
             tokenization.tokens,
             { insert: '.', deleteLeft: 0, deleteRight: 0 },
             false
-          ),
-          retokenization: [...rawTextTokens]
+          )
         },
         removedTokenCount: 0
       },
@@ -498,8 +486,7 @@ describe('precomputationSubsetKeyer', function() {
             tokenization.tokens,
             { insert: '.', deleteLeft: 0, deleteRight: 0 },
             false
-          ),
-          retokenization: [...rawTextTokens]
+          )
         },
         removedTokenCount: 0
       },
@@ -519,8 +506,7 @@ describe('precomputationSubsetKeyer', function() {
         tokenization.tokens,
         { insert: 't', deleteLeft: 0, deleteRight: 0 },
         false
-      ),
-      retokenization: [...rawTextTokens]
+      )
     };
     precomputation2.tokenizedTransform = (() => {
       const map = new Map<number, Transform>();
@@ -549,8 +535,7 @@ describe('precomputationSubsetKeyer', function() {
             tokenization.tokens,
             { insert: ' ', deleteLeft: 0, deleteRight: 0 },
             false
-          ),
-          retokenization: [...rawTextTokens]
+          )
         },
         removedTokenCount: 0
       },
