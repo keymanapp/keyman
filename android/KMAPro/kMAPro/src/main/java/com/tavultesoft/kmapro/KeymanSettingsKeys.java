@@ -2,8 +2,10 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  * 
  * Created by MengchouChey on 2026-06-10
+ *            Internship Program, 9th Feb - 27th Apr 2026
  * 
- * (These are the keys used for KeymanSettingsActivity and KeymanSettingsFragment)
+ * These are the keys used to replace KeymanSettingsActivity and KeymanSettingsFragment
+ * 
  */
 package com.tavultesoft.kmapro;
 

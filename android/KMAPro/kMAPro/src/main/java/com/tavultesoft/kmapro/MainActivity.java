@@ -51,16 +51,13 @@ import com.keyman.engine.util.WebViewUtils.SystemWebViewStatus;
 
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
-
 import android.graphics.Color;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.os.Build;
 import android.os.Bundle;
-
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 
@@ -83,7 +80,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -205,8 +201,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       KMManager.setDebugMode(true);
     }
 
-    // Verify WebView installed and enabled before attempting to initialize
-    // KMManager
+    // Verify WebView installed and enabled before attempting to initialize KMManager
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
 
     KMManager.executeResourceUpdate(this);
@@ -214,8 +209,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     DefaultLanguageResource.install(context);
 
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(
-        prefs.getString(KeymanSettingsKeys.SPACEBAR_TEXT, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
+    KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsKeys.SPACEBAR_TEXT, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
     checkHapticFeedback();
@@ -254,20 +248,12 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle(null);
-
     getSupportActionBar().setDisplayUseLogoEnabled(true);
     getSupportActionBar().setDisplayShowHomeEnabled(true);
-    getSupportActionBar().setDisplayShowTitleEnabled(true);
     getSupportActionBar().setLogo(R.drawable.keyman_logo);
-
-    getSupportActionBar().setDisplayUseLogoEnabled(false);
-    getSupportActionBar().setDisplayShowHomeEnabled(false);
-
-    getSupportActionBar().setDisplayUseLogoEnabled(true);
-    getSupportActionBar().setDisplayShowHomeEnabled(true);
-    getSupportActionBar().setLogo(R.drawable.keyman_logo_mode);
-
     getSupportActionBar().setDisplayShowTitleEnabled(false);
+    // For Darkmode - once switched to dark mode, the logo becomes white 
+    getSupportActionBar().setLogo(R.drawable.keyman_logo_mode);
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
 
     drawerLayout = findViewById(R.id.drawer_layout);
