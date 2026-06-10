@@ -641,6 +641,10 @@ export function mapWhitespacedTokenization(
   const stackedDeletes = edgeWindow.deleteLengths.slice();
 
   const tokenize = determineModelTokenizer(lexicalModel);
+
+  // Do SENTINEL chars like deadkey chars in base JS-keyboard KMW.
+  // Reinsert them after the 'retokenization' seen here, attaching them as well as possible.
+  // (They are needed within construction of edit-effected transform.insert values)
   const postTokenization = tokenize({left: retokenizationText + transform.insert, startOfBuffer: true, endOfBuffer: true}).left.map(t => t.text);
 
   // TODO:  hmm, how to tokenize with Insert spur placeholders...
@@ -731,7 +735,7 @@ export function mapWhitespacedTokenization(
   // dropped some tokens outright.
   const removedTokenCount = baseRemovedTokenCount + (droppedFinalTransform ? 1 : 0);
 
-  // Final step:  check for any unexpected boundary shifts not mappable to 'merge' / 'split'
+  // Penultimate step:  check for any unexpected boundary shifts not mappable to 'merge' / 'split'
   // and not caused by transforms.  All transforms always apply in sequence at the end.
   const unmappedEdits: EditTuple<EditOperation>[] = [];
   for(let i = 0; i < editPath.length - transformMap.size; i++) {
@@ -748,6 +752,30 @@ export function mapWhitespacedTokenization(
         // We may wish to add extra analysis in the future when supporting
         // prediction from multiple competing tokenizations.
         unmappedEdits.push(editPath[i] as EditTuple<EditOperation>);
+    }
+  }
+
+  // Final step:  was the boundary token involved in a merge or split operation?
+  // If so, ensure the boundary reflects this!
+  for(let m of merges) {
+    if(m.inputs.find((entry) => entry.index == editBoundary.tokenIndex + mergeOffset + splitOffset)) {
+      // Reflect the merged edit-boundary.
+      editBoundary.text = m.match.text;
+      editBoundary.tokenIndex = m.inputs[0].index;
+    }
+  }
+
+  for(let s of splits) {
+    // Assumption:  the split is always on the boundary token.
+    if(s.input.index == editBoundary.tokenIndex + splitOffset + mergeOffset) {
+      const firstTransformKey = transformMap.keys().next().value as number;
+      const isLastOfSplit = firstTransformKey >= s.matches.length - 1;
+      editBoundary.text = s.matches[firstTransformKey].text;
+      editBoundary.tokenIndex = s.matches[firstTransformKey].index;
+      editBoundary.isPartial = isLastOfSplit;
+      editBoundary.omitsEmptyToken &&= isLastOfSplit;
+
+      // NOTE:  cannot reasonably overwrite .sourceRangeKey here!
     }
   }
 
