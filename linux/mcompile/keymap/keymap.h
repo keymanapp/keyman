@@ -1,3 +1,9 @@
+/*
+ * Keyman is copyright (C)  SIL Global. MIT License.
+ *
+ * Mnemonic layout support for Linux
+ */
+
 #pragma once
 #ifndef KEYMAP_H
 #define KEYMAP_H
