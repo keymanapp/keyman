@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.245 alpha 2026-06-10
+
+* chore(web): hide KMX keyboard test page (#16083)
+* docs(web): remove unnecessary mentioning of Keyman 17 from docs (#16085)
+* chore(web): remove outdated `*_load.js` files (#16086)
+* fix(web): fix `KeyboardStub.validateForCustomKeyboard` (#16067)
+
 ## 19.0.244 alpha 2026-06-09
 
 * refactor(web): extract function, rename variables (#16063)
