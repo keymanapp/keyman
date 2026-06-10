@@ -9,7 +9,7 @@
  */
 
 import { SENTINEL_CODE_UNIT } from "@keymanapp/models-templates";
-import { PathEdge, SearchNode } from "./distance-modeler.js";
+import { EDIT_DISTANCE_COST_SCALE, PathEdge, SearchNode } from "./distance-modeler.js";
 import { SearchQuotientNode } from "./search-quotient-node.js";
 import { SearchQuotientSpur } from "./search-quotient-spur.js";
 import { TokenResultMapping } from "./token-result-mapping.js";
@@ -47,6 +47,8 @@ export class InsertionQuotientSpur extends SearchQuotientSpur {
     // We use the SENTINEL char as an insertion place-holder, as there's no
     // actual keystroke to source better characters from.
     base.text += SENTINEL_CODE_UNIT;
+    // Be sure to penalize the insertion-edit properly!
+    base.p *= Math.exp(-EDIT_DISTANCE_COST_SCALE);
 
     return base;
   }
