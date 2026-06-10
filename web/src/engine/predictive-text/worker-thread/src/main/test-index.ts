@@ -7,6 +7,7 @@ export { ContextTransition } from './correction/context-transition.js';
 export * from './correction/correction-searchable.js';
 export * from './correction/correction-result-mapping.js';
 export * from './correction/distance-modeler.js';
+export * from './correction/execution-timer.js';
 export * from './correction/search-quotient-cluster.js';
 export * from './correction/search-quotient-spur.js';
 export * from './correction/search-quotient-node.js';
@@ -20,11 +21,13 @@ export * from './correction/tokenization-subsets.js';
 export * from './correction/transition-helpers.js';
 export * from './correction/token-result-mapping.js';
 export * from './correction/tokenization-result-mapping.js';
-export * as correction from './correction/index.js';
-export * from './model-helpers.js';
+export {
+    determinePunctuationFromModel, determineModelWordbreaker,
+    determineModelTokenizer, detectCurrentCasing
+} from './model-helpers.js';
 export * as models from './models/index.js';
 export { ModelCompositor } from './model-compositor.js';
 export * from './predict-helpers.js';
-export { default as TransformUtils } from './transformUtils.js'
-export { default as LMLayerWorker } from './index.js'
-export * from './transform-subsets.js';
+export { TransformUtils } from './transformUtils.js'
+export { LMLayerWorker } from './index.js'
+export { TransformSubset, subsetByInterval, subsetByChar, mergeSubset } from './transform-subsets.js';

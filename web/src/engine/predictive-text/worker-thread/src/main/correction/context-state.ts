@@ -11,7 +11,7 @@
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { applyTransform } from '@keymanapp/models-templates';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 import { ContextToken } from './context-token.js';
 import { ContextTokenization } from './context-tokenization.js';
@@ -19,7 +19,7 @@ import { ContextTransition } from './context-transition.js';
 import { precomputeTransitions, transitionTokenizations } from './transition-helpers.js';
 
 import { determineModelTokenizer } from '../model-helpers.js';
-import TransformUtils from '../transformUtils.js';
+import { TransformUtils } from '../transformUtils.js';
 
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;

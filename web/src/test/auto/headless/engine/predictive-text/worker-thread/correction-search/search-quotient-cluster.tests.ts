@@ -11,7 +11,7 @@ import { assert } from 'chai';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 import {
   generateSubsetId,
   LegacyQuotientRoot,
@@ -818,7 +818,7 @@ describe('SearchQuotientCluster', () => {
 
       const mergeResult = baseCluster.merge(new LegacyQuotientSpur(
         // Is (and mocks) the head result from `path_k4c4_i1.split(3)`.
-        fixture.paths[0].rootPath,
+        fixture.rootPath,
         // Mocks the tail result from `path_k4c4_i1.split(3)`.
         fixture.distributions[4].distrib_c2_i1d0, {
           segment: {

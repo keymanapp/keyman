@@ -128,5 +128,3 @@ export class DummyModel implements LexicalModel {
     }
   }
 };
-
-export default DummyModel;

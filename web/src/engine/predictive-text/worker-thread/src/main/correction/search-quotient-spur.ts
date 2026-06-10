@@ -8,7 +8,7 @@
  * engine.
  */
 
-import { KMWString, PriorityQueue } from '@keymanapp/web-utils';
+import { KMWString, PriorityQueue } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 

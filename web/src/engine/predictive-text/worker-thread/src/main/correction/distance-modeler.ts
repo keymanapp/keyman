@@ -1,5 +1,5 @@
 import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
-import { PriorityQueue } from '@keymanapp/web-utils';
+import { PriorityQueue } from 'keyman/common/web-utils';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
@@ -10,7 +10,7 @@ import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.
 import { SearchQuotientNode } from './search-quotient-node.js';
 import { initTokenResultFilterer, TokenResultMapping } from './token-result-mapping.js';
 import { subsetByChar, subsetByInterval, mergeSubset, TransformSubset } from '../transform-subsets.js';
-import TransformUtils from '../transformUtils.js';
+import { TransformUtils } from '../transformUtils.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import LexiconTraversal = LexicalModelTypes.LexiconTraversal;

@@ -2,11 +2,11 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
 
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { PredictionContext } from 'keyman/engine/interfaces';
-import { Mock } from 'keyman/engine/js-processor';
+import { NodeWorker } from "@keymanapp/lexical-model-layer/node";
+import { SyntheticTextStore } from 'keyman/engine/keyboard';
 
 import Suggestion = LexicalModelTypes.Suggestion;
 
@@ -70,8 +70,7 @@ describe("PredictionContext", () => {
   let langProcessor: LanguageProcessor;
 
   beforeEach(function() {
-    // @ts-ignore
-    langProcessor = new LanguageProcessor(LMWorker, new TranscriptionCache());
+    langProcessor = new LanguageProcessor(NodeWorker, new TranscriptionCache());
   });
 
   afterEach(function() {
@@ -86,9 +85,9 @@ describe("PredictionContext", () => {
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
 
-    let mock = new Mock("appl", 4); // "appl|", with '|' as the caret position.
-    const initialMock = Mock.from(mock);
-    const promise = predictiveContext.setCurrentTarget(mock);
+    let textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
+    const initialTextStore = SyntheticTextStore.from(textStore);
+    const promise = predictiveContext.setCurrentTextStore(textStore);
 
     // Initial predictive state:  no suggestions.  context.initializeState() has not yet been called.
     assert.equal(updateFake.callCount, 1);
@@ -104,8 +103,8 @@ describe("PredictionContext", () => {
     assert.isNotOk(suggestions.find((obj) => obj.tag == 'keep'));
     assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 0));
 
-    mock.insertTextBeforeCaret('e'); // appl| + e = apple
-    let transcription = mock.buildTranscriptionFrom(initialMock, null, true);
+    textStore.insertTextBeforeCaret('e'); // appl| + e = apple
+    let transcription = textStore.buildTranscriptionFrom(initialTextStore, null, true);
     await langProcessor.predict(transcription, dummiedGetLayer());
 
     // First predict call results:  our second set of dummy suggestions, the first of which includes
@@ -125,9 +124,9 @@ describe("PredictionContext", () => {
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
 
-    let mock = new Mock("appl", 4); // "appl|", with '|' as the caret position.
-    const initialMock = Mock.from(mock);
-    const promise = predictiveContext.setCurrentTarget(mock);
+    let textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
+    const initialTextStore = SyntheticTextStore.from(textStore);
+    const promise = predictiveContext.setCurrentTextStore(textStore);
 
     // Initial predictive state:  no suggestions.  context.initializeState() has not yet been called.
     assert.equal(updateFake.callCount, 1);
@@ -143,14 +142,14 @@ describe("PredictionContext", () => {
     assert.isNotOk(suggestions.find((obj) => obj.tag == 'keep'));
     assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 0));
 
-    const baseTranscription = mock.buildTranscriptionFrom(initialMock, null, true);
+    const baseTranscription = textStore.buildTranscriptionFrom(initialTextStore, null, true);
 
     // Mocking:  corresponds to the second set of mocked predictions - round 2 of
     // 'apple', 'apply', 'apples'.
     const skippedPromise = langProcessor.predict(baseTranscription, dummiedGetLayer());
 
-    mock.insertTextBeforeCaret('e'); // appl| + e = apple
-    const finalTranscription = mock.buildTranscriptionFrom(initialMock, null, true);
+    textStore.insertTextBeforeCaret('e'); // appl| + e = apple
+    const finalTranscription = textStore.buildTranscriptionFrom(initialTextStore, null, true);
 
     // Mocking:  corresponds to the third set of mocked predictions - 'applied'.
     const expectedPromise = langProcessor.predict(finalTranscription, dummiedGetLayer());
@@ -178,8 +177,8 @@ describe("PredictionContext", () => {
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
-    let mock = new Mock("appl", 4); // "appl|", with '|' as the caret position.
-    const initialSuggestions = await predictiveContext.setCurrentTarget(mock);
+    let textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
+    const initialSuggestions = await predictiveContext.setCurrentTextStore(textStore);
 
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
@@ -201,16 +200,16 @@ describe("PredictionContext", () => {
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
-    let textState = new Mock("appl", 4); // "appl|", with '|' as the caret position.
+    let textState = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
 
-    await predictiveContext.setCurrentTarget(textState);
+    await predictiveContext.setCurrentTextStore(textState);
 
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
 
     let suggestions: Suggestion[];
 
-    let previousTextState = Mock.from(textState);
+    let previousTextState = SyntheticTextStore.from(textState);
     textState.insertTextBeforeCaret('e'); // appl| + e = apple
     let transcription = textState.buildTranscriptionFrom(previousTextState, null, true);
     await langProcessor.predict(transcription, dummiedGetLayer());
@@ -223,7 +222,7 @@ describe("PredictionContext", () => {
     assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'apps');
 
     // Now for the real test.
-    previousTextState = Mock.from(textState); // snapshot it!
+    previousTextState = SyntheticTextStore.from(textState); // snapshot it!
 
     const suggestionApply = suggestions.find((obj) => obj.displayAs == 'apply');
     assert.isOk(suggestionApply);

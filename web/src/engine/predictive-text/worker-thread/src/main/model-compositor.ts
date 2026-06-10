@@ -1,13 +1,13 @@
 import * as models from '@keymanapp/models-templates';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import * as correction from './correction/index.js'
-import TransformUtils from './transformUtils.js';
+import { TransformUtils } from './transformUtils.js';
 import { applySuggestionCasing, correctAndEnumerate, createDefaultKeep, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
 import { ContextTracker } from './correction/context-tracker.js';
 import { DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL } from './correction/distance-modeler.js';
+import { ExecutionTimer } from './correction/execution-timer.js';
 
 import CasingForm = LexicalModelTypes.CasingForm;
 import Configuration = LexicalModelTypes.Configuration;
@@ -23,7 +23,7 @@ import Transform = LexicalModelTypes.Transform;
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;
-  private _contextTracker?: correction.ContextTracker;
+  private _contextTracker?: ContextTracker;
 
   /**
    * Returns the context-caching store used to store intermediate
@@ -43,7 +43,7 @@ export class ModelCompositor {
    * hold a reference to its time-management ExecutionTimer, which can
    * be used to have it exit early (once it yields to the task queue).
    */
-  activeTimer?: correction.ExecutionTimer;
+  activeTimer?: ExecutionTimer;
 
   /**
    * Controls the strength of anti-corrective measures for single-character scenarios.
@@ -147,7 +147,7 @@ export class ModelCompositor {
     // searching for results that yield viable predictions from the model.
 
     const SEARCH_TIMEOUT = DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
-    const timer = this.activeTimer = new correction.ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
+    const timer = this.activeTimer = new ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
 
     const { postContextState, rawPredictions, revertableTransitionId } = await correctAndEnumerate(this.contextTracker, this.lexicalModel, timer, transformDistribution, context);
 
@@ -413,5 +413,3 @@ export class ModelCompositor {
     }
   }
 }
-
-export default ModelCompositor;
