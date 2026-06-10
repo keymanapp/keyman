@@ -200,6 +200,12 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
       }
     });
 
+    /*
+      Automatically does the following:
+        SharedPreferences.Editor editor = prefs.edit();
+          editor.putBoolean(KeymanSettingsActivity.showBannerKey, isChecked);
+      as part of the default onClick() used by SwitchPreference.
+     */
     SwitchPreference getStartedPreference = new SwitchPreference(context);
     getStartedPreference.setKey(GetStartedActivity.showGetStartedKey);
     getStartedPreference.setTitle(String.format(getString(R.string.show_get_started), getString(R.string.get_started)));
