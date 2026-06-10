@@ -9,15 +9,14 @@
 
 import { assert } from 'chai';
 
-import { PriorityQueue } from '@keymanapp/web-utils';
+import { PriorityQueue } from 'keyman/common/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { correction, CORRECTION_QUEUE_COMPARATOR, models } from '@keymanapp/lm-worker/test-index';
+import { CORRECTION_QUEUE_COMPARATOR, models, SearchNode } from '@keymanapp/lm-worker/test-index';
 
 import SENTINEL_CODE_UNIT = models.SENTINEL_CODE_UNIT;
 import Distribution = LexicalModelTypes.Distribution;
-import SearchNode = correction.SearchNode;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
@@ -35,7 +34,7 @@ const FIRST_CHAR_VARIANTS = 24;
 
 let SEARCH_EDGE_SEED = 0;
 
-function assertEdgeChars(edge: correction.SearchNode, input: string, match: string) {
+function assertEdgeChars(edge: SearchNode, input: string, match: string) {
   assert.isTrue(edgeHasChars(edge, input, match));
 }
 
@@ -43,7 +42,7 @@ function lastEntry<T>(arr: readonly T[]): T {
   return arr.slice().pop();
 }
 
-function edgeHasChars(edge: correction.SearchNode, input: string, match: string) {
+function edgeHasChars(edge: SearchNode, input: string, match: string) {
   if(edge.priorInput[edge.priorInput.length - 1].sample.insert != input) {
     return false;
   }
@@ -51,7 +50,7 @@ function edgeHasChars(edge: correction.SearchNode, input: string, match: string)
   return lastEntry(edge.calculation.matchSequence) == match;
 }
 
-function findEdgesWithChars(edgeArray: correction.SearchNode[], match: string) {
+function findEdgesWithChars(edgeArray: SearchNode[], match: string) {
   let results = edgeArray.filter(function(value) {
     return lastEntry(value.calculation.matchSequence) == match;
   });
@@ -347,7 +346,7 @@ describe('Correction Distance Modeler', () => {
         assert.isNotEmpty(rootTraversal);
 
         const rootSeed = SEARCH_EDGE_SEED++;
-        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        const rootNode = new SearchNode(rootTraversal, rootSeed);
         assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
         const edges = rootNode.buildInsertionEdges();
@@ -373,7 +372,7 @@ describe('Correction Distance Modeler', () => {
         assert.isNotEmpty(rootTraversal);
 
         const rootSeed = SEARCH_EDGE_SEED++;
-        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        const rootNode = new SearchNode(rootTraversal, rootSeed);
         assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
         const edges = rootNode.buildInsertionEdges();
@@ -402,7 +401,7 @@ describe('Correction Distance Modeler', () => {
         assert.isNotEmpty(rootTraversal);
 
         const rootSeed = SEARCH_EDGE_SEED++;
-        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        const rootNode = new SearchNode(rootTraversal, rootSeed);
         assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
         const edges = rootNode.buildDeletionEdges([{
@@ -421,7 +420,7 @@ describe('Correction Distance Modeler', () => {
         assert.isNotEmpty(rootTraversal);
 
         const rootSeed = SEARCH_EDGE_SEED++;
-        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        const rootNode = new SearchNode(rootTraversal, rootSeed);
         assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
         const edges = rootNode.buildSubstitutionEdges([{
@@ -441,7 +440,7 @@ describe('Correction Distance Modeler', () => {
         assert.isNotEmpty(rootTraversal);
 
         const rootSeed = SEARCH_EDGE_SEED++;
-        const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+        const rootNode = new SearchNode(rootTraversal, rootSeed);
         assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
         const subSeed = SEARCH_EDGE_SEED++;
@@ -489,7 +488,7 @@ describe('Correction Distance Modeler', () => {
       assert.isNotEmpty(rootTraversal);
 
       const rootSeed = SEARCH_EDGE_SEED++;
-      const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+      const rootNode = new SearchNode(rootTraversal, rootSeed);
       assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
       const subsetSeed = SEARCH_EDGE_SEED++;
@@ -560,7 +559,7 @@ describe('Correction Distance Modeler', () => {
         const rootTraversal = testModel.traverseFromRoot();
         assert.isNotEmpty(rootTraversal);
 
-        const rootNode = new correction.SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
+        const rootNode = new SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
         assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
         const subsetSeed = SEARCH_EDGE_SEED++;
@@ -585,7 +584,7 @@ describe('Correction Distance Modeler', () => {
       it('step 2: first processing layer resolves zero + one char inserts', () => {
         // From "step 1" above, assertions removed
         const rootTraversal = testModel.traverseFromRoot();
-        const rootNode = new correction.SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
+        const rootNode = new SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
         const subsetSeed = SEARCH_EDGE_SEED++;
         const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution, subsetSeed);
         subsetNodes.sort(CORRECTION_QUEUE_COMPARATOR);
@@ -719,7 +718,7 @@ describe('Correction Distance Modeler', () => {
       it('step 3: second processing layer resolves two char inserts', () => {
         // From "steps 0, 1" above, assertions removed
         const rootTraversal = testModel.traverseFromRoot();
-        const rootNode = new correction.SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
+        const rootNode = new SearchNode(rootTraversal, SEARCH_EDGE_SEED++);
         const subsetSeed = SEARCH_EDGE_SEED++;
         const subsetNodes = rootNode.buildSubstitutionEdges(synthDistribution, subsetSeed);
         subsetNodes.sort(CORRECTION_QUEUE_COMPARATOR);
@@ -1037,7 +1036,7 @@ describe('Correction Distance Modeler', () => {
       assert.isNotEmpty(rootTraversal);
 
       const rootSeed = SEARCH_EDGE_SEED++;
-      const rootNode = new correction.SearchNode(rootTraversal, rootSeed);
+      const rootNode = new SearchNode(rootTraversal, rootSeed);
       assert.equal(rootNode.calculation.getHeuristicFinalCost(), 0);
 
       // VERY artificial distributions.

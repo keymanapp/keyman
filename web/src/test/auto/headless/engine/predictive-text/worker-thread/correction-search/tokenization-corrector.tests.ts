@@ -17,8 +17,8 @@ import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs'
 import {
   ContextToken,
   ContextTokenization,
-  correction,
   correctionValidForAutoSelect,
+  ExecutionTimer,
   generateSubsetId,
   getBestMatches,
   models,
@@ -45,7 +45,7 @@ const plainModel = new TrieModel(
 );
 
 function buildTestTimer() {
-  return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
+  return new ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
 }
 
 function buildFixture_therefore() {

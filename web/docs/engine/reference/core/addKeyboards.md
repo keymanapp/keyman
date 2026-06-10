@@ -26,7 +26,9 @@ keyman.addKeyboards(spec[, spec...])
 fulfilled upon adding keyboards.
 
 The promise is an array containing a combination of the following:
-* successfully registered keyboard objects which define some or all of these [properties](../keyboard_properties)
+
+* successfully registered keyboard objects which define some or all of these
+  [properties](../keyboard_properties)
 * [ErrorStub](../keyboard_registration_errors) objects for keyboards that failed to register
 
 ## Description
@@ -35,7 +37,8 @@ The keyboard spec can be a string or an object. Multiple keyboard specs can be
 specified in a single call, which can reduce the round-trip cost of multiple
 calls to Keyman Cloud servers (when using Keyman Cloud).
 
-For general information and example uses of this method, please see the [Adding Keyboards](../../guide/adding-keyboards) page from the guide section.
+For general information and example uses of this method, please see the
+[Adding Keyboards](../../guide/adding-keyboards) page from the guide section.
 
 ### Using a `string`
 
@@ -48,7 +51,7 @@ The string format is one of the following:
 * `'keyboardID@languageID'`: Loads a specific keyboard + language combination
 
 The keyboard catalogue is online at
-[http://keyman.com/developer/keymanweb/keyboards](http://keyman.com/developer/keymanweb/keyboards).
+[https://keyman.com/developer/keymanweb/keyboards](https://keyman.com/developer/keymanweb/keyboards).
 
 ### Using an `object`
 
@@ -58,7 +61,6 @@ specification of the object is related to the Keyman Cloud JSON API (formerly
 known as KeymanWeb Server Data API):
 
 The `spec` object contains the following members:
-
 
 `name`
 
@@ -143,7 +145,7 @@ The `spec.languages` object contains the following members:
 
 : `array|object` <span class="optional">optional</span>
 
-  An array of Font objects (see definition below) or single object describing
+  An array of Font objects (see `font` definition below) or single object describing
   fonts for input fields and the OSK (if `oskFont` is not present.)
 
 `oskFont`

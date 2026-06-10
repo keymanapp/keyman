@@ -8,7 +8,7 @@
  */
 
 import { LexicalModelTypes } from "@keymanapp/common-types";
-import { KMWString } from "@keymanapp/web-utils";
+import { KMWString } from "keyman/common/web-utils";
 
 import { SearchNode } from "./distance-modeler.js";
 import { PathInputProperties, SearchQuotientNode } from "./search-quotient-node.js";

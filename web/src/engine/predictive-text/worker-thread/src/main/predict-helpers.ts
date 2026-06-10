@@ -1,9 +1,9 @@
 import * as models from '@keymanapp/models-templates';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { defaultWordbreaker, WordBreakProperty } from '@keymanapp/models-wordbreakers';
+import { searchForProperty, WordBreakProperty } from '@keymanapp/models-wordbreakers';
 
-import TransformUtils from './transformUtils.js';
+import { TransformUtils } from './transformUtils.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 import { ContextTokenization } from './correction/context-tokenization.js';
 import { ContextTracker } from './correction/context-tracker.js';
@@ -11,11 +11,9 @@ import { ContextToken } from './correction/context-token.js';
 import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
 import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
-import ModelCompositor from './model-compositor.js';
+import { ModelCompositor } from './model-compositor.js';
 import { getBestTokenMatches } from './correction/distance-modeler.js';
 import { TokenResultMapping } from './correction/token-result-mapping.js';
-
-const searchForProperty = defaultWordbreaker.searchForProperty;
 
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;

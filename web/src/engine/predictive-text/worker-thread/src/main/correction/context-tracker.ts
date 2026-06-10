@@ -1,4 +1,4 @@
-import { RewindableCache } from '@keymanapp/web-utils';
+import { RewindableCache } from 'keyman/common/web-utils';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import Configuration = LexicalModelTypes.Configuration;

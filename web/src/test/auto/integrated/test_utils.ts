@@ -24,9 +24,9 @@ try {
   DEVICE_DETECT_FAILURE = true;
 }
 
-// // Keyman test suite utility methods
+// Keyman test suite utility methods
 
-export function setupKMW(kmwOptions: BrowserInitOptionSpec | string, timeout: number) {
+export async function setupKMW(kmwOptions: BrowserInitOptionSpec | string, timeout: number): Promise<any> {
   let ui: string;
 
   if(typeof(kmwOptions) == 'string' || typeof(kmwOptions) == 'undefined' || kmwOptions == null) {
@@ -69,13 +69,13 @@ export function setupKMW(kmwOptions: BrowserInitOptionSpec | string, timeout: nu
     compositePromise = Promise.all([kmwPromise, uiPromise]);
   }
 
-  return compositePromise.then(() => {
-    if(window[keyman_window]) {
-      return window[keyman_window].init(kmwOptions);
-    } else {
-      return Promise.reject();
-    }
-  });
+  await compositePromise;
+
+  if(window[keyman_window]) {
+    return window[keyman_window].init(kmwOptions);
+  } else {
+    return Promise.reject();
+  }
 }
 
 /**

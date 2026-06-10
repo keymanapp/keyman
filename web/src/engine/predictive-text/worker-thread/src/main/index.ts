@@ -32,11 +32,10 @@
 /// <reference types="@keymanapp/lm-message-types" />
 
 import * as models from './models/index.js';
-import * as correction from './correction/index.js';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
-import { KMWString } from "@keymanapp/web-utils";
+import { KMWString } from "keyman/common/web-utils";
 
-import ModelCompositor from './model-compositor.js';
+import { ModelCompositor } from './model-compositor.js';
 import { ImportScripts, IncomingMessage, LMLayerWorkerState, LoadMessage, ModelEval, ModelFile, ModelSourceSpec, PostMessage } from './worker-interfaces.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import Capabilities = LexicalModelTypes.Capabilities;
@@ -66,7 +65,7 @@ import { OutgoingMessageKind } from '@keymanapp/lm-message-types';
  * The model and the configuration are ONLY relevant in the `ready` state;
  * as such, they are NOT direct properties of the LMLayerWorker.
  */
-export default class LMLayerWorker {
+export class LMLayerWorker {
   /**
    * State pattern. This object handles onMessage().
    * handleMessage() can transition to a different state, if
@@ -330,8 +329,8 @@ export default class LMLayerWorker {
           // This is far more encapsulated and likely more secure... and the former point means this is
           // easier to bundle and more optimizable when bundling than direct eval.
           // Reference: https://esbuild.github.io/link/direct-eval
-          const modelLoader = new Function('LMLayerWorker', 'models', 'correction', 'wordBreakers', code);
-          modelLoader(_this, models, correction, wordBreakers);
+          const modelLoader = new Function('LMLayerWorker', 'models', 'wordBreakers', code);
+          modelLoader(_this, models, wordBreakers);
         }
       }
     };
@@ -433,8 +432,6 @@ export default class LMLayerWorker {
     scope['LMLayerWorker'] = worker;
     // @ts-ignore
     scope['models'] = models;
-    // @ts-ignore
-    scope['correction'] = correction;
     // @ts-ignore
     scope['wordBreakers'] = wordBreakers;
 

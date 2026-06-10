@@ -7,14 +7,15 @@ import * as sinon from 'sinon';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KeyboardTest, RecordedPhysicalKeystroke, RecordedSequenceTestSet } from '@keymanapp/recorder-core';
-import { Worker } from '@keymanapp/lexical-model-layer/node';
-import { DeviceSpec, KMWString } from '@keymanapp/web-utils';
+import { NodeWorker } from '@keymanapp/lexical-model-layer/node';
+import { DeviceSpec, KMWString } from 'keyman/common/web-utils';
 
 import { InputProcessor } from 'keyman/engine/main';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
-import { KeyEvent, KeyEventSpec, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
+import { ActiveKey, DefaultOutputRules, JSKeyboard, KeyEvent, KeyEventSpec, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { PredictionContext } from 'keyman/engine/interfaces';
+import { DEFAULT_PROCESSOR_INIT_OPTIONS, NodeKeyboardLoader } from 'keyman/test/resources';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 
 import Context = LexicalModelTypes.Context;
 import Suggestion = LexicalModelTypes.Suggestion;
@@ -57,7 +58,7 @@ KMWString.enableSupplementaryPlane(false);
 describe('InputProcessor', function() {
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
-      let core = new InputProcessor(device, null);
+      let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
       assert.isNotNull(core);
     });
 
@@ -67,7 +68,11 @@ describe('InputProcessor', function() {
         // Can construct without the second parameter; if so, the final assertion - .mayPredict
         // will be invalidated.  (No worker, no ability to predict.)
         // @ts-ignore
-        core = new InputProcessor(device, Worker);
+        core = new InputProcessor(device, NodeWorker, {
+          baseLayout: 'us',
+          keyboardInterface: new JSKeyboardInterface({}, null, new VariableStoreTestSerializer()),
+          defaultOutputRules: new DefaultOutputRules()
+        });
 
         assert.isOk(core.keyboardProcessor);
         assert.isDefined(core.keyboardProcessor.contextDevice);
@@ -95,7 +100,8 @@ describe('InputProcessor', function() {
   });
 
   describe('efficiency tests', function() {
-    let keyboardWithHarness: KeyboardInterface;
+    let testDistribution: {keySpec: ActiveKey, p: number}[] = [];
+    let keyboardWithHarness: JSKeyboardInterface;
 
     let mainWebScriptURL = require.resolve('@keymanapp/lm-worker/worker-main.wrapped.js');
 
@@ -109,20 +115,33 @@ describe('InputProcessor', function() {
     }
 
     this.beforeAll(async function() {
+      testDistribution = [];
+
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js'));
-      keyboardWithHarness = keyboardLoader.harness as KeyboardInterface;
+      keyboardWithHarness = keyboardLoader.harness as JSKeyboardInterface;
       keyboardWithHarness.activeKeyboard = keyboard;
+
+      const layout = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').row.flatMap((r) => r.key).flat();
+      for(let keySpec of layout) {
+        testDistribution.push({
+          keySpec,
+          p: 1 / 26
+        });
+      }
     });
 
     describe('without fat-fingering', function() {
+      beforeEach(() => {
+        KMWString.enableSupplementaryPlane(false);
+      });
+
       it('with minimal context (no fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, null);
-        let context = new Mock("", 0);
+        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        let context = new SyntheticTextStore("", 0);
 
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
@@ -134,15 +153,14 @@ describe('InputProcessor', function() {
 
       it('with extremely long context (' + KMWString.length(coreSourceCode) + ' chars, no fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new Mock(coreSourceCode, KMWString.length(coreSourceCode));
+        let context = new SyntheticTextStore(coreSourceCode, KMWString.length(coreSourceCode));
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
 
-        let core = new InputProcessor(device, null);  // I mean, it IS long context, and time
-                                          // thresholding is disabled within Node.
+        // I mean, it IS long context, and time thresholding is disabled within Node.
+        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
 
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
@@ -154,16 +172,20 @@ describe('InputProcessor', function() {
     });
 
     describe('with fat-fingering', function() {
+      beforeEach(() => {
+        KMWString.enableSupplementaryPlane(false);
+      });
+
       it('with minimal context (with fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, null);
-        let context = new Mock("", 0);
+        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        let context = new SyntheticTextStore("", 0);
 
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
+        event.keyDistribution = testDistribution;
 
         let behavior = core.processKeyEvent(event, context, null);
         assert.isNotNull(behavior);
@@ -171,7 +193,7 @@ describe('InputProcessor', function() {
 
       it('with extremely long context (' + KMWString.length(coreSourceCode) + ' chars, with fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new Mock(coreSourceCode, KMWString.length(coreSourceCode));
+        let context = new SyntheticTextStore(coreSourceCode, KMWString.length(coreSourceCode));
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
@@ -179,14 +201,14 @@ describe('InputProcessor', function() {
                                           // Keep at the same 'order of magnitude' as the
                                           // 'without fat-fingers' test.
 
-        let core = new InputProcessor(device, null);  // It IS long context, and time
-                                          // thresholding is disabled within Node.
+        // It IS long context, and time thresholding is disabled within Node.
+        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
 
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness as KeyboardInterface;
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
         let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
+        event.keyDistribution = testDistribution;
 
         let behavior = core.processKeyEvent(event, context, null);
         assert.isNotNull(behavior);
@@ -195,7 +217,7 @@ describe('InputProcessor', function() {
   });
 
   describe('Deadkeys bug #8568 - backspace should not reset all deadkeys', function () {
-    let keyboardWithHarness: KeyboardInterface;
+    let keyboardWithHarness: JSKeyboardInterface;
     let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/8568_deadkeys.json'));
     // For convenience we define the key sequence in a test file although we don't use the
     // rest of the recorder stuff since it uses only KeyboardProcessor, not InputProcessor.
@@ -203,9 +225,9 @@ describe('InputProcessor', function() {
 
     before(async function () {
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_8568_deadkeys.js'));
-      keyboardWithHarness = keyboardLoader.harness as KeyboardInterface;
+      keyboardWithHarness = keyboardLoader.harness as JSKeyboardInterface;
       keyboardWithHarness.activeKeyboard = keyboard;
 
       // This part provides extra assurance that the keyboard properly loaded.
@@ -216,11 +238,10 @@ describe('InputProcessor', function() {
     for (let testSet of testsToRun.testSet) {
       it(testSet.msg ?? 'test', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, null);
-        let context = new Mock("", 0);
+        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        let context = new SyntheticTextStore("", 0);
 
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
-        let keyboard = keyboardWithHarness.activeKeyboard;
+        let keyboard = keyboardWithHarness.activeKeyboard as JSKeyboard;
 
         for (let key of testSet.inputs) {
           const keystroke = key as RecordedPhysicalKeystroke;
@@ -245,7 +266,7 @@ describe('InputProcessor', function() {
   });
 
   describe('Predictive-text integration tests', () => {
-    let keyboardWithHarness: KeyboardInterface;
+    let keyboardWithHarness: JSKeyboardInterface;
     const device: DeviceSpec = {
       formFactor: DeviceSpec.FormFactor.Phone,
       OS: DeviceSpec.OperatingSystem.iOS,
@@ -278,9 +299,9 @@ describe('InputProcessor', function() {
 
     before(async () => {
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_simple_deadkeys.js'));
-      keyboardWithHarness = keyboardLoader.harness as KeyboardInterface;
+      keyboardWithHarness = keyboardLoader.harness as JSKeyboardInterface;
       keyboardWithHarness.activeKeyboard = keyboard;
 
       // This part provides extra assurance that the keyboard properly loaded.
@@ -288,14 +309,12 @@ describe('InputProcessor', function() {
     });
 
     it('replaces appended whitespace when a manually-applied suggestion is followed by a K_SPACE (dummy models)', async () => {
-      // @ts-ignore
-      const core = new InputProcessor(device, Worker);
+      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
         await langProcessor.loadModel(simpleTestingDummyModel);
         const predContext = new PredictionContext(core.languageProcessor, () => 'default');
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         const keyboard = keyboardWithHarness.activeKeyboard;
 
         const getEventFor = (keyId: string) => {
@@ -312,8 +331,8 @@ describe('InputProcessor', function() {
           { left: 'this context is for testing ', startOfBuffer: true, endOfBuffer: true },
         ];
 
-        const mock = new Mock(contexts[0].left);
-        predContext.setCurrentTarget(mock);
+        const mock = new SyntheticTextStore(contexts[0].left);
+        predContext.setCurrentTextStore(mock);
 
         const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_I')), mock, predContext);
         assert.equal(mock.getTextBeforeCaret(), contexts[1].left);
@@ -347,14 +366,12 @@ describe('InputProcessor', function() {
     });
 
     it('replaces appended whitespace when a manually-applied suggestion is followed by a K_SPACE (trie models)', async () => {
-      // @ts-ignore
-      const core = new InputProcessor(device, Worker);
+      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
         await langProcessor.loadModel(simpleTrieModel);
         const predContext = new PredictionContext(core.languageProcessor, () => 'default');
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         const keyboard = keyboardWithHarness.activeKeyboard;
 
         const getEventFor = (keyId: string) => {
@@ -371,8 +388,8 @@ describe('InputProcessor', function() {
           { left: 'this context is for technical ', startOfBuffer: true, endOfBuffer: true },
         ];
 
-        const mock = new Mock(contexts[0].left);
-        predContext.setCurrentTarget(mock);
+        const mock = new SyntheticTextStore(contexts[0].left);
+        predContext.setCurrentTextStore(mock);
 
         const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_H')), mock, predContext);
         assert.equal(mock.getTextBeforeCaret(), contexts[1].left);
@@ -407,14 +424,12 @@ describe('InputProcessor', function() {
     });
 
     it('auto-applies a suggestion properly when available and triggered appropriately', async () => {
-      // @ts-ignore
-      const core = new InputProcessor(device, Worker);
+      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
         await langProcessor.loadModel(simpleTestingDummyModel);
         const predContext = new PredictionContext(core.languageProcessor, () => 'default');
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         const keyboard = keyboardWithHarness.activeKeyboard;
 
         const getEventFor = (keyId: string) => {
@@ -432,8 +447,8 @@ describe('InputProcessor', function() {
           { left: 'this context is for testing..', startOfBuffer: true, endOfBuffer: true }
         ];
 
-        const mock = new Mock(contexts[0].left);
-        predContext.setCurrentTarget(mock);
+        const mock = new SyntheticTextStore(contexts[0].left);
+        predContext.setCurrentTextStore(mock);
 
         const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_I')), mock, predContext);
         assert.equal(mock.getTextBeforeCaret(), contexts[1].left);
@@ -461,15 +476,13 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after manually applying a suggestion and immediately backspacing', async () => {
-      // @ts-ignore
-      const core = new InputProcessor(device, Worker);
+      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
         // This feature only activates with 14.0+ models.
         await langProcessor.loadModel(simpleTrieModel);
         const predContext = new PredictionContext(core.languageProcessor, () => 'default');
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         const keyboard = keyboardWithHarness.activeKeyboard;
 
         const getEventFor = (keyId: string) => {
@@ -486,8 +499,8 @@ describe('InputProcessor', function() {
           { left: 'this context is for technical ', startOfBuffer: true, endOfBuffer: true }
         ];
 
-        const mock = new Mock(contexts[0].left);
-        predContext.setCurrentTarget(mock);
+        const mock = new SyntheticTextStore(contexts[0].left);
+        predContext.setCurrentTextStore(mock);
 
         const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_H')), mock, predContext);
         assert.equal(mock.getTextBeforeCaret(), contexts[1].left);
@@ -520,15 +533,13 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after returning to the whitespace after a manually-applied suggestion', async () => {
-      // @ts-ignore
-      const core = new InputProcessor(device, Worker);
+      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
         // This feature only activates with 14.0+ models.
         await langProcessor.loadModel(simpleTrieModel);
         const predContext = new PredictionContext(core.languageProcessor, () => 'default');
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         const keyboard = keyboardWithHarness.activeKeyboard;
 
         const getEventFor = (keyId: string) => {
@@ -546,8 +557,8 @@ describe('InputProcessor', function() {
           { left: 'this context is for technical det', startOfBuffer: true, endOfBuffer: true }
         ];
 
-        const mock = new Mock(contexts[0].left);
-        predContext.setCurrentTarget(mock);
+        const mock = new SyntheticTextStore(contexts[0].left);
+        predContext.setCurrentTextStore(mock);
 
         const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_H')), mock, predContext);
         const techPredictions = await ruleBehavior.predictionPromise;
@@ -583,15 +594,13 @@ describe('InputProcessor', function() {
     });
 
     it("displays a reversion after returning to the end of a manually-applied suggestion's body", async () => {
-      // @ts-ignore
-      const core = new InputProcessor(device, Worker);
+      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
         // This feature only activates with 14.0+ models.
         await langProcessor.loadModel(simpleTrieModel);
         const predContext = new PredictionContext(core.languageProcessor, () => 'default');
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         const keyboard = keyboardWithHarness.activeKeyboard;
 
         const getEventFor = (keyId: string) => {
@@ -609,8 +618,8 @@ describe('InputProcessor', function() {
           { left: 'this context is for technical det', startOfBuffer: true, endOfBuffer: true }
         ];
 
-        const mock = new Mock(contexts[0].left);
-        predContext.setCurrentTarget(mock);
+        const mock = new SyntheticTextStore(contexts[0].left);
+        predContext.setCurrentTextStore(mock);
 
         const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_H')), mock, predContext);
         const techPredictions = await ruleBehavior.predictionPromise;
@@ -647,15 +656,13 @@ describe('InputProcessor', function() {
     });
 
     it("does not display a reversion after backspacing part of an applied suggestion", async () => {
-      // @ts-ignore
-      const core = new InputProcessor(device, Worker);
+      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
         // This feature only activates with 14.0+ models.
         await langProcessor.loadModel(simpleTrieModel);
         const predContext = new PredictionContext(core.languageProcessor, () => 'default');
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         const keyboard = keyboardWithHarness.activeKeyboard;
 
         const getEventFor = (keyId: string) => {
@@ -674,8 +681,8 @@ describe('InputProcessor', function() {
           { left: 'this context is for technica', startOfBuffer: true, endOfBuffer: true }
         ];
 
-        const mock = new Mock(contexts[0].left);
-        predContext.setCurrentTarget(mock);
+        const mock = new SyntheticTextStore(contexts[0].left);
+        predContext.setCurrentTextStore(mock);
 
         const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_H')), mock, predContext);
         const techPredictions = await ruleBehavior.predictionPromise;
@@ -713,15 +720,13 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after auto-applying a suggestion and immediately backspacing', async () => {
-      // @ts-ignore
-      const core = new InputProcessor(device, Worker);
+      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
         // This feature only activates with 14.0+ models.
         await langProcessor.loadModel(simpleTrieModel);
         const predContext = new PredictionContext(core.languageProcessor, () => 'default');
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         const keyboard = keyboardWithHarness.activeKeyboard;
 
         const getEventFor = (keyId: string) => {
@@ -738,8 +743,8 @@ describe('InputProcessor', function() {
           { left: 'this context is for technical.', startOfBuffer: true, endOfBuffer: true }
         ];
 
-        const mock = new Mock(contexts[0].left);
-        predContext.setCurrentTarget(mock);
+        const mock = new SyntheticTextStore(contexts[0].left);
+        predContext.setCurrentTextStore(mock);
 
         const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_N')), mock, predContext);
         assert.equal(mock.getTextBeforeCaret(), contexts[1].left);
@@ -770,15 +775,13 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after returning to the whitespace after a auto-applied suggestion', async () => {
-      // @ts-ignore
-      const core = new InputProcessor(device, Worker);
+      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
         // This feature only activates with 14.0+ models.
         await langProcessor.loadModel(simpleTrieModel);
         const predContext = new PredictionContext(core.languageProcessor, () => 'default');
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         const keyboard = keyboardWithHarness.activeKeyboard;
 
         const getEventFor = (keyId: string) => {
@@ -796,8 +799,8 @@ describe('InputProcessor', function() {
           { left: 'this context is for technical... ', startOfBuffer: true, endOfBuffer: true }
         ];
 
-        const mock = new Mock(contexts[0].left);
-        predContext.setCurrentTarget(mock);
+        const mock = new SyntheticTextStore(contexts[0].left);
+        predContext.setCurrentTextStore(mock);
 
         const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_N')), mock, predContext);
         await ruleBehavior.predictionPromise;
@@ -826,15 +829,13 @@ describe('InputProcessor', function() {
     });
 
     it("displays a reversion after returning to the end of an auto-applied suggestion's body", async () => {
-      // @ts-ignore
-      const core = new InputProcessor(device, Worker);
+      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
         // This feature only activates with 14.0+ models.
         await langProcessor.loadModel(simpleTrieModel);
         const predContext = new PredictionContext(core.languageProcessor, () => 'default');
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         const keyboard = keyboardWithHarness.activeKeyboard;
 
         const getEventFor = (keyId: string) => {
@@ -852,8 +853,8 @@ describe('InputProcessor', function() {
           { left: 'this context is for technical... ', startOfBuffer: true, endOfBuffer: true }
         ];
 
-        const mock = new Mock(contexts[0].left);
-        predContext.setCurrentTarget(mock);
+        const mock = new SyntheticTextStore(contexts[0].left);
+        predContext.setCurrentTextStore(mock);
 
         const ruleBehavior = core.processKeyEvent(new KeyEvent(getEventFor('K_N')), mock, predContext);
         await ruleBehavior.predictionPromise;

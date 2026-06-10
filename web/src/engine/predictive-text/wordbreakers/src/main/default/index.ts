@@ -38,7 +38,7 @@ export interface DefaultWordBreakerOptions {
  * @see http://unicode.org/reports/tr29/#Word_Boundaries
  * @see https://github.com/eddieantonio/unicode-default-word-boundary/tree/v12.0.0
  */
- function default_(text: string, options?: DefaultWordBreakerOptions): LexicalModelTypes.Span[] {
+export function default_(text: string, options?: DefaultWordBreakerOptions): LexicalModelTypes.Span[] {
   let boundaries = findBoundaries(text, options);
   if (boundaries.length == 0) {
     return [];
@@ -65,7 +65,7 @@ export interface DefaultWordBreakerOptions {
 }
 
 // Exposes `searchForProperty` for external use while associating it with this wordbreaker.
-const def = Object.assign(default_, { 
+const def = Object.assign(default_, {
   /**
    * This method returns enum values corresponding to the character type as perceived by the wordbreaking algorithm.
    */

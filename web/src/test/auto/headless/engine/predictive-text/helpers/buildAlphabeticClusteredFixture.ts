@@ -141,6 +141,7 @@ export const buildAlphabeticClusterFixtures = () => {
   const cluster_k5c6 = new SearchQuotientCluster([path_k5c6_a, path_k5c6_b]);
 
   return {
+    rootPath,
     distributions: {
       1: {
         distrib_c1_i1d0,
