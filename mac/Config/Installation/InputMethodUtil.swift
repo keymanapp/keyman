@@ -17,6 +17,11 @@ extension Notification.Name {
     static let accessCheck = Notification.Name("com.keyman.accessibility.state")
 }
 
+public enum KeymanVersionCheckError: Error {
+  case inputMethodNotFound
+  case versionNotFound
+}
+
 public enum KeymanInvocationError: Error {
   case inputMethodNotFound
   case inputMethodCouldNotBeInvoked
@@ -38,7 +43,19 @@ public class InputMethodUtil {
   public init() {
     self.pathUtil = KeymanPaths()
   }
-  
+
+  /**
+   * true if the Keyman input method exists at `~/Library/Input Methods`
+   */
+  public func keymanInputMethodExists()  -> Bool {
+    guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
+      print("Keyman input method not found, failed to create input method url")
+      return false
+    }
+    
+    return FileManager.default.fileExists(atPath: inputMethodUrl.path)
+  }
+
   /**
    * true if the Keyman input method of the correct version exists in the correct location
    */
@@ -50,8 +67,8 @@ public class InputMethodUtil {
   /**
    * Returns version number string of Keyman input method
    */
-  public func getKeymanInputMethodVersion() -> String? {
-    return self.appVersion(applicationName: keymanInputMethodApplicationName)
+  public func getKeymanInputMethodVersion() throws -> String {
+    return try self.appVersionForInputMethod(applicationName: keymanInputMethodApplicationName)
   }
   
   /**
@@ -122,37 +139,26 @@ public class InputMethodUtil {
   }
   
   /**
-   * Returns version number string for application with specified name
+   * Returns version number string for the specifed app located at `~/Library/Input Methods`
    */
-  func appVersion(applicationName: String) -> String? {
-    var version: String? = nil
-    
-    if let location = pathUtil.buildInputMethodPathUrl(fileName: applicationName) {
-      print("app location: \(location.absoluteString)")
-      if let keyputBundle = Bundle(url: location) {
-        print("app bundle path: \(keyputBundle.bundlePath)")
-        if let infoDictionary = keyputBundle.infoDictionary {
-          print("infoDictionary key count: \(infoDictionary.count)")
-          if let appVersion = infoDictionary["CFBundleShortVersionString"] as? String {
-            print("app '\(applicationName)', appVersion: \(appVersion)")
-            version = appVersion
-          }
-        }
-      } else {
-        print("cannot create KeyPut bundle")
-      }
-      /*
-       if let keyputBundle = Bundle(url: location), let infoDictionary = keyputBundle.infoDictionary, let appVersion = infoDictionary["CFBundleShortVersionString"] as? String {
-       ConfigLogger.shared.testLogger.debug("App Version: \(appVersion)")
-       } else {
-       ConfigLogger.shared.testLogger.debug("App Version not found")
-       }
-       */
-    } else {
-      print("app '\(applicationName)' not found")
+  func appVersionForInputMethod(applicationName: String) throws -> String {
+    guard let location = pathUtil.buildInputMethodPathUrl(fileName: applicationName) else {
+      throw KeymanVersionCheckError.inputMethodNotFound
     }
     
-    return version
+    guard let keymanBundle = Bundle(url: location) else {
+      throw KeymanVersionCheckError.inputMethodNotFound
+    }
+    
+    guard let infoDictionary = keymanBundle.infoDictionary else {
+      throw KeymanVersionCheckError.versionNotFound
+    }
+
+    guard let appVersionString = infoDictionary["CFBundleShortVersionString"] as? String else {
+      throw KeymanVersionCheckError.versionNotFound
+    }
+    
+    return appVersionString
   }
   
   /**

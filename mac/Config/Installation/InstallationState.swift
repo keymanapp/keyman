@@ -16,6 +16,7 @@ public class InstallationState {
   let kDateRestartRequestedKey = "dateRestartRequested"
   let kRepairKey = "isRepair"
 
+  public let inputMethodExists: Bool
   public let keymanVersion: String
   public var dateRestartRequested: Date?
   // indicates whether we are repairing a previous installation or doing a full installation
@@ -27,20 +28,8 @@ public class InstallationState {
     tasks.allSatisfy(\.isComplete)
   }
   
-  /**
-   * Create InstallationState for new install
-   */
-  static func createForNewInstall(version: String) -> InstallationState {
-    var installationTasks = Set<InstallationTask>()
-    installationTasks.insert(InstallationTask(task: .migrateData, completed: false))
-    installationTasks.insert(InstallationTask(task: .enableInputMethod, completed: false))
-    installationTasks.insert(InstallationTask(task: .requestAccess, completed: false))
-    installationTasks.insert(InstallationTask(task: .restartMac, completed: false))
-
-    return InstallationState(version: version, tasks: installationTasks)
-  }
-
-  init(version: String, dateRestartRequested: Date? = nil, isRepair: Bool = false, tasks: Set<InstallationTask>) {
+  init(exists: Bool = true, version: String, dateRestartRequested: Date? = nil, isRepair: Bool = false, tasks: Set<InstallationTask>) {
+    self.inputMethodExists = exists
     self.keymanVersion = version
     self.dateRestartRequested = dateRestartRequested
     self.isRepair = isRepair
@@ -51,6 +40,8 @@ public class InstallationState {
    * initialize using the dictionary from UserDefaults
    */
   init?(from dictionary: Dictionary<String, Any>) {
+    // assume that the input method exists, as we only attempt to load this data when it does
+    self.inputMethodExists = true
     self.keymanVersion = dictionary[kVersionKey] as? String ?? ""
     self.dateRestartRequested = dictionary[kDateRestartRequestedKey] as? Date
     self.isRepair = dictionary[kRepairKey] as? Bool ?? false

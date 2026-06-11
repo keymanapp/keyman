@@ -34,8 +34,8 @@ public class InstallationContainer : ObservableObject {
     self.defaultsRepository = defaultsRepo
     inputMethodUtil = InputMethodUtil()
     notificationCenter = DistributedNotificationCenter.default()
-        
-    self.installationState = InstallationCheck(version: "1.0.0", defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil).evaluate()
+    
+    self.installationState = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil).evaluate()
     
     self.registerObservers()
   }
@@ -212,7 +212,7 @@ public class InstallationContainer : ObservableObject {
    * for testing purposes, replace the InstallationState with a new object set for a new installation
    */
   func resetInstallation() {
-    self.installationState = InstallationCheck(version: "1.0.0", defaultsRepo: self.defaultsRepository, inputMethodUtil: self.inputMethodUtil).createInstallationStateForNewInstallation()
+      self.installationState = InstallationCheck(defaultsRepo: self.defaultsRepository, inputMethodUtil: self.inputMethodUtil).createInstallationStateForNewInstallation()
   }
   
   /**
@@ -234,11 +234,11 @@ public class InstallationContainer : ObservableObject {
   }
   
   public func debug() {
-    let version = inputMethodUtil.getKeymanInputMethodVersion()
+    let version = (try? inputMethodUtil.getKeymanInputMethodVersion()) ?? "unknown"
     let enabled = inputMethodUtil.isKeymanInputMethodEnabled()
     let running = inputMethodUtil.isKeymanInputMethodRunning()
     let accessGranted = self.accessIsGranted()
-    print("Keyman status, version: \(version ?? ""), enabled: \(enabled), running: \(running), accessGranted: \(accessGranted)")
+    print("Keyman status, version: \(version), enabled: \(enabled), running: \(running), accessGranted: \(accessGranted)")
   }
   
 
@@ -314,11 +314,12 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
-   * first kill the Keyman input method if it is running
-   * second, call Keyman as a separate process with an argument that requests the system to prompt the user to grant accessibility
-   * listen for message from Keyman to indicate the result
+   * First kill the Keyman input method if it is running.
+   * Second, call Keyman as a separate process with an argument that requests the system to prompt the user to grant accessibility.
+   * The Keyman input method cannot send a message to indicate success, because it does not know itself when the user has
+   * finished making the change in Settings.
+   * To learn the result, we must poll with `isAccessibilityGranted()`
    */
-  // MAC-CONFIG-TODO: do we get an accurate message from Keyman Input Method
   public func requestAccessibility() -> Bool {
     var requested = false
     

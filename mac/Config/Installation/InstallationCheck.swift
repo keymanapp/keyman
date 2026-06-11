@@ -13,18 +13,31 @@ import KeymanSettings
 
 
 public class InstallationCheck {
-  fileprivate let keymanVersion: String
+  fileprivate let inputMethodVersion: String
   fileprivate let defaultsRepository: DefaultsRepo
   fileprivate let inputMethodUtil: InputMethodUtil
+  fileprivate let inputMethodExists: Bool
   
-  public init(version: String, defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil) {
-    self.keymanVersion = version
+  public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil) {
     self.defaultsRepository = defaultsRepo
     self.inputMethodUtil = inputMethodUtil
+    let exists = inputMethodUtil.keymanInputMethodExists()
+    
+    if exists {
+      self.inputMethodExists = true
+      self.inputMethodVersion = (try? inputMethodUtil.getKeymanInputMethodVersion()) ?? "unknown"
+    } else {
+      self.inputMethodExists = false
+      self.inputMethodVersion = "unknown"
+    }
   }
   
   public func evaluate() -> InstallationState {
     var installationState: InstallationState
+    
+    guard self.inputMethodExists else {
+      return createInstallationStateForNonexistentInputMethod()
+    }
     
     if let savedInstallationState = readInstallationState() {
       // check whether the installation requires repair
@@ -34,8 +47,7 @@ public class InstallationCheck {
       } else {
         installationState = savedInstallationState
       }
-    } else
-    {
+    } else {
       // if installation could not be read, then
       installationState = self.createInstallationStateForNewInstallation()
     }
@@ -61,12 +73,23 @@ public class InstallationCheck {
   func checkForNewInstallation() {
     // MAC-CONFIG-TODO: impelement version checks
   }
-  
+
+  /**
+   * Create InstallationState for non-existent input method (installer needs to be run)
+   * Note that this is not persisted, because a non-existent installation doesn't really have state.
+   * Instead this is used to indicate to the user that they need to run the installer and try again.
+   */
+  func createInstallationStateForNonexistentInputMethod() -> InstallationState {
+    var taskList = Set<InstallationTask>()
+    taskList.insert(InstallationTask(task: .verifyInputMethod, completed: false))
+    return InstallationState(exists: false, version: "unknown", tasks: taskList)
+  }
+
   /**
    * Creates a InstallationState object describing a new installation
    */
   func createInstallationStateForNewInstallation() -> InstallationState {
-    let installationState = InstallationState(version: self.keymanVersion, tasks: self.createNewInstallationTasks())
+    let installationState = InstallationState(version: self.inputMethodVersion, tasks: self.createNewInstallationTasks())
     self.defaultsRepository.writeInstallationState(installationState.toUserDefaultsDictionary())
 
     return installationState
@@ -112,7 +135,7 @@ public class InstallationCheck {
     }
     
     if !repairTasks.isEmpty {
-      repairInstallationState = InstallationState(version: self.keymanVersion, tasks: repairTasks)
+      repairInstallationState = InstallationState(version: self.inputMethodVersion, tasks: repairTasks)
     }
     
     return repairInstallationState
