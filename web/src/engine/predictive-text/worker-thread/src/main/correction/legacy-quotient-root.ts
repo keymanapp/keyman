@@ -1,4 +1,4 @@
-import { PriorityQueue } from '@keymanapp/web-utils';
+import { PriorityQueue } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { CORRECTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';

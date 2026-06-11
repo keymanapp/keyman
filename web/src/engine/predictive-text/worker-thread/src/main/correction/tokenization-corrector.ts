@@ -8,7 +8,7 @@
  * predictive-text correction-search engine.
  */
 
-import { PriorityQueue } from "@keymanapp/web-utils";
+import { PriorityQueue } from "keyman/common/web-utils";
 
 import { ContextToken } from "./context-token.js";
 import { CorrectionSearchable, PathResult } from "./correction-searchable.js";

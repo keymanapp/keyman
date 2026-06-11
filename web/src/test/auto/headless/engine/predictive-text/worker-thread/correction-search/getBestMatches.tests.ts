@@ -11,7 +11,7 @@ import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import {
-  correction,
+  ExecutionTimer,
   generateSpaceSeed,
   getBestTokenMatches,
   LegacyQuotientSpur,
@@ -26,7 +26,7 @@ import TrieModel = models.TrieModel;
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
 function buildTestTimer() {
-  return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
+  return new ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
 }
 
 describe('Correction Searching', () => {

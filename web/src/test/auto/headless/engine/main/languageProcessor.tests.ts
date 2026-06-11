@@ -1,3 +1,8 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Unit tests for the Dummy prediction model.
+ */
 import { env } from 'node:process';
 import path from 'node:path';
 
@@ -6,11 +11,11 @@ import { assert } from 'chai';
 import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
 import { LexicalModelCompiler } from '@keymanapp/kmc-model';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+import { SyntheticTextStore } from 'keyman/engine/keyboard';
+import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 
 import { ModelSpec } from 'keyman/engine/interfaces';
-import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { Mock } from 'keyman/engine/js-processor';
 
 const KEYMAN_ROOT = env.KEYMAN_ROOT;
 
@@ -24,7 +29,7 @@ declare global {
 // dependent keyboards, like khmer_angkor, will otherwise fail to load.
 global.keyman = MinimalKeymanGlobal;
 
-// Test the KeyboardProcessor interface.
+// Test the JSKeyboardProcessor interface.
 describe('LanguageProcessor', function() {
   let languageProcessor: LanguageProcessor;
   const callbacks = new TestCompilerCallbacks(this);
@@ -114,7 +119,7 @@ describe('LanguageProcessor', function() {
       });
 
       it("generates the expected prediction set", function(done) {
-        let contextSource = new Mock("li", 2);
+        let contextSource = new SyntheticTextStore("li", 2);
         let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
         languageProcessor.loadModel(modelSpec).then(function() {
@@ -154,7 +159,7 @@ describe('LanguageProcessor', function() {
 
         describe("does not alter casing when input is lowercased", function() {
           it("when input is fully lowercased", function(done) {
-            let contextSource = new Mock("li", 2);
+            let contextSource = new SyntheticTextStore("li", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
@@ -172,7 +177,7 @@ describe('LanguageProcessor', function() {
           });
 
           it("when input has non-initial uppercased letters", function(done) {
-            let contextSource = new Mock("lI", 2);
+            let contextSource = new SyntheticTextStore("lI", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
@@ -191,7 +196,7 @@ describe('LanguageProcessor', function() {
           });
 
           it("unless the suggestion has uppercased letters", function(done) {
-            let contextSource = new Mock("i", 1);
+            let contextSource = new SyntheticTextStore("i", 1);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
@@ -211,7 +216,7 @@ describe('LanguageProcessor', function() {
 
         describe("uppercases suggestions when input is fully capitalized ", function() {
           it("for suggestions with default casing  (== 'lower')", function(done) {
-            let contextSource = new Mock("LI", 2);
+            let contextSource = new SyntheticTextStore("LI", 2);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
@@ -230,7 +235,7 @@ describe('LanguageProcessor', function() {
           });
 
           it("for precapitalized suggestions", function(done) {
-            let contextSource = new Mock("I", 1);
+            let contextSource = new SyntheticTextStore("I", 1);
             let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
             languageProcessor.loadModel(modelSpec).then(function() {
@@ -251,7 +256,7 @@ describe('LanguageProcessor', function() {
         describe("initial-cases suggestions when input uses initial casing ", function() {
           describe("when input is a single capitalized letter", function() {
             it("for suggestions with default casing (== 'lower')", function(done) {
-              let contextSource = new Mock("L", 1);
+              let contextSource = new SyntheticTextStore("L", 1);
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
               languageProcessor.loadModel(modelSpec).then(function() {
@@ -272,7 +277,7 @@ describe('LanguageProcessor', function() {
 
           describe("input length > 1", function() {
             it("for suggestions with default casing (== 'lower')", function(done) {
-              let contextSource = new Mock("Li", 2);
+              let contextSource = new SyntheticTextStore("Li", 2);
               let transcription = contextSource.buildTranscriptionFrom(contextSource, null, null);
 
               languageProcessor.loadModel(modelSpec).then(function() {

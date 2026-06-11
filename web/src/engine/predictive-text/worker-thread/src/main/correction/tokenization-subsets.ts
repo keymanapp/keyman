@@ -1,6 +1,6 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 import { ContextTokenization, TransitionEdgeAlignment, TokenizationTransitionEdits } from './context-tokenization.js';
 
