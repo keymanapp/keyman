@@ -361,15 +361,15 @@ describe('determineTraversallessCorrectionSequences', () => {
         ...entry.rootContext, casingForm: entry.rootContext.casingForm ?? undefined
       }, {
         casingForm: undefined,
-        // Large-scale deletions will receive enhanced handling soon.  But, for now, it's
-        // deleted by the `preservationTransform`, not here.
-        left: 'the quick brown ',
+        left: 'the ',
         right: '',
         startOfBuffer: true,
         endOfBuffer: true
       }
     );
 
+    // Coming up next - actually providing ALL correction elements, not just the final one.
+    // We're not _quite_ ready for that yet, though.
     assert.equal(entry.tokenizedCorrection.length, 1);
     assert.deepEqual(entry.tokenizedCorrection[0].sample, {
       insert: 'd',

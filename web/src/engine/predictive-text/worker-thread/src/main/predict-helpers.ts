@@ -14,6 +14,8 @@ import { ExecutionTimer } from './correction/execution-timer.js';
 import { ModelCompositor } from './model-compositor.js';
 import { EDIT_DISTANCE_COST_SCALE, getBestTokenMatches } from './correction/distance-modeler.js';
 import { TokenResult } from './correction/tokenization-corrector.js';
+import { TokenizationCorrector } from './correction/tokenization-corrector.js';
+import { TokenizationResultMapping } from './correction/tokenization-result-mapping.js';
 
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
@@ -233,7 +235,8 @@ export function determineTraversallessCorrectionSequences(
       return match;
     });
 
-    const suggestionParams = buildCorrectionSequence(transitionEffects, context, correctionRoots[correctionRoots.length - 1]);
+    // But, for now, only actually use the last one.
+    const suggestionParams = buildCorrectionSequence(transitionEffects, context, new TokenizationResultMapping([correctionRoots[correctionRoots.length - 1]], null));
 
     const tokenizationMapping = mapWhitespacedTokenization(tokenization.left.map((t) => { return {exampleInput: t.text, codepointLength: KMWString.length(t.text)} }), lexicalModel, correction.sample);
     const tokenizedCorrection = tokenizationMapping.tokenizedTransform;
@@ -377,12 +380,8 @@ export function determineSuggestionRange<T extends ContextTokenLike>(
     return temp(a, b);
   }
 
-  const deleteLeftCalc = (tokenSet: T[], predictCount: number) => {
-    // TODO:  once we start activating multi-tokenization for real, only the
-    // 'reduce' component should remain.
-    return (predictCount > 1)
-      ? (tokenSet[tokenSet.length - 1]?.codepointLength ?? 0)
-      : tokenSet.reduce((prev, curr) => prev + curr.codepointLength, 0);
+  const deleteLeftCalc = (tokenSet: T[]) => {
+    return tokenSet.reduce((prev, curr) => prev + curr.codepointLength, 0);
   }
 
   const tokenSetA = userContextTokenization.slice();
@@ -396,7 +395,7 @@ export function determineSuggestionRange<T extends ContextTokenLike>(
     return {
       tokensToRemove: tokenSetA,
       tokensToPredict: tokenSetB,
-      deleteLeft: deleteLeftCalc(tokenSetA, tokenSetB.length)
+      deleteLeft: deleteLeftCalc(tokenSetA)
     }
   } else if(aHeadIndexInB != 0 && bHeadIndexInA != 0) {
     throw new Error("Leading edge of context should not differ in both tokenizations.");
@@ -422,7 +421,7 @@ export function determineSuggestionRange<T extends ContextTokenLike>(
   return {
     tokensToRemove,
     tokensToPredict,
-    deleteLeft: deleteLeftCalc(tokensToRemove, tokensToPredict.length)
+    deleteLeft: deleteLeftCalc(tokensToRemove)
   }
 }
 
@@ -456,44 +455,49 @@ export interface PredictionParameters {
 }
 
 export function buildCorrectionSequence(
-  transitionEffects: ReturnType<typeof determineSuggestionRange>,
+  transitionEffects: SuggestionReplacement<ContextTokenLike>,
   context: Context,
-  match: Readonly<TokenResult>,
+  tokenizationCorrection: TokenizationResultMapping
 ) {
   const { deleteLeft } = transitionEffects;
 
   const rootContext = models.applyTransform({insert: '', deleteLeft}, context);
 
   // Replace the existing context with the correction.
-  const correctionTransform: Transform = {
-    insert: match.matchString,  // insert correction string
-    deleteLeft: 0,
-  }
+  const tokenizedCorrections = tokenizationCorrection.matchedResult.map((correction, i) => {
+    /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
+     * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+     * there are significantly more likely words.  We only need this to allow very minor fat-finger
+     * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+     * key borders.
+     *
+     * Technically, the probabilities this produces won't be normalized as-is... but there's no
+     * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+     * to apply it could become tricky, so it's simpler to leave out.
+     *
+     * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+     * is needed in the future.
+     */
+    const costFactor = (correction.inputCount <= 1) ? ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT : 1;
 
-  /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
-    * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
-    * there are significantly more likely words.  We only need this to allow very minor fat-finger
-    * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
-    * key borders.
-    *
-    * Technically, the probabilities this produces won't be normalized as-is... but there's no
-    * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
-    * to apply it could become tricky, so it's simpler to leave out.
-    *
-    * Worst-case, it's possible to temporarily add normalization if a code deep-dive
-    * is needed in the future.
-    */
-  const costFactor = (match.inputCount <= 1) ? ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT : 1;
+    const entry = {
+      sample: {
+        insert: correction.matchString,  // insert correction string
+        deleteLeft: 0,
+      } as Transform,
+      p: Math.exp(-correction.totalCost * costFactor)
+    };
 
-  const rootCost = match.totalCost;
-  const predictionRoot = {
-    sample: correctionTransform,
-    p: Math.exp(-rootCost * costFactor)
-  };
+    if(transitionEffects.transitionId !== undefined) {
+      entry.sample.id = transitionEffects.transitionId;
+    }
+
+    return entry;
+  });
 
   return {
     rootContext,
-    tokenizedCorrection: [predictionRoot]
+    tokenizedCorrection: tokenizedCorrections
   };
 }
 
@@ -512,10 +516,11 @@ export function buildCorrectionSequence(
 export function determineTokenizedCorrectionSequence(
   transition: ContextTransition,
   tokenization: ContextTokenization,
-  match: Readonly<TokenResult>
+  match: TokenizationResultMapping
 ): PredictionParameters {
   const applicationTarget = transition.base.displayTokenization;
   const transitionParams = determineSuggestionRange(applicationTarget.tokens, tokenization.tokens, (a, b) => a.spaceId == b.spaceId);
+  transitionParams.transitionId = transition.transitionId;
 
   const suggestionParams = buildCorrectionSequence(transitionParams, transition.base.context, match);
 
@@ -641,7 +646,11 @@ export async function correctAndEnumerate(
       continue;
     }
 
-    const predictionPrep = determineTokenizedCorrectionSequence(transition, tokenization, match);
+    const suggestionRange = determineSuggestionRange(transition.base.displayTokenization.tokens, tokenization.tokens, (a, b) => a.spaceId == b.spaceId);
+    suggestionRange.transitionId = transition.transitionId;
+    const corrector = new TokenizationCorrector(tokenization, suggestionRange.tokensToPredict.length, () => true);
+    const predictionPrep = determineTokenizedCorrectionSequence(transition, tokenization, new TokenizationResultMapping([match], corrector));
+
     const predictions = predictFromCorrectionSequence(lexicalModel, predictionPrep.tokenizedCorrection, predictionPrep.rootContext, transition.transitionId);
     predictions.forEach((p) => predictionPrep.applyInPost(p));
 

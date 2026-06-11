@@ -15,7 +15,16 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { KMWString } from 'keyman/common/web-utils';
 
-import { determineTokenizedCorrectionSequence, models, ContextState, ContextToken, ContextTokenization, CorrectionPredictionTuple, ModelCompositor } from "@keymanapp/lm-worker/test-index";
+import {
+  determineTokenizedCorrectionSequence,
+  models,
+  ContextState,
+  ContextToken,
+  ContextTokenization,
+  CorrectionPredictionTuple,
+  ModelCompositor,
+  TokenizationResultMapping
+} from "@keymanapp/lm-worker/test-index";
 
 import Context = LexicalModelTypes.Context;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
@@ -51,13 +60,14 @@ describe('determineTokenizedCorrectionSequence', () => {
 
     const results = determineTokenizedCorrectionSequence(
       transition,
-      transition.final.displayTokenization, {
+      transition.final.displayTokenization,
+      new TokenizationResultMapping([{
         matchString: 'fo',
         inputSamplingCost: -Math.log(trueInput.p),
         inputCount: 2,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      }
+      }], null)
     );
 
     assert.deepEqual({...results.rootContext, casingForm: results.rootContext.casingForm}, {
@@ -101,13 +111,14 @@ describe('determineTokenizedCorrectionSequence', () => {
 
     const results = determineTokenizedCorrectionSequence(
       transition,
-      transition.final.displayTokenization, {
+      transition.final.displayTokenization,
+      new TokenizationResultMapping([{
         matchString: ' ',
         inputSamplingCost: -Math.log(trueInput.p),
         inputCount: 1,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      }
+      }], null)
     );
 
     assert.deepEqual({...results.rootContext, casingForm: results.rootContext.casingForm}, {
@@ -148,13 +159,14 @@ describe('determineTokenizedCorrectionSequence', () => {
 
     const results = determineTokenizedCorrectionSequence(
       transition,
-      transition.final.displayTokenization, {
+      transition.final.displayTokenization,
+      new TokenizationResultMapping([{
         matchString: 'f',
         inputSamplingCost: -Math.log(trueInput.p),
         inputCount: 1,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      }
+      }], null)
     );
 
     assert.deepEqual({...results.rootContext, casingForm: results.rootContext.casingForm}, {
@@ -202,13 +214,14 @@ describe('determineTokenizedCorrectionSequence', () => {
 
     const results = determineTokenizedCorrectionSequence(
       transition,
-      transition.final.displayTokenization, {
+      transition.final.displayTokenization,
+      new TokenizationResultMapping([{
         matchString: 'can\'t',
         inputSamplingCost: -Math.log(trueInput.p),
         inputCount: 5,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      }
+      }], null)
     );
 
     assert.deepEqual({...results.rootContext, casingForm: results.rootContext.casingForm}, {
@@ -253,13 +266,14 @@ describe('determineTokenizedCorrectionSequence', () => {
 
     const results = determineTokenizedCorrectionSequence(
       transition,
-      transition.final.displayTokenization, {
+      transition.final.displayTokenization,
+      new TokenizationResultMapping([{
         matchString: ' ',
         inputSamplingCost: -Math.log(trueInput.p),
         inputCount: 1,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      }
+      }], null)
     );
 
     assert.deepEqual({...results.rootContext, casingForm: results.rootContext.casingForm}, {
@@ -300,26 +314,26 @@ describe('determineTokenizedCorrectionSequence', () => {
 
     const results = determineTokenizedCorrectionSequence(
       transition,
-      transition.final.displayTokenization, {
+      transition.final.displayTokenization,
+      new TokenizationResultMapping([{
         matchString: 'd',
         inputSamplingCost: -Math.log(trueInput.p),
         inputCount: 1,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      }
+      }], null)
     );
 
-    // Large-scale deletions will receive enhanced handling soon.  But, for now, it's
-    // deleted by the `preservationTransform`, not here.
     assert.deepEqual({...results.rootContext, casingForm: results.rootContext.casingForm}, {
       casingForm: undefined,
-      left: 'the quick brown ',
+      left: 'the ',
       right: '',
       startOfBuffer: true,
       endOfBuffer: true
     });
 
-
+    // Coming up next - actually providing ALL correction elements, not just the final one.
+    // We're not _quite_ ready for that yet, though.
     assert.equal(results.tokenizedCorrection.length, 1);
     assert.deepEqual(results.tokenizedCorrection[0].sample, {
       insert: 'd',
