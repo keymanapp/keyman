@@ -186,3 +186,13 @@ lcov.info
 
 # flag file for build script
 .configured
+
+# Local artifacts from the Delphi CE dev workflow (see docs/build/windows-delphi-ce.md)
+/delphi-library-paths.backup*.reg
+/local-delphi-12-patches.patch
+/configure.log
+/core-build.log
+/cpp-engine-build.log
+/install-build-env.log
+/kmcmplib-build.log
+/web-build.log

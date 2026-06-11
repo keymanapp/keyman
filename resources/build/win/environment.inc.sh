@@ -100,6 +100,15 @@ tds2dbg() {
 }
 
 delphi_msbuild() {
+  # When KEYMAN_DELPHI_CE=1 the Delphi Community Edition blocks CLI
+  # compilation. Pause and prompt the developer to build in the IDE.
+  if [[ "${KEYMAN_DELPHI_CE:-}" == "1" ]]; then
+    local project="${1:-<project.dproj>}"
+    builder_echo warning "Delphi CE: CLI compilation is not available."
+    builder_echo warning "Please build ${project} in the Delphi IDE now, then press Enter to continue (or Ctrl-C to abort)."
+    read -r _
+    return 0
+  fi
   run_in_delphi_env msbuild.exe "$@" "$DELPHI_MSBUILD_FLAG_DEBUG"
 }
 
