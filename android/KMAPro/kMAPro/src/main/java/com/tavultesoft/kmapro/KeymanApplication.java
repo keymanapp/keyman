@@ -1,5 +1,11 @@
-/**
- * Copyright (C) SIL International. All rights reserved.
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ * 
+ * Created by MengchouChey on 2026-06-10
+ *            Internship Program, 9th Feb - 27th Apr 2026
+ * 
+ * This file is the Application class for Keyman, which is used to set the default night mode based on user preferences when the application starts.
+ * 
  */
 package com.tavultesoft.kmapro;
 
