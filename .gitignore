@@ -19,6 +19,7 @@
 /windows/src/**/*.identcache
 /windows/src/**/*.vcxproj.user
 /windows/src/**/version.res
+/windows/src/**/version*.res
 /windows/src/**/*.pch
 /windows/src/**/*.wixobj
 /windows/src/**/*.sbr
@@ -186,3 +187,6 @@ lcov.info
 
 # flag file for build script
 .configured
+
+# Meson wrap dependency lock files
+**/subprojects/.wraplock
