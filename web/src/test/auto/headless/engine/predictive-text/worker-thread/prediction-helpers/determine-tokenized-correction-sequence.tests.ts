@@ -286,7 +286,7 @@ describe('determineTokenizedCorrectionSequence', () => {
     ]);
   });
 
-  it(`properly analyzes conplex transition - multi-token replacement`, () => {
+  it(`properly analyzes complex transition - multi-token replacement`, () => {
     const context: Context = {
       left: 'the quick brown f',
       right: '',
