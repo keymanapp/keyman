@@ -247,6 +247,7 @@ export async function correctAndEnumerateWithoutTraversals(
 
   const wordbreak = determineModelWordbreaker(lexicalModel);
   // Remove `null` entries, then determine suggestions.
+  predictionRoots = predictionRoots.filter(tuple => !!tuple);
   predictionRoots.forEach((pr) => {
     const postContext = models.applyTransform(pr.sample, context);
     const tailTokenText = wordbreak(postContext);
