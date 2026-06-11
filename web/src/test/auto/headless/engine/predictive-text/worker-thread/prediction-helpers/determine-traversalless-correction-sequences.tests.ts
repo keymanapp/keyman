@@ -13,7 +13,7 @@ import { LexicalModelTypes } from "@keymanapp/common-types";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { KMWString } from 'keyman/common/web-utils';
 
-import { CorrectionPredictionTuple, determineTraversallessCorrectionSequences, models } from "@keymanapp/lm-worker/test-index";
+import { CorrectionPredictionTuple, ModelCompositor, determineTraversallessCorrectionSequences, models } from "@keymanapp/lm-worker/test-index";
 
 import Context = LexicalModelTypes.Context;
 import DummyModel = models.DummyModel;
@@ -204,13 +204,12 @@ describe('determineTraversallessCorrectionSequences', () => {
       }
     );
 
-    assert.deepEqual(entry.tokenizedCorrection, [{
-      sample: {
-        insert: '', // empty token after a whitespace.
-        deleteLeft: 0
-      },
-      p: trueInput.p
-    }]);
+    assert.equal(entry.tokenizedCorrection.length, 1);
+    assert.deepEqual(entry.tokenizedCorrection[0].sample, {
+      insert: '',
+      deleteLeft: 0
+    });
+    assert.approximately(entry.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
   });
 
 
@@ -246,13 +245,12 @@ describe('determineTraversallessCorrectionSequences', () => {
       }
     );
 
-    assert.deepEqual(entry.tokenizedCorrection, [{
-      sample: {
-        insert: 'f',
-        deleteLeft: 0
-      },
-      p: trueInput.p
-    }]);
+    assert.equal(entry.tokenizedCorrection.length, 1);
+    assert.deepEqual(entry.tokenizedCorrection[0].sample, {
+      insert: 'f',
+      deleteLeft: 0
+    });
+    assert.approximately(entry.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
   });
 
   it(`properly analyzes post-merge case`, () => {
@@ -330,13 +328,12 @@ describe('determineTraversallessCorrectionSequences', () => {
     //   }
     // );
 
-    assert.deepEqual(entry.tokenizedCorrection, [{
-      sample: {
-        insert: '', // empty token after a whitespace.
-        deleteLeft: 0
-      },
-      p: trueInput.p
-    }]);
+    assert.equal(entry.tokenizedCorrection.length, 1);
+    assert.deepEqual(entry.tokenizedCorrection[0].sample, {
+      insert: '',
+      deleteLeft: 0
+    });
+    assert.approximately(entry.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
   });
 
   it(`properly analyzes complex transition - multi-token replacement`, () => {
@@ -373,13 +370,12 @@ describe('determineTraversallessCorrectionSequences', () => {
       }
     );
 
-    assert.deepEqual(entry.tokenizedCorrection, [{
-      sample: {
-        insert: 'd',
-        deleteLeft: 0
-      },
-      p: trueInput.p
-    }]);
+    assert.equal(entry.tokenizedCorrection.length, 1);
+    assert.deepEqual(entry.tokenizedCorrection[0].sample, {
+      insert: 'd',
+      deleteLeft: 0
+    });
+    assert.approximately(entry.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
 
     const dummiedTuple: CorrectionPredictionTuple = {
       prediction: {
