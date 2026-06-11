@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:drawable="@drawable/keyman_ic"
+        android:width="35dp"
+        android:height="28dp"
+        android:gravity="start|center_vertical"/>
+
+    <item
+        android:left="15dp"
+        android:width="125dp"
+        android:height="28dp">
+        <bitmap
+            android:src="@drawable/keyman_text"
+            android:gravity="center_vertical"
+            android:tint="@color/iconColor"/>
+    </item>
+
+</layer-list>
