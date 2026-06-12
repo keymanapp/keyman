@@ -77,7 +77,7 @@ const testModelWithoutCasing = new DummyModel({
       .replace(/[“”]/g, '"')
       // ** Difference from model-defaults here **
       // And finally, erase single-quotation marks.
-      .replace(/'/, '');
+      .replace(/'/g, '');
   }
   // No suggestions needed here, so we don't define any.
 });
@@ -233,7 +233,7 @@ describe('processSimilarity', () => {
     const keep_its = toAnnotatedSuggestion(testModelWithCasing, original_its.components.prediction, 'keep', QuoteBehavior.noQuotes);
     keep_its.matchesModel = true;
 
-    processSimilarity(testModelWithCasing, distribution, context, trueInput);
+    processSimilarity(testModelWithCasing, distribution, context, models.applyTransform(trueInput.sample, context));
 
     assert.sameDeepMembers(distribution, expectation);
     assert.equal(its.components.prediction.tag, 'keep');
@@ -270,7 +270,7 @@ describe('processSimilarity', () => {
     const keep_it_is = toAnnotatedSuggestion(testModelWithCasing, original_it_is.components.prediction, 'keep', QuoteBehavior.noQuotes);
     keep_it_is.matchesModel = true;
 
-    processSimilarity(testModelWithCasing, distribution, context, trueInput);
+    processSimilarity(testModelWithCasing, distribution, context, models.applyTransform(trueInput.sample, context));
 
     assert.sameDeepMembers(distribution, expectation);
     assert.equal(it_is.components.prediction.tag, 'keep');
@@ -318,7 +318,7 @@ describe('processSimilarity', () => {
       expectation[1].metadata.matchLevel = SuggestionSimilarity.sameText;  // it_is
       expectation[2].metadata.matchLevel = SuggestionSimilarity.none;      // is
       expectation[3].metadata.matchLevel = SuggestionSimilarity.none;      // is_not
-      processSimilarity(testModelWithCasing, distribution, context, trueInput);
+      processSimilarity(testModelWithCasing, distribution, context, models.applyTransform(trueInput.sample, context));
 
       // Because we mucked with the casing here, there is no perfect 'keep' match.
       const keep = distribution.find((entry) => entry.components.prediction.tag == 'keep');
@@ -358,7 +358,7 @@ describe('processSimilarity', () => {
       const expectation: IntermediateCompositedPrediction[] = [...Object.values(testSet)];
 
       expectation.forEach((entry) => entry.metadata.matchLevel = SuggestionSimilarity.none);
-      processSimilarity(testModelWithoutCasing, distribution, context, trueInput);
+      processSimilarity(testModelWithoutCasing, distribution, context, models.applyTransform(trueInput.sample, context));
 
       // Because we mucked with the casing here, there is no perfect 'keep' match.
       const keep = distribution.find((entry) => entry.components.prediction.tag == 'keep');
