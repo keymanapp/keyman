@@ -209,9 +209,14 @@ export class ContextTokenization {
 
     // Assumption:  deleteLeft is always empty.  (There's nothing to the left;
     // we apply on that side.)
+
+    // This can occur during a context-reset or similar operation that would
+    // repeat the same prediction state.  We build clean tokenizations here,
+    // bereft of `preservationTransform` data and other data about the original
+    // state's input.
     if(TransformUtils.isEmpty(transform)) {
       // No edits needed?  Why retokenize?
-      return new ContextTokenization(this);
+      return new ContextTokenization(this.tokens);
     }
 
     // Step 1: build a window for window-start retokenization in case the context-window slid.
