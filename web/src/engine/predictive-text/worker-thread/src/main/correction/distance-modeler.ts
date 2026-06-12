@@ -661,12 +661,16 @@ export async function *getBestMatches<
 
       let lowestCostSource = spaceQueue.dequeue();
       const newResult = lowestCostSource.handleNextNode();
-      spaceQueue.enqueue(lowestCostSource);
-      spaceQueue = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR, spaceQueue.toArray());
 
       if(newResult.type == 'none') {
+        // Do not re-add the source if its searchspace is exhausted.
         return null;
-      } else if(newResult.type == 'complete') {
+      } else {
+        spaceQueue.enqueue(lowestCostSource);
+        spaceQueue = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR, spaceQueue.toArray());
+      }
+
+      if(newResult.type == 'complete') {
         const mapping = newResult.mapping;
         return filter(mapping) ? mapping : null;
       }
@@ -683,7 +687,7 @@ export async function *getBestMatches<
     if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
       await timer.defer();
     }
-  } while(!timer.elapsed && spaceQueue.peek().currentCost < Number.POSITIVE_INFINITY);
+  } while(!timer.elapsed && spaceQueue.count > 0 && spaceQueue.peek().currentCost < Number.POSITIVE_INFINITY);
 
   return null;
 }

@@ -12,10 +12,9 @@ import { ContextState, determineContextSlideTransform } from './correction/conte
 import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import { ModelCompositor } from './model-compositor.js';
-import { EDIT_DISTANCE_COST_SCALE, getBestTokenMatches } from './correction/distance-modeler.js';
-import { TokenResult } from './correction/tokenization-corrector.js';
-import { TokenizationCorrector } from './correction/tokenization-corrector.js';
-import { TokenizationResultMapping } from './correction/tokenization-result-mapping.js';
+import { EDIT_DISTANCE_COST_SCALE, getBestMatches } from './correction/distance-modeler.js';
+import { TokenizationCorrector, TokenResult } from './correction/tokenization-corrector.js';
+import { TokenizationResult, TokenizationResultMapping } from './correction/tokenization-result-mapping.js';
 
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
@@ -630,7 +629,7 @@ export function prepareTokenizationSearch(
     return new TokenizationCorrector(tuple.tokenization, mutatedLength, (token, index) => {
       return index >= unaffectedTokenCount  // is a modified token
         && index == mutatedLength - 1       // TEMP: adjacent to the caret (TO BE REMOVED)
-        && correctionValidForAutoSelect(token.exampleInput);  // and is eligible text-correction
+        && (token.codepointLength == 0 || correctionValidForAutoSelect(token.exampleInput));  // and is eligible text-correction
     });
   });
 
@@ -717,31 +716,38 @@ export async function correctAndEnumerate(
   const tokenizations = transition.final.tokenizations;
   const searchModules = tokenizations.map(t => t.tail.searchModule);
 
+  const preppedTokenizationSearch = prepareTokenizationSearch(transition, tokenizations);
+
   // Only run the correction search when corrections are enabled.
   let rawPredictions: IntermediateTokenizedPrediction[] = [];
   let bestCorrectionCost: number;
-  for await(const match of getBestTokenMatches(searchModules, timer)) {
-    // Corrections obtained:  now to predict from them!
-    const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
-
-    // If our 'match' results in fully deleting the new token, reject it and try again.
-    if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
+  for await(const match of getBestMatches<TokenizationResult, TokenizationResultMapping, TokenizationCorrector>(preppedTokenizationSearch, timer)) {
+    const { totalEditCount, totalEditableCodepoints } = match.matchedResult;
+    // If our 'match' fully replaces the tokens, reject it and try again.
+    //
+    // If the known edit count matches the total length of editable text, reject
+    // the suggestion source. Q: for any token, or across ALL tokens? If "for
+    // any", we need to distinguish between penalization where corrections
+    // couldn't be found and where there's actual edit cost.  (2.5 edits does
+    // stand out a bit, but we should do something more robust.)
+    if(totalEditCount != 0 && totalEditableCodepoints == totalEditCount) { // TODO:  double-check approach!
       continue;
     }
 
-    // If our 'match' fully replaces the token, reject it and try again.
-    if(match.matchSequence.length != 0 && match.matchSequence.length == match.knownCost) {
+    // Perhaps make a return object, add a cumulative 'editCount' property?
+    // Or, we could just sum it up here.
+    if(totalEditCount > 0 && !searchModules.find(s => s.correctionsEnabled)) {
       continue;
     }
 
-    if(match.editCount > 0 && !searchModules.find(s => s.correctionsEnabled)) {
-      continue;
-    }
+    // Worth considering:  extend Traversal to allow direct prediction lookups?
+    // let traversal = match.finalTraversal;
 
+    const tokenization = match.matchingSpace.tokenization;
     const suggestionRange = determineSuggestionRange(transition.base.displayTokenization.tokens, tokenization.tokens, (a, b) => a.spaceId == b.spaceId);
     suggestionRange.transitionId = transition.transitionId;
-    const corrector = new TokenizationCorrector(tokenization, suggestionRange.tokensToPredict.length, () => true);
-    const predictionPrep = determineTokenizedCorrectionSequence(transition, tokenization, new TokenizationResultMapping([match], corrector));
+    // const corrector = new TokenizationCorrector(tokenization, suggestionRange.tokensToPredict.length, () => true);
+    const predictionPrep = determineTokenizedCorrectionSequence(transition, tokenization, match);
 
     const predictions = predictFromCorrectionSequence(lexicalModel, predictionPrep);
 
