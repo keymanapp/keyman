@@ -14,6 +14,7 @@ import KeymanSettings
 
 public class InstallationCheck {
   fileprivate let inputMethodVersion: String
+  fileprivate let configurationVersion: String
   fileprivate let defaultsRepository: DefaultsRepo
   fileprivate let inputMethodUtil: InputMethodUtil
   fileprivate let inputMethodExists: Bool
@@ -21,15 +22,16 @@ public class InstallationCheck {
   public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil) {
     self.defaultsRepository = defaultsRepo
     self.inputMethodUtil = inputMethodUtil
-    let exists = inputMethodUtil.keymanInputMethodExists()
     
-    if exists {
+    if inputMethodUtil.keymanInputMethodExists() {
       self.inputMethodExists = true
       self.inputMethodVersion = (try? inputMethodUtil.getKeymanInputMethodVersion()) ?? "unknown"
     } else {
       self.inputMethodExists = false
       self.inputMethodVersion = "unknown"
     }
+    
+    self.configurationVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
   }
   
   public func evaluate() -> InstallationState {
