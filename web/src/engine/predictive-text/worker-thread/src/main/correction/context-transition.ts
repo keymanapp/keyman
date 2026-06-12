@@ -154,8 +154,8 @@ export class ContextTransition {
     ) => {
       const appliedDistribution = [{sample: transformToApply, p: 1}];
       const { subsets: applicationSubsets, keyMatchingUserContext } = precomputeTransitions(
-        [rootTokenization], appliedDistribution
-      );
+        [rootTokenization], appliedDistribution, rootTokenization.clusteringKey, false /* do not correct when applying suggestions */
+      ); //
 
       // Filter out insert and delete edges here!  ONLY the primary substitution
       // edge should be permitted!
@@ -255,7 +255,8 @@ export class ContextTransition {
     // applying the suggestion, we can easily reconstruct the original .final.
     const original = this.base.analyzeTransition(
       this.base.context,
-      this.inputDistribution
+      this.inputDistribution,
+      this.base.tokenizations.length != 1 || this.inputDistribution.length != 1
     );
 
     if(this.final.suggestions) {

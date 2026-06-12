@@ -126,14 +126,6 @@ describe('ContextTokenization', function() {
         baseTokenization.tokens.map((token) => token.searchModule)
       );
 
-      // The `.searchModule` instances will not be deep-equal; there are class properties
-      // that hold functions with closures, configured at runtime.
-
-      // @ts-ignore - TS2704 b/c deleting a readonly property.
-      baseTokenization.tokens.forEach((token) => delete token.searchModule);
-      // @ts-ignore - TS2704 b/c deleting a readonly property.
-      cloned.tokens.forEach((token) => delete token.searchModule);
-
       assert.deepEqual(cloned, baseTokenization);
     });
   });
@@ -172,9 +164,7 @@ describe('ContextTokenization', function() {
         splits: [],
         unmappedEdits: [],
         edgeWindow: {
-          ...edgeWindow,
-          // The range within the window constructed by the prior call for its parameterization.
-          retokenization: [...targetTokens.slice(edgeWindow.sliceIndex, -1).map(t => t.text), 'can\'']
+          ...edgeWindow
         },
         removedTokenCount: 0
       });
@@ -230,9 +220,7 @@ describe('ContextTokenization', function() {
         }],
         unmappedEdits: [],
         edgeWindow: {
-          ...edgeWindow,
-          // The range within the window constructed by the prior call for its parameterization.
-          retokenization: [...targetTokens.slice(edgeWindow.sliceIndex, -1).map(t => t.text)]
+          ...edgeWindow
         },
         removedTokenCount: 0
       });
@@ -280,9 +268,7 @@ describe('ContextTokenization', function() {
           splits: [],
           unmappedEdits: [],
           edgeWindow: {
-            ...edgeWindow,
-            // The range within the window constructed by the prior call for its parameterization.
-            retokenization: targetTokens.slice(edgeWindow.sliceIndex, -2).map(t => t.text)
+            ...edgeWindow
           },
           removedTokenCount: 0
         },
@@ -332,10 +318,7 @@ describe('ContextTokenization', function() {
           splits: [],
           unmappedEdits: [],
           edgeWindow: {
-            ...edgeWindow,
-            // The range within the window constructed by the prior call for its parameterization.
-            // Any adjustments on the boundary token itself are included here.
-            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex).map(t => t.text)]
+            ...edgeWindow
           },
           removedTokenCount: 2
         },
@@ -369,10 +352,7 @@ describe('ContextTokenization', function() {
           splits: [],
           unmappedEdits: [],
           edgeWindow: {
-            ...edgeWindow,
-            // The range within the window constructed by the prior call for its parameterization.
-            // Any adjustments on the boundary token itself are included here.
-            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex).map(t => t.text), 'day']
+            ...edgeWindow
           },
           removedTokenCount: 0
         },
@@ -415,10 +395,7 @@ describe('ContextTokenization', function() {
           splits: [],
           unmappedEdits: [],
           edgeWindow: {
-            ...edgeWindow,
-            // The range within the window constructed by the prior call for its parameterization.
-            // Any adjustments on the boundary token itself are included here.
-            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex).map(t => t.text), 'week']
+            ...edgeWindow
           },
           removedTokenCount: 0
         },
@@ -471,10 +448,7 @@ describe('ContextTokenization', function() {
           splits: [],
           unmappedEdits: [],
           edgeWindow: {
-            ...edgeWindow,
-            // The range within the window constructed by the prior call for its parameterization.
-            // Any adjustments on the boundary token itself are included here.
-            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex).map(t => t.text)]
+            ...edgeWindow
           },
           removedTokenCount: 0
         },
@@ -524,9 +498,7 @@ describe('ContextTokenization', function() {
           splits: [],
           unmappedEdits: [],
           edgeWindow: {
-            ...edgeWindow,
-            // The range within the window constructed by the prior call for its parameterization.
-            retokenization: targetTokens.slice(edgeWindow.sliceIndex, -2).map(t => t.text)
+            ...edgeWindow
           },
           removedTokenCount: 0
         },
@@ -597,9 +569,7 @@ describe('ContextTokenization', function() {
           splits: [],
           unmappedEdits: [],
           edgeWindow: {
-            ...edgeWindow,
-            // The range within the window constructed by the prior call for its parameterization.
-            retokenization: targetTokens.slice(edgeWindow.sliceIndex, -2).map(t => t.text)
+            ...edgeWindow
           },
           removedTokenCount: 0
         },
@@ -663,9 +633,7 @@ describe('ContextTokenization', function() {
           splits: [],
           unmappedEdits: [],
           edgeWindow: {
-            ...edgeWindow,
-            // The range within the window constructed by the prior call for its parameterization.
-            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex, -1).map(t => t.text), 'can\'']
+            ...edgeWindow
           },
           removedTokenCount: 0
         },
@@ -731,9 +699,7 @@ describe('ContextTokenization', function() {
           }],
           unmappedEdits: [],
           edgeWindow: {
-            ...edgeWindow,
-            // The range within the window constructed by the prior call for its parameterization.
-            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex, -1).map(t => t.text)]
+            ...edgeWindow
           },
           removedTokenCount: 0
         },
@@ -963,6 +929,8 @@ describe('ContextTokenization', function() {
           sliceIndex: 2
         });
       });
+
+      // with insertion spurs (and their SENTINEL padding)
     });
   });
 
@@ -1235,7 +1203,6 @@ describe('ContextTokenization', function() {
       assert.equal(results.alignment.removedTokenCount, 0);
 
       assert.deepEqual(results.alignment.edgeWindow, {
-        retokenization: ['apple', ' ', 'a', ' ', 'da'],
         retokenizationText: 'apple a da',
         editBoundary: {
           text: 'da',
@@ -1273,7 +1240,6 @@ describe('ContextTokenization', function() {
       assert.equal(results.alignment.removedTokenCount, 0);
 
       assert.deepEqual(results.alignment.edgeWindow, {
-        retokenization: ['apple', ' ', 'a', ' ', 'da'].map(t => toMathematicalSMP(t)),
         retokenizationText: toMathematicalSMP('apple a da'),
         editBoundary: {
           text: toMathematicalSMP('da'),
@@ -1502,7 +1468,6 @@ describe('ContextTokenization', function() {
       assert.equal(results.alignment.removedTokenCount, 0);
 
       assert.deepEqual(results.alignment.edgeWindow, {
-        retokenization: ['apple', ' ', 'a', ' ', 'da'],
         retokenizationText: 'apple a da',
         editBoundary: {
           text: 'da',
@@ -1546,7 +1511,6 @@ describe('ContextTokenization', function() {
       assert.equal(results.alignment.removedTokenCount, 0);
 
       assert.deepEqual(results.alignment.edgeWindow, {
-        retokenization: ['apple', ' ', 'a', ' ', 'da'].map(t => toMathematicalSMP(t)),
         retokenizationText: toMathematicalSMP('apple a da'),
         editBoundary: {
           text: toMathematicalSMP('da'),
@@ -1749,10 +1713,9 @@ describe('ContextTokenization', function() {
         edgeWindowSpec
       );
 
-      assert.deepEqual(results.alignment.edgeWindow, {...windowResults, retokenization: results.alignment.edgeWindow.retokenization});
+      assert.deepEqual(results.alignment.edgeWindow, windowResults);
       assert.deepEqual(results.alignment.edgeWindow, {
         retokenizationText: 'brown fox',
-        retokenization: ['brown', ' ', 'fox'],
         editBoundary: {
           isPartial: false,
           omitsEmptyToken: false,
@@ -1783,10 +1746,9 @@ describe('ContextTokenization', function() {
         edgeWindowSpec
       );
 
-      assert.deepEqual(results.alignment.edgeWindow, {...windowResults, retokenization: results.alignment.edgeWindow.retokenization});
+      assert.deepEqual(results.alignment.edgeWindow, windowResults);
       assert.deepEqual(results.alignment.edgeWindow, {
         retokenizationText: 'brown fox ',
-        retokenization: ['brown', ' ', 'fox', ' '], // no final '' token
         editBoundary: {
           isPartial: false,
           omitsEmptyToken: false,
@@ -1818,10 +1780,9 @@ describe('ContextTokenization', function() {
         edgeWindowSpec
       );
 
-      assert.deepEqual(results.alignment.edgeWindow, {...windowResults, retokenization: results.alignment.edgeWindow.retokenization});
+      assert.deepEqual(results.alignment.edgeWindow, windowResults);
       assert.deepEqual(results.alignment.edgeWindow, {
         retokenizationText: 'brown fox',
-        retokenization: ['brown', ' ', 'fox'],
         editBoundary: {
           isPartial: false,
           omitsEmptyToken: false,
@@ -1852,10 +1813,9 @@ describe('ContextTokenization', function() {
         edgeWindowSpec
       );
 
-      assert.deepEqual(results.alignment.edgeWindow, {...windowResults, retokenization: results.alignment.edgeWindow.retokenization});
+      assert.deepEqual(results.alignment.edgeWindow, windowResults);
       assert.deepEqual(results.alignment.edgeWindow, {
         retokenizationText: ' brown f',
-        retokenization: [' ', 'brown', ' ', 'f'],
         editBoundary: {
           isPartial: true,
           omitsEmptyToken: false,
@@ -1887,10 +1847,9 @@ describe('ContextTokenization', function() {
         edgeWindowSpec
       );
 
-      assert.deepEqual(results.alignment.edgeWindow, {...windowResults, retokenization: results.alignment.edgeWindow.retokenization});
+      assert.deepEqual(results.alignment.edgeWindow, windowResults);
       assert.deepEqual(results.alignment.edgeWindow, {
         retokenizationText: 'quick ',
-        retokenization: ['quick', ' '],
         editBoundary: {
           isPartial: false,
           omitsEmptyToken: false,

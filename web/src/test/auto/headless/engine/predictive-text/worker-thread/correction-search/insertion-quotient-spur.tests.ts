@@ -12,6 +12,7 @@ import { assert } from 'chai';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import {
   DeletionQuotientSpur,
+  EDIT_DISTANCE_COST_SCALE,
   InsertionQuotientSpur,
   models,
   SearchQuotientRoot,
@@ -38,7 +39,7 @@ describe('InsertionQuotientSpur', () => {
       assert.isNumber(extendedPath.spaceId);
       assert.notEqual(extendedPath.spaceId, rootPath.spaceId);
       assert.equal(extendedPath.bestExample.text.length, 1);
-      assert.equal(extendedPath.bestExample.p, 1);
+      assert.equal(extendedPath.bestExample.p, Math.exp(-EDIT_DISTANCE_COST_SCALE));
 
       assert.deepEqual(extendedPath.parents, [rootPath]);
       assert.deepEqual(extendedPath.inputs, null);
@@ -77,7 +78,8 @@ describe('InsertionQuotientSpur', () => {
       assert.isNumber(length2Path.spaceId);
       assert.notEqual(length2Path.spaceId, length1Path.spaceId);
       assert.equal(length2Path.bestExample.text.length, 2);
-      assert.equal(length2Path.bestExample.p, leadEdgeDistribution[0].p);
+      assert.equal(length2Path.bestExample.p, leadEdgeDistribution[0].p * Math.exp(-EDIT_DISTANCE_COST_SCALE));
+
       assert.deepEqual(length2Path.parents, [length1Path]);
       assert.deepEqual(length2Path.inputs, null);
       assert.deepEqual(length2Path.inputSegments, [

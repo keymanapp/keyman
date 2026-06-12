@@ -403,7 +403,7 @@ export function determineContextTransition(
     transition.inputDistribution = transformDistribution;
     return transition;
   } else {
-    transition = baseContextState.analyzeTransition(context, transformDistribution);
+    transition = baseContextState.analyzeTransition(context, transformDistribution, baseContextState.tokenizations.length != 1 || transformDistribution.length != 1);
   }
 
   contextTracker.latest = transition;

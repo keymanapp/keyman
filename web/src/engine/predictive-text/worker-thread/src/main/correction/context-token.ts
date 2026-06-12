@@ -9,8 +9,10 @@
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { SearchQuotientNode, PathInputProperties } from "./search-quotient-node.js";
+import { PathInputProperties, SearchQuotientNode } from "./search-quotient-node.js";
 import { TokenSplitMap } from "./context-tokenization.js";
+import { SearchQuotientCluster } from './search-quotient-cluster.js';
+import { SearchQuotientSpur } from './search-quotient-spur.js';
 import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
 import { LegacyQuotientRoot } from "./legacy-quotient-root.js";
 import { generateSubsetId } from './tokenization-subsets.js';
@@ -159,6 +161,14 @@ export class ContextToken implements ContextTokenLike {
    */
   get codepointLength() {
     return this._searchModule.codepointLength;
+  }
+
+  addInboundSpur(spur: SearchQuotientSpur) {
+    if(this.searchModule instanceof SearchQuotientCluster) {
+      this._searchModule = new SearchQuotientCluster([...this._searchModule.parents, spur])
+    } else {
+      this._searchModule = new SearchQuotientCluster([this._searchModule, spur]);
+    }
   }
 
   get inputCount() {

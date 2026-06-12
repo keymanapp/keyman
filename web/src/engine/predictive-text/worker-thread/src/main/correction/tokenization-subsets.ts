@@ -2,7 +2,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 import { KMWString } from 'keyman/common/web-utils';
 
-import { ContextTokenization, TransitionEdgeAlignment, TokenizationTransitionEdits } from './context-tokenization.js';
+import { ContextTokenization, TokenizationTransitionEdits, TransitionEdgeAlignment } from './context-tokenization.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
@@ -68,12 +68,26 @@ export interface TokenizationSubset {
    * result search paths.
    */
   readonly key: string;
+
   /**
    * A set of pre-existing tokenizations and transforms that may be input to
    * them, yielding compatible search paths and tokenization effects after their
-   * application.
+   * application via substitution edit.
    */
-  readonly transitionEdges: Map<ContextTokenization, TransitionEdge>;
+  readonly substitutionEdges: Map<ContextTokenization, TransitionEdge>;
+
+  /**
+   * A set of pre-existing tokenizations and transforms that may be input to
+   * them, yielding compatible search paths and tokenization effects after their
+   * application via deletion edit.
+   */
+  readonly deletionEdges: Map<ContextTokenization, TransitionEdge>;
+
+  /**
+   * Denotes the `key` property for tokenizations that match an insert edit spur built
+   * upon the results of this `TokenizationSubset`.
+   */
+  readonly insertEdgeKeys: [string, string]
 }
 
 export function editKeyer(precomputation: TokenizationTransitionEdits): string[] {
@@ -108,6 +122,8 @@ export function editKeyer(precomputation: TokenizationTransitionEdits): string[]
   return components;
 }
 
+// editKeyer may be removed when this is, and this may be removed when the
+// LegacyQuotient* classes are removed.
 export function legacySubsetKeyer(tokenizationEdits: TokenizationTransitionEdits): string {
   const { alignment, tokenizedTransform } = tokenizationEdits;
   const { edgeWindow, merges, splits } = alignment;
@@ -158,10 +174,19 @@ export function legacySubsetKeyer(tokenizationEdits: TokenizationTransitionEdits
   return components.concat(editKeyer(tokenizationEdits)).join(SENTINEL_CODE_UNIT);
 }
 
-export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransitionEdits): string {
-  const { alignment, tokenizedTransform } = tokenizationEdits;
+// Keep the extra param:  it helps us map insert spur edges to pre-existing sets outside this file
+// and the subset builder.
+export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransitionEdits, insertCnt?: number): string {
+  const { alignment } = tokenizationEdits;
+  const tokenizedTransform = tokenizationEdits.tokenizedTransform ?? (() => {
+    const emptyTransformMap = new Map<number, Transform>();
+    emptyTransformMap.set(0, {insert: '', deleteLeft: 0});
+
+    return emptyTransformMap;
+  })();
   const { edgeWindow, merges, splits } = alignment;
   const components: string[] = [];
+  insertCnt ??= 0;
 
   // First entry: based on the edge window.  The real key:  what's the edit
   // boundary?  We need to apply to the same token and portion thereof.
@@ -173,7 +198,7 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
   // in this tokenization, but that doesn't matter here - we want to imply the
   // represented keystroke range.
   const boundaryEdgeIndex = editBoundary.tokenIndex - edgeWindow.sliceIndex;
-  const boundaryComponent = `B${editBoundary.tokenIndex}=${editBoundary.sourceRangeKey}`; // source range is part of it
+  const boundaryComponent = `B${editBoundary.tokenIndex}=${editBoundary.sourceRangeKey}`; // source range is part of it //
 
   components.push(boundaryComponent);
 
@@ -191,8 +216,9 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
   // Now, based on the transform tokenization. We want to force uniqueness for
   // all variations of result length on each tokenized transform resulting from
   // the precomputation's represented keystroke.
+  const lastIndex = Math.min(...tokenizedTransform.keys());
   for(const {0: relativeIndex, 1: transform} of tokenizedTransform.entries()) {
-    const insertLen = KMWString.length(transform.insert);
+    const insertLen = KMWString.length(transform.insert) + (relativeIndex == lastIndex ? insertCnt : 0);
     if(relativeIndex > 0) {
       // The true boundary lies before the insert if the value is non-zero;
       // don't differentiate here!
@@ -214,7 +240,11 @@ export function precomputationSubsetKeyer(tokenizationEdits: TokenizationTransit
     }
   }
 
-  return components.concat(editKeyer(tokenizationEdits)).join(SENTINEL_CODE_UNIT);
+  // Edit-keying is no longer needed here - we instantly realign if a merge or split is needed,
+  // before we add the (realigned) base tokenization to the subset builder.
+  //
+  // See ContextState.analyzeTransition.
+  return components /*.concat(editKeyer(tokenizationEdits))*/ .join(SENTINEL_CODE_UNIT);
 }
 
 export class TokenizationSubsetBuilder {
@@ -225,34 +255,49 @@ export class TokenizationSubsetBuilder {
     this.keyer = keyer ?? precomputationSubsetKeyer;
   }
 
-  addPrecomputation(tokenization: ContextTokenization, precomputation: TokenizationTransitionEdits, p: number) {
-    const key = this.keyer(precomputation);
+  addPrecomputation(tokenization: ContextTokenization, precomputation: TokenizationTransitionEdits, p: number, mayCorrect: boolean) {
+    const key = this.keyer(precomputation, 0);
 
     // Should file the object and its transform data appropriately.
     //
     // Maps any number of Tokenizations and their incoming alignment data to a common key
     // for final tokenization forms.
     const entry: TokenizationSubset = this._subsets.get(key) ?? {
-      transitionEdges: new Map(),
-      key: key
+      substitutionEdges: new Map(),
+      deletionEdges: new Map(),
+      key: key,
+      insertEdgeKeys: mayCorrect ? [this.keyer(precomputation, 1), this.keyer(precomputation, 2)] : ['', '']
     }
 
-    // Finds any previously-accumulated data corresponding to both the incoming and
-    // target final tokenization form, creating an empty entry if none yet exists.
-    const forTokenization: TransitionEdge = entry.transitionEdges.get(tokenization) ?? {
-      alignment: precomputation.alignment,
-      inputs: [],
-      inputSubsetId: generateSubsetId()
-    };
+    const tokenizedTransform = precomputation.tokenizedTransform;
+    if(tokenizedTransform) {
+      // Finds any previously-accumulated data corresponding to both the incoming and
+      // target final tokenization form, creating an empty entry if none yet exists.
+      const forSubstitution: TransitionEdge = entry.substitutionEdges.get(tokenization) ?? {
+        alignment: precomputation.alignment,
+        inputs: [],
+        inputSubsetId: generateSubsetId()
+      };
+      // Adds the incoming tokenized transform data for the pairing...
+      forSubstitution.inputs.push({sample: precomputation.tokenizedTransform, p});
 
-    // Adds the incoming tokenized transform data for the pairing...
-    forTokenization.inputs.push({sample: precomputation.tokenizedTransform, p});
-    // and ensures that the pairing's data-accumulator is in the map.
-    entry.transitionEdges.set(tokenization, forTokenization);
+      // and ensures that the pairing's data-accumulator is in the map.
+      entry.substitutionEdges.set(tokenization, forSubstitution);
+    }
+    if(!tokenizedTransform) {
+      const forDeletion: TransitionEdge = entry.deletionEdges.get(tokenization) ?? {
+        alignment: precomputation.alignment,
+        inputs: [],
+        inputSubsetId: generateSubsetId()
+      };
+      entry.deletionEdges.set(tokenization, forDeletion);
+    }
 
     // Also ensures that the target tokenization's data (accumulating the pairings)
     // is made available within the top-level map.
     this._subsets.set(key, entry);
+
+    return key;
   }
 
   get subsets(): ReadonlyMap<string, TokenizationSubset> {

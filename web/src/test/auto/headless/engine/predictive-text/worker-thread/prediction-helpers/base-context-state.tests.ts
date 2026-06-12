@@ -51,7 +51,7 @@ describe('matchBaseContextState', () => {
       left: 'this is tech',
       startOfBuffer: true,
       endOfBuffer: true
-    }, [{sample: { insert: 'n', deleteLeft: 0 }, p: 1}]);
+    }, [{sample: { insert: 'n', deleteLeft: 0 }, p: 1}], true);
     contextTracker.latest = transition;
 
     const warningSpy = sinon.spy(console, 'warn');
@@ -82,7 +82,7 @@ describe('matchBaseContextState', () => {
       left: 'a lot of test here might cause the sliding context window to shi',
       startOfBuffer: false, // We're sliding now.
       endOfBuffer: true
-    }, [{sample: { insert: 'f', deleteLeft: 0 }, p: 1}]);
+    }, [{sample: { insert: 'f', deleteLeft: 0 }, p: 1}], true);
     contextTracker.latest = transition;
 
     const warningSpy = sinon.spy(console, 'warn');
@@ -113,7 +113,7 @@ describe('matchBaseContextState', () => {
       left: 'meet you at the caf',
       startOfBuffer: true,
       endOfBuffer: true
-    }, [{sample: { insert: 'e', deleteLeft: 0 }, p: 1}]);
+    }, [{sample: { insert: 'e', deleteLeft: 0 }, p: 1}], true);
     contextTracker.latest = transition;
 
     const matchedState = matchBaseContextState(contextTracker, {
@@ -138,7 +138,7 @@ describe('matchBaseContextState', () => {
       left: 'ot of test here might cause the sliding context window to shift ',
       startOfBuffer: false, // We're sliding now.
       endOfBuffer: true
-    }, [{sample: { insert: 'dramatically', deleteLeft: 0 }, p: 1}]);
+    }, [{sample: { insert: 'dramatically', deleteLeft: 0 }, p: 1}], true);
 
     contextTracker.latest = transition;
 
@@ -205,7 +205,7 @@ describe('matchBaseContextState', () => {
       left: 'ere might cause the sliding context window to shift dramatically',
       startOfBuffer: false, // We're sliding now.
       endOfBuffer: true
-    }, [{sample: { insert: '', deleteLeft: 'dramatically'.length }, p: 1}]);
+    }, [{sample: { insert: '', deleteLeft: 'dramatically'.length }, p: 1}], true);
     contextTracker.latest = transition;
 
     const warningSpy = sinon.spy(console, 'warn');

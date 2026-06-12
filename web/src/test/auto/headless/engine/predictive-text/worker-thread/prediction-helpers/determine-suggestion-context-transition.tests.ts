@@ -5,7 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
-import { ContextTracker, determineContextTransition, ModelCompositor, models } from "@keymanapp/lm-worker/test-index";
+import { ContextTracker, determineContextTransition, ModelCompositor, models, SubstitutionQuotientSpur } from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -103,7 +103,12 @@ describe('determineContextTransition', () => {
       assert.isOk(transition);
       assert.equal(transition, tracker.latest);
       assert.isFalse(warningEmitterSpy.called);
-      assert.sameOrderedMembers(transition.final.displayTokenization.exampleInput, ['this', ' ', 'is', ' ', 'for', ' ', 'techn']);
+      assert.equal(transition.final.tokenizations.length, 1);
+      assert.equal(transition.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
+      assert.sameOrderedMembers(transition.final.tokenizations[0].exampleInput, ['this', ' ', 'is', ' ', 'for', ' ', 'techn']);
       assert.equal(transition.final.context.left, targetContext.left);
       assert.equal(transition.final.context.right ?? "", targetContext.right ?? "");
       assert.sameDeepOrderedMembers(transition.inputDistribution, inputDistribution);
@@ -224,6 +229,11 @@ describe('determineContextTransition', () => {
       assert.notEqual(extendingTransition, baseTransition);
 
       // These values support delayed reversions.
+      assert.equal(extendingTransition.final.tokenizations.length, 1);
+      assert.equal(extendingTransition.final.tokenizations.filter(
+        t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
+        1
+      );
       assert.equal(extendingTransition.final.displayTokenization.tokens[6].appliedTransitionId, pred_testing.transformId);
       assert.equal(extendingTransition.final.displayTokenization.tokens[7].appliedTransitionId, pred_testing.transformId);
 

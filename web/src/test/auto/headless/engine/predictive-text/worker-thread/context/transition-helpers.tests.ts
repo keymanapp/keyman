@@ -54,16 +54,6 @@ function buildOutboundTransitionEdge (
   inputs: Distribution<Required<Transform>>,
   tokenizedInputs: Distribution<Map<number, Transform>>
 ): TransitionEdge {
-  const primaryTokenizedInput = tokenizedInputs[0].sample;
-  const relativeTailIndex = [...primaryTokenizedInput.keys()][0];
-
-  const tokens = baseTokenization.tokens;
-  const baseTexts = tokens.map((t) => t.exampleInput);
-  const tail = relativeTailIndex <= 0 ? tokens[tokens.length - 1 + relativeTailIndex] : ContextToken.fromRawText(plainModel, '', true);
-  // Do NOT include incoming 'insert' text - it's not "retokenized", as it
-  // wasn't in the original token.
-  const newTailText = tail.exampleInput.substring(0, tail.exampleInput.length - primaryTokenizedInput.get(relativeTailIndex).deleteLeft);
-
   const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputs[0].sample, false);
   return {
     alignment: {
@@ -72,7 +62,6 @@ function buildOutboundTransitionEdge (
       unmappedEdits: [],
       edgeWindow: {
         ...edgeWindow,
-        retokenization: baseTexts.slice(edgeWindow.sliceIndex, baseTexts.length - 1).concat(newTailText)
       },
       removedTokenCount: 0
     },
@@ -143,9 +132,9 @@ function generateFixtureForTokenizationOutboundTransition (
     };
 
     const key = precomputationSubsetKeyer(keyable);
-    const subset: TokenizationSubset = { key, transitionEdges: new Map() };
+    const subset: TokenizationSubset = { key, deletionEdges: new Map(), substitutionEdges: new Map(), insertEdgeKeys: ['', ''] };
 
-    subset.transitionEdges.set(srcTokenization, tokenizationEdge);
+    subset.substitutionEdges.set(srcTokenization, tokenizationEdge);
 
     // Generate full transition for the affected token.
     const inputProp = {
@@ -285,12 +274,14 @@ function generateFixturesForTransitionSource() {
       // merge tokenizations
       const combinedSubset: TokenizationSubset = {
         key: oldEntry.key,
-        transitionEdges: new Map(oldEntry.transitionEdges)
+        deletionEdges: new Map(),
+        substitutionEdges: new Map(oldEntry.substitutionEdges),
+        insertEdgeKeys: ['', '']
       };
       const oldTokenization = distrib2Tokenizations.get(key);
 
-      tuple.subset.transitionEdges.forEach((value, key) => {
-        combinedSubset.transitionEdges.set(key, value);
+      tuple.subset.substitutionEdges.forEach((value, key) => {
+        combinedSubset.substitutionEdges.set(key, value);
       });
 
       const mergedTokenization = mergeAlignedTokenizations([oldTokenization, tuple.transitionedTokenization]);
@@ -392,21 +383,21 @@ describe('precomputeTransitions', () => {
   it('handles the "cafe" fixture\'s first input correctly', () => {
     const { cafe } = generateFixturesForTransitionSource();
 
-    const precomputation = precomputeTransitions([cafe.base], cafe.key1.dist, precomputationSubsetKeyer);
+    const precomputation = precomputeTransitions([cafe.base], cafe.key1.dist, cafe.base.clusteringKey, true, precomputationSubsetKeyer);
     assert.sameOrderedMembers([...precomputation.subsets.keys()], [...cafe.key1.subsets.keys()]);
 
       // Note:  subset id entries won't match due to how they're generated!
     [...cafe.key1.subsets.keys()].forEach((key) => {
       assert.deepEqual(
-        [...precomputation.subsets.get(key).transitionEdges.keys()],
-        [...cafe.key1.subsets.get(key).transitionEdges.keys()]
+        [...precomputation.subsets.get(key).substitutionEdges.keys()],
+        [...cafe.key1.subsets.get(key).substitutionEdges.keys()]
       );
-      assert.deepEqual([...precomputation.subsets.get(key).transitionEdges.keys()], [cafe.base]);
+      assert.deepEqual([...precomputation.subsets.get(key).substitutionEdges.keys()], [cafe.base]);
 
       // We coerce the id to match what is expected here by overwriting what our method call produced.
-      const expectedTransitionEdge = cafe.key1.subsets.get(key).transitionEdges.get(cafe.base);
+      const expectedTransitionEdge = cafe.key1.subsets.get(key).substitutionEdges.get(cafe.base);
       const actualTransitionEdge = {
-        ...precomputation.subsets.get(key).transitionEdges.get(cafe.base),
+        ...precomputation.subsets.get(key).substitutionEdges.get(cafe.base),
         inputSubsetId: expectedTransitionEdge.inputSubsetId
       };
 
@@ -421,6 +412,8 @@ describe('precomputeTransitions', () => {
     const precomputation = precomputeTransitions(
       key1Tokenizations,
       cafe.key2.dist,
+      key1Tokenizations[0].clusteringKey,
+      true,
       precomputationSubsetKeyer
     );
     assert.sameOrderedMembers([...precomputation.subsets.keys()], [...cafe.key2.subsets.keys()]);
@@ -430,16 +423,16 @@ describe('precomputeTransitions', () => {
       const expectedSubset = cafe.key2.subsets.get(key);
       const actualSubset = precomputation.subsets.get(key);
 
-      const subsetKeys = [...expectedSubset.transitionEdges.keys()];
+      const subsetKeys = [...expectedSubset.substitutionEdges.keys()];
       // Some destination subsets aren't reachable from all source tokenizations.
       assert.includeDeepMembers(key1Tokenizations, subsetKeys);
-      assert.includeDeepMembers(key1Tokenizations, [...actualSubset.transitionEdges.keys()]);
+      assert.includeDeepMembers(key1Tokenizations, [...actualSubset.substitutionEdges.keys()]);
 
       // We coerce the id to match what is expected here by overwriting what our method call produced.
       subsetKeys.forEach((srcTokenization) => {
-        const expectedTransitionEdge = expectedSubset.transitionEdges.get(srcTokenization);
+        const expectedTransitionEdge = expectedSubset.substitutionEdges.get(srcTokenization);
         const actualTransitionEdge = {
-          ...actualSubset.transitionEdges.get(srcTokenization),
+          ...actualSubset.substitutionEdges.get(srcTokenization),
           inputSubsetId: expectedTransitionEdge.inputSubsetId
         };
 

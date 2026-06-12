@@ -25,9 +25,13 @@ var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
 
 function assertClonedStateMatch(a: ContextState, b: ContextState) {
   assert.notEqual(a, b);
+  assert.notEqual(a.tokenizations, b.tokenizations);
+  assert.equal(a.tokenizations.length, b.tokenizations.length);
   assert.notEqual(a.displayTokenization, b.displayTokenization);
-  assert.notSameOrderedMembers(a.displayTokenization.tokens, b.displayTokenization.tokens);
-  assert.sameOrderedMembers(a.displayTokenization.exampleInput, b.displayTokenization.exampleInput);
+  for(let i = 0; i < a.tokenizations.length; i++) {
+    assert.notSameOrderedMembers(a.tokenizations[i].tokens, b.tokenizations[i].tokens);
+    assert.sameOrderedMembers(a.tokenizations[i].exampleInput, b.tokenizations[i].exampleInput);
+  }
 
   assert.deepEqual(a.suggestions, b.suggestions);
 }
@@ -86,7 +90,7 @@ describe('ContextTransition', () => {
       // currently, also calls the .finalize method internally.
       const transition = baseState.analyzeTransition(baseState.context, [
         { sample: { insert: '!', deleteLeft: 0 }, p: 1 }
-      ]);
+      ], true);
 
       const cloned = new ContextTransition(transition);
       assert.notEqual(cloned, transition);
@@ -106,7 +110,7 @@ describe('ContextTransition', () => {
       // currently, also calls the .finalize method internally.
       const transition = baseState.analyzeTransition(baseContext, [
         { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: 1 }
-      ]);
+      ], true);
       assert.isOk(transition);
 
       let suggestions = transition.final.suggestions = [{
@@ -143,9 +147,11 @@ describe('ContextTransition', () => {
       assert.notEqual(appliedTransition.base, transition);
       assert.isOk(appliedTransition.appended);
       assert.notEqual(appliedTransition.appended, transition);
+      assert.equal(appliedTransition.base.final.tokenizations.length, 1);
       assert.sameOrderedMembers(appliedTransition.base.final.displayTokenization.exampleInput, [
         'hello', ' ', 'world'
       ]);
+      assert.equal(appliedTransition.appended.final.tokenizations.length, 1);
       assert.sameOrderedMembers(appliedTransition.appended.final.displayTokenization.exampleInput, [
         'hello', ' ', 'world', ' ', ''
       ]);
@@ -190,7 +196,7 @@ describe('ContextTransition', () => {
       // currently, also calls the .finalize method internally.
       const transition = baseState.analyzeTransition(baseContext, [
         { sample: { insert: ' ', deleteLeft: 0, id: 2 }, p: 1 }
-      ]);
+      ], true);
       assert.isOk(transition);
 
       let suggestions = transition.final.suggestions = [{
@@ -227,9 +233,11 @@ describe('ContextTransition', () => {
       assert.notEqual(appliedTransition.base, transition);
       assert.isOk(appliedTransition.appended);
       assert.notEqual(appliedTransition.appended, transition);
+      assert.equal(appliedTransition.base.final.tokenizations.length, 1);
       assert.sameOrderedMembers(appliedTransition.base.final.displayTokenization.exampleInput, [
         'hello', ' ', 'world', '  ', 'the'
       ]);
+      assert.equal(appliedTransition.appended.final.tokenizations.length, 1);
       assert.sameOrderedMembers(appliedTransition.appended.final.displayTokenization.exampleInput, [
         'hello', ' ', 'world', '  ', 'the', ' ', ''
       ]);
@@ -275,8 +283,9 @@ describe('ContextTransition', () => {
 
       // currently, also calls the .finalize method internally.
       const transition = baseState.analyzeTransition(baseContext, [
-        { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: 1 }
-      ]);
+        { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: .99 },
+        { sample: { insert: 'l', deleteLeft: 0, id: 2 }, p: .01 }
+      ], true);
 
       let suggestions = transition.final.suggestions = [{
         transform: {
@@ -325,8 +334,9 @@ describe('ContextTransition', () => {
 
       // currently, also calls the .finalize method internally.
       const transition = baseState.analyzeTransition(baseContext, [
-        { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: 1 }
-      ]);
+        { sample: { insert: 'r', deleteLeft: 0, id: 2 }, p: .99 },
+        { sample: { insert: 'l', deleteLeft: 0, id: 2 }, p: .01 }
+      ], true);
 
       let suggestions = transition.final.suggestions = [{
         transform: {
