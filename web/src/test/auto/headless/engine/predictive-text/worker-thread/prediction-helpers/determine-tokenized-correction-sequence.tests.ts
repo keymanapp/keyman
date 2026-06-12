@@ -13,7 +13,6 @@ import { assert } from 'chai';
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { KMWString } from 'keyman/common/web-utils';
 
 import {
   determineTokenizedCorrectionSequence,
@@ -403,10 +402,5 @@ describe('determineTokenizedCorrectionSequence', () => {
     };
 
     results.applyInPost(dummiedTuple);
-
-    assert.deepEqual(dummiedTuple.metadata.preservationTransform, {
-      insert: trueInput.sample.insert.substring(0, KMWString.length(trueInput.sample.insert) - 1), // remove the 'd'.
-      deleteLeft: trueInput.sample.deleteLeft - 1
-    });
   });
 });

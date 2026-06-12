@@ -11,7 +11,6 @@ import { assert } from 'chai';
 
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
-import { KMWString } from 'keyman/common/web-utils';
 
 import { determineTraversallessCorrectionSequences, IntermediateTokenizedPrediction, ModelCompositor, models } from "@keymanapp/lm-worker/test-index";
 
@@ -453,10 +452,5 @@ describe('determineTraversallessCorrectionSequences', () => {
     };
 
     entry.applyInPost(dummiedTuple);
-
-    assert.deepEqual(dummiedTuple.metadata.preservationTransform, {
-      insert: trueInput.sample.insert.substring(0, KMWString.length(trueInput.sample.insert) - 1), // remove the 'd'.
-      deleteLeft: trueInput.sample.deleteLeft - 1
-    });
   });
 });

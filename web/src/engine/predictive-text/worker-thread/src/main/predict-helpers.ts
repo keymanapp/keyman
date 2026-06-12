@@ -6,7 +6,7 @@ import { searchForProperty, WordBreakProperty } from '@keymanapp/models-wordbrea
 import { TransformUtils } from './transformUtils.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 import { ContextTokenLike } from './correction/context-token.js';
-import { ContextTokenization, mapWhitespacedTokenization } from './correction/context-tokenization.js';
+import { ContextTokenization } from './correction/context-tokenization.js';
 import { ContextTracker } from './correction/context-tracker.js';
 import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
 import { ContextTransition } from './correction/context-transition.js';
@@ -181,12 +181,6 @@ export interface PredictionMetadata {
    * available upon initial construction of this type.
    */
   matchLevel?: SuggestionSimilarity;
-
-  /**
-   * Text from the triggering input that should _not_ be affected by the
-   * prediction.
-   */
-  preservationTransform?: Transform;
 }
 
 export interface IntermediateTokenizedPrediction {
@@ -312,21 +306,9 @@ export function determineTraversallessCorrectionSequences(
       suggestionParams.tokens.forEach((token) => token.correction.sample.id = transformId);
     }
 
-    const tokenizationMapping = mapWhitespacedTokenization(tokenization.left.map((t) => { return {exampleInput: t.text, codepointLength: KMWString.length(t.text)} }), lexicalModel, correction.sample);
-    const tokenizedCorrection = tokenizationMapping.tokenizedTransform;
-    const tokenizedCorrectionEntries = [...tokenizedCorrection.values()];
-
-    // IF:  array has multiple entries, then build the preservation-transform as below, including the deleteLeft.
-    // If not, don't make one!
-    const preservationTransform = tokenizedCorrectionEntries.slice(0, -1).reduce((accum, curr) => {
-      return { insert: accum.insert + curr.insert, deleteLeft: accum.deleteLeft + curr.deleteLeft };
-    }, { insert: '', deleteLeft: 0, id: correction.sample.id});
-
     returnedPredictionData.push({
       ...suggestionParams,
-      applyInPost: (p) => {
-        p.metadata.preservationTransform = preservationTransform;
-      }
+      applyInPost: (p) => {}
     })
   }
 
@@ -616,16 +598,9 @@ export function determineTokenizedCorrectionSequence(
     suggestionParams.tokens.forEach((t) => t.correction.sample.id = transition.transitionId);
   }
 
-  const { deleteLeft } = transitionParams;
-
   return {
     ...suggestionParams,
-    applyInPost: (entry: IntermediateTokenizedPrediction) => {
-      entry.metadata.preservationTransform = tokenization.taillessTrueKeystroke;
-      // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
-      // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
-      entry.components[0].prediction.transform.deleteLeft = deleteLeft;
-    }
+    applyInPost: (entry) => {}
   };
 }
 
@@ -1327,24 +1302,6 @@ export function finalizeSuggestions(
 
   const suggestions = deduplicatedSuggestionTuples.map((tuple) => {
     const prediction = tuple.components.prediction;
-
-    // If this is a suggestion after any form of wordbreak input, make sure we preserve any components
-    // from prior tokens!
-    //
-    // Note:  may need adjustment if/when supporting phrase-level correction.
-    if(tuple.metadata.preservationTransform) {
-      const mergedTransform = {
-        ...models.buildMergedTransform(tuple.metadata.preservationTransform, {...prediction.transform, deleteLeft: 0}),
-        deleteLeft: prediction.transform.deleteLeft
-      };
-
-      // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
-      // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
-      let mutableSuggestion = prediction as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
-
-      // Assignment via by-reference behavior, as suggestion is an object
-      mutableSuggestion.transform = mergedTransform;
-    }
 
     // Is sometimes not set during unit tests.
     if(prediction.transformId !== undefined) {

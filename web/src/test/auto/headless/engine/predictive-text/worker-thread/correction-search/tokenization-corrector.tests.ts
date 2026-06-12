@@ -359,7 +359,7 @@ describe('TokenizationCorrector', () => {
         p: 1
       }
       const therefxyz = new ContextToken(new SubstitutionQuotientSpur(therefxy, [zInput], zInput));
-      const therefxyzTokenization = new ContextTokenization([therefxyz], null, null);
+      const therefxyzTokenization = new ContextTokenization([therefxyz]);
 
       const instance = new TokenizationCorrector(
         therefxyzTokenization,
