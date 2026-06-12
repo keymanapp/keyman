@@ -21,18 +21,19 @@ import {
   ExecutionTimer,
   generateSubsetId,
   getBestMatches,
-  LegacyQuotientSpur,
   models,
   PathInputProperties,
   PathResult,
   SearchQuotientNode,
   SearchQuotientRoot,
+  SubstitutionQuotientSpur,
   TokenizationCorrector,
   TokenResult,
   TokenizationResultMapping
 } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import TrieModel = models.TrieModel;
 import Transform = LexicalModelTypes.Transform;
 
@@ -86,22 +87,21 @@ function buildFixture_therefore() {
   const therefTokens: ContextToken[] = []; // as in "therefore"
   const the_efTokens: ContextToken[] = []; // as in "the effect"
 
-  // TODO:  Use SubstitutionQuotientSpur instead!
   let firstTokenNode: SearchQuotientNode = new SearchQuotientRoot(plainModel);
   for(let i=0; i < 3; i++) {
-    firstTokenNode = new LegacyQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
+    firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
   }
 
   the_efTokens.push(new ContextToken(firstTokenNode, false));
 
-  firstTokenNode = new LegacyQuotientSpur(firstTokenNode, [distributions[3][1]], {
+  firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, [distributions[3][1]], {
     ...inputSources[3],
     subsetId: generateSubsetId()
   });
 
   // whitespace token alternate - using the ' ' input instead.
   const whitespaceToken = new ContextToken(
-    new LegacyQuotientSpur(
+    new SubstitutionQuotientSpur(
       new SearchQuotientRoot(plainModel),
       [distributions[3][0]],
       { ...inputSources[3], subsetId: generateSubsetId() }
@@ -112,11 +112,11 @@ function buildFixture_therefore() {
 
   let secondTokenNode: SearchQuotientNode = new SearchQuotientRoot(plainModel);
   for(let i=4; i < distributions.length; i++) {
-    firstTokenNode = new LegacyQuotientSpur(firstTokenNode, distributions[i], {
+    firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, distributions[i], {
       ...inputSources[i],
       subsetId: generateSubsetId()
     });
-    secondTokenNode = new LegacyQuotientSpur(secondTokenNode, distributions[i], {
+    secondTokenNode = new SubstitutionQuotientSpur(secondTokenNode, distributions[i], {
       ...inputSources[i],
       subsetId: generateSubsetId()
     })
@@ -171,17 +171,16 @@ function buildFixture_terminalWhitespace() {
   const fullTokens: ContextToken[] = [];
   const lastToken: ContextToken[] = [];
 
-  // TODO:  Use SubstitutionQuotientSpur instead!
   let firstTokenNode: SearchQuotientNode = new SearchQuotientRoot(plainModel);
   for(let i=0; i < 5; i++) {
-    firstTokenNode = new LegacyQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
+    firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
   }
 
   fullTokens.push(new ContextToken(firstTokenNode, false));
 
   // whitespace token alternate - using the ' ' input instead.
   const whitespaceToken = new ContextToken(
-    new LegacyQuotientSpur(
+    new SubstitutionQuotientSpur(
       new SearchQuotientRoot(plainModel),
       distributions[5],
       inputSources[5],
@@ -316,14 +315,80 @@ describe('TokenizationCorrector', () => {
       }
 
       searchResult = instance.handleNextNode();
-      // There should be more results that may be found.
+      // There should be more searching to perform before aborting.
       assert.notEqual(searchResult.type, 'none');
 
       do {
         searchResult = instance.handleNextNode();
       } while(searchResult.type == 'intermediate');
 
-      assert.notEqual(searchResult.type, 'none');
+      // However, no other valid results are within correction range
+      // while rooted on 6 input transforms.
+      assert.equal(searchResult.type, 'none');
+    });
+
+    it('finds a default correction for a single correctable token without a model match', () => {
+      const fixture = buildFixture_therefore();
+
+      const theref = fixture.theref.tail;
+      const xInput: ProbabilityMass<Transform> = {
+        sample: {
+          insert: 'x',
+          deleteLeft: 0,
+          id: 123
+        },
+        p: 1
+      }
+      const therefx = new SubstitutionQuotientSpur(theref.searchModule, [xInput], xInput);
+      const yInput: ProbabilityMass<Transform> = {
+        sample: {
+          insert: 'y',
+          deleteLeft: 0,
+          id: 124
+        },
+        p: 1
+      }
+      const therefxy = new SubstitutionQuotientSpur(therefx, [yInput], yInput);
+      const zInput: ProbabilityMass<Transform> = {
+        sample: {
+          insert: 'z',
+          deleteLeft: 0,
+          id: 125
+        },
+        p: 1
+      }
+      const therefxyz = new ContextToken(new SubstitutionQuotientSpur(therefxy, [zInput], zInput));
+      const therefxyzTokenization = new ContextTokenization([therefxyz], null, null);
+
+      const instance = new TokenizationCorrector(
+        therefxyzTokenization,
+        1,
+        fixture.filter
+      );
+
+      let searchResult: PathResult<TokenizationResultMapping>;
+      do {
+        searchResult = instance.handleNextNode();
+      } while(searchResult.type == 'intermediate');
+
+      assert.equal(searchResult.type, 'complete');
+      if(searchResult.type == 'complete') {
+        const mapping = searchResult.mapping;
+        const tokenResults = mapping.matchedResult;
+        assert.isNotNaN(searchResult.cost);
+        assert.equal(searchResult.cost, searchResult.mapping.totalCost);
+        assert.equal(tokenResults.length, 1);
+        assert.sameOrderedMembers(tokenResults.map((r) => r.matchString), ['therefxyz']);
+
+        // Now that an entry has been found, verify the corrector's state.
+        assert.isNotOk(instance.predictableToken); // should become an uncorrectable.
+        assert.isTrue(instance.generatedTokenResults.has(therefxyz));
+        assert.equal(instance.generatedTokenResults.get(therefxyz), tokenResults[0]);
+      }
+
+      // There should be no further possible suggestions.
+      searchResult = instance.handleNextNode();
+      assert.equal(searchResult.type, 'none');
     });
 
     it('finds corrections for a group of tokens with two correctable', () => {

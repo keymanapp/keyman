@@ -131,8 +131,8 @@ export class TokenResultMapping implements CorrectionResultMapping<SearchNode>, 
     return new SearchNode(this.node, spaceId);
   }
 
-  buildInsertionEdges(): SearchNode[] {
-    return this.node.buildInsertionEdges();
+  buildInsertionEdges(spaceId?: number): SearchNode[] {
+    return this.node.buildInsertionEdges(spaceId);
   }
 
   buildDeletionEdges(dist: Distribution<Transform>, edgeId: number): SearchNode[] {
@@ -141,5 +141,9 @@ export class TokenResultMapping implements CorrectionResultMapping<SearchNode>, 
 
   buildSubstitutionEdges(dist: Distribution<Transform>, edgeId: number): SearchNode[] {
     return this.node.buildSubstitutionEdges(dist, edgeId);
+  }
+
+  get lastEdgeType() {
+    return this.node.lastEdgeType;
   }
 }
