@@ -423,7 +423,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPYRIGHT_STRING = "Copyright © SIL Global.";
 				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = "$(PRODUCT_VERSION)";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 3YE4W86L3G;
 				ENABLE_APP_SANDBOX = NO;
@@ -436,7 +436,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.5;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "$(PRODUCT_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.config;
 				PRODUCT_NAME = "Keyman Configuration";
 				PRODUCT_VERSION = 0.0.0;
@@ -463,7 +463,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				COPYRIGHT_STRING = "Copyright © SIL Global.";
 				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = "$(PRODUCT_VERSION)";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 3YE4W86L3G;
 				ENABLE_APP_SANDBOX = NO;
@@ -476,7 +476,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.5;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = "$(PRODUCT_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.config;
 				PRODUCT_NAME = "Keyman Configuration";
 				PRODUCT_VERSION = 0.0.0;

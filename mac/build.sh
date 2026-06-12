@@ -170,7 +170,6 @@ updatePlist() {
         /usr/libexec/Plistbuddy -c "Set :Keyman:VersionWithTag $KEYMAN_VERSION_WITH_TAG" "$KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set :Keyman:VersionGitTag $KEYMAN_VERSION_GIT_TAG" "$KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set :Keyman:VersionRelease $KEYMAN_VERSION_RELEASE" "$KM_PLIST"
-        # /usr/libexec/Plistbuddy -c "Set NSHumanReadableCopyright Copyright © SIL Global." "$KM_PLIST"
     fi
 }
 
@@ -379,9 +378,9 @@ do_install() {
   builder_heading "Attempting local deployment with command:"
 
   KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
-  KM4_CONFIG_APP_BASE_PATH="$CONFIGAPP_BASE_PATH/build/Build/Products/$CONFIG"
-  builder_echo info "$KEYMAN_MAC_BASE_PATH/local-deploy.sh \"$KM4MIM_APP_BASE_PATH\" \"$KM4_CONFIG_APP_BASE_PATH\""
-  "$KEYMAN_MAC_BASE_PATH/local-deploy.sh" "$KM4MIM_APP_BASE_PATH" "$KM4_CONFIG_APP_BASE_PATH"
+  KM4M_CONFIG_APP_BASE_PATH="$CONFIGAPP_BASE_PATH/build/Build/Products/$CONFIG"
+  builder_echo info "$KEYMAN_MAC_BASE_PATH/local-deploy.sh \"$KM4MIM_APP_BASE_PATH\" \"$KM4M_CONFIG_APP_BASE_PATH\""
+  "$KEYMAN_MAC_BASE_PATH/local-deploy.sh" "$KM4MIM_APP_BASE_PATH" "$KM4M_CONFIG_APP_BASE_PATH"
 }
 
 # MAC-CONFIG-TODO: delete this and everything else related to building .dmg
