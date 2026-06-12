@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<visualkeyboard>
+  <header>
+    <version>10.0</version>
+    <kbdname>easternpwokaren</kbdname>
+    <flags>
+      <key102/>
+    </flags>
+  </header>
+  <encoding name="unicode" fontname="Arial" fontsize="-12">
+    <layer shift="">
+      <key vkey="K_SPACE"></key>
+      <key vkey="K_0">𑛚</key>
+      <key vkey="K_1">𑛛</key>
+      <key vkey="K_2">𑛜</key>
+      <key vkey="K_3">𑛝</key>
+      <key vkey="K_4">𑛞</key>
+      <key vkey="K_5">𑛟</key>
+      <key vkey="K_6">𑛠</key>
+      <key vkey="K_7">𑛡</key>
+      <key vkey="K_8">𑛢</key>
+      <key vkey="K_9">𑛣</key>
+      <key vkey="K_A">ေ</key>
+      <key vkey="K_B">ဘ</key>
+      <key vkey="K_C">ခ</key>
+      <key vkey="K_D">ိ</key>
+      <key vkey="K_E">န</key>
+      <key vkey="K_F">်</key>
+      <key vkey="K_G">ါ</key>
+      <key vkey="K_H">့</key>
+      <key vkey="K_I">င</key>
+      <key vkey="K_J">ြ</key>
+      <key vkey="K_K">ု</key>
+      <key vkey="K_L">ူ</key>
+      <key vkey="K_M">ာ</key>
+      <key vkey="K_N">ည</key>
+      <key vkey="K_O">သ</key>
+      <key vkey="K_P">စ</key>
+      <key vkey="K_Q">ဆ</key>
+      <key vkey="K_R">မ</key>
+      <key vkey="K_S">ျ</key>
+      <key vkey="K_T">အ</key>
+      <key vkey="K_U">က</key>
+      <key vkey="K_V">လ</key>
+      <key vkey="K_W">တ</key>
+      <key vkey="K_X">ထ</key>
+      <key vkey="K_Y">ပ</key>
+      <key vkey="K_Z">ဖ</key>
+      <key vkey="K_COLON">း</key>
+      <key vkey="K_EQUAL">=</key>
+      <key vkey="K_COMMA">,</key>
+      <key vkey="K_HYPHEN">-</key>
+      <key vkey="K_PERIOD">ႋ</key>
+      <key vkey="K_SLASH">/</key>
+      <key vkey="K_BKQUOTE">`</key>
+      <key vkey="K_LBRKT">ဟ</key>
+      <key vkey="K_RBRKT">☆</key>
+      <key vkey="K_QUOTE">'</key>
+      <key vkey="K_BKSLASH">|</key>
+    </layer>
+    <layer shift="S">
+      <key vkey="K_SPACE"></key>
+      <key vkey="K_0">(</key>
+      <key vkey="K_1">ဠ</key>
+      <key vkey="K_2">ဎ</key>
+      <key vkey="K_3">ဋ</key>
+      <key vkey="K_4">$</key>
+      <key vkey="K_5">%</key>
+      <key vkey="K_6">^</key>
+      <key vkey="K_7">ရ</key>
+      <key vkey="K_8">*</key>
+      <key vkey="K_9">)</key>
+      <key vkey="K_B">ယ</key>
+      <key vkey="K_C">ဃ</key>
+      <key vkey="K_D">ီ</key>
+      <key vkey="K_E">ၞ</key>
+      <key vkey="K_H">ံ</key>
+      <key vkey="K_I">ၚ</key>
+      <key vkey="K_J">ဲ</key>
+      <key vkey="K_K">ဒ</key>
+      <key vkey="K_L">ဓ</key>
+      <key vkey="K_M">ၜ</key>
+      <key vkey="K_O">ဴ</key>
+      <key vkey="K_P">ဏ</key>
+      <key vkey="K_Q">ဈ</key>
+      <key vkey="K_R">ၟ</key>
+      <key vkey="K_S">ှ</key>
+      <key vkey="K_T">ဍ</key>
+      <key vkey="K_U">ဥ</key>
+      <key vkey="K_V">ၠ</key>
+      <key vkey="K_W">ဝ</key>
+      <key vkey="K_X">ဌ</key>
+      <key vkey="K_Z">ဇ</key>
+      <key vkey="K_COLON">ဂ</key>
+      <key vkey="K_EQUAL">+</key>
+      <key vkey="K_COMMA">၊</key>
+      <key vkey="K_HYPHEN">_</key>
+      <key vkey="K_PERIOD">။</key>
+      <key vkey="K_SLASH">/</key>
+      <key vkey="K_BKQUOTE">~</key>
+      <key vkey="K_LBRKT">ၯ</key>
+      <key vkey="K_RBRKT">ၰ</key>
+      <key vkey="K_QUOTE">"</key>
+      <key vkey="K_Y">ဲါ</key>
+      <key vkey="K_A">ဗ</key>
+      <key vkey="K_F">္</key>
+      <key vkey="K_G">ွ</key>
+      <key vkey="K_N">ဉ</key>
+      <key vkey="K_BKSLASH">\</key>
+    </layer>
+    <layer shift="RA">
+      <key vkey="K_0">⸨</key>
+      <key vkey="K_1"></key>
+      <key vkey="K_9">⸩</key>
+      <key vkey="K_A"></key>
+      <key vkey="K_B"></key>
+      <key vkey="K_I"></key>
+      <key vkey="K_K"></key>
+      <key vkey="K_O"></key>
+      <key vkey="K_P"></key>
+      <key vkey="K_S"></key>
+      <key vkey="K_T"></key>
+      <key vkey="K_U"></key>
+      <key vkey="K_V"></key>
+      <key vkey="K_Y"></key>
+      <key vkey="K_Z"></key>
+      <key vkey="K_COLON"></key>
+      <key vkey="K_SLASH"></key>
+      <key vkey="K_BKQUOTE"></key>
+      <key vkey="K_LBRKT">]</key>
+      <key vkey="K_BKSLASH">\</key>
+      <key vkey="K_RBRKT">[</key>
+      <key vkey="K_QUOTE">'</key>
+    </layer>
+    <layer shift="SRA">
+      <key vkey="K_1"></key>
+      <key vkey="K_B"></key>
+      <key vkey="K_K"></key>
+      <key vkey="K_P"></key>
+      <key vkey="K_S"></key>
+      <key vkey="K_V"></key>
+      <key vkey="K_Z"></key>
+      <key vkey="K_SLASH"></key>
+      <key vkey="K_BKQUOTE"></key>
+      <key vkey="K_LBRKT">}</key>
+      <key vkey="K_RBRKT">{</key>
+      <key vkey="K_QUOTE">"</key>
+    </layer>
+  </encoding>
+</visualkeyboard>

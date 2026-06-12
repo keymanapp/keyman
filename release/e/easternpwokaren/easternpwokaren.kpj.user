@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProjectUser>
+  <ViewState>
+    <tab>1</tab>
+    <showhelp>1</showhelp>
+    <path>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\easternpwokaren.kpj</path>
+  </ViewState>
+  <FileStates>
+    <FileState>
+      <ID>id_16fc085cffcf205b70a04b2c4dbe43ad</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\easternpwokaren.kpj</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_93ba8f43a9c53ace3343ec76e0758445</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\easternpwokaren.kpj.user</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_ede98e4633e239f933cbfd1f4e1b766c</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\HISTORY.md</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_53e892b8b41cc4caece1cfd5ef21d6e7</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\LICENSE.md</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_0730bb7c2e8f9ea2438b52e419dd86c9</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\README.md</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_48f9dd718dde6ad38b13bf1c99acc97e</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\easternpwokaren.ico</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_3114d13ed434247578573add7e7abe0b</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\easternpwokaren.keyman-touch-layout</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_3b2bedfa98c66fb306c2323929dc530c</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\easternpwokaren.kmn</FullPath>
+      <IDEState>
+        <LayoutDisplay102Key>0</LayoutDisplay102Key>
+        <DebugDefaultFont>1</DebugDefaultFont>
+        <DebugFont>Consolas|-9|   |0</DebugFont>
+        <DisplayMapFont>Consolas|-9|   |0</DisplayMapFont>
+        <CodeFont>Consolas|-9|   |0</CodeFont>
+        <CharFont>Consolas|-9|   |0</CharFont>
+      </IDEState>
+      <Debug>True</Debug>
+    </FileState>
+    <FileState>
+      <ID>id_7554a66169dc9bd9c195e1e82f25b718</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\easternpwokaren.kps</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_8dcf851c9ff1447eb662ce5b69d8f50d</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\easternpwokaren.kvks</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_8da344c4cea6f467013357fe099006f5</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\readme.htm</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_356e5d149c1e539356d72698c1e401a6</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\welcome.htm</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_f2e0fb41a46b4ab5991475c9ba342f82</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\..\build\easternpwokaren.kmx</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_7e931b953374c77dc5854b35481cd022</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\..\build\easternpwokaren.js</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_43c3a3054bde03eb68ad53f4c4e51a00</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\..\build\easternpwokaren.kvk</FullPath>
+    </FileState>
+    <FileState>
+      <ID>id_c296b5df3dc126e219e0173fcbc1baec</ID>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\..\LICENSE.md</FullPath>
+    </FileState>
+  </FileStates>
+  <MRU>
+    <File>
+      <ID>id_MRU0</ID>
+      <Filename>easternpwokaren.kmn</Filename>
+      <FileType>.kmn</FileType>
+      <FullPath>C:\Users\SKULL\Documents\Keyman Developer\Projects\easternpwokaren\source\easternpwokaren.kmn</FullPath>
+    </File>
+  </MRU>
+</KeymanDeveloperProjectUser>
