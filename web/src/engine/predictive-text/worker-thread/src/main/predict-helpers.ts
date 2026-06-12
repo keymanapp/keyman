@@ -613,7 +613,7 @@ export function determineTokenizedCorrectionSequence(
   // The correction should always be based on the most recent external
   // transform/transcription ID.
   if(transition.transitionId !== undefined) {
-    suggestionParams.tokens.map((t) => t.correction.sample.id = transition.transitionId);
+    suggestionParams.tokens.forEach((t) => t.correction.sample.id = transition.transitionId);
   }
 
   const { deleteLeft } = transitionParams;
@@ -825,9 +825,9 @@ export function predictFromCorrectionSequence(
     if(predictions.length != 0) {
       successfulPredictions++;
     } else {
-      const failbackSuggestion = {
+      const fallbackSuggestion = {
         sample: {
-          transform: correctionTransform,
+          transform: {...correctionTransform},
           displayAs: correctionTransform.insert
         },
         // It's not found in the lexicon, so we'll take a low probability for it.
@@ -836,7 +836,7 @@ export function predictFromCorrectionSequence(
         p: Math.exp(-EDIT_DISTANCE_COST_SCALE)
       };
 
-      predictions.push(failbackSuggestion);
+      predictions.push(fallbackSuggestion);
     }
 
     // Regardless of origin, overwrite the transform's deleteLeft value with what it should actually hold.
@@ -861,6 +861,12 @@ export function predictFromCorrectionSequence(
     if(!isLastToken) {
       prefixProb *= predictions[0].p;
     }
+
+    // In case future models can use bigrams or similar strategies to adjust predictions based
+    // on prior tokens, we update the root context for following iterations with the current
+    // correction.  (This could be improved by trying variations of valid predictions, but that's
+    // currently out-of-scope.)
+    currentContext = models.applyTransform(correctionToken.correction.sample, currentContext);
 
     return predictionsToReturn.map((prediction) => {
       return {
@@ -958,6 +964,15 @@ export function compositeIntermediatePredictions(predictions: IntermediateTokeni
   return predictions.map((predictionData) => {
     const components = predictionData.components;
 
+    const reduceBaseTransform: Transform = {
+      insert: '',
+      deleteLeft: 0
+    }
+    const transformId = predictionData.components[0].prediction.transformId;
+    if(transformId !== undefined) {
+      reduceBaseTransform.id = transformId;
+    }
+
     return {
       components: components.reduce((total, current) => {
         const mergedTransform = models.buildMergedTransform(total.prediction.transform, current.prediction.transform);
@@ -968,7 +983,7 @@ export function compositeIntermediatePredictions(predictions: IntermediateTokeni
           correction: total.correction + current.correction
         }
       }, {
-        prediction: {...components[0].prediction, transform: { insert: '', deleteLeft: 0 }, displayAs: ''},
+        prediction: {...components[0].prediction, transform: reduceBaseTransform, displayAs: ''},
         correction: ''
       }),
       metadata: predictionData.metadata
