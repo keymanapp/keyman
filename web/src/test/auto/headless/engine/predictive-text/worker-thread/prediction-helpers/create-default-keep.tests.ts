@@ -12,7 +12,7 @@ import { assert } from 'chai';
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
-import { CorrectionPredictionTuple, createDefaultKeep, models, SuggestionSimilarity } from "@keymanapp/lm-worker/test-index";
+import { IntermediateCompositedPrediction, createDefaultKeep, models, SuggestionSimilarity } from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -108,13 +108,9 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: CorrectionPredictionTuple = {
-      correction: {
-        sample: 'iphone',
-        p: 1
-      },
-      prediction: {
-        sample: {
+    const expectedKeep: IntermediateCompositedPrediction = {
+      components: {
+        prediction: {
           transform: {
             insert: 'iphone',
             deleteLeft: 5
@@ -123,10 +119,17 @@ describe('createDefaultKeep', () => {
           matchesModel: false,
           tag: 'keep'
         },
-        p: 1
+        correction: 'iphone'
       },
-      totalProb: 1,
-      matchLevel: SuggestionSimilarity.exact
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
     };
 
     const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);
@@ -149,13 +152,9 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: CorrectionPredictionTuple = {
-      correction: {
-        sample: 'iphone',
-        p: 1
-      },
-      prediction: {
-        sample: {
+    const expectedKeep: IntermediateCompositedPrediction = {
+      components: {
+        prediction: {
           transform: {
             insert: 'iphone',
             deleteLeft: 7
@@ -164,10 +163,17 @@ describe('createDefaultKeep', () => {
           matchesModel: false,
           tag: 'keep'
         },
-        p: 1
+        correction: 'iphone'
       },
-      totalProb: 1,
-      matchLevel: SuggestionSimilarity.exact
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
     };
 
     const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);
@@ -190,13 +196,9 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: CorrectionPredictionTuple = {
-      correction: {
-        sample: 'iphone',
-        p: 1
-      },
-      prediction: {
-        sample: {
+    const expectedKeep: IntermediateCompositedPrediction = {
+      components: {
+        prediction: {
           transform: {
             insert: 'iphone',
             deleteLeft: 8
@@ -205,10 +207,17 @@ describe('createDefaultKeep', () => {
           matchesModel: false,
           tag: 'keep'
         },
-        p: 1
+        correction: 'iphone'
       },
-      totalProb: 1,
-      matchLevel: SuggestionSimilarity.exact
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
     };
 
     const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);
@@ -231,13 +240,9 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: CorrectionPredictionTuple = {
-      correction: {
-        sample: 'and',
-        p: 1
-      },
-      prediction: {
-        sample: {
+    const expectedKeep: IntermediateCompositedPrediction = {
+      components: {
+        prediction: {
           transform: {
             insert: 'iphones and',
             deleteLeft: 5
@@ -246,10 +251,17 @@ describe('createDefaultKeep', () => {
           matchesModel: false,
           tag: 'keep'
         },
-        p: 1
+        correction: 'and'
       },
-      totalProb: 1,
-      matchLevel: SuggestionSimilarity.exact
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
     };
 
     const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);
@@ -272,13 +284,9 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: CorrectionPredictionTuple = {
-      correction: {
-        sample: 'iphones',
-        p: 1
-      },
-      prediction: {
-        sample: {
+    const expectedKeep: IntermediateCompositedPrediction = {
+      components: {
+        prediction: {
           transform: {
             insert: 'iphones',
             deleteLeft: 7
@@ -287,10 +295,17 @@ describe('createDefaultKeep', () => {
           matchesModel: false,
           tag: 'keep'
         },
-        p: 1
+        correction: 'iphones'
       },
-      totalProb: 1,
-      matchLevel: SuggestionSimilarity.exact
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
     };
 
     const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);
@@ -313,13 +328,9 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: CorrectionPredictionTuple = {
-      correction: {
-        sample: '',
-        p: 1
-      },
-      prediction: {
-        sample: {
+    const expectedKeep: IntermediateCompositedPrediction = {
+      components: {
+        prediction: {
           transform: {
             insert: 'iphone ',
             deleteLeft: 5
@@ -328,10 +339,17 @@ describe('createDefaultKeep', () => {
           matchesModel: false,
           tag: 'keep'
         },
-        p: 1
+        correction: ''
       },
-      totalProb: 1,
-      matchLevel: SuggestionSimilarity.exact
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
     };
 
     const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);

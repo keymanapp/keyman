@@ -116,19 +116,19 @@ describe('predictFromCorrectionSequence', () => {
 
       const transitionID = 12345;
       const predictions = predictFromCorrectionSequence(model, correctionDistribution, context, transitionID);
-      predictions.forEach((entry) => assert.equal(entry.correction.sample, 'Its'));
-      predictions.forEach((entry) => assert.equal(entry.correction.p, 0.6));
+      predictions.forEach((entry) => assert.equal(entry.components.correction, 'Its'));
+      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, 0.6));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions.map((s) => {
+      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), dummied_suggestions.map((s) => {
         delete s.p;
         s.transformId = transitionID;
         s.transform.id = transitionID;
         return s;
       }));
 
-      assert.approximately(predictions[0].totalProb, 0.18 * 0.6, 0.00001);
-      assert.approximately(predictions[1].totalProb, 0.02 * 0.6, 0.00001);
+      assert.approximately(predictions[0].metadata.probabilities.total, 0.18 * 0.6, 0.00001);
+      assert.approximately(predictions[1].metadata.probabilities.total, 0.02 * 0.6, 0.00001);
     });
 
     it('constructs suggestions matching multiple lexical entries directly - with transform ID', () => {
@@ -174,12 +174,12 @@ describe('predictFromCorrectionSequence', () => {
       });
 
       const predictions = predictFromCorrectionSequence(model, correctionDistribution, context, transitionID);
-      predictions.forEach((entry) => assert.equal(entry.correction.sample, 'Its'));
-      predictions.forEach((entry) => assert.equal(entry.correction.p, 0.6));
+      predictions.forEach((entry) => assert.equal(entry.components.correction, 'Its'));
+      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, 0.6));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.sameOrderedMembers(predictions.map((entry) => entry.prediction.sample.displayAs), ["it's", "its"]);
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions.map((entry) => {
+      assert.sameOrderedMembers(predictions.map((entry) => entry.components.prediction.displayAs), ["it's", "its"]);
+      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), dummied_suggestions.map((entry) => {
         entry = deepCopy(entry);
         entry.transformId = transitionID;
         entry.transform.id = transitionID;
@@ -187,9 +187,9 @@ describe('predictFromCorrectionSequence', () => {
         return entry;
       }));
 
-      assert.approximately(predictions[0].totalProb, 0.18 * 0.6, 0.00001);
-      assert.approximately(predictions[1].totalProb, 0.02 * 0.6, 0.00001);
-      predictions.forEach((prediction) => assert.equal(prediction.prediction.sample.transformId, transitionID));
+      assert.approximately(predictions[0].metadata.probabilities.total, 0.18 * 0.6, 0.00001);
+      assert.approximately(predictions[1].metadata.probabilities.total, 0.02 * 0.6, 0.00001);
+      predictions.forEach((prediction) => assert.equal(prediction.components.prediction.transformId, transitionID));
     });
 
     it('constructs suggestions without input (as if after a context reset)', () => {
@@ -227,11 +227,11 @@ describe('predictFromCorrectionSequence', () => {
 
       const transitionID = 12345;
       const predictions = predictFromCorrectionSequence(model, correctionDistribution, context, transitionID);
-      predictions.forEach((entry) => assert.equal(entry.correction.sample, 'appl'));
-      predictions.forEach((entry) => assert.equal(entry.correction.p, 1));
+      predictions.forEach((entry) => assert.equal(entry.components.correction, 'appl'));
+      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, 1));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions.map((s) => {
+      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), dummied_suggestions.map((s) => {
         delete s.p;
         s.transformId = transitionID;
         s.transform.id = transitionID;
@@ -318,15 +318,15 @@ describe('predictFromCorrectionSequence', () => {
       });
 
       const predictions = predictFromCorrectionSequence(model, correctionSequence, context, transitionID);
-      predictions.forEach((entry) => assert.equal(entry.correction.sample, 'golden app'));
-      predictions.forEach((entry) => assert.equal(entry.correction.p, correctionSequence.reduce((accum, curr) => accum * curr.p, 1)));
+      predictions.forEach((entry) => assert.equal(entry.components.correction, 'golden app'));
+      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, correctionSequence.reduce((accum, curr) => accum * curr.p, 1)));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.equal(predictions[0].prediction.sample.transform.insert, 'golden apple');
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), [expected_prediction.sample]);
+      assert.equal(predictions[0].components.prediction.transform.insert, 'golden apple');
+      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), [expected_prediction.sample]);
 
-      assert.approximately(predictions[0].prediction.p, expected_prediction.p, 0.00001);
-      assert.equal(predictions[0].prediction.sample.transformId, transitionID);
+      assert.approximately(predictions[0].metadata.probabilities.prediction, expected_prediction.p, 0.00001);
+      assert.equal(predictions[0].components.prediction.transformId, transitionID);
     });
 
     it('returns no results if all correction tokens lack predictions', () => {
@@ -468,15 +468,15 @@ describe('predictFromCorrectionSequence', () => {
       // There should be no variations with 'green' or 'gray' apples.
       assert.equal(predictions.length, 1);
 
-      predictions.forEach((entry) => assert.equal(entry.correction.sample, 'g app'));
-      predictions.forEach((entry) => assert.equal(entry.correction.p, correctionSequence.reduce((accum, curr) => accum * curr.p, 1)));
+      predictions.forEach((entry) => assert.equal(entry.components.correction, 'g app'));
+      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, correctionSequence.reduce((accum, curr) => accum * curr.p, 1)));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.equal(predictions[0].prediction.sample.transform.insert, 'golden apple');
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), [expected_prediction.sample]);
+      assert.equal(predictions[0].components.prediction.transform.insert, 'golden apple');
+      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), [expected_prediction.sample]);
 
-      assert.approximately(predictions[0].prediction.p, expected_prediction.p, 0.00001);
-      assert.equal(predictions[0].prediction.sample.transformId, transitionID);
+      assert.approximately(predictions[0].metadata.probabilities.prediction, expected_prediction.p, 0.00001);
+      assert.equal(predictions[0].components.prediction.transformId, transitionID);
     });
 
     it('uses all suggestions generated from context-final correction-tokens', () => {
@@ -582,19 +582,19 @@ describe('predictFromCorrectionSequence', () => {
       const predictions = predictFromCorrectionSequence(model, correctionSequence, context, transitionID);
       assert.equal(predictions.length, dummied_suggestion_sequences[dummied_suggestion_sequences.length - 1].length);
 
-      predictions.forEach((entry) => assert.equal(entry.correction.sample, 'golden app'));
-      predictions.forEach((entry) => assert.equal(entry.correction.p, correctionSequence.reduce((accum, curr) => accum * curr.p, 1)));
+      predictions.forEach((entry) => assert.equal(entry.components.correction, 'golden app'));
+      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, correctionSequence.reduce((accum, curr) => accum * curr.p, 1)));
       predictions.sort(tupleDisplayOrderSort);
 
       assert.sameOrderedMembers(
-        predictions.map((t) => t.prediction.sample.transform.insert),
+        predictions.map((t) => t.components.prediction.transform.insert),
         ['golden apple', 'golden application', 'golden appetizer']
       );
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), expected_predictions.map((p => p.sample)));
+      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), expected_predictions.map((p => p.sample)));
 
       for(let i = 0; i < predictions.length; i++) {
-        assert.approximately(predictions[i].prediction.p, expected_predictions[i].p, 0.00001, `Expected probabilty mismatch at index ${i}`);
-        assert.equal(predictions[i].prediction.sample.transformId, transitionID);
+        assert.approximately(predictions[i].metadata.probabilities.prediction, expected_predictions[i].p, 0.00001, `Expected probabilty mismatch at index ${i}`);
+        assert.equal(predictions[i].components.prediction.transformId, transitionID);
       }
     });
   });
