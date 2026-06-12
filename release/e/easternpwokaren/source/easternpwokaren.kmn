@@ -1,0 +1,161 @@
+﻿c Keyman keyboard generated from KLC Source Data
+c Source: EasternPwoKarenUnicode Version 1.0
+c Copyright © EPKUT
+
+store(&Version) "10.0"
+store(&NAME) 'EasternPwoKaren'
+store(&TARGETS) 'any'
+store(&VISUALKEYBOARD) 'easternpwokaren.kvks'
+store(&BITMAP) 'easternpwokaren.ico'
+store(&LAYOUTFILE) 'easternpwokaren.keyman-touch-layout'
+store(&COPYRIGHT) 'Copyright © EPKUT'
+store(&KEYBOARDVERSION) '1.0'
+store(&MESSAGE) 'Eastern Pwo Karen Unicode Team'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [K_SPACE] > U+0020
+
+c Number Row
++ [K_1] > U+116db
++ [SHIFT K_1] > U+1020
+
++ [K_2] > U+116dc
++ [SHIFT K_2] > U+100e
+
++ [K_3] > U+116dd
++ [SHIFT K_3] > U+100b
+
++ [K_4] > U+116de
++ [SHIFT K_4] > U+0024
+
++ [K_5] > U+116df
++ [SHIFT K_5] > U+0025
+
++ [K_6] > U+116e0
++ [SHIFT K_6] > U+005e
+
++ [K_7] > U+116e1
++ [SHIFT K_7] > U+101b
+
++ [K_8] > U+116e2
++ [SHIFT K_8] > U+002a
+
++ [K_9] > U+116e3
++ [SHIFT K_9] > U+0028
+
++ [K_0] > U+116da
++ [SHIFT K_0] > U+0029
+
++ [K_HYPHEN] > U+002d
++ [SHIFT K_HYPHEN] > U+005f
+
++ [K_EQUAL] > U+003d
++ [SHIFT K_EQUAL] > U+002b
+
+c QWERTY Row
++ [K_Q] > U+1006
++ [SHIFT K_Q] > U+1008
+
++ [K_W] > U+1010
++ [SHIFT K_W] > U+101d
+
++ [K_E] > U+1014
++ [SHIFT K_E] > U+105e
+
++ [K_R] > U+1019
++ [SHIFT K_R] > U+105f
+
++ [K_T] > U+1021
++ [SHIFT K_T] > U+100d
+
++ [K_Y] > U+1015
++ [SHIFT K_Y] > 'ါဲ'
+
++ [K_U] > U+1000
++ [SHIFT K_U] > U+1025
+
++ [K_I] > U+1004
++ [SHIFT K_I] > U+105a
+
++ [K_O] > U+101e
++ [SHIFT K_O] > U+1034
+
++ [K_P] > U+1005
++ [SHIFT K_P] > U+100f
+
++ [K_LBRKT] > U+101f
++ [SHIFT K_LBRKT] > U+106f
+
++ [K_RBRKT] > U+2606
++ [SHIFT K_RBRKT] > U+1070
+
+c ASDFGH Row
++ [K_A] > U+1031
++ [SHIFT K_A] > U+1017
+
++ [K_S] > U+103b
++ [SHIFT K_S] > U+103e
+
++ [K_D] > U+102d
++ [SHIFT K_D] > U+102e
+
++ [K_F] > U+103a
++ [SHIFT K_F] > U+1039
+
++ [K_G] > U+102b
++ [SHIFT K_G] > U+103d
+
++ [K_H] > U+1037
++ [SHIFT K_H] > U+1036
+
++ [K_J] > U+103c
++ [SHIFT K_J] > U+1032
+
++ [K_K] > U+102f
++ [SHIFT K_K] > U+1012
+
++ [K_L] > U+1030
++ [SHIFT K_L] > U+1013
+
++ [K_COLON] > U+1038
++ [SHIFT K_COLON] > U+1002
+
++ [K_QUOTE] > U+0027
++ [SHIFT K_QUOTE] > U+0022
+
++ [K_BKSLASH] > U+005c
++ [SHIFT K_BKSLASH] > U+007c
+
+c ZXCVBN Row
++ [K_Z] > U+1016
++ [SHIFT K_Z] > U+1007
+
++ [K_X] > U+1011
++ [SHIFT K_X] > U+100c
+
++ [K_C] > U+1001
++ [SHIFT K_C] > U+1003
+
++ [K_V] > U+101c
++ [SHIFT K_V] > U+1060
+
++ [K_B] > U+1018
++ [SHIFT K_B] > U+101a
+
++ [K_N] > U+100a
++ [SHIFT K_N] > U+1009
+
++ [K_M] > U+102c
++ [SHIFT K_M] > U+105c
+
++ [K_COMMA] > U+002c
++ [SHIFT K_COMMA] > U+104a
+
++ [K_PERIOD] > U+108b
++ [SHIFT K_PERIOD] > U+104b
+
++ [K_SLASH] > U+002f
++ [SHIFT K_SLASH] > U+003f
