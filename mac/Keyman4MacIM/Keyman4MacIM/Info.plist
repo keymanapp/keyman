@@ -23,8 +23,6 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleGetInfoString</key>
-	<string>$(GET_INFO_STRING)</string>
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
@@ -82,7 +80,7 @@
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Keyman needs to send key events to the target application.</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>$(COPYRIGHT_STRING)</string>
+	<string>$(COPYRIGHT_STRING_RIGHTS)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

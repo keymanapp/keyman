@@ -62,7 +62,8 @@ function archive_apps() {
           -configuration Release \
           -archivePath "${KEYMAN_BUILD_PATH}/Keyman.xcarchive" \
           ARCHS=\"arm64 x86_64\" \
-          ONLY_ACTIVE_ARCH=NO
+          ONLY_ACTIVE_ARCH=NO \
+          PRODUCT_VERSION=$KEYMAN_VERSION
 
   # xcodebuild for x86_64 and arm64 (universal binary)
   mac_xcodebuild archive -workspace "$KEYMAN_WORKSPACE_PATH" \
@@ -70,7 +71,8 @@ function archive_apps() {
           -configuration Release \
           -archivePath "${KEYMAN_BUILD_PATH}/Config.xcarchive" \
           ARCHS=\"arm64 x86_64\" \
-          ONLY_ACTIVE_ARCH=NO
+          ONLY_ACTIVE_ARCH=NO \
+          PRODUCT_VERSION=$KEYMAN_VERSION
 }
 
 function export_apps() {

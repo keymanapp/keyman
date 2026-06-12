@@ -661,16 +661,14 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International.";
+				COPYRIGHT_STRING = "Copyright © SIL Global.";
 				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
-				COPYRIGHT_YEARS = "2017-2019";
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				GET_INFO_STRING = "Keyman Engine $(PRODUCT_VERSION) for macOS. $(COPYRIGHT_STRING_RIGHTS)";
 				INFOPLIST_FILE = KeymanEngine4Mac/Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
@@ -703,9 +701,8 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International.";
+				COPYRIGHT_STRING = "Copyright © SIL Global.";
 				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
-				COPYRIGHT_YEARS = "2017-2019";
 				COPY_PHASE_STRIP = NO;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
@@ -713,7 +710,6 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				GET_INFO_STRING = "Keyman Engine $(PRODUCT_VERSION) for macOS. $(COPYRIGHT_STRING_RIGHTS)";
 				INFOPLIST_FILE = KeymanEngine4Mac/Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";

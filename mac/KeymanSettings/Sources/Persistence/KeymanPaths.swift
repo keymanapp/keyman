@@ -31,12 +31,13 @@ import Foundation
  */
 
 public struct KeymanPaths {
-  static let keymanBundleId = "keyman.inputmethod.Keyman"
-  static let configBundleId = "com.keyman.config"
-  static let groupId = "group.com.keyman"
+  // MAC-CONFIG-TODO: move to input method util?
+  static public let keymanBundleId = "keyman.inputmethod.Keyman"
+  static public let configBundleId = "com.keyman.config"
+  static public let groupId = "group.com.keyman"
   
   static private let preKeyman19PackagesDirectoryName = "Keyman-Keyboards"
-  static private let keymanSubdirectoryName = "keyman.inputmethod.Keyman"
+  static private let keymanSubdirectoryName = keymanBundleId
   
   // keyman 19 directory names
   static private let containerPreferencesPartialPath = "Library/Preferences"
@@ -122,6 +123,15 @@ public struct KeymanPaths {
     }
   }
   
+  public func buildInputMethodExecutableUrl(fileName:String) -> URL? {
+    if let inputMethodUrl = self.buildInputMethodPathUrl(fileName: fileName) {
+      let executableName = inputMethodUrl.deletingPathExtension().lastPathComponent
+      return inputMethodUrl.appendingPathComponent("Contents/MacOS/\(executableName)")
+    } else {
+      return nil
+    }
+  }
+
   /**
    * build the URL to the user's Documents directory
    */

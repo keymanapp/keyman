@@ -8,6 +8,8 @@
 	<string>developer-id</string>
 	<key>signingStyle</key>
 	<string>manual</string>
+  <key>manageAppVersionAndBuildNumber</key>
+  <false/>  
 	<key>provisioningProfiles</key>
 	<dict>
 		<key>keyman.inputmethod.Keyman</key>

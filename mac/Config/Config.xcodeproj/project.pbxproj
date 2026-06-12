@@ -34,6 +34,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		D87D6F492FAF95400083A95E /* Installation */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Installation;
+			sourceTree = "<group>";
+		};
 		D88F03C82F50ED5000C02A31 /* Config */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Config;
@@ -80,6 +85,7 @@
 		D88F03BD2F50ED5000C02A31 = {
 			isa = PBXGroup;
 			children = (
+				D87D6F492FAF95400083A95E /* Installation */,
 				D88F03C82F50ED5000C02A31 /* Config */,
 				D88F03D62F50ED5100C02A31 /* ConfigTests */,
 				D88F03E02F50ED5100C02A31 /* ConfigUITests */,
@@ -121,6 +127,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				D87D6F492FAF95400083A95E /* Installation */,
 				D88F03C82F50ED5000C02A31 /* Config */,
 			);
 			name = Config;
@@ -414,22 +421,25 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				COPYRIGHT_STRING = "Copyright © SIL Global.";
+				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
+				CURRENT_PROJECT_VERSION = "$(PRODUCT_VERSION)";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 3YE4W86L3G;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "$(COPYRIGHT_STRING_RIGHTS)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
-				MARKETING_VERSION = 1.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
+				MARKETING_VERSION = "$(PRODUCT_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.config;
 				PRODUCT_NAME = "Keyman Configuration";
+				PRODUCT_VERSION = 0.0.0;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "Keyman Mac Config Dev";
 				REGISTER_APP_GROUPS = YES;
@@ -451,22 +461,25 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				COPYRIGHT_STRING = "Copyright © SIL Global.";
+				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
+				CURRENT_PROJECT_VERSION = "$(PRODUCT_VERSION)";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 3YE4W86L3G;
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "$(COPYRIGHT_STRING_RIGHTS)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.5;
-				MARKETING_VERSION = 1.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
+				MARKETING_VERSION = "$(PRODUCT_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.keyman.config;
 				PRODUCT_NAME = "Keyman Configuration";
+				PRODUCT_VERSION = 0.0.0;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "Keyman Mac Config Dist";
 				REGISTER_APP_GROUPS = YES;
