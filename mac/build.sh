@@ -103,6 +103,7 @@ if [[ -f "$THIS_SCRIPT_PATH/localenv.sh" ]]; then
 fi
 
 BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS PRODUCT_VERSION=$KEYMAN_VERSION"
+builder_echo info "BUILD_OPTIONS: $BUILD_OPTIONS"
 
 ### START OF THE BUILD ###
 
@@ -169,8 +170,7 @@ updatePlist() {
         /usr/libexec/Plistbuddy -c "Set :Keyman:VersionWithTag $KEYMAN_VERSION_WITH_TAG" "$KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set :Keyman:VersionGitTag $KEYMAN_VERSION_GIT_TAG" "$KM_PLIST"
         /usr/libexec/Plistbuddy -c "Set :Keyman:VersionRelease $KEYMAN_VERSION_RELEASE" "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set CFBundleGetInfoString $APPNAME $KEYMAN_VERSION_WITH_TAG for macOS, Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
-        /usr/libexec/Plistbuddy -c "Set NSHumanReadableCopyright Copyright © 2017-$YEAR SIL International." "$KM_PLIST"
+        # /usr/libexec/Plistbuddy -c "Set NSHumanReadableCopyright Copyright © SIL Global." "$KM_PLIST"
     fi
 }
 
