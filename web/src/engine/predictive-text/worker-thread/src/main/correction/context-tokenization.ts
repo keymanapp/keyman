@@ -109,18 +109,6 @@ export class ContextTokenization {
   readonly tokens: ContextToken[];
 
   /**
-   * Denotes whether or not the transition to this tokenization added or deleted
-   * any tokens.
-   */
-  readonly transitionEdits?: {
-    addedNewTokens: boolean,
-    removedOldTokens: boolean,
-    // NOTE:  slated for removal in an upcoming PR.  Exists in this form to
-    // facilitate factorization of the changes into smaller bodies of work.
-    editedTokenCount: number
-  };
-
-  /**
    * The portion of edits from the true input keystroke that are not part of the
    * final entry in `token`.  If `null`, all edits are considered part of the
    * final token's contents.
@@ -147,18 +135,10 @@ export class ContextTokenization {
         throw new Error("ContextTokenization requires at least one existing ContextToken");
       }
       this.tokens = [].concat(tokens);
-      if(tokenizationPath) {
-        this.transitionEdits = {
-          addedNewTokens: tokenizationPath?.inputs[0].sample.has(1) ?? false,
-          removedOldTokens: (tokenizationPath?.alignment.removedTokenCount ?? 0) > 0,
-          editedTokenCount: tokenizationPath?.inputs[0].sample.size
-        }
-      }
       this.taillessTrueKeystroke = taillessTrueKeystroke;
     } else {
       const priorToClone = param1;
       this.tokens = priorToClone.tokens.map((entry) => new ContextToken(entry));
-      this.transitionEdits = priorToClone.transitionEdits ? {...priorToClone.transitionEdits} : null;
       this.taillessTrueKeystroke = priorToClone.taillessTrueKeystroke;
     }
   }

@@ -248,6 +248,7 @@ describe('ContextState', () => {
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
       // We want to preserve the added whitespace when predicting a token that follows after it.
+
       assert.deepEqual(newContextMatch.final.displayTokenization.taillessTrueKeystroke, { insert: ' ', deleteLeft: 0 });
 
       // The 'wordbreak' transform
