@@ -4,16 +4,12 @@ import { assert } from 'chai';
 import { deepCopy } from "keyman/common/web-utils";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { EDIT_DISTANCE_COST_SCALE, models, predictFromCorrectionSequence, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
+import { EDIT_DISTANCE_COST_SCALE, PredictionParameters, models, predictFromCorrectionSequence, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
-import Context = LexicalModelTypes.Context;
-import Distribution = LexicalModelTypes.Distribution;
 import DummyModel = models.DummyModel;
 import Outcome = LexicalModelTypes.Outcome;
-import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Suggestion = LexicalModelTypes.Suggestion;
-import Transform = LexicalModelTypes.Transform;
 
 // See: developer/src/kmc-model/model-defaults.ts, defaultApplyCasing
 const applyCasing: CasingFunction = (casing, text) => {
@@ -75,21 +71,32 @@ const DUMMY_MODEL_CONFIG = {
 describe('predictFromCorrectionSequence', () => {
   describe('on a single correction', () => {
     it('constructs suggestions matching multiple lexical entries directly - no transform ID', () => {
-      const context: Context = {
-        left: '',
-        right: '',
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
+      const transitionID = 12345;
 
-      const correctionDistribution: Distribution<Transform> = [{
-          sample: {
-            insert: 'Its',
-            deleteLeft: 0
-          },
-          p: 0.6
-        }
-      ];
+      const parameters: PredictionParameters = {
+        rootContext: {
+          left: '',
+          right: '',
+          startOfBuffer: true,
+          endOfBuffer: true
+        },
+        tokens: [
+          {
+            correction: {
+              sample: {
+                insert: 'Its',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.6
+            },
+            casingRoot: '',
+            autoSelectable: true
+          }
+        ],
+        applyInPost: (x) => x,
+        deleteLeft: 0
+      };
 
       const dummied_suggestions: Outcome<Suggestion>[] = [
         {
@@ -114,13 +121,12 @@ describe('predictFromCorrectionSequence', () => {
         futureSuggestions: [ dummied_suggestions ]
       });
 
-      const transitionID = 12345;
-      const predictions = predictFromCorrectionSequence(model, correctionDistribution, context, transitionID);
-      predictions.forEach((entry) => assert.equal(entry.components.correction, 'Its'));
+      const predictions = predictFromCorrectionSequence(model, parameters);
+      predictions.forEach((entry) => assert.equal(entry.components[0].correction, 'Its'));
       predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, 0.6));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), dummied_suggestions.map((s) => {
+      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components[0].prediction), dummied_suggestions.map((s) => {
         delete s.p;
         s.transformId = transitionID;
         s.transform.id = transitionID;
@@ -132,23 +138,32 @@ describe('predictFromCorrectionSequence', () => {
     });
 
     it('constructs suggestions matching multiple lexical entries directly - with transform ID', () => {
-      const context: Context = {
-        left: '',
-        right: '',
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
-
       const transitionID = 314159;
-      const correctionDistribution: Distribution<Transform> = [{
-          sample: {
-            insert: 'Its',
-            deleteLeft: 0,
-            id: transitionID
-          },
-          p: 0.6
-        }
-      ];
+
+      const parameters: PredictionParameters = {
+        rootContext: {
+          left: '',
+          right: '',
+          startOfBuffer: true,
+          endOfBuffer: true
+        },
+        tokens: [
+          {
+            correction: {
+              sample: {
+                insert: 'Its',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.6
+            },
+            casingRoot: '',
+            autoSelectable: true
+          }
+        ],
+        applyInPost: (x) => x,
+        deleteLeft: 0
+      };
 
       const dummied_suggestions: Outcome<Suggestion>[] = [
         {
@@ -173,41 +188,51 @@ describe('predictFromCorrectionSequence', () => {
         futureSuggestions: [ dummied_suggestions ]
       });
 
-      const predictions = predictFromCorrectionSequence(model, correctionDistribution, context, transitionID);
-      predictions.forEach((entry) => assert.equal(entry.components.correction, 'Its'));
+      const predictions = predictFromCorrectionSequence(model, parameters);
+      predictions.forEach((entry) => assert.equal(entry.components[0].correction, 'Its'));
       predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, 0.6));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.sameOrderedMembers(predictions.map((entry) => entry.components.prediction.displayAs), ["it's", "its"]);
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), dummied_suggestions.map((entry) => {
+      assert.sameOrderedMembers(predictions.map((entry) => entry.components[0].prediction.displayAs), ["it's", "its"]);
+      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components[0].prediction), dummied_suggestions.map((entry) => {
         entry = deepCopy(entry);
         entry.transformId = transitionID;
         entry.transform.id = transitionID;
-        delete entry.p;
         return entry;
       }));
 
       assert.approximately(predictions[0].metadata.probabilities.total, 0.18 * 0.6, 0.00001);
       assert.approximately(predictions[1].metadata.probabilities.total, 0.02 * 0.6, 0.00001);
-      predictions.forEach((prediction) => assert.equal(prediction.components.prediction.transformId, transitionID));
+      predictions.forEach((prediction) => assert.equal(prediction.components[0].prediction.transformId, transitionID));
     });
 
     it('constructs suggestions without input (as if after a context reset)', () => {
-      const context: Context = {
-        left: 'appl',
-        right: '',
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
+      const transitionID = 271828;
 
-      const correctionDistribution: Distribution<Transform> = [{
-          sample: {
-            insert: 'appl',
-            deleteLeft: 4
-          },
-          p: 1
-        }
-      ];
+      const parameters: PredictionParameters = {
+        rootContext: {
+          left: '',
+          right: '',
+          startOfBuffer: true,
+          endOfBuffer: true
+        },
+        tokens: [
+          {
+            correction: {
+              sample: {
+                insert: 'appl',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 1
+            },
+            casingRoot: 'appl',
+            autoSelectable: true
+          }
+        ],
+        applyInPost: (x) => x,
+        deleteLeft: 0
+      };
 
       const dummied_suggestions: Outcome<Suggestion>[] = [
         {
@@ -225,60 +250,79 @@ describe('predictFromCorrectionSequence', () => {
         futureSuggestions: [ dummied_suggestions ]
       });
 
-      const transitionID = 12345;
-      const predictions = predictFromCorrectionSequence(model, correctionDistribution, context, transitionID);
-      predictions.forEach((entry) => assert.equal(entry.components.correction, 'appl'));
+      const predictions = predictFromCorrectionSequence(model, parameters);
+      predictions.forEach((entry) => assert.deepEqual(entry.components.map((c => c.correction)), ['appl']));
       predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, 1));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), dummied_suggestions.map((s) => {
+      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.map((c) => c.prediction)), [dummied_suggestions.map((s) => {
         delete s.p;
         s.transformId = transitionID;
         s.transform.id = transitionID;
         return s;
-      }));
+      })]);
     });
   });
 
   describe('on a sequence of corrections', () => {
     it('returns results even if some correction tokens lack predictions', () => {
-      const context: Context = {
-        left: 'i want to eat a ',
-        right: '',
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
+      const transitionID = 101;
 
-      const correctionSequence: Distribution<Transform> = [
-        {
-          sample: {
-            insert: 'golden',
-            deleteLeft: 0
-          },
-          p: 0.1
-        }, {
-          sample: {
-            insert: ' ',
-            deleteLeft: 0
-          },
-          p: 0.2
-        }, {
-          sample: {
-            insert: 'app',
-            deleteLeft: 0
-          },
-          p: 0.2
-        }
-      ];
+      const parameters: PredictionParameters = {
+        rootContext: {
+          left: 'i want to eat a ',
+          right: '',
+          startOfBuffer: true,
+          endOfBuffer: true
+        },
+        tokens: [
+          {
+            correction: {
+              sample: {
+                insert: 'g',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.1
+            },
+            casingRoot: 'g',
+            autoSelectable: true
+          }, {
+            correction: {
+              sample: {
+                insert: ' ',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.2
+            },
+            casingRoot: ' ',
+            autoSelectable: true
+          }, {
+            correction: {
+              sample: {
+                insert: 'apple',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.2
+            },
+            casingRoot: 'apple',
+            autoSelectable: true
+          }
+        ],
+        applyInPost: (x) => x,
+        deleteLeft: 0
+      };
 
       const dummied_suggestion_sequences: Outcome<Suggestion>[][] = [
         [
           {
             transform: {
-              insert: "golden",
+              insert: "g",
               deleteLeft: 0
             },
-            displayAs: "golden",
+            displayAs: "g",
             p: 0.1
           }
         ],
@@ -295,69 +339,104 @@ describe('predictFromCorrectionSequence', () => {
         ]
       ];
 
-      const transitionID = 101;
-      const expected_prediction: ProbabilityMass<Suggestion> = {
-        sample: {
+      const expected_predictions: Suggestion[] = [
+        {
           transform: {
-            insert: 'golden apple',
+            insert: 'g',
             deleteLeft: 0,
             id: transitionID
           },
-          displayAs: 'golden apple',
+          displayAs: 'g',
+          transformId: transitionID,
+        }, {
+          transform: {
+            insert: ' ',
+            deleteLeft: 0,
+            id: transitionID
+          },
+          displayAs: ' ',
           transformId: transitionID
-        }, p: dummied_suggestion_sequences.map((dist) => {
+        }, {
+          transform: {
+            insert: 'apple',
+            deleteLeft: 0,
+            id: transitionID
+          },
+          displayAs: 'apple',
+          transformId: transitionID
+        }
+      ];
+
+      const expected_prediction_p = dummied_suggestion_sequences.map((dist) => {
           return dist[0]
         }).reduce((accum, curr) => {
           return accum * (curr ? curr.p : Math.exp(-EDIT_DISTANCE_COST_SCALE))
-        }, 1)
-      }
+        }, 1);
 
       const model = new DummyModel({
         ...DUMMY_MODEL_CONFIG,
         futureSuggestions: dummied_suggestion_sequences
       });
 
-      const predictions = predictFromCorrectionSequence(model, correctionSequence, context, transitionID);
-      predictions.forEach((entry) => assert.equal(entry.components.correction, 'golden app'));
-      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, correctionSequence.reduce((accum, curr) => accum * curr.p, 1)));
+      const predictions = predictFromCorrectionSequence(model, parameters);
+      predictions.forEach((entry) => assert.deepEqual(entry.components.map((c) => c.correction), ['g', ' ', 'apple']));
+      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, parameters.tokens.reduce((accum, curr) => accum * curr.correction.p, 1)));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.equal(predictions[0].components.prediction.transform.insert, 'golden apple');
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), [expected_prediction.sample]);
+      assert.sameDeepOrderedMembers(predictions[0].components.map((c) => c.prediction), expected_predictions);
 
-      assert.approximately(predictions[0].metadata.probabilities.prediction, expected_prediction.p, 0.00001);
-      assert.equal(predictions[0].components.prediction.transformId, transitionID);
+      assert.approximately(predictions[0].metadata.probabilities.prediction, expected_prediction_p, 0.00001);
     });
 
     it('returns no results if all correction tokens lack predictions', () => {
-      const context: Context = {
-        left: 'i want to eat a ',
-        right: '',
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
+      const transitionID = 3;
 
-      const correctionSequence: Distribution<Transform> = [
-        {
-          sample: {
-            insert: 'golden',
-            deleteLeft: 0
-          },
-          p: 0.1
-        }, {
-          sample: {
-            insert: ' ',
-            deleteLeft: 0
-          },
-          p: 0.2
-        }, {
-          sample: {
-            insert: 'app',
-            deleteLeft: 0
-          },
-          p: 0.2
-        }
-      ];
+      const parameters: PredictionParameters = {
+        rootContext: {
+          left: 'i want to eat a ',
+          right: '',
+          startOfBuffer: true,
+          endOfBuffer: true
+        },
+        tokens: [
+          {
+            correction: {
+              sample: {
+                insert: 'golden',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.1
+            },
+            casingRoot: 'golden',
+            autoSelectable: true
+          }, {
+            correction: {
+              sample: {
+                insert: ' ',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.2
+            },
+            casingRoot: ' ',
+            autoSelectable: true
+          }, {
+            correction: {
+              sample: {
+                insert: 'app',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.2
+            },
+            casingRoot: 'app',
+            autoSelectable: true
+          }
+        ],
+        applyInPost: (x) => x,
+        deleteLeft: 0
+      };
 
       const dummied_suggestion_sequences: Outcome<Suggestion>[][] = [
         [],
@@ -370,39 +449,59 @@ describe('predictFromCorrectionSequence', () => {
         futureSuggestions: dummied_suggestion_sequences
       });
 
-      const predictions = predictFromCorrectionSequence(model, correctionSequence, context, 3);
+      const predictions = predictFromCorrectionSequence(model, parameters);
       assert.deepEqual(predictions, []);
     });
 
     it('uses only the best suggestion for non-final corrected tokens', () => {
-      const context: Context = {
-        left: 'i want to eat a ',
-        right: '',
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
+      const transitionID = 42;
 
-      const correctionSequence: Distribution<Transform> = [
-        {
-          sample: {
-            insert: 'g',
-            deleteLeft: 0
-          },
-          p: 0.1
-        }, {
-          sample: {
-            insert: ' ',
-            deleteLeft: 0
-          },
-          p: 0.2
-        }, {
-          sample: {
-            insert: 'app',
-            deleteLeft: 0
-          },
-          p: 0.2
-        }
-      ];
+      const parameters: PredictionParameters = {
+        rootContext: {
+          left: 'i want to eat a ',
+          right: '',
+          startOfBuffer: true,
+          endOfBuffer: true
+        },
+        tokens: [
+          {
+            correction: {
+              sample: {
+                insert: 'g',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.1
+            },
+            casingRoot: 'g',
+            autoSelectable: true
+          }, {
+            correction: {
+              sample: {
+                insert: ' ',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.2
+            },
+            casingRoot: ' ',
+            autoSelectable: true
+          }, {
+            correction: {
+              sample: {
+                insert: 'app',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.2
+            },
+            casingRoot: 'app',
+            autoSelectable: true
+          }
+        ],
+        applyInPost: (x) => x,
+        deleteLeft: 0
+      };
 
       const dummied_suggestion_sequences: Outcome<Suggestion>[][] = [
         [
@@ -442,72 +541,109 @@ describe('predictFromCorrectionSequence', () => {
         ]
       ];
 
-      const transitionID = 42;
-      const expected_prediction: ProbabilityMass<Suggestion> = {
-        sample: {
-          transform: {
-            insert: 'golden apple',
-            deleteLeft: 0,
-            id: transitionID
-          },
-          displayAs: 'golden apple',
-          transformId: 42
-        }, p: dummied_suggestion_sequences.map((dist) => {
+      const expected_prediction_p = dummied_suggestion_sequences
+        .map((dist) => {
           return dist[0]
         }).reduce((accum, curr) => {
           return accum * (curr ? curr.p : Math.exp(-EDIT_DISTANCE_COST_SCALE))
-        }, 1)
-      }
+        }, 1);
+
+      const expected_predictions: Suggestion[] = [
+        {
+          transform: {
+            insert: 'golden',
+            deleteLeft: 0,
+            id: transitionID
+          },
+          displayAs: 'golden',
+          transformId: transitionID
+        }, {
+          transform: {
+            insert: ' ',
+            deleteLeft: 0,
+            id: transitionID
+          },
+          displayAs: ' ',
+          transformId: transitionID
+        }, {
+          transform: {
+            insert: 'apple',
+            deleteLeft: 0,
+            id: transitionID
+          },
+          displayAs: 'apple',
+          transformId: transitionID
+        }
+      ];
 
       const model = new DummyModel({
         ...DUMMY_MODEL_CONFIG,
         futureSuggestions: dummied_suggestion_sequences
       });
 
-      const predictions = predictFromCorrectionSequence(model, correctionSequence, context, transitionID);
+      const predictions = predictFromCorrectionSequence(model, parameters);
       // There should be no variations with 'green' or 'gray' apples.
       assert.equal(predictions.length, 1);
 
-      predictions.forEach((entry) => assert.equal(entry.components.correction, 'g app'));
-      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, correctionSequence.reduce((accum, curr) => accum * curr.p, 1)));
+      predictions.forEach((entry) => assert.deepEqual(entry.components.map((c) => c.correction), ['g', ' ', 'app']));
+      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, parameters.tokens.reduce((accum, curr) => accum * curr.correction.p, 1)));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.equal(predictions[0].components.prediction.transform.insert, 'golden apple');
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), [expected_prediction.sample]);
+      assert.deepEqual(predictions[0].components.map((c) => c.prediction.transform.insert), ['golden', ' ', 'apple']);
+      assert.sameDeepOrderedMembers(predictions[0].components.map((entry) => entry.prediction), expected_predictions);
 
-      assert.approximately(predictions[0].metadata.probabilities.prediction, expected_prediction.p, 0.00001);
-      assert.equal(predictions[0].components.prediction.transformId, transitionID);
+      assert.approximately(predictions[0].metadata.probabilities.prediction, expected_prediction_p, 0.00001);
     });
 
     it('uses all suggestions generated from context-final correction-tokens', () => {
-      const context: Context = {
-        left: 'i want to eat a ',
-        right: '',
-        startOfBuffer: true,
-        endOfBuffer: true
-      };
+      const transitionID = 13;
 
-      const correctionSequence: Distribution<Transform> = [
-        {
-          sample: {
-            insert: 'golden',
-            deleteLeft: 0
-          },
-          p: 0.1
-        }, {
-          sample: {
-            insert: ' ',
-            deleteLeft: 0
-          },
-          p: 0.2
-        }, {
-          sample: {
-            insert: 'app',
-            deleteLeft: 0
-          },
-          p: 0.2
-        }
-      ];
+      const parameters: PredictionParameters = {
+        rootContext: {
+          left: 'i want to eat a ',
+          right: '',
+          startOfBuffer: true,
+          endOfBuffer: true
+        },
+        tokens: [
+          {
+            correction: {
+              sample: {
+                insert: 'golden',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.1
+            },
+            casingRoot: 'golden',
+            autoSelectable: true
+          }, {
+            correction: {
+              sample: {
+                insert: ' ',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.2
+            },
+            casingRoot: ' ',
+            autoSelectable: true
+          }, {
+            correction: {
+              sample: {
+                insert: 'app',
+                deleteLeft: 0,
+                id: transitionID
+              },
+              p: 0.2
+            },
+            casingRoot: 'app',
+            autoSelectable: true
+          }
+        ],
+        applyInPost: (x) => x,
+        deleteLeft: 0
+      };
 
       const dummied_suggestion_sequences: Outcome<Suggestion>[][] = [
         [
@@ -549,29 +685,40 @@ describe('predictFromCorrectionSequence', () => {
 
       const tailIndex = dummied_suggestion_sequences.length - 1;
 
-      const transitionID = 13;
-      const expected_predictions: ProbabilityMass<Suggestion>[] = dummied_suggestion_sequences[tailIndex].map((p) => {
-        const expectedText = `golden ${p.transform.insert}`;
+      const expected_prediction_prefix_p = dummied_suggestion_sequences
+        .slice(0, dummied_suggestion_sequences.length - 1)
+        .map((dist) => {
+          return dist[0]
+        }).reduce((accum, curr) => {
+          return accum * (curr ? curr.p : Math.exp(-EDIT_DISTANCE_COST_SCALE))
+        }, 1);
 
-        return {
-          sample: {
-            transform: {
-              insert: expectedText,
-              deleteLeft: 0,
-              id: transitionID
-            },
-            displayAs: expectedText,
-            transformId: transitionID
-          }, p: dummied_suggestion_sequences.map((dist) => {
-            return dist[0]
-          }).reduce((accum, curr, index) => {
-            if(tailIndex == index) {
-              return accum * p.p;
-            } else {
-              return accum * (curr ? curr.p : Math.exp(-EDIT_DISTANCE_COST_SCALE))
-            }
-          }, 1)
-        };
+      const expected_prediction_prefix: Suggestion[] = [
+        {
+          transform: {
+            insert: 'golden',
+            deleteLeft: 0,
+            id: transitionID
+          },
+          displayAs: 'golden',
+          transformId: transitionID
+        }, {
+          transform: {
+            insert: ' ',
+            deleteLeft: 0,
+            id: transitionID
+          },
+          displayAs: ' ',
+          transformId: transitionID
+        }
+      ];
+
+      const expected_prediction_sequences: Suggestion[][] = dummied_suggestion_sequences[tailIndex].map((p) => {
+        return [...expected_prediction_prefix, p];
+      });
+
+      const expected_prediction_seq_probs: number[] = dummied_suggestion_sequences[tailIndex].map((p) => {
+        return p.p * expected_prediction_prefix_p;
       });
 
       const model = new DummyModel({
@@ -579,22 +726,17 @@ describe('predictFromCorrectionSequence', () => {
         futureSuggestions: dummied_suggestion_sequences
       });
 
-      const predictions = predictFromCorrectionSequence(model, correctionSequence, context, transitionID);
+      const predictions = predictFromCorrectionSequence(model, parameters);
       assert.equal(predictions.length, dummied_suggestion_sequences[dummied_suggestion_sequences.length - 1].length);
 
-      predictions.forEach((entry) => assert.equal(entry.components.correction, 'golden app'));
-      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, correctionSequence.reduce((accum, curr) => accum * curr.p, 1)));
+      predictions.forEach((entry) => assert.deepEqual(entry.components.map((c) => c.correction), ['golden', ' ', 'app']));
+      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, parameters.tokens.reduce((accum, curr) => accum * curr.correction.p, 1)));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.sameOrderedMembers(
-        predictions.map((t) => t.components.prediction.transform.insert),
-        ['golden apple', 'golden application', 'golden appetizer']
-      );
-      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.prediction), expected_predictions.map((p => p.sample)));
+      assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.map((c) => c.prediction)), expected_prediction_sequences);
 
       for(let i = 0; i < predictions.length; i++) {
-        assert.approximately(predictions[i].metadata.probabilities.prediction, expected_predictions[i].p, 0.00001, `Expected probabilty mismatch at index ${i}`);
-        assert.equal(predictions[i].components.prediction.transformId, transitionID);
+        assert.approximately(predictions[i].metadata.probabilities.prediction, expected_prediction_seq_probs[i], 0.00001, `Expected probabilty mismatch at index ${i}`);
       }
     });
   });
