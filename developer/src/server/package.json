@@ -32,7 +32,7 @@
     "@types/multer": "^1.4.12",
     "@types/ws": "^8.2.2",
     "copyfiles": "^2.4.1",
-    "node-gyp": "^10.2.0",
+    "node-gyp": "^13.0.0",
     "tsc-watch": "^4.5.0",
     "typescript": "^5.4.5"
   }
