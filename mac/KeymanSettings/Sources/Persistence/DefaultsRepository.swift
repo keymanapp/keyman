@@ -42,10 +42,6 @@ public class DefaultsRepository: DefaultsRepo {
     self.groupDefaults = userDefaults
   }
   
-  public func installationStateExists() -> Bool {
-    return self.groupDefaults.object(forKey: "kInstallationState") != nil
-  }
-  
   /**
    * read the dictionary of the installation info from the UserDefaults
    */
