@@ -19,7 +19,9 @@ uses
   Winapi.Messages,
   Winapi.Windows,
   UfrmKeymanBase,
-  UserMessages, Vcl.Imaging.pngimage;
+  UserMessages,
+  UtilNetworkConnection,
+  Vcl.Imaging.pngimage;
 
 type
   TfrmStartInstall = class(TfrmKeymanBase)
@@ -27,6 +29,8 @@ type
     cmdLater: TButton;
     lblUpdateMessage: TLabel;
     imgKeymanLogo: TImage;
+    shpMeteredWarning: TShape;
+    lblMeteredWarning: TLabel;
     procedure FormCreate(Sender: TObject);
   private
     FRestartRequired: Boolean;
@@ -48,6 +52,8 @@ begin
 end;
 
 procedure TfrmStartInstall.FormCreate(Sender: TObject);
+var
+  IsMetered: Boolean;
 begin
   inherited;
   cmdInstall.Caption := MsgFromId(S_Update_Now);
@@ -56,6 +62,12 @@ begin
     lblUpdateMessage.Caption := MsgFromId(S_Update_Restart_Req)
   else
     lblUpdateMessage.Caption := MsgFromId(S_Ready_To_Install);
+
+  IsMetered := UtilNetworkConnection.IsMetered;
+  lblMeteredWarning.Visible := IsMetered;
+  shpMeteredWarning.Visible := IsMetered;
+  if IsMetered then
+    lblMeteredWarning.Caption := MsgFromId(S_Metered_Warning);
 end;
 
 end.

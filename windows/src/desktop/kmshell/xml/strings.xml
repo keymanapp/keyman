@@ -608,10 +608,15 @@
   <!-- Introduced: 18.0.168 -->
   <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Installing the update now will require a restart of your computer before you can use Keyman again. Update now anyway?</string>
 
-  <!-- Context: Configuration Dialog - Update on boot pop up -->
+  <!-- Context: Configuration Dialog - Update on pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
   <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">An update to Keyman has been downloaded and is ready to install.</string>
+
+  <!-- Context: Configuration Dialog - Update on pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 19.0.146 -->
+  <string name="S_Metered_Warning" comment="Update warning - inform user about being on a metered connection">You\'re on a metered connection. Downloading now may incur data charges.</string>
 
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->

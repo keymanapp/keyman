@@ -212,6 +212,7 @@ uses
   utilexecute,
   utilkmshell,
   utilhttp,
+  UtilNetworkConnection,
   utiluac,
   utilxml,
   KeymanPaths;
@@ -817,10 +818,15 @@ var
   ShellPath : string;
   FResult, InstallNow: Boolean;
   frmStartInstallNow: TfrmStartInstall;
+  IsMetered: Boolean;
 begin
   InstallNow := True;
   // Confirm User is ok that this will require a reset
-  if HasKeymanRun then
+  // The metered warning has been added to the update pop up. In the future
+  // it would be better to have this warning in a banner on the configuration
+  // page.
+  IsMetered := UtilNetworkConnection.IsMetered;
+  if HasKeymanRun OR IsMetered then
   begin
     frmStartInstallNow := TfrmStartInstall.Create(nil, true);
     try
