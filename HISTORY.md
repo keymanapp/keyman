@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.246 alpha 2026-06-15
+
+* feat(developer): run project validation from IDE (#16076)
+* fix(core): use meson subsystem and needs_exe_wrapper for cross builds on Windows (#16088)
+* docs(windows): add context documentation for additional Advanced options (#16089)
+
 ## 19.0.245 alpha 2026-06-10
 
 * chore(web): hide KMX keyboard test page (#16083)
