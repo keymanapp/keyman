@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.247 alpha 2026-06-16
+
+* chore: update multi-labeler to 5.0.0 (#16100)
+
 ## 19.0.246 alpha 2026-06-15
 
 * feat(developer): run project validation from IDE (#16076)
