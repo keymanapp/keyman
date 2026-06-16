@@ -36,7 +36,7 @@
 		<string>x.y</string>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>$(COPYRIGHT_STRING_RIGHTS)</string>
+	<string>$(COPYRIGHT_STRING)</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
 </dict>

@@ -3,8 +3,7 @@
  *
  * Created by Shawn Schantz on 2026-02-24
  *
- * Represents the state of the installation of the Keyman input method
- * Communicates with the Keyman input method when the configuration is changed
+ * Manages the steps for completing the installation of the Keyman input method
  *
  */
 import SwiftUI
@@ -13,10 +12,18 @@ import KeymanSettings
 
 @MainActor // run on the main actor since data is published directly to the UI
 public class InstallationContainer : ObservableObject {
-  @Published public var installationState: InstallationState
-  
+  // if the installer was run, then installed and current should be true
+  public let isInputMethodInstalled : Bool
+  public let isInputMethodCurrent : Bool
+  // for convenience, combination of Installed and Current
+  public var isCurrentInputMethodInstalled : Bool {
+    isInputMethodInstalled && isInputMethodCurrent
+  }
+  // installationState describes the remaining tasks to complete the installation
+  @Published public var installationState: InstallationState?
+
+  fileprivate let installationCheck: InstallationCheck
   fileprivate let defaultsRepository: DefaultsRepo
-  fileprivate let notificationCenter:DistributedNotificationCenter
   fileprivate let inputMethodUtil: InputMethodUtil
   
   public init() {
@@ -33,74 +40,39 @@ public class InstallationContainer : ObservableObject {
     
     self.defaultsRepository = defaultsRepo
     inputMethodUtil = InputMethodUtil()
-    notificationCenter = DistributedNotificationCenter.default()
     
-    self.installationState = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil).evaluate()
-    
-    self.registerObservers()
+    self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
+    self.isInputMethodInstalled = self.installationCheck.isInputMethodInstalled
+    self.isInputMethodCurrent = self.installationCheck.isInputMethodCurrent
+    self.installationState = self.installationCheck.evaluate()
   }
   
-  
-  public func accessIsGranted() -> Bool {
-    self.inputMethodUtil.requestAccessGranted
-  }
-
-  func registerObservers() {
-    DispatchQueue.main.async {
-      // Register for the distributed notification
-      DistributedNotificationCenter.default().addObserver(
-        self,
-        selector: #selector(self.handleCheckAccess(_:)),
-        name: NSNotification.Name("com.keyman.accessibility.state.ignore"),
-//        name: .accessCheck,
-        object: nil // Observe notifications from any sender
-      )
-      
-      DistributedNotificationCenter.default().addObserver(
-        self,
-        selector: #selector(self.handleRequestAccess(_:)),
-        name: NSNotification.Name("com.activeoyster.test"),
-        object: nil // Observe notifications from any sender
-      )
-    }
-  }
-
-  @objc func handleCheckAccess(_ notification: Notification) {
-    let details:String
-    // extract message from the notification if available
-//    if let userInfo = notification.userInfo as? [String: Any],
-//       let message = userInfo["message"] as? String {
-    if let message = notification.object as? String {
-      details = message
-    } else {
-      details = "no data included."
-    }
-    print("Notification received by handleCheckAccess: \(details)")
-  }
-
-  @objc func handleRequestAccess(_ notification: Notification) {
-    let details:String
-    if let message = notification.object as? String {
-      details = message
-    } else {
-      details = "no data included."
-    }
-    print("Notification received by handleRequestAccess: \(details)")
+  /**
+   * Returns true if the Accessibility permission has been granted by the user for the Keyman input method.
+   * This is an optional return value because it is only set in response to a call to `checkAccessibilityPermissionGranted`
+   * and is not populated until an asynchronous message is received in response.
+   */
+  public func isAccessibilityPermissionGranted() -> Bool? {
+    return self.inputMethodUtil.accessibilityPermissionGranted
   }
 
   /**
-   * return trues if every installation task is incomplete
+   * return trues if every installation task has been completed
    */
   public func isInstallationComplete() -> Bool {
-    return self.installationState.isComplete
+    guard let state = self.installationState else { return false }
+    
+    return state.isComplete
   }
   
   /**
-   * returns the next installation task which is incomplete, if there is one remaining
-   * note that this function determines the order in which the tasks are executed as they are stored in an unsorted Set
+   * Returns the next incompleted installation task, if there is one remaining.
+   * Note that this function determines the order in which the tasks are executed as they are stored in an unsorted Set.
    */
   public func nextTask() -> InstallationTask? {
-    let incompleteTasks = installationState.tasks.filter { !$0.isComplete }
+    guard let state = self.installationState else { return nil }
+
+    let incompleteTasks = state.tasks.filter { !$0.isComplete }
     
     if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .verifyInputMethod }) {
       return incompleteTask
@@ -118,11 +90,13 @@ public class InstallationContainer : ObservableObject {
   }
  
   /**
-   * returns the next installation task which is incomplete, if there is one remaining
-   * note that this function determines the order in which the tasks are executed as they are stored in an unsorted Set
+   * Executes the specified installation task.
    */
-  public func executeTask(_ task: InstallationTask) {
+  func executeTask(_ task: InstallationTask) {
+    guard let state = self.installationState else { return }
+
     var completedTask = false
+    
     switch task.taskType {
     case .verifyInputMethod:
       completedTask = self.verifyInputMethod()
@@ -133,18 +107,18 @@ public class InstallationContainer : ObservableObject {
     case .requestAccess:
       completedTask = self.requestAccessibility()
     case .restartMac:
-      completedTask = self.promptUserToRestart()
+      completedTask = self.notifyUserPromptedToRestart()
     }
     
     if completedTask {
       print("executeTask: \(task.taskType.rawValue) completed")
-      self.installationState.markTaskAsCompleted(task: task.taskType)
+      state.updateTaskAsCompleted(task: task.taskType)
       self.writeInstallationState()
     }
   }
   
   /**
-   * execute the next task required for installation
+   * Executes the next installation task which is incomplete, if there is one remaining.
    */
   public func executeNextInstallationTask() {
     if let nextTask = self.nextTask() {
@@ -153,7 +127,7 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
-   * run the Keyman input method as a subprocess to migrate data to the shared space and immediately exit
+   * Run the Keyman input method as a subprocess to migrate data to the shared space and immediately exit
    */
   public func migrateData() -> Bool {
     let success = self.inputMethodUtil.invokeKeymanInputMethodMigration()
@@ -163,42 +137,50 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
-   * save the installation info
+   * Save the installation state
    */
-  fileprivate func writeInstallationState() {
-    self.defaultsRepository.writeInstallationState(self.installationState.toUserDefaultsDictionary())
+  func writeInstallationState() {
+    guard let state = self.installationState else { return }
+
+    self.defaultsRepository.writeInstallationState(state.toUserDefaultsDictionary())
   }
   
  /**
-   * save the time that the user was requested to restart their machine
+   * Write the time that the user was requested to restart their machine
    */
-  fileprivate func writeRestartRequestTime() {
-    self.installationState.dateRestartRequested = Date()
+  func writeRestartRequestTime() {
+    guard let state = self.installationState else { return }
+
+    state.dateRestartRequested = Date()
     self.writeInstallationState()
   }
   
   /**
-   * get the time that the user was requested to restart their machine
+   * Read the time that the user was requested to restart their machine
    */
-  fileprivate func readRestartRequestTime() -> Date? {
-    return self.installationState.dateRestartRequested
+  func readRestartRequestTime() -> Date? {
+    guard let state = self.installationState else { return nil }
+    
+    return state.dateRestartRequested
   }
   
   /**
-   * check whether the user has restarted by comparing the latest startup time to the time we requested the user to restart
+   * Notify that the user has been prompted to restart the machine.
    */
-  public func promptUserToRestart() -> Bool {
+  public func notifyUserPromptedToRestart() -> Bool {
     self.writeRestartRequestTime()
     return true
   }
   
   /**
-   * check whether the user has restarted by comparing the latest startup time to the time we requested the user to restart
+   * Check whether the user has restarted by comparing the latest startup time to the time we requested the user to restart
    */
-  public func validateRestarted() -> Bool {
+  public func validateUserHasRestarted() -> Bool {
     var hasRestarted = false
     
-    if let timeRestartRequested = self.installationState.dateRestartRequested {
+    guard let state = self.installationState else { return false }
+
+    if let timeRestartRequested = state.dateRestartRequested {
       if let mostRecentStartupTime = self.getMostRecentRestartTime() {
         hasRestarted = mostRecentStartupTime > timeRestartRequested
         print("mostRecentStartupTime: \(mostRecentStartupTime), timeRestartRequested: \(timeRestartRequested)")
@@ -233,12 +215,20 @@ public class InstallationContainer : ObservableObject {
     }
   }
   
+  /**
+   * used to report on some current state
+   */
   public func debug() {
+    var permissionString = "unknown"
+    if let permissionGranted = self.isAccessibilityPermissionGranted() {
+      permissionString = permissionGranted ? "granted" : "denied"
+    }
+
     let version = (try? inputMethodUtil.getKeymanInputMethodVersion()) ?? "unknown"
     let enabled = inputMethodUtil.isKeymanInputMethodEnabled()
     let running = inputMethodUtil.isKeymanInputMethodRunning()
-    let accessGranted = self.accessIsGranted()
-    print("Keyman status, version: \(version), enabled: \(enabled), running: \(running), accessGranted: \(accessGranted)")
+
+    print("Keyman status, version: \(version), enabled: \(enabled), running: \(running), permissionGranted: \(permissionString)")
   }
   
 
@@ -263,13 +253,12 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
-   * verify that a Keyman input method exists in the correct location and is of the correct version
-   * if false, this means that there was an issue with the installer package or, perhaps more likely,
-   * the input method was manually replaced or deleted before the configuration app was run
+   * Verify that the input method has been correctly installed.
+   * This may be superflous as we are verifying this before creating the installation tasks
    */
   public func verifyInputMethod()  -> Bool {
-    // MAC-CONFIG-TODO: implement with version check
-    return inputMethodUtil.isKeymanInputMethodCurrent()
+    // MAC-CONFIG-TODO: currently does nothing, already verified when InstallationCheck is created
+    return true
   }
   
   /**
@@ -296,11 +285,9 @@ public class InstallationContainer : ObservableObject {
   /**
    * first kill the Keyman input method if it is running
    * second, call Keyman as a separate process with an argument that checks whether accessibility has been granted by the user
-   * listen for message from Keyman to indicate the result
+   * and listen for message from Keyman to indicate the result
    */
-  public func isAccessibilityGranted() -> Bool {
-    var hasAccess = false
-    
+  public func checkAccessibilityPermissionGranted() {
     if (inputMethodUtil.isKeymanInputMethodRunning()) {
       let killed = self.inputMethodUtil.killKeymanInputMethod()
       print("checkAccessibilityPermission, Keyman input method killed: \(killed)")
@@ -308,9 +295,7 @@ public class InstallationContainer : ObservableObject {
       print("checkAccessibilityPermission, Keyman input method not running")
     }
  
-    self.inputMethodUtil.doAsyncAccessCheck()
-
-    return hasAccess
+    self.inputMethodUtil.doAsyncAccessibilityCheck()
   }
   
   /**
@@ -371,36 +356,4 @@ public class InstallationContainer : ObservableObject {
   public func uninstall() {
     self.inputMethodUtil.uninstallKeyman()
   }
-  
-  /*
-   public init() {
-   self.settings = SettingsContainer()
-   
-   notificationCenter = DistributedNotificationCenter.default()
-   self.keyboardPackages = []
-   
-   if let keyboardsUrl = self.pathUtil.keymanKeyboardsDirectory {
-   
-   if FileManager.default.fileExists(atPath: keyboardsUrl.path) {
-   ConfigLogger.shared.testLogger.debug("directory exists: \(keyboardsUrl.absoluteString)")
-   } else {
-   ConfigLogger.shared.testLogger.debug("non-existent directory: \(keyboardsUrl.absoluteString)")
-   }
-   }
-   
-   load keyboards from disk
-   let packageSourceArray = self.dataRepo.readKeyboardPackageSource()
-   
-   create a KeymanPackage object for each PackageSource and insert it in the array
-   for source in packageSourceArray {
-   let package = KeymanPackage(packageSource: source)
-   self.keyboardPackages.append(package)
-   }
-   
-   ConfigLogger.shared.testLogger.debug("posting to notification center from KeyFig")
-   notificationCenter.postNotificationName(NSNotification.Name("com.keyman.removedkeyboard"), object: nil, userInfo: ["data": "khmer angkor"], deliverImmediately: false)
-   
-   }
-   */
-  
 }

@@ -80,7 +80,7 @@
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Keyman needs to send key events to the target application.</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>$(COPYRIGHT_STRING_RIGHTS)</string>
+	<string>$(COPYRIGHT_STRING)</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

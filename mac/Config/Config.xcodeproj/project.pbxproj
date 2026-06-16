@@ -422,7 +422,6 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPYRIGHT_STRING = "Copyright © SIL Global.";
-				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
 				CURRENT_PROJECT_VERSION = "$(PRODUCT_VERSION)";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 3YE4W86L3G;
@@ -430,7 +429,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "$(COPYRIGHT_STRING_RIGHTS)";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "$(COPYRIGHT_STRING)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -462,7 +461,6 @@
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPYRIGHT_STRING = "Copyright © SIL Global.";
-				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
 				CURRENT_PROJECT_VERSION = "$(PRODUCT_VERSION)";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 3YE4W86L3G;
@@ -470,7 +468,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "$(COPYRIGHT_STRING_RIGHTS)";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "$(COPYRIGHT_STRING)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

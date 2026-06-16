@@ -25,6 +25,7 @@ struct InstallView: View {
         Button("Next...") {
           installation.executeNextInstallationTask()
         }
+        .disabled(!installation.isCurrentInputMethodInstalled)
         Button("Migrate Data") {
           _ = installation.migrateData()
         }
@@ -38,7 +39,7 @@ struct InstallView: View {
           _ = installation.selectKeymanInputMethod()
         }
         Button("Check Permission") {
-          _ = installation.isAccessibilityGranted()
+          installation.checkAccessibilityPermissionGranted()
         }
         Button("Request Permission") {
           _ = installation.requestAccessibility()
@@ -48,10 +49,10 @@ struct InstallView: View {
       .padding()
       HStack {
         Button("Request Restart") {
-          _ = installation.promptUserToRestart()
+          _ = installation.notifyUserPromptedToRestart()
         }
         Button("Check Restart") {
-          _ = installation.validateRestarted()
+          _ = installation.validateUserHasRestarted()
         }
         Button("debug") {
           installation.debug()

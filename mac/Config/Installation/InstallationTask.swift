@@ -4,7 +4,6 @@
  * Created by Shawn Schantz on 2026-06-01
  *
  * Class for tracking the state of a single installation task.
- * Includes functions for mapping to a Dictionary to store in the UserDefaults.
  */
 
 import Foundation
@@ -23,28 +22,28 @@ public enum InstallationTaskType: String {
 public struct InstallationTask: Hashable, Equatable {
   public let taskType: InstallationTaskType
   public let isComplete: Bool
-
+  
   /**
    * Hashable conformance based on taskType
    */
   public func hash(into hasher: inout Hasher) {
-      hasher.combine(taskType)
+    hasher.combine(taskType)
   }
   
   /**
    * Hashable conformance based on taskType
    */
   public static func == (lhs: InstallationTask, rhs: InstallationTask) -> Bool {
-      return lhs.taskType == rhs.taskType
+    return lhs.taskType == rhs.taskType
   }
-
+  
   /**
    * Create new InstallationTask: `completed` set to `false`
    */
   static func createNewInstallationTask(type: InstallationTaskType) -> InstallationTask {
     return InstallationTask(task: type, completed: false)
   }
-
+  
   /**
    * Create InstallationTask with `completed` set to `true`
    */

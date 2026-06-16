@@ -21,8 +21,8 @@ NSString *kAccessCommand = @"access";
 NSString *kCheckCommand = @"check";
 
 // notification messages sent to Keyman Configuration
-NSString *kAccessGrantedMessage = @"granted";
-NSString *kAccessNotGrantedMessage = @"not-granted";
+NSString *kAcessibilityPermissionGrantedMessage = @"granted";
+NSString *kAcessibilityPermissionNotGrantedMessage = @"not-granted";
 
 
 void runAsInputMethod(void) {
@@ -37,6 +37,10 @@ void runAsInputMethod(void) {
   [[NSApplication sharedApplication] run];
 }
 
+/**
+ * Migrate data from older locations to the appropriate place for the current version.
+ * Executed as requested by the Keyman Configuration app.
+ */
 int doMigration(void) {
   os_log_info([KMLogs startupLog], "doMigration executed");
   // if necessary, migrate settings and keyboard data for compatibility with Keyman 19
@@ -47,7 +51,11 @@ int doMigration(void) {
   return 0;
 }
 
-int doAccessibility(void) {
+/**
+ * Make a request to the system to add Accessibility permissions for the Keyman input method.
+ * Executed as requested by the Keyman Configuration app.
+ */
+int requestAccessibility(void) {
   os_log_info([KMLogs startupLog], "doAccessibility executed");
   [PrivacyConsent.shared requestPrivacyAccessForKeyman19:^void (void){
     os_log_info([KMLogs startupLog], "doAccessibility completion handler: requestPrivacyAccessForKeyman19 completed");
@@ -55,16 +63,20 @@ int doAccessibility(void) {
   return 0;
 }
 
+/**
+ * Check whether Accessibility permissions have been granted by the user for the Keyman input method.
+ * Executed as requested by the Keyman Configuration app.
+ */
 int checkAccessibility(void) {
   BOOL hasAccess = NO;
-  NSString *message = kAccessNotGrantedMessage;
+  NSString *message = kAcessibilityPermissionNotGrantedMessage;
   
   hasAccess = [PrivacyConsent.shared checkPostEventAccess];
   os_log_info([KMLogs startupLog], "checkAccessibility hasAccess: %{public}@", hasAccess?@"YES":@"NO");
   
   if (hasAccess) {
     hasAccess = 0;
-    message = kAccessGrantedMessage;
+    message = kAcessibilityPermissionGrantedMessage;
   } else {
     hasAccess = 1;
   }
@@ -88,7 +100,7 @@ int main(int argc, const char * argv[]) {
       if ([commandString isEqualToString:kMigrateCommand]) {
         return doMigration();
       } else if ([commandString isEqualToString:kAccessCommand]) {
-        return doAccessibility();
+        return requestAccessibility();
       } else if ([commandString isEqualToString:kCheckCommand]) {
         return checkAccessibility();
       } else {

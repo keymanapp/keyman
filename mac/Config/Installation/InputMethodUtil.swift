@@ -3,9 +3,8 @@
  *
  * Created by Shawn Schantz on 2026-05-11
  *
- * Stateless utility for enabling, selecting, killing and
- * getting information about the Keyman input method and
- * for selecting another input source
+ * Stateless utility for enabling, selecting, killing, requesting Accessibility permission
+ * and getting information about the Keyman input method and for selecting another input source
  */
 
 import Foundation
@@ -14,7 +13,7 @@ import AppKit
 import KeymanSettings
 
 extension Notification.Name {
-    static let accessCheck = Notification.Name("com.keyman.accessibility.state")
+  static let accessCheck = Notification.Name("com.keyman.accessibility.state")
 }
 
 public enum KeymanVersionCheckError: Error {
@@ -29,21 +28,23 @@ public enum KeymanInvocationError: Error {
 
 public class InputMethodUtil {
   public let keymanInputMethodApplicationName = "Keyman.app"
-  public var requestAccessGranted: Bool = false
+  
+  // only initialized after message is received from input method
+  public var accessibilityPermissionGranted: Bool? = nil
   fileprivate let pathUtil: KeymanPaths
   fileprivate var inputMethodProccesId: pid_t = 0
   fileprivate var observer: NSObjectProtocol?
-
-  let kAccessGrantedMessage = "granted"
-
+  
+  let kAccessibilityPermissionGrantedMessage = "granted"
+  
   let kMigrateCommand = "migrate"
   let kAccessCommand = "access"
   let kCheckCommand = "check"
-
+  
   public init() {
     self.pathUtil = KeymanPaths()
   }
-
+  
   /**
    * true if the Keyman input method exists at `~/Library/Input Methods`
    */
@@ -55,7 +56,7 @@ public class InputMethodUtil {
     
     return FileManager.default.fileExists(atPath: inputMethodUrl.path)
   }
-
+  
   /**
    * true if the Keyman input method of the correct version exists in the correct location
    */
@@ -63,7 +64,7 @@ public class InputMethodUtil {
     // MAC-CONFIG-TODO: implement with version check
     return true
   }
-
+  
   /**
    * Returns version number string of Keyman input method
    */
@@ -106,14 +107,14 @@ public class InputMethodUtil {
   public func enableKeymanInputMethod() -> Bool {
     return self.enableInputMethod(bundleId: KeymanPaths.keymanBundleId)
   }
-
+  
   /**
    * attempts to select the Keyman input method and returns true if successful
    */
   public func selectKeymanInputMethod() -> Bool {
     return self.selectInputSource(inputSourceId: KeymanPaths.keymanBundleId)
   }
-
+  
   /**
    * attempts to disable the Keyman input method and returns true if successful
    */
@@ -153,7 +154,7 @@ public class InputMethodUtil {
     guard let infoDictionary = keymanBundle.infoDictionary else {
       throw KeymanVersionCheckError.versionNotFound
     }
-
+    
     guard let appVersionString = infoDictionary["CFBundleShortVersionString"] as? String else {
       throw KeymanVersionCheckError.versionNotFound
     }
@@ -261,7 +262,7 @@ public class InputMethodUtil {
       }
     }
   }
- 
+  
   /**
    * Special care is needed with this code because `processAccessCheckResult(with:)` is bound to the Main Actor,
    * but it is called from a closure which may not run on the Main Actor.
@@ -269,19 +270,21 @@ public class InputMethodUtil {
    * does not ensure that the closure is running on the main actor.
    * To ensure this, a Task is defined around the call to  `processAccessCheckResult`.
    */
-  func doAsyncAccessCheck() {
+  func doAsyncAccessibilityCheck() {
     do {
       try self.invokeKeymanInputMethodCheckAccess()
     } catch {
       print("invoking Keyman failed: \(error.localizedDescription)")
     }
-
+    
     let timeStyle = Date.FormatStyle()
       .hour(.twoDigits(amPM: Date.FormatStyle.Symbol.Hour.AMPMStyle.abbreviated))
       .minute(.twoDigits)
       .second(.twoDigits)
       .secondFraction(.fractional(3))
-    print("doAsyncAccessCheck, listening across process boundaries, time: \(Date().formatted(timeStyle))")
+    print("doAsyncAccessibilityCheck, listening across process boundaries, time: \(Date().formatted(timeStyle))")
+    
+    // MAC-CONFIG_TODO: add timeout
     
     // register to listen to system-wide notification sent from Keyman input method
     observer = DistributedNotificationCenter.default().addObserver(
@@ -293,7 +296,7 @@ public class InputMethodUtil {
       // in DistributedNotificationCenter, the string message is passed as the object
       if let receivedString = notification.object as? String {
         Task { @MainActor [weak self] in
-            self?.processAccessCheckResult(with: receivedString)
+          self?.processAccessibilityCheckResult(with: receivedString)
         }
       } else {
         print("notification received, but object was not a String.")
@@ -301,7 +304,10 @@ public class InputMethodUtil {
     }
   }
   
-  private func processAccessCheckResult(with message: String) {
+  /**
+   * Process the distributed notification message that we received from the Keyman input method and remove the observer.
+   */
+  private func processAccessibilityCheckResult(with message: String) {
     let timeStyle = Date.FormatStyle()
       .hour(.twoDigits(amPM: Date.FormatStyle.Symbol.Hour.AMPMStyle.abbreviated))
       .minute(.twoDigits)
@@ -310,8 +316,8 @@ public class InputMethodUtil {
     print("processAccessCheckResult received message: \(message), time: \(Date().formatted(timeStyle))")
     
     // if the message indicates that access was granted, then set as true
-    self.requestAccessGranted = message == kAccessGrantedMessage
-
+    self.accessibilityPermissionGranted = message == kAccessibilityPermissionGrantedMessage
+    
     // Clean up the observer immediately so it only fires once
     if let observer = observer {
       DistributedNotificationCenter.default().removeObserver(observer)
@@ -409,7 +415,7 @@ public class InputMethodUtil {
     }
     return enableCapable
   }
-
+  
   /**
    * register the newly installed input method with the specified bundleId
    * this will allow a `TISInputSourceRef` to be obtained to access the input source
@@ -431,10 +437,10 @@ public class InputMethodUtil {
     } else {
       print("registerInputMethod for bundle ID '\(bundleId)' failed, result = \(result)")
     }
-
+    
     return success
   }
-
+  
   /**
    * attempts to enable the input method with the specified bundleId, returns true if successful
    */
