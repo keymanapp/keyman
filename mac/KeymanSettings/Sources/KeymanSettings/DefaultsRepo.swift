@@ -11,7 +11,6 @@
 import Foundation
 
 public protocol DefaultsRepo {
-  func installationStateExists() -> Bool
   func readInstallationState() -> Dictionary<String, Any>?
   func writeInstallationState(_ dictionary: Dictionary<String, Any>)
   func deleteInstallationState()
