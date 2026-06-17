@@ -34,8 +34,12 @@ type
     procedure FormCreate(Sender: TObject);
   private
     FRestartRequired: Boolean;
+    FReadyToInstall: Boolean;
   public
-  constructor Create(AOwner: TComponent; const RestartRequired: Boolean); reintroduce;
+  constructor Create(
+    AOwner: TComponent;
+    const RestartRequired: Boolean;
+    const ReadyToInstall: Boolean = False); reintroduce;
   end;
 
 implementation
@@ -45,10 +49,14 @@ uses
 
 {$R *.dfm}
 
-constructor TfrmStartInstall.Create(AOwner: TComponent; const RestartRequired: Boolean);
+constructor TfrmStartInstall.Create(
+  AOwner: TComponent;
+  const RestartRequired: Boolean;
+  const ReadyToInstall: Boolean = False);
 begin
   inherited Create(AOwner);
   FRestartRequired := RestartRequired;
+  FReadyToInstall := ReadyToInstall;
 end;
 
 procedure TfrmStartInstall.FormCreate(Sender: TObject);
@@ -64,8 +72,8 @@ begin
     lblUpdateMessage.Caption := MsgFromId(S_Ready_To_Install);
 
   IsMetered := UtilNetworkConnection.IsMetered;
-  lblMeteredWarning.Visible := IsMetered;
-  shpMeteredWarning.Visible := IsMetered;
+  lblMeteredWarning.Visible := IsMetered and not FReadyToInstall;
+  shpMeteredWarning.Visible := IsMetered and not FReadyToInstall;
   if IsMetered then
     lblMeteredWarning.Caption := MsgFromId(S_Metered_Warning);
 end;
