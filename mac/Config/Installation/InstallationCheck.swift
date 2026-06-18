@@ -55,29 +55,34 @@ public class InstallationCheck {
     return true
   }
   
+  /**
+   * register the observer to listen for the response from the input method which
+   * checks the current state of Accessibility permissions
+   */
   func registerObservers() {
-    print("registerObservers")
+    print("InstallationCheck registerObservers")
     DistributedNotificationCenter.default().addObserver(
       self,
       selector: #selector(self.handlePermissionNotification(_:)),
-      name: NSNotification.Name.accessCheck,
+      name: NSNotification.Name.accessCheckResponse,
       object: nil // Observe notifications from any sender
     )
     // MAC-CONFIG_TODO: add timeout?
   }
   
+  /**
+   * called when `NSNotification.Name.accessCheck` is received
+   */
   @objc func handlePermissionNotification(_ notification: Notification) {
     print("handlePermissionNotification")
     // Extract message from the notification if available
     if let message = notification.object as? String {
       let permissionGranted = self.processInputMethodResponse(with: message)
-      let repairState = self.completeValidation(accessibilityPermissionGranted: permissionGranted)
-      self.installationState = repairState
+      self.completeValidation(accessibilityPermissionGranted: permissionGranted)
     } else {
-      print("notification received but did not include message")
+      print("accessCheckResponse received but did not include message")
     }
   }
-
   
   /**
    * Process the distributed notification message that we received from the Keyman input method.
@@ -92,6 +97,15 @@ public class InstallationCheck {
     
     // if the message indicates that access was granted, then return true
     return !message.isEmpty && message == kAccessibilityPermissionGrantedMessage
+  }
+
+  /**
+   * Save the new InstallationState for handling repairs and notify observers
+   */
+  func prepareToRepair(newState: InstallationState) {
+    self.defaultsRepository.writeInstallationState(newState.toUserDefaultsDictionary())
+    self.installationState = newState
+    NotificationCenter.default.post(name: .installationRepairNeeded, object: newState)
   }
 
   /**
@@ -144,15 +158,14 @@ public class InstallationCheck {
   
   /**
    * Determine whether the completed installation has been altered in some way and needs repair.
-   * If repair is needed, then a new InstallationState object will be returned.
+   * If repair is needed, then call `prepareToRepair` with the new `InstallationState`
    */
-  func completeValidation(accessibilityPermissionGranted: Bool) -> InstallationState? {
+  func completeValidation(accessibilityPermissionGranted: Bool) {
     // check whether the installation requires repair
-    if let repairInstallationState = self.createRepairInstallationState(accessibilityPermissionGranted: accessibilityPermissionGranted) {
-      self.defaultsRepository.writeInstallationState(repairInstallationState.toUserDefaultsDictionary())
-      return repairInstallationState
+    if let newInstallationState = self.createRepairInstallationState(accessibilityPermissionGranted: accessibilityPermissionGranted) {
+      self.prepareToRepair(newState: newInstallationState)
     } else {
-      return nil
+      print("completeValidation: no repair needed")
     }
   }
   

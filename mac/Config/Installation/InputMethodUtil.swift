@@ -15,7 +15,8 @@ import KeymanSettings
 public let kAccessibilityPermissionGrantedMessage = "granted"
 
 extension Notification.Name {
-  static let accessCheck = Notification.Name("com.keyman.accessibility.state")
+  static let accessCheckResponse = Notification.Name("com.keyman.accessibility.state")
+  static let installationRepairNeeded = Notification.Name("com.keyman.installation.repair.needed")
 }
 
 public enum KeymanVersionCheckError: Error {
@@ -446,28 +447,6 @@ public class InputMethodUtil {
       }
     } else {
       print("Keyman not found")
-    }
-  }
-  
-  /**
-   * get the ID of the current input source
-   */
-  public func getCurrentInputSourceId() -> String? {
-    // Get the current keyboard input source
-    guard let inputSource = TISCopyCurrentKeyboardInputSource()?.takeUnretainedValue() else {
-      print("Could not get current keyboard input source.")
-      return nil
-    }
-    
-    let inputSourceValue = TISGetInputSourceProperty(inputSource, kTISPropertyInputSourceID)
-    if let cfType = inputSourceValue {
-      // Bridge the CFTypeRef to an Unmanaged<AnyObject> and then to a Swift String
-      let inputSourceId = Unmanaged<AnyObject>.fromOpaque(cfType).takeUnretainedValue() as? String
-      print("Input Source ID: \(String(describing: inputSourceId))")
-      return inputSourceId
-    } else {
-      print("Failed to get input source ID property")
-      return nil
     }
   }
   

@@ -45,8 +45,38 @@ public class InstallationContainer : ObservableObject {
     self.isInputMethodInstalled = self.installationCheck.isInputMethodInstalled
     self.isInputMethodCurrent = self.installationCheck.isInputMethodCurrent
     self.installationState = self.installationCheck.installationState
+
+    self.registerObservers()
   }
+
   
+  /**
+   * register the observer to listen for a notification from the InstallationCheck to
+   * repair the current installation
+   */
+  func registerObservers() {
+    print("InstallationContainer registerObservers")
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(self.handleRepairNeeded(_:)),
+      name: NSNotification.Name.installationRepairNeeded,
+      object: nil // Observe notifications from any sender
+    )
+  }
+
+  /**
+   * called when `NSNotification.Name.installationRepairNeeded` is received
+   */
+  @objc func handleRepairNeeded(_ notification: Notification) {
+    print("handleRepairNeeded")
+    // Extract message from the notification if available
+    if let newState = notification.object as? InstallationState {
+      self.installationState = newState
+    } else {
+      print("handleRepairNeeded received but did not include new InstallationState")
+    }
+  }
+
   /**
    * Returns true if the Accessibility permission has been granted by the user for the Keyman input method.
    * This is an optional return value because it is only set in response to a call to `checkAccessibilityPermissionGranted`
@@ -202,7 +232,6 @@ public class InstallationContainer : ObservableObject {
    */
   func forceValidateInstallation() {
     self.installationCheck.startValidation()
-    self.installationState = installationCheck.installationState
   }
 
   /**
