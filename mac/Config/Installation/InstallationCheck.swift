@@ -15,7 +15,7 @@
 import Foundation
 import KeymanSettings
 
-
+@MainActor
 public class InstallationCheck {
   public let isInputMethodInstalled: Bool
   public let isInputMethodCurrent: Bool
