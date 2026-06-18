@@ -25,7 +25,7 @@ struct InstallView: View {
         Button("Next...") {
           installation.executeNextInstallationTask()
         }
-        .disabled(!installation.isCurrentInputMethodInstalled)
+        .disabled(installation.isInstallationComplete())
         Button("Migrate Data") {
           _ = installation.migrateData()
         }
@@ -69,8 +69,11 @@ struct InstallView: View {
         Button("Uninstall") {
           installation.uninstall()
         }
-        Button("Reset Installation") {
-          installation.resetInstallation()
+        Button("Force Reset Installation") {
+          installation.forceResetInstallation()
+        }
+        Button("Force Validate Installation") {
+          installation.forceValidateInstallation()
         }
         Spacer()
       }

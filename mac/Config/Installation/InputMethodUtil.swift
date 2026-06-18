@@ -12,6 +12,8 @@ import Carbon.HIToolbox
 import AppKit
 import KeymanSettings
 
+public let kAccessibilityPermissionGrantedMessage = "granted"
+
 extension Notification.Name {
   static let accessCheck = Notification.Name("com.keyman.accessibility.state")
 }
@@ -28,14 +30,13 @@ public enum KeymanInvocationError: Error {
 
 public class InputMethodUtil {
   public let keymanInputMethodApplicationName = "Keyman.app"
-  
+
   // only initialized after message is received from input method
   public var accessibilityPermissionGranted: Bool? = nil
   fileprivate let pathUtil: KeymanPaths
   fileprivate var inputMethodProccesId: pid_t = 0
   fileprivate var observer: NSObjectProtocol?
   
-  let kAccessibilityPermissionGrantedMessage = "granted"
   
   let kMigrateCommand = "migrate"
   let kAccessCommand = "access"
@@ -249,8 +250,6 @@ public class InputMethodUtil {
       openConfig.arguments = [argument]
     }
     
-    print("NSWorkspace.OpenConfiguration: \(openConfig))")
-    
     guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
       print("launchKeymanInputMethodAsSeparateProcess, failed to create input method url")
       throw KeymanInvocationError.inputMethodNotFound
@@ -283,45 +282,6 @@ public class InputMethodUtil {
       .second(.twoDigits)
       .secondFraction(.fractional(3))
     print("doAsyncAccessibilityCheck, listening across process boundaries, time: \(Date().formatted(timeStyle))")
-    
-    // MAC-CONFIG_TODO: add timeout
-    
-    // register to listen to system-wide notification sent from Keyman input method
-    observer = DistributedNotificationCenter.default().addObserver(
-      forName: .accessCheck,
-      object: nil, // nil to listen for this notification from any sender
-      queue: .main
-    ) { [weak self] notification in
-      
-      // in DistributedNotificationCenter, the string message is passed as the object
-      if let receivedString = notification.object as? String {
-        Task { @MainActor [weak self] in
-          self?.processAccessibilityCheckResult(with: receivedString)
-        }
-      } else {
-        print("notification received, but object was not a String.")
-      }
-    }
-  }
-  
-  /**
-   * Process the distributed notification message that we received from the Keyman input method and remove the observer.
-   */
-  private func processAccessibilityCheckResult(with message: String) {
-    let timeStyle = Date.FormatStyle()
-      .hour(.twoDigits(amPM: Date.FormatStyle.Symbol.Hour.AMPMStyle.abbreviated))
-      .minute(.twoDigits)
-      .second(.twoDigits)
-      .secondFraction(.fractional(3))
-    print("processAccessCheckResult received message: \(message), time: \(Date().formatted(timeStyle))")
-    
-    // if the message indicates that access was granted, then set as true
-    self.accessibilityPermissionGranted = message == kAccessibilityPermissionGrantedMessage
-    
-    // Clean up the observer immediately so it only fires once
-    if let observer = observer {
-      DistributedNotificationCenter.default().removeObserver(observer)
-    }
   }
   
   /**

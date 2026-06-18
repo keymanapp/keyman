@@ -44,7 +44,7 @@ public class InstallationContainer : ObservableObject {
     self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
     self.isInputMethodInstalled = self.installationCheck.isInputMethodInstalled
     self.isInputMethodCurrent = self.installationCheck.isInputMethodCurrent
-    self.installationState = self.installationCheck.evaluate()
+    self.installationState = self.installationCheck.installationState
   }
   
   /**
@@ -193,10 +193,18 @@ public class InstallationContainer : ObservableObject {
   /**
    * for testing purposes, replace the InstallationState with a new object set for a new installation
    */
-  func resetInstallation() {
+  func forceResetInstallation() {
       self.installationState = InstallationCheck(defaultsRepo: self.defaultsRepository, inputMethodUtil: self.inputMethodUtil).createInstallationStateForNewInstallation()
   }
   
+  /**
+   * for testing purposes, validate the installation
+   */
+  func forceValidateInstallation() {
+    self.installationCheck.startValidation()
+    self.installationState = installationCheck.installationState
+  }
+
   /**
    * return the last time the system was booted
    */
