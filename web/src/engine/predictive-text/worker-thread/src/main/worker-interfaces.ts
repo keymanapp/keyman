@@ -36,7 +36,7 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import type ModelCompositor from './model-compositor.js';
+import { type ModelCompositor } from './model-compositor.js';
 import { Token } from '@keymanapp/models-templates';
 
 /**

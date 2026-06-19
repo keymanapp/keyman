@@ -336,6 +336,7 @@ int main(int argc, char * argv[])
   test_assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('L')}}, {KM_CORE_IT_END}}));
 
   // Without the calling `km_core_state_context_set_if_needed` action struct has a delete for 'L'?
+  // Issue raised to investigate further: https://github.com/keymanapp/keyman/issues/15962
   km_core_cu const *state_context = get_context_as_string(km_core_state_context(test_state));
   km_core_state_context_set_if_needed(test_state, state_context);
   delete [] state_context;

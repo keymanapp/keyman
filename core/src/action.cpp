@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <sstream>
 #include <memory>
+#include <cstring>
 
 
 #include "action.hpp"
