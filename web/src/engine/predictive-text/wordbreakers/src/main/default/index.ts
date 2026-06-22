@@ -67,7 +67,7 @@ export function default_(text: string, options?: DefaultWordBreakerOptions): Lex
 /**
  * A span that does not cut out the substring until it absolutely has to!
  */
-class LazySpan implements LexicalModelTypes.Span {
+export class LazySpan implements LexicalModelTypes.Span {
   private _source: string;
   readonly start: number;
   readonly end: number;
