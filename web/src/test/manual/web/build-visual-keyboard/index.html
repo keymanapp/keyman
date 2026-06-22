@@ -37,8 +37,6 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-
       var platform = 'desktop';
 
       keyman.getOskWidth = function() {
@@ -51,7 +49,7 @@
                 platform == 'phone' ? 240 : 360;
       };
 
-      let shadowfy = function(container) {
+      function shadowfy(container) {
         const shadow = container.attachShadow({ mode: "open" });
         const docBase = container.children[0];
 
@@ -67,7 +65,7 @@
         shadow.appendChild(docBase);
       }
 
-      let documentKeyboard = async function(kbdid, langid, formFactor, layer) {
+      async function documentKeyboard(kbdid, langid, formFactor, layer) {
         let docTarget = document.getElementById("docTarget");
         label = document.createElement('h3');
         docTarget.appendChild(label);
@@ -77,8 +75,8 @@
 
         const container = document.createElement('div');
 
-        await kmw.addKeyboards(`${kbdid}@${langid}`);
-        await kmw.setActiveKeyboard(kbdid, langid);
+        await keyman.addKeyboards(`${kbdid}@${langid}`);
+        await keyman.setActiveKeyboard(kbdid, langid);
         docBase = keyman.BuildVisualKeyboard(kbdid, 1, formFactor, layer);
 
         label.textContent = `${keyman.getKeyboard(kbdid).Name} - ${formFactor} - ${layer} layer`;
@@ -95,7 +93,8 @@
         shadowfy(container);
       }
 
-      kmw.init().then(async function() {
+      keyman.init().then(async function() {
+        await loadKeyboards(1);
         await documentKeyboard("gff_amharic", "am", "phone", "default");
         await documentKeyboard("sil_euro_latin", "no", "phone", "shift");
         await documentKeyboard("lao_2008_basic", "lo", "tablet", "default");
@@ -111,7 +110,7 @@
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards(1);'>
+  <body>
     <h2>KeymanWeb:  Keyboard documentation rendering</h2>
 
     <div id='DynamicTextboxes'>
@@ -121,15 +120,12 @@
       (It is ignored by other User Interfaces.)
     -->
     <div id='KeymanWebControl'></div>
-	<h3>This test page exists for testing KMW's keyboard-documentation rendering system.</h3>
-	<!--<iframe src="hello-world.html" height=100></iframe>-->
-  <hr>
-  <div id="docTarget"></div>
-  </div>
-   <h3><a href="../">Return to testing home page</a></h3>
-
-
-
+    <h3>This test page exists for testing KMW's keyboard-documentation rendering system.</h3>
+    <!--<iframe src="hello-world.html" height=100></iframe>-->
+    <hr>
+    <div id="docTarget"></div>
+    </div>
+    <h3><a href="../">Return to testing home page</a></h3>
   </body>
 
   <!--

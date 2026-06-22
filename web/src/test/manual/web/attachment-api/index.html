@@ -40,9 +40,10 @@
       const attachType = (new URLSearchParams(window.location.search)).get("mode");
       var attachText = attachType ? attachType : "default";
 
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType: attachType ? attachType : ''
+      }).then(function() {
+        loadKeyboards(1);
       });
     </script>
 
@@ -56,7 +57,7 @@
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards(1);'>
+  <body>
     <h2>KeymanWeb Sample Page - Attachment API Testing</h2>
 	<p>This page is designed to stress-test the new attachment/enablement API model and its functions.</p>
 	<p id="modeSelect">You are currently testing under the <em id="mode"> </em> attachment mode.  Two other modes are available:
