@@ -1,3 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2026-04-13
+ *
+ * This file unit tests against the `predictFromCorrectionSequence`
+ * prediction-helper function, validating construction of predictions based on
+ * their root correction sequences.
+ */
 
 import { assert } from 'chai';
 
@@ -41,7 +50,7 @@ const applyCasing: CasingFunction = (casing, text) => {
 
       // Capitalizes the first code unit of the string, leaving the rest intact.
       return text.substring(0, headUnitLength).toUpperCase() // head - uppercased
-             .concat(text.substring(headUnitLength));        // tail - lowercased
+             .concat(text.substring(headUnitLength));        // tail - unchanged
   }
 };
 
