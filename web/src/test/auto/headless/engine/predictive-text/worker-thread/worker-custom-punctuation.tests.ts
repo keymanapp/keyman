@@ -87,17 +87,30 @@ describe('Custom Punctuation', function () {
         // the tests run smoothly.
         wordbreaker: (text) => {
           const textLen = text.length;
-          if(text.charAt(textLen - 1) == " ") {
-            return [
-              {text: text.substring(0, 1), start: 0, end: 1, length: 1},
-              {text: text.substring(1, textLen-2), start: 1, end: textLen-1, length: textLen-2},
-              {text: text.substring(textLen-1), start: textLen-1, end: textLen, length: 1}
-            ];
+          if(text.charAt(0) == "᚛") { // ensure the prior token component (the '᚛') wordbreaks.
+            if(text.charAt(textLen - 1) == " ") { // ensure the insert-after component word-breaks.
+              return [
+                {text: text.substring(0, 1), start: 0, end: 1, length: 1},
+                {text: text.substring(1, textLen-2), start: 1, end: textLen-1, length: textLen-2},
+                {text: text.substring(textLen-1), start: textLen-1, end: textLen, length: 1}
+              ];
+            } else {
+              return [
+                {text: text.substring(0, 1), start: 0, end: 1, length: 1},
+                {text: text.substring(1), start: 1, end: textLen, length: textLen-1}
+              ];
+            }
           } else {
-            return [
-              {text: text.substring(0, 1), start: 0, end: 1, length: 1},
-              {text: text.substring(1), start: 1, end: textLen, length: textLen-1}
-            ];
+            if(text.charAt(textLen - 1) == " ") {
+              return [
+                {text: text.substring(0, textLen-2), start: 0, end: textLen-1, length: textLen-1},
+                {text: text.substring(textLen-1), start: textLen-1, end: textLen, length: 1}
+              ];
+            } else {
+              return [
+                {text: text, start: 0, end: textLen, length: textLen}
+              ];
+            }
           }
         }
       });
