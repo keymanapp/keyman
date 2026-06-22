@@ -107,7 +107,10 @@ function buildQuickBrownFixture() {
     null
   );
 
+  const deleteLeftCalc = (tokens: ContextToken[]) => tokens.reduce((accum, curr) => accum + curr.codepointLength, 0);
+
   return {
+    deleteLeftCalc,
     baseTokenization,
     variations: {
       noChange: {
@@ -115,7 +118,8 @@ function buildQuickBrownFixture() {
         tokenization: baseTokenization,
         range: {
           tokensToRemove: [baseTokenization.tail],
-          tokensToPredict: [baseTokenization.tail]
+          tokensToPredict: [baseTokenization.tail],
+          deleteLeft: deleteLeftCalc([baseTokenization.tail])
         }
       },
       plainInsert: {
@@ -123,7 +127,8 @@ function buildQuickBrownFixture() {
         tokenization: plainInsertTokenization,
         range: {
           tokensToRemove: [baseTokenization.tail],
-          tokensToPredict: [plainInsertTokenization.tail]
+          tokensToPredict: [plainInsertTokenization.tail],
+          deleteLeft: deleteLeftCalc([baseTokenization.tail])
         }
       },
       newTokenInsert: {
@@ -131,7 +136,8 @@ function buildQuickBrownFixture() {
         tokenization: newTokenInsertTokenization,
         range: {
           tokensToRemove: [] as ContextToken[],
-          tokensToPredict: [newTokenInsertTokenization.tail]
+          tokensToPredict: [newTokenInsertTokenization.tail],
+          deleteLeft: deleteLeftCalc([])
         }
       },
       charReplace: {
@@ -139,7 +145,8 @@ function buildQuickBrownFixture() {
         tokenization: charReplaceTokenization,
         range: {
           tokensToRemove: [baseTokenization.tail],
-          tokensToPredict: [charReplaceTokenization.tail]
+          tokensToPredict: [charReplaceTokenization.tail],
+          deleteLeft: deleteLeftCalc([baseTokenization.tail])
         }
       },
       eraseToken: {
@@ -147,7 +154,8 @@ function buildQuickBrownFixture() {
         tokenization: eraseTokenTokenization,
         range: {
           tokensToRemove: [baseTokenization.tail],
-          tokensToPredict: [eraseTokenTokenization.tail]
+          tokensToPredict: [eraseTokenTokenization.tail],
+          deleteLeft: deleteLeftCalc([baseTokenization.tail])
         }
       },
       del5Insert5: {
@@ -155,7 +163,8 @@ function buildQuickBrownFixture() {
         tokenization: del5Insert5Tokenization,
         range: {
           tokensToRemove: baseTokenization.tokens.slice(baseTokenCount-3),
-          tokensToPredict: [del5Insert5Tokenization.tail]
+          tokensToPredict: [del5Insert5Tokenization.tail],
+          deleteLeft: deleteLeftCalc(baseTokenization.tokens.slice(baseTokenCount-3))
         }
       },
       deleteToBound: {
@@ -163,86 +172,96 @@ function buildQuickBrownFixture() {
         tokenization: deleteToBoundTokenization,
         range: {
           tokensToRemove: baseTokenization.tokens.slice(baseTokenCount-3),
-          tokensToPredict: [deleteToBoundTokenization.tail]
+          tokensToPredict: [deleteToBoundTokenization.tail],
+          deleteLeft: deleteLeftCalc(baseTokenization.tokens.slice(baseTokenCount-3))
         }
       }
     }
   };
 }
 
+const tokenEquality = (a: ContextToken, b: ContextToken) => a.spaceId == b.spaceId;
+
 describe('determineSuggestionRange', () => {
   it('adjusts the final token if no tokenization changes occur', () => {
     const fixture = buildQuickBrownFixture();
     const noChange = fixture.variations.noChange;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, noChange.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, noChange.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, noChange.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, noChange.range.tokensToPredict);
+    assert.equal(analysis.deleteLeft, noChange.range.deleteLeft);
   });
 
   it('adjusts the final token after a simple same-token insert', () => {
     const fixture = buildQuickBrownFixture();
     const plainInsert = fixture.variations.plainInsert;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, plainInsert.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, plainInsert.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, plainInsert.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, plainInsert.range.tokensToPredict);
+    assert.equal(analysis.deleteLeft, plainInsert.range.deleteLeft);
   });
 
   it('adjusts the final token after a simple word-breaking insert', () => {
     const fixture = buildQuickBrownFixture();
     const newTokenInsert = fixture.variations.newTokenInsert;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, newTokenInsert.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, newTokenInsert.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, newTokenInsert.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, newTokenInsert.range.tokensToPredict);
+    assert.equal(analysis.deleteLeft, newTokenInsert.range.deleteLeft);
   });
 
   it('adjusts the final token after a simple same-token character replacement', () => {
     const fixture = buildQuickBrownFixture();
     const charReplace = fixture.variations.charReplace;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, charReplace.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, charReplace.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, charReplace.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, charReplace.range.tokensToPredict);
+    assert.equal(analysis.deleteLeft, charReplace.range.deleteLeft);
   });
 
   it('handles deletion of two tokens + alteration of the token before', () => {
     const fixture = buildQuickBrownFixture();
     const del5Insert5 = fixture.variations.del5Insert5;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, del5Insert5.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, del5Insert5.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, del5Insert5.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, del5Insert5.range.tokensToPredict);
+    assert.equal(analysis.deleteLeft, del5Insert5.range.deleteLeft);
   });
 
   it('handles deletion of chars up to closest whitespace', () => {
     const fixture = buildQuickBrownFixture();
     const eraseToken = fixture.variations.eraseToken;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, eraseToken.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, eraseToken.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, eraseToken.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, eraseToken.range.tokensToPredict);
+    assert.equal(analysis.deleteLeft, eraseToken.range.deleteLeft);
   });
 
   it('handles deletion up to boundary of ancestor non-whitespace token', () => {
     const fixture = buildQuickBrownFixture();
     const deleteToBound = fixture.variations.deleteToBound;
 
-    const analysis = determineSuggestionRange(fixture.baseTokenization, deleteToBound.tokenization);
+    const analysis = determineSuggestionRange(fixture.baseTokenization.tokens, deleteToBound.tokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(analysis.tokensToRemove, deleteToBound.range.tokensToRemove);
     assert.sameOrderedMembers(analysis.tokensToPredict, deleteToBound.range.tokensToPredict);
+    assert.equal(analysis.deleteLeft, deleteToBound.range.deleteLeft);
   });
 
   it('handles large variation in intermediate tokens', () => {
-    const originalQuickBrownTokenization = buildQuickBrownFixture().baseTokenization;
+    const { deleteLeftCalc, baseTokenization: originalQuickBrownTokenization } = buildQuickBrownFixture();
     const rawText = ['beyond', ' ', 'the', ' ', 'hungry', ' ', 'green', ' ', 'alligator'];
     // the quick brown fox jumped |
     // Final whitespace is immediately before index 10.
@@ -255,7 +274,7 @@ describe('determineSuggestionRange', () => {
       null
     )
 
-    const analysis = determineSuggestionRange(originalQuickBrownTokenization, foxVsAlligatorTokenization);
+    const analysis = determineSuggestionRange(originalQuickBrownTokenization.tokens, foxVsAlligatorTokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(
       analysis.tokensToRemove,
@@ -265,10 +284,15 @@ describe('determineSuggestionRange', () => {
       analysis.tokensToPredict,
       tokensToAppend
     );
+
+    // TODO:  Once we allow multiple tokens to contribute to deleteLeft, replace
+    // RHS with
+    // originalQuickBrownTokenization.tokens.slice(transitionSliceIndex).
+    assert.equal(analysis.deleteLeft, deleteLeftCalc([originalQuickBrownTokenization.tail]));
   });
 
   it('handles insertion of many extra new tokens at once', () => {
-    const originalQuickBrownTokenization = buildQuickBrownFixture().baseTokenization;
+    const { deleteLeftCalc, baseTokenization: originalQuickBrownTokenization } = buildQuickBrownFixture();
     const originalTokenCount = originalQuickBrownTokenization.tokens.length;
     const rawText = ['dogs', ' ', 'and', ' ', 'the', ' ', 'sleeping', ' ', 'cat'];
     const tokensToAppend = rawText.map((t) => ContextToken.fromRawText(plainModel, t, false));
@@ -279,7 +303,7 @@ describe('determineSuggestionRange', () => {
       null
     )
 
-    const analysis = determineSuggestionRange(originalQuickBrownTokenization, dogsAndCatTokenization);
+    const analysis = determineSuggestionRange(originalQuickBrownTokenization.tokens, dogsAndCatTokenization.tokens, tokenEquality);
 
     assert.sameOrderedMembers(
       analysis.tokensToRemove,
@@ -289,5 +313,7 @@ describe('determineSuggestionRange', () => {
       analysis.tokensToPredict,
       tokensToAppend
     );
+
+    assert.equal(analysis.deleteLeft, deleteLeftCalc([originalQuickBrownTokenization.tail]));
   });
 });
