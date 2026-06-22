@@ -34,6 +34,7 @@ import { MAX_EDIT_THRESHOLD_FACTOR } from "./search-quotient-spur.js";
 export type TokenResult = {
   matchString: string,
   inputSamplingCost: number,
+  inputCount: number,
   knownCost: number,
   totalCost: number
 }
@@ -62,6 +63,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
   private tokenLookupMap: Map<number, ContextToken>;
   private lastTotalCost: number;
   private handleHasBeenCalled: boolean = false;
+  private predictableMatchFound: boolean = false;
 
   get currentCost(): number {
     const correctable = this.selectionQueue.peek();
@@ -195,6 +197,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
       this._generatedTokenResults.set(uncorrectable.spaceId, {
         matchString: lockedResult.text,
         inputSamplingCost: -Math.log(lockedResult.p),
+        inputCount: uncorrectable.inputCount,
         knownCost: 0,
         totalCost: -Math.log(lockedResult.p)
       });
@@ -276,8 +279,9 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     const correctableToUpdate = this.selectionQueue.dequeue();
     const tokenResult = correctableToUpdate?.handleNextNode();
 
+    const correctionIsThePredictable = correctableToUpdate == this._predictable;
     const delistCorrectable = () => {
-      if(correctableToUpdate != this._predictable) {
+      if(!correctionIsThePredictable) {
         // Lock the 'correctable' token now that either a valid correction for
         // it has been found or all possible corrections are exhausted. We only
         // consider a single correction for most of a tokenization's tokens,
@@ -289,18 +293,25 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     }
 
     if(tokenResult.type == 'none') {
-      // Transition the node from 'correctable' to 'uncorrectable' - we were
-      // unable to find valid corrections for it.
-      const lockedResult = correctableToUpdate.bestExample;
-      this._generatedTokenResults.set(correctableToUpdate.spaceId, {
-        matchString: lockedResult.text,
-        inputSamplingCost: -Math.log(lockedResult.p),
-        knownCost: MAX_EDIT_THRESHOLD_FACTOR, // we'll use the same threshold at which further search is terminated.
-        totalCost: -Math.log(lockedResult.p) + MAX_EDIT_THRESHOLD_FACTOR * EDIT_DISTANCE_COST_SCALE
-      });
+      // If it's a correction, or if we were unable to find a correction for
+      // the predictable token - both cases need a 'default 'entry.
+      if(!correctionIsThePredictable || !this.predictableMatchFound) {
+        // Transition the node from 'correctable' to 'uncorrectable' - we were
+        // unable to find valid corrections for it.
+        const lockedResult = correctableToUpdate.bestExample;
+        this._generatedTokenResults.set(correctableToUpdate.spaceId, {
+          matchString: lockedResult.text,
+          inputSamplingCost: -Math.log(lockedResult.p),
+          inputCount: correctableToUpdate.inputCount,
+          knownCost: MAX_EDIT_THRESHOLD_FACTOR, // we'll use the same threshold at which further search is terminated.
+          totalCost: -Math.log(lockedResult.p) + MAX_EDIT_THRESHOLD_FACTOR * EDIT_DISTANCE_COST_SCALE
+        });
+      }
 
       // We can make no further predictions if we've exhausted all search options.
-      if(correctableToUpdate == this._predictable) {
+      // If we've reached this case, we're likely at the end of the search
+      // (unless correction for a correctable is still possible).
+      if(correctionIsThePredictable) {
         this._uncorrectables.push(correctableToUpdate);
         delete this._predictable;
       } else {
@@ -311,6 +322,10 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
       // correctables may exist and need their first corrections before we look
       // for other corrective variations of the 'predictable'.
       delistCorrectable();
+
+      if(correctionIsThePredictable) {
+        this.predictableMatchFound = true;
+      }
 
       // Either way, update the token -> correction-string map with the obtained result.
       this._generatedTokenResults.set(correctableToUpdate.spaceId, tokenResult.mapping);
@@ -351,11 +366,20 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     }
 
     // Determine the proper return type and construct the proper return object accordingly.
-    this._previousResults.push(correctionResults);
-    return {
-      type: 'complete',
-      cost: tokenizationCost,
-      mapping: correctionResults
-    };
+    //
+    // If there was no result obtained from the predictable and a result was previously found,
+    // that indicates no further predictions may be found.
+    if(tokenResult.type != 'none' || !correctionIsThePredictable || !this.predictableMatchFound) {
+      this._previousResults.push(correctionResults);
+      return {
+        type: 'complete',
+        cost: tokenizationCost,
+        mapping: correctionResults
+      };
+    } else {
+      return {
+        type: 'none'
+      };
+    }
   }
 }

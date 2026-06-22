@@ -15,7 +15,6 @@ import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
 import { LegacyQuotientRoot } from "./legacy-quotient-root.js";
 import { generateSubsetId } from './tokenization-subsets.js';
 
-import Distribution = LexicalModelTypes.Distribution;
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
 
@@ -36,11 +35,42 @@ function textToCharTransforms(text: string, transformId?: number): Transform[] {
     [...text].map(insert => ({insert, deleteLeft: 0}));
 }
 
+
+/**
+ * Defines an interface compatible with ContextToken that is useful for handling
+ * cases that should not be considered correctable.
+ */
+export interface ContextTokenLike {
+  /**
+   * Generates text corresponding to the net effects of the most likely inputs
+   * received that can correspond to the represented token.
+   */
+  exampleInput: string;
+
+  /**
+   * Reports the length in codepoints of corrected text represented by the
+   * current token.
+   */
+  codepointLength: number;
+
+  /**
+   * Whether or not the token is likely still being edited by the user (due to
+   * adjacency of the caret)
+   */
+  isPartial?: boolean;
+
+  /**
+   * Gets a compact string-based representation of `inputRange` that
+   * maps compatible token source ranges to each other.
+   */
+  sourceRangeKey?: string;
+}
+
 /**
  * Represents cached data about one token (either a word or a unit of whitespace)
  * in the context and associated correction-search progress and results.
  */
-export class ContextToken {
+export class ContextToken implements ContextTokenLike {
   /**
    * Indicates whether or not the token is considered whitespace.
    */
@@ -55,6 +85,10 @@ export class ContextToken {
   }
   private _searchModule: SearchQuotientNode;
 
+  /**
+   * Whether or not the token is likely still being edited by the user (due to
+   * adjacency of the caret)
+   */
   isPartial: boolean;
 
   /**
@@ -120,11 +154,11 @@ export class ContextToken {
   }
 
   /**
-   * Call this to record the original keystroke Transforms for the context range
-   * corresponding to this token.
+   * Reports the length in codepoints of corrected text represented by the
+   * current token.
    */
-  addInput(inputSource: PathInputProperties, distribution: Distribution<Transform>) {
-    this._searchModule = new LegacyQuotientSpur(this._searchModule, distribution, inputSource);
+  get codepointLength() {
+    return this._searchModule.codepointLength;
   }
 
   get inputCount() {
@@ -164,7 +198,7 @@ export class ContextToken {
 
   /**
    * Generates text corresponding to the net effects of the most likely inputs
-   * received that can correspond to the current instance.
+   * received that can correspond to the represented token.
    */
   get exampleInput(): string {
     return this.searchModule.bestExample.text;
