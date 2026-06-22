@@ -965,9 +965,11 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
 
   const keepOption = suggestionDistribution[0].prediction.sample as Outcome<Keep>;
   if(keepOption.tag == 'keep' && keepOption.matchesModel) {
-    // Auto-select it for auto-acceptance; we don't correct away from perfectly-valid
-    // lexical entries, even if they are comparatively low-frequency.
-    keepOption.autoAccept = true;
+    // Do not auto-select 'keep' suggestions'; there's no need to apply them.
+    //
+    // Do, however, block auto-selection of any other suggestions if we would
+    // have auto-selected the 'keep'; even if it is comparatively unlikely /
+    // low-frequency, we 'keep' the current context.
     return;
   } else if(suggestionDistribution.length == 1) {
     return;
