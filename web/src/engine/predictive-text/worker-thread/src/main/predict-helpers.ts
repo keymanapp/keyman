@@ -950,13 +950,13 @@ export function applySuggestionCasing(predictionToken: TokenizedPredictionData, 
 }
 
 /**
- * Composites a set of `IntermediateTokenizedPrediction`s, merging the tokenized
+ * Composes a set of `IntermediateTokenizedPrediction`s, merging the tokenized
  * data into corresponding `IntermediateCompositedPrediction`s representing the
  * full range of affected context.
  * @param predictions
  * @returns
  */
-export function compositeIntermediatePredictions(predictions: IntermediateTokenizedPrediction[]): IntermediateCompositedPrediction[] {
+export function composeIntermediatePredictions(predictions: IntermediateTokenizedPrediction[]): IntermediateCompositedPrediction[] {
   return predictions.map((predictionData) => {
     const components = predictionData.components;
 
