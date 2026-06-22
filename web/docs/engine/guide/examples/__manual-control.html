@@ -1,29 +1,27 @@
+<!DOCTYPE html>
 <html>
 <head>
   <script src='https://s.keyman.com/kmw/engine/17.0.331/keymanweb.js'></script>
-  <script>var kmw = keyman;</script>
-
-  <script type='text/javascript' src='js/laokeys_load.js'></script>
 
   <script type="text/javascript">
-    function SetupDocument()
-    {
-      keyman.init().then(function() {
-        keyman.setActiveKeyboard('laokeys');
-        keyman.osk.hide();
+    keyman.init().then(async function() {
+      await keyman.addKeyboards({
+        id: "laokeys",
+        name: "Lao (Phonetic)",
+        languages: { id: 'lo', name: 'Lao' },
+        filename: "./js/laokeys.js"
       });
-    }
+      keyman.setActiveKeyboard('laokeys');
+      keyman.osk.hide();
+    });
 
-    function KWControlClick()
-    {
+    function KWControlClick() {
       if(keyman.osk.isEnabled()) {
         keyman.osk.hide();
       } else {
         keyman.osk.show(true); // Specifies that the OSK should display whenever a valid control has focus, re-enabling the default behavior.
       }
     }
-
-    window.addEventListener('load', SetupDocument);
   </script>
 </head>
 <body>

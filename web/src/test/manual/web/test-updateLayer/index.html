@@ -36,9 +36,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-  var kmw=window.keyman;
-  kmw.init({
+  keyman.init({
     attachType: 'auto'
+  }).then(function() {
+    loadKeyboards();
   });
     </script>
 
@@ -51,7 +52,7 @@
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards();'>
+  <body>
     <h2>KeymanWeb Sample Page - Shift Testing</h2>
     <p>See <a href='https://github.com/keymanapp/keyman/issues/978'>issue #978</a> for details on what this test
     is all about.</p>
