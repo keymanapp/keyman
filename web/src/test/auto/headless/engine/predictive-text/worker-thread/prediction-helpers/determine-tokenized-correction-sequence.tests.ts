@@ -15,7 +15,7 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { KMWString } from 'keyman/common/web-utils';
 
-import { determineTokenizedCorrectionSequence, models, ContextState, ContextToken, ContextTokenization, CorrectionPredictionTuple } from "@keymanapp/lm-worker/test-index";
+import { determineTokenizedCorrectionSequence, models, ContextState, ContextToken, ContextTokenization, CorrectionPredictionTuple, ModelCompositor } from "@keymanapp/lm-worker/test-index";
 
 import Context = LexicalModelTypes.Context;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
@@ -54,10 +54,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       transition.final.displayTokenization, {
         matchString: 'fo',
         inputSamplingCost: -Math.log(trueInput.p),
+        inputCount: 2,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      },
-      1
+      }
     );
 
     assert.deepEqual({...results.rootContext, casingForm: results.rootContext.casingForm}, {
@@ -104,10 +104,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       transition.final.displayTokenization, {
         matchString: ' ',
         inputSamplingCost: -Math.log(trueInput.p),
+        inputCount: 1,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      },
-      1
+      }
     );
 
     assert.deepEqual({...results.rootContext, casingForm: results.rootContext.casingForm}, {
@@ -118,15 +118,12 @@ describe('determineTokenizedCorrectionSequence', () => {
       endOfBuffer: true
     });
 
-    assert.deepEqual(results.tokenizedCorrection, [
-      {
-        sample: {
-          insert: ' ',
-          deleteLeft: 0
-        },
-        p: trueInput.p
-      }
-    ]);
+    assert.equal(results.tokenizedCorrection.length, 1);
+    assert.deepEqual(results.tokenizedCorrection[0].sample, {
+      insert: ' ',
+      deleteLeft: 0
+    });
+    assert.approximately(results.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
   });
 
   it(`properly analyzes common-case word-start - beginning a new token`, () => {
@@ -154,10 +151,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       transition.final.displayTokenization, {
         matchString: 'f',
         inputSamplingCost: -Math.log(trueInput.p),
+        inputCount: 1,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      },
-      1
+      }
     );
 
     assert.deepEqual({...results.rootContext, casingForm: results.rootContext.casingForm}, {
@@ -168,15 +165,13 @@ describe('determineTokenizedCorrectionSequence', () => {
       endOfBuffer: true
     });
 
-    assert.deepEqual(results.tokenizedCorrection, [
-      {
-        sample: {
-          insert: 'f',
-          deleteLeft: 0
-        },
-        p: trueInput.p
-      }
-    ]);
+
+    assert.equal(results.tokenizedCorrection.length, 1);
+    assert.deepEqual(results.tokenizedCorrection[0].sample, {
+      insert: 'f',
+      deleteLeft: 0
+    });
+    assert.approximately(results.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
   });
 
   it(`properly analyzes post-merge case`, () => {
@@ -210,10 +205,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       transition.final.displayTokenization, {
         matchString: 'can\'t',
         inputSamplingCost: -Math.log(trueInput.p),
+        inputCount: 5,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      },
-      1
+      }
     );
 
     assert.deepEqual({...results.rootContext, casingForm: results.rootContext.casingForm}, {
@@ -261,10 +256,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       transition.final.displayTokenization, {
         matchString: ' ',
         inputSamplingCost: -Math.log(trueInput.p),
+        inputCount: 1,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      },
-      1
+      }
     );
 
     assert.deepEqual({...results.rootContext, casingForm: results.rootContext.casingForm}, {
@@ -275,15 +270,13 @@ describe('determineTokenizedCorrectionSequence', () => {
       endOfBuffer: true
     });
 
-    assert.deepEqual(results.tokenizedCorrection, [
-      {
-        sample: {
-          insert: ' ',
-          deleteLeft: 0
-        },
-        p: trueInput.p
-      }
-    ]);
+
+    assert.equal(results.tokenizedCorrection.length, 1);
+    assert.deepEqual(results.tokenizedCorrection[0].sample, {
+      insert: ' ',
+      deleteLeft: 0
+    });
+    assert.approximately(results.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
   });
 
   it(`properly analyzes complex transition - multi-token replacement`, () => {
@@ -310,10 +303,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       transition.final.displayTokenization, {
         matchString: 'd',
         inputSamplingCost: -Math.log(trueInput.p),
+        inputCount: 1,
         knownCost: 0,
         totalCost: -Math.log(trueInput.p)
-      },
-      1
+      }
     );
 
     // Large-scale deletions will receive enhanced handling soon.  But, for now, it's
@@ -326,15 +319,13 @@ describe('determineTokenizedCorrectionSequence', () => {
       endOfBuffer: true
     });
 
-    assert.deepEqual(results.tokenizedCorrection, [
-      {
-        sample: {
-          insert: 'd',
-          deleteLeft: 0
-        },
-        p: trueInput.p
-      }
-    ]);
+
+    assert.equal(results.tokenizedCorrection.length, 1);
+    assert.deepEqual(results.tokenizedCorrection[0].sample, {
+      insert: 'd',
+      deleteLeft: 0
+    });
+    assert.approximately(results.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
 
     const dummiedTuple: CorrectionPredictionTuple = {
       prediction: {
