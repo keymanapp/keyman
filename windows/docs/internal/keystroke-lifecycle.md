@@ -90,6 +90,14 @@ Non-compliant Applications in Windows, Mac and
 Linux](https://help.keyman.com/knowledge-base/?id=118) Which includes a more
 complete sequence diagram.
 
+TODO expand
+Sending the output for non complaint apps see
+aiWin2000Unicode.cpp
+It ultimately uses SendInput(), which synthesizes keystrokes. It does this via the SerialEventClient::SignalServer()
+TODO expand
+Sending output for compliant apps see aiTIP.cpp.
+This uses _td->TIPProcessOutput() which is ultimately is using the Text Services Framework.
+
 
 The sequence diagram show the keystroke life cycle. Note that all actions are
 shown from Engine to OS but on any given keystroke it will not be all of those
