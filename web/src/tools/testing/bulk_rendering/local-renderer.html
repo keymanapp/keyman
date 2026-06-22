@@ -32,8 +32,7 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType:'auto'
       });
 
@@ -119,7 +118,7 @@
       };
 
       async function runRenderer() {
-        kmw_renderer.run(document.getElementById('allLayers').checked, document.getElementById('filter').value);
+        keyman_renderer.run(document.getElementById('allLayers').checked, document.getElementById('filter').value);
       }
     </script>
   </head>

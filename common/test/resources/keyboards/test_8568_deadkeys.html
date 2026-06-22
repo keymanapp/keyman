@@ -36,22 +36,20 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      (function(kmw) {
-        kmw.init({
-          attachType:'auto'
-        }).then(function() {
-          kmw.addKeyboards({
-            id:'test_8568_deadkeys',
-            name:'Testcase for deadkeys bug (#8568)',
-            languages:{
-              id:'en',
-              name:'English'
-            },
-            filename:'./test_8568_deadkeys.js'
-          });
+      keyman.init({
+        attachType:'auto'
+      }).then(async function() {
+        await keyman.addKeyboards({
+          id:'test_8568_deadkeys',
+          name:'Testcase for deadkeys bug (#8568)',
+          languages:{
+            id:'en',
+            name:'English'
+          },
+          filename:'./test_8568_deadkeys.js'
         });
-        })(keyman);
-      </script>
+      });
+    </script>
 
 
   </head>

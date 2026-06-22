@@ -245,22 +245,26 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
    * We treat a few certain infrastructure messages with special colours
    * @param event
    * @returns
+   * Keep in sync with: UfrmMessages.pas, TfrmMessages.Add
    */
   messageSpecialColor(event: CompilerEvent) {
     switch(event.code) {
       case InfrastructureMessages.INFO_BuildingFile:
       case InfrastructureMessages.INFO_CopyingProject:
       case InfrastructureMessages.INFO_GeneratingProject:
+      case InfrastructureMessages.INFO_ValidatingProject:
         return color.whiteBright;
       case InfrastructureMessages.INFO_FileNotBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectNotBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectNotCopiedSuccessfully:
       case InfrastructureMessages.INFO_ProjectNotGeneratedSuccessfully:
+      case InfrastructureMessages.INFO_ProjectNotValidatedSuccessfully:
         return color.red;
       case InfrastructureMessages.INFO_FileBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectCopiedSuccessfully:
       case InfrastructureMessages.INFO_ProjectGeneratedSuccessfully:
+      case InfrastructureMessages.INFO_ProjectValidatedSuccessfully:
         return color.green;
     }
     return null;
