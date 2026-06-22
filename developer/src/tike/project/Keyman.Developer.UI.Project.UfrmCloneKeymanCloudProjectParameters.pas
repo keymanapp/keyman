@@ -46,6 +46,7 @@ type
     cmdBrowse: TButton;
     editPath: TEdit;
     chkRelocateExternal: TCheckBox;
+    lblMessage: TLabel;
     procedure cmdOKClick(Sender: TObject);
     procedure editSourceProjectFilenameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -57,6 +58,7 @@ type
     cef: TframeCEFHost;
     dlgBrowse: TBrowse4Folder;
     FKeymanID: string;
+    FSourceAvailable: Boolean;
     frmDownloadProgress: TfrmDownloadProgress;
     function GetBasePath: string;
     function GetKeyboardID: string;
@@ -64,6 +66,7 @@ type
     procedure EnableControls;
     procedure SetKeyboardID(const Value: string);
     procedure UpdateProjectFilename;
+    procedure UpdateMessage;
     function GetProjectFilename: string;
     function GetSourceProjectFilename: string;
     function GetRelocateExternal: Boolean;
@@ -71,6 +74,7 @@ type
     procedure cefLoadEnd(Sender: TObject);
     procedure DownloadCallback(Owner: TfrmDownloadProgress; var Result: Boolean);
     procedure DownloadWrapperCallback(var Cancelled: Boolean);
+    function IsKeyboardSourceAvailable(const id: string): Boolean;
   protected
     function GetHelpTopic: string; override;
   public
@@ -86,9 +90,11 @@ function ShowCloneKeymanCloudProjectParameters(Owner: TComponent): Boolean;
 implementation
 
 uses
+  System.JSON,
   System.Net.UrlClient,
   Vcl.ComCtrls,
 
+  HttpUploader,
   KeymanDeveloperOptions,
   Keyman.Developer.System.KmcWrapper,
   Keyman.Developer.System.HelpTopics,
@@ -182,6 +188,7 @@ begin
   dlgBrowse.Root := Desktop;
   dlgBrowse.Title := 'Select folder to save project to';
 
+  UpdateMessage;
   EnableControls;
 end;
 
@@ -201,7 +208,95 @@ begin
       not u.Path.StartsWith(URLSubPath_KeymanDeveloper_Clone_Keyboards_Custom)
     then FKeymanID := u.Path.Substring(URLSubPath_KeymanDeveloper_Clone_Keyboards.Length)
     else FKeymanID := '';
+
+  FSourceAvailable := IsKeyboardSourceAvailable(FKeymanID);
+  UpdateMessage;
   EnableControls;
+end;
+
+function TfrmCloneKeymanCloudProjectParameters.IsKeyboardSourceAvailable(const id: string): Boolean;
+
+  function GetKeyboardDataFromApiServer(const id: string): string;
+  var
+    http: THTTPUploader;
+  begin
+    http := THTTPUploader.Create(nil);
+    try
+      http.Request.HostName := API_Server;
+      http.Request.Protocol := API_Protocol;
+      http.Request.UrlPath := API_Path_Keyboard(id);
+      try
+        http.Upload;
+      except
+        // Silently swallow network errors
+        on E:Exception do Exit('');
+      end;
+
+      if (http.Response.StatusCode < 200) or (http.Response.StatusCode > 299) then
+      begin
+        // Keyboard not found or invalid response
+        Exit('');
+      end;
+
+      Result := UTF8ToString(PAnsiChar(http.Response.MessageBodyAsString));
+    finally
+      FreeAndNil(http);
+    end;
+  end;
+
+  function GetSourcePathFromBody(const body: string): string;
+  var
+    val: TJSONValue;
+    obj: TJSONObject;
+  begin
+    try
+      val := TJSONObject.ParseJSONValue(body);
+    except
+      // Not a valid response
+      Exit('');
+    end;
+
+    if not (val is TJSONObject) then
+    begin
+      // Not a valid response
+      Exit('');
+    end;
+
+    obj := val as TJSONObject;
+    val := obj.Values['sourcePath'];
+    if not Assigned(val) or not (val is TJSONString) then
+    begin
+      // no sourcePath property
+      Exit('');
+    end;
+
+    Result := (val as TJSONString).Value;
+  end;
+
+var
+  body, sourcePath: string;
+begin
+  if id = '' then
+  begin
+    Exit(False);
+  end;
+
+  body := GetKeyboardDataFromApiServer(id);
+  if body = '' then
+  begin
+    Exit(False);
+  end;
+
+  sourcePath := GetSourcePathFromBody(body);
+  if sourcePath = '' then
+  begin
+    Exit(False);
+  end;
+
+  // Keyboards in legacy/ do not have source available. Keyboards in
+  // release/ and experimental/ have source, and other new categories will
+  // also have source in future.
+  Result := not sourcePath.startsWith('legacy');
 end;
 
 procedure TfrmCloneKeymanCloudProjectParameters.cmdBrowseClick(Sender: TObject);
@@ -221,22 +316,26 @@ end;
 procedure TfrmCloneKeymanCloudProjectParameters.editKeyboardIDChange(Sender: TObject);
 begin
   UpdateProjectFilename;
+  UpdateMessage;
   EnableControls;
 end;
 
 procedure TfrmCloneKeymanCloudProjectParameters.editSourceProjectFilenameChange(Sender: TObject);
 begin
+  UpdateMessage;
   EnableControls;
 end;
 
 procedure TfrmCloneKeymanCloudProjectParameters.editPathChange(Sender: TObject);
 begin
   UpdateProjectFilename;
+  UpdateMessage;
   EnableControls;
 end;
 
 procedure TfrmCloneKeymanCloudProjectParameters.editVersionChange(Sender: TObject);
 begin
+  UpdateMessage;
   EnableControls;
 end;
 
@@ -248,7 +347,8 @@ begin
     (FKeymanID <> '') and
     (Trim(editPath.Text) <> '') and
     (Trim(editKeyboardID.Text) <> '') and
-    TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True);
+    TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True) and
+    FSourceAvailable;
 
   cmdOK.Enabled := e;
 end;
@@ -292,7 +392,39 @@ end;
 procedure TfrmCloneKeymanCloudProjectParameters.SetKeyboardID(const Value: string);
 begin
   editKeyboardID.Text := Value;
+  UpdateMessage;
   EnableControls;
+end;
+
+procedure TfrmCloneKeymanCloudProjectParameters.UpdateMessage;
+var
+  msg: string;
+begin
+  if FKeymanID = '' then
+  begin
+    msg := 'Please choose a keyboard from the search form above.';
+  end
+  else if not FSourceAvailable then
+  begin
+    msg := Format('The keyboard %0:s has no source available. It cannot be cloned.', [FKeymanID]);
+  end
+  else if Trim(editPath.Text) = '' then
+  begin
+    msg := 'A valid destination path must be selected.';
+  end
+  else if Trim(editKeyboardID.Text) = '' then
+  begin
+    msg := 'Please enter a valid new project identifier.';
+  end
+  else if not TKeyboardUtils.IsValidKeyboardID(Trim(editKeyboardID.Text), True) then
+  begin
+    msg := 'Please enter a valid new project identifier.';
+  end
+  else
+  begin
+    msg := '';
+  end;
+  lblMessage.Caption := msg;
 end;
 
 procedure TfrmCloneKeymanCloudProjectParameters.UpdateProjectFilename;
