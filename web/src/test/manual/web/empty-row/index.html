@@ -36,18 +36,16 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType: 'auto'
       }).then(function() {
         // A testing keyboard with empty rows on each layer
-        kmw.addKeyboards({id:'empty_row', name: 'Empty Row',
+        keyman.addKeyboards({id:'empty_row', name: 'Empty Row',
           languages:{
             id:'en', name:'English'
           },
           filename: 'empty_row-1.0.js'
-        });
-        kmw.addKeyboards({id:'afghan_turkmen', name:'Afghan Turkmen',
+        }, {id:'afghan_turkmen', name:'Afghan Turkmen',
           languages:{
             id:'tk-Arab', name:'Turkmen (Arabic)'
           },

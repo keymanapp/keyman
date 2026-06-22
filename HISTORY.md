@@ -1,5 +1,48 @@
 # Keyman Version History
 
+## 19.0.247 alpha 2026-06-16
+
+* chore: update multi-labeler to 5.0.0 (#16100)
+
+## 19.0.246 alpha 2026-06-15
+
+* feat(developer): run project validation from IDE (#16076)
+* fix(core): use meson subsystem and needs_exe_wrapper for cross builds on Windows (#16088)
+* docs(windows): add context documentation for additional Advanced options (#16089)
+
+## 19.0.245 alpha 2026-06-10
+
+* chore(web): hide KMX keyboard test page (#16083)
+* docs(web): remove unnecessary mentioning of Keyman 17 from docs (#16085)
+* chore(web): remove outdated `*_load.js` files (#16086)
+* fix(web): fix `KeyboardStub.validateForCustomKeyboard` (#16067)
+
+## 19.0.244 alpha 2026-06-09
+
+* refactor(web): extract function, rename variables (#16063)
+* refactor(web): reformatting of files (#16066)
+* chore(web): improve the KeymanWeb integration documentation (#16064)
+* chore(web): more improvements to documentation (#16070)
+
+## 19.0.243 alpha 2026-06-08
+
+* fix(developer): reduce km_core_keyboard_attrs size to 12 (#16075)
+* chore(deps): bump minimatch in /core/tests/unit/wasm (#16045)
+* chore(deps): bump glob from 10.4.5 to 10.5.0 in /core/tests/unit/wasm (#16046)
+* chore(deps-dev): bump js-yaml from 4.1.0 to 4.2.0 in /core/tests/unit/wasm (#16047)
+* chore(deps-dev): bump picomatch from 2.3.1 to 2.3.2 in /core/tests/unit/wasm (#16048)
+* chore(deps): bump qs and express (#16009)
+
+## 19.0.242 alpha 2026-06-03
+
+* fix(web): fix displaying of keyboard menu (#16061)
+
+## 19.0.241 alpha 2026-06-02
+
+* chore(web): web-core preflight - strip core references (#16040)
+* docs: add note on how to use composer on dockerized websites (#16029)
+* fix(web): fix race displaying active keyboard in menu (#16042)
+
 ## 19.0.240 alpha 2026-05-28
 
 * chore(web): add filename to link text of manual web tests (#16019)
