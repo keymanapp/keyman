@@ -17,7 +17,6 @@ import { TokenResult } from './correction/tokenization-corrector.js';
 import { TokenizationCorrector } from './correction/tokenization-corrector.js';
 import { TokenizationResultMapping } from './correction/tokenization-result-mapping.js';
 
-import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import Keep = LexicalModelTypes.Keep;
@@ -795,12 +794,7 @@ export function shouldStopSearchingEarly(
  * "rank" and select the best predictions once the search is complete.  This is
  * performed at later stages.
  * @param lexicalModel
- * @param corrections Each `correction` should insert a full token's text to be
- * appended to the context resulting from all preceding corrections.
- * @param rootContext This context should represent all portions of the
- * post-context not represented by the entries of the `corrections` array.
- * @param transitionId Indicates the unique ID of the transition that triggered
- * prediction generation.
+ * @param predictionPrep
  * @returns
  */
 export function predictFromCorrectionSequence(
@@ -921,33 +915,28 @@ export function predictFromCorrectionSequence(
 /**
  * Applies the specified casing-form to generated suggestions, leveraging the model's
  * defined casing behaviors to do so.
- * @param suggestion
- * @param baseWord
+ * @param predictionToken  A tuple representing a single context token's prediction and base correction
  * @param lexicalModel
- * @param casingForm
  */
 export function applySuggestionCasing(predictionToken: TokenizedPredictionData, lexicalModel: LexicalModel) {
-  const suggestion = predictionToken.prediction;
-
   // Step 0:  our pattern for generating predictions and corrections already
-  // enforces them to encompass the whole word.
-
-  // Step 1:  detect the original token's casing
-  let casingForm: CasingForm;
+  // enforces that they encompass the whole word.
+  const suggestion = predictionToken.prediction;
 
   // If we are using the context-tracking engine (when traversals are enabled),
   // we just leverage the context token's exampleInput to determine casing.
   //
   // If it's not available, the correction entry reflects a word-broken piece of
   // the original context, with its original casing - so we use that instead.
-  let casingRoot = predictionToken.casingRoot ? predictionToken.casingRoot : predictionToken.correction;
+  const casingRoot = predictionToken.casingRoot ? predictionToken.casingRoot : predictionToken.correction;
   if(!casingRoot) {
     // There's no text in place to verify casing expectations; just leave it
     // unchanged.
     return;
   }
 
-  casingForm = detectCurrentCasing(lexicalModel, {
+  // Step 1:  detect the original token's casing
+  const casingForm = detectCurrentCasing(lexicalModel, {
     left: casingRoot,
     startOfBuffer: true,
     endOfBuffer: true
@@ -960,6 +949,13 @@ export function applySuggestionCasing(predictionToken: TokenizedPredictionData, 
   }
 }
 
+/**
+ * Composites a set of `IntermediateTokenizedPrediction`s, merging the tokenized
+ * data into corresponding `IntermediateCompositedPrediction`s representing the
+ * full range of affected context.
+ * @param predictions
+ * @returns
+ */
 export function compositeIntermediatePredictions(predictions: IntermediateTokenizedPrediction[]): IntermediateCompositedPrediction[] {
   return predictions.map((predictionData) => {
     const components = predictionData.components;
