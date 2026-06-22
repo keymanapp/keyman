@@ -5,13 +5,13 @@ export class TokenizationResultMapping implements CorrectionResultMapping<Readon
   readonly matchingSpace: TokenizationCorrector;
   readonly matchedResult: ReadonlyArray<TokenResult>;
 
-  constructor(tokenization: TokenResult[], corrector: TokenizationCorrector) {
+  constructor(tokenization: TokenResult[], corrector?: TokenizationCorrector) {
     this.matchingSpace = corrector;
     this.matchedResult = tokenization;
   }
 
   get spaceId(): number {
-    return this.matchingSpace.tokenization.spaceId;
+    return this.matchingSpace?.tokenization.spaceId;
   }
 
   // /**
