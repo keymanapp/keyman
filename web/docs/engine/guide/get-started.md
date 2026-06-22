@@ -22,12 +22,10 @@ The source code for the page may be seen below.
   <script src='https://s.keyman.com/kmw/engine/18.0.245/keymanweb.js'></script>
   <script src='https://s.keyman.com/kmw/engine/18.0.245/kmwuitoggle.js'></script>
   <script>
-    (function() {
-      keyman.init({attachType:'auto'}).then(function() {
-        keyman.addKeyboards('@en'); // Loads default English keyboard from Keyman Cloud (CDN)
-        keyman.addKeyboards('@th'); // Loads default Thai keyboard from Keyman Cloud (CDN)
-      });
-    })(keyman);
+    keyman.init({attachType:'auto'}).then(async function() {
+      await keyman.addKeyboards('@en'); // Loads default English keyboard from Keyman Cloud (CDN)
+      await keyman.addKeyboards('@th'); // Loads default Thai keyboard from Keyman Cloud (CDN)
+    });
   </script>
 </head>
 <body>
