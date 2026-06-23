@@ -262,6 +262,11 @@ function setupKeyman() {
       newOSK.setSize(targetDevice.dimensions[0]+'px', targetDevice.dimensions[1]+'px');
     }
     document.getElementById('osk-host').appendChild(newOSK.element);
+
+    // After attaching a new OSK, we also need to set the OSK's active keyboard
+    // and model
+    newOSK.activeKeyboard = keyman.contextManager.activeKeyboard;  // Note: undocumented KeymanWeb API refs on both sides
+    selectModel(keyman.core.activeModel?.id);
   }
 
   setOSK();
