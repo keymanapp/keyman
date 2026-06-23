@@ -29,6 +29,37 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     this.performCacheBusting = cacheBust || false;
   }
 
+  /**
+   * Fetches a resource from the specified URL. This replaces the Fetch API function
+   * fetch() which doesn't work with file:// URLs.
+   *
+   * @param uri
+   * @returns A response promise
+   *
+   * @see https://stackoverflow.com/a/63582110
+   *
+   * Note: Even with this function some browsers like Chrome will still block
+   * file:// because of CORS, so where possible we shouldn't use file:// but
+   * serve the files through a HTTP server. In the Keyman for Android and iOS
+   * apps however we don't want to do this and this function allows us to work
+   * around the limitation of the Fetch API fetch(). On Android we still have to
+   * explicitly allow file URLs.
+   */
+  private fetch(uri: string): Promise<Response> {
+    return new Promise(function (resolve, reject) {
+      const httpRequest = new XMLHttpRequest();
+      httpRequest.onload = function () {
+        resolve(new Response(httpRequest.response, { status: httpRequest.status }));
+      };
+      httpRequest.onerror = (e) => {
+        reject(e);
+      };
+      httpRequest.open('GET', uri);
+      httpRequest.responseType = "arraybuffer";
+      httpRequest.send(null);
+    });
+  };
+
   protected async loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array> {
     if (this.performCacheBusting) {
       uri = this.cacheBust(uri);
@@ -36,7 +67,7 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
 
     let response: Response;
     try {
-      response = await fetch(uri);
+      response = await this.fetch(uri);
     } catch (e) {
       throw errorBuilder.keyboardDownloadError(e);
     }
