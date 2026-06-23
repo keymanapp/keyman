@@ -27,18 +27,65 @@ import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 const MIN_TOKENS_TO_RECONSIDER_FOR_TOKENIZATION = 3;
 const MIN_CHARS_TO_RECONSIDER_FOR_TOKENIZATION = 8;
 
+/**
+ * This type is used to indicate properties of tokens affected by merges and
+ * splits during a context transition.
+ */
 interface EditTokenMap {
+  /**
+   * The index of the affected token.
+   */
   index: number,
+  /**
+   * The token's most likely represented text.
+   */
   text: string
 };
 
+/**
+ * This type represents mappings for tokens affected by merge edit operations.
+ */
 interface TokenMergeMap {
+  /**
+   * Entries here represent source-context tokens that are combined as part of
+   * the merge edit operation.
+   *
+   * Entries will appear in the same ordering as the codepoints they represent
+   * appear in the underlying context.
+   */
   inputs: EditTokenMap[],
+
+  /**
+   * This entry represents the post-transition context token produced from the
+   * merge edit operation.
+   *
+   * Note that it is possible for extra codepoints to exist here that were not
+   * represented in the original source-context tokens.
+   */
   match: EditTokenMap
 };
 
+
+/**
+ * This type represents mappings for tokens affected by split edit operations.
+ */
 export interface TokenSplitMap {
+  /**
+   * This entry represents the source-context token that was split as part of
+   * the split edit operation.
+   *
+   * Note that it is possible for codepoints to exist here but not be
+   * represented in the post-transition context tokens resulting from the split.
+   */
   input: EditTokenMap,
+
+  /**
+   * Entries here represent post-transition tokens that represent pieces of the
+   * original source-context token affected by the split edit operation.
+   *
+   * Entries will appear in the same ordering as the codepoints they represent
+   * appear in the underlying context.
+   */
   matches: (EditTokenMap & { textOffset: number })[]
 };
 
@@ -956,8 +1003,8 @@ export function traceInsertEdits(tokens: string[], transform: Transform): {
  * Given context tokenizations before and after applying an incoming transform,
  * this method analyzes the tokenizations in order to make adjustments for any
  * 'merge' or 'split' edits needed for the transition.
- * @param priorTokenization
- * @param resultTokenization
+ * @param priorTokenization The raw-text form of the pre-transition context tokenization
+ * @param resultTokenization The raw-text form of the post-transition context tokenization
  * @returns
  */
 export function analyzePathMergesAndSplits(priorTokenization: string[], resultTokenization: string[]): {
@@ -1166,7 +1213,9 @@ export function assembleTransforms(stackedInserts: string[], stackedDeletes: num
  * Used to construct and represent the part of the incoming transform that does
  * not land as part of the final token in the resulting context.  This component
  * should be preserved by any suggestions that get applied.
- * @param tokenizationAnalysis
+ * @param tokenizationAnalysis Precomputed metadata about a potential transition
+ * from a pre-transition context tokenization to a post-transition context
+ * tokenization
  * @returns
  */
 export function determineTaillessTrueKeystroke(tokenizationAnalysis: TransitionEdge) {
