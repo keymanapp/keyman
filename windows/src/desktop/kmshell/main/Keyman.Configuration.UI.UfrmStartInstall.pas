@@ -72,6 +72,8 @@ begin
     lblUpdateMessage.Caption := MsgFromId(S_Ready_To_Install);
 
   IsMetered := UtilNetworkConnection.IsMetered;
+  // Show warning if on a metered connection. If FReadyToInstall the update is 
+  // already downloaded, so no use in displaying the warning.
   lblMeteredWarning.Visible := IsMetered and not FReadyToInstall;
   shpMeteredWarning.Visible := IsMetered and not FReadyToInstall;
   if IsMetered then
