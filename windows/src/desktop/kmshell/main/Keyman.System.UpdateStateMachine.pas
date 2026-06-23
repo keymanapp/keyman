@@ -722,7 +722,7 @@ begin
   bucStateContext.SetRegistryState(usUpdateAvailable);
 
   if bucStateContext.FAutomaticUpdate and
-    not UtilNetworkConnection.IsBackgroundUpdateAllowed then
+    not UtilNetworkConnection.IsBackgroundUpdateBlocked then
   begin
     StartDownloadProcess;
   end;
@@ -755,7 +755,7 @@ end;
 function UpdateAvailableState.HandleKmShell;
 begin
   if bucStateContext.FAutomaticUpdate and
-    not UtilNetworkConnection.IsBackgroundUpdateAllowed then
+    not UtilNetworkConnection.IsBackgroundUpdateBlocked then
   begin
     // we will use a new kmshell process to enable
     // the download as background process.

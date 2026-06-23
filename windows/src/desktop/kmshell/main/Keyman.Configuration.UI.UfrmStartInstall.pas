@@ -20,7 +20,6 @@ uses
   Winapi.Windows,
   UfrmKeymanBase,
   UserMessages,
-  UtilNetworkConnection,
   Vcl.Imaging.pngimage;
 
 type
@@ -34,11 +33,13 @@ type
     procedure FormCreate(Sender: TObject);
   private
     FRestartRequired: Boolean;
+    FIsMetered: Boolean;
     FReadyToInstall: Boolean;
   public
   constructor Create(
     AOwner: TComponent;
     const RestartRequired: Boolean;
+    const IsMetered: Boolean;
     const ReadyToInstall: Boolean = False); reintroduce;
   end;
 
@@ -52,16 +53,16 @@ uses
 constructor TfrmStartInstall.Create(
   AOwner: TComponent;
   const RestartRequired: Boolean;
+  const IsMetered: Boolean;
   const ReadyToInstall: Boolean = False);
 begin
   inherited Create(AOwner);
   FRestartRequired := RestartRequired;
+  FIsMetered  := IsMetered;
   FReadyToInstall := ReadyToInstall;
 end;
 
 procedure TfrmStartInstall.FormCreate(Sender: TObject);
-var
-  IsMetered: Boolean;
 begin
   inherited;
   cmdInstall.Caption := MsgFromId(S_Update_Now);
@@ -71,12 +72,11 @@ begin
   else
     lblUpdateMessage.Caption := MsgFromId(S_Ready_To_Install);
 
-  IsMetered := UtilNetworkConnection.IsMetered;
-  // Show warning if on a metered connection. If FReadyToInstall the update is 
+  // Show warning if on a metered connection. If FReadyToInstall the update is
   // already downloaded, so no use in displaying the warning.
-  lblMeteredWarning.Visible := IsMetered and not FReadyToInstall;
-  shpMeteredWarning.Visible := IsMetered and not FReadyToInstall;
-  if IsMetered then
+  lblMeteredWarning.Visible := FIsMetered and not FReadyToInstall;
+  shpMeteredWarning.Visible := FIsMetered and not FReadyToInstall;
+  if FIsMetered then
     lblMeteredWarning.Caption := MsgFromId(S_Metered_Warning);
 end;
 

@@ -821,14 +821,14 @@ var
   IsMetered: Boolean;
 begin
   InstallNow := True;
-  // Confirm User is ok that this will require a reset
-  // The metered warning has been added to the update pop up. In the future
-  // it would be better to have this warning in a banner on the configuration
-  // page.
   IsMetered := UtilNetworkConnection.IsMetered;
+  // If a restarted is required (HasKeymanRun == True)
+  // OR it is a Metered connection warn the user and allow
+  // them to cancel their request to Install Now.
+  // Otherwise start installing.
   if HasKeymanRun OR IsMetered then
   begin
-    frmStartInstallNow := TfrmStartInstall.Create(nil, true);
+    frmStartInstallNow := TfrmStartInstall.Create(nil, HasKeymanRun, IsMetered);
     try
       if frmStartInstallNow.ShowModal = mrOk then
         InstallNow := True

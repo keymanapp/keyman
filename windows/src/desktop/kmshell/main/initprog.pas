@@ -145,6 +145,7 @@ uses
   UILanguages,
   uninstall,
   UpgradeMnemonicLayout,
+  UtilNetworkConnection,
   utilfocusappwnd,
   utilkmshell,
   Keyman.System.UpdateStateMachine,
@@ -669,6 +670,7 @@ function ShouldSendToBUpdateSM(FSilent: Boolean; BUpdateSM: TUpdateStateMachine;
 // UI elements from the state machine we have bring some of logic here.
 var
   frmStartInstall: TfrmStartInstall;
+  IsMetered: Boolean;
   ValidateReadyToInstall: Boolean;
 begin
   ValidateReadyToInstall := BUpdateSM.ValidateReadyToInstall;
@@ -677,7 +679,8 @@ begin
      (FMode in [fmStart, fmSplash, fmMain, fmAbout,
                 fmHelp, fmShowHelp, fmSettings, fmBoot]) then
   begin
-    frmStartInstall := TfrmStartInstall.Create(nil, false, ValidateReadyToInstall);
+    IsMetered := UtilNetworkConnection.IsMetered;
+    frmStartInstall := TfrmStartInstall.Create(nil, false, IsMetered, ValidateReadyToInstall);
     try
       Result := frmStartInstall.ShowModal = mrOk;
     finally

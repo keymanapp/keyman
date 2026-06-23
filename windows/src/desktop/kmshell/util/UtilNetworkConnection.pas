@@ -26,16 +26,16 @@ function IsMetered: Boolean;
 function IsBackgroundDataRestricted: Boolean;
 
 (**
- * Determines whether background updates are allowed.
+ * Determines whether background updates are blocked.
  *
- * @returns True if updates can proceed, False if blocked by network constraints.
+ * @returns True if background updates are blocked, False if allowed.
  *
  * Note: Currently this checks for metered connection OR background
         data usage restricted. If a configuration item is added that
         provides the option to download on metered connections then
         this should be updated to include that logic
  *)
-function IsBackgroundUpdateAllowed: Boolean;
+function IsBackgroundUpdateBlocked: Boolean;
 
 implementation
 
@@ -86,7 +86,7 @@ end;
 // data usage restricted. If a configuration item is added that
 // provides the option to download on metered connections then
 // this should be updated to include that logic
-function IsBackgroundUpdateAllowed: Boolean;
+function IsBackgroundUpdateBlocked: Boolean;
 begin
   Result := IsMetered OR IsBackgroundDataRestricted;
 end;
