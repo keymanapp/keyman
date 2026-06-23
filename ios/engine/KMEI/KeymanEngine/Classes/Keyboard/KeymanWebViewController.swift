@@ -182,7 +182,7 @@ extension KeymanWebViewController {
     }
     view = nil
   }
-  
+
   func languageMenuPosition(_ completion: @escaping (CGRect) -> Void) {
     webView!.evaluateJavaScript("langMenuPos();") { result, _ in
       guard let result = result as? String, !result.isEmpty else {
@@ -422,10 +422,11 @@ extension KeymanWebViewController {
 
       let predict = userDefaults.predictSettingForLanguage(languageID: lexicalModel.languageID)
       let correct = userDefaults.correctSettingForLanguage(languageID: lexicalModel.languageID)
+      let autocorrect = userDefaults.autocorrectSettingForLanguage(languageID: lexicalModel.languageID)
 
       // Pass these off to KMW!
       // We do these first so that they're automatically set for the to-be-registered model in advance.
-      webView!.evaluateJavaScript("enableSuggestions(\(stubString), \(predict), \(correct))")
+      webView!.evaluateJavaScript("enableSuggestions(\(stubString), \(predict), \(correct), \(autocorrect))")
       self.activeModel = predict
     } else {  // We're registering a model in the background - don't change settings.
       webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)

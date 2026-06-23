@@ -154,6 +154,9 @@
 /* Label for the toggle that enables corrections that is displayed within a language-specific settings menu */
 "menu-langsettings-toggle-correct" = "Enable corrections";
 
+/* Label for the toggle that enables auto-corrections that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-autocorrect" = "Enable autocorrections";
+
 /* Label for the toggle that enables predictions that is displayed within a language-specific settings menu */
 "menu-langsettings-toggle-predict" = "Enable predictions";
 
