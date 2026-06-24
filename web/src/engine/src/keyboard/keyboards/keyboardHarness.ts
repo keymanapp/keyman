@@ -42,7 +42,7 @@ export const MinimalKeymanGlobal: KeyboardKeymanGlobal = {
 export class KeyboardHarness {
   public readonly _jsGlobal: any;
   public readonly keymanGlobal: KeyboardKeymanGlobal;
-  activeDevice: DeviceSpec;
+  public activeDevice: DeviceSpec;
 
 
   /**

@@ -1,14 +1,15 @@
 /*
-  Copyright:    © 2011,2018 SIL International.
-  Description:  Unit tests for the UTF{8,16,32} codec template library.
-  Create Date:  2011
-  Authors:      Tim Eves (TSE)
-  History:      28 Sep 2018 - TSE - Imported from graphite2 project.
-                25 Oct 2018 - TSE - Relicensed under the MIT license for
-                                    inclusion in the Keyman project.
-*/
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Created by Tim Eves in 2011
+ *
+ * Keyman Core - Unit tests for the UTF{8,16,32} codec template library.
+ */
+
 #include <iostream>
 #include "utfcodec.hpp"
+
+#include "../helpers/core_test_helpers.h"
 
 template<typename UTF>
 struct test
@@ -33,55 +34,41 @@ size_t count_unicode_characters(typename U::codeunit_t const (&c)[N], void const
 
 
 template<typename UTF, size_t N>
-inline
-int run_tests(char const *prog_name, test<UTF> const (&tests)[N])
-{
+void run_tests(test<UTF> const (&tests)[N]) {
   void const * error;
 
-  for (auto const & test: tests)
-  {
+  for (auto const & test: tests) {
     auto const test_num = (int)(&test - &tests[0] + 1);
     size_t res = count_unicode_characters<UTF>(test.str, error);
-    if (test.error >= 0)
-    {
-      if (!error)
-      {
-        std::cerr << prog_name << ": test " << sizeof(typename UTF::codeunit_t)*8 << ": "
+    if (test.error >= 0) {
+      ASSERT_TRUE(error)
+          << ": test " << sizeof(typename UTF::codeunit_t)*8 << ": "
           << test_num
           << " failed: expected error condition did not occur" << std::endl;
-        return test_num;
-      }
-      else if (ptrdiff_t(error) - ptrdiff_t(test.str) != test.error)
-      {
-        std::cerr << prog_name << ": test " << sizeof(typename UTF::codeunit_t)*8 << ": "
+
+      ASSERT_EQ(ptrdiff_t(error) - ptrdiff_t(test.str), test.error)
+          << ": test " << sizeof(typename UTF::codeunit_t)*8 << ": "
           << test_num
           << " failed: error at codepoint "
           << ptrdiff_t(error) - ptrdiff_t(test.str)
           << " expected at codepoint " << test.error
           << std::endl;
-        return test_num;
-      }
     }
-    else if (error)
-    {
-      std::cerr << prog_name << ": test " << sizeof(typename UTF::codeunit_t)*8 << ": "
+    else {
+      ASSERT_FALSE(error)
+         << ": test " << sizeof(typename UTF::codeunit_t)*8 << ": "
         << test_num
         << " failed: unexpected error occured at codepoint "
         << int(ptrdiff_t(error) - ptrdiff_t(test.str))
         << std::endl;
-      return test_num;
-    }
-    if (res != test.len)
-    {
-      std::cerr << prog_name << ": test " << sizeof(typename UTF::codeunit_t)*8 << ": "
+
+      ASSERT_EQ(res, test.len)
+        << ": test " << sizeof(typename UTF::codeunit_t)*8 << ": "
         << test_num
         << " failed: character count failure " << res << " != " << test.len
         << std::endl;
-      return test_num;
     }
   }
-
-  return 0;
 }
 
 
@@ -109,16 +96,12 @@ constexpr test<utf16> const tests16[] = {
     {2,  6, {0x0045, 0xD900, 0xDD00, 0xD900, 0xFFFF, 0x0000} },
 };
 
+TEST(UtfTests, TestUtf8) {
+  // TODO(lowpri): refactor into parameterized test suite
+  ASSERT_NO_FATAL_FAILURE(run_tests<utf8>(tests8));
+}
 
-int main(int, char * argv[])
-{
-  auto r = 0;
-
-  for (auto const & t: tests8)
-    std::cout << t.len << std::endl;
-
-  r += run_tests<utf8>(argv[0], tests8);
-  r += run_tests<utf16>(argv[0], tests16);
-
-  return r;
+TEST(UtfTests, TestUtf16) {
+  // TODO(lowpri): refactor into parameterized test suite
+  ASSERT_NO_FATAL_FAILURE(run_tests<utf16>(tests16));
 }
