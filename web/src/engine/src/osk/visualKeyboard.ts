@@ -1398,7 +1398,7 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
       styleSheetManager: null,
       specialFont: {
         family: 'SpecialOSK',
-        files: [`${pathConfig.resources}/osk/keymanweb-osk.ttf`],
+        files: [`${pathConfig.resources}keymanweb-osk.ttf`],
         path: '' // Not actually used.
       }
     });
