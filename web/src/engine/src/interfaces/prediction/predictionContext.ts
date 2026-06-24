@@ -266,7 +266,7 @@ export class PredictionContext extends EventEmitter<PredictionContextEventMap> {
         this._revertSuggestion = s as Reversion;
       }
 
-      if (this.langProcessor.mayAutoCorrect && s.autoAccept && !this.selected) {
+      if (this.langProcessor.mayAutoCorrect && s.autoAccept && !this.selected && s.tag != 'keep') {
         this.selected = s;
       }
     }
