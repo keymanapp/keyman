@@ -329,7 +329,7 @@ describe('KmnFileWriter', function () {
     ],
     [''],
     [''],
-    ["c WARNING: ambiguous rule: later: [RALT K_B]  >  dk(A0) ambiguous rule: earlier: [RALT K_B]  >  'X' PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN ! here: "]],
+    ["c WARNING: ambiguous rule: later: [RALT K_B]  >  dk(A0) ambiguous rule: earlier: [RALT K_B]  >  'X' PLEASE CHECK THAT RULE AS IT WILL NOT BE WRITTEN ! here: "]],
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
         const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 2);

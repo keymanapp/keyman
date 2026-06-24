@@ -6,7 +6,7 @@
  * Abstraction for XML reading and writing
  */
 
-import { XMLParser, XMLBuilder, XMLMetaData, X2jOptions, XmlBuilderOptions } from 'fast-xml-parser';
+import { XMLParser, XMLBuilder, XMLMetaData, X2jOptions, XmlBuilderOptions,JPathOrMatcher } from 'fast-xml-parser';
 import { SymbolUtils } from "./symbol-utils.js";
 
 /** Symbol giving the start offset, in chars, of the node */
@@ -85,8 +85,8 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
   },
   'kvks': {
     ...PARSER_COMMON_OPTIONS,
-    tagValueProcessor: (_tagName: string, tagValue: string, _jPath: string, _hasAttributes: boolean, isLeafNode: boolean): string | undefined => {
-     if (!isLeafNode) {
+    tagValueProcessor: (_tagName: string, tagValue: string, _jPathOrMatcher: JPathOrMatcher, _hasAttributes: boolean, isLeafNode: boolean) : unknown => {
+      if (!isLeafNode) {
         return tagValue?.trim(); // trimmed value
       } else {
         return undefined;  // no change to leaf nodes

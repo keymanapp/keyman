@@ -135,7 +135,7 @@ export class KeylayoutToKmnConverter {
 
     const processedData = await this.convert(jsonO, inputFilename, outputFilename);
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
-kmnFileWriter.writeToFile((processedData));
+
     // write to object/ConverterToKmnResult
     const outputKmn = kmnFileWriter.write(processedData);
     const result: ConverterToKmnResult = {
