@@ -225,6 +225,10 @@ export class KeymanEngineBase<
     });
   }
 
+  protected createKeyboardLoader(): DOMKeyboardLoader {
+    return new DOMKeyboardLoader(this.interface, this.config.applyCacheBusting);
+  }
+
   public async init(optionSpec: Required<InitOptionSpec>){
     // There may be some valid mutations possible even on repeated calls?
     // The original seems to allow it.
@@ -242,7 +246,7 @@ export class KeymanEngineBase<
 
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
     // All components initialized below require a properly-configured `config.paths` or similar.
-    const keyboardLoader = new DOMKeyboardLoader(this.interface, config.applyCacheBusting);
+    const keyboardLoader = this.createKeyboardLoader();
     this.keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(), this.config.paths);
     this.modelCache = new ModelCache();
     const kbdCache = this.keyboardRequisitioner.cache;

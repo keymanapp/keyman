@@ -7,14 +7,17 @@ import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
 import { KeyboardLoaderBase } from '../keyboardLoaderBase.js';
 import { KeyboardLoadErrorBuilder } from '../keyboardLoadError.js';
 
+export type FetchFunction = (uri: string) => Promise<Response>;
+
 export class DOMKeyboardLoader extends KeyboardLoaderBase {
   public readonly element: HTMLIFrameElement;
   private readonly performCacheBusting: boolean;
+  private readonly fetchKeyboardFunc: FetchFunction;
 
   constructor()
   constructor(harness: KeyboardHarness);
-  constructor(harness: KeyboardHarness, cacheBust?: boolean)
-  constructor(harness?: KeyboardHarness, cacheBust?: boolean) {
+  constructor(harness: KeyboardHarness, cacheBust?: boolean, fetchKeyboardFunc?: FetchFunction)
+  constructor(harness?: KeyboardHarness, cacheBust?: boolean, fetchKeyboardFunc?: FetchFunction) {
     if(harness && harness._jsGlobal != window) {
       // Copy the String typing over; preserve string extensions!
       harness._jsGlobal['String'] = window['String'];
@@ -27,38 +30,9 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     }
 
     this.performCacheBusting = cacheBust || false;
+    const defaultFetchFunc: FetchFunction = (uri) => fetch(uri);
+    this.fetchKeyboardFunc = fetchKeyboardFunc ?? defaultFetchFunc;
   }
-
-  /**
-   * Fetches a resource from the specified URL. This replaces the Fetch API function
-   * fetch() which doesn't work with file:// URLs.
-   *
-   * @param uri
-   * @returns A response promise
-   *
-   * @see https://stackoverflow.com/a/63582110
-   *
-   * Note: Even with this function some browsers like Chrome will still block
-   * file:// because of CORS, so where possible we shouldn't use file:// but
-   * serve the files through a HTTP server. In the Keyman for Android and iOS
-   * apps however we don't want to do this and this function allows us to work
-   * around the limitation of the Fetch API fetch(). On Android we still have to
-   * explicitly allow file URLs.
-   */
-  private fetch(uri: string): Promise<Response> {
-    return new Promise(function (resolve, reject) {
-      const httpRequest = new XMLHttpRequest();
-      httpRequest.onload = function () {
-        resolve(new Response(httpRequest.response, { status: httpRequest.status }));
-      };
-      httpRequest.onerror = (e) => {
-        reject(e);
-      };
-      httpRequest.open('GET', uri);
-      httpRequest.responseType = "arraybuffer";
-      httpRequest.send(null);
-    });
-  };
 
   protected async loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array> {
     if (this.performCacheBusting) {
@@ -67,7 +41,7 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
 
     let response: Response;
     try {
-      response = await this.fetch(uri);
+      response = await this.fetchKeyboardFunc(uri);
     } catch (e) {
       throw errorBuilder.keyboardDownloadError(e);
     }

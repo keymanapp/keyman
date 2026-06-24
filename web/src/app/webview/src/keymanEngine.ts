@@ -1,5 +1,5 @@
 import { DeviceSpec } from 'keyman/common/web-utils';
-import { DefaultOutputRules, ProcessorAction } from 'keyman/engine/keyboard';
+import { DefaultOutputRules, DOMKeyboardLoader, ProcessorAction } from 'keyman/engine/keyboard';
 import { KeymanEngineBase, KeyboardInterfaceBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
@@ -40,6 +40,10 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
     });
 
     this.hardKeyboard = new PassthroughKeyboard(config.hardDevice);
+  }
+
+  protected createKeyboardLoader(): DOMKeyboardLoader {
+    return new DOMKeyboardLoader(this.interface, this.config.applyCacheBusting, this.fetch);
   }
 
   async init(options: Required<WebviewInitOptionSpec>) {
@@ -159,4 +163,32 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
   get context() {
     return this.contextManager.activeTextStore;
   }
+
+  /**
+   * Fetches a resource from the specified URL.
+   *
+   * @param uri
+   * @returns A response promise
+   *
+   * @see https://stackoverflow.com/a/63582110
+   *
+   * Note: Using XMLHttpRequest allows us to work around the limitations of
+   * Fetch API's fetch() which doesn't support file:// URLs. At least in
+   * Keyman for Android we still have to explicitly allow file URLs.
+   */
+  private fetch(uri: string): Promise<Response> {
+    return new Promise(function (resolve, reject) {
+      const httpRequest = new XMLHttpRequest();
+      httpRequest.onload = function () {
+        resolve(new Response(httpRequest.response, { status: httpRequest.status }));
+      };
+      httpRequest.onerror = (e) => {
+        reject(e);
+      };
+      httpRequest.open('GET', uri);
+      httpRequest.responseType = "arraybuffer";
+      httpRequest.send(null);
+    });
+  };
+
 }
