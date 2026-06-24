@@ -85,7 +85,6 @@ export class KeyboardInterfaceBase<ContextManagerType extends ContextManagerBase
     //
     // It may also be used by documented legacy API:
     // https://help.keyman.com/developer/engine/web/2.0/guide/examples/manual-control
-    // (See: referenced laokeys_load.js)
     //
     // The mobile apps typically have fully-preconfigured paths, but Developer's
     // test-host page does not.

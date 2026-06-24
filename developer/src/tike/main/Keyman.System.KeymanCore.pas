@@ -233,7 +233,7 @@ type
   km_core_keyboard_attrs = record
     version_string: pkm_core_cu;
     id: pkm_core_cu;
-    default_optons: pkm_core_option_item
+    default_options: pkm_core_option_item
   end;
 
   pkm_core_keyboard_attrs = ^km_core_keyboard_attrs;

@@ -36,9 +36,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType:'auto'
+      }).then(function() {
+        loadKeyboards();
       });
     </script>
 
@@ -48,7 +49,7 @@
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards();'>
+  <body>
     <h2>KeymanWeb Sample Page - Error Testing page</h2>
 	<p>Pick one of the 'debugging' keyboards to test whether the represented error is handled correctly.
     <div>
