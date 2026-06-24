@@ -197,7 +197,28 @@ export class InfrastructureMessages {
     `Failed to generate new project '${def(o.id)}'.`,
   )});
 
-  static ERROR_InvalidTargetVersion = SevError | 0x0029;
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ValidatingProject = SevInfo | 0x0029;
+  static Info_ValidatingProject = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_ValidatingProject,
+    `Validating ${def(o.relativeFilename)}`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectValidatedSuccessfully = SevInfo | 0x002A;
+  static Info_ProjectValidatedSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_ProjectValidatedSuccessfully,
+    `${def(o.relativeFilename)} validated successfully.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectNotValidatedSuccessfully = SevInfo | 0x002B;
+  static Info_ProjectNotValidatedSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_ProjectNotValidatedSuccessfully,
+    `${def(o.relativeFilename)} failed to validate.`
+  )});
+
+  static ERROR_InvalidTargetVersion = SevError | 0x002C;
   static Error_InvalidTargetVersion = (o:{targetVersion:string}) => m(
     this.ERROR_InvalidTargetVersion,
     `Target version parameter '${def(o.targetVersion)}' is not a valid Keyman version.`,

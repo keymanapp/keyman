@@ -5,8 +5,6 @@ import { LanguageProcessor }  from "./languageProcessor.js";
 import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec, isEmptyTransform } from "keyman/common/web-utils";
 
-import { CoreKeyboardProcessor } from 'keyman/engine/core-processor';
-
 import {
   Codes,
   JSKeyboard, // required to be able to distinguish between JS and Core kbd processor
@@ -38,7 +36,6 @@ export class InputProcessor {
    */
   private contextDevice: DeviceSpec;
   private jsKbdProcessor: JSKeyboardProcessor;
-  private coreKbdProcessor: CoreKeyboardProcessor;
   private _keyboardProcessor: KeyboardProcessor;
   private _languageProcessor: LanguageProcessor;
 
@@ -58,7 +55,6 @@ export class InputProcessor {
   }
 
   public async init(paths: PathConfiguration, storeSerializer: VariableStoreSerializer): Promise<void> {
-    await this.coreKbdProcessor.init(paths.basePath, storeSerializer);
   }
 
   public get languageProcessor(): LanguageProcessor {
@@ -79,13 +75,7 @@ export class InputProcessor {
 
   public set activeKeyboard(keyboard: Keyboard) {
 
-    if (keyboard instanceof JSKeyboard || keyboard == null) {
-      // TODO-web-core: consider keyboard==null scenario; which keyboardProcessor should be active?
-      this._keyboardProcessor = this.jsKbdProcessor;
-    } else {
-      this._keyboardProcessor = this.coreKbdProcessor;
-    }
-
+    this._keyboardProcessor = this.jsKbdProcessor;
     this.keyboardInterface.activeKeyboard = keyboard;
 
     // All old deadkeys and keyboard-specific cache should immediately be invalidated

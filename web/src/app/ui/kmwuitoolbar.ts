@@ -1149,8 +1149,8 @@ if(!keymanweb) {
         internalName: string,
         languageCode: string
       }) => {  // Uses a different format than .getKeyboards(), b/c why not?
-        // https://help.keyman.com/developer/engine/web/16.0/reference/core/getKeyboards vs
-        // https://help.keyman.com/developer/engine/web/16.0/reference/events/kmw.keyboardchange
+        // https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboards vs
+        // https://help.keyman.com/developer/engine/web/current-version/reference/events/kmw.keyboardchange
         this.lastSelectedKeyboard = null;
         const kbName=p.internalName,
             lgName=keymanweb.util.getLanguageCodes(p.languageCode)[0];
