@@ -154,7 +154,7 @@ For example to debug the integration tests in Docker:
 
   ```bash
   resources/docker-images/run.sh --remote-debug :linux -- linux/ibus-keyman/tests/scripts/run-tests.sh \
-    --no-x11 --remote-debug -- --directory /home/build/.local/share/keyman/test_kmx k_001___basic_input_unicodei
+    --no-x11 --remote-debug -- --directory /home/build/.local/share/keyman/test_kmx k_0100___basic_input_unicodei
   ```
 
 * then attach debugger in vscode

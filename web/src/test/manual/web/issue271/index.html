@@ -36,9 +36,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window['keyman'] ? keyman : tavultesoft.keymanweb;
-      kmw.init({
+      keyman.init({
         attachType:'auto'
+      }).then(function () {
+        loadKeyboards(1);
       });
     </script>
 
@@ -49,7 +50,7 @@
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards(1);'>
+  <body>
     <h2>KeymanWeb:  Test page for interactions between setActiveKeyboard and the toolbar UI</h2>
 
 	<h3>This version is used to test the interactions of <code>SetActiveKeyboard</code> with the Toolbar UI.</h3>

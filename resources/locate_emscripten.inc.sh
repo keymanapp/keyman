@@ -38,7 +38,7 @@ locate_emscripten() {
   if [[ -z "${EMSCRIPTEN_BASE:-}" ]]; then
     if [[ -z "${EMCC:-}" ]]; then
       local EMCC
-      EMCC="$(command -v "${EMCC_EXECUTABLE}")"
+      EMCC="$(command -v "${EMCC_EXECUTABLE}" || true)"
       [[ -z "${EMCC}" ]] && builder_die "locate_emscripten: Could not locate emscripten (${EMCC_EXECUTABLE}) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
     fi
     [[ -f "${EMCC}" && ! -x "${EMCC}" ]] && builder_die "locate_emscripten: Variable EMCC (${EMCC}) points to ${EMCC_EXECUTABLE} but it is not executable"
@@ -115,5 +115,24 @@ _select_emscripten_version_with_emsdk() {
       cd upstream/emscripten
       npm install
     fi
+  )
+}
+
+install_emscripten_into() {
+  if [[ -z "${1:-}" ]]; then
+    builder_die "${FUNCNAME[0]} requires a directory argument"
+  fi
+
+  local EMSDK_DIR=$1
+  builder_heading "Installing emscripten into ${EMSDK_DIR}"
+
+  mkdir -p "${EMSDK_DIR}"
+  (
+    cd "${EMSDK_DIR}"
+    git clone https://github.com/emscripten-core/emsdk.git .
+    ./emsdk install "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
+    ./emsdk activate "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
+    cd upstream/emscripten
+    npm install
   )
 }

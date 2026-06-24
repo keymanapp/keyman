@@ -1,5 +1,148 @@
 # Keyman Version History
 
+## 19.0.247 alpha 2026-06-16
+
+* chore: update multi-labeler to 5.0.0 (#16100)
+
+## 19.0.246 alpha 2026-06-15
+
+* feat(developer): run project validation from IDE (#16076)
+* fix(core): use meson subsystem and needs_exe_wrapper for cross builds on Windows (#16088)
+* docs(windows): add context documentation for additional Advanced options (#16089)
+
+## 19.0.245 alpha 2026-06-10
+
+* chore(web): hide KMX keyboard test page (#16083)
+* docs(web): remove unnecessary mentioning of Keyman 17 from docs (#16085)
+* chore(web): remove outdated `*_load.js` files (#16086)
+* fix(web): fix `KeyboardStub.validateForCustomKeyboard` (#16067)
+
+## 19.0.244 alpha 2026-06-09
+
+* refactor(web): extract function, rename variables (#16063)
+* refactor(web): reformatting of files (#16066)
+* chore(web): improve the KeymanWeb integration documentation (#16064)
+* chore(web): more improvements to documentation (#16070)
+
+## 19.0.243 alpha 2026-06-08
+
+* fix(developer): reduce km_core_keyboard_attrs size to 12 (#16075)
+* chore(deps): bump minimatch in /core/tests/unit/wasm (#16045)
+* chore(deps): bump glob from 10.4.5 to 10.5.0 in /core/tests/unit/wasm (#16046)
+* chore(deps-dev): bump js-yaml from 4.1.0 to 4.2.0 in /core/tests/unit/wasm (#16047)
+* chore(deps-dev): bump picomatch from 2.3.1 to 2.3.2 in /core/tests/unit/wasm (#16048)
+* chore(deps): bump qs and express (#16009)
+
+## 19.0.242 alpha 2026-06-03
+
+* fix(web): fix displaying of keyboard menu (#16061)
+
+## 19.0.241 alpha 2026-06-02
+
+* chore(web): web-core preflight - strip core references (#16040)
+* docs: add note on how to use composer on dockerized websites (#16029)
+* fix(web): fix race displaying active keyboard in menu (#16042)
+
+## 19.0.240 alpha 2026-05-28
+
+* chore(web): add filename to link text of manual web tests (#16019)
+* docs(web): reformat and small fixes (#16021)
+
+## 19.0.239 alpha 2026-05-27
+
+* chore(web): remove obsolete file (#16013)
+
+## 19.0.238 alpha 2026-05-26
+
+* maint(linux): Don't block merge if source verification check fails (#16010)
+* maint(linux): fix Linux source tarball (#16011)
+
+## 19.0.237 alpha 2026-05-22
+
+* fix(windows): Ensure default locale always appears in list of locales (#15984)
+* chore(ios): update First Voices distribution certificate (#15993)
+
+## 19.0.236 alpha 2026-05-21
+
+* docs(developer): write up basic internal docs on kmc modules (#15982)
+* chore(common): move common cpp files and remove unused files (#15981)
+* docs(developer): update links to lexical model distribution (#15974)
+
+## 19.0.235 alpha 2026-05-20
+
+* fix(linux): fix source tarball verification (#15975)
+* fix(windows): add apply actions call to core_event (#15867)
+* chore(ios): add extra logging to xcodebuild (#15964)
+* maint(linux): skip source verification if script is missing (#15979)
+
+## 19.0.234 alpha 2026-05-19
+
+* chore(deps): bump brace-expansion from 5.0.5 to 5.0.6 in /developer/src/server/src/win32/trayicon/addon-src (#15969)
+* chore(deps): bump ws from 8.18.1 to 8.20.1 (#15971)
+* chore: move to .localhost for local server URLs (#15963)
+
+## 19.0.233 alpha 2026-05-18
+
+* chore(deps): bump path-to-regexp and express (#15902)
+* chore(deps): bump ip-address and socks (#15918)
+* chore(deps): bump fast-uri from 3.1.0 to 3.1.2 (#15932)
+* chore(deps): bump fast-xml-parser from 5.3.8 to 5.7.1 (#15868)
+* chore(deps): bump ip-address from 10.1.0 to 10.2.0 in /developer/src/server/src/win32/trayicon/addon-src (#15921)
+* fix(linux): add dependency on `procps` (#15967)
+* maint(linux): fix source tarball verification (#15966)
+
+## 19.0.232 alpha 2026-05-15
+
+* docs: clarify Build-bot test build trigger (#15958)
+
+## 19.0.231 alpha 2026-05-13
+
+* chore(deps): bump lodash and @microsoft/api-extractor (#15829)
+* chore(deps-dev): bump basic-ftp from 5.0.5 to 5.2.2 (#15848)
+* chore(deps): bump uuid and @actions/core (#15866)
+
+## 19.0.230 alpha 2026-05-11
+
+* chore(linux): add verification for source tarball and source package (#15916)
+* chore(linux): make `debian.sh` a builder script (#15924)
+* chore(linux): remove `--project` parameter (#15925)
+* maint(core): exclude `.configured` files from source tarball (#15928)
+* maint(core): retry upload to launchpad on network failures (#15930)
+* maint(linux): fix uploading to ppa (#15944)
+
+## 19.0.229 alpha 2026-05-08
+
+* maint(linux): fix source tarball used for packaging (#15926)
+
+## 19.0.228 alpha 2026-05-06
+
+* fix(windows): caps lock stores to work in compliant applications (#15771)
+* chore: move localization documentation to /docs (#15909)
+
+## 19.0.227 alpha 2026-05-05
+
+* maint(linux): make emscripten setup on build agents idempotent (#15908)
+
+## 19.0.226 alpha 2026-05-04
+
+* chore(common): cleanup optionals in ldml keyboard reader (#15865)
+
+## 19.0.225 alpha 2026-05-01
+
+* fix(windows): contextual help chm file has blank pages (#15724)
+
+## 19.0.224 alpha 2026-04-30
+
+* fix(linux): fix context after typing Bksp with Wayland (#15820)
+
+## 19.0.223 alpha 2026-04-23
+
+* fix(android): Reorder display language list (#15863)
+
+## 19.0.222 alpha 2026-04-08
+
+* fix(linux): fix memory problem (#15823)
+
 ## 19.0.221 alpha 2026-03-27
 
 * fix(common): add missing `default` property to keyman-touch-layout.clean.spec.json (#15787)
