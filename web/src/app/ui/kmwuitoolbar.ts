@@ -3,7 +3,7 @@
    Copyright 2019-2023 SIL International
 ***/
 
-import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
+import type { KeymanEngine, KeyboardCookie, KeyboardDetails, UIModule } from 'keyman/app/browser';
 
 declare global {
   interface Window {
@@ -31,8 +31,6 @@ type ToolbarCookie = {
   maxrecent: number;
 } & Record<`recent${number}`, string>;
 
-type KeyboardDetail = ReturnType<KeymanEngine['_GetKeyboardDetail']>;
-
 type LanguageEntry = {
   /** Language id */
   id: string;
@@ -43,13 +41,13 @@ type LanguageEntry = {
   /**
    * A rich list of keyboard metadata for keyboards matching this language's language code (`id`).
    */
-  keyboards: KeyboardDetail[];
+  keyboards: KeyboardDetails[];
 }
 
 interface ListedKeyboard {
   priority: number;
   lang: LanguageEntry,
-  keyboard: KeyboardDetail;
+  keyboard: KeyboardDetails;
   buttonNode: HTMLDivElement;
   aNode: HTMLAnchorElement;
 }
@@ -128,7 +126,7 @@ if(!keymanweb) {
        */
       maxListedKeyboards = 1;
       lastActiveControl: HTMLElement = null;
-      selectedKeyboard: KeyboardDetail = null;
+      selectedKeyboard: KeyboardDetails = null;
       selectedLanguage = '';
       helpOffsetX = 0;
       helpOffsetY = 0;
@@ -563,7 +561,7 @@ if(!keymanweb) {
        * @param       {Object}  b
        * @return      {number}
        **/
-      readonly sortKeyboards = function(a: KeyboardDetail, b: KeyboardDetail) {
+      readonly sortKeyboards = function(a: KeyboardDetails, b: KeyboardDetails) {
         if(a.RegionCode < b.RegionCode) {
           return -2;
         }
@@ -611,7 +609,7 @@ if(!keymanweb) {
        * @param       {Object}  lang
        * @param       {Object}  kbd
        **/
-      addKeyboardToList(lang: LanguageEntry, kbd: KeyboardDetail) {
+      addKeyboardToList(lang: LanguageEntry, kbd: KeyboardDetails) {
         const found = this.findListedKeyboard(lang);
         if(found == null) {
           // Add the button
@@ -795,7 +793,7 @@ if(!keymanweb) {
        **/
       selectLanguage(event: Event, lang: LanguageEntry) {
         const found = this.findListedKeyboard(lang);
-        let kbd: KeyboardDetail = null;
+        let kbd: KeyboardDetails = null;
 
         if(found == null) {
           kbd = lang.keyboards[0];
@@ -820,7 +818,7 @@ if(!keymanweb) {
        * @param       {boolean} updateKeyman
        * @return      {boolean}
        **/
-      private async selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetail, updateKeyman: boolean) {
+      private async selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetails, updateKeyman: boolean): Promise<boolean> {
         keymanweb.activatingUI(true);
 
         if(this.selectedLanguage) {
@@ -943,7 +941,7 @@ if(!keymanweb) {
        * @return      {boolean}
        * Description  Update the UI when all keyboards disabled by user
        **/
-      private readonly offButtonClickEvent = async (event: Event) => {
+      private readonly offButtonClickEvent = async (event: Event): Promise<boolean> => {
         if(this.toolbarNode.className != 'kmw_controls_disabled') {
           this.hideKeyboardsForLanguage(null);
           if(this.selectedLanguage) {
@@ -1152,8 +1150,8 @@ if(!keymanweb) {
         internalName: string,
         languageCode: string
       }) => {  // Uses a different format than .getKeyboards(), b/c why not?
-        // https://help.keyman.com/developer/engine/web/16.0/reference/core/getKeyboards vs
-        // https://help.keyman.com/developer/engine/web/16.0/reference/events/kmw.keyboardchange
+        // https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboards vs
+        // https://help.keyman.com/developer/engine/web/current-version/reference/events/kmw.keyboardchange
         this.lastSelectedKeyboard = null;
         const kbName=p.internalName,
             lgName=keymanweb.util.getLanguageCodes(p.languageCode)[0];

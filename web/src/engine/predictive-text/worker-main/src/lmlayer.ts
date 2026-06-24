@@ -28,7 +28,7 @@ import Distribution = LexicalModelTypes.Distribution;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import PromiseStore from "./promise-store.js";
+import { PromiseStore } from "./promise-store.js";
 import { OutgoingMessage } from '@keymanapp/lm-message-types';
 
 /// <reference types="worker-interface.d.ts" />
@@ -53,7 +53,7 @@ import { OutgoingMessage } from '@keymanapp/lm-message-types';
  * The top-level LMLayer will automatically starts up its own Web Worker.
  */
 
-export default class LMLayer {
+export class LMLayer {
   /**
    * The underlying worker instance. By default, this is the LMLayerWorker.
    */
