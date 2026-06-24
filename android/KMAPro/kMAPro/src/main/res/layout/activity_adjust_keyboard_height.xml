@@ -22,8 +22,8 @@
     android:layout_marginTop="8dp"
     android:text="@string/adjust_keyboard_instructions"
     android:textSize="@dimen/adjust_keyboard_height_label_textsize"
-      android:textColor="@color/main_text_color"
-      app:layout_constraintTop_toBottomOf="@id/titlebar" />
+    android:textColor="@color/main_text_color"
+    app:layout_constraintTop_toBottomOf="@id/titlebar" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
       android:id="@+id/button_layout"
