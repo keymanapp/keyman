@@ -419,11 +419,6 @@
       <p>Choose a help file to include in the keyboard</p>
     </Control>
 
-    <Control Name="cmdCompileKeymanWeb" Title="Compile to Web">
-      <p>Compiles the keyboard for KeymanWeb.  Two output files will be generated: [filename].js and [filename]_load.js.  The KeymanWeb Tutorial
-      contains more information about the difference between the two output files.</p>
-    </Control>
-
     <Control Name="cmdTestKeymanWeb" Title="Test KeymanWeb Keyboard">
       <p>Tests your KeymanWeb keyboard in an Internet Explorer embedded window</p>
     </Control>
