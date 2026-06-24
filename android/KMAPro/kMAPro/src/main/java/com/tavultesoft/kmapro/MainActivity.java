@@ -598,14 +598,14 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     getMenuInflater().inflate(R.menu.main, menu);
     this.menu = menu;
 
-    KMManager.getUpdateTool().addPropertyChangeListener(new PropertyChangeListener() 
+    KMManager.getUpdateTool().addPropertyChangeListener(new PropertyChangeListener()
       {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-          if (!evt.getPropertyName().equals("updateCount"))
+          if(!evt.getPropertyName().equals("updateCount"))
             return;
           updateUpdateCountIndicator(
-              evt.getNewValue() == null ? 0 : (Integer) evt.getNewValue());
+            evt.getNewValue()==null?0:(Integer) evt.getNewValue());
         }
       }
     );
@@ -848,7 +848,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   /**
    * Parse the URI data to determine the filename and URL for the .kmp keyboard package.
    * If URL is valid, download the kmp.
-   * @param packageUri  URI to download the package.
+   * @param packageUri URI to download the package.
    * @param installMode KMP installation mode (silent, welcome only, or full)
    * TODO: only ever pass packageId and bcp47 from callers, as KMPLink should be responsible for
    *       URL parsing, not this function.
@@ -1123,7 +1123,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   /**
    * Based on whether Chrome and WebView are installed & enabled,
    * display the corresponding update panel
-   * 
    * @param chromeStatus
    * @param webViewStatus
    */
@@ -1202,7 +1201,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     // TextView's default string is to update Chrome
     TextView textView = (TextView)findViewById(R.id.kmWebViewChromeTextView);
     textView.setText(String.format(getString(R.string.text_require_chrome_version),
-        WebViewUtils.KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME));
+      WebViewUtils.KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME));
 
     Button button = (Button)findViewById(R.id.webViewChromeButton);
     button.setText(getString(R.string.button_update_chrome));
