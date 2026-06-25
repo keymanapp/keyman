@@ -819,16 +819,33 @@ var
   FResult, InstallNow: Boolean;
   frmStartInstallNow: TfrmStartInstall;
   IsMetered: Boolean;
+  EInstallScenario: TInstallCase;
 begin
   InstallNow := True;
   IsMetered := UtilNetworkConnection.IsMetered;
+
   // If a restarted is required (HasKeymanRun == True)
   // OR it is a Metered connection warn the user and allow
   // them to cancel their request to Install Now.
-  // Otherwise start installing.
-  if HasKeymanRun OR IsMetered then
+  // Otherwise start installing with out pop-up warnings.
+  EInstallScenario := TInstallCase.icNone;
+  if HasKeymanRun and not IsMetered then
   begin
-    frmStartInstallNow := TfrmStartInstall.Create(nil, HasKeymanRun, IsMetered);
+    EInstallScenario := TInstallCase.icRestartRequiredNotMetered;
+  end
+  else if HasKeymanRun and IsMetered then
+  begin
+    EInstallScenario := TInstallCase.icRestartRequiredMetered;
+  end
+  else if (not HasKeymanRun) and IsMetered then
+  begin
+     EInstallScenario := TInstallCase.icNoInstallMessageMetered;
+  end;
+
+  // Render dialog if conditions require it
+  if EInstallScenario <> TInstallCase.icNone then
+  begin
+    frmStartInstallNow := TfrmStartInstall.Create(nil, EInstallScenario);
     try
       if frmStartInstallNow.ShowModal = mrOk then
         InstallNow := True
@@ -839,18 +856,23 @@ begin
     end;
   end;
 
-  if InstallNow = True then
+  // Process installation execution execution path
+  if InstallNow then
   begin
     ShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
     FResult := TUtilExecute.Shell(0, ShellPath, '', '-an');
     if not FResult then
+    begin
       TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-        'TrmfMain: Shell Execute Update_ApplyNow Failed')
+        'TrmfMain: Shell Execute Update_ApplyNow Failed');
+    end
     else
-      ModalResult := mrAbort;
+    begin
       // If a splash screen is currently open when "Install Now" is executed,
       // setting mrAbort ensures the splash screen is closed on the
       // return of "Keyman Configuration".
+      ModalResult := mrAbort;
+    end;
   end;
 end;
 
