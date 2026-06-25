@@ -43,6 +43,14 @@ public final class WebViewUtils {
   private static final Pattern installPattern = Pattern.compile(CHROME_INSTALL_PATTERN_FORMATSTR);
 
   /**
+   * Reserved magic domain for loading files from the local device. At runtime
+   * the WebViewAssetLoader will replace the protocol and domain with the
+   * internal storage path.
+   * See https://developer.android.com/reference/androidx/webkit/WebViewAssetLoader
+   */
+  public static final String MAGIC_DEFAULT_DOMAIN = "https://appassets.androidplatform.net";
+
+  /**
    * Get the Keyman Engine mode based on the Chrome version.
    * @param context       - The context
    * @param webView       - If provided, the Chrome version of webView is used

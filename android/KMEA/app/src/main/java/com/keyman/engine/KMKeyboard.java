@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2017-2018 SIL International. All rights reserved.
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
  */
 
 package com.keyman.engine;
@@ -23,6 +23,7 @@ import com.keyman.engine.util.DependencyUtil.LibraryType;
 import com.keyman.engine.util.FileUtils;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.WebViewUtils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -367,7 +368,9 @@ final class KMKeyboard extends WebView {
       KMManager.SystemKeyboardWebViewClient.setKeyboardLoaded(false);
     }
 
-    String htmlPath = "file://" + getContext().getDir("data", Context.MODE_PRIVATE) + "/" + KMManager.KMFilename_KeyboardHtml;
+    // Use the reserved magic domain for loading the keyboard from the local device.
+    // See https://developer.android.com/reference/androidx/webkit/WebViewAssetLoader
+    String htmlPath = WebViewUtils.MAGIC_DEFAULT_DOMAIN + "/data/" + KMManager.KMFilename_KeyboardHtml;
     loadUrl(htmlPath);
     setBackgroundColor(0);
   }
@@ -561,6 +564,7 @@ final class KMKeyboard extends WebView {
     return oskFont;
   }
 
+  // REVIEW: this method seems to be unused
   /**
    * Return the full path to the special OSK font,
    * which is with all the keyboard assets at the root app_data folder
@@ -715,7 +719,7 @@ final class KMKeyboard extends WebView {
 
     String kbKey = KMString.format("%s_%s", languageID, keyboardID);
 
-    String keyboardPath = makeKeyboardPath(packageID, keyboardID, keyboardVersion);
+    String keyboardUrl = makeKeyboardUrl(packageID, keyboardID, keyboardVersion);
 
     JSONObject reg = new JSONObject();
     try {
@@ -723,7 +727,7 @@ final class KMKeyboard extends WebView {
       reg.put("KI", "Keyboard_" + keyboardID);
       reg.put("KLC", languageID);
       reg.put("KL", languageName);
-      reg.put("KF", keyboardPath);
+      reg.put("KF", keyboardUrl);
       reg.put("KP", packageID);
 
       if (jDisplayFont != null) reg.put("KFont", jDisplayFont);
@@ -811,26 +815,24 @@ final class KMKeyboard extends WebView {
   // Set the base path of the keyboard depending on the package ID
   private void setKeyboardRoot(String packageID) {
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      this.keyboardRoot = (context.getDir("data", Context.MODE_PRIVATE).toString() +
-        File.separator + KMManager.KMDefault_UndefinedPackageID + File.separator);
+      this.keyboardRoot = WebViewUtils.MAGIC_DEFAULT_DOMAIN + "/data/" + KMManager.KMDefault_UndefinedPackageID + "/";
     } else {
-      this.keyboardRoot = (context.getDir("data", Context.MODE_PRIVATE).toString() +
-        File.separator + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator);
+      this.keyboardRoot = WebViewUtils.MAGIC_DEFAULT_DOMAIN + "/data/" + KMManager.KMDefault_AssetPackages + "/" + packageID + "/";
     }
   }
 
-  public String getKeyboardRoot() {
+  private String getKeyboardRoot() {
     return this.keyboardRoot;
   }
 
-  private String makeKeyboardPath(String packageID, String keyboardID, String keyboardVersion) {
-    String keyboardPath;
+  private String makeKeyboardUrl(String packageID, String keyboardID, String keyboardVersion) {
+    String keyboardUrl = getKeyboardRoot();
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      keyboardPath = getKeyboardRoot() + keyboardID + "-" + keyboardVersion + ".js";
+      keyboardUrl += keyboardID + "-" + keyboardVersion + ".js";
     } else {
-      keyboardPath = getKeyboardRoot() + keyboardID + ".js";
+      keyboardUrl += keyboardID + ".js";
     }
-    return keyboardPath;
+    return keyboardUrl;
   }
 
   private void sendKMWError(int lineNumber, String sourceId, String message) {
@@ -1059,7 +1061,7 @@ final class KMKeyboard extends WebView {
         JSONObject jfont = new JSONObject();
         jfont.put(KMManager.KMKey_FontFamily, font.substring(0, font.length()-4));
         JSONArray jfiles = new JSONArray();
-        jfiles.put(keyboardRoot + font);
+        jfiles.put(getKeyboardRoot() + font);
         jfont.put(KMManager.KMKey_FontFiles, jfiles);
         return jfont;
       }
@@ -1077,7 +1079,7 @@ final class KMKeyboard extends WebView {
       Object obj = fontObj.get(KMManager.KMKey_FontFiles);
       if (obj instanceof String) {
         fontFile = fontObj.getString(KMManager.KMKey_FontFiles);
-        fontObj.put(KMManager.KMKey_FontFiles, keyboardRoot + obj);
+        fontObj.put(KMManager.KMKey_FontFiles, getKeyboardRoot() + obj);
         return fontObj;
       } else if (obj instanceof JSONArray) {
         sourceArray = fontObj.optJSONArray(KMManager.KMKey_FontFiles);
@@ -1085,7 +1087,7 @@ final class KMKeyboard extends WebView {
           for (int i = 0; i < sourceArray.length(); i++) {
             fontFile = sourceArray.getString(i);
             if (FileUtils.hasFontExtension(fontFile)) {
-              fontObj.put(KMManager.KMKey_FontFiles, keyboardRoot + fontFile);
+              fontObj.put(KMManager.KMKey_FontFiles, getKeyboardRoot() + fontFile);
               fontObj.remove(KMManager.KMKey_FontSource);
               return fontObj;
             }

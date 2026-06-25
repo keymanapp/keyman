@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2020 SIL International. All rights reserved.
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
  */
 package com.keyman.engine.data;
 
@@ -15,6 +15,7 @@ import com.keyman.engine.util.BCP47;
 import com.keyman.engine.util.FileUtils;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.WebViewUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -174,17 +175,16 @@ public class Keyboard extends LanguageResource implements Serializable {
   }
 
   private String getKeyboardRoot(Context context) {
-    String keyboardRoot = context.getDir("data", Context.MODE_PRIVATE).toString() +
-      File.separator;
-
+    String keyboardRoot = WebViewUtils.MAGIC_DEFAULT_DOMAIN + "/data/";
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      return keyboardRoot + KMManager.KMDefault_UndefinedPackageID + File.separator;
+      keyboardRoot += KMManager.KMDefault_UndefinedPackageID + "/";
     } else {
-      return keyboardRoot + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator;
+      keyboardRoot += KMManager.KMDefault_AssetPackages + "/" + packageID + "/";
     }
+    return keyboardRoot;
   }
 
-  public String getKeyboardPath(Context context) {
+  private String getKeyboardUrl(Context context) {
     String keyboardID = this.getKeyboardID();
     String keyboardVersion = this.getVersion();
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
@@ -202,7 +202,7 @@ public class Keyboard extends LanguageResource implements Serializable {
       stubObj.put("KI", "Keyboard_" + this.getKeyboardID());
       stubObj.put("KLC", this.getLanguageID());
       stubObj.put("KL", this.getLanguageName());
-      stubObj.put("KF", this.getKeyboardPath(context));
+      stubObj.put("KF", this.getKeyboardUrl(context));
       stubObj.put("KP", this.getPackageID());
 
       String displayFont = this.getFont();

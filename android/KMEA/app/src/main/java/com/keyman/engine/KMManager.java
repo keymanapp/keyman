@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2017 SIL International. All rights reserved.
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
  */
 
 package com.keyman.engine;
@@ -398,12 +398,20 @@ public final class KMManager {
     return appContext.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
   }
 
+  public static String getResourceUrl() {
+    return WebViewUtils.MAGIC_DEFAULT_DOMAIN +"/data/";
+  }
+
   public static String getPackagesDir() {
     return getResourceRoot() + KMDefault_AssetPackages + File.separator;
   }
 
   public static String getLexicalModelsDir() {
     return getResourceRoot() + KMDefault_LexicalModelPackages + File.separator;
+  }
+
+  public static String getLexicalModelsUrl() {
+    return getResourceUrl() + KMDefault_LexicalModelPackages + File.separator;
   }
 
   public static String getCloudDir() {
@@ -1650,8 +1658,9 @@ public final class KMManager {
     String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
     String languageID = lexicalModelInfo.get(KMKey_LanguageID);
     boolean modelFileExists = true;
-    File modelFile = new File(getLexicalModelsDir(), pkgID + File.separator + modelID + ".model.js");
-    String path = "file://" + modelFile.getAbsolutePath();
+    String modelFilename = pkgID + File.separator + modelID + ".model.js";
+    File modelFile = new File(getLexicalModelsDir(), modelFilename);
+    String url = getLexicalModelsUrl() + modelFilename;
 
     // Disable sugestions if lexical-model file doesn't exist
     if (!modelFile.exists()) {
@@ -1666,7 +1675,7 @@ public final class KMManager {
       modelObj.put("id", modelID);
       languageJSONArray.put(languageID);
       modelObj.put("languages", languageJSONArray);
-      modelObj.put("path", path);
+      modelObj.put("path", url);
       modelObj.put("CustomHelpLink", lexicalModelInfo.get(KMKey_CustomHelpLink));
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Invalid lexical model to register", e);
