@@ -51,18 +51,25 @@ var
   CostLevel: IConnectionCost;
 begin
   Result := False;
-  // Get the profile currently providing internet access
-  Profile := TNetworkInformation.GetInternetConnectionProfile;
-
-  if Profile <> nil then
-  begin
-    CostLevel := Profile.GetConnectionCost;
-    Result := (CostLevel.NetworkCostType <> NetworkCostType.Unrestricted)
-      or CostLevel.Roaming
-      or CostLevel.OverDataLimit;
+  try
+    // Get the profile currently providing internet access
+    Profile := TNetworkInformation.GetInternetConnectionProfile;
+    if Profile <> nil then
+    begin
+      CostLevel := Profile.GetConnectionCost;
+      if CostLevel <> nil then
+        Result := (CostLevel.NetworkCostType <> NetworkCostType.Unrestricted)
+          or CostLevel.Roaming
+          or CostLevel.OverDataLimit;
+    end;
+  except
+    on E: Exception do
+      // If the WinRT network APIs are unavailable or throw (e.g. unusual
+      // Windows SKUs, containers, Network List Manager service stopped),
+      // treat the connection as non-metered so updates are not blocked.
+      Result := False;
   end;
 end;
-
 function IsBackgroundDataRestricted: Boolean;
 var
   Profile: IConnectionProfile;
@@ -70,15 +77,18 @@ var
   DataRestriction: IConnectionCost2;
 begin
   Result := False;
-  Profile := TNetworkInformation.GetInternetConnectionProfile;
-  if Profile <> nil then
-  begin
-    CostLevel := Profile.GetConnectionCost;
-    if (CostLevel <> nil) and Supports(CostLevel, IConnectionCost2, DataRestriction) then
+  try
+    Profile := TNetworkInformation.GetInternetConnectionProfile;
+    if Profile <> nil then
     begin
+      CostLevel := Profile.GetConnectionCost;
+      if (CostLevel <> nil) and Supports(CostLevel, IConnectionCost2, DataRestriction) then
         Result := DataRestriction.BackgroundDataUsageRestricted;
-        Exit;
     end;
+  except
+    on E: Exception do
+      // See IsMetered: default to not-restricted if the WinRT APIs throw.
+      Result := False;
   end;
 end;
 

@@ -21,7 +21,7 @@ uses
   Vcl.Imaging.pngimage;
 
 type
-  // The 4 valid installation form scenarios
+  // The 4 valid installation form scenarios plus a None case for validation
   TInstallCase = (
     icNone, // Not a valid case, can be used as check before calling creating form
     icRestartRequiredMetered,
