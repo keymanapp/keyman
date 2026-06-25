@@ -13,6 +13,7 @@ import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from '.
 import { ActionStateOutput, KeylayoutFileData, KeylayoutToKmnConverter, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
 import { ConverterMessages } from '../src/converter-messages.js';
+import { KeylayoutXMLSourceFile } from '../../common/web/utils/src/types/keylayout/keylayout-xml.js';
 
 describe('KeylayoutToKmnConverter', function () {
 
@@ -78,10 +79,12 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_ambiguous_keys.keylayout'],
       ['../data/Test_differentEncodings.keylayout'],
       ['../data/Test_ExtraWarning.keylayout'],
+      ['../data/Test_characters.keylayout'],
+      ['../data/Test_mixedEncodings.keylayout'],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
-        sut.run(makePathToFixture(files[0]));
-        assert.isTrue(compilerTestCallbacks.messages.length === 0);
+        await sut.run(makePathToFixture(files[0]));
+        assert.equal(compilerTestCallbacks.messages.length, 0);
       });
     });
   });
@@ -97,10 +100,11 @@ describe('KeylayoutToKmnConverter', function () {
         sut.run(makePathToFixture(files[0]));
        // assert.isTrue(compilerTestCallbacks.messages.length === 1 && compilerTestCallbacks.messages[0].code === 5292037);
         assert.isTrue(compilerTestCallbacks.messages.length === 0);
-      });
-    });
-  });
-
+        await sut.run(makePathToFixture(files[0]));
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+       });
+     });
+   });
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -115,10 +119,9 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_MissingActionsERROR.keylayout'],
       ['../data/Test_MissingTerminatorsERROR.keylayout'],
       ['../data/Test_MissingAllERROR.keylayout'],
-      // ['../data/Test_characters.keylayout'],
     ].forEach(function (files) {
       it(files + " should give an error ", async function () {
-        sut.run(makePathToFixture(files[0]));
+        await sut.run(makePathToFixture(files[0]));
         assert.isTrue(compilerTestCallbacks.messages.length > 0);
       });
     });
@@ -131,8 +134,8 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_undefinedAction.keylayout'],
     ].forEach(function (files) {
       it(files + " should give Error: undefined action detected", async function () {
-        sut.run(makePathToFixture(files[0]));
-        assert.isTrue(compilerTestCallbacks.messages.length === 1);
+         sut.run(makePathToFixture(files[0]));
+        assert.equal(compilerTestCallbacks.messages.length, 1);
         assert.equal(compilerTestCallbacks.messages[0].code, 5292040);
       });
     });
@@ -143,10 +146,9 @@ describe('KeylayoutToKmnConverter', function () {
 
     it('run() should throw on unavailable input file name and null output file name', async function () {
       const inputFilename = makePathToFixture('../data/Unavailable.keylayout');
-      const result = sut.run(inputFilename, null);
-      assert.isNotNull(result);
+      const result = await sut.run(inputFilename, undefined);
+      assert.isNull(result);
       assert.equal(compilerTestCallbacks.messages.length, 2);
-      //assert.deepEqual(compilerTestCallbacks.messages[0], ConverterMessages.Error_UnableToRead());
       assert.isTrue(compilerTestCallbacks.hasMessage(ConverterMessages.ERROR_UnableToRead));
       assert.equal(compilerTestCallbacks.messages[1].code, 5292037);
     });
@@ -163,41 +165,44 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/OutputXName.bb'],
     ].forEach(function (files) {
       it(infile + " should run ", async function () {
-        await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), makePathToFixture(files[0])));
-       // assert.isTrue(compilerTestCallbacks.messages.length === 1 && compilerTestCallbacks.messages[0].code === 5292037);
-        assert.isTrue(compilerTestCallbacks.messages.length === 0);
+        await NodeAssert.doesNotReject(async () => await sut.run(makePathToFixture(infile), makePathToFixture(files[0]) ?? undefined));
+        assert.equal(compilerTestCallbacks.messages.length, 0);
       });
     });
   });
 
   describe('convert() ', function () {
-    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    const sutR = new KeylayoutFileReader(compilerTestCallbacks);
 
-    // ProcessedData from usable file
-    const inputFilename = makePathToFixture('../data/Test.keylayout');
-    const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    let sut: KeylayoutToKmnConverter;
+    let sutR: KeylayoutFileReader;
 
-    // ProcessedData from unavailable file
-    const inputFilenameUnavailable = makePathToFixture('../data/X.keylayout');
-    const readUnavailable = sutR.read(compilerTestCallbacks.loadFile(inputFilenameUnavailable));
-    const convertedUnavailable = sut.unitTestEndpoints.convert(readUnavailable, inputFilenameUnavailable.replace(/\.keylayout$/, '.kmn'));
-
-    // ProcessedData from empty file
-    const inputFilenameEmpty = makePathToFixture('');
-    const readEmpty = sutR.read(compilerTestCallbacks.loadFile(inputFilenameEmpty));
-    const convertedEmpty = sut.unitTestEndpoints.convert(readEmpty, inputFilenameEmpty);
-
-    it('should return converted array on correct input', async function () {
-      assert.isTrue(converted.rules.length !== 0);
+    beforeEach(function () {
+      sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+      sutR = new KeylayoutFileReader(compilerTestCallbacks);
     });
 
+    // ProcessedData from usable file
+    it('should return converted array on correct input', async function () {
+      const inputFilename = makePathToFixture('../data/Test.keylayout');
+      const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+      const converted = sut.unitTestEndpoints.convert(read as KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
+      assert.isNotNull(converted);
+      assert.notEqual(converted.rules.length, 0);
+    });
+
+    // ProcessedData from unavailable file
     it('should return null on empty name as input', async function () {
+      const inputFilenameUnavailable = makePathToFixture('../data/X.keylayout');
+      const readUnavailable = sutR.read(compilerTestCallbacks.loadFile(inputFilenameUnavailable));
+      const convertedUnavailable = sut.unitTestEndpoints.convert(readUnavailable as KeylayoutXMLSourceFile, inputFilenameUnavailable.replace(/\.keylayout$/, '.kmn'));
       assert.isNull(convertedUnavailable);
     });
 
+    // ProcessedData from empty file
     it('should return null on empty input', async function () {
+      const inputFilenameEmpty = makePathToFixture('');
+      const readEmpty = sutR.read(compilerTestCallbacks.loadFile(inputFilenameEmpty));
+      const convertedEmpty = sut.unitTestEndpoints.convert(readEmpty as KeylayoutXMLSourceFile, inputFilenameEmpty);
       assert.isNull(convertedEmpty);
     });
 
@@ -327,7 +332,7 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (values) {
       it(("checkIfCapsIsUsed(" + values[0] + ")").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
         const result = sut.checkIfCapsIsUsed(values[0] as string[][]);
-        assert.isTrue(result === values[1]);
+        assert.equal(result, values[1]);
       });
     });
   });
@@ -337,7 +342,9 @@ describe('KeylayoutToKmnConverter', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+
+    const converted = sut.unitTestEndpoints.convert(read as KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
+
     [
       [[{ key: '0', behavior: 0 }], [['', 'shift? caps? ']]],
       [[{ key: '0', behavior: 2 }], [['shift? leftShift caps? ', 'anyShift caps?', 'shift leftShift caps ', 'shift? rightShift caps? ']]],
@@ -352,7 +359,7 @@ describe('KeylayoutToKmnConverter', function () {
       it((values[1] !== null) ?
         ("getModifierArrayFromKeyModifierArray('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + JSON.stringify(values[1]) + "'" :
         ("getModifierArrayFromKeyModifierArray('" + JSON.stringify(values[0]) + "')").padEnd(68, " ") + " should return '" + "null" + "'", async function () {
-          const result = sut.getModifierArrayFromKeyModifierArray(converted.modifiers, values[0] as unknown as KeylayoutFileData[]);
+          const result = sut.getModifierArrayFromKeyModifierArray(converted?.modifiers as string[][], values[0] as unknown as KeylayoutFileData[]);
           assert.deepStrictEqual(JSON.stringify(result), JSON.stringify(values[1]));
         });
     });
@@ -374,11 +381,13 @@ describe('KeylayoutToKmnConverter', function () {
       ['', []],
     ].forEach(function (values) {
       let outstring = '[ ';
-      for (let i = 0; i < values[1].length; i++) {
-        outstring = outstring + "[ " + JSON.stringify(values[1][i]) + "], ";
+      if (values[1]) {
+        for (let i = 0; i < values[1].length; i++) {
+          outstring = outstring + "[ " + JSON.stringify(values[1]?.[i]) + "], ";
+        }
       }
       it(("getKeyModifierArrayFromActionID('" + values[0] + "')").padEnd(57, " ") + ' should return ' + outstring.substring(0, outstring.lastIndexOf(']') + 2) + " ]", async function () {
-        const result = sut.getKeyModifierArrayFromActionID(read, String(values[0]));
+        const result = sut.getKeyModifierArrayFromActionID(read as KeylayoutXMLSourceFile, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -404,7 +413,7 @@ describe('KeylayoutToKmnConverter', function () {
       ['unknown', ''],
     ].forEach(function (values) {
       it(("getActionIdFromActionNext('" + values[0] + "')").padEnd(49, " ") + ' should return ' + "'" + values[1] + "'", async function () {
-        const result = sut.getActionIdFromActionNext(read, String(values[0]));
+        const result = sut.getActionIdFromActionNext(read as KeylayoutXMLSourceFile, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -428,7 +437,7 @@ describe('KeylayoutToKmnConverter', function () {
       ['unknown', -1],
     ].forEach(function (values) {
       it(("getActionIndexFromActionId('" + values[0] + "')").padEnd(50, " ") + ' should return ' + values[1], async function () {
-        const result = sut.getActionIndexFromActionId(read, String(values[0]));
+        const result = sut.getActionIndexFromActionId(read as KeylayoutXMLSourceFile, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -448,7 +457,7 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (values) {
       it(
         ("getOutputFromActionIdNone('" + values[0] + "')").padEnd(56, " ") + ' should return ' + "'" + values[1] + "'", async function () {
-          const result = sut.getOutputFromActionIdNone(read, String(values[0]));
+          const result = sut.getOutputFromActionIdNone(read as KeylayoutXMLSourceFile, String(values[0]));
           assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
         });
     });
@@ -458,7 +467,7 @@ describe('KeylayoutToKmnConverter', function () {
     [99, ''],
     ].forEach(function (values) {
       it(("getOutputFromActionIdNone('" + values[0] + "')").padEnd(56, " ") + ' should return ' + values[1], async function () {
-        const result = sut.getOutputFromActionIdNone(read, String(values[0]));
+        const result = sut.getOutputFromActionIdNone(read as KeylayoutXMLSourceFile, String(values[0]));
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -541,7 +550,7 @@ describe('KeylayoutToKmnConverter', function () {
 
       it((JSON.stringify(values[1]).length > 60) ? 'an array of objects should return an array of objects' :
         stringIn.padEnd(74, " ") + ' should return ' + stringOut, async function () {
-          const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read, values[0], isCapsUsed);
+          const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read as KeylayoutXMLSourceFile, values[0], isCapsUsed);
           assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
         });
     });
@@ -555,7 +564,7 @@ describe('KeylayoutToKmnConverter', function () {
       const stringOut = "['" + values[1].actionId + "', '" + "', '" + values[1].modifier + "', '" + values[1].key + "', '" + values[1].outchar + "']";
 
       it(stringIn.padEnd(74, " ") + ' should return ' + stringOut, async function () {
-        const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read, [values[0]], isCapsUsed);
+        const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read as KeylayoutXMLSourceFile, [values[0]], isCapsUsed);
         assert.equal(JSON.stringify(result), JSON.stringify([values[1]]));
       });
     });
@@ -566,7 +575,7 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (values) {
       const isCaps = true;
       it(("getKeybehaviorModOutputArrayFromKeyActionbehaviorOutputArray([" + values[0] + "])").padEnd(74, " ") + ' should return ' + "[" + values[1] + "]", async function () {
-        const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read, values[0], isCaps);
+        const result = sut.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(read as KeylayoutXMLSourceFile, values[0] ?? [], isCaps);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -613,7 +622,7 @@ describe('KeylayoutToKmnConverter', function () {
       it((JSON.stringify(values[1]).length > 30) ?
         ("getActionStateOutputArrayFromActionState('" + values[0] + "')").padEnd(60, " ") + ' should return an array of objects' :
         ("getActionStateOutputArrayFromActionState('" + values[0] + "')").padEnd(60, " ") + ' should return ' + "'" + JSON.stringify(values[1]) + "'", async function () {
-          const result = sut.getActionStateOutputArrayFromActionState(read, String(values[0]));
+          const result = sut.getActionStateOutputArrayFromActionState(read as KeylayoutXMLSourceFile, String(values[0]));
           assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
         });
     });
@@ -624,7 +633,8 @@ describe('KeylayoutToKmnConverter', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+
+    const converted = sut.unitTestEndpoints.convert(read as KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
     [
       ['A_1', 'A', true,
         [{ "outchar": "A", "actionId": "A_1", "behavior": "1", "key": "K_A", "modifier": "CAPS" },
@@ -645,10 +655,11 @@ describe('KeylayoutToKmnConverter', function () {
       ['', 'a', false, []],
       ['', '', , []],
     ].forEach(function (values) {
+      assert.isNotNull(read);
       it((JSON.stringify(values[3]).length > 35) ?
         ("getActionOutputbehaviorKeyModiFromActionIDStateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return an array of objects' :
         ("getActionOutputbehaviorKeyModiFromActionIDStateOutput('" + values[0] + "', '" + values[1] + "', " + values[2] + ")").padEnd(67, " ") + ' should return ' + "'" + JSON.stringify(values[3]) + "'", async function () {
-          const result = sut.getActionOutputBehaviorKeyModiFromActionIDStateOutput(read, converted.modifiers, String(values[0]), String(values[1]), Boolean(values[2]));
+          const result = sut.getActionOutputBehaviorKeyModiFromActionIDStateOutput(read as KeylayoutXMLSourceFile, converted.modifiers, String(values[0]), String(values[1]), Boolean(values[2]));
           assert.equal(JSON.stringify(result), JSON.stringify(values[3]));
         });
     });
@@ -702,7 +713,7 @@ describe('KeylayoutToKmnConverter', function () {
     [[b6ActionIdArr, b1KeycodeArr],
     ].forEach(function (values) {
       it(("getKeyActionOutputArrayFromActionStateOutputArray([['" + JSON.stringify(values[0]) + "'],..])").padEnd(73, " ") + '1 should return an array of objects', async function () {
-        const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
+        const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read as KeylayoutXMLSourceFile, values[0] as ActionStateOutput[]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -732,7 +743,7 @@ describe('KeylayoutToKmnConverter', function () {
     [[{ "id": "A_0", "state": "", "output": "ˆ" }], oneEntryResult],
     ].forEach(function (values) {
       it(("getKeyActionOutputArrayFromActionStateOutputArray(['" + JSON.stringify(values[0]) + "'])").padEnd(73, " ") + ' should return an array of objects', async function () {
-        const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
+        const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read as KeylayoutXMLSourceFile, values[0] as ActionStateOutput[]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -743,7 +754,7 @@ describe('KeylayoutToKmnConverter', function () {
 
     ].forEach(function (values) {
       it(("getKeyActionOutputArrayFromActionStateOutputArray(" + JSON.stringify(values[0]) + ")").padEnd(73, " ") + ' should return ' + "'[" + JSON.stringify(values[1]) + "]'", async function () {
-        const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
+        const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read as KeylayoutXMLSourceFile, values[0] as ActionStateOutput[]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -753,7 +764,7 @@ describe('KeylayoutToKmnConverter', function () {
     [null, []],
     ].forEach(function (values) {
       it(("getKeyActionOutputArrayFromActionStateOutputArray(" + JSON.stringify(values[0]) + ")").padEnd(73, " ") + ' should return ' + "'[" + JSON.stringify(values[1]) + "]'", async function () {
-        const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read, values[0] as ActionStateOutput[]);
+        const result = sut.getKeyActionOutputArrayFromActionStateOutputArray(read as KeylayoutXMLSourceFile, values[0] as ActionStateOutput[]);
         assert.equal(JSON.stringify(result), JSON.stringify(values[1]));
       });
     });
@@ -814,6 +825,7 @@ describe('KeylayoutToKmnConverter', function () {
         const inputFilename = makePathToFixture(values[0][0]);
         const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
         const processedData = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+        assert.isNotNull(processedData);
         assert.deepEqual(processedData.rules[0], values[1][0]);
       });
     });

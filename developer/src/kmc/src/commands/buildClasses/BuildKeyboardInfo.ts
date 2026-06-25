@@ -49,6 +49,7 @@ export class BuildKeyboardInfo extends BuildActivity {
       sourcePath: calculateSourcePath(infile),
       lastCommitDate,
       forPublishing: !!options.forPublishing,
+      publishOnly: !!options.publishOnly,
     };
     // Note: should we always ignore the passed-in output filename for .keyboard_info?
     const outputFilename = project.getOutputFilePath(KeymanFileTypes.Binary.KeyboardInfo);

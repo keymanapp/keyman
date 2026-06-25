@@ -9,7 +9,7 @@ Add default or all keyboards for a given language to KeymanWeb.
 ## Syntax
 
 ```js
-keyman.addKeyboardsForLanguage(spec[, spec...])
+await keyman.addKeyboardsForLanguage(spec[, spec...])
 ```
 
 ### Parameters
