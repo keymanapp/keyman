@@ -13,6 +13,9 @@ import Foundation
 public protocol PackageRepo {
   func keyman19SharedDataDirectoryExists() -> Bool
   func createKeyman19SharedDataDirectories()
-  func loadPackages() -> [KeymanPackage]
+  func loadAllPackages() -> [KeymanPackage]
   func deletePackage(package: KeymanPackage)
+  func getDownloadUrlForPackageName(packageName: String) -> URL?
+  func installPackage(packageUrl: URL) throws -> URL?
+  func loadSinglePackage(packageUrl: URL) throws -> KeymanPackage
 }

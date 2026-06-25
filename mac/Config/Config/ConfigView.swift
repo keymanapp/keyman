@@ -11,7 +11,8 @@ import KeymanSettings
 
 struct ConfigView: View {
   @EnvironmentObject var settings: SettingsContainer
-  
+  @State private var isShowingSheet = false
+
   var body: some View {
     VStack {
       HStack {
@@ -28,9 +29,20 @@ struct ConfigView: View {
         Button("clear defaults") {
           settings.clearUserDefaults()
         }
+        Button("install keyboard") {
+          isShowingSheet = true
+        }
         Spacer()
       }
       .padding()
+      .frame(width: 700, height: 100)
+      // Binds the visibility state to the sheet builder
+      .sheet(isPresented: $isShowingSheet) {
+        InstallKeyboardView()
+          .presentationDetents([.medium, .large])
+          .frame(width: 700, height: 500)
+      }
+
       
       ScrollView {
         VStack(alignment: .leading, spacing: 6) {

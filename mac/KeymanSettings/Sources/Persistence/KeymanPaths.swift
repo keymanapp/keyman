@@ -36,6 +36,9 @@ public struct KeymanPaths {
   static public let configBundleId = "com.keyman.config"
   static public let groupId = "group.com.keyman"
   
+    // keyman file extensions
+  static public let keyman17PackageExtension: String = "kmp"
+
   static private let preKeyman19PackagesDirectoryName = "Keyman-Keyboards"
   static private let keymanSubdirectoryName = keymanBundleId
   

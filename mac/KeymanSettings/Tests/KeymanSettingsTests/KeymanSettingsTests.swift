@@ -11,14 +11,13 @@ import Testing
 import Foundation
 @testable import KeymanSettings
 
-
 @Suite("Settings Container") struct SettingsContainersTests {
   
   fileprivate init() async throws {
     print("init")
   }
   
-  @Test("Check settings creation") func testSettingsCreation() async throws {
+  @Test("Check settings creation") @MainActor func testSettingsCreation() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
@@ -31,7 +30,7 @@ import Foundation
     #expect(defaultsRepo.readEnabledKeyboards().contains(moabiteKeyboardKey))
   }
   
-  @Test("Check finding packages by UUID") func testFindPackage() async throws {
+  @Test("Check finding packages by UUID") @MainActor func testFindPackage() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
@@ -42,7 +41,7 @@ import Foundation
     #expect(settingsContainer.findPackage(packageId: packageRepo.nullPackageId) == nil)
   }
   
-  @Test("Check remove package") func testRemovePackage() async throws {
+  @Test("Check remove package") @MainActor func testRemovePackage() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
@@ -57,7 +56,7 @@ import Foundation
   /**
    * test whether an uninstalled keyboard is removed from the list of enabled keyboards when calling `validateSettings()`
    */
-  @Test("Check settings validation ") func testSettingsValidation() async throws {
+  @Test("Check settings validation ") @MainActor func testSettingsValidation() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, uninstalledKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
@@ -73,7 +72,7 @@ import Foundation
   /**
    * test whether keyboard state changes from disabled to enabled when settings are applied
    */
-  @Test("Check settings applied ") func testSettingsApplied() async throws {
+  @Test("Check settings applied ") @MainActor func testSettingsApplied() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
@@ -90,7 +89,7 @@ import Foundation
     #expect(package.isKeyboardEnabled(keyboardKey: hittiteKeyboardKey))
   }
   
-  @Test("Check get installed keyboards") func testGetInstalledKeyboards() async throws {
+  @Test("Check get installed keyboards") @MainActor func testGetInstalledKeyboards() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey, hittiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
@@ -100,7 +99,7 @@ import Foundation
     #expect(settingsContainer.getInstalledKeyboardKeys().count == 2)
   }
   
-  @Test("Check get enabled keyboards") func testGetEnabledKeyboards() async throws {
+  @Test("Check get enabled keyboards") @MainActor func testGetEnabledKeyboards() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
@@ -110,7 +109,7 @@ import Foundation
     #expect(settingsContainer.getEnabledKeyboardKeys().count == 1)
   }
   
-  @Test("Check keyboard enabled") func testIsKeyboardEnabled() async throws {
+  @Test("Check keyboard enabled") @MainActor func testIsKeyboardEnabled() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
@@ -120,7 +119,7 @@ import Foundation
     #expect(settingsContainer.isKeyboardEnabled(packageId: packageRepo.testPackageId, keyboardKey: moabiteKeyboardKey))
   }
   
-  @Test("Check enable keyboard") func testEnableKeyboard() async throws {
+  @Test("Check enable keyboard") @MainActor func testEnableKeyboard() async throws {
     let defaultsRepo = DefaultsRepoStub(enabledKeyboards: Set([moabiteKeyboardKey]))
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
@@ -222,7 +221,7 @@ import Foundation
 
   fileprivate init() async throws {
     self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
-    source =  packageRepo.readPackage(packageDirectoryUrl: fakePackageUrl, kmpFileUrl: self.kmpUrl)
+    source = try packageRepo.readPackage(packageDirectoryUrl: fakePackageUrl, kmpFileUrl: self.kmpUrl)
   }
   
   @Test("Read package name") func readPackageName() async throws {
@@ -262,7 +261,7 @@ import Foundation
     
     fileprivate init() async throws {
       self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
-      self.packageSource =  packageRepo.readPackage(packageDirectoryUrl: fakePackageUrl, kmpFileUrl: self.kmpUrl)
+      self.packageSource = try packageRepo.readPackage(packageDirectoryUrl: fakePackageUrl, kmpFileUrl: self.kmpUrl)
     }
 
     @Test("Check keyboard is disabled") func checkKeyboardDisabled() async throws {
