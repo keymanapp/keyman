@@ -144,6 +144,23 @@ If we find duplicate or ambiguous rules or if we discover an unsupported modifie
  if we find duplicate rules we print out only one of them
 
 
+<br>
+<br>
+
+### Definition of part1-3 and mod1-6
+
+'Rule' consists of a set of up to 3 modifier/key combinations. We define these as **part1, part2, part3** and abbreviate combinations of modifiers ( e.g. SHIFT CAPS or NCAPS RALT etc.) to **mod1-mod6**.
+
+ - C0 and C1 rules only contain part3 (Text 1)
+ - C2 rules contain part2 and part3 (Text 2 and Text 3)
+ - C3 rules contain part1-part3 (Text 4 and Text 5 and Text 6)
+<br>
+
+
+![image](parts_of_a_rule1.png)
+_<left>a rule is made of up to 3 parts<left>_<br>
+<br>
+
 # Duplicate rules
 
 
@@ -190,20 +207,6 @@ dk(B1) + [SHIFT CAPS RALT K_Z]  >  'ˆ'
 
 dk(B29) + [SHIFT NCAPS K_SPACE]  >  'ˆ'
 dk(B29) + [SHIFT CAPS K_SPACE]  >  'ˆ'
-<br>
-
-### Definition of part1-3 and mod1-6
-
-'Rule' consists of a set of up to 3 modifier/key combinations. We define these as **part1, part2, part3** and abbreviate combinations of modifiers ( e.g. SHIFT CAPS or NCAPS RALT etc.) to **mod1-mod6**.
-
- - C0 and C1 rules only contain part3 (Text 1)
- - C2 rules contain part2 and part3 (Text 2 and Text 3)
- - C3 rules contain part1-part3 (Text 4 and Text 5 and Text 6)
-<br>
-
-
-![image](parts_of_a_rule1.png)
-_<left>a rule is made of up to 3 parts<left>_<br>
 <br>
 
 # Ambiguous rules
