@@ -3,7 +3,7 @@
  *
  * Created by S. Schmitt on 2025-05-12
  *
- * Tests for KeylayoutToKmnConverter, KeylayoutFileReader, KmnFileWriter
+ * Tests for KmnFileWriter
  *
  */
 
@@ -11,6 +11,7 @@ import 'mocha';
 import { assert } from 'chai';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
+import { KeylayoutXMLSourceFile } from '../../common/web/utils/src/types/keylayout/keylayout-xml.js';
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
@@ -27,7 +28,7 @@ describe('KmnFileWriter', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.unitTestEndpoints.convert(read as KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     it('writeDataRules() should return true (no error) if written', async function () {
       const result = sutW.writeDataRules(converted);
@@ -42,7 +43,7 @@ describe('KmnFileWriter', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.convertBound.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.unitTestEndpoints.convert(read as KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     const outExpectedFirst: string =
       "c ..................................................................................................................\n"
@@ -63,8 +64,15 @@ describe('KmnFileWriter', function () {
 
     it(('writeKmnFileHeader should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
       const writtenCorrectName = sutW.writeKmnFileHeader(converted);
-      assert.equal(writtenCorrectName, (outExpectedFirst + (converted?.keylayoutFilename ?? "") + outExpectedLast));
+      assert.isNotNull(converted);
+      assert.equal(writtenCorrectName, (outExpectedFirst + (converted.keylayoutFilename ?? "") + outExpectedLast));
     });
+    it(('writeKmnFileHeader should return no text with null filename ').padEnd(62, " ") + 'on correct input', async function () {
+      const writtenEmptytName = sutW.writeKmnFileHeader(null);
+      assert.equal(writtenEmptytName, '');
+    });
+
+
   });
 
   describe('convertToUnicodeCharacter ', function () {
@@ -113,34 +121,41 @@ describe('KmnFileWriter', function () {
     });
   });
 
-  describe('writeCharacterOrUnicode ', function () {
+  describe('writeCharacterOrUnicode and return values', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
-      ["A", "Msg", "A", "Msg"],
-      ["ሴ", "Msg", "ሴ", "Msg"],
-      ["😀", "Msg", "😀", "Msg"],
-      ["ẘ", "Msg", "ẘ", "Msg"],
-      ["U+0001", "Msg", "U+0001", "Msg; Use of a control character "],
-      ["U+0061", "Msg", "a", "Msg"],
-      ["&#x0002;", "Msg", "U+0002", "Msg; Use of a control character "],
-      ["&#x1234;", "Msg", 'ሴ', "Msg",],
-      ["&#0003;", "Msg", "U+0003", "Msg; Use of a control character "],
-      ["&#4666;", "Msg", "ሺ", "Msg",],
-      [null, "Msg", null, null],
-      [undefined, "Msg", null, null],
-      ["", "Msg", null, null],
-      ["", "Msg", "U+0006", "Msg; Use of a control character "],
+      ["A", "A", "Msg; "],
+      ["ሴ", "ሴ", "Msg; "],
+      ["😀", "😀", "Msg; "],
+      ["ẘ", "ẘ", "Msg; "],
+      ["U+0001", "U+0001", "Msg; Use of a control character "],
+      ["U+0061", "a", "Msg; "],
+      ["&#x0002;", "U+0002", "Msg; Use of a control character "],
+      ["&#x1234;", 'ሴ', "Msg; "],
+      ["&#0003;", "U+0003", "Msg; Use of a control character "],
+      ["&#4666;", "ሺ", "Msg; "],
+      ["", "U+0006", "Msg; Use of a control character "],
+      ['', '', 'Msg; empty output or unsupported numerical html entity: '],
     ].forEach(function (values) {
-      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[2] + '"', async function () {
-        const result = sutW.writeCharacterOrUnicode(values[0] as string, values[1] as string);
-        if (result) {
-          assert.equal(result.character, values[2]);
-          assert.equal(result.message, values[3]);
-        }
-        else {
-          assert.isNull(values[2]);
-          assert.isNull(values[3]);
-        }
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg");
+        assert.isNotNull(result);
+        assert.equal(result.character, values[1]);
+        assert.equal(result.message, values[2]);
+      });
+    });
+  });
+
+  describe('writeCharacterOrUnicode and return null for result.message and result.character', function () {
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    [
+      [null, null],
+      [undefined, null],
+
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sutW.writeCharacterOrUnicode(values[0], "");
+        assert.isNull(result);
       });
     });
   });
@@ -188,9 +203,9 @@ describe('KmnFileWriter', function () {
       ['c WARNING: unavailable modifier : here: '],
       ['c WARNING: unavailable superior rule ( [Y K_Y]  >  dk(B0) ) : here: ']],
 
-    ].forEach(function (values: any, index: number) {
-      it(('rule " ' + values[0][0].ruleType + ' "') + 'should create "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.reviewRules(values[0], 0);
+    ].forEach(function (values: (string[] | Rule[])[], index: number) {
+      it(('rule " ' + (values[0][0] as Rule).ruleType as string + ' "') + 'should create "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 0);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -353,9 +368,9 @@ describe('KmnFileWriter', function () {
       [''],
       ["c WARNING: duplicate rule: earlier: [CAPS K_C]  >  'X' here: "]],
 
-    ].forEach(function (values: any, index: number) {
-      it('rule ' + values[0][0].ruleType + ' should create " ' + ' "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.reviewRules(values[0], 1);
+    ].forEach(function (values: (string[] | Rule[])[], index: number) {
+      it('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 1);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -373,9 +388,9 @@ describe('KmnFileWriter', function () {
     [''],
     [''],
     ["c WARNING: ambiguous rule: later: [RALT K_B]  >  dk(A0) ambiguous rule: earlier: [RALT K_B]  >  'X' here: PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  "]],
-    ].forEach(function (values: any, index: number) {
-      it(('rule ' + values[0][0].ruleType + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.reviewRules(values[0], 2);
+    ].forEach(function (values: (string[] | Rule[])[], index: number) {
+      it(('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 2);
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -472,17 +487,22 @@ describe('KmnFileWriter', function () {
           "dk(B2) + [NCAPS RALT K_A]  >  'â'\n\n"
         ]
       ],
-    ].forEach(function (values: any) {
+    ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('an array of Rules should create a set of kmn rules '), async function () {
         const data: ProcessedData = {
           keylayoutFilename: "",
           kmnFilename: "",
           modifiers: [[]],
-          rules: values[0]
+          rules: values[0] as Rule[]
         };
         const result1 = sutW.writeDataRules(data);
-        assert.isTrue(result1 === values[1][0]);
+        assert.equal(result1, values[1][0]);
       });
+
+    });
+    it(('null should create empty string '), async function () {
+      const result1 = sutW.writeDataRules(null);
+      assert.equal(result1, '');
     });
   });
 

@@ -1,14 +1,11 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
-import NodeCloudRequester from 'keyman/engine/keyboard-storage/node-requester';
-
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { NodeCloudRequester, getWebTestResourcesPath } from 'keyman/test/resources';
 
 describe("KeyboardStub", () => {
   function performMockedRequest(mockedResultsFile) {
@@ -81,7 +78,7 @@ describe("KeyboardStub", () => {
   });
 
   it('merge(): barebones stub + fetched sil_euro_latin@no', async () => {
-    const query = performMockedRequest(`${__dirname}/../../../resources/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
+    const query = performMockedRequest(`${getWebTestResourcesPath()}/query-mock-results/sil_euro_latin@no_sv.js.fixture`);
     await query.promise;
 
     assert.isTrue(query.mockedRegister.called);

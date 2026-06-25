@@ -7,8 +7,8 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 
 const Namespace = CompilerErrorNamespace.Converter;
 //const SevInfo = CompilerErrorSeverity.Info | Namespace;
-// const SevHint = CompilerErrorSeverity.Hint | Namespace;
-// const SevWarn = CompilerErrorSeverity.Warn | Namespace;
+ const SevHint = CompilerErrorSeverity.Hint | Namespace;
+const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 // const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
@@ -17,22 +17,10 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
  */
 export class ConverterMessages {
 
-  static ERROR_OutputFilenameIsRequired = SevError | 0x0001;
-  static Error_OutputFilenameIsRequired = () => m(
-    this.ERROR_OutputFilenameIsRequired,
-    `An output filename is required for keyboard conversion.`
-  );
-
-  static ERROR_IntputFilenameIsRequired = SevError | 0x0002;
-  static Error_IntputFilenameIsRequired = () => m(
-    this.ERROR_IntputFilenameIsRequired,
-    `An output filename is required for keyboard conversion.`
-  );
-
   static ERROR_FileNotFound = SevError | 0x0003;
   static Error_FileNotFound = (o: { inputFilename: string | null; }) => m(
     this.ERROR_FileNotFound,
-    `Input filename '${def(o.inputFilename)}' does not exist or could not be loaded.`
+    `Input filename '${def(o?.inputFilename)}' does not exist or could not be loaded.`
   );
 
   static ERROR_InvalidFile = SevError | 0x0004;
@@ -48,21 +36,21 @@ export class ConverterMessages {
   );
 
   static ERROR_UnableToRead = SevError | 0x0006;
-  static Error_UnableToRead = () => m(
+  static Error_UnableToRead = (o: { errorText: string; }) => m(
     this.ERROR_UnableToRead,
-    `Input file could not be read.`
+    `Input file could not be read. ${def(o.errorText)}`
   );
 
   static ERROR_UnsupportedCharactersDetected = SevError | 0x0007;
-  static Error_UnsupportedCharactersDetected = (o: { inputFilename: string, keymapIndex: string, key: string, KeyName: string, output: string; }) => m(
+  static Error_UnsupportedCharactersDetected = (o: { keymapIndex: string, key: string, KeyName: string, output: string; }) => m(
     this.ERROR_UnsupportedCharactersDetected,
-    `Input file ${def(o.inputFilename)} contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
+    `Input file contains unsupported character '${def(o.output)}' at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
   );
 
   static ERROR_UndefinedActionDetected = SevError | 0x0008;
-  static Error_UndefinedActionDetected = (o: { inputFilename: string, action: string, KeyName: string, keymapIndex: string; }) => m(
+  static Error_UndefinedActionDetected = (o: { action: string, KeyName: string, keymapIndex: string; }) => m(
     this.ERROR_UndefinedActionDetected,
-    `${def(o.inputFilename)}: Action id ${def(o.action)} of key ${def(o.KeyName)} in keymapIndex ${def(o.keymapIndex)} is not defined`
+    `Action id ${def(o.action)} of key ${def(o.KeyName)} in keymapIndex ${def(o.keymapIndex)} is not defined`
   );
 
   static ERROR_NoConverterFound = SevError | 0x0009;
@@ -81,6 +69,23 @@ export class ConverterMessages {
   static Error_UnableToWrite = (o: { outputFilename: string, errorText: string; }) => m(
     this.ERROR_UnableToWrite,
     `Output file for '${def(o.outputFilename)}' could not be written. ${def(o.errorText)}`
+  );
+
+  static ERROR_UnableToParse = SevError | 0x000C;
+  static Error_UnableToParse = () => m(
+    this.ERROR_UnableToParse,
+    `Input data could not be parsed.`
+  );
+
+  static WARN_EmptyOutput = SevWarn | 0x000D;
+  static Warn_EmptyOutput =(o: { keymapIndex: string, key: string, KeyName: string; }) => m(
+    this.WARN_EmptyOutput,
+    `Key has empty output (possibly caused by use of html entity) at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
+  );
+  static HINT_EmptyOutput = SevHint | 0x000E;
+  static Hint_EmptyOutput =(o: { keymapIndex: string, key: string, KeyName: string; }) => m(
+    this.HINT_EmptyOutput,
+    `Key has empty output at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)}) possibly caused by use of html entity `
   );
 
 }
