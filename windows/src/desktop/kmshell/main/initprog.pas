@@ -145,6 +145,7 @@ uses
   UILanguages,
   uninstall,
   UpgradeMnemonicLayout,
+  utilexecute,
   utilfocusappwnd,
   utilkmshell,
   Keyman.System.UpdateStateMachine,
@@ -163,6 +164,25 @@ function FirstRun(FQuery, FDisablePackages, FDefaultUILanguage: string): Boolean
 procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
 function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean): Boolean; forward;
+
+
+// TODO pretty sure this exists in a common unit somewhere, but I can't find it.  So for now, just copy it here
+function IsProcessElevated: Boolean;
+var
+  hToken: THandle;
+  Elevation: TTokenElevation;
+  cbSize: DWORD;
+begin
+  Result := False;
+  if OpenProcessToken(GetCurrentProcess, TOKEN_QUERY, hToken) then
+  try
+    cbSize := SizeOf(TTokenElevation);
+    if GetTokenInformation(hToken, TokenElevation, @Elevation, SizeOf(TTokenElevation), cbSize) then
+      Result := Elevation.TokenIsElevated <> 0;
+  finally
+    CloseHandle(hToken);
+  end;
+end;
 
 function Main(Owner: TComponent = nil): TModalResult;
 var
@@ -393,6 +413,7 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
+  ShellExitCode: Cardinal;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -540,9 +561,19 @@ begin
       end;
 
     fmBaseKeyboard:   // I4169
-      if ConfigureBaseKeyboard
-        then ExitCode := 0
-        else ExitCode := 1;
+      begin
+        if IsProcessElevated then
+        begin
+          if TUtilExecute.CreateProcessAsShellUser(ParamStr(0), '"'+ParamStr(0)+'" -basekeyboard', True, ShellExitCode) then
+            ExitCode := ShellExitCode
+          else
+            ExitCode := 1;
+          Exit;
+        end
+        else if ConfigureBaseKeyboard
+          then ExitCode := 0
+          else ExitCode := 1;
+      end;
 
     fmInstall:
       if TInstallFile.Execute(KeyboardFileNames, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile)
