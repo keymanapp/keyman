@@ -102,7 +102,8 @@ function update_bundle ( ) {
   KMW_PRODUCT="$KEYMAN_ROOT/web/build/app/webview/$CONFIG"
   KMW_RESOURCES="$KEYMAN_ROOT/web/build/app/resources"
 
-  #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
+  # Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
+  cp "$KMW_RESOURCES/osk/globe-hint.css"        "$BUNDLE_PATH/globe-hint.css"
   cp "$KMW_RESOURCES/osk/kmwosk.css"            "$BUNDLE_PATH/kmwosk.css"
   cp "$KMW_RESOURCES/osk/keymanweb-osk.ttf"     "$BUNDLE_PATH/keymanweb-osk.ttf"
   cp "$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
