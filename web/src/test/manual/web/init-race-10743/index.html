@@ -36,9 +36,8 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
       window.setTimeout(() => {
-        kmw.init({
+        keyman.init({
           attachType:'auto',
         }).then(function() {
           loadKeyboards(1);
