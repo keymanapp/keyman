@@ -44,9 +44,9 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-    implementation 'com.google.android.material:material:1.12.0'
+    implementation libs.appcompat
+    implementation libs.constraintlayout
+    implementation libs.material
     implementation files('libs/keyman-engine.aar')
-    implementation 'androidx.preference:preference:1.2.1'
+    implementation libs.preference
 }

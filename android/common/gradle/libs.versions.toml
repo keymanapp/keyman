@@ -1,0 +1,29 @@
+[versions]
+appcompat = "1.7.0"
+commons-io = "2.16.1"
+constraintlayout = "2.2.1"
+core = "1.6.1"
+installreferrer = "2.2"
+junit = "1.2.1"
+material = "1.12.0"
+material-stepper = "4.3.1"
+preference = "1.2.1"
+qrgen = "3.0.1"
+robolectric = "4.14.1"
+sentry = "8.19.1"
+webkit = "1.14.0"
+
+[libraries]
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+commons-io = { group = "commons-io", name = "commons-io", version.ref = "commons-io" }
+constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+core = { group = "androidx.test", name = "core", version.ref = "core" }
+installreferrer = { group = "com.android.installreferrer", name = "installreferrer", version.ref = "installreferrer" }
+junit = { group = "androidx.test.ext", name = "junit", version.ref = "junit" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+material-stepper = { group = "com.stepstone.stepper", name = "material-stepper", version.ref = "material-stepper" }
+preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
+qrgen = { group = "com.github.kenglxn.QRGen", name = "android", version.ref = "qrgen" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+sentry = { group = "io.sentry", name = "sentry-android", version.ref = "sentry" }
+webkit = { group = "androidx.webkit", name = "webkit", version.ref = "webkit" }
