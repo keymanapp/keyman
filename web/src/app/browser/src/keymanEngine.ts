@@ -8,7 +8,7 @@ import {
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 import { DeviceSpec } from 'keyman/common/web-utils';
-import { JSKeyboard, Keyboard } from "keyman/engine/keyboard";
+import { DOMKeyboardLoader, JSKeyboard, Keyboard } from "keyman/engine/keyboard";
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import * as views from './viewsAnchorpoint.js';
@@ -30,6 +30,7 @@ import { BeepHandler } from './beepHandler.js';
 import { KeyboardInterface } from './keyboardInterface.js';
 import { WorkerFactory } from '@keymanapp/lexical-model-layer/web';
 import { KeyboardDetails } from './keyboardDetails.js';
+import { BrowserKeyboardLoader } from './browserKeyboardLoader.js';
 
 export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
@@ -719,5 +720,9 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     this.legacyAPIEvents.callEvent('unloaduserinterface', {});
     this.ui?.shutdown();
+  }
+
+  protected createKeyboardLoader(): DOMKeyboardLoader {
+    return new BrowserKeyboardLoader(this.interface, this.config.applyCacheBusting);
   }
 }

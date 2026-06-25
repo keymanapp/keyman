@@ -32,7 +32,7 @@ export { KeyMapping } from "./keyMapping.js";
 export { type SystemStoreMutationHandler, MutableSystemStore, SystemStore, SystemStoreIDs, type SystemStoreDictionary } from "./systemStore.js";
 export { type VariableStores, VariableStoreSerializer } from "./variableStore.js";
 
-export { type FetchFunction, DOMKeyboardLoader } from './keyboards/loaders/domKeyboardLoader.js';
+export { DOMKeyboardLoader } from './keyboards/loaders/domKeyboardLoader.js';
 export { SyntheticTextStore } from "./syntheticTextStore.js";
 export { TextStore } from "./textStore.js";
 export { TextStoreLanguageProcessorInterface } from "./textStoreLanguageProcessorInterface.js";

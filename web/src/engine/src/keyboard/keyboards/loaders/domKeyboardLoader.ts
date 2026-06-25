@@ -7,17 +7,14 @@ import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
 import { KeyboardLoaderBase } from '../keyboardLoaderBase.js';
 import { KeyboardLoadErrorBuilder } from '../keyboardLoadError.js';
 
-export type FetchFunction = (uri: string) => Promise<Response>;
-
 export class DOMKeyboardLoader extends KeyboardLoaderBase {
   public readonly element: HTMLIFrameElement;
   private readonly performCacheBusting: boolean;
-  private readonly fetchKeyboardFunc: FetchFunction;
 
   constructor()
   constructor(harness: KeyboardHarness);
-  constructor(harness: KeyboardHarness, cacheBust?: boolean, fetchKeyboardFunc?: FetchFunction)
-  constructor(harness?: KeyboardHarness, cacheBust?: boolean, fetchKeyboardFunc?: FetchFunction) {
+  constructor(harness: KeyboardHarness, cacheBust?: boolean)
+  constructor(harness?: KeyboardHarness, cacheBust?: boolean) {
     if(harness && harness._jsGlobal != window) {
       // Copy the String typing over; preserve string extensions!
       harness._jsGlobal['String'] = window['String'];
@@ -30,8 +27,6 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     }
 
     this.performCacheBusting = cacheBust || false;
-    const defaultFetchFunc: FetchFunction = (uri) => fetch(uri);
-    this.fetchKeyboardFunc = fetchKeyboardFunc ?? defaultFetchFunc;
   }
 
   protected async loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array> {
@@ -41,7 +36,7 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
 
     let response: Response;
     try {
-      response = await this.fetchKeyboardFunc(uri);
+      response = await this.fetch(uri);
     } catch (e) {
       throw errorBuilder.keyboardDownloadError(e);
     }
@@ -90,4 +85,7 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     f.call(context, script);
   }
 
+  protected fetch(uri: string): Promise<Response> {
+    throw new Error('not implemented');
+  }
 }

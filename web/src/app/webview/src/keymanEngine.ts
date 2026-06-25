@@ -10,6 +10,7 @@ import { ContextManager, HostTextStore } from './contextManager.js';
 import { PassthroughKeyboard } from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
 import { WorkerFactory } from '@keymanapp/lexical-model-layer';
+import { WebviewKeyboardLoader } from './webviewKeyboardLoader.js';
 
 export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, ContextManager, PassthroughKeyboard> {
   // Ideally, we would be able to auto-detect `sourceUri`: https://stackoverflow.com/a/60244278.
@@ -40,10 +41,6 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
     });
 
     this.hardKeyboard = new PassthroughKeyboard(config.hardDevice);
-  }
-
-  protected createKeyboardLoader(): DOMKeyboardLoader {
-    return new DOMKeyboardLoader(this.interface, this.config.applyCacheBusting, this.fetch);
   }
 
   async init(options: Required<WebviewInitOptionSpec>) {
@@ -164,31 +161,7 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
     return this.contextManager.activeTextStore;
   }
 
-  /**
-   * Fetches a resource from the specified URL.
-   *
-   * @param uri
-   * @returns A response promise
-   *
-   * @see https://stackoverflow.com/a/63582110
-   *
-   * Note: Using XMLHttpRequest allows us to work around the limitations of
-   * Fetch API's fetch() which doesn't support file:// URLs. At least in
-   * Keyman for Android we still have to explicitly allow file URLs.
-   */
-  private fetch(uri: string): Promise<Response> {
-    return new Promise(function (resolve, reject) {
-      const httpRequest = new XMLHttpRequest();
-      httpRequest.onload = function () {
-        resolve(new Response(httpRequest.response, { status: httpRequest.status }));
-      };
-      httpRequest.onerror = (e) => {
-        reject(e);
-      };
-      httpRequest.open('GET', uri);
-      httpRequest.responseType = "arraybuffer";
-      httpRequest.send(null);
-    });
-  };
-
+  protected createKeyboardLoader(): DOMKeyboardLoader {
+    return new WebviewKeyboardLoader(this.interface, this.config.applyCacheBusting);
+  }
 }
