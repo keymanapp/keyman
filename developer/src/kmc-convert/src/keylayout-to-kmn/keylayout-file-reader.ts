@@ -11,17 +11,82 @@ import { CompilerCallbacks, DeveloperUtilsMessages, Keylayout, KeymanXMLReader }
 import { util, SchemaValidators } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import boxXmlArray = util.boxXmlArray;
+import { KL_KeyMapSelect, KL_KeyMap } from "../../../common/web/utils/src/types/keylayout/keylayout-xml.js";
 
 export class KeylayoutFileReader {
 
   constructor(private callbacks: CompilerCallbacks /*,private options: CompilerOptions*/) { };
 
   /**
+   * @brief  Helper function to check if a specific keyMap index exists in a keyMapSet.
+   * This is neccessary because the amount of <keyMap index> must correspond to
+   * the amount of <keyMapSelect mapIndex>.
+   * @param  jsonObj the read keylayout data to be checked
+   * @param  keyMapSelect the keyMapSelect element to find in keyMapSet
+   * @return true if the keyMapSet element is found, false if not
+   */
+  public findMapIndexinKeymap(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMapSelect: KL_KeyMapSelect): boolean {
+    for (const keyMapSet of jsonObj.keyboard.keyMapSet) {
+      for (const keyMap of keyMapSet.keyMap) {
+        if (keyMap['index'] === keyMapSelect.mapIndex) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @brief Helper function to check if a specific keyMapSelect index exists in a modifierMap.
+   * This is neccessary because the amount of <keyMap index> must correspond to
+   * the amount of <keyMapSelect mapIndex>.
+   * @param  jsonObj the read keylayout data to be checked
+   * @param  keyMap the keyMap element to find in modifierMap
+   * @return true if the keyMap element is found, false if not
+   */
+  public findIndexinKeymapSelect(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMap: KL_KeyMap): boolean {
+    for (const modifierMap of jsonObj.keyboard.modifierMap) {
+      for (const keyMapSelect of modifierMap.keyMapSelect) {
+        if (keyMapSelect['mapIndex'] === keyMap.index) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @brief  member function checking if all keyMapSelect elements have exact one corresponding keyMap element (per keyMapSet)
+   * in the .keylayout file (if not, the .keylayout file is invalid and will not be converted)
+   * see TN2056 (https://developer.apple.com/library/archive/technotes/tn2056/_index.html#//apple_ref/doc/uid/DTS10003085-CH1-SUBSECTION7)
+   * @param  jsonObj the read keylayout data to be checked
+   * @return true if all keyMapSelect elements have a corresponding keyMap element, false if not
+   */
+  public checkForCorrespondingElements(jsonObj: Keylayout.KeylayoutXMLSourceFile): boolean {
+    let available = true;
+
+    // check if all keyMapSelect elements have a corresponding keyMap element in the .keylayout file
+    for (const modifierMap of jsonObj.keyboard.modifierMap) {
+      for (const keyMapSelect of modifierMap.keyMapSelect) {
+        available = available && this.findMapIndexinKeymap(jsonObj, keyMapSelect);
+      }
+    }
+    // check if all keyMap elements have a corresponding keyMapSelect element in the .keylayout file
+    for (const keyMapSet of jsonObj.keyboard.keyMapSet) {
+      for (const keyMap of keyMapSet.keyMap) {
+        available = available && this.findIndexinKeymapSelect(jsonObj, keyMap);
+      }
+    }
+    return available;
+  }
+
+
+  /**
    * @returns true if valid, false if invalid
    */
-  public validate(source: Keylayout.KeylayoutXMLSourceFile|null): boolean {
+  public validate(source: Keylayout.KeylayoutXMLSourceFile, inputFilename: string): boolean {
     if (!source) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ inputFilename: inputFilename }));
       return false;
     }
     if (!SchemaValidators.default.keylayout(source)) {
@@ -30,6 +95,12 @@ export class KeylayoutFileReader {
           e: err.instancePath
         }));
       }
+      return false;
+    }
+
+    // check if all keyMapSelect elements have a corresponding keyMap element in the .keylayout file
+    if (!this.checkForCorrespondingElements(source)) {
+      this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: inputFilename }));
       return false;
     }
     return true;
@@ -42,35 +113,40 @@ export class KeylayoutFileReader {
    */
   public boxArray(source: any) {
 
+    boxXmlArray(source, 'modifierMap');
+
     boxXmlArray(source, 'keyMapSet');
 
-    boxXmlArray(source.layouts, 'layout');
-    boxXmlArray(source?.modifierMap, 'keyMapSelect');
-
-    for (const keyMapSelect of source?.modifierMap?.keyMapSelect) {
-      boxXmlArray(keyMapSelect, 'modifier');
+    if (source.layouts) {
+      boxXmlArray(source.layouts, 'layout');
     }
 
-    boxXmlArray(source.keyMapSet[0], 'keyMap');
+    if (source.modifierMap) {
+      for (const modifierMap of source.modifierMap) {
+        boxXmlArray(modifierMap, 'keyMapSelect');
+        if (modifierMap.keyMapSelect) {
+          for (const keyMapSelect of modifierMap.keyMapSelect) {
+            boxXmlArray(keyMapSelect, 'modifier');
+          }
+        }
+      }
+    }
 
-    for (const keyMapSet of source?.keyMapSet) {
+    for (const keyMapSet of source.keyMapSet) {
+      boxXmlArray(keyMapSet, 'keyMap');
       for (const keyMap of keyMapSet.keyMap) {
         boxXmlArray(keyMap, 'key');
       }
-      boxXmlArray(keyMapSet, 'keyMap');
     }
 
-    boxXmlArray(source?.actions, 'action');
-    for (const action of source?.actions?.action) {
-      boxXmlArray(action, 'when');
+    if (source.actions) {
+      boxXmlArray(source.actions, 'action');
+      for (const action of source.actions.action) {
+        boxXmlArray(action, 'when');
+      }
     }
 
-    boxXmlArray(source.terminators, 'when');
-    for (const action of source?.actions?.action) {
-      boxXmlArray(action, 'when');
-    }
-
-    return source;
+    boxXmlArray(source?.terminators, 'when');
   }
 
   /**
@@ -84,12 +160,17 @@ export class KeylayoutFileReader {
     try {
       const data = new TextDecoder().decode(source);
       const jsonObj = new KeymanXMLReader('keylayout').parse(data) as Keylayout.KeylayoutXMLSourceFile;
+
+      if (!jsonObj?.keyboard) {
+        this.callbacks.reportMessage(ConverterMessages.Error_UnableToParse());
+        return null;
+      }
       this.boxArray(jsonObj.keyboard);            // jsonObj now contains arrays; no single fields
       return jsonObj;
     }
-    catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
+    catch (err: any) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ errorText: err }));
       return null;
     }
   }
-}
+};
