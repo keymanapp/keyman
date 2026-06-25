@@ -6,7 +6,7 @@
  * Abstraction for XML reading and writing
  */
 
-import { XMLParser, XMLBuilder, XMLMetaData, X2jOptions, XmlBuilderOptions,JPathOrMatcher } from 'fast-xml-parser';
+import { XMLParser, XMLBuilder, XMLMetaData, X2jOptions, XmlBuilderOptions, JPathOrMatcher } from 'fast-xml-parser';
 import { SymbolUtils } from "./symbol-utils.js";
 
 /** Symbol giving the start offset, in chars, of the node */

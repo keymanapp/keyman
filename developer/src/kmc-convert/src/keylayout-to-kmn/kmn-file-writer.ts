@@ -24,10 +24,12 @@ interface RuleReview {
   'DuplicateRule' | 'AmbiguousRule';
   compare_type: string;
   earlier_later: [boolean, boolean];
-  dk_bothPrefix_prevdk_dk: [string, string];// todo rename to dk_prefix
+  // dk_id[0]: prev_dk; dk_id[1]: dk;
+  dk_id: [number, number];
+  // dk_prefix[0]: prev_dk_prefix; dk_prefix[1]: dk_prefix;
+  dk_prefix: [string, string];
   prevDk_modifier: string;
   prevDk_key: string;
-  dk_bothId_prevdk_dk: [number, number];// todo rename to dk_id
   Dk_modifier: string;
   Dk_key: string;
   modifier: string;
@@ -241,7 +243,6 @@ export class KmnFileWriter {
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         let versionOutputCharacter;
         const warnText = this.reviewRules(uniqueDataRules, k);
-
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
@@ -420,28 +421,34 @@ export class KmnFileWriter {
   }
 
   /**
-   * @brief  take a child object of RuleReview and return the appropriate warning message
-   * @param  inObj : an object containing all data
-   * @return outMsg the warning message
+   * @brief  take a child object of RuleReview and return the appropriate warning message array
+   * @param  inObj : an object containing filtered data for a specified comparison
+   * @param  posWarning : index specifying to which element of the warning message array a warning message will be added:
+   * outMsg[0]: Warning for part 1 of a rule (e.g. modifier_prev_dk + key_prev_dk > prev_dk)
+   * outMsg[1]: Warning for part 2 of a rule (e.g. (prev_dk +) modifier_dk + key_dk > dk)
+   * outMsg[2]: Warning for part 3 of a rule (e.g. (dk +) modifier+key > output)
+   * see here on parts of a rule:
+   * https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.16sx096j6jmy
+   * @return outMsg the warning message array for all parts
    */
-  public createWarningText(inObj: RuleReview, pos: number): string[] {
+  public createWarningText(inObj: RuleReview, posWarning: number = 2): string[] {
 
     const outMsg = [...inObj.warningMessages];
 
     if (inObj.compare_type === 'unav_C0_C1') {
-      outMsg[pos] = "unavailable modifier ";
+      outMsg[posWarning] = "unavailable modifier ";
     }
 
     if (inObj.compare_type === 'unav_C2') {
-      // if the dk is unavailable, the dependant C0 rules and theIr modifiers need to get a warning 'unavailable superior rule '
+      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
       if (inObj.Dk_modifier) {
         outMsg[1] = "unavailable modifier ";
         outMsg[2] = "unavailable superior rule ( ["
           + inObj.Dk_modifier + " "
           + inObj.Dk_key
           + "]  >  dk("
-          + inObj.dk_bothPrefix_prevdk_dk[1]
-          + inObj.dk_bothId_prevdk_dk[1]
+          + inObj.dk_prefix[1]
+          + inObj.dk_id[1]
           + ") ) : ";
       }
 
@@ -452,28 +459,28 @@ export class KmnFileWriter {
 
     if (inObj.compare_type === 'unav_C3') {
 
-      // if the dk is unavailable, the dependant C0 rules and theIr modifiers need to get a warning 'unavailable superior rule '
+      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
       if (inObj.prevDk_modifier) {
         outMsg[0] = "unavailable modifier ";
         outMsg[1] = "unavailable superior rule ( ["
           + inObj.prevDk_modifier + " "
           + inObj.prevDk_key
           + "]  >  dk("
-          + inObj.dk_bothPrefix_prevdk_dk[1]
-          + inObj.dk_bothId_prevdk_dk[1]
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
           + ") ) : ";
       }
 
 
-      // if the dk is unavailable, the dependant C0 rules and theIr modifiers need to get a warning 'unavailable superior rule '
+      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
       if (inObj.Dk_modifier) {
         outMsg[1] += "unavailable modifier ";
         outMsg[2] = "unavailable superior rule ( ["
           + inObj.Dk_modifier + " "
           + inObj.Dk_key
           + "]  >  dk("
-          + inObj.dk_bothPrefix_prevdk_dk[1]
-          + inObj.dk_bothId_prevdk_dk[1]
+          + inObj.dk_prefix[1]
+          + inObj.dk_id[1]
           + ") ) : ";
       }
 
@@ -484,7 +491,7 @@ export class KmnFileWriter {
 
     if (inObj.compare_type === 'amb_1_1' || inObj.compare_type === 'dup_1_1') {
 
-      outMsg[pos] = inObj.warningMessages[2]
+      outMsg[posWarning] = inObj.warningMessages[posWarning]
         + ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + "rule: "
         + (inObj.earlier_later[0] ? "earlier" : "later")
         + ": [" + inObj.modifier + " " + inObj.key + "]  >  \'"
@@ -500,10 +507,10 @@ export class KmnFileWriter {
         ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + "rule: "
         + (inObj.earlier_later[0] ? "earlier" : "later")
         + ": [" + inObj.Dk_modifier + " " + inObj.Dk_key + "]  >  dk("
-        + inObj.dk_bothPrefix_prevdk_dk[1] + inObj.dk_bothId_prevdk_dk[1] + ") ");
+        + inObj.dk_prefix[1] + inObj.dk_id[1] + ") ");
 
-      if (outMsg[pos].indexOf(textsegment) === -1)
-        outMsg[pos] += textsegment;
+      if (outMsg[posWarning].indexOf(textsegment) === -1)
+        outMsg[posWarning] += textsegment;
     }
 
 
@@ -515,10 +522,10 @@ export class KmnFileWriter {
         ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + "rule: "
         + (inObj.earlier_later[0] ? "earlier" : "later") + ": ["
         + inObj.prevDk_modifier + " " + inObj.prevDk_key + "]  >  dk("
-        + inObj.dk_bothPrefix_prevdk_dk[0] + inObj.dk_bothId_prevdk_dk[0] + ") ");
+        + inObj.dk_prefix[0] + inObj.dk_id[0] + ") ");
 
-      if (outMsg[pos].indexOf(textsegment) === -1)
-        outMsg[pos] += textsegment;
+      if (outMsg[posWarning].indexOf(textsegment) === -1)
+        outMsg[posWarning] += textsegment;
     }
 
 
@@ -527,12 +534,12 @@ export class KmnFileWriter {
       const textsegment = (
         ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
         + (inObj.earlier_later[0] ? "earlier" : "later")
-        + ': dk(' + inObj.dk_bothPrefix_prevdk_dk[1] + inObj.dk_bothId_prevdk_dk[1] + ") + ["
+        + ': dk(' + inObj.dk_prefix[1] + inObj.dk_id[1] + ") + ["
         + inObj.Dk_modifier + " " + inObj.Dk_key + "]  >  "
-        + 'dk(' + inObj.dk_bothPrefix_prevdk_dk[0] + inObj.dk_bothId_prevdk_dk[0] + ") ");
+        + 'dk(' + inObj.dk_prefix[0] + inObj.dk_id[0] + ") ");
 
-      if (outMsg[pos].indexOf(textsegment) === -1)
-        outMsg[pos] += textsegment;
+      if (outMsg[1].indexOf(textsegment) === -1)
+        outMsg[1] += textsegment;
     }
 
 
@@ -543,11 +550,11 @@ export class KmnFileWriter {
       const textsegment = (
         ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: ' +
         (inObj.earlier_later[0] ? "earlier" : "later")
-        + ': dk(' + inObj.dk_bothPrefix_prevdk_dk[1] + inObj.dk_bothId_prevdk_dk[1] + ") + ["
+        + ': dk(' + inObj.dk_prefix[1] + inObj.dk_id[1] + ") + ["
         + inObj.modifier + " " + inObj.key + "]  >  \'" + inObj.output + "\' ");
 
-      if (outMsg[pos].indexOf(textsegment) === -1)
-        outMsg[pos] += textsegment;
+      if (outMsg[posWarning].indexOf(textsegment) === -1)
+        outMsg[posWarning] += textsegment;
     }
 
     return outMsg;
@@ -592,7 +599,7 @@ export class KmnFileWriter {
     if ((rule[index].ruleType === "C0") || (rule[index].ruleType === "C1")) {
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
         unavailableModiWarnings.compare_type = 'unav_C0_C1';
-        unavailableModiWarnings.warningMessages = this.createWarningText(unavailableModiWarnings, 2);
+        unavailableModiWarnings.warningMessages = this.createWarningText(unavailableModiWarnings);
       }
     }
 
@@ -600,18 +607,18 @@ export class KmnFileWriter {
     else if (rule[index].ruleType === "C2") {
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C2';
-        unavailableSuperiWarnings.dk_bothPrefix_prevdk_dk = ['C', 'A'];
-        unavailableSuperiWarnings.dk_bothId_prevdk_dk = [rule[0].idPrevDeadkey, rule[0].idDeadkey];
+        unavailableSuperiWarnings.dk_prefix = ['C', 'A'];
+        unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
         unavailableSuperiWarnings.Dk_modifier = rule[index].modifierDeadkey;
         unavailableSuperiWarnings.Dk_key = rule[index].deadkey;
-        unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings, 2);
+        unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings);
       }
 
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
         unavailableModiWarnings.compare_type = 'unav_C2';
         unavailableModiWarnings.modifier = rule[index].modifierKey;
         unavailableModiWarnings.key = rule[index].key;
-        unavailableModiWarnings.warningMessages = this.createWarningText(unavailableModiWarnings, 2);
+        unavailableModiWarnings.warningMessages = this.createWarningText(unavailableModiWarnings);
       }
     }
 
@@ -619,8 +626,8 @@ export class KmnFileWriter {
     else if (rule[index].ruleType === "C3") {
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierPrevDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C3';
-        unavailableSuperiWarnings.dk_bothPrefix_prevdk_dk = ['C', 'A'];
-        unavailableSuperiWarnings.dk_bothId_prevdk_dk = [rule[0].idPrevDeadkey, rule[0].idDeadkey];
+        unavailableSuperiWarnings.dk_prefix = ['A', ''];
+        unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
         unavailableSuperiWarnings.prevDk_modifier = rule[index].modifierPrevDeadkey;
         unavailableSuperiWarnings.prevDk_key = rule[index].prevDeadkey;
         unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings, 2);
@@ -629,8 +636,8 @@ export class KmnFileWriter {
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C3';
         unavailableSuperiWarnings.prevDk_modifier = '';
-        unavailableSuperiWarnings.dk_bothPrefix_prevdk_dk = ['', 'B'];
-        unavailableSuperiWarnings.dk_bothId_prevdk_dk = [rule[0].idPrevDeadkey, rule[0].idDeadkey];
+        unavailableSuperiWarnings.dk_prefix = ['', 'B'];
+        unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
         unavailableSuperiWarnings.Dk_modifier = rule[index].modifierDeadkey;
         unavailableSuperiWarnings.Dk_key = rule[index].deadkey;
         unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings, 2);
@@ -690,8 +697,8 @@ export class KmnFileWriter {
       if (amb_4_1.length > 0) {
         ambiguousWarnings.compare_type = 'amb_4_1';
         ambiguousWarnings.earlier_later = [false, true];
-        ambiguousWarnings.dk_bothPrefix_prevdk_dk = ['C', 'A'];
-        ambiguousWarnings.dk_bothId_prevdk_dk = [amb_4_1[0].idPrevDeadkey, amb_4_1[0].idDeadkey];
+        ambiguousWarnings.dk_prefix = ['C', 'A'];
+        ambiguousWarnings.dk_id = [amb_4_1[0].idPrevDeadkey, amb_4_1[0].idDeadkey];
         ambiguousWarnings.prevDk_modifier = amb_4_1[0].modifierPrevDeadkey;
         ambiguousWarnings.prevDk_key = amb_4_1[0].prevDeadkey;
         ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 2);
@@ -700,8 +707,8 @@ export class KmnFileWriter {
       if (amb_2_1.length > 0) {
         ambiguousWarnings.compare_type = 'amb_2_1';
         ambiguousWarnings.earlier_later = [false, true];
-        ambiguousWarnings.dk_bothPrefix_prevdk_dk = ['C', 'A'];
-        ambiguousWarnings.dk_bothId_prevdk_dk = [amb_2_1[0].idPrevDeadkey, amb_2_1[0].idDeadkey];
+        ambiguousWarnings.dk_prefix = ['C', 'A'];
+        ambiguousWarnings.dk_id = [amb_2_1[0].idPrevDeadkey, amb_2_1[0].idDeadkey];
         ambiguousWarnings.Dk_modifier = amb_2_1[0].modifierDeadkey;
         ambiguousWarnings.Dk_key = amb_2_1[0].deadkey;
         ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 2);
@@ -779,8 +786,8 @@ export class KmnFileWriter {
       if (amb_2_2.length > 0) {
         ambiguousWarnings.compare_type = 'amb_2_2';
         ambiguousWarnings.earlier_later = [true, false];
-        ambiguousWarnings.dk_bothPrefix_prevdk_dk = ['', 'C'];
-        ambiguousWarnings.dk_bothId_prevdk_dk = [amb_2_2[0].idPrevDeadkey, amb_2_2[0].idDeadkey];
+        ambiguousWarnings.dk_prefix = ['', 'C'];
+        ambiguousWarnings.dk_id = [amb_2_2[0].idPrevDeadkey, amb_2_2[0].idDeadkey];
         ambiguousWarnings.Dk_modifier = amb_2_2[0].modifierDeadkey;
         ambiguousWarnings.Dk_key = amb_2_2[0].deadkey;
         ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 1);
@@ -789,8 +796,8 @@ export class KmnFileWriter {
       if (dup_2_2.length > 0) {
         duplicateWarnings.compare_type = 'dup_2_2';
         duplicateWarnings.earlier_later = [true, false];
-        duplicateWarnings.dk_bothPrefix_prevdk_dk = ['', 'C'];
-        duplicateWarnings.dk_bothId_prevdk_dk = [dup_2_2[0].idPrevDeadkey, dup_2_2[0].idDeadkey];
+        duplicateWarnings.dk_prefix = ['', 'C'];
+        duplicateWarnings.dk_id = [dup_2_2[0].idPrevDeadkey, dup_2_2[0].idDeadkey];
         duplicateWarnings.Dk_modifier = dup_2_2[0].modifierDeadkey;
         duplicateWarnings.Dk_key = dup_2_2[0].deadkey;
         duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 1);
@@ -799,8 +806,8 @@ export class KmnFileWriter {
       if (amb_3_3.length > 0) {
         ambiguousWarnings.compare_type = 'amb_3_3';
         ambiguousWarnings.earlier_later = [true, false];
-        ambiguousWarnings.dk_bothPrefix_prevdk_dk = ['', 'A'];
-        ambiguousWarnings.dk_bothId_prevdk_dk = [amb_3_3[0].idPrevDeadkey, amb_3_3[0].idDeadkey];
+        ambiguousWarnings.dk_prefix = ['', 'A'];
+        ambiguousWarnings.dk_id = [amb_3_3[0].idPrevDeadkey, amb_3_3[0].idDeadkey];
         ambiguousWarnings.modifier = amb_3_3[0].modifierKey;
         ambiguousWarnings.key = amb_3_3[0].key;
         ambiguousWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output)).character;
@@ -810,8 +817,8 @@ export class KmnFileWriter {
       if (dup_3_3.length > 0) {
         duplicateWarnings.compare_type = 'dup_3_3';
         duplicateWarnings.earlier_later = [true, false];
-        duplicateWarnings.dk_bothId_prevdk_dk = [dup_3_3[0].idPrevDeadkey, dup_3_3[0].idDeadkey];
-        duplicateWarnings.dk_bothPrefix_prevdk_dk = ['', 'A'];
+        duplicateWarnings.dk_id = [dup_3_3[0].idPrevDeadkey, dup_3_3[0].idDeadkey];
+        duplicateWarnings.dk_prefix = ['', 'A'];
         duplicateWarnings.modifier = dup_3_3[0].modifierKey;
         duplicateWarnings.key = dup_3_3[0].key;
         duplicateWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output)).character;
@@ -821,8 +828,8 @@ export class KmnFileWriter {
       if (amb_4_2.length > 0) {
         ambiguousWarnings.compare_type = 'amb_4_2';
         ambiguousWarnings.earlier_later = [false, true];
-        ambiguousWarnings.dk_bothPrefix_prevdk_dk = ['C', ''];
-        ambiguousWarnings.dk_bothId_prevdk_dk = [amb_4_2[0].idPrevDeadkey, amb_4_2[0].idDeadkey];
+        ambiguousWarnings.dk_prefix = ['C', ''];
+        ambiguousWarnings.dk_id = [amb_4_2[0].idPrevDeadkey, amb_4_2[0].idDeadkey];
         ambiguousWarnings.prevDk_modifier = amb_4_2[0].modifierPrevDeadkey;
         ambiguousWarnings.prevDk_key = amb_4_2[0].prevDeadkey;
         ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 0);
@@ -924,8 +931,8 @@ export class KmnFileWriter {
       if (amb_2_4.length > 0) {
         ambiguousWarnings.compare_type = 'amb_2_4';
         ambiguousWarnings.earlier_later = [true, false];
-        ambiguousWarnings.dk_bothPrefix_prevdk_dk = ['', 'A'];
-        ambiguousWarnings.dk_bothId_prevdk_dk = [amb_2_4[0].idPrevDeadkey, amb_2_4[0].idDeadkey];
+        ambiguousWarnings.dk_prefix = ['', 'A'];
+        ambiguousWarnings.dk_id = [amb_2_4[0].idPrevDeadkey, amb_2_4[0].idDeadkey];
         ambiguousWarnings.Dk_modifier = amb_2_4[0].modifierDeadkey;
         ambiguousWarnings.Dk_key = amb_2_4[0].deadkey;
         ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 0);
@@ -934,8 +941,8 @@ export class KmnFileWriter {
       if (amb_6_3.length > 0) {
         ambiguousWarnings.compare_type = 'amb_6_3';
         ambiguousWarnings.earlier_later = [true, false];
-        ambiguousWarnings.dk_bothPrefix_prevdk_dk = ['', 'C'];
-        ambiguousWarnings.dk_bothId_prevdk_dk = [amb_6_3[0].idPrevDeadkey, amb_6_3[0].idDeadkey];
+        ambiguousWarnings.dk_prefix = ['', 'C'];
+        ambiguousWarnings.dk_id = [amb_6_3[0].idPrevDeadkey, amb_6_3[0].idDeadkey];
         ambiguousWarnings.modifier = amb_6_3[0].modifierKey;
         ambiguousWarnings.key = amb_6_3[0].key;
         ambiguousWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output)).character;
@@ -945,8 +952,8 @@ export class KmnFileWriter {
       if (dup_6_3.length > 0) {
         duplicateWarnings.compare_type = 'dup_6_3';
         duplicateWarnings.earlier_later = [true, false];
-        duplicateWarnings.dk_bothPrefix_prevdk_dk = ['', 'C'];
-        duplicateWarnings.dk_bothId_prevdk_dk = [dup_6_3[0].idPrevDeadkey, dup_6_3[0].idDeadkey];
+        duplicateWarnings.dk_prefix = ['', 'C'];
+        duplicateWarnings.dk_id = [dup_6_3[0].idPrevDeadkey, dup_6_3[0].idDeadkey];
         duplicateWarnings.modifier = dup_6_3[0].modifierKey;
         duplicateWarnings.key = dup_6_3[0].key;
         duplicateWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output)).character;
@@ -956,8 +963,8 @@ export class KmnFileWriter {
       if (amb_4_4.length > 0) {
         ambiguousWarnings.compare_type = 'amb_4_4';
         ambiguousWarnings.earlier_later = [true, false];
-        ambiguousWarnings.dk_bothPrefix_prevdk_dk = ['C', ''];
-        ambiguousWarnings.dk_bothId_prevdk_dk = [amb_4_4[0].idPrevDeadkey, amb_4_4[0].idDeadkey];
+        ambiguousWarnings.dk_prefix = ['C', ''];
+        ambiguousWarnings.dk_id = [amb_4_4[0].idPrevDeadkey, amb_4_4[0].idDeadkey];
         ambiguousWarnings.prevDk_modifier = amb_4_4[0].modifierPrevDeadkey;
         ambiguousWarnings.prevDk_key = amb_4_4[0].prevDeadkey;
         ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 0);
@@ -966,8 +973,8 @@ export class KmnFileWriter {
       if (dup_4_4.length > 0) {
         duplicateWarnings.compare_type = 'dup_4_4';
         duplicateWarnings.earlier_later = [true, false];
-        duplicateWarnings.dk_bothPrefix_prevdk_dk = ['C', ''];
-        duplicateWarnings.dk_bothId_prevdk_dk = [dup_4_4[0].idPrevDeadkey, dup_4_4[0].idDeadkey];
+        duplicateWarnings.dk_prefix = ['C', ''];
+        duplicateWarnings.dk_id = [dup_4_4[0].idPrevDeadkey, dup_4_4[0].idDeadkey];
         duplicateWarnings.prevDk_modifier = dup_4_4[0].modifierPrevDeadkey;
         duplicateWarnings.prevDk_key = dup_4_4[0].prevDeadkey;
         duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 0);
@@ -976,17 +983,19 @@ export class KmnFileWriter {
       if (amb_5_5.length > 0) {
         ambiguousWarnings.compare_type = 'amb_5_5';
         ambiguousWarnings.earlier_later = [true, false];
-        ambiguousWarnings.dk_bothPrefix_prevdk_dk = ['B', 'B'];
-        ambiguousWarnings.dk_bothId_prevdk_dk = [amb_5_5[0].idPrevDeadkey, amb_5_5[0].idDeadkey];
+        ambiguousWarnings.dk_prefix = ['B', 'B'];
+        ambiguousWarnings.dk_id = [amb_5_5[0].idPrevDeadkey, amb_5_5[0].idDeadkey];
         ambiguousWarnings.Dk_modifier = amb_5_5[0].modifierDeadkey;
         ambiguousWarnings.Dk_key = amb_5_5[0].deadkey;
-        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 1);
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings);
       }
 
       if (dup_5_5.length > 0) {
         duplicateWarnings.compare_type = 'dup_5_5';
         duplicateWarnings.earlier_later = [true, false];
-        duplicateWarnings.dk_bothPrefix_prevdk_dk = ['B', 'B'];
+        duplicateWarnings.dk_prefix = ['B', 'B'];
+        duplicateWarnings.dk_id = [dup_5_5[0].idPrevDeadkey, dup_5_5[0].idDeadkey];
+
         duplicateWarnings.Dk_modifier = rule[index].modifierDeadkey;
         duplicateWarnings.Dk_key = rule[index].deadkey;
         duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 1);
@@ -995,8 +1004,8 @@ export class KmnFileWriter {
       if (amb_6_6.length > 0) {
         ambiguousWarnings.compare_type = 'amb_6_6';
         ambiguousWarnings.earlier_later = [true, false];
-        ambiguousWarnings.dk_bothPrefix_prevdk_dk = ['', 'B'];
-        ambiguousWarnings.dk_bothId_prevdk_dk = [amb_6_6[0].idPrevDeadkey, amb_6_6[0].idDeadkey];
+        ambiguousWarnings.dk_prefix = ['', 'B'];
+        ambiguousWarnings.dk_id = [amb_6_6[0].idPrevDeadkey, amb_6_6[0].idDeadkey];
         ambiguousWarnings.modifier = amb_6_6[0].modifierKey;
         ambiguousWarnings.key = amb_6_6[0].key;
         ambiguousWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output)).character;
@@ -1006,8 +1015,8 @@ export class KmnFileWriter {
       if (dup_6_6.length > 0) {
         duplicateWarnings.compare_type = 'dup_6_6';
         duplicateWarnings.earlier_later = [true, false];
-        duplicateWarnings.dk_bothPrefix_prevdk_dk = ['', 'B'];
-        duplicateWarnings.dk_bothId_prevdk_dk = [dup_6_6[0].idPrevDeadkey, dup_6_6[0].idDeadkey];
+        duplicateWarnings.dk_prefix = ['', 'B'];
+        duplicateWarnings.dk_id = [dup_6_6[0].idPrevDeadkey, dup_6_6[0].idDeadkey];
         duplicateWarnings.modifier = dup_6_6[0].modifierKey;
         duplicateWarnings.key = dup_6_6[0].key;
         duplicateWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output)).character;
