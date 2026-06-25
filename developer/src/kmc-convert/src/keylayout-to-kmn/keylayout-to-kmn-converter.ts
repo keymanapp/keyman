@@ -73,7 +73,7 @@ export class Rule {
   constructor(
     public readonly ruleType: string,             /* C0, C1, C2, C3, or C4 */
 
-    public readonly modifierPrevDeadkey: string, /* first key used by C3 rules*/
+    public readonly modifierPrevDeadkey: string,  /* first key used by C3 rules*/
     public readonly prevDeadkey: string,
     public idPrevDeadkey: number,
     public uniquePrevDeadkey: number,
@@ -85,7 +85,7 @@ export class Rule {
 
     public readonly modifierKey: string,          /* third key used by C0,C1,C2,C3,C4 rules*/
     public readonly key: string,
-    public readonly output: Uint8Array,            /* output used by C0,C1,C2,C3,C4 rules*/
+    public readonly output: Uint8Array,           /* output used by C0,C1,C2,C3,C4 rules*/
   ) { }
 
 }
@@ -1039,4 +1039,3 @@ export class KeylayoutToKmnConverter {
     convert: this.convert.bind(this),
   };
 }
-
