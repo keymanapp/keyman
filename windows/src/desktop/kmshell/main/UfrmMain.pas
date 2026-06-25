@@ -824,7 +824,7 @@ begin
   InstallNow := True;
   IsMetered := UtilNetworkConnection.IsMetered;
 
-  // If a restarted is required (HasKeymanRun == True)
+  // If a restart is required (HasKeymanRun == True)
   // OR it is a Metered connection warn the user and allow
   // them to cancel their request to Install Now.
   // Otherwise start installing with out pop-up warnings.
