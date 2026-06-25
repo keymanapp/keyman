@@ -124,29 +124,29 @@ describe('KmnFileWriter', function () {
       [''],
       ['c WARNING: unavailable modifier  here: ']],
 
-      [[new Rule("C2", '', '', 0, 0, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'UNAVAILABLE', 'K_C', new TextEncoder().encode('C'),)],
+      [[new Rule("C2", '', '', 1, 1, 'UNAVAILABLE_dk', 'K_EQUAL', 2, 2, 'UNAVAILABLE', 'K_C', new TextEncoder().encode('C'),)],
       [''],
       ['c WARNING: unavailable modifier  here: '],
-      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(A0) ) : unavailable modifier  here: ']],
+      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(A2) ) : unavailable modifier  here: ']],
 
-      [[new Rule("C3", 'UNAVAILABLE_prev_dk', 'K_D', 0, 0, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
+      [[new Rule("C3", 'UNAVAILABLE_prev_dk', 'K_D', 1, 1, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
       ['c WARNING: unavailable modifier  here: '],
-      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_prev_dk K_D]  >  dk(A0) ) : unavailable modifier  here: '],
+      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_prev_dk K_D]  >  dk(A1) ) : unavailable modifier  here: '],
       ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) :  here: ']],
 
-      [[new Rule("C3", 'CAPS', 'K_D', 0, 0, 'RALT', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
+      [[new Rule("C3", 'CAPS', 'K_D',1, 1, 'RALT', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
       [''],
       [''],
       ['']],
 
-      [[new Rule("C3", 'X', 'K_X', 0, 0, 'Y', 'K_Y', 0, 0, 'SHIFT', 'K_Z', new TextEncoder().encode('D'),)],
+      [[new Rule("C3", 'X', 'K_X', 1, 1, 'Y', 'K_Y', 0, 0, 'SHIFT', 'K_Z', new TextEncoder().encode('D'),)],
       ['c WARNING: unavailable modifier  here: '],
-      ['c WARNING: unavailable superior rule ( [X K_X]  >  dk(A0) ) : unavailable modifier  here: '],
+      ['c WARNING: unavailable superior rule ( [X K_X]  >  dk(A1) ) : unavailable modifier  here: '],
       ['c WARNING: unavailable superior rule ( [Y K_Y]  >  dk(B0) ) :  here: ']],
 
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('rule " ' + (values[0][0] as Rule).ruleType as string + ' "') + 'should create "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 0);
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 0).warningMessages;
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -312,7 +312,7 @@ describe('KmnFileWriter', function () {
 
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 1);
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 1).warningMessages;
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -332,7 +332,7 @@ describe('KmnFileWriter', function () {
     ["c WARNING: ambiguous rule: later: [RALT K_B]  >  dk(A0) ambiguous rule: earlier: [RALT K_B]  >  'X' PLEASE CHECK THAT RULE AS IT WILL NOT BE WRITTEN ! here: "]],
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 2);
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 2).warningMessages;
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);

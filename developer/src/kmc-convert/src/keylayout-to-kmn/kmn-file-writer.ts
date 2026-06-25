@@ -21,7 +21,7 @@ interface RuleReview {
   warningMessages: string[];
   extraWarning: string;
   type: 'RuleReview' | 'UnavailableModifier' | 'UnavailableSuperiorRule' |
-  'DuplicateRule' | 'AmbiguousRule';
+  'DuplicateRule' | 'AmbiguousRule' | 'WarningTextSet';
   compare_type: string;
   earlier_later: [boolean, boolean];
   // dk_id[0]: prev_dk; dk_id[1]: dk;
@@ -49,7 +49,9 @@ interface DuplicateRules extends RuleReview {
 interface AmbiguousRules extends RuleReview {
   type: 'AmbiguousRule';
 };
-
+interface WarningTextSet extends RuleReview {
+  type: 'WarningTextSet';
+};
 
 export class KmnFileWriter {
 
@@ -177,7 +179,7 @@ export class KmnFileWriter {
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         let versionOutputCharacter;
-        const warnText = this.reviewRules(uniqueDataRules, k);
+        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
@@ -242,7 +244,7 @@ export class KmnFileWriter {
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         let versionOutputCharacter;
-        const warnText = this.reviewRules(uniqueDataRules, k);
+        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
@@ -329,7 +331,7 @@ export class KmnFileWriter {
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         let versionOutputCharacter;
 
-        const warnText = this.reviewRules(uniqueDataRules, k);
+        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
 
@@ -569,7 +571,7 @@ export class KmnFileWriter {
    * @param  index the index of a rule in Rule[]
    * @return a string[] containing possible warnings for a rule
    */
-  public reviewRules(rule: Rule[], index: number): string[] {
+  public reviewRules(rule: Rule[], index: number): RuleReview {
 
     const unavailableModiWarnings = {
       type: 'UnavailableModifier',
@@ -591,8 +593,11 @@ export class KmnFileWriter {
       warningMessages: ['', '', ''],
     } as AmbiguousRules;
 
+    const resultWarningTextSet = {
+      warningMessages: ['', '', ''],
+    } as WarningTextSet;
+
     const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
-    const warningText: string[] = Array(3).fill("");
 
     // ------------------------- check unavailable modifiers -------------------------
 
@@ -1048,11 +1053,10 @@ export class KmnFileWriter {
         + ambiguousWarnings.warningMessages[i]
         + unavailableModiWarnings.warningMessages[i];
 
-      completeWarning ? (warningText[i] = "c WARNING: " + completeWarning + " here: ") : warningText[i] = '';
-
+      completeWarning ? (resultWarningTextSet.warningMessages[i] = "c WARNING: " + completeWarning + " here: ") : resultWarningTextSet.warningMessages[i] = '';
     }
 
-    return warningText;
+    return resultWarningTextSet;
   }
 
   /**
