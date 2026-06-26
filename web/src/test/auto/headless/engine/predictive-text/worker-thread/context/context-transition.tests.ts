@@ -118,9 +118,8 @@ describe('ContextTransition', () => {
         appendedTransform: {
           insert: ' ',
           deleteLeft: 0,
-          id: 2
+          id: 3
         },
-        transformId: 2,
         id: 10,
         displayAs: 'world'
       }, {
@@ -132,9 +131,8 @@ describe('ContextTransition', () => {
         appendedTransform: {
           insert: ' ',
           deleteLeft: 0,
-          id: 2
+          id: 3
         },
-        transformId: 2,
         id: 11,
         displayAs: 'won'
       }];
@@ -155,7 +153,7 @@ describe('ContextTransition', () => {
       // 3 long, only last token was edited.
       appliedTransition.base.final.tokenization.tokens.forEach((token, index) => {
         if(index >= 2) {
-          assert.equal(token.appliedTransitionId, suggestions[0].transformId);
+          assert.equal(token.appliedTransitionId, suggestions[0].transform.id);
         } else {
           assert.isUndefined(token.appliedTransitionId);
         }
@@ -163,7 +161,7 @@ describe('ContextTransition', () => {
 
       appliedTransition.appended.final.tokenization.tokens.forEach((token, index) => {
         if(index >= 2) {
-          assert.equal(token.appliedTransitionId, suggestions[0].transformId);
+          assert.equal(token.appliedTransitionId, suggestions[0].transform.id);
         } else {
           assert.isUndefined(token.appliedTransitionId);
         }
@@ -202,9 +200,8 @@ describe('ContextTransition', () => {
         appendedTransform: {
           insert: ' ',
           deleteLeft: 0,
-          id: 2
+          id: 3
         },
-        transformId: 2,
         id: 10,
         displayAs: 'the'
       }, {
@@ -216,9 +213,8 @@ describe('ContextTransition', () => {
         appendedTransform: {
           insert: ' ',
           deleteLeft: 0,
-          id: 2
+          id: 3
         },
-        transformId: 2,
         id: 11,
         displayAs: 'and'
       }];
@@ -239,7 +235,7 @@ describe('ContextTransition', () => {
       // 3 long, only last token was edited.
       appliedTransition.base.final.tokenization.tokens.forEach((token, index) => {
         if(index >= 4) {
-          assert.equal(token.appliedTransitionId, suggestions[0].transformId);
+          assert.equal(token.appliedTransitionId, suggestions[0].transform.id);
         } else {
           assert.isUndefined(token.appliedTransitionId);
         }
@@ -247,7 +243,7 @@ describe('ContextTransition', () => {
 
       appliedTransition.appended.final.tokenization.tokens.forEach((token, index) => {
         if(index >= 4) {
-          assert.equal(token.appliedTransitionId, suggestions[0].transformId);
+          assert.equal(token.appliedTransitionId, suggestions[0].transform.id);
         } else {
           assert.isUndefined(token.appliedTransitionId);
         }
@@ -287,9 +283,8 @@ describe('ContextTransition', () => {
         appendedTransform: {
           insert: ' ',
           deleteLeft: 0,
-          id: 2
+          id: 3
         },
-        transformId: 2,
         id: 10,
         displayAs: 'world'
       }, {
@@ -301,9 +296,8 @@ describe('ContextTransition', () => {
         appendedTransform: {
           insert: ' ',
           deleteLeft: 0,
-          id: 2
+          id: 3
         },
-        transformId: 2,
         id: 11,
         displayAs: 'won'
       }];
@@ -337,9 +331,8 @@ describe('ContextTransition', () => {
         appendedTransform: {
           insert: ' ',
           deleteLeft: 0,
-          id: 2
+          id: 3
         },
-        transformId: 2,
         id: 10,
         displayAs: 'world'
       }, {
@@ -351,9 +344,8 @@ describe('ContextTransition', () => {
         appendedTransform: {
           insert: ' ',
           deleteLeft: 0,
-          id: 2
+          id: 3
         },
-        transformId: 2,
         id: 11,
         displayAs: 'won'
       }];

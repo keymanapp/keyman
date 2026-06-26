@@ -89,7 +89,7 @@ export class ContextState {
       return undefined;
     }
 
-    return this.suggestions.find(s => s.id == this.appliedSuggestionId)?.transformId;
+    return this.suggestions.find(s => s.id == this.appliedSuggestionId)?.transform.id;
   }
 
   /**

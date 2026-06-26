@@ -613,8 +613,8 @@ export class ContextTokenization {
    * @param transitionEdge Batched results from one or more
    * `precomputeTokenizationAfterInput` calls on this instance, all with the
    * same alignment values.
-   * @param transitionId The id of the Transform associated with the keystroke
-   * triggering the transition.
+   * @param transitionId The id of the context transition associated with the
+   * Transition
    * @param bestProbFromSet The probability of the single most likely input
    * transform in the overall transformDistribution associated with the
    * keystroke triggering the transition.  It need not be represented by the
