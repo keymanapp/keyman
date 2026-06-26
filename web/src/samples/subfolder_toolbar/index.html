@@ -28,11 +28,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType:'auto'
-      }).then(function() {
-        loadKeyboards();
+      }).then(async function() {
+        await loadKeyboards();
       });
     </script>
   <!--
@@ -44,10 +43,9 @@
     Keyboard paths may be absolute (with respect to the server root) or relative to the keyboards option path.
   -->
     <script>
-      function loadKeyboards() {
-        keyman.addKeyboards().then(function() {
-          keyman.setActiveKeyboard('basic_kbdus','en');
-        });
+      async function loadKeyboards() {
+        await keyman.addKeyboards();
+        await keyman.setActiveKeyboard('basic_kbdus','en');
       }
     </script>
 

@@ -36,11 +36,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
 		    attachType:'auto'
-      }).then(function() {
-        kmw.addKeyboards({id:'default_subkey',name:'English',languages:{id:'en',name:'English'}, filename:'./default_subkey.js'});
+      }).then(async function() {
+        await keyman.addKeyboards({id:'default_subkey',name:'English',languages:{id:'en',name:'English'}, filename:'./default_subkey.js'});
 
         var pageRef = (window.location.protocol == 'file:')
           ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)

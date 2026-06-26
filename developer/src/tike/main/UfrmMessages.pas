@@ -170,6 +170,12 @@ const // ABGR - text on white bg, Colors similar to Light+ VSCode color theme
   INFO_FileNotBuiltSuccessfully = NAMESPACE_Infrastructure or $0007;
   INFO_ProjectBuiltSuccessfully = NAMESPACE_Infrastructure or $000B;
   INFO_ProjectNotBuiltSuccessfully = NAMESPACE_Infrastructure or $000C;
+  INFO_ProjectCopiedSuccessfully = NAMESPACE_Infrastructure or $0024;
+  INFO_ProjectNotCopiedSuccessfully = NAMESPACE_Infrastructure or $0025;
+  INFO_ProjectGeneratedSuccessfully = NAMESPACE_Infrastructure or $0027;
+  INFO_ProjectNotGeneratedSuccessfully = NAMESPACE_Infrastructure or $0028;
+  INFO_ProjectValidatedSuccessfully = NAMESPACE_Infrastructure or $002A;
+  INFO_ProjectNotValidatedSuccessfully = NAMESPACE_Infrastructure or $002B;
 
   Segment_Filename           = 0;
   Segment_Filename_Separator = 1;
@@ -254,12 +260,18 @@ begin
     FColor := clBlack;
     FTextColor := Color_Text;
 
-    // Override formatting for 4 known messages
+    // Override formatting for known messages -- keep in sync with messageSpecialColor() in NodeCompilerCallbacks.ts
     if (MsgCode = INFO_FileBuiltSuccessfully) or
-       (MsgCode = INFO_ProjectBuiltSuccessfully) then
+       (MsgCode = INFO_ProjectBuiltSuccessfully) or
+       (MsgCode = INFO_ProjectCopiedSuccessfully) or
+       (MsgCode = INFO_ProjectGeneratedSuccessfully) or
+       (MsgCode = INFO_ProjectValidatedSuccessfully) then
       state := plsSuccess
     else if (MsgCode = INFO_FileNotBuiltSuccessfully) or
-       (MsgCode = INFO_ProjectNotBuiltSuccessfully) then
+       (MsgCode = INFO_ProjectNotBuiltSuccessfully) or
+       (MsgCode = INFO_ProjectNotCopiedSuccessfully) or
+       (MsgCode = INFO_ProjectNotGeneratedSuccessfully) or
+       (MsgCode = INFO_ProjectNotValidatedSuccessfully) then
       state := plsFailure;
 
     case state of

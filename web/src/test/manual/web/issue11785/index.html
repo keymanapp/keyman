@@ -40,9 +40,8 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
-		    attachType:'auto',
+      keyman.init({
+        attachType:'auto',
       });
 
       // Note:  explicitly NOT deferred or waiting on the `init` Promise.  This is
