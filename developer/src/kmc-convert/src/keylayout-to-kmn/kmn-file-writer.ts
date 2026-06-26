@@ -536,9 +536,9 @@ export class KmnFileWriter {
       const textsegment = (
         ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
         + (inObj.earlier_later[0] ? "earlier" : "later")
-        + ': dk(' + inObj.dk_prefix[1] + inObj.dk_id[1] + ") + ["
+        + ': dk(' + inObj.dk_prefix[0] + inObj.dk_id[0] + ") + ["
         + inObj.Dk_modifier + " " + inObj.Dk_key + "]  >  "
-        + 'dk(' + inObj.dk_prefix[0] + inObj.dk_id[0] + ") ");
+        + 'dk(' + inObj.dk_prefix[1] + inObj.dk_id[1] + ") ");
 
       if (outMsg[1].indexOf(textsegment) === -1)
         outMsg[1] += textsegment;
@@ -712,7 +712,7 @@ export class KmnFileWriter {
       if (amb_2_1.length > 0) {
         ambiguousWarnings.compare_type = 'amb_2_1';
         ambiguousWarnings.earlier_later = [false, true];
-        ambiguousWarnings.dk_prefix = ['C', 'A'];
+        ambiguousWarnings.dk_prefix = ['', 'A'];
         ambiguousWarnings.dk_id = [amb_2_1[0].idPrevDeadkey, amb_2_1[0].idDeadkey];
         ambiguousWarnings.Dk_modifier = amb_2_1[0].modifierDeadkey;
         ambiguousWarnings.Dk_key = amb_2_1[0].deadkey;
@@ -988,7 +988,7 @@ export class KmnFileWriter {
       if (amb_5_5.length > 0) {
         ambiguousWarnings.compare_type = 'amb_5_5';
         ambiguousWarnings.earlier_later = [true, false];
-        ambiguousWarnings.dk_prefix = ['B', 'B'];
+        ambiguousWarnings.dk_prefix = ['C', 'B'];
         ambiguousWarnings.dk_id = [amb_5_5[0].idPrevDeadkey, amb_5_5[0].idDeadkey];
         ambiguousWarnings.Dk_modifier = amb_5_5[0].modifierDeadkey;
         ambiguousWarnings.Dk_key = amb_5_5[0].deadkey;
@@ -998,7 +998,7 @@ export class KmnFileWriter {
       if (dup_5_5.length > 0) {
         duplicateWarnings.compare_type = 'dup_5_5';
         duplicateWarnings.earlier_later = [true, false];
-        duplicateWarnings.dk_prefix = ['B', 'B'];
+        duplicateWarnings.dk_prefix = ['C', 'B'];
         duplicateWarnings.dk_id = [dup_5_5[0].idPrevDeadkey, dup_5_5[0].idDeadkey];
 
         duplicateWarnings.Dk_modifier = rule[index].modifierDeadkey;

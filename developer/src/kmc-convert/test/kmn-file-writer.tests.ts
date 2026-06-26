@@ -134,7 +134,7 @@ describe('KmnFileWriter', function () {
       ['c WARNING: unavailable superior rule ( [UNAVAILABLE_prev_dk K_D]  >  dk(A1) ) : unavailable modifier  here: '],
       ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) :  here: ']],
 
-      [[new Rule("C3", 'CAPS', 'K_D',1, 1, 'RALT', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
+      [[new Rule("C3", 'CAPS', 'K_D', 1, 1, 'RALT', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
       [''],
       [''],
       ['']],
@@ -163,7 +163,7 @@ describe('KmnFileWriter', function () {
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),],
       ['c WARNING: duplicate rule: earlier: [LALT K_A]  >  dk(C0)  here: '],
-      ["c WARNING: duplicate rule: earlier: dk(B0) + [SHIFT K_B]  >  dk(B0)  here: "],
+      ["c WARNING: duplicate rule: earlier: dk(C0) + [SHIFT K_B]  >  dk(B0)  here: "],
       ["c WARNING: duplicate rule: earlier: dk(B0) + [CAPS K_C]  >  'X'  here: "]],
 
       //6-6 dup
@@ -187,7 +187,7 @@ describe('KmnFileWriter', function () {
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 1, 'RALT', 'K_F', new TextEncoder().encode('X')),],
       ['c WARNING: duplicate rule: earlier: [LALT K_A]  >  dk(C0)  here: '],
-      ["c WARNING: ambiguous rule: earlier: dk(B0) + [NCAPS K_B]  >  dk(B0)  here: "], [''],
+      ["c WARNING: ambiguous rule: earlier: dk(C0) + [NCAPS K_B]  >  dk(B0)  here: "], [''],
       ],
 
       // 5-5 dup
@@ -195,7 +195,7 @@ describe('KmnFileWriter', function () {
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 0, 'RALT', 'K_F', new TextEncoder().encode('X')),],
       ['c WARNING: duplicate rule: earlier: [LALT K_A]  >  dk(C0)  here: '],
-      ["c WARNING: duplicate rule: earlier: dk(B0) + [NCAPS K_B]  >  dk(B0)  here: "],
+      ["c WARNING: duplicate rule: earlier: dk(C0) + [NCAPS K_B]  >  dk(B0)  here: "],
       ['']],
 
       // 4-2 amb
