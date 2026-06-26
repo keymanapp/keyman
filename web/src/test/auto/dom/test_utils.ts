@@ -1,6 +1,8 @@
 // Defines an object for dynamically adding elements for testing purposes.
 // Designed for use with the robustAttachment.html fixture.
 
+import { DOMKeyboardLoader, KeyboardHarness } from "keyman/engine/keyboard";
+
 export class DynamicElements {
   static inputCounter = 0;
 
@@ -80,5 +82,15 @@ export class DynamicElements {
 
     masterDiv.appendChild(editable);
     return editable.id;
+  }
+}
+
+export class TestingDOMKeyboardLoader extends DOMKeyboardLoader {
+  constructor(harness: KeyboardHarness, cacheBust?: boolean) {
+    super(harness, cacheBust);
+  }
+
+  protected fetch(uri: string): Promise<Response> {
+    return window.fetch(uri);
   }
 }

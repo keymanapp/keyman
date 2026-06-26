@@ -2,10 +2,10 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { DOMKeyboardLoader } from 'keyman/engine/keyboard';
 import { PathConfiguration } from 'keyman/engine/interfaces';
 import { CloudQueryEngine, KeyboardRequisitioner, type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { DOMCloudRequester } from 'keyman/engine/keyboard-storage';
+import { TestingDOMKeyboardLoader } from '../../test_utils.js';
 
 const pathConfig = new PathConfiguration({
   root: '',
@@ -61,7 +61,7 @@ function mockQuery(querier: CloudQueryEngine, queryResultsFile: string) {
 
 describe("KeyboardRequisitioner", function () {
   it('queries for remote stubs and loads their keyboards', async () => {
-    const keyboardLoader = new DOMKeyboardLoader(new KeyboardHarness(window, MinimalKeymanGlobal));
+    const keyboardLoader = new TestingDOMKeyboardLoader(new KeyboardHarness(window, MinimalKeymanGlobal));
     const keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(true), pathConfig);
     const cache = keyboardRequisitioner.cache;
 
@@ -83,7 +83,7 @@ describe("KeyboardRequisitioner", function () {
   });
 
   it('loads keyboards for page-local, API-added stubs', async () => {
-    const keyboardLoader = new DOMKeyboardLoader(new KeyboardHarness(window, MinimalKeymanGlobal));
+    const keyboardLoader = new TestingDOMKeyboardLoader(new KeyboardHarness(window, MinimalKeymanGlobal));
     const keyboardRequisitioner = new KeyboardRequisitioner(keyboardLoader, new DOMCloudRequester(true), pathConfig);
     const cache = keyboardRequisitioner.cache;
 

@@ -5,7 +5,7 @@ import { LegacyEventEmitter } from 'keyman/engine/events';
 import { StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
 import { KeyboardInterfaceBase } from 'keyman/engine/main';
 
-import { KeyboardHarness, MinimalKeymanGlobal, DOMKeyboardLoader  } from 'keyman/engine/keyboard';
+import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { KeyboardMap, loadKeyboardsFromStubs } from '../../kbdLoader.js';
 
 import { DeviceSpec, ManagedPromise, timedPromise } from 'keyman/common/web-utils';
@@ -13,6 +13,7 @@ import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-t
 import sinon from 'sinon';
 
 import { assert } from 'chai';
+import { TestingDOMKeyboardLoader } from '../../test_utils.js';
 
 const TEST_PHYSICAL_DEVICE = {
   formFactor: 'desktop',
@@ -192,7 +193,7 @@ describe('app/browser:  ContextManager', function () {
     }, () => new LegacyEventEmitter());
 
     // Needed for the keyboard tests later.
-    keyboardLoader = new DOMKeyboardLoader(new KeyboardHarness(window, MinimalKeymanGlobal));
+    keyboardLoader = new TestingDOMKeyboardLoader(new KeyboardHarness(window, MinimalKeymanGlobal));
     keyboardCache = new StubAndKeyboardCache(keyboardLoader);
 
     contextManager.configure({

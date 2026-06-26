@@ -7,7 +7,7 @@ import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
 import { KeyboardLoaderBase } from '../keyboardLoaderBase.js';
 import { KeyboardLoadErrorBuilder } from '../keyboardLoadError.js';
 
-export class DOMKeyboardLoader extends KeyboardLoaderBase {
+export abstract class DOMKeyboardLoader extends KeyboardLoaderBase {
   public readonly element: HTMLIFrameElement;
   private readonly performCacheBusting: boolean;
 
@@ -85,7 +85,5 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     f.call(context, script);
   }
 
-  protected fetch(uri: string): Promise<Response> {
-    throw new Error('not implemented');
-  }
+  protected abstract fetch(uri: string): Promise<Response>;
 }

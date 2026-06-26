@@ -35,7 +35,7 @@ function determineBaseLayout(): string {
 export type KeyEventFullResultCallback = (result: ProcessorAction, error?: Error) => void;
 export type KeyEventFullHandler = (event: KeyEvent, callback?: KeyEventFullResultCallback) => void;
 
-export class KeymanEngineBase<
+export abstract class KeymanEngineBase<
   ConfigurationT extends EngineConfiguration,
   ContextManagerT extends ContextManagerBase<any>,
   HardKeyboardT extends HardKeyboardBase
@@ -225,9 +225,7 @@ export class KeymanEngineBase<
     });
   }
 
-  protected createKeyboardLoader(): DOMKeyboardLoader {
-    return new DOMKeyboardLoader(this.interface, this.config.applyCacheBusting);
-  }
+  protected abstract createKeyboardLoader(): DOMKeyboardLoader;
 
   public async init(optionSpec: Required<InitOptionSpec>){
     // There may be some valid mutations possible even on repeated calls?

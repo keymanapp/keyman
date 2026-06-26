@@ -1,11 +1,11 @@
 import { assert } from 'chai';
 
-import { DOMKeyboardLoader } from 'keyman/engine/keyboard';
 import { DeviceSpec } from 'keyman/common/web-utils';
 import { KeyboardHarness, JSKeyboard, MinimalKeymanGlobal, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError, Keyboard, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { assertThrowsAsync } from 'keyman/tools/testing/test-utils';
 import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
+import { TestingDOMKeyboardLoader } from '../../test_utils.js';
 
 declare let window: typeof globalThis;
 // KeymanEngine from the web/ folder... when available.
@@ -29,7 +29,7 @@ describe('Keyboard loading in DOM', function() {
 
   it('throws error when keyboard does not exist', async () => {
     const harness = new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer());
-    const keyboardLoader = new DOMKeyboardLoader(harness);
+    const keyboardLoader = new TestingDOMKeyboardLoader(harness);
     const nonExisting = '/does/not/exist.js';
 
     await assertThrowsAsync(async () => await keyboardLoader.loadKeyboardFromPath(nonExisting),
@@ -38,7 +38,7 @@ describe('Keyboard loading in DOM', function() {
 
   it('throws error when keyboard is invalid', async () => {
     const harness = new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer());
-    const keyboardLoader = new DOMKeyboardLoader(harness);
+    const keyboardLoader = new TestingDOMKeyboardLoader(harness);
     const nonKeyboardPath = '/common/test/resources/index.mjs';
 
     await assertThrowsAsync(async () => await keyboardLoader.loadKeyboardFromPath(nonKeyboardPath),
@@ -47,7 +47,7 @@ describe('Keyboard loading in DOM', function() {
 
   it('`window`, disabled rule processing', async () => {
     const harness = new KeyboardHarness(window, MinimalKeymanGlobal);
-    let keyboardLoader = new DOMKeyboardLoader(harness);
+    let keyboardLoader = new TestingDOMKeyboardLoader(harness);
     let keyboard: Keyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/khmer_angkor.js');
 
     assert.isOk(keyboard);
@@ -67,7 +67,7 @@ describe('Keyboard loading in DOM', function() {
 
   it('`window`, enabled rule processing', async () => {
     const jsHarness = new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer());
-    const keyboardLoader = new DOMKeyboardLoader(jsHarness);
+    const keyboardLoader = new TestingDOMKeyboardLoader(jsHarness);
     const keyboard: Keyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/khmer_angkor.js');
     const jsKeyboard = keyboard as JSKeyboard;
     jsHarness.activeKeyboard = jsKeyboard;
@@ -99,7 +99,7 @@ describe('Keyboard loading in DOM', function() {
 
   it('load keyboards successfully in parallel without side effects', async () => {
     let jsHarness = new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer());
-    let keyboardLoader = new DOMKeyboardLoader(jsHarness);
+    let keyboardLoader = new TestingDOMKeyboardLoader(jsHarness);
 
     // Preload a keyboard and make it active.
     const test_kbd: Keyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/test_917.js');

@@ -1,5 +1,4 @@
 import {
-  DOMKeyboardLoader,
   JSKeyboard,
   Keyboard,
   KeyboardProperties,
@@ -9,8 +8,9 @@ import {
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { KeyboardInfoPair } from 'keyman/engine/main';
 import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
+import { TestingDOMKeyboardLoader } from './test_utils.js';
 
-const loader = new DOMKeyboardLoader(new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
+const loader = new TestingDOMKeyboardLoader(new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
 
 export function loadKeyboardFromPath(path: string) {
   return loader.loadKeyboardFromPath(path);
