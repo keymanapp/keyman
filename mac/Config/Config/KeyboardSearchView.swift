@@ -135,6 +135,12 @@ struct KeyboardSearchView: NSViewRepresentable {
       print("Download failed with error: \(error.localizedDescription)")
     }
   }
+  
+  func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+      // The web process crashed. Reload the webview safely here.
+      print("WebKit process terminated unexpectedly: reloading content...")
+      webView.reload()
+  }
 }
 
 

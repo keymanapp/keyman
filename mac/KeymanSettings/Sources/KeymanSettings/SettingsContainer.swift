@@ -115,10 +115,27 @@ public class SettingsContainer : ObservableObject {
       if let installedPackageUrl = try self.packageRepository.installPackage(packageUrl: packageUrl) {
         let package = try self.packageRepository.loadSinglePackage(packageUrl: installedPackageUrl)
         self.installedPackages.append(package)
-        // MAC-CONFIG-TODO: set defaults for enabled
+        self.addEnabledKeyboardsForInstalledPackage(package: package)
       }
     } catch {
       print ("zip error '\(error)' for \(packageUrl)")
+    }
+  }
+
+  /**
+   *  for each enabled keyboard in the package being installed, add it to the enabled keyboards set and save it in the UserDefaults
+   */
+  func addEnabledKeyboardsForInstalledPackage(package: KeymanPackage) {
+    let currentlyEnabledKeyboards = self.defaultsRepository.readEnabledKeyboards()
+    var updatedEnabledKeyboards = currentlyEnabledKeyboards
+
+    // set enabled flag if the keyboard is contained in the set of enabledKeyboards
+    package.keyboards.forEach {
+      updatedEnabledKeyboards.insert($0.keyboardKey)
+    }
+    
+    if updatedEnabledKeyboards != currentlyEnabledKeyboards {
+      self.defaultsRepository.writeEnabledKeyboards(enabledKeyboardsArray: Array(updatedEnabledKeyboards))
     }
   }
 
@@ -184,7 +201,7 @@ public class SettingsContainer : ObservableObject {
     // update persisted state in UserDefaults enabledKeyboards array
     self.saveKeyboardState()
   }
-  
+ 
   /**
    * save the keyboard state in the UserDefaults
    */
