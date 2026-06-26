@@ -191,7 +191,6 @@ describe('Common utility functions', function() {
           deleteLeft: 0,
           id: 0
         },
-        transitionId: 0,
         displayAs: 'hello'
       };
 
@@ -205,7 +204,6 @@ describe('Common utility functions', function() {
           deleteLeft: 0,
           id: 0
         },
-        transitionId: 0,
         displayAs: 'hello',
         p: 0
       };
@@ -220,7 +218,6 @@ describe('Common utility functions', function() {
           deleteLeft: 0,
           id: 0
         },
-        transitionId: 0,
         displayAs: 'hello',
         p: 0.5
       };
@@ -228,14 +225,13 @@ describe('Common utility functions', function() {
       assert.deepEqual(models.transformToSuggestion(suggestion.transform, 0.5), suggestion);
     });
 
-    it('properly handles the transitionId', function() {
+    it('properly handles the transition ID', function() {
       let suggestion = {
         transform: {
           insert: 'hello',
           deleteLeft: 0,
           id: 3
         },
-        transitionId: 3, // Ensures there isn't a separate ID seed in use.
         displayAs: 'hello'
       };
 
