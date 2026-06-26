@@ -697,7 +697,7 @@ export function predictFromCorrections(
       // Let's not rely on the model to copy transform IDs.
       // Only bother is there IS an ID to copy.
       if(correctionTransform.id !== undefined) {
-        pair.sample.transformId = correctionTransform.id;
+        pair.sample.transform.id = correctionTransform.id;
       }
 
       let tuple: CorrectionPredictionTuple = {
@@ -829,7 +829,7 @@ export function processSimilarity(
   for(let tuple of suggestionDistribution) {
     // Don't set it unnecessarily; this can have side-effects in some automated tests.
     if(inputTransform.id !== undefined) {
-      tuple.prediction.sample.transformId = inputTransform.id;
+      tuple.prediction.sample.transform.id = inputTransform.id;
     }
 
     const predictedWord = wordbreak(models.applyTransform(tuple.prediction.sample.transform, context));
@@ -907,7 +907,7 @@ export function createDefaultKeep(
 
   let keepOption = toAnnotatedSuggestion(lexicalModel, keepSuggestion, 'keep');
   if(inputTransform.id !== undefined) {
-    keepOption.transformId = inputTransform.id;
+    keepOption.transform.id = inputTransform.id;
   }
   keepOption.matchesModel = false;
 
@@ -1084,11 +1084,6 @@ export function finalizeSuggestions(
       mutableSuggestion.transform = mergedTransform;
     }
 
-    // Is sometimes not set during unit tests.
-    if(prediction.sample.transformId !== undefined) {
-      prediction.sample.transform.id = prediction.sample.transformId;
-    }
-
     if(!verbose) {
       return {
         ...prediction.sample,
@@ -1189,8 +1184,8 @@ export function toAnnotatedSuggestion(
     result.appendedTransform = suggestion.appendedTransform;
   }
 
-  if(suggestion.transformId !== undefined) {
-    result.transformId = suggestion.transformId;
+  if(suggestion.transform.id !== undefined) {
+    result.transform.id = suggestion.transform.id;
   }
 
   return result;

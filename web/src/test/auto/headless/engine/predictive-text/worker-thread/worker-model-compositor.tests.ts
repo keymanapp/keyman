@@ -588,7 +588,6 @@ describe('ModelCompositor', function() {
         deleteLeft: 0,
         id: 0
       },
-      transformId: 0,
       displayAs: 'hello'
     };
 
@@ -668,13 +667,12 @@ describe('ModelCompositor', function() {
     }
 
     it('first word of context, postTransform provided, .deleteLeft = 0', function() {
-      let baseSuggestion = {
+      let baseSuggestion: Suggestion = {
         transform: {
           insert: 'hello ',
           deleteLeft: 2,
           id: 0
         },
-        transformId: 0,
         id: 1,
         displayAs: 'hello'
       };
@@ -691,7 +689,7 @@ describe('ModelCompositor', function() {
       }
 
       let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
-      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.transform.id, baseSuggestion.transform.id);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
@@ -711,13 +709,12 @@ describe('ModelCompositor', function() {
     });
 
     it('second word of context, postTransform provided, .deleteLeft = 0', function() {
-      let baseSuggestion = {
+      let baseSuggestion: Suggestion = {
         transform: {
           insert: 'world ',
           deleteLeft: 3,
           id: 0
         },
-        transformId: 0,
         id: 0,
         displayAs: 'world'
       };
@@ -734,7 +731,7 @@ describe('ModelCompositor', function() {
       }
 
       let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
-      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.transform.id, baseSuggestion.transform.id);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
@@ -754,13 +751,12 @@ describe('ModelCompositor', function() {
     });
 
     it('second word of context, postTransform undefined', function() {
-      let baseSuggestion = {
+      let baseSuggestion: Suggestion = {
         transform: {
           insert: 'world ',
           deleteLeft: 3,
           id: 0
         },
-        transformId: 0,
         id: 0,
         displayAs: 'world'
       };
@@ -770,7 +766,7 @@ describe('ModelCompositor', function() {
       }
 
       let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext);
-      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.transform.id, baseSuggestion.transform.id);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
@@ -790,13 +786,12 @@ describe('ModelCompositor', function() {
     });
 
     it('first word of context + postTransform provided, .deleteLeft > 0', function() {
-      let baseSuggestion = {
+      let baseSuggestion: Suggestion = {
         transform: {
           insert: 'hello ',
           deleteLeft: 2,
           id: 0
         },
-        transformId: 0,
         id: 0,
         displayAs: 'hello'
       };
@@ -813,7 +808,7 @@ describe('ModelCompositor', function() {
       }
 
       let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
-      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.transform.id, baseSuggestion.transform.id);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       // Check #1:  Does the returned reversion properly revert the context to its pre-application state?
@@ -847,13 +842,12 @@ describe('ModelCompositor', function() {
       // it('first word of context + postTransform provided, .deleteLeft > 0')
       // seen earlier in the file.
 
-      let baseSuggestion = {
+      let baseSuggestion: Suggestion = {
         transform: {
           insert: 'hello ',
           deleteLeft: 2,
           id: 0
         },
-        transformId: 0,
         id: 0,
         displayAs: 'hello'
       };
@@ -873,7 +867,7 @@ describe('ModelCompositor', function() {
       let compositor = new ModelCompositor(model, true);
 
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
-      assert.equal(reversion.transformId, baseSuggestion.transformId);
+      assert.equal(reversion.transform.id, baseSuggestion.transform.id);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
@@ -887,7 +881,8 @@ describe('ModelCompositor', function() {
 
       let expectedTransform = {
         insert: 'hi',  // Keeps current context the same, though it adds a wordbreak.
-        deleteLeft: 2
+        deleteLeft: 2,
+        id: 0
       }
       assert.deepEqual(suggestions[0].transform, expectedTransform);
       assert.deepEqual(suggestions[0].appendedTransform, {
@@ -923,7 +918,7 @@ describe('ModelCompositor', function() {
       let baseSuggestion = initialSuggestions[1];
       baseSuggestion.appendedTransform.id = 15; // set an id for the applied transform.
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
-      assert.equal(reversion.transformId, -baseSuggestion.transformId);
+      assert.equal(reversion.transform.id, -baseSuggestion.transform.id);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
@@ -970,7 +965,7 @@ describe('ModelCompositor', function() {
       assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
       let contextIds = compositor.contextTracker.unitTestEndPoints.cache().keys();
 
-      assert.equal(reversion.transformId, -baseSuggestion.transformId);
+      assert.equal(reversion.transform.id, -baseSuggestion.transform.id);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       const appliedContextState = compositor.contextTracker.unitTestEndPoints.cache().get(15);

@@ -27,12 +27,12 @@ import Transform = LexicalModelTypes.Transform;
  * any prior cached data or for rewriting its probabilities after
  * receiving backspace input.
  * @param text
- * @param transformId
+ * @param transitionId
  * @returns
  */
-function textToCharTransforms(text: string, transformId?: number): Transform[] {
-  return transformId ?
-    [...text].map(insert => ({insert, deleteLeft: 0, id: transformId})) :
+function textToCharTransforms(text: string, transitionId?: number): Transform[] {
+  return transitionId ?
+    [...text].map(insert => ({insert, deleteLeft: 0, id: transitionId})) :
     [...text].map(insert => ({insert, deleteLeft: 0}));
 }
 
@@ -100,7 +100,7 @@ export class ContextToken {
   static fromRawText(model: LexicalModel, rawText: string, isPartial?: boolean) {
     rawText ||= '';
 
-    // Supports the old pathway for: updateWithBackspace(tokenText: string, transformId: number)
+    // Supports the old pathway for: updateWithBackspace(tokenText: string, transitionId: number)
     // Build a token that represents the current text with no ambiguity - probability at max (1.0)
     let searchModule: SearchQuotientNode = new LegacyQuotientRoot(model);
     const BASE_PROBABILITY = 1;
