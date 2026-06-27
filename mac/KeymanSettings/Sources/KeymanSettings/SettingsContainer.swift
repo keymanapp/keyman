@@ -23,6 +23,7 @@
 
 import Foundation
 import Combine
+import ZIPFoundation
 
 public enum SettingsError: Error {
   case unknownPackage
@@ -97,6 +98,48 @@ public class SettingsContainer : ObservableObject {
   }
   
   /**
+   * get the url for where the specified package should be downloaded
+   */
+  public func getDownloadUrlForPackageName(packageName: String) -> URL? {
+    return self.packageRepository.getDownloadUrlForPackageName(packageName: packageName)
+  }
+    
+  /**
+   * install keyboard UI
+   */
+  public func installPackage(packageUrl: URL) {
+    print ("install package \(packageUrl)")
+
+    // MAC-CONFIG-TODO: fire events for successful and unsuccesful installation
+    do {
+      if let installedPackageUrl = try self.packageRepository.installPackage(packageUrl: packageUrl) {
+        let package = try self.packageRepository.loadSinglePackage(packageUrl: installedPackageUrl)
+        self.installedPackages.append(package)
+        self.addEnabledKeyboardsForInstalledPackage(package: package)
+      }
+    } catch {
+      print ("zip error '\(error)' for \(packageUrl)")
+    }
+  }
+
+  /**
+   *  for each enabled keyboard in the package being installed, add it to the enabled keyboards set and save it in the UserDefaults
+   */
+  func addEnabledKeyboardsForInstalledPackage(package: KeymanPackage) {
+    let currentlyEnabledKeyboards = self.defaultsRepository.readEnabledKeyboards()
+    var updatedEnabledKeyboards = currentlyEnabledKeyboards
+
+    // set enabled flag if the keyboard is contained in the set of enabledKeyboards
+    package.keyboards.forEach {
+      updatedEnabledKeyboards.insert($0.keyboardKey)
+    }
+    
+    if updatedEnabledKeyboards != currentlyEnabledKeyboards {
+      self.defaultsRepository.writeEnabledKeyboards(enabledKeyboardsArray: Array(updatedEnabledKeyboards))
+    }
+  }
+
+  /**
    * find the installed package with the specified UUID
    */
   public func findPackage(packageId: UUID) -> KeymanPackage? {
@@ -158,7 +201,7 @@ public class SettingsContainer : ObservableObject {
     // update persisted state in UserDefaults enabledKeyboards array
     self.saveKeyboardState()
   }
-  
+ 
   /**
    * save the keyboard state in the UserDefaults
    */
@@ -175,7 +218,7 @@ public class SettingsContainer : ObservableObject {
     
     // read keyboards from disk
     if (self.packageRepository.keyman19SharedDataDirectoryExists()) {      
-      packagesArray = self.packageRepository.loadPackages()
+      packagesArray = self.packageRepository.loadAllPackages()
     } else {
       self.packageRepository.createKeyman19SharedDataDirectories()
     }

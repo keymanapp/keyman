@@ -21,6 +21,11 @@ enum LoadPackageError: Error {
   case missingKmxFile
 }
 
+enum InstallPackageError: Error {
+  case invalidUrl
+  case unzipError
+}
+
 // Conform to LocalizedError to provide the description
 extension LoadPackageError: LocalizedError {
   var errorDescription: String? {
@@ -58,7 +63,7 @@ public class PackageRepository: PackageRepo {
    * If the `KeymanPackage` passes validation, then add it to the `installedPackages` array.
    *
    */
-  public func loadPackages() -> [KeymanPackage] {
+  public func loadAllPackages() -> [KeymanPackage] {
     var installedPackages: [KeymanPackage] = []
     let packageSourceArray = self.readKeymanPackagesForKeyman19()
     
@@ -77,6 +82,19 @@ public class PackageRepository: PackageRepo {
     return installedPackages
   }
   
+  /**
+   * Load the single package from disk and wrap it as a `KeymanPackage` object
+   * If the `KeymanPackage` passes validation, then add it to the `installedPackages` array.
+   *
+   */
+  public func loadSinglePackage(packageUrl: URL) throws -> KeymanPackage {
+    guard let source =  try readPackageFromDirectory(packageDirectoryUrl: packageUrl) else { throw InstallPackageError.invalidUrl }
+      
+    let package = KeymanPackage(packageSource: source)
+    try package.validate()
+    return package
+  }
+
   /**
    * delete the package from disk
    */
@@ -135,7 +153,44 @@ public class PackageRepository: PackageRepo {
       print("App Group container URL not found. Check your entitlements and provisioning profiles.")
     }
   }
-  
+ 
+  /**
+   * get the url for where the specified package should be downloaded
+   */
+  public func getDownloadUrlForPackageName(packageName: String) -> URL? {
+    var downloadFileUrl: URL? = nil
+    
+    if let packagesUrl = self.pathUtil.keyman19PackagesDirectory {
+      downloadFileUrl = packagesUrl.appendingPathComponent(packageName)
+    }
+    
+    return downloadFileUrl
+  }
+
+  /**
+   * install keyboard at specified URL
+   */
+  public func installPackage(packageUrl: URL) throws -> URL? {
+    print ("install package \(packageUrl)")
+    var destinationUrl: URL? = nil
+    
+    let fileManager = FileManager.default
+    
+    do {
+      // set destination to full path but without the .kmp extension
+      let packageDestinationUrl = packageUrl.deletingPathExtension()
+      
+      try fileManager.unzipItem(at: packageUrl, to: packageDestinationUrl)
+      destinationUrl = packageDestinationUrl
+      print("Successfully unzipped the file!")
+    } catch {
+      print("Extraction failed: \(error.localizedDescription)")
+      throw InstallPackageError.unzipError
+    }
+    
+    return destinationUrl
+  }
+
   /**
    * Check to see whether the shared Keyman data directory exists under 'Library/Group Containers/'
    */
