@@ -60,9 +60,6 @@ struct InstallView: View {
         Button("Disable Keyman") {
           _ = installation.disableKeymanInputMethod()
         }
-        Button("Run Keyman") {
-          _ = installation.runKeymanInputMethod()
-        }
         Button("Kill Keyman") {
           _ = installation.killKeymanInputMethod()
         }

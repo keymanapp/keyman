@@ -269,9 +269,9 @@ public class InstallationContainer : ObservableObject {
   }
   
 
-/**
- * register may need to happen before enabling
- */
+  /**
+   * register may need to happen before enabling
+   */
   public func registerKeymanInputMethod() -> Bool {
     let success = self.inputMethodUtil.registerKeymanInputMethod()
     print("registerKeymanInputMethod suceeded: \(success)")
@@ -358,20 +358,6 @@ public class InstallationContainer : ObservableObject {
     return requested
   }
 
-  
-  /**
-   * run Keyman as a separate process with its full Input Method functionality
-   */
-  public func runKeymanInputMethod() -> Bool {
-    do {
-      try self.inputMethodUtil.runKeymanInputMethod()
-      return true
-    } catch {
-      print("runKeymanInputMethod error: \(error)")
-      return false
-    }
-  }
-  
   /**
    * kill the Keyman Input Method process
    */

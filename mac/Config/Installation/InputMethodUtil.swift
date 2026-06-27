@@ -35,7 +35,6 @@ public class InputMethodUtil {
   // only initialized after message is received from input method
   public var accessibilityPermissionGranted: Bool? = nil
   fileprivate let pathUtil: KeymanPaths
-  fileprivate var inputMethodProccesId: pid_t = 0
   fileprivate var observer: NSObjectProtocol?
   
   
@@ -86,13 +85,6 @@ public class InputMethodUtil {
    */
   public func isKeymanInputMethodEnabled() -> Bool {
     return self.isInputMethodEnabled(bundleId: KeymanPaths.keymanBundleId)
-  }
-  
-  /**
-   * launch the Keyman input method
-   */
-  public func runKeymanInputMethod() throws {
-    try self.launchKeymanInputMethodAsSeparateProcess()
   }
   
   /**
@@ -441,12 +433,12 @@ public class InputMethodUtil {
     if let keymanFile = self.pathUtil.buildInputMethodPathUrl(fileName: keymanInputMethodApplicationName) {
       do {
         try fileManager.removeItem(at: keymanFile)
-        print("Successfully deleted Keyman")
+        print("Successfully deleted Keyman.app")
       } catch {
-        print("Error deleting file: \(error)")
+        print("Error deleting Keyman.app: \(error)")
       }
     } else {
-      print("Keyman not found")
+      print("Keyman.app not found")
     }
   }
   
