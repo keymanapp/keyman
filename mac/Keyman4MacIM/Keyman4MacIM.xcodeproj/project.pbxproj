@@ -1374,9 +1374,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International.";
-				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
-				COPYRIGHT_YEARS = "2017-2019";
+				COPYRIGHT_STRING = "Copyright © SIL Global.";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
@@ -1388,7 +1386,6 @@
 					"$(PROJECT_DIR)/Keyman4MacIM/Frameworks",
 					"$(PROJECT_DIR)/../Carthage/Build/Mac/**",
 				);
-				GET_INFO_STRING = "Keyman $(PRODUCT_VERSION) for macOS, $(COPYRIGHT_STRING_RIGHTS)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"{$PROJECT_DIR}/Keyman4MacIM/KMAboutWindow",
@@ -1423,9 +1420,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Developer ID Application";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International.";
-				COPYRIGHT_STRING_RIGHTS = "$(COPYRIGHT_STRING) All rights reserved.";
-				COPYRIGHT_YEARS = "2017-2019";
+				COPYRIGHT_STRING = "Copyright © SIL Global.";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				"DEVELOPMENT_TEAM[sdk=macosx*]" = 3YE4W86L3G;
@@ -1436,7 +1431,6 @@
 					"$(PROJECT_DIR)/Keyman4MacIM/Frameworks",
 					"$(PROJECT_DIR)/../Carthage/Build/Mac/**",
 				);
-				GET_INFO_STRING = "Keyman $(PRODUCT_VERSION) for macOS, $(COPYRIGHT_STRING_RIGHTS)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"{$PROJECT_DIR}/Keyman4MacIM/KMAboutWindow",

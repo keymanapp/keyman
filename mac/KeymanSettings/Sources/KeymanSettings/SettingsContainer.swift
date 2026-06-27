@@ -28,6 +28,7 @@ public enum SettingsError: Error {
   case unknownPackage
 }
 
+@MainActor // run on the main actor since data is published directly to the UI
 public class SettingsContainer : ObservableObject {
   // packages are loaded from disk, each package may contain one or more keyboard
   @Published public var installedPackages: [KeymanPackage]

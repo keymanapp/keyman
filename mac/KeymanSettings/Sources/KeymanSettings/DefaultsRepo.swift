@@ -11,6 +11,9 @@
 import Foundation
 
 public protocol DefaultsRepo {
+  func readInstallationState() -> Dictionary<String, Any>?
+  func writeInstallationState(_ dictionary: Dictionary<String, Any>)
+  func deleteInstallationState()
   func readEnabledKeyboards() -> Set<String>
   func writeEnabledKeyboards(enabledKeyboardsArray: [String])
   func readSelectedKeyboard() -> String
