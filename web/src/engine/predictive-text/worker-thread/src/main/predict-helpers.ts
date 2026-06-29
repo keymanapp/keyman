@@ -188,7 +188,7 @@ export interface PredictionMetadata {
   preservationTransform?: Transform;
 }
 
-export interface IntermediateTokenizedPrediction {
+export interface TokenizedIntermediatePrediction {
   /**
    * Contains the tokenized components to be used to construct a full
    * predictive-text Suggestion, as well as data about the source for each
@@ -201,7 +201,7 @@ export interface IntermediateTokenizedPrediction {
   metadata: PredictionMetadata;
 }
 
-export interface IntermediateCompositedPrediction {
+export interface CompositedIntermediatePrediction {
   /**
    * Contains the fully composited predictive-text Suggestion and its underlying correction string.
    */
@@ -212,7 +212,7 @@ export interface IntermediateCompositedPrediction {
   metadata: PredictionMetadata;
 }
 
-type IntermediatePrediction = IntermediateCompositedPrediction | IntermediateTokenizedPrediction;
+type IntermediatePrediction = CompositedIntermediatePrediction | TokenizedIntermediatePrediction;
 
 /**
  * An enum to be used when categorizing the level of similarity between
@@ -527,7 +527,7 @@ export interface PredictionParameters {
    * @param entry
    * @returns
    */
-  applyInPost: (entry: IntermediateTokenizedPrediction) => void;
+  applyInPost: (entry: TokenizedIntermediatePrediction) => void;
 }
 
 export function buildCorrectionSequence(
@@ -619,7 +619,7 @@ export function determineTokenizedCorrectionSequence(
 
   return {
     ...suggestionParams,
-    applyInPost: (entry: IntermediateTokenizedPrediction) => {
+    applyInPost: (entry: TokenizedIntermediatePrediction) => {
       entry.metadata.preservationTransform = tokenization.taillessTrueKeystroke;
       // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
       // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
@@ -654,7 +654,7 @@ export async function correctAndEnumerate(
   /**
    * The suggestions generated based on the user's input state.
    */
-  rawPredictions: IntermediateTokenizedPrediction[];
+  rawPredictions: TokenizedIntermediatePrediction[];
 
   /**
    * The id of a prior ContextTransition event that triggered a Suggestion found
@@ -709,7 +709,7 @@ export async function correctAndEnumerate(
   const searchModules = tokenizations.map(t => t.tail.searchModule);
 
   // Only run the correction search when corrections are enabled.
-  let rawPredictions: IntermediateTokenizedPrediction[] = [];
+  let rawPredictions: TokenizedIntermediatePrediction[] = [];
   let bestCorrectionCost: number;
   for await(const match of getBestTokenMatches(searchModules, timer)) {
     // Corrections obtained:  now to predict from them!
@@ -761,7 +761,7 @@ export async function correctAndEnumerate(
 export function shouldStopSearchingEarly(
   bestCorrectionCost: number,
   currentCorrectionCost: number,
-  rawPredictions: IntermediateTokenizedPrediction[]
+  rawPredictions: TokenizedIntermediatePrediction[]
 ) {
   if(currentCorrectionCost >= bestCorrectionCost + CORRECTION_SEARCH_THRESHOLDS.MAX_SEARCH_THRESHOLD) {
     return true;
@@ -800,7 +800,7 @@ export function shouldStopSearchingEarly(
 export function predictFromCorrectionSequence(
   lexicalModel: LexicalModel,
   predictionPrep: PredictionParameters
-): IntermediateTokenizedPrediction[] {
+): TokenizedIntermediatePrediction[] {
   let successfulPredictions = 0;
 
   const correctionTokens = predictionPrep.tokens;
@@ -886,10 +886,10 @@ export function predictFromCorrectionSequence(
     .slice(0, predictionComponents.length-1)
     .map((p) => p[0]);
 
-  const completePredictionTuples: IntermediateTokenizedPrediction[] = predictionComponents[predictionComponents.length-1].map((tuple) => {
+  const completePredictionTuples: TokenizedIntermediatePrediction[] = predictionComponents[predictionComponents.length-1].map((tuple) => {
     const predictionCost = tuple.predictionProb * prefixProb;
 
-    const returnVal: IntermediateTokenizedPrediction = {
+    const returnVal: TokenizedIntermediatePrediction = {
       components: [...predictionPrefix, tuple],
       metadata: {
         probabilities: {
@@ -951,12 +951,12 @@ export function applySuggestionCasing(predictionToken: TokenizedPredictionData, 
 
 /**
  * Composes a set of `IntermediateTokenizedPrediction`s, merging the tokenized
- * data into corresponding `IntermediateCompositedPrediction`s representing the
+ * data into corresponding `CompositedIntermediatePrediction`s representing the
  * full range of affected context.
  * @param predictions
  * @returns
  */
-export function composeIntermediatePredictions(predictions: IntermediateTokenizedPrediction[]): IntermediateCompositedPrediction[] {
+export function composeIntermediatePredictions(predictions: TokenizedIntermediatePrediction[]): CompositedIntermediatePrediction[] {
   return predictions.map((predictionData) => {
     const components = predictionData.components;
 
@@ -1000,13 +1000,13 @@ export function composeIntermediatePredictions(predictions: IntermediateTokenize
  */
 export function dedupeSuggestions(
   lexicalModel: LexicalModel,
-  rawPredictions: IntermediateCompositedPrediction[],
+  rawPredictions: CompositedIntermediatePrediction[],
   context: Context
 ) {
   const wordbreak = determineModelWordbreaker(lexicalModel);
 
-  let suggestionDistribMap: {[key: string]: IntermediateCompositedPrediction} = {};
-  let suggestionDistribution: IntermediateCompositedPrediction[] = [];
+  let suggestionDistribMap: {[key: string]: CompositedIntermediatePrediction} = {};
+  let suggestionDistribution: CompositedIntermediatePrediction[] = [];
 
   // Deduplicator + annotator of 'keep' suggestions.
   for(let tuple of rawPredictions) {
@@ -1057,7 +1057,7 @@ export function dedupeSuggestions(
  */
 export function processSimilarity(
   lexicalModel: LexicalModel,
-  suggestionDistribution: IntermediateCompositedPrediction[],
+  suggestionDistribution: CompositedIntermediatePrediction[],
   baseContext: Context,
   finalContext: Context
 ): boolean {
@@ -1128,7 +1128,7 @@ export function createDefaultKeep(
   lexicalModel: LexicalModel,
   context: Context,
   trueInput: ProbabilityMass<Transform>
-): IntermediateCompositedPrediction {
+): CompositedIntermediatePrediction {
   const { sample: inputTransform, p: inputTransformProb } = trueInput;
   const wordbreak = determineModelWordbreaker(lexicalModel);
   const tokenizer = determineModelTokenizer(lexicalModel);
@@ -1210,7 +1210,7 @@ export function correctionValidForAutoSelect(correction: string) {
   return false;
 }
 
-export function predictionAutoSelect(suggestionDistribution: IntermediateCompositedPrediction[]) {
+export function predictionAutoSelect(suggestionDistribution: CompositedIntermediatePrediction[]) {
   if(suggestionDistribution.length == 0) {
     return;
   }
@@ -1304,7 +1304,7 @@ export function predictionAutoSelect(suggestionDistribution: IntermediateComposi
  */
 export function finalizeSuggestions(
   lexicalModel: LexicalModel,
-  deduplicatedSuggestionTuples: IntermediateCompositedPrediction[],
+  deduplicatedSuggestionTuples: CompositedIntermediatePrediction[],
   context: Context,
   inputTransform: Transform,
   verbose?: boolean
