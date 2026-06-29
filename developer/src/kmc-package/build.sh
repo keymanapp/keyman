@@ -34,5 +34,5 @@ builder_parse "$@"
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action build      tsc --build
-builder_run_action api        typescript_run_api_extractor developer/src/kmc-copy main.d.ts
+builder_run_action api        typescript_run_api_extractor developer/src/kmc-package main.d.ts
 builder_run_action test       typescript_run_eslint_mocha_tests
