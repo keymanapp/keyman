@@ -57,4 +57,15 @@ public class WebViewUtilsTest {
     Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion),
       WebViewUtils.EngineWebViewVersionStatus.FULL);
   }
+
+  @Test
+  public void test_buildAssetUrl() {
+    Assert.assertEquals("https://appassets.androidplatform.net/data/", WebViewUtils.buildAssetUrl(""));
+    Assert.assertEquals("https://appassets.androidplatform.net/data/", WebViewUtils.buildAssetUrl(null));
+    Assert.assertEquals("https://appassets.androidplatform.net/data/foo", WebViewUtils.buildAssetUrl("foo"));
+    Assert.assertEquals("https://appassets.androidplatform.net/data/foo/", WebViewUtils.buildAssetUrl("foo/"));
+    Assert.assertEquals("https://appassets.androidplatform.net/data/foo/", WebViewUtils.buildAssetUrl("/foo/"));
+    Assert.assertEquals("https://appassets.androidplatform.net/data/foo/bar.html", WebViewUtils.buildAssetUrl("foo/bar.html"));
+  }
+
 }
