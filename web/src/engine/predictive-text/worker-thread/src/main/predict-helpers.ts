@@ -790,7 +790,7 @@ export function shouldStopSearchingEarly(
  * Given a generated set of corrections from the correction-search process, this
  * function searches the lexical model for valid predictions rooted on each.
  *
- * While doing so, it also associates each prediction with metadata used for to
+ * While doing so, it also associates each prediction with metadata used to
  * "rank" and select the best predictions once the search is complete.  This is
  * performed at later stages.
  * @param lexicalModel
@@ -802,11 +802,9 @@ export function predictFromCorrectionSequence(
   predictionPrep: PredictionParameters
 ): TokenizedIntermediatePrediction[] {
   let successfulPredictions = 0;
-
   const correctionTokens = predictionPrep.tokens;
   const context = predictionPrep.rootContext;
   let currentContext = context;
-
   let prefixProb = 1;
 
   const predictionComponents = correctionTokens.map((correctionToken, i) => {

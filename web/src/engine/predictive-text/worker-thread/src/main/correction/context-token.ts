@@ -37,7 +37,7 @@ function textToCharTransforms(text: string, transformId?: number): Transform[] {
 
 
 /**
- * Implements an interface similar to ContextToken that is useful for handling
+ * Defines an interface compatible with ContextToken that is useful for handling
  * cases that should not be considered correctable.
  */
 export interface ContextTokenLike {
