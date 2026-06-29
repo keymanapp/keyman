@@ -92,6 +92,46 @@ const testModelWithCasing = new DummyModel({
 });
 
 describe('createDefaultKeep', () => {
+  it(`creates an 'exact'-match suggestion based on context when no change occurs and no match is found`, () => {
+    const transformId = 314159;
+
+    const context: Context = {
+      left: 'appl',
+      right: '',
+      startOfBuffer: true,
+      endOfBuffer: true
+    };
+
+    const expectedKeep: CompositedIntermediatePrediction = {
+      components: {
+        prediction: {
+          transform: {
+            insert: 'appl',
+            deleteLeft: 4,
+            id: transformId
+          },
+          transformId,
+          displayAs: '<appl>',
+          matchesModel: false,
+          tag: 'keep'
+        },
+        correction: 'appl'
+      },
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
+    };
+
+    const tuple = createDefaultKeep(testModelWithCasing, context, { sample: { insert: '', deleteLeft: 0, id: transformId }, p: 1});
+    assert.deepEqual(tuple, expectedKeep);
+  });
+
   it(`creates an 'exact'-match suggestion based on simple primary input`, () => {
     const context: Context = {
       left: 'iphon',

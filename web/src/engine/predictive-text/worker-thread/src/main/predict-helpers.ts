@@ -4,7 +4,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { searchForProperty, WordBreakProperty } from '@keymanapp/models-wordbreakers';
 
 import { TransformUtils } from './transformUtils.js';
-import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
+import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 import { ContextTokenLike } from './correction/context-token.js';
 import { ContextTokenization, mapWhitespacedTokenization } from './correction/context-tokenization.js';
 import { ContextTracker } from './correction/context-tracker.js';
@@ -17,7 +17,6 @@ import { TokenResult } from './correction/tokenization-corrector.js';
 import { TokenizationCorrector } from './correction/tokenization-corrector.js';
 import { TokenizationResultMapping } from './correction/tokenization-result-mapping.js';
 
-import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import Keep = LexicalModelTypes.Keep;
@@ -112,6 +111,21 @@ export interface SuggestionReplacement<T extends ContextTokenLike> {
   transitionId?: number
 }
 
+export interface TokenizedPredictionData {
+  /**
+   * The potential Suggestion
+   */
+  prediction: Suggestion,
+  /**
+   * The correction upon which the Suggestion is based
+   */
+  correction: string,
+  /**
+   * The unkeyed original string underlying the correction/prediction.
+   */
+  casingRoot: string
+}
+
 export interface CompositedPredictionData {
   /**
    * The potential Suggestion (or Keep)
@@ -174,6 +188,19 @@ export interface PredictionMetadata {
   preservationTransform?: Transform;
 }
 
+export interface TokenizedIntermediatePrediction {
+  /**
+   * Contains the tokenized components to be used to construct a full
+   * predictive-text Suggestion, as well as data about the source for each
+   * component.
+   */
+  components: TokenizedPredictionData[];
+  /**
+   * Tracks common intermediate prediction data, such as its underlying probabilities and its similarity to the actual context.
+   */
+  metadata: PredictionMetadata;
+}
+
 export interface CompositedIntermediatePrediction {
   /**
    * Contains the fully composited predictive-text Suggestion and its underlying correction string.
@@ -185,7 +212,7 @@ export interface CompositedIntermediatePrediction {
   metadata: PredictionMetadata;
 }
 
-type IntermediatePrediction = CompositedIntermediatePrediction;
+type IntermediatePrediction = CompositedIntermediatePrediction | TokenizedIntermediatePrediction;
 
 /**
  * An enum to be used when categorizing the level of similarity between
@@ -280,6 +307,9 @@ export function determineTraversallessCorrectionSequences(
 
     // But, for now, only actually use the last one.
     const suggestionParams = buildCorrectionSequence(transitionEffects, context, new TokenizationResultMapping([correctionRoots[correctionRoots.length - 1]], null));
+    if(transformId !== undefined) {
+      suggestionParams.tokens.forEach((token) => token.correction.sample.id = transformId);
+    }
 
     const tokenizationMapping = mapWhitespacedTokenization(tokenization.left.map((t) => { return {exampleInput: t.text, codepointLength: KMWString.length(t.text)} }), lexicalModel, correction.sample);
     const tokenizedCorrection = tokenizationMapping.tokenizedTransform;
@@ -295,9 +325,6 @@ export function determineTraversallessCorrectionSequences(
       ...suggestionParams,
       applyInPost: (p) => {
         p.metadata.preservationTransform = preservationTransform;
-        if(transformId !== undefined) {
-          p.components.prediction.transformId = transformId;
-        }
       }
     })
   }
@@ -487,27 +514,37 @@ export interface PredictionParameters {
    * "unchanged" (root) context used for that suggestion will include the
    * changes from the entry at index 0 (or possibly, a suggestion derived from it).
    */
-  tokenizedCorrection: ProbabilityMass<Transform>[],
+  tokens: {
+    correction: ProbabilityMass<Transform>,
+    casingRoot: string,
+    autoSelectable: boolean
+  }[],
+
+  deleteLeft: number;
 
   /**
    * A closure to be applied to the generated suggestion's metadata.
    * @param entry
    * @returns
    */
-  applyInPost: (entry: CompositedIntermediatePrediction) => void
+  applyInPost: (entry: TokenizedIntermediatePrediction) => void;
 }
 
 export function buildCorrectionSequence(
   transitionEffects: SuggestionReplacement<ContextTokenLike>,
   context: Context,
   tokenizationCorrection: TokenizationResultMapping
-) {
+): Omit<PredictionParameters, 'applyInPost'> {
   const { deleteLeft } = transitionEffects;
 
   const rootContext = models.applyTransform({insert: '', deleteLeft}, context);
 
   // Replace the existing context with the correction.
-  const tokenizedCorrections = tokenizationCorrection.matchedResult.map((correction, i) => {
+  const orderedTokens = tokenizationCorrection.matchingSpace?.orderedTokens;
+  const tokens: PredictionParameters['tokens'] = [];
+
+  for(let i = 0; i < tokenizationCorrection.matchedResult.length; i++) {
+    const correction = tokenizationCorrection.matchedResult[i];
     /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
      * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
      * there are significantly more likely words.  We only need this to allow very minor fat-finger
@@ -535,12 +572,17 @@ export function buildCorrectionSequence(
       entry.sample.id = transitionEffects.transitionId;
     }
 
-    return entry;
-  });
+    tokens.push({
+      correction: entry,
+      casingRoot: orderedTokens ? orderedTokens[i].exampleInput : entry.sample.insert,
+      autoSelectable: correctionValidForAutoSelect(entry.sample.insert)
+    });
+  }
 
   return {
     rootContext,
-    tokenizedCorrection: tokenizedCorrections
+    tokens,
+    deleteLeft
   };
 }
 
@@ -570,18 +612,18 @@ export function determineTokenizedCorrectionSequence(
   // The correction should always be based on the most recent external
   // transform/transcription ID.
   if(transition.transitionId !== undefined) {
-    suggestionParams.tokenizedCorrection.forEach((t) => t.sample.id = transition.transitionId);
+    suggestionParams.tokens.forEach((t) => t.correction.sample.id = transition.transitionId);
   }
 
   const { deleteLeft } = transitionParams;
 
   return {
     ...suggestionParams,
-    applyInPost: (entry: CompositedIntermediatePrediction) => {
+    applyInPost: (entry: TokenizedIntermediatePrediction) => {
       entry.metadata.preservationTransform = tokenization.taillessTrueKeystroke;
       // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
       // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
-      entry.components.prediction.transform.deleteLeft = deleteLeft;
+      entry.components[0].prediction.transform.deleteLeft = deleteLeft;
     }
   };
 }
@@ -612,7 +654,7 @@ export async function correctAndEnumerate(
   /**
    * The suggestions generated based on the user's input state.
    */
-  rawPredictions: CompositedIntermediatePrediction[];
+  rawPredictions: TokenizedIntermediatePrediction[];
 
   /**
    * The id of a prior ContextTransition event that triggered a Suggestion found
@@ -632,8 +674,7 @@ export async function correctAndEnumerate(
     const predictionData = determineTraversallessCorrectionSequences(lexicalModel, transformDistribution, context);
     return {
       rawPredictions: predictionData.flatMap((entry) => {
-        const predictions = predictFromCorrectionSequence(lexicalModel, entry.tokenizedCorrection, entry.rootContext, transformDistribution[0]?.sample.id);
-        predictions.forEach((p) => entry.applyInPost(p));
+        const predictions = predictFromCorrectionSequence(lexicalModel, entry);
         return predictions;
       })
     };
@@ -668,7 +709,7 @@ export async function correctAndEnumerate(
   const searchModules = tokenizations.map(t => t.tail.searchModule);
 
   // Only run the correction search when corrections are enabled.
-  let rawPredictions: CompositedIntermediatePrediction[] = [];
+  let rawPredictions: TokenizedIntermediatePrediction[] = [];
   let bestCorrectionCost: number;
   for await(const match of getBestTokenMatches(searchModules, timer)) {
     // Corrections obtained:  now to predict from them!
@@ -693,8 +734,7 @@ export async function correctAndEnumerate(
     const corrector = new TokenizationCorrector(tokenization, suggestionRange.tokensToPredict.length, () => true);
     const predictionPrep = determineTokenizedCorrectionSequence(transition, tokenization, new TokenizationResultMapping([match], corrector));
 
-    const predictions = predictFromCorrectionSequence(lexicalModel, predictionPrep.tokenizedCorrection, predictionPrep.rootContext, transition.transitionId);
-    predictions.forEach((p) => predictionPrep.applyInPost(p));
+    const predictions = predictFromCorrectionSequence(lexicalModel, predictionPrep);
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && (bestCorrectionCost === undefined || bestCorrectionCost > match.totalCost)) {
@@ -721,7 +761,7 @@ export async function correctAndEnumerate(
 export function shouldStopSearchingEarly(
   bestCorrectionCost: number,
   currentCorrectionCost: number,
-  rawPredictions: CompositedIntermediatePrediction[]
+  rawPredictions: TokenizedIntermediatePrediction[]
 ) {
   if(currentCorrectionCost >= bestCorrectionCost + CORRECTION_SEARCH_THRESHOLDS.MAX_SEARCH_THRESHOLD) {
     return true;
@@ -754,131 +794,195 @@ export function shouldStopSearchingEarly(
  * "rank" and select the best predictions once the search is complete.  This is
  * performed at later stages.
  * @param lexicalModel
- * @param corrections Each `correction` should insert a full token's text to be
- * appended to the context resulting from all preceding corrections.
- * @param rootContext This context should represent all portions of the
- * post-context not represented by the entries of the `corrections` array.
- * @param transitionId Indicates the unique ID of the transition that triggered
- * prediction generation.
+ * @param predictionPrep
  * @returns
  */
 export function predictFromCorrectionSequence(
   lexicalModel: LexicalModel,
-  corrections: ProbabilityMass<Transform>[],
-  rootContext: Context,
-  transitionId: number
-): CompositedIntermediatePrediction[] {
-  let predictionPrefixSequence: ProbabilityMass<Suggestion>[] = [];
-  let tailPredictions: ProbabilityMass<Suggestion>[];
-
-  let currentContext = rootContext;
+  predictionPrep: PredictionParameters
+): TokenizedIntermediatePrediction[] {
   let successfulPredictions = 0;
+  const correctionTokens = predictionPrep.tokens;
+  const context = predictionPrep.rootContext;
+  let currentContext = context;
+  let prefixProb = 1;
 
-  for(let i = 0; i < corrections.length; i++) {
-    const correction = corrections[i].sample;
-    const predictions = lexicalModel.predict(correction, currentContext);
+  const predictionComponents = correctionTokens.map((correctionToken, i) => {
+    const correctionTransform = correctionToken.correction.sample;
+    const predictions = lexicalModel.predict(correctionTransform, currentContext);
+    const transitionId = correctionTransform.id;
 
     // Failsafe:  if there are no matching predictions, create a fake prediction
     // matching the original text.
     if(predictions.length != 0) {
       successfulPredictions++;
     } else {
-      predictions.push({
+      const fallbackSuggestion = {
         sample: {
-          transform: correction,
-          displayAs: correction.insert
+          transform: {...correctionTransform},
+          displayAs: correctionTransform.insert
         },
         // It's not found in the lexicon, so we'll take a low probability for it.
         //
         // Edit penalties will be applied via the correction component separately later on.
         p: Math.exp(-EDIT_DISTANCE_COST_SCALE)
-      });
+      };
+
+      predictions.push(fallbackSuggestion);
     }
 
-    if(i == corrections.length - 1) {
-      tailPredictions = predictions;
-    } else {
-      let bestMatch = predictions.find((p) => KMWString.length(p.sample.transform.insert) == KMWString.length(correction.insert));
-      if(!bestMatch) {
-        bestMatch = predictions[0];
+    // Regardless of origin, overwrite the transform's deleteLeft value with what it should actually hold.
+    predictions.forEach((entry) => {
+      // Remove the `p` field from the Dummy model's mocked suggestions; these should not be emitted.
+      delete (entry.sample as Outcome<Suggestion>).p;
+
+      entry.sample.transform.deleteLeft = correctionTransform.deleteLeft;
+      if(transitionId !== undefined) {
+        entry.sample.transformId = transitionId;
+        entry.sample.transform.id = transitionId;
       }
+    });
 
-      predictionPrefixSequence = predictionPrefixSequence.concat(bestMatch);
+    // Use traversals if possible - extract the most likely entry that is on the traversal,
+    // rather than predicting (and possibly extending) tokens not adjacent to the caret.
+    //
+    // Also, fall back to the actual correction string should prediction not be valid here.
+    const isLastToken = i == correctionTokens.length - 1;
+    const predictionsToReturn = isLastToken ? predictions : [predictions[0]];
+
+    if(!isLastToken) {
+      prefixProb *= predictions[0].p;
     }
 
-    // Or maybe per prediction, in some manner?
-    currentContext = models.applyTransform(correction, currentContext);
-  }
+    // In case future models can use bigrams or similar strategies to adjust predictions based
+    // on prior tokens, we update the root context for following iterations with the current
+    // correction.  (This could be improved by trying variations of valid predictions, but that's
+    // currently out-of-scope.)
+    currentContext = models.applyTransform(correctionToken.correction.sample, currentContext);
 
-  if(!successfulPredictions) {
+    return predictionsToReturn.map((prediction) => {
+      return {
+        prediction: prediction.sample,
+        correction: correctionTransform.insert,
+        casingRoot: correctionToken.casingRoot,
+        // This is tagged on as an addition because we need each final
+        // token-prediction's probability to be available in the next loop
+        // below.
+        predictionProb: prediction.p,
+        autoSelectable: correctionToken.autoSelectable
+      };
+    });
+  });
+
+  if(successfulPredictions == 0) {
     return [];
   }
 
-  const predictions: CompositedIntermediatePrediction[] = tailPredictions.map((p) => {
-    // Concat corrections + predictions for their components.
-    const predictionSequence = [...predictionPrefixSequence, p];
-    const fullPrediction: ProbabilityMass<Suggestion> = predictionSequence.reduce((prev, curr) => {
-      return {
-        sample: {
-          transform: models.buildMergedTransform(prev.sample.transform, curr.sample.transform),
-          displayAs: prev.sample.displayAs + curr.sample.displayAs
-        },
-        p: prev.p * curr.p
-      };
-    }, {sample: {transform: {insert: '', deleteLeft: 0}, displayAs: ''}, p: 1});
+  // Constructs a common prefix for all but the final token's component.
+  const correctionCost = correctionTokens.reduce((accum, curr) => accum * curr.correction.p, 1);
+  const predictionPrefix = predictionComponents
+    .slice(0, predictionComponents.length-1)
+    .map((p) => p[0]);
 
-    const fullCorrection: ProbabilityMass<string> = corrections.reduce((prev, curr) => {
-      return {
-        sample: prev.sample + curr.sample.insert,
-        p: prev.p * curr.p
-      }
-    }, {sample: '', p: 1})
+  const completePredictionTuples: TokenizedIntermediatePrediction[] = predictionComponents[predictionComponents.length-1].map((tuple) => {
+    const predictionCost = tuple.predictionProb * prefixProb;
 
-    if(transitionId !== undefined) {
-      fullPrediction.sample.transform.id = transitionId;
-      fullPrediction.sample.transformId = transitionId;
-    }
-
-    return {
-      components: {
-        prediction: fullPrediction.sample,
-        correction: fullCorrection.sample
-      },
+    const returnVal: TokenizedIntermediatePrediction = {
+      components: [...predictionPrefix, tuple],
       metadata: {
         probabilities: {
-          prediction: fullPrediction.p,
-          correction: fullCorrection.p,
-          total: fullPrediction.p * fullCorrection.p
+          prediction: predictionCost,
+          correction: correctionCost,
+          total: predictionCost * correctionCost
         },
-        autoSelectable: correctionValidForAutoSelect(fullCorrection.sample),
+        autoSelectable: tuple.autoSelectable,
         matchLevel: SuggestionSimilarity.none
       }
-    };
+    }
+
+    returnVal.components[0].prediction.transform.deleteLeft = predictionPrep.deleteLeft;
+
+    return returnVal;
   });
 
-  return predictions;
+  completePredictionTuples.forEach((pt) => predictionPrep.applyInPost(pt));
+
+  return completePredictionTuples;
 }
 
 /**
  * Applies the specified casing-form to generated suggestions, leveraging the model's
  * defined casing behaviors to do so.
- * @param suggestion
- * @param baseWord
+ * @param predictionToken  A tuple representing a single context token's prediction and base correction
  * @param lexicalModel
- * @param casingForm
  */
-export function applySuggestionCasing(suggestion: Suggestion, baseWord: string, lexicalModel: LexicalModel, casingForm: CasingForm) {
-  // Step 1:  does the suggestion replace the whole word?  If not, we should extend the suggestion to do so.
-  let unchangedLength  = KMWString.length(baseWord) - suggestion.transform.deleteLeft;
+export function applySuggestionCasing(predictionToken: TokenizedPredictionData, lexicalModel: LexicalModel) {
+  // Step 0:  our pattern for generating predictions and corrections already
+  // enforces that they encompass the whole word.
+  const suggestion = predictionToken.prediction;
 
-  if(unchangedLength > 0) {
-    suggestion.transform.deleteLeft += unchangedLength;
-    suggestion.transform.insert = KMWString.substr(baseWord, 0, unchangedLength) + suggestion.transform.insert;
+  // If we are using the context-tracking engine (when traversals are enabled),
+  // we just leverage the context token's exampleInput to determine casing.
+  //
+  // If it's not available, the correction entry reflects a word-broken piece of
+  // the original context, with its original casing - so we use that instead.
+  const casingRoot = predictionToken.casingRoot ? predictionToken.casingRoot : predictionToken.correction;
+  if(!casingRoot) {
+    // There's no text in place to verify casing expectations; just leave it
+    // unchanged.
+    return;
   }
 
+  // Step 1:  detect the original token's casing
+  const casingForm = detectCurrentCasing(lexicalModel, {
+    left: casingRoot,
+    startOfBuffer: true,
+    endOfBuffer: true
+  });
+
   // Step 2: Now that the transform affects the whole word, we may safely apply casing rules.
-  suggestion.transform.insert = lexicalModel.applyCasing(casingForm, suggestion.transform.insert);
-  suggestion.displayAs = lexicalModel.applyCasing(casingForm, suggestion.displayAs);
+  if(casingForm && casingForm != 'lower') {
+    suggestion.transform.insert = lexicalModel.applyCasing(casingForm, suggestion.transform.insert);
+    suggestion.displayAs = lexicalModel.applyCasing(casingForm, suggestion.displayAs);
+  }
+}
+
+/**
+ * Composes a set of `IntermediateTokenizedPrediction`s, merging the tokenized
+ * data into corresponding `CompositedIntermediatePrediction`s representing the
+ * full range of affected context.
+ * @param predictions
+ * @returns
+ */
+export function composeIntermediatePredictions(predictions: TokenizedIntermediatePrediction[]): CompositedIntermediatePrediction[] {
+  return predictions.map((predictionData) => {
+    const components = predictionData.components;
+
+    const reduceBaseTransform: Transform = {
+      insert: '',
+      deleteLeft: 0
+    }
+    const transformId = predictionData.components[0].prediction.transformId;
+    if(transformId !== undefined) {
+      reduceBaseTransform.id = transformId;
+    }
+
+    return {
+      components: components.reduce((total, current) => {
+        const mergedTransform = models.buildMergedTransform(total.prediction.transform, current.prediction.transform);
+        const mergedDisplayAs = total.prediction.displayAs + current.prediction.displayAs
+
+        return {
+          prediction: {...total.prediction, transform: mergedTransform, displayAs: mergedDisplayAs},
+          correction: total.correction + current.correction
+        }
+      }, {
+        prediction: {...components[0].prediction, transform: reduceBaseTransform, displayAs: ''},
+        correction: ''
+      }),
+      metadata: predictionData.metadata
+    };
+  });
 }
 
 /**
@@ -1053,6 +1157,7 @@ export function createDefaultKeep(
   let keepOption = toAnnotatedSuggestion(lexicalModel, keepSuggestion, 'keep');
   if(inputTransform.id !== undefined) {
     keepOption.transformId = inputTransform.id;
+    keepOption.transform.id = inputTransform.id;
   }
   keepOption.matchesModel = false;
 

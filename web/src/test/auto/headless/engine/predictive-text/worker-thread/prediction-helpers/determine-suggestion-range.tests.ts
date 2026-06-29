@@ -285,10 +285,7 @@ describe('determineSuggestionRange', () => {
       tokensToAppend
     );
 
-    // TODO:  Once we allow multiple tokens to contribute to deleteLeft, replace
-    // RHS with
-    // originalQuickBrownTokenization.tokens.slice(transitionSliceIndex).
-    assert.equal(analysis.deleteLeft, deleteLeftCalc([originalQuickBrownTokenization.tail]));
+    assert.equal(analysis.deleteLeft, deleteLeftCalc(originalQuickBrownTokenization.tokens.slice(transitionSliceIndex)));
   });
 
   it('handles insertion of many extra new tokens at once', () => {

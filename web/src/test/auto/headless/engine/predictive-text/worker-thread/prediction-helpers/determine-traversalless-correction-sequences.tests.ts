@@ -13,7 +13,7 @@ import { LexicalModelTypes } from "@keymanapp/common-types";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { KMWString } from 'keyman/common/web-utils';
 
-import { CompositedIntermediatePrediction, ModelCompositor, determineTraversallessCorrectionSequences, models } from "@keymanapp/lm-worker/test-index";
+import { determineTraversallessCorrectionSequences, TokenizedIntermediatePrediction, ModelCompositor, models } from "@keymanapp/lm-worker/test-index";
 
 import Context = LexicalModelTypes.Context;
 import DummyModel = models.DummyModel;
@@ -80,12 +80,16 @@ describe('determineTraversallessCorrectionSequences', () => {
       }
     );
 
-    assert.deepEqual(entry.tokenizedCorrection, [{
-      sample: {
-        insert: 'appl',
-        deleteLeft: 0
+    assert.deepEqual(entry.tokens, [{
+      correction: {
+        sample: {
+          insert: 'appl',
+          deleteLeft: 0
+        },
+        p: trueInput.p
       },
-      p: trueInput.p
+      casingRoot: 'appl',
+      autoSelectable: true
     }]);
   });
 
@@ -122,13 +126,19 @@ describe('determineTraversallessCorrectionSequences', () => {
       }
     );
 
-    assert.deepEqual(entry.tokenizedCorrection, [{
-      sample: {
-        insert: 'iPhone',
-        deleteLeft: 0
-      },
-      p: trueInput.p
-    }]);
+    assert.deepEqual(predictionRootEntries[0].tokens, [
+      {
+        correction: {
+          sample: {
+            insert: 'iPhone',
+            deleteLeft: 0
+          },
+          p: trueInput.p
+        },
+        casingRoot: 'iPhone',
+        autoSelectable: true
+      }
+    ]);
   });
 
   it(`properly analyzes common-case token-extension - adding a letter to an existing word`, () => {
@@ -163,13 +173,19 @@ describe('determineTraversallessCorrectionSequences', () => {
       }
     );
 
-    assert.deepEqual(entry.tokenizedCorrection, [{
-      sample: {
-        insert: 'fo',
-        deleteLeft: 0
-      },
-      p: trueInput.p
-    }]);
+    assert.deepEqual(entry.tokens, [
+      {
+        correction: {
+          sample: {
+            insert: 'fo',
+            deleteLeft: 0
+          },
+          p: trueInput.p
+        },
+        casingRoot: 'fo',
+        autoSelectable: true
+      }
+    ]);
   });
 
   it(`properly analyzes common-case whitespace - ending a token and adding a new one`, () => {
@@ -204,12 +220,20 @@ describe('determineTraversallessCorrectionSequences', () => {
       }
     );
 
-    assert.equal(entry.tokenizedCorrection.length, 1);
-    assert.deepEqual(entry.tokenizedCorrection[0].sample, {
-      insert: '',
-      deleteLeft: 0
-    });
-    assert.approximately(entry.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+    assert.equal(entry.tokens.length, 1);
+    assert.approximately(entry.tokens[0].correction.p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+
+    assert.deepEqual(entry.tokens, [{
+      correction: {
+        sample: {
+          insert: '',
+          deleteLeft: 0
+        },
+        p: entry.tokens[0].correction.p
+      },
+      casingRoot: '',
+      autoSelectable: false
+    }]);
   });
 
 
@@ -245,12 +269,20 @@ describe('determineTraversallessCorrectionSequences', () => {
       }
     );
 
-    assert.equal(entry.tokenizedCorrection.length, 1);
-    assert.deepEqual(entry.tokenizedCorrection[0].sample, {
-      insert: 'f',
-      deleteLeft: 0
-    });
-    assert.approximately(entry.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+    assert.equal(entry.tokens.length, 1);
+    assert.approximately(entry.tokens[0].correction.p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+
+    assert.deepEqual(entry.tokens, [{
+      correction: {
+        sample: {
+          insert: 'f',
+          deleteLeft: 0
+        },
+        p: entry.tokens[0].correction.p
+      },
+      casingRoot: 'f',
+      autoSelectable: true
+    }]);
   });
 
   it(`properly analyzes post-merge case`, () => {
@@ -285,12 +317,16 @@ describe('determineTraversallessCorrectionSequences', () => {
       }
     );
 
-    assert.deepEqual(entry.tokenizedCorrection, [{
-      sample: {
-        insert: 'can\'t',
-        deleteLeft: 0
+    assert.deepEqual(entry.tokens, [{
+      correction: {
+        sample: {
+          insert: 'can\'t',
+          deleteLeft: 0
+        },
+        p: trueInput.p
       },
-      p: trueInput.p
+      casingRoot: 'can\'t',
+      autoSelectable: true
     }]);
   });
 
@@ -328,12 +364,20 @@ describe('determineTraversallessCorrectionSequences', () => {
     //   }
     // );
 
-    assert.equal(entry.tokenizedCorrection.length, 1);
-    assert.deepEqual(entry.tokenizedCorrection[0].sample, {
-      insert: '',
-      deleteLeft: 0
-    });
-    assert.approximately(entry.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+    assert.equal(entry.tokens.length, 1);
+    assert.approximately(entry.tokens[0].correction.p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+
+    assert.deepEqual(entry.tokens, [{
+      correction: {
+        sample: {
+          insert: '',
+          deleteLeft: 0
+        },
+        p: entry.tokens[0].correction.p
+      },
+      casingRoot: '',
+      autoSelectable: false
+    }]);
   });
 
   it(`properly analyzes complex transition - multi-token replacement`, () => {
@@ -370,21 +414,34 @@ describe('determineTraversallessCorrectionSequences', () => {
 
     // Coming up next - actually providing ALL correction elements, not just the final one.
     // We're not _quite_ ready for that yet, though.
-    assert.equal(entry.tokenizedCorrection.length, 1);
-    assert.deepEqual(entry.tokenizedCorrection[0].sample, {
+    assert.equal(entry.tokens.length, 1);
+    assert.deepEqual(entry.tokens[0].correction.sample, {
       insert: 'd',
       deleteLeft: 0
     });
-    assert.approximately(entry.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+    assert.approximately(entry.tokens[0].correction.p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
 
-    const dummiedTuple: CompositedIntermediatePrediction = {
-      components: {
+    assert.deepEqual(entry.tokens, [{
+      correction: {
+        sample: {
+          insert: 'd',
+          deleteLeft: 0
+        },
+        p: entry.tokens[0].correction.p
+      },
+      casingRoot: 'd',
+      autoSelectable: true
+    }]);
+
+    const dummiedTuple: TokenizedIntermediatePrediction = {
+      components: [{
         prediction: {
           transform: { insert: 'dog', deleteLeft: 0 },
           displayAs: 'dog'
         },
-        correction: 'd'
-      },
+        correction: 'd',
+        casingRoot: 'd'
+      }],
       metadata: {
         probabilities: {
           prediction: .25,

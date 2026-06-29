@@ -1,15 +1,15 @@
 import { assert } from 'chai';
 
-import { CORRECTION_SEARCH_THRESHOLDS, CompositedIntermediatePrediction, ModelCompositor, shouldStopSearchingEarly } from "@keymanapp/lm-worker/test-index";
+import { CORRECTION_SEARCH_THRESHOLDS, TokenizedIntermediatePrediction, ModelCompositor, shouldStopSearchingEarly } from "@keymanapp/lm-worker/test-index";
 
-function mockIntermediatePrediction(value: number) {
+function mockTokenizedPrediction(value: number) {
   return {
     metadata: {
       probabilities: {
         total: value
       }
     }
-  } as CompositedIntermediatePrediction
+  } as TokenizedIntermediatePrediction
 }
 
 describe('correction-search: shouldStopSearchingEarly', () => {
@@ -22,7 +22,7 @@ describe('correction-search: shouldStopSearchingEarly', () => {
     assert.equal(predictionProbs.length, ModelCompositor.MAX_SUGGESTIONS, "test setup no longer valid");
 
     // The only part for each entry we actually care about here:  .totalProb.
-    const predictions = predictionProbs.map((entry) => mockIntermediatePrediction(entry));
+    const predictions = predictionProbs.map((entry) => mockTokenizedPrediction(entry));
 
     // Thresholding is performed in log-space.
     // 0.0501 and 0.0499 are offset on each side of 0.05, the last value in the array defined above.
@@ -38,8 +38,8 @@ describe('correction-search: shouldStopSearchingEarly', () => {
     //
     // Can technically run the method with an empty array, but the actual scenario would have
     // at least one prediction present in the "found predictions" array.
-    assert.isFalse(shouldStopSearchingEarly(baseCost, baseCost + expectedThreshold - 0.01, [mockIntermediatePrediction(Math.exp(-1))]));
-    assert.isTrue(shouldStopSearchingEarly( baseCost, baseCost + expectedThreshold + 0.01, [mockIntermediatePrediction(Math.exp(-1))]));
+    assert.isFalse(shouldStopSearchingEarly(baseCost, baseCost + expectedThreshold - 0.01, [mockTokenizedPrediction(Math.exp(-1))]));
+    assert.isTrue(shouldStopSearchingEarly( baseCost, baseCost + expectedThreshold + 0.01, [mockTokenizedPrediction(Math.exp(-1))]));
   });
 
   it('stops checking corrections earlier when enough predictions have been found', () => {
@@ -48,7 +48,7 @@ describe('correction-search: shouldStopSearchingEarly', () => {
 
     // The only part for each entry we actually care about here:  .totalProb.
     /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]} */
-    const predictions = predictionProbs.map((entry) => mockIntermediatePrediction(entry));
+    const predictions = predictionProbs.map((entry) => mockTokenizedPrediction(entry));
 
     const baseCost = 1;
 

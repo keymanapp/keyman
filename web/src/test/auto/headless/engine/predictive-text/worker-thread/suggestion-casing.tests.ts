@@ -13,7 +13,7 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { applySuggestionCasing, models } from '@keymanapp/lm-worker/test-index';
+import { TokenizedPredictionData, applySuggestionCasing, models } from '@keymanapp/lm-worker/test-index';
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import TrieModel = models.TrieModel;
@@ -45,117 +45,137 @@ describe('applySuggestionCasing', function() {
   );
 
   it('properly cases suggestions with no suggestion root', function() {
-    let suggestion = {
-      transform: {
-        insert: 'the',
-        deleteLeft: 0
+    let suggestion: TokenizedPredictionData[] = [{
+      prediction: {
+        transform: {
+          insert: 'the',
+          deleteLeft: 0
+        },
+        displayAs: 'the'
       },
-      displayAs: 'the'
-    };
+      correction: '',
+      casingRoot: 'th'
+    }];
 
-    applySuggestionCasing(suggestion, '', plainCasedModel, 'initial');
-    assert.equal(suggestion.displayAs, 'The');
-    assert.equal(suggestion.transform.insert, 'The');
+    applySuggestionCasing(suggestion[0], plainCasedModel);
+    assert.equal(suggestion[0].prediction.displayAs, 'the');
+    assert.equal(suggestion[0].prediction.transform.insert, 'the');
 
-    suggestion = {
-      transform: {
-        insert: 'thE',
-        deleteLeft: 0
+    suggestion = [{
+      prediction: {
+        transform: {
+          insert: 'ThE',
+          deleteLeft: 0
+        },
+        displayAs: 'ThE'
       },
-      displayAs: 'thE'
-    };
+      correction: '',
+      casingRoot: 'Th'
+    }];
 
-    applySuggestionCasing(suggestion, '', plainCasedModel, 'initial');
-    assert.equal(suggestion.displayAs, 'ThE');
-    assert.equal(suggestion.transform.insert, 'ThE');
-
-    suggestion = {
-      transform: {
-        insert: 'the',
-        deleteLeft: 0
-      },
-      displayAs: 'the'
-    };
-
-    applySuggestionCasing(suggestion, '', plainCasedModel, 'upper');
-    assert.equal(suggestion.displayAs, 'THE');
-    assert.equal(suggestion.transform.insert, 'THE');
+    applySuggestionCasing(suggestion[0], plainCasedModel);
+    assert.equal(suggestion[0].prediction.displayAs, 'ThE');
+    assert.equal(suggestion[0].prediction.transform.insert, 'ThE');
   });
 
   it('properly cases suggestions that fully replace the suggestion root', function() {
-    let suggestion = {
-      transform: {
-        insert: 'therefore',
-        deleteLeft: 3
+    let suggestion: TokenizedPredictionData[] = [{
+      prediction: {
+        transform: {
+          insert: 'therefore',
+          deleteLeft: 3
+        },
+        displayAs: 'therefore'
       },
-      displayAs: 'therefore'
-    };
+      correction: 'The',
+      casingRoot: 'Th'
+    }];
 
-    applySuggestionCasing(suggestion, 'the', plainCasedModel, 'initial');
-    assert.equal(suggestion.displayAs, 'Therefore');
-    assert.equal(suggestion.transform.insert, 'Therefore');
+    applySuggestionCasing(suggestion[0], plainCasedModel);
+    assert.equal(suggestion[0].prediction.displayAs, 'Therefore');
+    assert.equal(suggestion[0].prediction.transform.insert, 'Therefore');
 
-    suggestion = {
-      transform: {
-        insert: 'thereFore',
-        deleteLeft: 3
+    suggestion = [{
+      prediction: {
+        transform: {
+          insert: 'thereFore',
+          deleteLeft: 3
+        },
+        displayAs: 'thereFore'
       },
-      displayAs: 'thereFore'
-    };
+      correction: 'The',
+      casingRoot: 'Th'
+    }];
 
-    applySuggestionCasing(suggestion, 'the', plainCasedModel, 'initial');
-    assert.equal(suggestion.displayAs, 'ThereFore');
-    assert.equal(suggestion.transform.insert, 'ThereFore');
+    applySuggestionCasing(suggestion[0], plainCasedModel);
+    assert.equal(suggestion[0].prediction.displayAs, 'ThereFore');
+    assert.equal(suggestion[0].prediction.transform.insert, 'ThereFore');
 
-    suggestion = {
-      transform: {
-        insert: 'therefore',
-        deleteLeft: 3
+    suggestion = [{
+      prediction: {
+        transform: {
+          insert: 'therefore',
+          deleteLeft: 3
+        },
+        displayAs: 'therefore'
       },
-      displayAs: 'therefore'
-    };
+      correction: 'THE',
+      casingRoot: 'TH'
+    }];
 
-    applySuggestionCasing(suggestion, 'the', plainCasedModel, 'upper');
-    assert.equal(suggestion.displayAs, 'THEREFORE');
-    assert.equal(suggestion.transform.insert, 'THEREFORE');
+    applySuggestionCasing(suggestion[0], plainCasedModel);
+    assert.equal(suggestion[0].prediction.displayAs, 'THEREFORE');
+    assert.equal(suggestion[0].prediction.transform.insert, 'THEREFORE');
   });
 
   it('properly cases suggestions that do not fully replace the suggestion root', function() {
-    let suggestion = {
-      transform: {
-        insert: 'erefore',
-        deleteLeft: 1
+    let suggestion: TokenizedPredictionData[] = [{
+      prediction: {
+        transform: {
+          insert: 'therefore',
+          deleteLeft: 3
+        },
+        displayAs: 'therefore'
       },
-      displayAs: 'therefore'
-    };
+      correction: 'The',
+      casingRoot: 'Th'
+    }];
 
     // When integrated, the 'the' string comes from a wordbreak operation on the current context.
-    applySuggestionCasing(suggestion, 'the', plainCasedModel, 'initial');
-    assert.equal(suggestion.displayAs, 'Therefore');
-    assert.equal(suggestion.transform.insert, 'Therefore');
+    applySuggestionCasing(suggestion[0], plainCasedModel);
+    assert.equal(suggestion[0].prediction.displayAs, 'Therefore');
+    assert.equal(suggestion[0].prediction.transform.insert, 'Therefore');
 
-    suggestion = {
-      transform: {
-        insert: 'ereFore',
-        deleteLeft: 1
+    suggestion = [{
+      prediction: {
+        transform: {
+          insert: 'ThereFore',
+          deleteLeft: 3
+        },
+        displayAs: 'thereFore'
       },
-      displayAs: 'thereFore'
-    };
+      correction: 'The',
+      casingRoot: 'Th'
+    }];
 
-    applySuggestionCasing(suggestion, 'the', plainCasedModel, 'initial');
-    assert.equal(suggestion.displayAs, 'ThereFore');
-    assert.equal(suggestion.transform.insert, 'ThereFore');
+    applySuggestionCasing(suggestion[0], plainCasedModel);
+    assert.equal(suggestion[0].prediction.displayAs, 'ThereFore');
+    assert.equal(suggestion[0].prediction.transform.insert, 'ThereFore');
 
-    suggestion = {
-      transform: {
-        insert: 'erefore',
-        deleteLeft: 1
+    suggestion = [{
+      prediction: {
+        transform: {
+          insert: 'therefore',
+          deleteLeft: 3
+        },
+        displayAs: 'therefore'
       },
-      displayAs: 'therefore'
-    };
+      correction: 'THE',
+      casingRoot: 'TH'
+    }];
 
-    applySuggestionCasing(suggestion, 'the', plainCasedModel, 'upper');
-    assert.equal(suggestion.displayAs, 'THEREFORE');
-    assert.equal(suggestion.transform.insert, 'THEREFORE');
+    applySuggestionCasing(suggestion[0], plainCasedModel);
+    assert.equal(suggestion[0].prediction.displayAs, 'THEREFORE');
+    assert.equal(suggestion[0].prediction.transform.insert, 'THEREFORE');
   });
 });

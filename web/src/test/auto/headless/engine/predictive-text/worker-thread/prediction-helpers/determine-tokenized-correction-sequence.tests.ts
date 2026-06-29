@@ -21,7 +21,7 @@ import {
   ContextState,
   ContextToken,
   ContextTokenization,
-  CompositedIntermediatePrediction,
+  TokenizedIntermediatePrediction,
   ModelCompositor,
   TokenizationResultMapping
 } from "@keymanapp/lm-worker/test-index";
@@ -78,13 +78,17 @@ describe('determineTokenizedCorrectionSequence', () => {
       endOfBuffer: true
     });
 
-    assert.deepEqual(results.tokenizedCorrection, [
+    assert.deepEqual(results.tokens, [
       {
-        sample: {
-          insert: 'fo',
-          deleteLeft: 0
+        correction: {
+          sample: {
+            insert: 'fo',
+            deleteLeft: 0
+          },
+          p: trueInput.p
         },
-        p: trueInput.p
+        casingRoot: 'fo',
+        autoSelectable: true
       }
     ]);
   });
@@ -129,12 +133,20 @@ describe('determineTokenizedCorrectionSequence', () => {
       endOfBuffer: true
     });
 
-    assert.equal(results.tokenizedCorrection.length, 1);
-    assert.deepEqual(results.tokenizedCorrection[0].sample, {
-      insert: ' ',
-      deleteLeft: 0
-    });
-    assert.approximately(results.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+    assert.equal(results.tokens.length, 1);
+    assert.approximately(results.tokens[0].correction.p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+
+    assert.deepEqual(results.tokens, [{
+      correction: {
+        sample: {
+          insert: ' ',
+          deleteLeft: 0
+        },
+        p: results.tokens[0].correction.p
+      },
+      casingRoot: ' ',
+      autoSelectable: false
+    }]);
   });
 
   it(`properly analyzes common-case word-start - beginning a new token`, () => {
@@ -178,12 +190,20 @@ describe('determineTokenizedCorrectionSequence', () => {
     });
 
 
-    assert.equal(results.tokenizedCorrection.length, 1);
-    assert.deepEqual(results.tokenizedCorrection[0].sample, {
-      insert: 'f',
-      deleteLeft: 0
-    });
-    assert.approximately(results.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+    assert.equal(results.tokens.length, 1);
+    assert.approximately(results.tokens[0].correction.p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+
+    assert.deepEqual(results.tokens, [{
+      correction: {
+        sample: {
+          insert: 'f',
+          deleteLeft: 0
+        },
+        p: results.tokens[0].correction.p
+      },
+      casingRoot: 'f',
+      autoSelectable: true
+    }]);
   });
 
   it(`properly analyzes post-merge case`, () => {
@@ -232,15 +252,17 @@ describe('determineTokenizedCorrectionSequence', () => {
       endOfBuffer: true
     });
 
-    assert.deepEqual(results.tokenizedCorrection, [
-      {
+    assert.deepEqual(results.tokens, [{
+      correction: {
         sample: {
           insert: 'can\'t',
           deleteLeft: 0
         },
         p: trueInput.p
-      }
-    ]);
+      },
+      casingRoot: 'can\'t',
+      autoSelectable: true
+    }]);
   });
 
   // Will be handled far better after resolving multi-tokenization handling.
@@ -285,12 +307,20 @@ describe('determineTokenizedCorrectionSequence', () => {
     });
 
 
-    assert.equal(results.tokenizedCorrection.length, 1);
-    assert.deepEqual(results.tokenizedCorrection[0].sample, {
-      insert: ' ',
-      deleteLeft: 0
-    });
-    assert.approximately(results.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+    assert.equal(results.tokens.length, 1);
+    assert.approximately(results.tokens[0].correction.p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+
+    assert.deepEqual(results.tokens, [{
+      correction: {
+        sample: {
+          insert: ' ',
+          deleteLeft: 0
+        },
+        p: results.tokens[0].correction.p
+      },
+      casingRoot: ' ',
+      autoSelectable: false
+    }]);
   });
 
   it(`properly analyzes complex transition - multi-token replacement`, () => {
@@ -334,21 +364,34 @@ describe('determineTokenizedCorrectionSequence', () => {
 
     // Coming up next - actually providing ALL correction elements, not just the final one.
     // We're not _quite_ ready for that yet, though.
-    assert.equal(results.tokenizedCorrection.length, 1);
-    assert.deepEqual(results.tokenizedCorrection[0].sample, {
+    assert.equal(results.tokens.length, 1);
+    assert.deepEqual(results.tokens[0].correction.sample, {
       insert: 'd',
       deleteLeft: 0
     });
-    assert.approximately(results.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
+    assert.approximately(results.tokens[0].correction.p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
 
-    const dummiedTuple: CompositedIntermediatePrediction = {
-      components: {
+    assert.deepEqual(results.tokens, [{
+      correction: {
+        sample: {
+          insert: 'd',
+          deleteLeft: 0
+        },
+        p: results.tokens[0].correction.p
+      },
+      casingRoot: 'd',
+      autoSelectable: true
+    }]);
+
+    const dummiedTuple: TokenizedIntermediatePrediction = {
+      components: [{
         prediction: {
           transform: { insert: 'dog', deleteLeft: 0 },
           displayAs: 'dog'
         },
-        correction: 'd'
-      },
+        correction: 'd',
+        casingRoot: 'd'
+      }],
       metadata: {
         probabilities: {
           prediction: .25,
