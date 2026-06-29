@@ -1,7 +1,7 @@
 /*
  *  Keyman is copyright (C) SIL Global. MIT License.
  *
- *  Created by Joshua Horton on 6/24/26.
+ *  Created by Joshua Horton on 2026-06-24.
  *
  *  WebViewKeyboardLoader implements a URLSchemeHandler that allows
  *  the hosted Keyman Engine for Web to access all files, consistently,
