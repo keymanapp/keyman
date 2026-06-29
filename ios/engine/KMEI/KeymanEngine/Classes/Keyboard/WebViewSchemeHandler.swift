@@ -63,7 +63,9 @@ class WebViewSchemeHandler: NSObject, WKURLSchemeHandler {
       let fileExtension = fileUrl!.pathExtension
       
       let mimeType: String = getMimeType(forExtension: fileExtension)
-      let charset: String = mimeType.hasPrefix("text/") ? "; charset=utf-8" : ""
+      let charset: String = (mimeType.hasPrefix("text/") || mimeType == "application/json")
+        ? "; charset=utf-8"
+        : ""
       
       let response = HTTPURLResponse(
         url: url,
