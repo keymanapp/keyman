@@ -952,55 +952,49 @@ export function dedupeSuggestions(
 export function processSimilarity(
   lexicalModel: LexicalModel,
   suggestionDistribution: CompositedIntermediatePrediction[],
-  context: Context,
-  trueInput: ProbabilityMass<Transform>
+  baseContext: Context,
+  finalContext: Context
 ): boolean {
-  const { sample: inputTransform } = trueInput;
   const wordbreak = determineModelWordbreaker(lexicalModel);
-
-  const postContext = models.applyTransform(inputTransform, context);
-  const truePrefix = wordbreak(postContext);
 
   const keyed = (text: string) => lexicalModel.toKey ? lexicalModel.toKey(text) : text;
   const keyCased = (text: string) => lexicalModel.applyCasing ? lexicalModel.applyCasing('lower', text) : text;
-  const keyedPrefix = keyed(truePrefix);
-  const lowercasedPrefix = keyCased(truePrefix);
+  const keyedTarget = keyed(finalContext.left);
+  const lowercasedTarget = keyCased(finalContext.left);
 
   let keepOption: Outcome<Keep>;
 
-  for(let tuple of suggestionDistribution) {
-    // Don't set it unnecessarily; this can have side-effects in some automated tests.
-    if(inputTransform.id !== undefined) {
-      tuple.components.prediction.transformId = inputTransform.id;
-    }
+  // If there are no suggestions found, we can't validate that the underlying
+  // correction was an empty token.
+  let allCorrectionsEmpty: boolean = suggestionDistribution.length > 0
+    ? true
+    : wordbreak(finalContext) == '';
 
-    const predictedWord = wordbreak(models.applyTransform(tuple.components.prediction.transform, context));
+  for(let tuple of suggestionDistribution) {
+    const appliedContext = models.applyTransform(tuple.components.prediction.transform, baseContext);
+    allCorrectionsEmpty &&= tuple.components.correction == '';
 
     // Is the suggestion an exact match (or, "similar enough") to the
     // actually-typed context?  If so, we wish to note this fact and to
     // prioritize such a suggestion over suggestions that are not.
-    if(keyed(tuple.components.correction) == keyedPrefix) {
-      if(predictedWord == truePrefix) {
-        // Exact match:  it's a perfect 'keep' suggestion.
-        tuple.metadata.matchLevel = SuggestionSimilarity.exact;
-        keepOption = toAnnotatedSuggestion(lexicalModel, tuple.components.prediction, 'keep',  models.QuoteBehavior.noQuotes);
+    if(appliedContext.left == finalContext.left) {
+      // Exact match:  it's a perfect 'keep' suggestion.
+      tuple.metadata.matchLevel = SuggestionSimilarity.exact;
+      keepOption = toAnnotatedSuggestion(lexicalModel, tuple.components.prediction, 'keep',  models.QuoteBehavior.noQuotes);
 
-        // Indicates that this suggestion exists directly within the lexical
-        // model as a valid suggestion.  (We actively display it if it's an
-        // exact match, but hide it if not, only preserving it for reversions
-        // if/when needed.)
-        keepOption.matchesModel = true;
-        Object.assign(tuple.components.prediction, keepOption);
-        keepOption = tuple.components.prediction as Outcome<Keep>;
-      } else if(keyCased(predictedWord) == lowercasedPrefix) {
-        // Case-insensitive match.  No diacritic differences; the ONLY difference is casing.
-        tuple.metadata.matchLevel = SuggestionSimilarity.sameText;
-      } else if(keyed(predictedWord) == keyedPrefix) {
-        // Diacritic-insensitive / exact-key match.
-        tuple.metadata.matchLevel = SuggestionSimilarity.sameKey;
-      } else {
-        tuple.metadata.matchLevel = SuggestionSimilarity.none;
-      }
+      // Indicates that this suggestion exists directly within the lexical
+      // model as a valid suggestion.  (We actively display it if it's an
+      // exact match, but hide it if not, only preserving it for reversions
+      // if/when needed.)
+      keepOption.matchesModel = true;
+      Object.assign(tuple.components.prediction, keepOption);
+      keepOption = tuple.components.prediction as Outcome<Keep>;
+    } else if(keyCased(appliedContext.left) == lowercasedTarget) {
+      // Case-insensitive match.  No diacritic differences; the ONLY difference is casing.
+      tuple.metadata.matchLevel = SuggestionSimilarity.sameText;
+    } else if(keyed(appliedContext.left) == keyedTarget) {
+      // Diacritic-insensitive / exact-key match.
+      tuple.metadata.matchLevel = SuggestionSimilarity.sameKey;
     } else {
       tuple.metadata.matchLevel = SuggestionSimilarity.none;
     }
@@ -1010,7 +1004,7 @@ export function processSimilarity(
   //
   // No actual 'keep' needed if the current context token is empty, so we say we
   // have a 'keep' for that case, even though there isn't really one.
-  return !!(keepOption || truePrefix == '');
+  return !!(keepOption || allCorrectionsEmpty);
 }
 
 /**
