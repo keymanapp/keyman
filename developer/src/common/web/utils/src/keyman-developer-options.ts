@@ -17,7 +17,7 @@ export const KeymanDeveloperOptionsPath = [/* '~', */ '.keymandeveloper', 'optio
 
 /**
  * The set of standard user options for Keyman Developer. Corresponds to
- * TKeymanDeveloperOptions in the Keyman Developer TIKE source.
+ * TKeymanDeveloperOptions in `developer/src/tike/main/KeymanDeveloperOptions.pas`
  */
 export interface KeymanDeveloperOptions {
   "use tab char": boolean;
@@ -61,7 +61,7 @@ export interface KeymanDeveloperOptions {
 export type KeymanDeveloperOption = keyof KeymanDeveloperOptions;
 
 const DEFAULT_OPTIONS: KeymanDeveloperOptions = {
-  // Corresponds to KeymanDeveloperOptions.pas, TKeymanDeveloperOptions.Read
+  // Corresponds to TKeymanDeveloperOptions.Read in KeymanDeveloperOptions.pas
   "use tab char": false,
   "link font sizes": true,
   "indent size": 4,
