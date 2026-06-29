@@ -86,7 +86,7 @@ final class KMKeyboard extends WebView {
 
   private static String txtFont = "";
   private static String oskFont = null;
-  private String keyboardRoot = "";
+  private static String keyboardRoot = "";
   private final String fontUndefined = "undefined";
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
@@ -367,10 +367,7 @@ final class KMKeyboard extends WebView {
     } else {
       KMManager.SystemKeyboardWebViewClient.setKeyboardLoaded(false);
     }
-
-    // Use the reserved magic domain for loading the keyboard from the local device.
-    // See https://developer.android.com/reference/androidx/webkit/WebViewAssetLoader
-    String htmlPath = WebViewUtils.MAGIC_DEFAULT_DOMAIN + "/data/" + KMManager.KMFilename_KeyboardHtml;
+    String htmlPath = WebViewUtils.buildAssetUrl(KMManager.KMFilename_KeyboardHtml);
     loadUrl(htmlPath);
     setBackgroundColor(0);
   }
@@ -815,9 +812,9 @@ final class KMKeyboard extends WebView {
   // Set the base path of the keyboard depending on the package ID
   private void setKeyboardRoot(String packageID) {
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      this.keyboardRoot = WebViewUtils.MAGIC_DEFAULT_DOMAIN + "/data/" + KMManager.KMDefault_UndefinedPackageID + "/";
+      this.keyboardRoot = WebViewUtils.buildAssetUrl(KMManager.KMDefault_UndefinedPackageID + "/");
     } else {
-      this.keyboardRoot = WebViewUtils.MAGIC_DEFAULT_DOMAIN + "/data/" + KMManager.KMDefault_AssetPackages + "/" + packageID + "/";
+      this.keyboardRoot = WebViewUtils.buildAssetUrl(KMManager.KMDefault_AssetPackages + "/" + packageID + "/");
     }
   }
 

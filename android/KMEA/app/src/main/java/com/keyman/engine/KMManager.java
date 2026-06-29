@@ -398,10 +398,6 @@ public final class KMManager {
     return appContext.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
   }
 
-  public static String getResourceUrl() {
-    return WebViewUtils.MAGIC_DEFAULT_DOMAIN +"/data/";
-  }
-
   public static String getPackagesDir() {
     return getResourceRoot() + KMDefault_AssetPackages + File.separator;
   }
@@ -411,7 +407,7 @@ public final class KMManager {
   }
 
   public static String getLexicalModelsUrl() {
-    return getResourceUrl() + KMDefault_LexicalModelPackages + "/";
+    return WebViewUtils.buildAssetUrl(KMDefault_LexicalModelPackages + "/");
   }
 
   public static String getCloudDir() {

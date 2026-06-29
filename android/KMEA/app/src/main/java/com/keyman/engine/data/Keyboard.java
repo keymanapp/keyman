@@ -175,13 +175,10 @@ public class Keyboard extends LanguageResource implements Serializable {
   }
 
   private String getKeyboardRoot() {
-    String keyboardRoot = WebViewUtils.MAGIC_DEFAULT_DOMAIN + "/data/";
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      keyboardRoot += KMManager.KMDefault_UndefinedPackageID + "/";
-    } else {
-      keyboardRoot += KMManager.KMDefault_AssetPackages + "/" + packageID + "/";
+      return WebViewUtils.buildAssetUrl(KMManager.KMDefault_UndefinedPackageID + "/");
     }
-    return keyboardRoot;
+    return WebViewUtils.buildAssetUrl(KMManager.KMDefault_AssetPackages + "/" + packageID + "/");
   }
 
   private String getKeyboardUrl() {

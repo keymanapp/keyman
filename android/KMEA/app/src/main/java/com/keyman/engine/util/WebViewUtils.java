@@ -48,7 +48,19 @@ public final class WebViewUtils {
    * internal storage path.
    * See https://developer.android.com/reference/androidx/webkit/WebViewAssetLoader
    */
-  public static final String MAGIC_DEFAULT_DOMAIN = "https://appassets.androidplatform.net";
+   private static final String MAGIC_DEFAULT_DOMAIN = "https://appassets.androidplatform.net";
+
+  /**
+   * Path under the asset domain where all assets live
+   */
+  public static final String ASSET_DATA_PATH = "/data/";
+
+  /**
+   * Build a full URL to the provided asset
+   */
+  public static String buildAssetUrl(String assetPath) {
+    return WebViewUtils.MAGIC_DEFAULT_DOMAIN + WebViewUtils.ASSET_DATA_PATH + assetPath;
+  }
 
   /**
    * Get the Keyman Engine mode based on the Chrome version.
