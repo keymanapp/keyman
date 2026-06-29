@@ -255,22 +255,25 @@ function TfrmCloneKeymanCloudProjectParameters.IsKeyboardSourceAvailable(const i
       // Not a valid response
       Exit('');
     end;
+    try
+      if not (val is TJSONObject) then
+      begin
+        // Not a valid response
+        Exit('');
+      end;
 
-    if not (val is TJSONObject) then
-    begin
-      // Not a valid response
-      Exit('');
+      obj := val as TJSONObject;
+      val := obj.Values['sourcePath'];
+      if not Assigned(val) or not (val is TJSONString) then
+      begin
+        // no sourcePath property
+        Exit('');
+      end;
+
+      Result := (val as TJSONString).Value;
+    finally
+      val.Free;
     end;
-
-    obj := val as TJSONObject;
-    val := obj.Values['sourcePath'];
-    if not Assigned(val) or not (val is TJSONString) then
-    begin
-      // no sourcePath property
-      Exit('');
-    end;
-
-    Result := (val as TJSONString).Value;
   end;
 
 var
