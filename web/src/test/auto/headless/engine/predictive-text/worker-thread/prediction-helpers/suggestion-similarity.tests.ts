@@ -5,7 +5,7 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { deepCopy } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { IntermediateCompositedPrediction, models, processSimilarity, SuggestionSimilarity, toAnnotatedSuggestion } from "@keymanapp/lm-worker/test-index";
+import { CompositedIntermediatePrediction, models, processSimilarity, SuggestionSimilarity, toAnnotatedSuggestion } from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -109,7 +109,7 @@ const testModelWithCasing = new DummyModel({
  * @returns
  */
 const build_its_is_set = () => {
-  const its: IntermediateCompositedPrediction = {
+  const its: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {
@@ -131,7 +131,7 @@ const build_its_is_set = () => {
     }
   };
 
-  const it_is: IntermediateCompositedPrediction = {
+  const it_is: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {
@@ -152,7 +152,7 @@ const build_its_is_set = () => {
     }
   };
 
-  const is: IntermediateCompositedPrediction = {
+  const is: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {
@@ -173,7 +173,7 @@ const build_its_is_set = () => {
     }
   };
 
-  const is_not: IntermediateCompositedPrediction = {
+  const is_not: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {
@@ -222,7 +222,7 @@ describe('processSimilarity', () => {
     const testSet = build_its_is_set();
     const distribution = [...Object.values(testSet)];
 
-    const expectation: IntermediateCompositedPrediction[] = [...Object.values(testSet)];
+    const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
     expectation[0].metadata.matchLevel = SuggestionSimilarity.exact;    // its
     expectation[1].metadata.matchLevel = SuggestionSimilarity.sameKey;  // it_is
     expectation[2].metadata.matchLevel = SuggestionSimilarity.none;     // is
@@ -259,7 +259,7 @@ describe('processSimilarity', () => {
     const testSet = build_its_is_set();
     const distribution = [...Object.values(testSet)];
 
-    const expectation: IntermediateCompositedPrediction[] = [...Object.values(testSet)];
+    const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
     expectation[0].metadata.matchLevel = SuggestionSimilarity.sameKey;  // its
     expectation[1].metadata.matchLevel = SuggestionSimilarity.exact;    // it_is
     expectation[2].metadata.matchLevel = SuggestionSimilarity.none;     // is
@@ -313,7 +313,7 @@ describe('processSimilarity', () => {
 
       const distribution = [...Object.values(testSet)];
 
-      const expectation: IntermediateCompositedPrediction[] = [...Object.values(testSet)];
+      const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
       expectation[0].metadata.matchLevel = SuggestionSimilarity.sameKey;   // its
       expectation[1].metadata.matchLevel = SuggestionSimilarity.sameText;  // it_is
       expectation[2].metadata.matchLevel = SuggestionSimilarity.none;      // is
@@ -355,7 +355,7 @@ describe('processSimilarity', () => {
 
       const distribution = [...Object.values(testSet)];
 
-      const expectation: IntermediateCompositedPrediction[] = [...Object.values(testSet)];
+      const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
 
       expectation.forEach((entry) => entry.metadata.matchLevel = SuggestionSimilarity.none);
       processSimilarity(testModelWithoutCasing, distribution, context, models.applyTransform(trueInput.sample, context));

@@ -21,7 +21,7 @@ import {
   ContextState,
   ContextToken,
   ContextTokenization,
-  IntermediateCompositedPrediction,
+  CompositedIntermediatePrediction,
   ModelCompositor,
   TokenizationResultMapping
 } from "@keymanapp/lm-worker/test-index";
@@ -341,7 +341,7 @@ describe('determineTokenizedCorrectionSequence', () => {
     });
     assert.approximately(results.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
 
-    const dummiedTuple: IntermediateCompositedPrediction = {
+    const dummiedTuple: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: { insert: 'dog', deleteLeft: 0 },

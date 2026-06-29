@@ -47,8 +47,16 @@ export type TokenResult = {
  * range.
  */
 export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray<TokenResult>, TokenizationResultMapping> {
+  /**
+   * The root ContextTokenization all generated corrections are based upon.
+   */
   public readonly tokenization: ContextTokenization;
-  private readonly tailCorrectionLength: number;
+
+  /**
+   * Indicates whether or not the correction range of this TokenizationCorrector
+   * started with any tokens considered "correctable".
+   */
+  public readonly modelsCorrectables: boolean;
 
   // public read-only via properties
   private readonly _uncorrectables: QuotientNodeFinalizer[];
@@ -58,13 +66,13 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
   private _previousResults: TokenizationResultMapping[] = [];
 
   // fully private
-  public readonly modelsCorrectables: boolean;
   private selectionQueue: PriorityQueue<QuotientNodeFinalizer>;
   private tokenCostMap: Map<number, number>;
   private tokenLookupMap: Map<number, ContextToken>;
   private lastTotalCost: number;
   private handleHasBeenCalled: boolean = false;
   private predictableMatchFound: boolean = false;
+  private readonly tailCorrectionLength: number;
 
   get currentCost(): number {
     const correctable = this.selectionQueue.peek();
