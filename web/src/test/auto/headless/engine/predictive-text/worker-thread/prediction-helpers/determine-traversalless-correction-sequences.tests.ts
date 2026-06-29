@@ -13,7 +13,7 @@ import { LexicalModelTypes } from "@keymanapp/common-types";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { KMWString } from 'keyman/common/web-utils';
 
-import { IntermediateCompositedPrediction, ModelCompositor, determineTraversallessCorrectionSequences, models } from "@keymanapp/lm-worker/test-index";
+import { CompositedIntermediatePrediction, ModelCompositor, determineTraversallessCorrectionSequences, models } from "@keymanapp/lm-worker/test-index";
 
 import Context = LexicalModelTypes.Context;
 import DummyModel = models.DummyModel;
@@ -377,7 +377,7 @@ describe('determineTraversallessCorrectionSequences', () => {
     });
     assert.approximately(entry.tokenizedCorrection[0].p, Math.pow(trueInput.p, ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT), Number.EPSILON*1000);
 
-    const dummiedTuple: IntermediateCompositedPrediction = {
+    const dummiedTuple: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: { insert: 'dog', deleteLeft: 0 },
