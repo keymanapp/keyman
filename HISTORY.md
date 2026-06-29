@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 19.0.248 alpha 2026-06-29
+
+* chore: add missing line to history (#16154)
+* maint(resources): DRY out `PRInformation` interface (#16158)
+* fix(developer): prevent clone of legacy keyboards with no source (#16111)
+* fix(developer): consolidate user options in TypeScript code (#16134)
+* fix(developer): fixup references to layer after deleting in Touch Layout Editor (#16129)
+* fix(web): revert regression in setting `activeKeyboard` in `set osk` (#16156)
+* test(web): add e2e tests for examples from guide (#16108)
+* maint(linux): show output of API check also in log file (#16153)
+
 ## 19.0.247 alpha 2026-06-16
 
 * chore: update multi-labeler to 5.0.0 (#16100)
