@@ -125,6 +125,10 @@ build_tests_action() {
   # shellcheck disable=SC2310
   if ! builder_is_ci_release_build; then
     for f in "${KEYMAN_ROOT}/web/build/docs/engine/guide/examples"/*.html; do
+      # Replace CDN URL (https://s.keyman.com/kwm/engine/18.0.123) with
+      # local local build path (/build/publish/debug). We write to a temp
+      # file and then replace the original instead of modifying in-place.
+      # This is safer and more portable.
       sed "s|https://s\.keyman\.com/kmw/engine/[0-9]*\.[0-9]*\.[0-9]*/|/build/publish/${config}/|g" \
         "${f}" > "${f}.tmp" && mv "${f}.tmp" "${f}"
     done
