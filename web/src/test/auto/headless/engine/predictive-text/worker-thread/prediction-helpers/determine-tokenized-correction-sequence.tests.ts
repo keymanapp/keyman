@@ -21,7 +21,7 @@ import {
   ContextState,
   ContextToken,
   ContextTokenization,
-  IntermediateTokenizedPrediction,
+  TokenizedIntermediatePrediction,
   ModelCompositor,
   TokenizationResultMapping
 } from "@keymanapp/lm-worker/test-index";
@@ -383,7 +383,7 @@ describe('determineTokenizedCorrectionSequence', () => {
       autoSelectable: true
     }]);
 
-    const dummiedTuple: IntermediateTokenizedPrediction = {
+    const dummiedTuple: TokenizedIntermediatePrediction = {
       components: [{
         prediction: {
           transform: { insert: 'dog', deleteLeft: 0 },

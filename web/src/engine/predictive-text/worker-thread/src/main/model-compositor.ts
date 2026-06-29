@@ -1,7 +1,7 @@
 import * as models from '@keymanapp/models-templates';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { applySuggestionCasing, compositeIntermediatePredictions, correctAndEnumerate, createDefaultKeep, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
+import { applySuggestionCasing, composeIntermediatePredictions, correctAndEnumerate, createDefaultKeep, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
 import { ContextTracker } from './correction/context-tracker.js';
@@ -151,7 +151,7 @@ export class ModelCompositor {
 
     // We want to dedupe before trimming the list so that we can present a full set
     // of viable distinct suggestions if available.
-    const deduplicatedSuggestionTuples = dedupeSuggestions(this.lexicalModel, compositeIntermediatePredictions(rawPredictions), context);
+    const deduplicatedSuggestionTuples = dedupeSuggestions(this.lexicalModel, composeIntermediatePredictions(rawPredictions), context);
 
     // Needs "casing" to be applied first.
     const postContext = postContextState?.context ?? models.applyTransform(inputTransform, context);

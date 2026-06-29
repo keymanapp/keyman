@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { AUTOSELECT_PROPORTION_THRESHOLD, IntermediateCompositedPrediction, predictionAutoSelect, SuggestionSimilarity, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
+import { AUTOSELECT_PROPORTION_THRESHOLD, CompositedIntermediatePrediction, predictionAutoSelect, SuggestionSimilarity, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
 /*
   * Preconditions:
   * - there should always be a 'keep' option.  Now, whether or not that option
@@ -9,7 +9,7 @@ import { AUTOSELECT_PROPORTION_THRESHOLD, IntermediateCompositedPrediction, pred
   */
 describe('predictionAutoSelect', () => {
   it(`does not throw when no suggestions are available`, () => {
-    const predictions: IntermediateCompositedPrediction[] = [];
+    const predictions: CompositedIntermediatePrediction[] = [];
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
 
@@ -17,7 +17,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`selects solitary 'keep' suggestion that does match the model`, () => {
-    const predictions: IntermediateCompositedPrediction[] = [
+    const predictions: CompositedIntermediatePrediction[] = [
       {
         components: {
           prediction: {
@@ -51,7 +51,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`does not select suggestions if the root correction has no letters`, () => {
-    const predictions: IntermediateCompositedPrediction[] = [
+    const predictions: CompositedIntermediatePrediction[] = [
       {
         components: {
           prediction: {
@@ -106,7 +106,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`does not select solitary 'keep' suggestion that doesn't match the model`, () => {
-    const predictions: IntermediateCompositedPrediction[] = [
+    const predictions: CompositedIntermediatePrediction[] = [
       {
         components: {
           prediction: {
@@ -140,7 +140,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`selects 'keep' suggestion that does match the model over any alternatives`, () => {
-    const keepSuggestion: IntermediateCompositedPrediction = {
+    const keepSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           tag: 'keep',
@@ -163,7 +163,7 @@ describe('predictionAutoSelect', () => {
       }
     }
 
-    const highestNonKeepSuggestion: IntermediateCompositedPrediction = {
+    const highestNonKeepSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {  // can be null / "mocked out"
@@ -184,7 +184,7 @@ describe('predictionAutoSelect', () => {
       }
     };
 
-    const predictions: IntermediateCompositedPrediction[] = [
+    const predictions: CompositedIntermediatePrediction[] = [
       keepSuggestion,
       highestNonKeepSuggestion,
       {
@@ -238,7 +238,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`selects solitary non-'keep' suggestion when 'keep' does not match model`, () => {
-    const keepSuggestion: IntermediateCompositedPrediction = {
+    const keepSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           tag: 'keep',
@@ -265,7 +265,7 @@ describe('predictionAutoSelect', () => {
     // This threshold may be subject to change.
     //
     // Refer to AUTOSELECT_PROPORTION_THRESHOLD in predict-helpers.ts.
-    const onlyNonKeepSuggestion: IntermediateCompositedPrediction = {
+    const onlyNonKeepSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {  // can be null / "mocked out"
@@ -286,7 +286,7 @@ describe('predictionAutoSelect', () => {
       }
     };
 
-    const predictions: IntermediateCompositedPrediction[] = [
+    const predictions: CompositedIntermediatePrediction[] = [
       keepSuggestion,
       onlyNonKeepSuggestion
     ];
@@ -305,7 +305,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`does not select non-'keep' without sufficient winning probability`, () => {
-    const keepSuggestion: IntermediateCompositedPrediction = {
+    const keepSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           tag: 'keep',
@@ -332,7 +332,7 @@ describe('predictionAutoSelect', () => {
     // This threshold may be subject to change.
     //
     // Refer to AUTOSELECT_PROPORTION_THRESHOLD in predict-helpers.ts.
-    const highestNonKeepSuggestion: IntermediateCompositedPrediction = {
+    const highestNonKeepSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {  // can be null / "mocked out"
@@ -353,7 +353,7 @@ describe('predictionAutoSelect', () => {
       }
     };
 
-    const predictions: IntermediateCompositedPrediction[] = [
+    const predictions: CompositedIntermediatePrediction[] = [
       keepSuggestion,
       highestNonKeepSuggestion,
       {
@@ -412,7 +412,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`does select non-'keep' with sufficient winning probability`, () => {
-    const keepSuggestion: IntermediateCompositedPrediction = {
+    const keepSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           tag: 'keep',
@@ -435,7 +435,7 @@ describe('predictionAutoSelect', () => {
       }
     }
 
-    const highestNonKeepSuggestion: IntermediateCompositedPrediction = {
+    const highestNonKeepSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {  // can be null / "mocked out"
@@ -456,7 +456,7 @@ describe('predictionAutoSelect', () => {
       }
     };
 
-    const predictions: IntermediateCompositedPrediction[] = [
+    const predictions: CompositedIntermediatePrediction[] = [
       keepSuggestion,
       highestNonKeepSuggestion,
       {
@@ -513,7 +513,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it('ignores non key-matched suggestions when key-matched suggestions exist', () => {
-    const keepSuggestion: IntermediateCompositedPrediction = {
+    const keepSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           tag: 'keep',
@@ -537,7 +537,7 @@ describe('predictionAutoSelect', () => {
       }
     }
 
-    const expectedSuggestion: IntermediateCompositedPrediction = {
+    const expectedSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {  // can be null / "mocked out"
@@ -559,7 +559,7 @@ describe('predictionAutoSelect', () => {
       }
     };
 
-    const predictions: IntermediateCompositedPrediction[] = [
+    const predictions: CompositedIntermediatePrediction[] = [
       keepSuggestion,
       expectedSuggestion,
       {
@@ -597,7 +597,7 @@ describe('predictionAutoSelect', () => {
   // The idea:  avoid "over-correcting" when a potential correction has a
   // super-high-frequency word.
   it('does not auto-select suggestion if its root correction is not most likely', () => {
-    const keepSuggestion: IntermediateCompositedPrediction = {
+    const keepSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           tag: 'keep',
@@ -620,7 +620,7 @@ describe('predictionAutoSelect', () => {
       }
     }
 
-    const highestCorrectionSuggestion: IntermediateCompositedPrediction = {
+    const highestCorrectionSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {  // can be null / "mocked out"
@@ -641,7 +641,7 @@ describe('predictionAutoSelect', () => {
       }
     };
 
-    const highestNonKeepSuggestion: IntermediateCompositedPrediction = {
+    const highestNonKeepSuggestion: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {  // can be null / "mocked out"
@@ -662,7 +662,7 @@ describe('predictionAutoSelect', () => {
       }
     };
 
-    const predictions: IntermediateCompositedPrediction[] = [
+    const predictions: CompositedIntermediatePrediction[] = [
       keepSuggestion,
       highestNonKeepSuggestion,
       highestCorrectionSuggestion
