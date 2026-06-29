@@ -47,8 +47,16 @@ export type TokenResult = {
  * range.
  */
 export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray<TokenResult>, TokenizationResultMapping> {
+  /**
+   * The root ContextTokenization all generated corrections are based upon.
+   */
   public readonly tokenization: ContextTokenization;
-  private readonly tailCorrectionLength: number;
+
+  /**
+   * Indicates whether or not the correction range of this TokenizationCorrector
+   * started with any tokens considered "correctable".
+   */
+  public readonly modelsCorrectables: boolean;
 
   // public read-only via properties
   private readonly _uncorrectables: QuotientNodeFinalizer[];
@@ -64,6 +72,7 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
   private lastTotalCost: number;
   private handleHasBeenCalled: boolean = false;
   private predictableMatchFound: boolean = false;
+  private readonly tailCorrectionLength: number;
 
   get currentCost(): number {
     const correctable = this.selectionQueue.peek();
@@ -172,13 +181,16 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
     this._correctables = [];
 
     this.tokenLookupMap = new Map();
+    let modelsCorrectables = false;
 
     orderedTokens.forEach((token, index) => {
       // New issue:  this mangles the space IDs!  We almost certainly need some
       // sort of proper map to the source token.
       const searchModule = new QuotientNodeFinalizer(token.searchModule, index == orderedTokens.length - 1);
       this.tokenLookupMap.set(searchModule.spaceId, token);
-      if(!filterClosure(token)) {
+      const passesFilter = filterClosure(token);
+      modelsCorrectables ||= passesFilter;
+      if(!passesFilter) {
         this._uncorrectables.push(searchModule);
       } else if(index == tailCorrectionLength - 1) {
         // The sole assignment case for this field.  It may only be assigned for
@@ -189,6 +201,8 @@ export class TokenizationCorrector implements CorrectionSearchable<ReadonlyArray
         this._correctables.push(searchModule);
       }
     });
+    // Set a readonly flag indicating if this Corrector started with correctable entries.
+    this.modelsCorrectables = modelsCorrectables;
 
     this._generatedTokenResults = new Map();
     const uncorrectables = this._uncorrectables;

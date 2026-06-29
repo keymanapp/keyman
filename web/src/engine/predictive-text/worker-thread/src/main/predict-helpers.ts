@@ -112,24 +112,53 @@ export interface SuggestionReplacement<T extends ContextTokenLike> {
   transitionId?: number
 }
 
-/**
- * Collates information related to suggestions during the suggestion generation
- * process.
- */
-export type CorrectionPredictionTuple = {
+export interface CompositedPredictionData {
   /**
    * The potential Suggestion (or Keep)
    */
-  prediction: ProbabilityMass<Suggestion | Keep>,
+  prediction: Suggestion | Keep;
   /**
    * The correction upon which the Suggestion (or Keep) is based
    */
-  correction: ProbabilityMass<string>,
+  correction: string
+}
+
+export interface PredictionProbabilities {
   /**
-   * The likelihood of the prediction - its lexical-model likelihood multiplied
-   * by the keystroke-sequence + correction likelihood.
+   * The probability of the word itself, separate from corrections, as
+   * determined by the LexicalModel itself.
    */
-  totalProb: number;
+  prediction: number;
+
+  /**
+   * The probability of text-correction steps taken to build the correction upon
+   * which the prediction is based.
+   */
+  correction: number;
+
+  /**
+   * The likelihood of the represented prediction, combining both the
+   * `prediction` and `correction` components into a single value.
+   */
+  total: number;
+}
+
+/**
+ * Tracks common intermediate prediction data, such as its underlying probabilities and its similarity to the actual context.
+ */
+export interface PredictionMetadata {
+  /**
+   * Tracks the relevant probability components contributing to a generated
+   * prediction.
+   */
+  probabilities: PredictionProbabilities;
+
+  /**
+   * Indicates that the 'suggestion' represents context changes that qualify for
+   * auto-selection.
+   */
+  autoSelectable: boolean;
+
   /**
    * How directly the prediction matches the current token in the context.
    *
@@ -137,12 +166,26 @@ export type CorrectionPredictionTuple = {
    * available upon initial construction of this type.
    */
   matchLevel?: SuggestionSimilarity;
+
   /**
    * Text from the triggering input that should _not_ be affected by the
    * prediction.
    */
   preservationTransform?: Transform;
-};
+}
+
+export interface CompositedIntermediatePrediction {
+  /**
+   * Contains the fully composited predictive-text Suggestion and its underlying correction string.
+   */
+  components: CompositedPredictionData;
+  /**
+   * Tracks common intermediate prediction data, such as its underlying probabilities and its similarity to the actual context.
+   */
+  metadata: PredictionMetadata;
+}
+
+type IntermediatePrediction = CompositedIntermediatePrediction;
 
 /**
  * An enum to be used when categorizing the level of similarity between
@@ -180,15 +223,15 @@ export enum SuggestionSimilarity {
   exact = 3
 }
 
-export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: CorrectionPredictionTuple) {
+export function tupleDisplayOrderSort(a: IntermediatePrediction, b: IntermediatePrediction) {
   // Similarity distance
-  const simDist = (b.matchLevel ?? 0) - (a.matchLevel ?? 0);
+  const simDist = (b.metadata.matchLevel ?? 0) - (a.metadata.matchLevel ?? 0);
   if(simDist != 0) {
     return simDist;
   }
 
   // Probability distance
-  return b.totalProb - a.totalProb;
+  return b.metadata.probabilities.total - a.metadata.probabilities.total;
 }
 
 export function determineTraversallessCorrectionSequences(
@@ -251,9 +294,9 @@ export function determineTraversallessCorrectionSequences(
     returnedPredictionData.push({
       ...suggestionParams,
       applyInPost: (p) => {
-        p.preservationTransform = preservationTransform;
-        if(transformId) {
-          p.prediction.sample.transformId = transformId;
+        p.metadata.preservationTransform = preservationTransform;
+        if(transformId !== undefined) {
+          p.components.prediction.transformId = transformId;
         }
       }
     })
@@ -451,7 +494,7 @@ export interface PredictionParameters {
    * @param entry
    * @returns
    */
-  applyInPost: (entry: CorrectionPredictionTuple) => void
+  applyInPost: (entry: CompositedIntermediatePrediction) => void
 }
 
 export function buildCorrectionSequence(
@@ -534,11 +577,11 @@ export function determineTokenizedCorrectionSequence(
 
   return {
     ...suggestionParams,
-    applyInPost: (entry: CorrectionPredictionTuple) => {
-      entry.preservationTransform = tokenization.taillessTrueKeystroke;
+    applyInPost: (entry: CompositedIntermediatePrediction) => {
+      entry.metadata.preservationTransform = tokenization.taillessTrueKeystroke;
       // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
       // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
-      entry.prediction.sample.transform.deleteLeft = deleteLeft;
+      entry.components.prediction.transform.deleteLeft = deleteLeft;
     }
   };
 }
@@ -569,7 +612,7 @@ export async function correctAndEnumerate(
   /**
    * The suggestions generated based on the user's input state.
    */
-  rawPredictions: CorrectionPredictionTuple[];
+  rawPredictions: CompositedIntermediatePrediction[];
 
   /**
    * The id of a prior ContextTransition event that triggered a Suggestion found
@@ -625,9 +668,8 @@ export async function correctAndEnumerate(
   const searchModules = tokenizations.map(t => t.tail.searchModule);
 
   // Only run the correction search when corrections are enabled.
-  let rawPredictions: CorrectionPredictionTuple[] = [];
+  let rawPredictions: CompositedIntermediatePrediction[] = [];
   let bestCorrectionCost: number;
-  const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
   for await(const match of getBestTokenMatches(searchModules, timer)) {
     // Corrections obtained:  now to predict from them!
     const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
@@ -659,14 +701,6 @@ export async function correctAndEnumerate(
       bestCorrectionCost = match.totalCost;
     }
 
-    // If we're getting the same prediction again, it's lower-cost.  Update!
-    let oldPredictionSet = correctionPredictionMap[match.matchString];
-    if(oldPredictionSet) {
-      rawPredictions = rawPredictions.filter((entry) => !oldPredictionSet.find((match) => entry.prediction.sample == match.sample));
-    }
-
-    correctionPredictionMap[match.matchString] = predictions.map((entry) => entry.prediction);
-
     rawPredictions = rawPredictions.concat(predictions);
 
     if(shouldStopSearchingEarly(bestCorrectionCost, match.totalCost, rawPredictions)) {
@@ -687,7 +721,7 @@ export async function correctAndEnumerate(
 export function shouldStopSearchingEarly(
   bestCorrectionCost: number,
   currentCorrectionCost: number,
-  rawPredictions: CorrectionPredictionTuple[]
+  rawPredictions: CompositedIntermediatePrediction[]
 ) {
   if(currentCorrectionCost >= bestCorrectionCost + CORRECTION_SEARCH_THRESHOLDS.MAX_SEARCH_THRESHOLD) {
     return true;
@@ -703,7 +737,7 @@ export function shouldStopSearchingEarly(
       // If the best suggestion from the search's current tier fails to beat the worst
       // pending suggestion from previous tiers, assume all further corrections will
       // similarly fail to win; terminate the search-loop.
-      if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].totalProb > Math.exp(-currentCorrectionCost)) {
+      if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].metadata.probabilities.total > Math.exp(-currentCorrectionCost)) {
         return true;
       }
     }
@@ -733,7 +767,7 @@ export function predictFromCorrectionSequence(
   corrections: ProbabilityMass<Transform>[],
   rootContext: Context,
   transitionId: number
-): CorrectionPredictionTuple[] {
+): CompositedIntermediatePrediction[] {
   let predictionPrefixSequence: ProbabilityMass<Suggestion>[] = [];
   let tailPredictions: ProbabilityMass<Suggestion>[];
 
@@ -780,7 +814,7 @@ export function predictFromCorrectionSequence(
     return [];
   }
 
-  const predictions: CorrectionPredictionTuple[] = tailPredictions.map((p) => {
+  const predictions: CompositedIntermediatePrediction[] = tailPredictions.map((p) => {
     // Concat corrections + predictions for their components.
     const predictionSequence = [...predictionPrefixSequence, p];
     const fullPrediction: ProbabilityMass<Suggestion> = predictionSequence.reduce((prev, curr) => {
@@ -806,10 +840,19 @@ export function predictFromCorrectionSequence(
     }
 
     return {
-      prediction: fullPrediction,
-      correction: fullCorrection,
-      totalProb: fullPrediction.p * fullCorrection.p,
-      matchLevel: SuggestionSimilarity.none,
+      components: {
+        prediction: fullPrediction.sample,
+        correction: fullCorrection.sample
+      },
+      metadata: {
+        probabilities: {
+          prediction: fullPrediction.p,
+          correction: fullCorrection.p,
+          total: fullPrediction.p * fullCorrection.p
+        },
+        autoSelectable: correctionValidForAutoSelect(fullCorrection.sample),
+        matchLevel: SuggestionSimilarity.none
+      }
     };
   });
 
@@ -851,17 +894,17 @@ export function applySuggestionCasing(suggestion: Suggestion, baseWord: string, 
  */
 export function dedupeSuggestions(
   lexicalModel: LexicalModel,
-  rawPredictions: CorrectionPredictionTuple[],
+  rawPredictions: CompositedIntermediatePrediction[],
   context: Context
 ) {
   const wordbreak = determineModelWordbreaker(lexicalModel);
 
-  let suggestionDistribMap: {[key: string]: CorrectionPredictionTuple} = {};
-  let suggestionDistribution: CorrectionPredictionTuple[] = [];
+  let suggestionDistribMap: {[key: string]: CompositedIntermediatePrediction} = {};
+  let suggestionDistribution: CompositedIntermediatePrediction[] = [];
 
   // Deduplicator + annotator of 'keep' suggestions.
   for(let tuple of rawPredictions) {
-    const predictedWord = wordbreak(models.applyTransform(tuple.prediction.sample.transform, context));
+    const predictedWord = wordbreak(models.applyTransform(tuple.components.prediction.transform, context));
 
     // Assumption:  suggestions that have the same net result should have the
     // same displayAs string.  (We could try to pick the one with highest net
@@ -871,7 +914,7 @@ export function dedupeSuggestions(
     // Merge 'em!
     const existingSuggestion = suggestionDistribMap[predictedWord];
     if(existingSuggestion) {
-      existingSuggestion.totalProb += tuple.totalProb;
+      existingSuggestion.metadata.probabilities.total += tuple.metadata.probabilities.total;
     } else {
       suggestionDistribMap[predictedWord] = tuple;
     }
@@ -899,15 +942,16 @@ export function dedupeSuggestions(
  *   current text
  * - any other suggestion
  *
+ * @param lexicalModel
  * @param suggestionDistribution
- * @param context
- * @param trueInput inputTransform + its assigned probability
+ * @param baseContext
+ * @param finalContext
  * @returns true if an existing suggestion fulfills the role of 'keep';
  * otherwise, false.
  */
 export function processSimilarity(
   lexicalModel: LexicalModel,
-  suggestionDistribution: CorrectionPredictionTuple[],
+  suggestionDistribution: CompositedIntermediatePrediction[],
   context: Context,
   trueInput: ProbabilityMass<Transform>
 ): boolean {
@@ -927,38 +971,38 @@ export function processSimilarity(
   for(let tuple of suggestionDistribution) {
     // Don't set it unnecessarily; this can have side-effects in some automated tests.
     if(inputTransform.id !== undefined) {
-      tuple.prediction.sample.transformId = inputTransform.id;
+      tuple.components.prediction.transformId = inputTransform.id;
     }
 
-    const predictedWord = wordbreak(models.applyTransform(tuple.prediction.sample.transform, context));
+    const predictedWord = wordbreak(models.applyTransform(tuple.components.prediction.transform, context));
 
     // Is the suggestion an exact match (or, "similar enough") to the
     // actually-typed context?  If so, we wish to note this fact and to
     // prioritize such a suggestion over suggestions that are not.
-    if(keyed(tuple.correction.sample) == keyedPrefix) {
+    if(keyed(tuple.components.correction) == keyedPrefix) {
       if(predictedWord == truePrefix) {
         // Exact match:  it's a perfect 'keep' suggestion.
-        tuple.matchLevel = SuggestionSimilarity.exact;
-        keepOption = toAnnotatedSuggestion(lexicalModel, tuple.prediction.sample, 'keep',  models.QuoteBehavior.noQuotes);
+        tuple.metadata.matchLevel = SuggestionSimilarity.exact;
+        keepOption = toAnnotatedSuggestion(lexicalModel, tuple.components.prediction, 'keep',  models.QuoteBehavior.noQuotes);
 
         // Indicates that this suggestion exists directly within the lexical
         // model as a valid suggestion.  (We actively display it if it's an
         // exact match, but hide it if not, only preserving it for reversions
         // if/when needed.)
         keepOption.matchesModel = true;
-        Object.assign(tuple.prediction.sample, keepOption);
-        keepOption = tuple.prediction.sample as Outcome<Keep>;
+        Object.assign(tuple.components.prediction, keepOption);
+        keepOption = tuple.components.prediction as Outcome<Keep>;
       } else if(keyCased(predictedWord) == lowercasedPrefix) {
         // Case-insensitive match.  No diacritic differences; the ONLY difference is casing.
-        tuple.matchLevel = SuggestionSimilarity.sameText;
+        tuple.metadata.matchLevel = SuggestionSimilarity.sameText;
       } else if(keyed(predictedWord) == keyedPrefix) {
         // Diacritic-insensitive / exact-key match.
-        tuple.matchLevel = SuggestionSimilarity.sameKey;
+        tuple.metadata.matchLevel = SuggestionSimilarity.sameKey;
       } else {
-        tuple.matchLevel = SuggestionSimilarity.none;
+        tuple.metadata.matchLevel = SuggestionSimilarity.none;
       }
     } else {
-      tuple.matchLevel = SuggestionSimilarity.none;
+      tuple.metadata.matchLevel = SuggestionSimilarity.none;
     }
   }
 
@@ -984,7 +1028,7 @@ export function createDefaultKeep(
   lexicalModel: LexicalModel,
   context: Context,
   trueInput: ProbabilityMass<Transform>
-): CorrectionPredictionTuple {
+): CompositedIntermediatePrediction {
   const { sample: inputTransform, p: inputTransformProb } = trueInput;
   const wordbreak = determineModelWordbreaker(lexicalModel);
   const tokenizer = determineModelTokenizer(lexicalModel);
@@ -1020,19 +1064,19 @@ export function createDefaultKeep(
 
   // Insert our synthetic keepOption as a prediction tuple.
   return {
-    // Product of the two p's below.
-    totalProb: inputTransformProb * MAX_PROB,
-    prediction: {
-      sample: keepOption,
-      // We always show the keep option if it doesn't directly match,
-      // so max probability is fine.
-      p: MAX_PROB,
+    components: {
+      prediction: keepOption,
+      correction: truePrefix
     },
-    correction: {
-      sample: truePrefix,
-      p: inputTransformProb * MAX_PROB
-    },
-    matchLevel: SuggestionSimilarity.exact
+    metadata: {
+      probabilities: {
+        prediction: MAX_PROB,
+        correction: inputTransformProb,
+        total: inputTransformProb * MAX_PROB
+      },
+      autoSelectable: false,
+      matchLevel: SuggestionSimilarity.exact
+    }
   };
 }
 
@@ -1065,12 +1109,12 @@ export function correctionValidForAutoSelect(correction: string) {
   return false;
 }
 
-export function predictionAutoSelect(suggestionDistribution: CorrectionPredictionTuple[]) {
+export function predictionAutoSelect(suggestionDistribution: CompositedIntermediatePrediction[]) {
   if(suggestionDistribution.length == 0) {
     return;
   }
 
-  const keepOption = suggestionDistribution[0].prediction.sample as Outcome<Keep>;
+  const keepOption = suggestionDistribution[0].components.prediction as Outcome<Keep>;
   if(keepOption.tag == 'keep' && keepOption.matchesModel) {
     // Auto-select it for auto-acceptance; we don't correct away from perfectly-valid
     // lexical entries, even if they are comparatively low-frequency.
@@ -1084,19 +1128,19 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
 
   if(suggestionDistribution.length == 1) {
     // Prevent auto-acceptance when the root doesn't meet validation criteria.
-    if(!correctionValidForAutoSelect(suggestionDistribution[0].correction.sample)) {
+    if(!suggestionDistribution[0].metadata.autoSelectable) {
       return;
     }
 
     // Mark for auto-acceptance; there are no alternatives.
-    suggestionDistribution[0].prediction.sample.autoAccept = true;
+    suggestionDistribution[0].components.prediction.autoAccept = true;
     return;
   }
 
   // Is it reasonable to auto-accept any of our suggestions?
   const bestSuggestion = suggestionDistribution[0];
 
-  const baseCorrection = bestSuggestion.correction.sample;
+  const baseCorrection = bestSuggestion.components.correction;
   if(baseCorrection.length == 0) {
     // If the correction is rooted on an empty root, there's no basis for
     // auto-correcting to this suggestion.
@@ -1105,8 +1149,8 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
 
   // Find the highest probability for any correction that led to a valid prediction.
   // No need to full-on re-sort everything, though.
-  const bestCorrection = suggestionDistribution.reduce((prev, current) => prev?.correction.p > current.correction.p ? prev : current, null).correction;
-  if(bestCorrection.p > bestSuggestion.correction.p) {
+  const bestCorrectionP = suggestionDistribution.reduce((prev, current) => Math.max(prev, current.metadata.probabilities.correction), 0);
+  if(bestCorrectionP > bestSuggestion.metadata.probabilities.correction) {
     // Here, the best suggestion didn't come from the best correction.
     // Is it actually reasonable to auto-correct?  We're probably just very
     // biased toward its frequency.  (Maybe a threshold should be considered?)
@@ -1117,28 +1161,28 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
   // - such as replacing `cant` with `can't` if the latter is much more frequent -
   // we may wish to group matchLevel values below by 'mapping' them with an appropriate
   // function.  (Both on the next line and within the reduce functor.)
-  const bestSuggestionTier = bestSuggestion.matchLevel;
+  const bestSuggestionTier = bestSuggestion.metadata.matchLevel;
 
   // compare best vs other probabilities of compatible tier.
   const probSum = suggestionDistribution.reduce((accum, current) => {
     // If the suggestion is from a different similarity tier, do not count it against
     // the required auto-select probability ratio threshold.  That threshold should
     // only apply within the suggestion's tier.
-    return accum + (current.matchLevel == bestSuggestionTier ? current.totalProb : 0)
+    return accum + (current.metadata.matchLevel == bestSuggestionTier ? current.metadata.probabilities.total : 0)
   }, 0);
-  const proportionOfBest = bestSuggestion.totalProb / probSum;
+  const proportionOfBest = bestSuggestion.metadata.probabilities.total / probSum;
   if(proportionOfBest < AUTOSELECT_PROPORTION_THRESHOLD) {
     return;
   }
 
-  if(!correctionValidForAutoSelect(bestSuggestion.correction.sample)) {
+  if(!bestSuggestion.metadata.autoSelectable) {
     return;
   }
 
   // compare correction-cost aspects?  We disable if the base correction is lower than best,
   // but should we do other comparisons too?
 
-  bestSuggestion.prediction.sample.autoAccept = true;
+  bestSuggestion.components.prediction.autoAccept = true;
 }
 
 /**
@@ -1159,7 +1203,7 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
  */
 export function finalizeSuggestions(
   lexicalModel: LexicalModel,
-  deduplicatedSuggestionTuples: CorrectionPredictionTuple[],
+  deduplicatedSuggestionTuples: CompositedIntermediatePrediction[],
   context: Context,
   inputTransform: Transform,
   verbose?: boolean
@@ -1168,42 +1212,44 @@ export function finalizeSuggestions(
   const tokenize = determineModelTokenizer(lexicalModel);
 
   const suggestions = deduplicatedSuggestionTuples.map((tuple) => {
-    const prediction = tuple.prediction;
+    const prediction = tuple.components.prediction;
 
     // If this is a suggestion after any form of wordbreak input, make sure we preserve any components
     // from prior tokens!
     //
     // Note:  may need adjustment if/when supporting phrase-level correction.
-    if(tuple.preservationTransform) {
+    if(tuple.metadata.preservationTransform) {
       const mergedTransform = {
-        ...models.buildMergedTransform(tuple.preservationTransform, {...prediction.sample.transform, deleteLeft: 0}),
-        deleteLeft: prediction.sample.transform.deleteLeft
+        ...models.buildMergedTransform(tuple.metadata.preservationTransform, {...prediction.transform, deleteLeft: 0}),
+        deleteLeft: prediction.transform.deleteLeft
       };
 
       // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
       // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
-      let mutableSuggestion = prediction.sample as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
+      let mutableSuggestion = prediction as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
 
       // Assignment via by-reference behavior, as suggestion is an object
       mutableSuggestion.transform = mergedTransform;
     }
 
     // Is sometimes not set during unit tests.
-    if(prediction.sample.transformId !== undefined) {
-      prediction.sample.transform.id = prediction.sample.transformId;
+    if(prediction.transformId !== undefined) {
+      prediction.transform.id = prediction.transformId;
     }
+
+    const probs = tuple.metadata.probabilities;
 
     if(!verbose) {
       return {
-        ...prediction.sample,
-        p: tuple.totalProb
+        ...prediction,
+        p: probs.total
       };
     } else {
       const sample: Outcome<Suggestion | Keep> = {
-        ...prediction.sample,
-        p: tuple.totalProb,
-        "lexical-p": prediction.p,
-        "correction-p": tuple.correction.p
+        ...prediction,
+        p: probs.total,
+        "lexical-p": probs.prediction,
+        "correction-p": probs.correction
       }
 
       return sample;

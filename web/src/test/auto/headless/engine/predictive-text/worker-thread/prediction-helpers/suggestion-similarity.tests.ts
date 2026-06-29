@@ -5,7 +5,7 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { deepCopy } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { CorrectionPredictionTuple, models, processSimilarity, SuggestionSimilarity, toAnnotatedSuggestion } from "@keymanapp/lm-worker/test-index";
+import { CompositedIntermediatePrediction, models, processSimilarity, SuggestionSimilarity, toAnnotatedSuggestion } from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -109,77 +109,89 @@ const testModelWithCasing = new DummyModel({
  * @returns
  */
 const build_its_is_set = () => {
-  const its: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'its',
-      p: 0.8
-    },
-    prediction: {
-      sample: {
+  const its: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 's',
           deleteLeft: 0
         },
         displayAs: 'its'
       },
-      p: 0.2
+      correction: 'its'
     },
-    totalProb: 0.16
-    // matchLevel does not yet exist.
+    metadata: {
+      probabilities: {
+        prediction: .2,
+        correction: .8,
+        total: .2 * .8
+      },
+      autoSelectable: true
+      // matchLevel does not yet exist.
+    }
   };
 
-  const it_is: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'its',
-      p: 0.8
-    },
-    prediction: {
-      sample: {
+  const it_is: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: '\'s',
           deleteLeft: 0
         },
         displayAs: 'it\'s'
       },
-      p: 0.8
+      correction: 'its'
     },
-    totalProb: 0.64
+    metadata: {
+      probabilities: {
+        prediction: .8,
+        correction: .8,
+        total: .8 * .8
+      },
+      autoSelectable: true
+    }
   };
 
-  const is: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'is',
-      p: 0.2
-    },
-    prediction: {
-      sample: {
+  const is: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 's',
           deleteLeft: 1
         },
         displayAs: 'is'
       },
-      p: 0.5
+      correction: 'is'
     },
-    totalProb: 0.1
+    metadata: {
+      probabilities: {
+        prediction: .5,
+        correction: .2,
+        total: .5 * .2
+      },
+      autoSelectable: true
+    }
   };
 
-  const is_not: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'is',
-      p: 0.2
-    },
-    prediction: {
-      sample: {
+  const is_not: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 'sn\'t',
           deleteLeft: 1
         },
         displayAs: 'isn\'t'
       },
-      p: 0.5
+      correction: 'is'
     },
-    totalProb: 0.1
+    metadata: {
+      probabilities: {
+        prediction: .5,
+        correction: .2,
+        total: .5 * .2
+      },
+      autoSelectable: true
+    }
   };
 
   return {
@@ -210,32 +222,22 @@ describe('processSimilarity', () => {
     const testSet = build_its_is_set();
     const distribution = [...Object.values(testSet)];
 
-    const expectation: CorrectionPredictionTuple[] = [
-      {
-        ...testSet.its,
-        matchLevel: SuggestionSimilarity.exact
-      }, {
-        ...testSet.it_is,
-        matchLevel: SuggestionSimilarity.sameKey
-      }, {
-        ...testSet.is,
-        matchLevel: SuggestionSimilarity.none
-      }, {
-        ...testSet.is_not,
-        matchLevel: SuggestionSimilarity.none
-      }
-    ];
+    const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
+    expectation[0].metadata.matchLevel = SuggestionSimilarity.exact;    // its
+    expectation[1].metadata.matchLevel = SuggestionSimilarity.sameKey;  // it_is
+    expectation[2].metadata.matchLevel = SuggestionSimilarity.none;     // is
+    expectation[3].metadata.matchLevel = SuggestionSimilarity.none;     // is_not
 
     const its = testSet.its;
     const original_its = deepCopy(its);
-    const keep_its = toAnnotatedSuggestion(testModelWithCasing, original_its.prediction.sample, 'keep', QuoteBehavior.noQuotes);
+    const keep_its = toAnnotatedSuggestion(testModelWithCasing, original_its.components.prediction, 'keep', QuoteBehavior.noQuotes);
     keep_its.matchesModel = true;
 
     processSimilarity(testModelWithCasing, distribution, context, trueInput);
 
     assert.sameDeepMembers(distribution, expectation);
-    assert.equal(its.prediction.sample.tag, 'keep');
-    assert.deepEqual(its.prediction.sample, keep_its);
+    assert.equal(its.components.prediction.tag, 'keep');
+    assert.deepEqual(its.components.prediction, keep_its);
   });
 
   it(`selects contraction as 'more similar' than same-keyed non-contraction when context is contraction`, () => {
@@ -257,32 +259,22 @@ describe('processSimilarity', () => {
     const testSet = build_its_is_set();
     const distribution = [...Object.values(testSet)];
 
-    const expectation: CorrectionPredictionTuple[] = [
-      {
-        ...testSet.its,
-        matchLevel: SuggestionSimilarity.sameKey
-      }, {
-        ...testSet.it_is,
-        matchLevel: SuggestionSimilarity.exact
-      }, {
-        ...testSet.is,
-        matchLevel: SuggestionSimilarity.none
-      }, {
-        ...testSet.is_not,
-        matchLevel: SuggestionSimilarity.none
-      }
-    ];
+    const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
+    expectation[0].metadata.matchLevel = SuggestionSimilarity.sameKey;  // its
+    expectation[1].metadata.matchLevel = SuggestionSimilarity.exact;    // it_is
+    expectation[2].metadata.matchLevel = SuggestionSimilarity.none;     // is
+    expectation[3].metadata.matchLevel = SuggestionSimilarity.none;     // is_not
 
     const it_is = testSet.it_is;
     const original_it_is = deepCopy(it_is);
-    const keep_it_is = toAnnotatedSuggestion(testModelWithCasing, original_it_is.prediction.sample, 'keep', QuoteBehavior.noQuotes);
+    const keep_it_is = toAnnotatedSuggestion(testModelWithCasing, original_it_is.components.prediction, 'keep', QuoteBehavior.noQuotes);
     keep_it_is.matchesModel = true;
 
     processSimilarity(testModelWithCasing, distribution, context, trueInput);
 
     assert.sameDeepMembers(distribution, expectation);
-    assert.equal(it_is.prediction.sample.tag, 'keep');
-    assert.deepEqual(it_is.prediction.sample, keep_it_is);
+    assert.equal(it_is.components.prediction.tag, 'keep');
+    assert.deepEqual(it_is.components.prediction, keep_it_is);
   });
 
   describe('with casing', () => {
@@ -314,34 +306,22 @@ describe('processSimilarity', () => {
 
       // Have the predictions replace existing context parts with the lowercased equivalents.
       Object.values(testSet).forEach((entry) => {
-        const transform = entry.prediction.sample.transform;
+        const transform = entry.components.prediction.transform;
         transform.insert = transform.deleteLeft == 0 ? `it${transform.insert}` : `i${transform.insert}`;
         transform.deleteLeft = 2;
       });
 
       const distribution = [...Object.values(testSet)];
 
-      const expectation: CorrectionPredictionTuple[] = [
-        {
-          ...testSet.its,
-          matchLevel: SuggestionSimilarity.sameKey
-        }, {
-          ...testSet.it_is,
-          // case mismatch, detectable because we have access to a lowercasing/uppercasing function.
-          matchLevel: SuggestionSimilarity.sameText
-        }, {
-          ...testSet.is,
-          matchLevel: SuggestionSimilarity.none
-        }, {
-          ...testSet.is_not,
-          matchLevel: SuggestionSimilarity.none
-        }
-      ];
-
+      const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
+      expectation[0].metadata.matchLevel = SuggestionSimilarity.sameKey;   // its
+      expectation[1].metadata.matchLevel = SuggestionSimilarity.sameText;  // it_is
+      expectation[2].metadata.matchLevel = SuggestionSimilarity.none;      // is
+      expectation[3].metadata.matchLevel = SuggestionSimilarity.none;      // is_not
       processSimilarity(testModelWithCasing, distribution, context, trueInput);
 
       // Because we mucked with the casing here, there is no perfect 'keep' match.
-      const keep = distribution.find((entry) => entry.prediction.sample.tag == 'keep');
+      const keep = distribution.find((entry) => entry.components.prediction.tag == 'keep');
       assert.isNotOk(keep);
       assert.sameDeepMembers(distribution, expectation);
     });
@@ -368,34 +348,20 @@ describe('processSimilarity', () => {
 
       // Have the predictions replace existing context parts with the lowercased equivalents.
       Object.values(testSet).forEach((entry) => {
-        const transform = entry.prediction.sample.transform;
+        const transform = entry.components.prediction.transform;
         transform.insert = transform.deleteLeft == 0 ? `it${transform.insert}` : `i${transform.insert}`;
         transform.deleteLeft = 2;
       });
 
       const distribution = [...Object.values(testSet)];
 
-      const expectation: CorrectionPredictionTuple[] = [
-        {
-          ...testSet.its,
-          matchLevel: SuggestionSimilarity.none
-        }, {
-          ...testSet.it_is,
-          // case mismatch, detectable because we have access to a lowercasing/uppercasing function.
-          matchLevel: SuggestionSimilarity.none
-        }, {
-          ...testSet.is,
-          matchLevel: SuggestionSimilarity.none
-        }, {
-          ...testSet.is_not,
-          matchLevel: SuggestionSimilarity.none
-        }
-      ];
+      const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
 
+      expectation.forEach((entry) => entry.metadata.matchLevel = SuggestionSimilarity.none);
       processSimilarity(testModelWithoutCasing, distribution, context, trueInput);
 
       // Because we mucked with the casing here, there is no perfect 'keep' match.
-      const keep = distribution.find((entry) => entry.prediction.sample.tag == 'keep');
+      const keep = distribution.find((entry) => entry.components.prediction.tag == 'keep');
       assert.isNotOk(keep);
       assert.sameDeepMembers(distribution, expectation);
     });
