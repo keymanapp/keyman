@@ -23,6 +23,7 @@ import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMManager.SuggestionType;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.util.WebViewUtils;
 
 import org.json.JSONObject;
 
@@ -42,8 +43,8 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
     this.keyboardType = keyboardType;
     this.keyboardLoaded = false;
     this.assetLoader = new WebViewAssetLoader.Builder()
-      .addPathHandler("/data/", new InternalStoragePathHandler(context,
-        context.getDir("data", Context.MODE_PRIVATE)))
+      .addPathHandler(WebViewUtils.ASSET_DATA_PATH,
+        new InternalStoragePathHandler(context, context.getDir("data", Context.MODE_PRIVATE)))
       .build();
 
     if (keyboardType != KeyboardType.KEYBOARD_TYPE_INAPP && keyboardType != KeyboardType.KEYBOARD_TYPE_SYSTEM) {
@@ -92,10 +93,10 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
 
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-    if (index < 0) {
-      index = 0;
+    Keyboard keyboardInfo = null;
+    if (index >= 0) {
+      keyboardInfo = KMManager.getKeyboardInfo(context, index);
     }
-    Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
     String langId = null;
     if (keyboardInfo != null) {
       langId = keyboardInfo.getLanguageID();
