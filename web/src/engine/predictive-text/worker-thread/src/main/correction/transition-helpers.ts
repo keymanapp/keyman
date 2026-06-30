@@ -130,7 +130,7 @@ export function transitionTokenizations(
 
       // Following call:  is actually designed to build SubstitutionQuotientSpurs.
       const transitionedTokenization = rootTokenization.evaluateTransition(precomp[1], trueInput.id, bestProb);
-      const remadeTokenization = new ContextTokenization(transitionedTokenization.tokens, subset.transitionEdges.get(rootTokenization), transitionedTokenization.taillessTrueKeystroke);
+      const remadeTokenization = new ContextTokenization(transitionedTokenization.tokens, subset.transitionEdges.get(rootTokenization));
 
       // If the last token is empty and has no flag for a revertable transition,
       // attempt to copy the previous token's revertable transition flag.

@@ -47,8 +47,6 @@ function buildQuickBrownFixture() {
     baseTokenization.tokens.slice(0, baseTokenCount-1).concat(
       new ContextToken(new LegacyQuotientSpur(baseTokenization.tail.searchModule, plainInsertDistrib, plainInsertDistrib[0]))
     ),
-    null,
-    null
   );
 
   const newTokenInsertDistrib: Distribution<Transform> = [
@@ -58,8 +56,6 @@ function buildQuickBrownFixture() {
     baseTokenization.tokens.slice(0, baseTokenCount).concat(
       new ContextToken(new LegacyQuotientSpur(new LegacyQuotientRoot(plainModel), newTokenInsertDistrib, newTokenInsertDistrib[0]))
     ),
-    null,
-    null
   );
 
   const charReplaceDistrib: Distribution<Transform> = [
@@ -69,9 +65,7 @@ function buildQuickBrownFixture() {
   const charReplaceTokenization = new ContextTokenization(
     baseTokenization.tokens.slice(0, baseTokenCount - 1).concat(
       new ContextToken(new LegacyQuotientSpur(baseTokenization.tail.searchModule, charReplaceDistrib, charReplaceDistrib[0]))
-    ),
-    null,
-    null
+    )
   );
 
   const eraseTokenDistrib: Distribution<Transform> = [
@@ -80,9 +74,7 @@ function buildQuickBrownFixture() {
   const eraseTokenTokenization = new ContextTokenization(
     baseTokenization.tokens.slice(0, baseTokenCount - 1).concat(
       new ContextToken(new LegacyQuotientRoot(plainModel))
-    ),
-    null,
-    null
+    )
   );
 
   const del5Insert5Distrib: Distribution<Transform> = [
@@ -91,9 +83,7 @@ function buildQuickBrownFixture() {
   const del5Insert5Tokenization = new ContextTokenization(
     baseTokenization.tokens.slice(0, baseTokenCount - 3).concat(
       new ContextToken(new LegacyQuotientSpur(baseTokenization.tokens[baseTokenCount-2].searchModule, del5Insert5Distrib, del5Insert5Distrib[0]))
-    ),
-    null,
-    null
+    )
   );
 
   const deleteToBoundDistrib: Distribution<Transform> = [
@@ -102,9 +92,7 @@ function buildQuickBrownFixture() {
   const deleteToBoundTokenization = new ContextTokenization(
     baseTokenization.tokens.slice(0, baseTokenCount - 3).concat(
       new ContextToken(new LegacyQuotientSpur(baseTokenization.tokens[baseTokenCount-2].searchModule, deleteToBoundDistrib, deleteToBoundDistrib[0]))
-    ),
-    null,
-    null
+    )
   );
 
   const deleteLeftCalc = (tokens: ContextToken[]) => tokens.reduce((accum, curr) => accum + curr.codepointLength, 0);
@@ -269,9 +257,7 @@ describe('determineSuggestionRange', () => {
     const tokensToAppend = rawText.map((t) => ContextToken.fromRawText(plainModel, t, false));
 
     const foxVsAlligatorTokenization = new ContextTokenization(
-      originalQuickBrownTokenization.tokens.slice(0, transitionSliceIndex).concat(tokensToAppend),
-      null,
-      null
+      originalQuickBrownTokenization.tokens.slice(0, transitionSliceIndex).concat(tokensToAppend)
     )
 
     const analysis = determineSuggestionRange(originalQuickBrownTokenization.tokens, foxVsAlligatorTokenization.tokens, tokenEquality);
@@ -295,9 +281,7 @@ describe('determineSuggestionRange', () => {
     const tokensToAppend = rawText.map((t) => ContextToken.fromRawText(plainModel, t, false));
 
     const dogsAndCatTokenization = new ContextTokenization(
-      originalQuickBrownTokenization.tokens.slice(0, originalTokenCount - 1).concat(tokensToAppend),
-      null,
-      null
+      originalQuickBrownTokenization.tokens.slice(0, originalTokenCount - 1).concat(tokensToAppend)
     )
 
     const analysis = determineSuggestionRange(originalQuickBrownTokenization.tokens, dogsAndCatTokenization.tokens, tokenEquality);

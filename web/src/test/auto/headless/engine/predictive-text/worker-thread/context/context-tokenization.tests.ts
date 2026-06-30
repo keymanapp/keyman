@@ -107,7 +107,7 @@ describe('ContextTokenization', function() {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       const tokens = rawTextTokens.map((text => toTransformToken(text)));
 
-      let tokenization = new ContextTokenization(tokens, null, null /* dummy val */);
+      let tokenization = new ContextTokenization(tokens);
 
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
@@ -118,7 +118,7 @@ describe('ContextTokenization', function() {
     it('clones', () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       const tokens = rawTextTokens.map((text => toTransformToken(text)));
-      let baseTokenization = new ContextTokenization(tokens, null, null /* dummy val */);
+      let baseTokenization = new ContextTokenization(tokens);
       let cloned = new ContextTokenization(baseTokenization);
 
       assert.sameOrderedMembers(
