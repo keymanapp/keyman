@@ -165,25 +165,6 @@ procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
 function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean): Boolean; forward;
 
-
-// TODO pretty sure this exists in a common unit somewhere, but I can't find it.  So for now, just copy it here
-function IsProcessElevated: Boolean;
-var
-  hToken: THandle;
-  Elevation: TTokenElevation;
-  cbSize: DWORD;
-begin
-  Result := False;
-  if OpenProcessToken(GetCurrentProcess, TOKEN_QUERY, hToken) then
-  try
-    cbSize := SizeOf(TTokenElevation);
-    if GetTokenInformation(hToken, TokenElevation, @Elevation, SizeOf(TTokenElevation), cbSize) then
-      Result := Elevation.TokenIsElevated <> 0;
-  finally
-    CloseHandle(hToken);
-  end;
-end;
-
 function Main(Owner: TComponent = nil): TModalResult;
 var
   frmMain: TfrmMain;
@@ -562,7 +543,7 @@ begin
 
     fmBaseKeyboard:   // I4169
       begin
-        if IsProcessElevated then
+        if kmcom.SystemInfo.IsAdministrator then
         begin
           if TUtilExecute.CreateProcessAsShellUser(ParamStr(0), '"'+ParamStr(0)+'" -basekeyboard', True, ShellExitCode) then
             ExitCode := ShellExitCode
