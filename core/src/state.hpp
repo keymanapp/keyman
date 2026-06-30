@@ -35,6 +35,10 @@ class actions : public std::vector<action>
 public:
   template<typename... Args>
   actions(Args&&... args);
+  actions(actions const &other);
+  // If the operator is needed in the future, it shall be implemented
+  // in like the deep copy constructor. Blocking accidental use of it.
+  actions &operator=(actions const &) = delete;
 
   void push_character(km_core_usv usv);
   void push_marker(uint32_t marker);
