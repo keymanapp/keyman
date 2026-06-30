@@ -76,10 +76,6 @@ var
 begin
   T := FSources.LockList;
   try
-    // Note: Unlike regular functions, Assert has short-circuit evaluation
-    // intrinsics on the first param which makes it safe to dereference T[0] in
-    // the second parameter.
-
     // There is a race where RegisterSource is called on the server side
     // where a request is started in the form but the server does not respond
     // before the form is destroyed:
