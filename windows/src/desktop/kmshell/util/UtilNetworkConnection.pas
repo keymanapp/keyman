@@ -54,7 +54,7 @@ begin
   try
     // Get the profile currently providing internet access
     Profile := TNetworkInformation.GetInternetConnectionProfile;
-    if Profile <> nil then
+    if Assigned(Profile) then
     begin
       CostLevel := Profile.GetConnectionCost;
       if CostLevel <> nil then

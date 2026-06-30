@@ -819,7 +819,7 @@ var
   FResult, InstallNow: Boolean;
   frmStartInstallNow: TfrmStartInstall;
   IsMetered: Boolean;
-  EInstallScenario: TInstallCase;
+  InstallCase: TInstallCase;
 begin
   InstallNow := True;
   IsMetered := UtilNetworkConnection.IsMetered;
