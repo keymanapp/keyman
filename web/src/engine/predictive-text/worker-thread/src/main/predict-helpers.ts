@@ -543,8 +543,8 @@ export function buildCorrectionSequence(
   const orderedTokens = tokenizationCorrection.matchingSpace?.orderedTokens;
   const tokens: PredictionParameters['tokens'] = [];
 
-  for(let i = 0; i < tokenizationCorrection.matchedResult.length; i++) {
-    const correction = tokenizationCorrection.matchedResult[i];
+  for(let i = 0; i < tokenizationCorrection.matchedResult.tokenCorrections.length; i++) {
+    const correction = tokenizationCorrection.matchedResult.tokenCorrections[i];
     /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
      * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
      * there are significantly more likely words.  We only need this to allow very minor fat-finger
@@ -809,8 +809,17 @@ export function predictFromCorrectionSequence(
 
   const predictionComponents = correctionTokens.map((correctionToken, i) => {
     const correctionTransform = correctionToken.correction.sample;
-    const predictions = lexicalModel.predict(correctionTransform, currentContext);
+    let predictions = lexicalModel.predict(correctionTransform, currentContext);
     const transitionId = correctionTransform.id;
+
+    // Ensure codepointLength == prediction codepoint length if i does not match the tail!
+    // Filter out cases that do not conform to this condition.
+    if(i != correctionTokens.length - 1) {
+      predictions = predictions.filter((p) => {
+        const codepointLength = KMWString.length(correctionToken.correction.sample.insert);
+        return KMWString.length(p.sample.transform.insert) == codepointLength;
+      });
+    }
 
     // Failsafe:  if there are no matching predictions, create a fake prediction
     // matching the original text.

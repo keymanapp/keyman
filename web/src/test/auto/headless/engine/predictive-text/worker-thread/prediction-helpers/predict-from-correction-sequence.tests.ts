@@ -551,8 +551,9 @@ describe('predictFromCorrectionSequence', () => {
       ];
 
       const expected_prediction_p = dummied_suggestion_sequences
-        .map((dist) => {
-          return dist[0]
+        .map((dist, i) => {
+          // There is no valid 'g' entry corresponding to token index 0.
+          return i == 0 ? null : dist[0]
         }).reduce((accum, curr) => {
           return accum * (curr ? curr.p : Math.exp(-EDIT_DISTANCE_COST_SCALE))
         }, 1);
@@ -560,11 +561,11 @@ describe('predictFromCorrectionSequence', () => {
       const expected_predictions: Suggestion[] = [
         {
           transform: {
-            insert: 'golden',
+            insert: 'g',
             deleteLeft: 0,
             id: transitionID
           },
-          displayAs: 'golden',
+          displayAs: 'g',
           transformId: transitionID
         }, {
           transform: {
@@ -598,7 +599,7 @@ describe('predictFromCorrectionSequence', () => {
       predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, parameters.tokens.reduce((accum, curr) => accum * curr.correction.p, 1)));
       predictions.sort(tupleDisplayOrderSort);
 
-      assert.deepEqual(predictions[0].components.map((c) => c.prediction.transform.insert), ['golden', ' ', 'apple']);
+      assert.deepEqual(predictions[0].components.map((c) => c.prediction.transform.insert), ['g', ' ', 'apple']);
       assert.sameDeepOrderedMembers(predictions[0].components.map((entry) => entry.prediction), expected_predictions);
 
       assert.approximately(predictions[0].metadata.probabilities.prediction, expected_prediction_p, 0.00001);
