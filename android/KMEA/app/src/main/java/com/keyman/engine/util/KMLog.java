@@ -117,8 +117,8 @@ public final class KMLog {
 
         // Sentry does limit the size of messages... so let's just
         // keep 10 entries and call it a day.
-        int limit = Math.min(rawTrace.length, 10 + skipCount);
         if(rawTrace.length > skipCount) {
+          int limit = Math.min(rawTrace.length, 10 + skipCount);
           String[] trace = new String[limit - skipCount];
           for (int i = skipCount; i < limit; i++) {
             trace[i-skipCount] = rawTrace[i].toString();
@@ -190,7 +190,7 @@ public final class KMLog {
     String errorMsg = "";
     try {
       if (msg != null && !msg.isEmpty()) {
-        errorMsg = msg + "\n" + e.toString();
+        errorMsg = msg + "\n" + e;
       } else if (e != null) {
         errorMsg = e.toString();
       }
@@ -206,6 +206,8 @@ public final class KMLog {
       }
     }
 
+    Log.e(tag, errorMsg);
+
     if (!canLogToSentry()) {
       return;
     }
@@ -215,12 +217,18 @@ public final class KMLog {
       tagDebugInfo();
       try {
         if(obj != null && objName != null) {
-          Sentry.setTag(objName, obj.toString());
+          Sentry.setExtra(objName, obj.toString());
         }
       } catch(Exception innerE) {
         Sentry.captureException(innerE);
       }
       Sentry.captureException(e);
+
+      if(obj != null && objName != null) {
+        // And remove the exception-specific tagged data, lest it also be
+        // tracked on subsequent errors not associated with the current call.
+        Sentry.removeExtra(objName);
+      }
     });
   }
 }
