@@ -190,6 +190,7 @@ uses
   Keyman.System.KeymanSentryClient,
   Keyman.System.UpdateStateMachine,
   OptionsXMLRenderer,
+  Keyman.Configuration.Util.NetworkConnection,
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
   Keyman.Configuration.UI.InstallFile,
@@ -212,7 +213,6 @@ uses
   utilexecute,
   utilkmshell,
   utilhttp,
-  UtilNetworkConnection,
   utiluac,
   utilxml,
   KeymanPaths;
@@ -822,30 +822,30 @@ var
   InstallCase: TInstallCase;
 begin
   InstallNow := True;
-  IsMetered := UtilNetworkConnection.IsMetered;
+  IsMetered := TNetworkConnection.IsMetered;
 
   // If a restart is required (HasKeymanRun == True)
   // OR it is a Metered connection warn the user and allow
   // them to cancel their request to Install Now.
   // Otherwise start installing with out pop-up warnings.
-  EInstallScenario := TInstallCase.icNone;
+  InstallCase := TInstallCase.icNone;
   if HasKeymanRun and not IsMetered then
   begin
-    EInstallScenario := TInstallCase.icRestartRequiredNotMetered;
+    InstallCase := TInstallCase.icRestartRequiredNotMetered;
   end
   else if HasKeymanRun and IsMetered then
   begin
-    EInstallScenario := TInstallCase.icRestartRequiredMetered;
+    InstallCase := TInstallCase.icRestartRequiredMetered;
   end
   else if (not HasKeymanRun) and IsMetered then
   begin
-     EInstallScenario := TInstallCase.icNoInstallMessageMetered;
+     InstallCase := TInstallCase.icNoInstallMessageMetered;
   end;
 
   // Render dialog if conditions require it
-  if EInstallScenario <> TInstallCase.icNone then
+  if InstallCase <> TInstallCase.icNone then
   begin
-    frmStartInstallNow := TfrmStartInstall.Create(nil, EInstallScenario);
+    frmStartInstallNow := TfrmStartInstall.Create(nil, InstallCase);
     try
       if frmStartInstallNow.ShowModal = mrOk then
         InstallNow := True

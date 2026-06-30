@@ -3,40 +3,41 @@
   *
   * Notes: Enable checking for metered connection and background data restrictions.
 *)
-unit UtilNetworkConnection;
+unit Keyman.Configuration.Util.NetworkConnection;
 
 interface
 
-(**
- * Checks if the current internet connection is restricted, roaming, or over its
- * data limit.
- * This learn microsoft article shows how to combine network costs to determine
- * if the connection is metered.
- * https://learn.microsoft.com/en-us/uwp/api/windows.networking.connectivity.connectionprofile?view=winrt-28000
- *
- * @returns True if the connection is metered, False otherwise.
- *)
-function IsMetered: Boolean;
 
-(**
- * Checks if background data usage is explicitly restricted by the current network profile.
- *
- * @returns True if background data usage is restricted, False otherwise.
- *)
-function IsBackgroundDataRestricted: Boolean;
-
-(**
- * Determines whether background updates are blocked.
- *
- * @returns True if background updates are blocked, False if allowed.
- *
- * Note: Currently this checks for metered connection OR background
-        data usage restricted. If a configuration item is added that
-        provides the option to download on metered connections then
-        this should be updated to include that logic
- *)
-function IsBackgroundUpdateBlocked: Boolean;
-
+type
+  TNetworkConnection = class
+    (**
+     * Checks if the current internet connection is restricted, roaming, or over its
+     * data limit.
+     * This learn microsoft article shows how to combine network costs to determine
+     * if the connection is metered.
+     * https://learn.microsoft.com/en-us/uwp/api/windows.networking.connectivity.connectionprofile?view=winrt-28000
+     *
+     * @returns True if the connection is metered, False otherwise.
+     *)
+    class function IsMetered: Boolean; static;
+    (**
+     * Checks if background data usage is explicitly restricted by the current network profile.
+     *
+     * @returns True if background data usage is restricted, False otherwise.
+     *)
+    class function IsBackgroundDataRestricted: Boolean; static;
+    (**
+     * Determines whether background updates are blocked.
+     *
+     * @returns True if background updates are blocked, False if allowed.
+     *
+     * Note: Currently this checks for metered connection OR background
+            data usage restricted. If a configuration item is added that
+            provides the option to download on metered connections then
+            this should be updated to include that logic
+     *)
+    class function IsBackgroundUpdateBlocked: Boolean; static;
+  end;
 implementation
 
 uses
@@ -45,7 +46,7 @@ uses
   Winapi.WinRT,
   Winapi.Networking.Connectivity;
 
-function IsMetered: Boolean;
+class function TNetworkConnection.IsMetered: Boolean;
 var
   Profile: IConnectionProfile;
   CostLevel: IConnectionCost;
@@ -70,7 +71,8 @@ begin
       Result := False;
   end;
 end;
-function IsBackgroundDataRestricted: Boolean;
+
+class function TNetworkConnection.IsBackgroundDataRestricted: Boolean;
 var
   Profile: IConnectionProfile;
   CostLevel: IConnectionCost;
@@ -96,7 +98,7 @@ end;
 // data usage restricted. If a configuration item is added that
 // provides the option to download on metered connections then
 // this should be updated to include that logic
-function IsBackgroundUpdateBlocked: Boolean;
+class function TNetworkConnection.IsBackgroundUpdateBlocked: Boolean;
 begin
   Result := IsMetered OR IsBackgroundDataRestricted;
 end;

@@ -14,10 +14,10 @@ uses
   Sentry.Client,
 
   KeymanPaths,
+  Keyman.Configuration.Util.NetworkConnection,
   Keyman.System.ExecutionHistory,
   Keyman.System.UpdateCheckResponse,
-  utilkmshell,
-  UtilNetworkConnection;
+  utilkmshell;
 
 type
   EUpdateStateMachine = class(Exception);
@@ -722,7 +722,7 @@ begin
   bucStateContext.SetRegistryState(usUpdateAvailable);
 
   if bucStateContext.FAutomaticUpdate and
-    not UtilNetworkConnection.IsBackgroundUpdateBlocked then
+    not TNetworkConnection.IsBackgroundUpdateBlocked then
   begin
     StartDownloadProcess;
   end;
@@ -755,7 +755,7 @@ end;
 function UpdateAvailableState.HandleKmShell;
 begin
   if bucStateContext.FAutomaticUpdate and
-    not UtilNetworkConnection.IsBackgroundUpdateBlocked then
+    not TNetworkConnection.IsBackgroundUpdateBlocked then
   begin
     // we will use a new kmshell process to enable
     // the download as background process.
