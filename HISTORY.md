@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.249 alpha 2026-06-30
+
+* fix(windows): add update property to remote check (#16126)
+* chore(android): allow to build FV app in docker container (#16163)
+* fix(developer): warn only on race when destroying TAppSourceHttpResponder (#16140)
+* fix(developer): map shift key nextlayer property when importing OSK (#16110)
+
 ## 19.0.248 alpha 2026-06-29
 
 * chore: add missing line to history (#16154)
