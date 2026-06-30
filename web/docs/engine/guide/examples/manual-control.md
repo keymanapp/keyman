@@ -2,7 +2,10 @@
 title: Manual Mode Example
 ---
 
-In this example, the web page designer specifies when KeymanWeb's on-screen keyboard may be displayed on non-mobile devices. They have also specified that the LaoKeys keyboard should be activated by default. This example continues to use the KeymanWeb default interface. Please click [this link](__manual-control.html) to open the test page.
+In this example, the web page designer specifies when KeymanWeb's on-screen keyboard may be
+displayed on non-mobile devices. They have also specified that the LaoKeys keyboard should be
+activated by default. This example continues to use the KeymanWeb default interface. Please click
+[this link](__manual-control.html) to open the test page.
 
 ## Code Walkthrough
 
@@ -17,7 +20,7 @@ Include the following script in the HEAD of your page:
         languages:{id:'lo',name:'Lao'},
         filename: "./js/laokeys.js"
       });
-      keyman.setActiveKeyboard('laokeys');
+      await keyman.setActiveKeyboard('laokeys');
       keyman.osk.hide();
     });
 
