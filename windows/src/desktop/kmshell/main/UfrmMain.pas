@@ -190,6 +190,7 @@ uses
   Keyman.System.KeymanSentryClient,
   Keyman.System.UpdateStateMachine,
   OptionsXMLRenderer,
+  Keyman.Configuration.Util.NetworkConnection,
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
   Keyman.Configuration.UI.InstallFile,
@@ -817,12 +818,34 @@ var
   ShellPath : string;
   FResult, InstallNow: Boolean;
   frmStartInstallNow: TfrmStartInstall;
+  IsMetered: Boolean;
+  InstallCase: TInstallCase;
 begin
   InstallNow := True;
-  // Confirm User is ok that this will require a reset
-  if HasKeymanRun then
+  IsMetered := TNetworkConnection.IsMetered;
+
+  // If a restart is required (HasKeymanRun == True)
+  // OR it is a Metered connection warn the user and allow
+  // them to cancel their request to Install Now.
+  // Otherwise start installing with out pop-up warnings.
+  InstallCase := TInstallCase.icNone;
+  if HasKeymanRun and not IsMetered then
   begin
-    frmStartInstallNow := TfrmStartInstall.Create(nil, true);
+    InstallCase := TInstallCase.icRestartRequiredNotMetered;
+  end
+  else if HasKeymanRun and IsMetered then
+  begin
+    InstallCase := TInstallCase.icRestartRequiredMetered;
+  end
+  else if (not HasKeymanRun) and IsMetered then
+  begin
+     InstallCase := TInstallCase.icNoInstallMessageMetered;
+  end;
+
+  // Render dialog if conditions require it
+  if InstallCase <> TInstallCase.icNone then
+  begin
+    frmStartInstallNow := TfrmStartInstall.Create(nil, InstallCase);
     try
       if frmStartInstallNow.ShowModal = mrOk then
         InstallNow := True
@@ -833,18 +856,23 @@ begin
     end;
   end;
 
-  if InstallNow = True then
+  // Process installation execution execution path
+  if InstallNow then
   begin
     ShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
     FResult := TUtilExecute.Shell(0, ShellPath, '', '-an');
     if not FResult then
+    begin
       TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-        'TrmfMain: Shell Execute Update_ApplyNow Failed')
+        'TrmfMain: Shell Execute Update_ApplyNow Failed');
+    end
     else
-      ModalResult := mrAbort;
+    begin
       // If a splash screen is currently open when "Install Now" is executed,
       // setting mrAbort ensures the splash screen is closed on the
       // return of "Keyman Configuration".
+      ModalResult := mrAbort;
+    end;
   end;
 end;
 

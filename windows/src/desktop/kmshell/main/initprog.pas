@@ -677,7 +677,8 @@ begin
      (FMode in [fmStart, fmSplash, fmMain, fmAbout,
                 fmHelp, fmShowHelp, fmSettings, fmBoot]) then
   begin
-    frmStartInstall := TfrmStartInstall.Create(nil, false);
+    // We are ready to install Metered warning not needed even if on Metered connection
+    frmStartInstall := TfrmStartInstall.Create(nil, TInstallCase.icReadyToInstallNotMetered);
     try
       Result := frmStartInstall.ShowModal = mrOk;
     finally

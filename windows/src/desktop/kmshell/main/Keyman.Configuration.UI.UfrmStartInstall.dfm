@@ -20,7 +20,7 @@ object frmStartInstall: TfrmStartInstall
   object lblUpdateMessage: TLabel
     Left = 64
     Top = 89
-    Width = 313
+    Width = 303
     Height = 34
     Caption = 'An update to Keyman has been downloaded and is ready to install.'
     Font.Charset = DEFAULT_CHARSET
@@ -145,6 +145,34 @@ object frmStartInstall: TfrmStartInstall
       ABDFF44AC33003247912AC03CC95ADAD855BD52A541A062D2D260D8396169386
       414B8B49C3A0A5C5A461D0D262FA3F82D7F60E256D51F10000000049454E44AE
       426082}
+  end
+  object shpMeteredWarning: TShape
+    Left = 60
+    Top = 149
+    Width = 314
+    Height = 45
+    Brush.Color = 15132415
+    Pen.Color = clRed
+    Visible = False
+  end
+  object lblMeteredWarning: TLabel
+    Left = 64
+    Top = 150
+    Width = 303
+    Height = 43
+    AutoSize = False
+    Caption = 'Metered Warning'
+    Color = 15132415
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Segoe UI'
+    Font.Style = []
+    ParentColor = False
+    ParentFont = False
+    Transparent = False
+    Visible = False
+    WordWrap = True
   end
   object cmdInstall: TButton
     Left = 229
