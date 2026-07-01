@@ -503,7 +503,7 @@ public final class KMManager {
   /**
    * Check if the given font is the default font or the default OSK font.
    * @param fontName  String - The font name and extension
-   * @return boolean  true if `fontName` is DejaVueSans.ttf or keymanweb-osk.ttf
+   * @return boolean  true if `fontName` is DejaVuSans.ttf or keymanweb-osk.ttf
    *                  or null or empty string, false otherwise
    */
   public static boolean isDefaultFont(String fontName) {
