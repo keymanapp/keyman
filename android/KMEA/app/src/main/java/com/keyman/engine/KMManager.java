@@ -2243,7 +2243,12 @@ public final class KMManager {
       File kmpJSONFile = new File(path);
       if (!kmpJSONFile.exists()) {
         if (!KMManager.isTestMode()) {
-          KMLog.LogError(TAG, path + " not found. Returning version 1.0");
+          if (packageID.equals(KMDefault_PackageID)) {
+            // Suppress error log for the default fallback keyboard if it's not installed
+            Log.d(TAG, path + " not found. Returning version 1.0");
+          } else {
+            KMLog.LogError(TAG, path + " not found. Returning version 1.0");
+          }
         }
         return "1.0";
       }
