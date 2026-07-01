@@ -86,7 +86,8 @@ final class KMKeyboard extends WebView {
 
   private static String txtFont = "";
   private static String oskFont = null;
-  private static String keyboardRoot = "";
+  private static String dataRoot = "";
+  private static String packageRoot = "";
   private final String fontUndefined = "undefined";
   private GestureDetector gestureDetector;
   private static ArrayList<OnKeyboardEventListener> kbEventListeners = null;
@@ -647,7 +648,7 @@ final class KMKeyboard extends WebView {
     }
     String kbKey = KMString.format("%s_%s", languageID, keyboardID);
 
-    setKeyboardRoot(packageID);
+    setPackageRoot(packageID);
 
     // Escape single-quoted names for javascript call
     keyboardName = keyboardName.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
@@ -703,13 +704,13 @@ final class KMKeyboard extends WebView {
         KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
     }
 
-    setKeyboardRoot(packageID);
+    setPackageRoot(packageID);
 
     if(kOskFont == null || kOskFont.isEmpty())
       kOskFont = kFont;
 
-    JSONObject jDisplayFont = makeFontPaths(kFont);
-    JSONObject jOskFont = makeFontPaths(kOskFont);
+    JSONObject jDisplayFont = makeFontObject(kFont);
+    JSONObject jOskFont = makeFontObject(kOskFont);
 
     txtFont = getFontFilename(jDisplayFont);
     oskFont = getFontFilename(jOskFont);
@@ -810,20 +811,25 @@ final class KMKeyboard extends WebView {
   }
 
   // Set the base path of the keyboard depending on the package ID
-  private void setKeyboardRoot(String packageID) {
+  private void setPackageRoot(String packageID) {
+    this.dataRoot = WebViewUtils.buildAssetUrl("");
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      this.keyboardRoot = WebViewUtils.buildAssetUrl(KMManager.KMDefault_UndefinedPackageID + "/");
+      this.packageRoot = this.dataRoot + KMManager.KMDefault_UndefinedPackageID + "/";
     } else {
-      this.keyboardRoot = WebViewUtils.buildAssetUrl(KMManager.KMDefault_AssetPackages + "/" + packageID + "/");
+      this.packageRoot = this.dataRoot + KMManager.KMDefault_AssetPackages + "/" + packageID + "/";
     }
   }
 
-  private String getKeyboardRoot() {
-    return this.keyboardRoot;
+  private String getDataRoot() {
+    return this.dataRoot;
+  }
+
+  private String getPackageRoot() {
+    return this.packageRoot;
   }
 
   private String makeKeyboardUrl(String packageID, String keyboardID, String keyboardVersion) {
-    String keyboardUrl = getKeyboardRoot();
+    String keyboardUrl = getPackageRoot();
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
       keyboardUrl += keyboardID + "-" + keyboardVersion + ".js";
     } else {
@@ -1041,13 +1047,26 @@ final class KMKeyboard extends WebView {
   }
 
   /**
-   * Take a font JSON object and adjust to pass to JS
-   * 1. Replace "source" keys for "files" keys
-   * 2. Create full font paths for .ttf or .svg
-   * @param font String font JSON object as a string
-   * @return JSONObject of modified font information with full paths. If font is invalid, return `null`
+   * Create a JSON object consisting of the font family and the URLs of the
+   * font files on the local device.
+   *
+   * The `font` parameter can either be the filename of the font (with an
+   * extension recognized as font), or a Font object or JSON string.
+   * In the former case a new JSON object is created with the font family
+   * derived from the filename, and the font filename prefixed with path
+   * to the fonts.
+   * In the latter case the legacy `sources` key is renamed to `files`.
+   * If `files` is a single string it will be prefixed with the path to the
+   * fonts. If `files` is an array, the array is iterated until finding
+   * the first file with a font extension which is then prefixed with the
+   * path to the fonts.
+   *
+   * @param font  A string containing either the font filename or a font JSON
+   *              object as a string
+   * @return JSONObject of modified font information with full paths. If font
+   *         is invalid, return `null`.
    */
-  private JSONObject makeFontPaths(String font) {
+  private JSONObject makeFontObject(String font) {
 
     if(font == null || font.equals("")) {
       return null;
@@ -1058,14 +1077,13 @@ final class KMKeyboard extends WebView {
         JSONObject jfont = new JSONObject();
         jfont.put(KMManager.KMKey_FontFamily, font.substring(0, font.length()-4));
         JSONArray jfiles = new JSONArray();
-        jfiles.put(getKeyboardRoot() + font);
+        String fontRoot = KMManager.isDefaultFont(font) ? getDataRoot() : getPackageRoot();
+        jfiles.put(fontRoot + font);
         jfont.put(KMManager.KMKey_FontFiles, jfiles);
         return jfont;
       }
 
       JSONObject fontObj = new JSONObject(font);
-      JSONArray sourceArray;
-      String fontFile;
 
       // Replace "sources" key with "files"
       if (fontObj.has(KMManager.KMKey_FontSource)) {
@@ -1075,16 +1093,18 @@ final class KMKeyboard extends WebView {
 
       Object obj = fontObj.get(KMManager.KMKey_FontFiles);
       if (obj instanceof String) {
-        fontFile = fontObj.getString(KMManager.KMKey_FontFiles);
-        fontObj.put(KMManager.KMKey_FontFiles, getKeyboardRoot() + obj);
+        String fontFile = fontObj.getString(KMManager.KMKey_FontFiles);
+        String fontRoot = KMManager.isDefaultFont(fontFile) ? getDataRoot() : getPackageRoot();
+        fontObj.put(KMManager.KMKey_FontFiles, fontRoot + obj);
         return fontObj;
       } else if (obj instanceof JSONArray) {
-        sourceArray = fontObj.optJSONArray(KMManager.KMKey_FontFiles);
+        JSONArray sourceArray = fontObj.optJSONArray(KMManager.KMKey_FontFiles);
         if (sourceArray != null) {
           for (int i = 0; i < sourceArray.length(); i++) {
-            fontFile = sourceArray.getString(i);
+            String fontFile = sourceArray.getString(i);
             if (FileUtils.hasFontExtension(fontFile)) {
-              fontObj.put(KMManager.KMKey_FontFiles, getKeyboardRoot() + fontFile);
+              String fontRoot = KMManager.isDefaultFont(fontFile) ? getDataRoot() : getPackageRoot();
+              fontObj.put(KMManager.KMKey_FontFiles, fontRoot + fontFile);
               fontObj.remove(KMManager.KMKey_FontSource);
               return fontObj;
             }
@@ -1093,7 +1113,6 @@ final class KMKeyboard extends WebView {
       }
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Failed to make font for '"+font+"'", e);
-      return null;
     }
 
     return null;

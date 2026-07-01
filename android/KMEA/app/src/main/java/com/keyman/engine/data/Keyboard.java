@@ -174,20 +174,24 @@ public class Keyboard extends LanguageResource implements Serializable {
     return o;
   }
 
-  private String getKeyboardRoot() {
+  private String getDataRoot() {
+    return WebViewUtils.buildAssetUrl("");
+  }
+
+  private String getPackageRoot() {
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      return WebViewUtils.buildAssetUrl(KMManager.KMDefault_UndefinedPackageID + "/");
+      return getDataRoot() + KMManager.KMDefault_UndefinedPackageID + "/";
     }
-    return WebViewUtils.buildAssetUrl(KMManager.KMDefault_AssetPackages + "/" + packageID + "/");
+    return getDataRoot() + KMManager.KMDefault_AssetPackages + "/" + packageID + "/";
   }
 
   private String getKeyboardUrl() {
     String keyboardID = this.getKeyboardID();
     String keyboardVersion = this.getVersion();
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      return getKeyboardRoot() + keyboardID + "-" + keyboardVersion + ".js";
+      return getPackageRoot() + keyboardID + "-" + keyboardVersion + ".js";
     } else {
-      return getKeyboardRoot() + keyboardID + ".js";
+      return getPackageRoot() + keyboardID + ".js";
     }
   }
 
@@ -225,34 +229,33 @@ public class Keyboard extends LanguageResource implements Serializable {
   }
 
   /**
-   * Take a font JSON object and adjust to pass to JS
-   * 1. Replace "source" keys for "files" keys
-   * 2. Create full font paths for .ttf or .svg
-   * @param font String font JSON object as a string
-   * @return JSONObject of modified font information with full paths. If font is invalid, return `null`
+   * Create a JSON object consisting of the font family and the font
+   * file URL.
+   *
+   * @param font  A string containing the font filename
+   * @return JSONObject of modified font information with full URL. If font
+   *         is invalid, return `null`.
    */
   private JSONObject buildDisplayFontObject(String font) {
     if(font == null || font.equals("")) {
       return null;
     }
 
-    String keyboardRoot = this.getKeyboardRoot();
+    String fontRoot = KMManager.isDefaultFont(font) ? this.getDataRoot() : this.getPackageRoot();
 
     try {
       if (FileUtils.hasFontExtension(font)) {
         JSONObject jfont = new JSONObject();
         jfont.put(KMManager.KMKey_FontFamily, font.substring(0, font.length() - 4));
         JSONArray jfiles = new JSONArray();
-        jfiles.put(keyboardRoot + font);
+        jfiles.put(fontRoot + font);
         jfont.put(KMManager.KMKey_FontFiles, jfiles);
         return jfont;
-      } else {
-        return null;
       }
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Failed to make font for '"+font+"'", e);
-      return null;
     }
+    return null;
   }
 
   /**
