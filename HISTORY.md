@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.250 alpha 2026-07-01
+
+* fix(android): use `WebViewAssetLoader` for loading assets on Android (address regression in 19.0.242) (#16146)
+* fix(ios): bundle in KMW's globe-hint.css (#16142)
+* fix(ios): load host page, keyboards through a consistent WKURLSchemeHandler (#16136)
+
 ## 19.0.249 alpha 2026-06-30
 
 * fix(windows): add update property to remote check (#16126)
