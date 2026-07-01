@@ -6,15 +6,12 @@
 
 // #region Big ol' list of imports
 
-import { EventEmitter } from 'eventemitter3';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes, type JSKeyboard, KeyEvent, Layouts,
   DefaultOutputRules, EmulationKeystrokes, type MutableSystemStore,
   TextStore, ProcessorAction, SystemStoreIDs, SyntheticTextStore,
-  KeyboardProcessor,
-  EventMap,
-  BeepHandler,
+  AbstractKeyboardProcessor,
 } from "keyman/engine/keyboard";
 import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
 import { DeviceSpec, KMWString } from "keyman/common/web-utils";
@@ -24,58 +21,17 @@ import { ProcessorInitOptions } from './processorInitOptions.js';
 
 export type LogMessageHandler = (str: string) => void;
 
-export class JSKeyboardProcessor extends EventEmitter<EventMap> implements KeyboardProcessor {
-  // Tracks the simulated value for supported state keys, allowing the OSK to mirror a physical keyboard for them.
-  // Using the exact keyCode name from the Codes definitions will allow for certain optimizations elsewhere in the code.
-  public stateKeys = {
-    "K_CAPS":false,
-    "K_NUMLOCK":false,
-    "K_SCROLL":false
-  };
-
-  // Tracks the most recent modifier state information in order to quickly detect changes
-  // in keyboard state not otherwise captured by the hosting page in the browser.
-  // Needed for AltGr simulation.
-  public modStateFlags: number = 0;
-
-  public keyboardInterface: JSKeyboardInterface;
-
-  /**
-   * Indicates the device (platform) to be used for non-keystroke events,
-   * such as those sent to `begin postkeystroke` and `begin newcontext`
-   * entry points.
-   */
-  public contextDevice: DeviceSpec;
-
-  public baseLayout: string;
-
+export class JSKeyboardProcessor extends AbstractKeyboardProcessor<JSKeyboard, JSKeyboardInterface> {
   public defaultOutputRules: DefaultOutputRules;
 
   // Callbacks for various feedback types
-  public beepHandler?: BeepHandler;
   public warningLogger?: LogMessageHandler;
   public errorLogger?: LogMessageHandler;
 
   constructor(device: DeviceSpec, options: ProcessorInitOptions) {
-    super();
+    super(device, options.baseLayout, options.keyboardInterface);
 
-    this.contextDevice = device;
-
-    this.baseLayout = options.baseLayout;
-    this.keyboardInterface = options.keyboardInterface;
     this.defaultOutputRules = options.defaultOutputRules;
-  }
-
-  public get activeKeyboard(): JSKeyboard {
-    return this.keyboardInterface.activeJSKeyboard;
-  }
-
-  public set activeKeyboard(keyboard: JSKeyboard) {
-    this.keyboardInterface.activeKeyboard = keyboard;
-
-    // All old deadkeys and keyboard-specific cache should immediately be invalidated
-    // on a keyboard change.
-    this.resetContext();
   }
 
   public get layerStore(): MutableSystemStore {
@@ -240,90 +196,7 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
     return matchBehavior;
   }
 
-  /**
-   * Function     _UpdateVKShift
-   * Scope        Private
-   * @param       {Object}            e     OSK event
-   * @return      {boolean}                 Always true
-   * Description  Updates the current shift state within KMW, updating the OSK's visualization thereof.
-   */
-  private _UpdateVKShift(e: KeyEvent): boolean {
-    let keyShiftState=0;
-
-    const lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'] as const;
-    const lockKeys = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
-    const lockModifiers = [ModifierKeyConstants.CAPITALFLAG, ModifierKeyConstants.NUMLOCKFLAG, ModifierKeyConstants.SCROLLFLAG] as const;
-
-
-    if(!this.activeKeyboard) {
-      return true;
-    }
-
-    if(e) {
-      // read shift states from Pevent
-      keyShiftState = e.Lmodifiers;
-
-      // Are we simulating AltGr?  If it's a simulation and not real, time to un-simulate for the OSK.
-      if(this.activeKeyboard.isChiral && (this.activeKeyboard.emulatesAltGr) &&
-          (this.modStateFlags & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM']) {
-        keyShiftState |= Codes.modifierBitmasks['ALT_GR_SIM'];
-        keyShiftState &= ~ModifierKeyConstants.RALTFLAG;
-      }
-
-      // Set stateKeys where corresponding value is passed in e.Lstates
-      let stateMutation = false;
-      for(let i=0; i < lockNames.length; i++) {
-        if(e.Lstates & Codes.stateBitmasks[lockNames[i]]) {
-          this.stateKeys[lockKeys[i]] = !!(e.Lstates & lockModifiers[i]);
-          stateMutation = true;
-        }
-      }
-
-      if(stateMutation) {
-        this.emit('statekeychange', this.stateKeys);
-      }
-    }
-
-    this.updateStates();
-
-    if(this.activeKeyboard.isMnemonic && this.stateKeys['K_CAPS']) {
-      // Modifier keypresses doesn't trigger mnemonic manipulation of modifier state.
-      // Only an output key does; active use of Caps will also flip the SHIFT flag.
-      if(!e || !e.isModifier) {
-        // Mnemonic keystrokes manipulate the SHIFT property based on CAPS state.
-        // We need to unflip them when tracking the OSK layer.
-        keyShiftState ^= ModifierKeyConstants.K_SHIFTFLAG;
-      }
-    }
-
-    this.layerId = this.getLayerId(keyShiftState);
-    return true;
-  }
-
-  private updateStates(): void {
-    const lockKeys = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
-    const lockModifiers = [ModifierKeyConstants.CAPITALFLAG, ModifierKeyConstants.NUMLOCKFLAG, ModifierKeyConstants.SCROLLFLAG] as const;
-    const noLockModifers = [ModifierKeyConstants.NOTCAPITALFLAG, ModifierKeyConstants.NOTNUMLOCKFLAG, ModifierKeyConstants.NOTSCROLLFLAG] as const;
-
-
-
-    for(let i=0; i < lockKeys.length; i++) {
-      const key = lockKeys[i];
-      const flag = this.stateKeys[key];
-
-      // Ensures that the current mod-state info properly matches the currently-simulated
-      // state key states.
-      if(flag) {
-        this.modStateFlags |= lockModifiers[i];
-        this.modStateFlags &= ~noLockModifers[i];
-      } else {
-        this.modStateFlags &= ~lockModifiers[i];
-        this.modStateFlags |= noLockModifers[i];
-      }
-    }
-  }
-
-  private getLayerId(modifier: number): string {
+  protected getLayerId(modifier: number): string {
     return Layouts.getLayerId(modifier);
   }
 
@@ -517,34 +390,6 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
     this.modStateFlags = baseModifierState | keyEvent.Lstates;
   }
 
-  // Returns true if the key event is a modifier press, allowing keyPress to return selectively
-  // in those cases.
-  public doModifierPress(Levent: KeyEvent, textStore: TextStore, isKeyDown: boolean): boolean {
-    if(!this.activeKeyboard) {
-      return false;
-    }
-
-    if(Levent.isModifier) {
-      this.activeKeyboard.notify(Levent.Lcode, textStore, isKeyDown ? 1 : 0);
-      // For eventual integration - we bypass an OSK update for physical keystrokes when in touch mode.
-      if(!Levent.device.touchable) {
-        return this._UpdateVKShift(Levent); // I2187
-      } else {
-        return true;
-      }
-    }
-
-    if(Levent.LmodifierChange) {
-      this.activeKeyboard.notify(0, textStore, 1);
-      if(!Levent.device.touchable) {
-        this._UpdateVKShift(Levent);
-      }
-    }
-
-    // No modifier keypresses detected.
-    return false;
-  }
-
   /**
    * Tell the currently active keyboard that a new context has been selected,
    * e.g. by focus change, selection change, keyboard change, etc.
@@ -570,14 +415,14 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
     this.keyboardInterface.resetContextCache();
 
     // May be null if it's a keyboard swap.
-    // Performed before _UpdateVKShift since the op may modify the displayed layer
+    // Performed before updateShiftState since the op may modify the displayed layer
     // Also updates the layer for predictions.
     if(textStore) {
       this.performNewContextEvent(textStore);
     }
 
     if(!this.contextDevice.touchable) {
-      this._UpdateVKShift(null);
+      this.updateShiftState(null);
     }
   };
 
