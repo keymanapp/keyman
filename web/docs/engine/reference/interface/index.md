@@ -42,9 +42,15 @@ Custom user interfaces would not normally use these functions, but they are desc
 :   Context deletion - removes the specified number of deadkeys and characters from the left of the caret.
 :   Shorthand name: `KeymanWeb.KDC`
 
+[`focusLastActiveTextStore` Function](focusLastActiveTextStore)
+:  Set focus to the currently-focused or most recently focused text store.
+
 [`fullContextMatch` Function](fullContextMatch)
 :   Context matching: Returns `true` if the current context matches the specified rule context specification.
 :   Shorthand name: `KeymanWeb.KFCM`
+
+[`getLastActiveTextStore` Function](getLastActiveTextStore)
+:  Get the currently or most recently focused text store. This is for use by IME keyboards.
 
 [`ifStore` Function](ifStore)
 :   `ifStore` compares the content of a [system `store`](/developer/language/guide/stores#toc-system-stores) with a string value.
@@ -105,3 +111,25 @@ Custom user interfaces would not normally use these functions, but they are desc
 [`stateMatch` Function](stateMatch)
 :   State-key matching: Returns `true` if the event matches the rule's state-key requirements.
 :   Shorthand name: `KeymanWeb.KSM`
+
+## Deprecated functions for IMEs
+
+The following functions have been retained for compatibility with existing IME
+keyboards, but should not be used in any new keyboards or user interfaces.
+
+[`GetLastActiveElement` or `getLastActiveElement` Function (Deprecated)](GetLastActiveElement)
+:   Use [`keyman.interface.getLastActiveTextStore()`](getLastActiveTextStore)
+
+[`FocusLastActiveElement` or `focusLastActiveElement` Function (Deprecated)](FocusLastActiveElement)
+:   Use [`keyman.interface.focusLastActiveTextStore()`](focusLastActiveTextStore)
+
+[`HideHelp` or `hideHelp` Function (Deprecated)](HideHelp)
+:   Use [`keyman.osk.hide()`](../osk/hide)
+
+[`ShowHelp` or `showHelp` Function (Deprecated)](ShowHelp)
+:   Use [`keyman.osk.setPos()`](../osk/setPos)
+    Use [`keyman.osk.show()`](../osk/show)
+
+[`ShowPinnedHelp` or `showPinnedHelp` Function (Deprecated)](ShowPinnedHelp)
+:   Use [`keyman.osk.setRect()`](../osk/setRect)
+:   Use [`keyman.osk.show()`](../osk/show)
