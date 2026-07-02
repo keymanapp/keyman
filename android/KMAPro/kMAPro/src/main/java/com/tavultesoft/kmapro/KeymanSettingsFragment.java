@@ -44,7 +44,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     getPreferenceManager().setSharedPreferencesName(getString(R.string.kma_prefs_name));
 
     languagesPreference = new Preference(context);
-    languagesPreference.setKey(KeymanSettingsActivity.installedLanguagesKey);
+    languagesPreference.setKey(KeymanSettingsKeys.INSTALLED_LANGUAGES);
     languagesPreference.setTitle(getInstalledLanguagesText());
     languagesPreference.setWidgetLayoutResource(R.layout.preference_icon_layout);
     Intent languagesIntent = new Intent(context, LanguagesSettingsActivity.class);
@@ -52,7 +52,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     languagesPreference.setIntent(languagesIntent);
 
     installKeyboardOrDictionary = new Preference(context);
-    installKeyboardOrDictionary.setKey(KeymanSettingsActivity.installKeyboardOrDictionaryKey);
+    installKeyboardOrDictionary.setKey(KeymanSettingsKeys.INSTALL_KEYBOARD_OR_DICTIONARY);
     installKeyboardOrDictionary.setTitle(getString(R.string.install_keyboard_or_dictionary));
     installKeyboardOrDictionary.setWidgetLayoutResource(R.layout.preference_add_icon_layout);
     Intent installIntent = new Intent(context, KeymanSettingsInstallActivity.class);
@@ -120,7 +120,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     /* Spacebar Caption Preference */
 
     spacebarTextPreference = new ListPreference(context);
-    spacebarTextPreference.setKey(KeymanSettingsActivity.spacebarTextKey);
+    spacebarTextPreference.setKey(KeymanSettingsKeys.SPACEBAR_TEXT);
 
     spacebarTextPreference.setTitle(getString(R.string.spacebar_caption)); // getString(R.string.change_display_language));
 
@@ -161,7 +161,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     });
 
     SwitchPreference oskWithPhysicalKeyboardPreference = new SwitchPreference(context);
-    oskWithPhysicalKeyboardPreference.setKey(KeymanSettingsActivity.oskWithPhysicalKeyboardKey);
+    oskWithPhysicalKeyboardPreference.setKey(KeymanSettingsKeys.OSK_WITH_PHYSICAL_KEYBOARD);
     oskWithPhysicalKeyboardPreference.setTitle(getString(R.string.show_osk));
     oskWithPhysicalKeyboardPreference.setSummary(getString(R.string.show_osk_hint));
 
@@ -169,7 +169,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
       PreferencesManager.kma_prefs_name, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     boolean showOSK = prefs.getBoolean(
-      KeymanSettingsActivity.oskWithPhysicalKeyboardKey, false);
+      KeymanSettingsKeys.OSK_WITH_PHYSICAL_KEYBOARD, false);
     oskWithPhysicalKeyboardPreference.setDefaultValue(showOSK);
 
     oskWithPhysicalKeyboardPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -179,14 +179,14 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
           return false;
         }
 
-        editor.putBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, (boolean)newValue);
+        editor.putBoolean(KeymanSettingsKeys.OSK_WITH_PHYSICAL_KEYBOARD, (boolean)newValue);
         editor.commit();
         return true;
       }
     });
 
     SwitchPreference hapticFeedbackPreference = new SwitchPreference(context);
-    hapticFeedbackPreference.setKey(KeymanSettingsActivity.hapticFeedbackKey);
+    hapticFeedbackPreference.setKey(KeymanSettingsKeys.HAPTIC_FEEDBACK);
     hapticFeedbackPreference.setTitle(getString(R.string.haptic_feedback));
     hapticFeedbackPreference.setDefaultValue(false);
     hapticFeedbackPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -212,7 +212,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     getStartedPreference.setDefaultValue(true);
 
     SwitchPreference sendCrashReportPreference = new SwitchPreference(context);
-    sendCrashReportPreference.setKey(KeymanSettingsActivity.sendCrashReport);
+    sendCrashReportPreference.setKey(KeymanSettingsKeys.SEND_CRASH_REPORT);
     sendCrashReportPreference.setTitle(getString(R.string.show_send_crash_report));
     sendCrashReportPreference.setSummaryOn(getString(R.string.show_send_crash_report_on));
     sendCrashReportPreference.setSummaryOff(getString(R.string.show_send_crash_report_off));
