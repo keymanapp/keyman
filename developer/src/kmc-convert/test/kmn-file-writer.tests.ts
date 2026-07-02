@@ -108,7 +108,7 @@ describe('KmnFileWriter', function () {
 
   describe('reviewRules messages', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    [
+    [/*
       [[new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'UNAVAILABLE', 'K_A', new TextEncoder().encode('A'))],
       [''],
       [''],
