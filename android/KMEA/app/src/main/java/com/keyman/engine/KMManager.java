@@ -1637,7 +1637,15 @@ public final class KMManager {
           return null;
         }
 
-        File file = new File(fontFilename);
+        // If fontFilename is a URL, replace the asset URL with the app's data directory path
+        String fontFilePath = fontFilename;
+        String rootUrl = WebViewUtils.buildAssetUrl("");
+        if (fontFilename.startsWith(rootUrl)) {
+          fontFilePath = fontFilename.replaceFirst(rootUrl,
+            context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator);
+        }
+
+        File file = new File(fontFilePath);
         if (file.exists()) {
           return Typeface.createFromFile(file);
         }
