@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="AppTheme.Base" parent="@style/Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="AppTheme.Toolbar" parent="Base.Widget.AppCompat.Toolbar">
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+</resources>
