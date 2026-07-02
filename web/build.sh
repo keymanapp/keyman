@@ -114,6 +114,25 @@ build_tests_action() {
 
   cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/textStoreForElement.tests.html" \
     "${KEYMAN_ROOT}/web/build/test/dom/cases/attachment/"
+
+  # Copy and update guide examples - for local, PR, and test builds we
+  # replace the CDN URL with the local build path, so that we can test
+  # against the current build
+  mkdir -p "${KEYMAN_ROOT}/web/build/docs/engine/guide"
+  cp -r "${KEYMAN_ROOT}/web/docs/engine/guide/examples" \
+    "${KEYMAN_ROOT}/web/build/docs/engine/guide/"
+
+  # shellcheck disable=SC2310
+  if ! builder_is_ci_release_build; then
+    for f in "${KEYMAN_ROOT}/web/build/docs/engine/guide/examples"/*.html; do
+      # Replace CDN URL (https://s.keyman.com/kwm/engine/18.0.123) with
+      # local local build path (/build/publish/debug). We write to a temp
+      # file and then replace the original instead of modifying in-place.
+      # This is safer and more portable.
+      sed "s|https://s\.keyman\.com/kmw/engine/[0-9]*\.[0-9]*\.[0-9]*/|/build/publish/${config}/|g" \
+        "${f}" > "${f}.tmp" && mv "${f}.tmp" "${f}"
+    done
+  fi
 }
 
 coverage_action() {
