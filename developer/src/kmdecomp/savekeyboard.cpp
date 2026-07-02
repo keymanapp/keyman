@@ -30,10 +30,11 @@
 
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 #include <codecvt>
-
 #include "../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "../../../common/include/vkeys.h"
+
+using namespace km::vkey;
 
 #define SSN__PREFIX		L"&"
 

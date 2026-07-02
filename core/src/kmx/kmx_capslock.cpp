@@ -7,6 +7,7 @@
 
 using namespace km::core;
 using namespace kmx;
+using namespace km::vkey;
 
 /**
  * Set caps lock state.
