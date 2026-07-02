@@ -19,7 +19,7 @@ KMManager.getFontTypeface(Context context, String fontFilename)
 :   The context.
 
 `fontFilename`
-:   The filename of the font.
+:   The filename and full path of the font.
 
 ### Returns
 
@@ -29,7 +29,7 @@ if it exists, `null` otherwise.
 ## Description
 
 Use this method to create a new typeface from the font file with
-specified filename if it exists in `assets/fonts/` folder.
+specified filename if it exists.
 
 ## Examples
 
@@ -37,9 +37,10 @@ specified filename if it exists in `assets/fonts/` folder.
 
 The following script illustrate the use of `getFontTypeface()`:
 
-``` javascript
+``` java
     KMTextView textView = (KMTextView) findViewById(R.id.kmTextView);
-    Typeface fontTypeface = KMManager.getFontTypeface(this, "aava1.ttf");
+    Typeface fontTypeface = KMManager.getFontTypeface(this,
+      getDir("data", Context.MODE_PRIVATE).toString() + File.separator + "aava1.ttf");
     textView.setTypeface(fontTypeface);
 ```
 
