@@ -123,8 +123,16 @@ begin
       finally
         Exclude(FFormState, fsCreating);
       end;
+      // Keyman local patch: Delphi 11/12 compat (vendored JVCL). The
+      // OldCreateOrder property was removed in Delphi 11; the modern semantics
+      // are equivalent to OldCreateOrder=True, so always call DoCreate on
+      // VER350+. On JVCL refresh from upstream: re-apply if not yet upstreamed.
+{$IF Defined(VER350) or Defined(VER360)}
+      DoCreate;
+{$ELSE}
       if OldCreateOrder then
         DoCreate;
+{$IFEND}
     end;
   finally
     GlobalNameSpace.EndWrite;
