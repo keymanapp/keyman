@@ -68,7 +68,7 @@
 
 #include <kmcmplibapi.h>
 
-#include <kmx/kmx_processevent.h>
+#include "../../../../core/src/kmx/kmx_conversion.h"
 #include "compfile.h"
 #include <kmn_compiler_errors.h>
 #include <cuchar>
