@@ -187,6 +187,3 @@ lcov.info
 
 # flag file for build script
 .configured
-
-# Meson wrap dependency lock files
-**/subprojects/.wraplock

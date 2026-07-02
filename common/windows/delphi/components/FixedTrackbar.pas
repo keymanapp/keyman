@@ -64,6 +64,8 @@ end;
 
   Tested on VER320 (10.2)
   Tested on VER330 (10.3) - 29 Oct 2019 - mcdurdin
+  Not yet fully verified against Vcl.Grids.pas in VER350 (11) or VER360 (12);
+  IFNDEF arms added to unblock compilation, override behaviour retained as-is.
 }
 
 {$IFNDEF VER340}

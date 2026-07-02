@@ -44,7 +44,11 @@ begin
   end;
 
   // Indy's UTF8 handling of URLs is *completely* broken.
-  // We may need to check this with updated versions of Delphi
+  // We may need to check this with updated versions of Delphi.
+  // VER340/VER350/VER360 added to the IFNDEF chain to unblock
+  // Delphi 10.4/11/12 compilation; whether Indy's URL handling was
+  // fixed in those versions has not been re-verified — the
+  // workaround stays applied conservatively.
 {$IFNDEF VER330}
 {$IFNDEF VER340}
 {$IFNDEF VER350}
