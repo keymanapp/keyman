@@ -5,6 +5,9 @@
  * VKCodes for keyman
  */
 
+
+#pragma once
+
 namespace km {
 namespace vkey {
 
@@ -54,8 +57,9 @@ namespace vkey {
 #define VK_EXECUTE 0x2B
 #define VK_SNAPSHOT 0x2C
 #define VK_INSERT 0x2D
-// #define VK_DECIMAL          0x2E  // _S2 if I use it here kmdecomp complains because of duplicate macro definition here and in
-// WinUser.h
+// #define VK_DECIMAL  0x2E // _S2 if I use it here kmdecomp complains because of duplicate macro definition here and in WinUser.h
+// #define VK_DECIMAL  0x2E //_S2 probably wrong 0x2E (which is actually the Windows VK_DELETE value, not the standard VK_DECIMAL which is 0x6E for the numpad decimal key)
+#define VK_DECIMAL  0x6E
 
 #define VK_KEY_0 0x30
 #define VK_KEY_1 0x31

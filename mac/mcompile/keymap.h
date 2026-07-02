@@ -41,7 +41,8 @@ enum ShiftState {
 
 #define VK_DIVIDE   0x6F
 #define VK_CANCEL   0x03
-#define VK_DECIMAL  0x2E
+//#define VK_DECIMAL  0x2E //_S2 probably wrong 0x2E (which is actually the Windows VK_DELETE value, not the standard VK_DECIMAL which is 0x6E for the numpad decimal key)
+#define VK_DECIMAL  0x6E
 
 #define VK_OEM_CLEAR      0xFE
 #define VK_LSHIFT         0xA0

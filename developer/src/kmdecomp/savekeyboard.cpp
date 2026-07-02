@@ -30,20 +30,11 @@
 
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 #include <codecvt>
-
 #include "../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
-
-
-// _S2 which version? here from chore/developer/scatteredCode/cleanup_VKeys
-//#include "../../../common/windows/cpp/include/vkeys.h"
-#include "../../../common/include/km_vkey.h"
-using namespace km::vkey;
-
-//_S2 ========
-// _S2 which version? here from master
 #include "../../../common/include/vkeys.h"
-//_S2 ========
+
+using namespace km::vkey;
 
 #define SSN__PREFIX		L"&"
 
