@@ -94,8 +94,7 @@ class DownloadKmpWindow(Gtk.Dialog):
                 qs = urllib.parse.parse_qs(parsed.query)
                 package_id = parsed.path.split('/')[-1]
                 downloadfile = os.path.join(get_download_folder(), package_id)
-                download_url = KeymanComUrl + '/go/package/download/' + package_id + \
-                    '?platform=linux&tier=' + __tier__
+                download_url = f'{KeymanComUrl}/go/package/download/{package_id}?platform=linux&tier={__tier__}'
                 if 'bcp47' in qs:
                     self.language = qs['bcp47'][0]
                     download_url += '&bcp47=' + qs['bcp47'][0]

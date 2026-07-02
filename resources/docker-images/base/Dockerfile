@@ -37,6 +37,15 @@ RUN echo "build ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 RUN <<EOF cat > /usr/bin/bashwrapper
 #!/bin/bash
+set -eu
+if [[ "${DOCKER_RUN_AS_ROOT:-}" == "1" ]] && [[ "$(id -u)" != "0" ]] ; then
+  # On Windows run as root so that the permissions are correct
+  # (root in Docker container is mapped to current user on Windows,
+  # whereas when Docker is run on Linux root is mapped to root)
+  sudo -u root -i "$0" "$@"
+  exit $?
+fi
+
 export KEYMAN_USE_NVM=1
 export DOCKER_RUNNING=true
 EOF
@@ -44,6 +53,7 @@ EOF
 # Install NVM
 RUN NVM_RELEASE=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep tag_name | cut -d : -f 2 | cut -d '"' -f 2) && \
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_RELEASE}/install.sh | bash
+RUN chmod -R +x,+r $HOME/
 RUN <<EOF cat >> /usr/bin/bashwrapper
 PATH=/home/build/.keyman/node:\$PATH
 export NVM_DIR="$HOME/.nvm"

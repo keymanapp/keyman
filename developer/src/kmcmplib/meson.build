@@ -8,7 +8,7 @@ project('kmcmplib', 'cpp', 'c',
         version: files('../../../VERSION.md'),
         license: 'MIT',
         default_options : ['buildtype=release',
-                           'cpp_std=c++14',
+                           'cpp_std=c++17',
                            'b_vscrt=static_from_buildtype',
                            'default_library=static',
                            'debug=true'])

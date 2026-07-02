@@ -21,6 +21,7 @@ interface
 
 uses
   System.Classes,
+  Winapi.ActiveX,
   Winapi.Messages,
   Winapi.RichEdit,
   Winapi.Windows,
@@ -35,14 +36,14 @@ type
 
   TMemoSelection = record
     Start, Finish: Integer;
-    Anchor: Integer;
+    Caret: Integer; // In a non-empty selection, Anchor is at the other end of the selection
+    function ToString: string;
   end;
 
   TKeymanDeveloperDebuggerMemo = class(TRichEdit41)
   private
     FOnMessage: TKeymanDeveloperDebuggerMessageEvent;
     FAllowUnicodeInput: Boolean;
-    FSelectionChanging: Boolean;
     FIsDebugging: Boolean;
     procedure SetAllowUnicode(const Value: Boolean);
     function GetSelection: TMemoSelection;
@@ -59,7 +60,6 @@ type
     property AllowUnicode: Boolean read FAllowUnicodeInput write SetAllowUnicode default True;
     property OnMessage: TKeymanDeveloperDebuggerMessageEvent read FOnMessage write FOnMessage;
     property Selection: TMemoSelection read GetSelection write SetSelection;
-    property SelectionChanging: Boolean read FSelectionChanging;
     property IsDebugging: Boolean read FIsDebugging write FIsDebugging;
   end;
 
@@ -68,6 +68,7 @@ procedure Register;
 implementation
 
 uses
+  tom_TLB,
   System.SysUtils;
 
 { TKeymanDeveloperDebuggerMemo }
@@ -106,24 +107,29 @@ begin
 end;
 
 function TKeymanDeveloperDebuggerMemo.GetSelection: TMemoSelection;
+var
+  Unk: IUnknown;
+  TextDoc: ITextDocument;
+  TextSel: ITextSelection;
 begin
-  // EM_GETSEL doesn't tell us the anchor position, but we can figure
-  // it out with this kludge. I am not aware of side effects from this
-  // at this time.
   SendMessage(Handle, EM_GETSEL, NativeUInt(@Result.Start), NativeUInt(@Result.Finish));
-  if Result.Start <> Result.Finish then
+  Result.Caret := Result.Finish;
+
+  if Result.Finish <> Result.Start then
   begin
-    // We only need to play the selection test game if there is a non-zero
-    // selection length
-    FSelectionChanging := True;
-    Lines.BeginUpdate;
-    try
-      SendMessage(Handle, EM_SETSEL, -1, 0);
-      SendMessage(Handle, EM_GETSEL, NativeUInt(@Result.Anchor), 0);
-      SetSelection(Result);
-    finally
-      Lines.EndUpdate;
-      FSelectionChanging := False;
+    if SendMessage(Handle, EM_GETOLEINTERFACE, 0, LPARAM(@Unk)) <> 0 then
+    begin
+      if Unk.QueryInterface(IID_ITextDocument, TextDoc) = S_OK then
+      begin
+        TextSel := TextDoc.Selection;
+        if TextSel <> nil then
+        begin
+          if (TextSel.Flags and tomSelStartActive) <> 0 then
+          begin
+            Result.Caret := Result.Start;
+          end;
+        end;
+      end;
     end;
   end;
 end;
@@ -150,7 +156,7 @@ end;
 procedure TKeymanDeveloperDebuggerMemo.SetSelection(
   const Value: TMemoSelection);
 begin
-  if Value.Anchor = Value.Start
+  if Value.Caret = Value.Start
     then SendMessage(Handle, EM_SETSEL, Value.Finish, Value.Start)
     else SendMessage(Handle, EM_SETSEL, Value.Start, Value.Finish);
 end;
@@ -168,6 +174,13 @@ end;
 procedure Register;
 begin
   RegisterComponents('Keyman', [TKeymanDeveloperDebuggerMemo]);
+end;
+
+{ TMemoSelection }
+
+function TMemoSelection.ToString: string;
+begin
+  Result := Format('TMemoSelection(start=%d finish=%d caret=%d)', [Start, Finish, Caret]);
 end;
 
 end.

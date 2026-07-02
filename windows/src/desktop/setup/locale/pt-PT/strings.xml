@@ -22,12 +22,12 @@
   <string name="ssActionInstall">A instalação será instalada:</string>
   <string name="ssFreeCaption">$APPNAME $VERSION é gratuito e de código aberto</string>
   <string name="ssLicenseLink">&amp;Leia a licença</string>
-  <string name="ssInstallOptionsLink">Instalar &amp;opções</string>
+  <string name="ssInstallOptionsLink">&amp;Opções de instalação</string>
   <string name="ssMessageBoxTitle">Configuração de $APPNAME</string>
   <string name="ssOkButton">OK</string>
   <string name="ssInstallButton">&amp;Instalar</string>
   <string name="ssCancelButton">Instalar Mais Tarde</string>
-  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssExitButton">S&amp;air</string>
   <string name="ssStatusInstalling">Instalando $APPNAME</string>
   <string name="ssStatusRemovingOlderVersions">Removendo versões anteriores</string>
   <string name="ssStatusComplete">Instalação concluída</string>

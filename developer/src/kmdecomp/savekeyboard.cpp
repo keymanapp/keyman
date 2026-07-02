@@ -28,13 +28,22 @@
 
 #include <stdio.h>
 
+#define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
+#include <codecvt>
+
 #include "../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
+
+
+// _S2 which version? here from chore/developer/scatteredCode/cleanup_VKeys
 #include "../../../common/windows/cpp/include/vkeys.h"
 #include "../../../common/include/keyman_vkey.h"
-
 using namespace km_vk;
 
+//_S2 ========
+// _S2 which version? here from master
+#include "../../../common/include/vkeys.h"
+//_S2 ========
 
 #define SSN__PREFIX		L"&"
 
@@ -159,13 +168,13 @@ PWCHAR flagstr(int flag)
 	return buf;
 }
 
-PCWCHAR GetVKeyName(LPKEY key)  // I3438
+const char* GetVKeyName(LPKEY key)  // I3438
 {
-  static WCHAR buf[100];
+  static char buf[100];
   if(key->Key <= VK__MAX)
     return VKeyNames[key->Key];
 
-  wsprintfW(buf, L"%d", key->Key - 256);  //TODO: Support getting the key name from the VK Dictionary
+  wsprintfA(buf, "%d", key->Key - 256);  //TODO: Support getting the key name from the VK Dictionary
   return buf;
 }
 
@@ -179,7 +188,7 @@ PWCHAR KeyString(LPKEY key)
 			wsprintfW(buf, L"[%s%c%c%c] ", flagstr(key->ShiftFlags), key->Key == L'"' ? L'\'' : L'"',
 				key->Key, key->Key == L'"' ? L'\'' : L'"');
 		else
-			wsprintfW(buf, L"[%s%s] ", flagstr(key->ShiftFlags), GetVKeyName(key));////; //, VKeyNames[key->Key]);  // I3438
+			wsprintfW(buf, L"[%s%hs] ", flagstr(key->ShiftFlags), GetVKeyName(key));  // I3438
 	}
 	else
 	{
@@ -262,7 +271,7 @@ PWCHAR ExtString(PWCHAR str)
             //TODO: Get extended key value
             wsprintfW(p, L"[%s %d] ", flagstr(*str), *(str+1)-VK__MAX-1);
           else
-					  wsprintfW(p, L"[%s%s] ", flagstr(*str), VKeyNames[*(str+1)]);
+					  wsprintfW(p, L"[%s%hs] ", flagstr(*str), VKeyNames[*(str+1)]);
         }
 				str+=2; // skip UC_SENTINEL_EXTENDEDEND
 				p = wcschr(p, 0);
@@ -370,7 +379,9 @@ PWCHAR ExtString(PWCHAR str)
 
 void wr(FILE *fp, PWSTR buf)
 {
-	fwrite(buf, wcslen(buf) * 2, 1, fp);
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
+	std::string utf8_string = utf8_conv.to_bytes(buf);
+	fwrite(utf8_string.c_str(), utf8_string.size(), 1, fp);
 }
 
 int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char* filename, char* bmpfile)
@@ -392,8 +403,6 @@ int SaveKeyboardSource(LPKEYBOARD kbd, LPBYTE lpBitmap, DWORD cbBitmap, char* fi
     Err("Unable to create output file.");
     return 3;
   }
-
-  fwrite(UTF16Sig, 2, 1, fp);
 
 	wsprintfW(buf, L"c Keyboard created by KMDECOMP\n"); wr(fp, buf);
 	wsprintfW(buf, L"c\n"); wr(fp, buf);

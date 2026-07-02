@@ -2,10 +2,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-source "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+source "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 builder_describe "Installation files for Keyman for Windows" \
   @/common/windows/data \
@@ -14,14 +14,14 @@ builder_describe "Installation files for Keyman for Windows" \
 # NOTE: not using deps here because we will only do this in the 'publish' phase
 # after all other builds complete
 
-builder_describe_outputs \
-  publish       /windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION}.exe
+builder_if_release_build_level builder_describe_outputs \
+  publish       /windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION_FOR_FILENAME}.exe
 
 builder_parse "$@"
 
 . "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 . "$KEYMAN_ROOT/resources/build/win/wix.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/zip.inc.sh"
+. "$KEYMAN_ROOT/resources/build/zip.inc.sh"
 
 # In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
 if [[ -z ${KEYMAN_TIER+x} ]]; then
@@ -74,7 +74,7 @@ function do_publish() {
     -nologo \
     -dWixUILicenseRtf=License.rtf \
     "$WIXLIGHTCOMPRESSION" \
-    -out keymandesktop.msi -ext WixUIExtension \
+    -out keymandesktop.msi -ext WixUIExtension -ext WixUtilExtension \
     keymandesktop.wixobj desktopui.wixobj cef.wixobj locale.wixobj
 
   #
@@ -86,17 +86,13 @@ function do_publish() {
   # Build self-extracting archive
   #
   create-setup-inf
-  wzzip keymandesktop.zip keymandesktop.msi license.html setup.inf
+  add_zip_files keymandesktop.zip keymandesktop.msi license.html setup.inf
   rm -f setup.inf
   cat "$WINDOWS_PROGRAM_APP/setup-redist.exe" keymandesktop.zip > keymandesktop.exe
   rm -f keymandesktop.zip
-
-  #
-  # Sign the installer
-  #
   wrap-signcode //d "Keyman for Windows" keymandesktop.exe
 
-  copy-installer
+  builder_if_release_build_level copy-installer
 }
 
 function copy-installer() {
@@ -104,13 +100,17 @@ function copy-installer() {
 
   mkdir -p "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}"
   cp keymandesktop.msi "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/keymandesktop.msi"
-  cp keymandesktop.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION}.exe"
+  cp keymandesktop.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/keyman-${KEYMAN_VERSION_FOR_FILENAME}.exe"
   cp "$WINDOWS_PROGRAM_APP/setup.exe" "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/setup.exe"
 
-  builder_if_release_build_level verify-installer-signatures
+  verify-installer-signatures
 
   # Copy the unsigned setup.exe for use in bundling scenarios; zip it up for clarity
-  wzzip "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/setup-redist.zip" "$WINDOWS_PROGRAM_APP/setup-redist.exe"
+  (
+    # shellcheck disable=SC2164
+    cd "${WINDOWS_PROGRAM_APP}"
+    add_zip_files "${KEYMAN_ROOT}/windows/release/${KEYMAN_VERSION}/setup-redist.zip" "setup-redist.exe"
+  )
 }
 
 function verify-program-signatures() {
@@ -147,7 +147,7 @@ function do_candle() {
 function heat-cef() {
   builder_heading heat-cef
 
-  # We copy the files to a temp folder in order to exclude .git and README.md from harvesting
+  # We copy the files to a temp folder in order to exclude .git from harvesting
   rm -rf "$KEYMAN_WIX_TEMP_CEF"
   mkdir -p "$KEYMAN_WIX_TEMP_CEF"
   cp -r "$KEYMAN_CEF4DELPHI_ROOT"/* "$KEYMAN_WIX_TEMP_CEF"
@@ -155,7 +155,6 @@ function heat-cef() {
   # When we candle/light build, we can grab the source files from the proper root so go ahead and delete the temp folder again
   rm -rf "$KEYMAN_WIX_TEMP_CEF"
 }
-
 
 function create-setup-inf() {
   builder_heading create-setup-inf

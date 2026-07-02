@@ -130,7 +130,7 @@ if(!keymanweb) {
         this.outerDiv = util.createElement('div');         // Container for UI (visible when KeymanWeb is active)
         this.innerDiv = util.createElement('div');         // inner div for UI
         this.kbdIcon = util.createElement('img');
-        this.outerDiv.innerHTML = "<a href='http://keyman.com/web/' target='KeymanWebHelp'>"
+        this.outerDiv.innerHTML = "<a href='https://keyman.com/developer/keymanweb/' target='KeymanWebHelp'>"
           + "<img src='"+imgPath+"kmicon.gif' border='0' style='padding: 0px 2px 0 1px; margin:0px;' title='KeymanWeb' alt='KeymanWeb' /></a>"; /* I2081 */
 
         let s=this.outerDiv.style;
@@ -261,12 +261,19 @@ if(!keymanweb) {
         }
         this.updateList = false;
 
-        // Set the menu selector to the currently saved keyboard
-        const sk = keymanweb.getSavedKeyboard().split(':');
-        if(sk.length < 2) {
-          sk[1] = '';
+        // Set the menu selector to the last active keyboard
+        let activeKeyboard = keymanweb.getActiveKeyboard();
+        let activeLanguage = '';
+        if (activeKeyboard) {
+          activeLanguage = keymanweb.getActiveLanguage();
+        } else {
+          // savedKeyboard is only correct if we use global keyboard settings,
+          // otherwise it's set to the first keyboard in the list
+          const savedKeyboard = keymanweb.getSavedKeyboard().split(':');
+          activeKeyboard = savedKeyboard[0];
+          activeLanguage = savedKeyboard.length < 2 ? '' : savedKeyboard[1];
         }
-        this.updateMenu(sk[0],sk[1]);
+        this.updateMenu(activeKeyboard, activeLanguage);
 
         // Redisplay the UI to correct width for any new language entries
         if(keymanweb.getLastActiveElement()) {
@@ -450,7 +457,7 @@ if(!keymanweb) {
        * @param       {Object}    e       event
        * Description  Change active keyboard in response to user selection event
        */
-      private readonly SelectKeyboardChange = async (e: Event) => {
+      private readonly SelectKeyboardChange = async (e: Event): Promise<void> => {
         keymanweb.activatingUI(true);
 
         if(this.KeyboardSelector.value != '-') {

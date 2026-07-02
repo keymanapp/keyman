@@ -15,7 +15,7 @@ One simple way to create your TSV file is to use the **PrimerPrep**
 tool:
 
 1.  Install PrimerPrep (info at
-    <http://lingtransoft.info/apps/primerprep>)
+    <[https://software.sil.org/primerprep/](https://software.sil.org/primerprep/)>)
 2.  Run PrimerPrep (note that on the first run it often takes a couple
     of minutes; subsequent starts are faster)
 3.  Click on the Add Text(s) button; select one or more plain text

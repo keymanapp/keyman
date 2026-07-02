@@ -81,9 +81,3 @@ createBase() {
   BINPKG_NAME=${tmpDir}/libkeymancore1_17.0.257-1+noble1_amd64.deb
   touch "${BINPKG_NAME}"
 }
-
-run_test() {
-  setup
-  $1 > "/tmp/$1.log" 2>&1 && echo -e "${COLOR_GREEN}$1: OK${COLOR_RESET}" || echo -e "${COLOR_RED}$1: FAILED${COLOR_RESET}"
-  teardown
-}

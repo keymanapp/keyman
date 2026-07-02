@@ -9,11 +9,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/windows/windows-actions.inc.sh"
 
@@ -30,14 +30,14 @@ builder_parse "$@"
 
 cd "${KEYMAN_ROOT}/windows/src"
 
-if ! is_windows; then
+if ! builder_is_windows; then
   builder_echo error "This script is intended to be run on Windows only."
   exit 1
 fi
 
 function windows_publish_action() {
   builder_echo start "publish windows" "Publishing Keyman for Windows"
-  "${KEYMAN_ROOT}/windows/build.sh" publish
+  builder_launch /windows/build.sh publish
   windows_upload_symbols_to_sentry
   builder_echo end "publish windows" success "Finished publishing Keyman for Windows"
 }

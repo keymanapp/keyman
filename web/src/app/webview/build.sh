@@ -3,18 +3,20 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 SUBPROJECT_NAME=app/webview
 . "$KEYMAN_ROOT/web/common.inc.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's puppetable version designed for use within WebViews." \
-  "@/web/src/engine/main build" \
-  "@/web/src/tools/building/sourcemap-root" \
+  "@/common/tools/es-bundling               build" \
+  "@/web/src/engine                         build" \
+  "@/web/src/tools/building/sourcemap-root  build" \
   "clean" \
   "configure" \
   "build" \
@@ -42,13 +44,13 @@ compile_and_copy() {
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/webview"
   SRC_ROOT="${KEYMAN_ROOT}/web/src/app/webview/src"
 
-  $BUNDLE_CMD    "${SRC_ROOT}/debug-main.js" \
+  node_es_bundle "${SRC_ROOT}/debug-main.js" \
     --out        "${BUILD_ROOT}/debug/keymanweb-webview.js" \
     --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/webview/debug" \
     --target     "es6"
 
-  $BUNDLE_CMD    "${SRC_ROOT}/release-main.js" \
+  node_es_bundle "${SRC_ROOT}/release-main.js" \
     --out        "${BUILD_ROOT}/release/keymanweb-webview.js" \
     --charset    "utf8" \
     --profile    "${BUILD_ROOT}/filesize-profile.log" \
@@ -61,6 +63,10 @@ compile_and_copy() {
 
   # Clean the sourcemaps of .. and . components
   for script in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/debug/"*.js; do
+    if [[ "${script}" == *"/km-core.js" ]]; then
+      continue
+    fi
+
     sourcemap="$script.map"
     node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" \
       "$script" "$sourcemap" --clean --inline
@@ -69,6 +75,9 @@ compile_and_copy() {
   # Do NOT inline sourcemaps for release builds - we don't want them to affect
   # load time.
   for script in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/release/"*.js; do
+    if [[ "${script}" == *"/km-core.js" ]]; then
+      continue
+    fi
     sourcemap="$script.map"
     node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" \
       "$script" "$sourcemap" --clean
@@ -77,9 +86,9 @@ compile_and_copy() {
   node map-polyfill-bundler.js
 
   # For dependent test pages.
-  "$KEYMAN_ROOT/web/src/test/manual/embed/android-harness/build.sh"
+  builder_launch /web/src/test/manual/embed/android-harness/build.sh configure,build
 }
 
-builder_run_action configure verify_npm_setup
+builder_run_action configure node_select_version_and_npm_ci
 builder_run_action clean rm -rf "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME"
 builder_run_action build compile_and_copy

@@ -1,3 +1,66 @@
+keyman (18.0.249-1) UNRELEASED; urgency=medium
+
+  * Add procps dependency (closes: 1136515)
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 18 May 2026 18:06:49 +0200
+
+keyman (18.0.248-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 12 Mar 2026 12:39:18 +0100
+
+keyman (18.0.247-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Tue, 10 Mar 2026 17:58:33 +0100
+
+keyman (18.0.246-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 04 Feb 2026 13:48:31 +0100
+
+keyman (18.0.245-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 04 Dec 2025 10:18:49 +0100
+
+keyman (18.0.244-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 10 Nov 2025 17:06:33 +0100
+
+keyman (18.0.243-1) unstable; urgency=medium
+
+  * replace dbus-x11 dependency with default-dbus-session-bus | dbus-session-bus
+    (closes: 1117068)
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 15 Oct 2025 12:09:24 +0200
+
+keyman (18.0.242-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 29 Sep 2025 11:38:38 +0200
+
+keyman (18.0.241-1) unstable; urgency=medium
+
+  * remove onboard-keyman recommends (closes: 1115423)
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 18 Sep 2025 11:35:01 +0200
+
+keyman (18.0.240-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 27 Aug 2025 18:02:36 +0200
+
 keyman (18.0.238-1) unstable; urgency=medium
 
   * New upstream release.

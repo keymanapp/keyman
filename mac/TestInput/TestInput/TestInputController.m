@@ -470,10 +470,9 @@ CFStringRef createStringForKey(CGKeyCode keyCode)
 CGKeyCode keyCodeForChar(const char c)
 {
     static CFMutableDictionaryRef charToCodeDict = NULL;
-    CGKeyCode code;
     UniChar character = c;
     CFStringRef charStr = NULL;
-    
+
     /* Generate table of keycodes and characters. */
     if (charToCodeDict == NULL) {
         size_t i;
@@ -482,7 +481,7 @@ CGKeyCode keyCodeForChar(const char c)
                                                    &kCFCopyStringDictionaryKeyCallBacks,
                                                    NULL);
         if (charToCodeDict == NULL) return UINT16_MAX;
-        
+
         /* Loop through every keycode (0 - 127) to find its current mapping. */
         for (i = 0; i < 128; ++i) {
             CFStringRef string = createStringForKey((CGKeyCode)i);
@@ -492,15 +491,21 @@ CGKeyCode keyCodeForChar(const char c)
             }
         }
     }
-    
+
     charStr = CFStringCreateWithCharacters(kCFAllocatorDefault, &character, 1);
-    
-    /* Our values may be NULL (0), so we need to use this function. */
-    if (!CFDictionaryGetValueIfPresent(charToCodeDict, charStr,
-                                       (const void **)&code)) {
+
+    /* Our values may be NULL (0), so we need to use this function.
+     * Use a pointer-sized variable to receive the value, since CFDictionary
+     * stores values as void pointers (64-bit on modern systems), then cast
+     * to CGKeyCode (uint16_t). */
+    const void *value = NULL;
+    CGKeyCode code;
+    if (CFDictionaryGetValueIfPresent(charToCodeDict, charStr, &value)) {
+        code = (CGKeyCode)(uintptr_t)value;
+    } else {
         code = UINT16_MAX;
     }
-    
+
     CFRelease(charStr);
     return code;
 }

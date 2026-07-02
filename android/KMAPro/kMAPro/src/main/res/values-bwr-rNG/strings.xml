@@ -114,9 +114,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Hulfur mnyayeri natǝ mdǝku kurtǝ ka hara instal ɗa</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Ndǝkǝr keyboard kamnyar jaktǝ wala kǝmta saɓǝlkur ni</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Shinar waya wala hansetu ni kamnyar katsa nzi thlat-thlata wala peri-periari</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">Ndǝkǝr keyboard kamnyar jaktǝ wala kǝmta saɓǝlkur ni. Shinar waya wala hansetu ni kamnyar katsa nzi thlat-thlata wala peri-periari.</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Kalaktǝni katsa ni tsu apa tǝ mdǝ nam ni</string>
   <!-- Context: Keyman Web Browser -->

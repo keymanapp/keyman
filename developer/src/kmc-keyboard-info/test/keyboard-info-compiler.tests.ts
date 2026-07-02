@@ -10,18 +10,6 @@ import { KMX, KeymanFileTypes, KeymanTargets, KmpJsonFile } from '@keymanapp/com
 import { CompilerCallbacks } from '@keymanapp/developer-utils';
 import { KeyboardInfoFile, KeyboardInfoFileLanguage, KeyboardInfoFilePlatform } from './keyboard-info-file.js';
 
-const callbacks = new TestCompilerCallbacks();
-
-beforeEach(function() {
-  callbacks.clear();
-});
-
-afterEach(function() {
-  if(this.currentTest?.isFailed()) {
-    callbacks.printMessages();
-  }
-});
-
 const KHMER_ANGKOR_KPJ = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
 const KHMER_ANGKOR_JS  = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
 const KHMER_ANGKOR_KPS = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
@@ -87,6 +75,9 @@ const JAVA_DISPLAY_FONT_INFO = { family: "Java", source: [ JAVA_DISPLAY_FONT ] }
 const JAVA_OSK_FONT_INFO = { family: "Java Kbd", source: [ JAVA_OSK_FONT ] };
 
 describe('keyboard-info-compiler', function () {
+
+  const callbacks = new TestCompilerCallbacks(this);
+
   it('compile a .keyboard_info file correctly', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const buildKeyboardInfoFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.keyboard_info');
@@ -844,6 +835,9 @@ describe('keyboard-info-compiler', function () {
 });
 
 describe('fillLanguageMetadata', function() {
+
+  const callbacks = new TestCompilerCallbacks(this);
+
   const tests: { bcp47: string, lang: KeyboardInfoFileLanguage, commonScript: string }[] = [
 
     // 'und' language subtag

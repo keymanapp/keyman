@@ -1,4 +1,7 @@
-# Using the build-utils.sh builder functions
+# Using the builder.inc.sh builder functions
+
+Note: see [resources/build/README.md](../resources/build/README.md) for
+distinction on builder-basic.inc.sh and builder-full.inc.sh.
 
 The Keyman repository is standardising on bash scripts for builds. These may
 call project-specific builders, such as `tsc` for Typescript projects, `meson`
@@ -43,7 +46,7 @@ set -eu
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # . "$KEYMAN_ROOT/.../foo.inc.sh"     # any other includes, such as jq.inc.sh
@@ -78,7 +81,7 @@ Builder scripts will inherit `set -eu` from builder.inc.sh:
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/build-utils.sh"
+. "$(dirname "$THIS_SCRIPT")/<relative-path-to-repo-root>/resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 ```
 
@@ -100,7 +103,7 @@ search-and-replace) this section in the future as required.
 
 ## Any other includes
 
-Once `build-utils.sh` has been included, the variable `$KEYMAN_ROOT` will be
+Once `builder-basic.inc.sh` has been included, the variable `$KEYMAN_ROOT` will be
 available, so other include scripts should be sourced accordingly, for example:
 
 ```bash
@@ -114,7 +117,7 @@ to `cd` at the start of your script.
 
 ## Standard environment
 
-`build-utils.sh` will prepend `$KEYMAN_ROOT/node_modules/.bin` to the `PATH`
+`builder-basic.inc.sh` will prepend `$KEYMAN_ROOT/node_modules/.bin` to the `PATH`
 variable to ensure that we run the correct versions of npm package commands, so
 there is no need to hard-code path references or add script wrappers to
 package.json (`npm run <script>`).
@@ -122,6 +125,13 @@ package.json (`npm run <script>`).
 * `BUILDER_CONFIGURATION` will be set to `debug` if the `--debug` option is
   passed in, or `release` otherwise, which corresponds to the output folder
   names for many projects.
+
+* `BUILDER_OS` will be set to `linux`, `mac`, or `win`, depending on the platform
+  the builder script is currently running on.
+
+  **NOTE:** Only use `BUILDER_OS` in a `case` statement. Use one of the
+  `builder_is_macos`, `builder_is_windows`, or `builder_is_linux` functions
+  to check if the script is running on a particular platform.
 
 Other environment variables and paths will probably be added over time.
 
@@ -221,7 +231,7 @@ The first step in your script is to describe the available parameters, using
 
 ```bash
 builder_describe \
-  "Tests the build-utils.sh builder functions. This is merely an example." \
+  "Tests the builder-basic.inc.sh builder functions. This is merely an example." \
   clean \
   build \
   test \
@@ -259,7 +269,7 @@ for example:
 
 ```bash
 if builder_start_action configure; then
-  verify_npm_setup
+  node_select_version_and_npm_ci
   builder_finish_action success configure
 fi
 
@@ -549,7 +559,7 @@ builder_describe_internal_dependency \
 ```
 
 **Note:** actions and targets must be fully specified, and this _must_ be called
-before either [`builder_describe_outputs`] or [`builder_parse`] in order for
+before both of [`builder_describe_outputs`] and [`builder_parse`] in order for
 dependencies to be resolved.
 
 --------------------------------------------------------------------------------
@@ -1028,6 +1038,28 @@ fi
 
 --------------------------------------------------------------------------------
 
+## `builder_launch` function
+
+Starts a child script build, passing current build dependency, inheritable
+options, and timing status through as parameters. This should be used rather
+than calling the build script directly, to avoid multiple builds of
+dependencies.
+
+Do not use builder standard options such as `--deps` or `--debug`.
+
+### Parameters
+
+* 1: `script`      path to script, relative to root of repo, with leading slash
+* 2+: `parameters` action(s), target(s), parameters for the child script to run
+
+### Example
+
+```bash
+  builder_launch /core/build.sh configure,build:wasm --no-tests
+```
+
+--------------------------------------------------------------------------------
+
 ## `builder_parse` function
 
 Initializes a build.sh script, parses command line. Will abort the script if
@@ -1082,7 +1114,7 @@ longhand form.
   }
 
   builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
-  builder_run_action configure    verify_npm_setup
+  builder_run_action configure    node_select_version_and_npm_ci
   builder_run_action build        do_build
 ```
 
@@ -1221,23 +1253,34 @@ fi
 
 --------------------------------------------------------------------------------
 
-## `builder_do_typescript_tests` function
+## `typescript_run_eslint_mocha_tests` function
 
 Runs eslint, builds tests, and then runs tests with mocha + c8 (coverage)
-
-**Note:** this is currently hosted in shellHelperFunctions.sh, but will
-be moved to builder.typescript.inc.sh in the future.
 
 ### Usage
 
 ```bash
-builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
+builder_run_action  test    typescript_run_eslint_mocha_tests [coverage_threshold]
 ```
 
 ### Parameters
 
 * **coverage_threshold** optional, minimum coverage for c8 to pass tests,
   defaults to 90 (percent)
+
+--------------------------------------------------------------------------------
+
+## `builder_is_windows`, `builder_is_macos`, and `builder_is_linux` functions
+
+Returns 0 (true) if building on the particular platform.
+
+### Usage
+
+```bash
+if builder_is_windows; then
+  builder_echo "We're building on a Windows machine"
+fi
+```
 
 --------------------------------------------------------------------------------
 

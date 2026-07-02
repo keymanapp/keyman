@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="ssLanguageName" comment="User interface language name in the UI language">ಕನ್ನಡ</string>
+  <string name="ssLanguageNameInEnglish" comment="User interface language name in English">Kannada</string>
   <string name="ssApplicationTitle">$APPNAME $VERSION ಸೆಟ್ಅಪ್</string>
   <string name="ssTitle">$APPNAME $VERSION ಸ್ಥಾಪಿಸಿ</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION ಯಶಸ್ವಿಯಾಗಿ ಸ್ಥಾಪಿಸಲಾಗಿದೆ.</string>

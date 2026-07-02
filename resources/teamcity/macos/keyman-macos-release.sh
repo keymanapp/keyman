@@ -11,11 +11,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-mac.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/macos/macos-actions.inc.sh"
@@ -64,7 +64,7 @@ function _publish_to_downloads_keyman_com() {
 
 function do_publish() {
   _publish_to_downloads_keyman_com
-  upload_help "Keyman for macOS" mac
+  tc_upload_help "Keyman for macOS" mac
 }
 
 ba_mac_unlock_keychain

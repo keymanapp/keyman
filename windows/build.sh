@@ -2,7 +2,7 @@
 ## START STANDARD UTILITY SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-basic.inc.sh"
 ## END STANDARD UTILITY SCRIPT INCLUDE
 
 # This is not a builder script but calls a builder script

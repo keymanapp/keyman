@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# shellcheck disable=SC1091
+. "$(dirname "$0")/test-cli.inc.sh"
+
+km_package_install__user() {
+  # Setup
+  gsettings set org.freedesktop.ibus.general preload-engines "['xkb:us::eng']"
+
+  # Run
+  km-package-install --file "$(dirname "$0")/data/khmer_angkor.kmp"
+
+  # Verify
+  verify_no_error $?
+  verify_ibus_restarted
+  verify_keyboard_file_exists "${HOME}/.local/share/keyman/khmer_angkor/khmer_angkor.kmx"
+  verify_ibus_preload_engines "['xkb:us::eng', 'km:${HOME}/.local/share/keyman/khmer_angkor/khmer_angkor.kmx']"
+  verify_custom_keyboards "@as []"
+
+  echo "PASS ${TEST_SCRIPT}/${FUNCNAME[0]}"
+}
+
+km_package_install__shared() {
+  # Setup - continue from previous tests
+
+  # Run
+  sudo km-package-install --shared --bcp47 ady --file "$(dirname "$0")/data/alephwithbeth.kmp"
+
+  # Verify
+  verify_no_error $?
+  verify_ibus_restarted
+  verify_keyboard_file_exists "/usr/local/share/keyman/alephwithbeth/alephwithbeth.kmx"
+  verify_ibus_preload_engines "['xkb:us::eng', 'km:${HOME}/.local/share/keyman/khmer_angkor/khmer_angkor.kmx', 'ady:/usr/local/share/keyman/alephwithbeth/alephwithbeth.kmx']"
+  verify_custom_keyboards "['ady:/usr/local/share/keyman/alephwithbeth/alephwithbeth.kmx']"
+
+  echo "PASS ${TEST_SCRIPT}/${FUNCNAME[0]}"
+}
+
+km_package_list_installed() {
+  # Setup - continue from previous tests
+  local result expected
+
+  # Run
+  result=$(km-package-list-installed)
+
+  # Verify
+  verify_no_error $?
+  expected="--- Installed user Keyman keyboard packages ---
+Khmer Angkor, version: 1.5, id: khmer_angkor
+--- Installed shared Keyman keyboard packages ---
+Aleph With Beth, version: 1.0.6, id: alephwithbeth
+--- Installed OS Keyman keyboard packages ---"
+  if [[ "${result}" != "${expected}" ]]; then
+    echo "FAIL ${TEST_SCRIPT}/${FUNCNAME[0]}: result wrong."
+    echo "EXPECTED:
+${expected}"
+    echo "ACTUAL:
+${result}"
+    exit 1
+  fi
+
+  echo "PASS ${TEST_SCRIPT}/${FUNCNAME[0]}"
+}
+
+km_package_uninstall__user() {
+  # Setup - continue from previous tests
+
+  # Run
+  km-package-uninstall khmer_angkor
+
+  # Verify
+  verify_no_error $?
+  verify_keyboard_file_not_exists "${HOME}/.local/share/keyman/khmer_angkor/khmer_angkor.kmx"
+  verify_ibus_preload_engines "['xkb:us::eng', 'ady:/usr/local/share/keyman/alephwithbeth/alephwithbeth.kmx']"
+  verify_custom_keyboards "['ady:/usr/local/share/keyman/alephwithbeth/alephwithbeth.kmx']"
+
+  echo "PASS ${TEST_SCRIPT}/${FUNCNAME[0]}"
+}
+
+km_package_uninstall__shared() {
+  # Setup - continue from previous tests
+
+  # Run
+  sudo km-package-uninstall --shared alephwithbeth
+
+  # Verify
+  verify_no_error $?
+  verify_keyboard_file_not_exists "/usr/local/share/keyman/alephwithbeth/alephwithbeth.kmx"
+  verify_ibus_preload_engines "['xkb:us::eng']"
+  verify_custom_keyboards "@as []"
+
+  echo "PASS ${TEST_SCRIPT}/${FUNCNAME[0]}"
+}
+
+#-------------------------------------------------------------------------------
+
+run_tests

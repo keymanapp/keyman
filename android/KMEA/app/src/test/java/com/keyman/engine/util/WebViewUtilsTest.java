@@ -26,35 +26,48 @@ public class WebViewUtilsTest {
   @Test
   public void test_ChromeEmpty_EngineWebViewVersionStatusDisabled() {
     String chromeVersion = "";
-    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion),
-      WebViewUtils.EngineWebViewVersionStatus.DISABLED);
+    Assert.assertEquals(WebViewUtils.EngineWebViewVersionStatus.DISABLED,
+      WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion));
   }
 
   @Test
   public void test_Chrome36_EngineWebViewVersionStatusDisabled() {
-    String chromeVersion = "36.0";
-    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion),
-      WebViewUtils.EngineWebViewVersionStatus.DISABLED);
+    double chromeVersionFloat = Float.parseFloat(WebViewUtils.KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME) - 1.0;
+    String chromeVersion = String.valueOf(chromeVersionFloat);
+    Assert.assertEquals(WebViewUtils.EngineWebViewVersionStatus.DISABLED,
+      WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion));
   }
 
   @Test
   public void test_Chrome37_EngineWebViewVersionStatusDegraded() {
-    String chromeVersion = "37.0";
-    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion),
-      WebViewUtils.EngineWebViewVersionStatus.DEGRADED);
+    String chromeVersion = WebViewUtils.KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME;
+    Assert.assertEquals(WebViewUtils.EngineWebViewVersionStatus.DEGRADED,
+      WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion));
   }
 
   @Test
-  public void test_Chrome56_EngineWebViewVersionStatusDegraded() {
-    String chromeVersion = "56.0";
-    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion),
-      WebViewUtils.EngineWebViewVersionStatus.DEGRADED);
+  public void test_Chrome94_EngineWebViewVersionStatusDegraded() {
+    double chromeVersionFloat = Float.parseFloat(WebViewUtils.KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME) - 1.0;
+    String chromeVersion = String.valueOf(chromeVersionFloat);
+    Assert.assertEquals(WebViewUtils.EngineWebViewVersionStatus.DEGRADED,
+      WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion));
   }
 
   @Test
-  public void test_Chrome57_EngineWebViewVersionStatusFull() {
-    String chromeVersion = "57.0";
-    Assert.assertEquals(WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion),
-      WebViewUtils.EngineWebViewVersionStatus.FULL);
+  public void test_Chrome95_EngineWebViewVersionStatusFull() {
+    String chromeVersion = WebViewUtils.KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME;
+    Assert.assertEquals(WebViewUtils.EngineWebViewVersionStatus.FULL,
+      WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion));
   }
+
+  @Test
+  public void test_buildAssetUrl() {
+    Assert.assertEquals("https://appassets.androidplatform.net/data/", WebViewUtils.buildAssetUrl(""));
+    Assert.assertEquals("https://appassets.androidplatform.net/data/", WebViewUtils.buildAssetUrl(null));
+    Assert.assertEquals("https://appassets.androidplatform.net/data/foo", WebViewUtils.buildAssetUrl("foo"));
+    Assert.assertEquals("https://appassets.androidplatform.net/data/foo/", WebViewUtils.buildAssetUrl("foo/"));
+    Assert.assertEquals("https://appassets.androidplatform.net/data/foo/", WebViewUtils.buildAssetUrl("/foo/"));
+    Assert.assertEquals("https://appassets.androidplatform.net/data/foo/bar.html", WebViewUtils.buildAssetUrl("foo/bar.html"));
+  }
+
 }

@@ -48,7 +48,7 @@ BOOL HKLIsIME(HKL hkl)  // I1498 - fix keyboard switching for shadow keyboards o
 HKL ForceKeymanIDToHKL(DWORD KeymanID)  // I3191   // I3526
 {
 #ifdef _WIN64
-  return (HKL) (LONG_PTR) (INT64) (LONG) KeymanID;  // Sign extension for x64
+  return (HKL) (LONG_PTR) (INT64) (LONG) KeymanID;  // Sign extension for 64-bit
 #else
   return (HKL) (DWORD_PTR) KeymanID;
 #endif

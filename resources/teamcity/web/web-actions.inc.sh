@@ -2,7 +2,7 @@
 # Keyman is copyright (C) SIL Global. MIT License.
 
 web_install_dependencies_on_linux_action() {
-  if ! is_ubuntu; then
+  if ! builder_is_linux; then
     return 0
   fi
 
@@ -18,7 +18,7 @@ web_install_dependencies_on_linux_action() {
 }
 
 _install_playwright_dependencies() {
-  if ! is_ubuntu || ! is_os_version_or_higher 24.04; then
+  if ! builder_is_linux || ! ba_linux_is_os_version_or_higher 24.04; then
     return 0
   fi
 
@@ -40,19 +40,19 @@ web_build_action() {
 
 web_test_action() {
   builder_echo start web_test "Running tests for native KeymanWeb"
-  if is_ubuntu; then
+  if builder_is_linux; then
     ba_linux_start_xvfb
     trap "ba_linux_stop_xvfb" ERR
   fi
 
   "${KEYMAN_ROOT}/web/ci.sh" test
 
-  if is_ubuntu; then
+  if builder_is_linux; then
     ba_linux_stop_xvfb
     trap ERR
   fi
 
-  "${KEYMAN_ROOT}/web/build.sh" coverage
+  builder_launch /web/build.sh coverage
 
   builder_echo end web_test success "Finished running tests for native KeymanWeb"
 }

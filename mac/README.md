@@ -27,8 +27,8 @@ keyboard input. You have two options for local builds:
 Keyman must be signed then notarized by Apple, even for local test builds. This requires additional
 configuration for your build environment.
 
-1. First, open XCode, Preferences, Accounts, and select Manage Certificates for the identity
-   you wish to use for signing. Click **+** and select **Developer ID Application**. A
+1. First, open XCode, Settings, Accounts, and select Manage Certificates for the identity
+   you wish to use for signing. Click **+** and select **Apple Development**. A
    certificate will then be generated and listed in your Keychain.
 
 2. Find the SHA-1 hash. To find the certificate in terminal:
@@ -64,23 +64,17 @@ configuration for your build environment.
 
 To build Keyman for macOS, do the following:
 1. Open a Terminal window.
-2. cd to **keyman/mac**. **build.sh** must be run in the directory containing the script.
-3. Build using `./build.sh -no-codesign`. Run `./build.sh -help` to see all options.
-    * If you have signing credentials from the core development team, you can build a signed
-      version by omitting `-no-codesign`. Somewhat misleadingly, `-no-codesign` only stops
-      automatic signing using the certificate maintained by the core development team!
-    * If you want to deploy, you will need to also add `-config Release`, as a Debug build cannot be notarized.
+2. Build using `mac/build.sh clean configure build`
 
 Note: If Carthage prompts you to allow it access to your github credentials, it's fine to click Deny.
 
 ### Running Keyman
 
-1. Deploy Keyman locally using `./build.sh -deploy local -deploy-only`.
+1. Deploy Keyman locally using `mac/build.sh install`.
     * This will notarize the app, signing with your local credentials if not already signed, and copy **keyman/mac/Keyman4MacIM/build/Debug/Keyman.app** to **~/Library/Input Methods**
 2. If running for the first time, follow the installation instructions at [Install Keyman for macOS].
 
-You can also use `./build.sh -no-codesign -deploy local` to do a single-step build, notarize,
-and deploy (see above for faster options).
+You can also use `mac/build.sh build install` to do a single-step build, notarize, and deploy (see above for faster options).
 
 ### Compiling from Xcode
 

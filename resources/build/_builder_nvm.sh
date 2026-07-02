@@ -6,7 +6,7 @@ set -e
 set -u
 
 if [[ $# -lt 1 ]]; then
-  echo "This script is called by shellHelperFunctions.sh, _select_node_version_with_nvm()"
+  echo "This script is called by node.inc.sh, _node_select_version_with_nvm()"
   echo "during build.sh configure steps. It is not intended to be called directly, as it"
   echo "is a wrapper for nvm."
   exit 99
@@ -25,7 +25,7 @@ fi
 # them also! Safest way to work around this is to load nvm in a child process
 # and run it there. Downside is then of course we don't get the `PATH` changes
 # that nvm does for us, so we have to do it ourselves back in the caller,
-# `_select_node_version_with_nvm()`.
+# `_node_select_version_with_nvm()`.
 #
 # Note: the readonly attribute for variables is not inherited by child
 #       processes.
@@ -46,7 +46,7 @@ if ! nvm use "${REQUIRED_NODE_VERSION}"; then
   nvm use "${REQUIRED_NODE_VERSION}"
 fi
 
-# Beware the hardcoded path below -- it should already be in the system PATH
+# Beware the hardcoded path below -- node.inc.sh will add it to PATH if necessary
 
 mkdir -p "$HOME/.keyman"
 rm -f "$HOME/.keyman/node"

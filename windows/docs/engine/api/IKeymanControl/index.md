@@ -9,11 +9,11 @@ and provides methods to trigger Keyman Engine's user interface.
 
 ## Interface Hierarchy
 
-`IDispatch`  
+`IDispatch`
 
-> [`IKeymanObject`](../IKeymanObject)  
+> [`IKeymanObject`](../IKeymanObject)
 >
-> > **`IKeymanControl`**  
+> > **`IKeymanControl`**
 
 
 ## Properties
@@ -45,13 +45,13 @@ and provides methods to trigger Keyman Engine's user interface.
 <!-- -->
 
 [`IsOnlineUpdateCheckOpen()`](IsOnlineUpdateCheckOpen)
-:   Returns `True` if the Keyman Desktop online update check tool is
+:   Returns `True` if the Keyman for Windows online update check tool is
     currently running.
 
 <!-- -->
 
 [`IsTextEditorOpen()`](IsTextEditorOpen)
-:   Returns `True` if the Keyman Desktop text editor is currently
+:   Returns `True` if the Keyman for Windows text editor is currently
     running.
 
 <!-- -->
@@ -72,17 +72,17 @@ and provides methods to trigger Keyman Engine's user interface.
 <!-- -->
 
 [`OpenHelp()`](OpenHelp)
-:   Opens Keyman Desktop help at the specific topic.
+:   Opens Keyman for Windows help at the specific topic.
 
 <!-- -->
 
 [`OpenTextEditor()`](OpenTextEditor)
-:   Opens Keyman Desktop text editor.
+:   Opens Keyman for Windows text editor.
 
 <!-- -->
 
 [`OpenUpdateCheck()`](OpenUpdateCheck)
-:   Opens Keyman Desktop online update check tool.
+:   Opens Keyman for Windows online update check tool.
 
 <!-- -->
 

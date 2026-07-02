@@ -56,6 +56,7 @@ uses
   Xml.XMLDoc,
   Xml.XMLIntf,
 
+  Keyman.System.KeymanSentryClient,
   RedistFiles;
 
 { TAppSourceHttpResponder }
@@ -75,11 +76,22 @@ var
 begin
   T := FSources.LockList;
   try
-    // Note: Unlike regular functions, Assert has short-circuit evaluation
-    // intrinsics on the first param which makes it safe to dereference T[0] in
-    // the second parameter.
-    Assert(T.Count = 0, 'TAppSourceHttpResponder.Sources should be empty at destruction '+
-      '(T.Count='+IntToStr(T.Count)+', T[0].Filename='+T[0].Filename+')');
+    // There is a race where RegisterSource is called on the server side
+    // where a request is started in the form but the server does not respond
+    // before the form is destroyed:
+    //  1. http request starts on form
+    //  2. Form destroyed, calls UnregisterSource
+    //  3. http request received in TAppSourceHttpResponder,
+    //     RespondTouchEditorState calls RegisterSource
+    //  4. Ooops
+
+    // There is another race somewhere with unsaved text editors, or else a
+    // resource leak. For now, we'll report this as a message rather than crash.
+    if T.Count > 0 then
+    begin
+      TKeymanSentryClient.Instance.ReportMessage('TAppSourceHttpResponder.Sources should be empty at destruction '+
+       '(T.Count='+IntToStr(T.Count)+', T[0].Filename='+T[0].Filename+')', True);
+    end;
   finally
     FSources.UnlockList;
   end;
@@ -145,6 +157,7 @@ begin
   begin
     AResponseInfo.ContentType := 'application/json';
     AResponseInfo.Charset := 'UTF-8';
+    TKeymanSentryClient.Breadcrumb('default', Format('RespondTouchEditorState: Filename=%s[#state]', [AFilename]), 'AppSourceHttpResponder');
     if TryGetSource(AFilename + '#state', FData)
       then AResponseInfo.ContentText := FData
       else AResponseInfo.ContentText := '{}';
@@ -167,6 +180,7 @@ var
   FData: string;
 begin
   // TODO: data will be passed separate call from touch editor later
+  TKeymanSentryClient.Breadcrumb('default', Format('RespondTouchEditor: Filename=%s', [AFilename]), 'AppSourceHttpResponder');
   if not TryGetSource(AFilename, FData) then
   begin
     Respond404(AContext, ARequestInfo, AResponseInfo);
@@ -216,6 +230,8 @@ var
 begin
   T := FSources.LockList;
   try
+    TKeymanSentryClient.Breadcrumb('default', Format('TrySetSource: Filename=%s count=%d', [Filename, T.Count]), 'AppSourceHttpResponder');
+
     for i := 0 to T.Count - 1 do
       if T[i].Filename = Filename then
       begin
@@ -236,6 +252,7 @@ procedure TAppSourceHttpResponder.RespondGet(const AFilename: string;
 var
   FData: string;
 begin
+  TKeymanSentryClient.Breadcrumb('default', Format('RespondGet: Filename=%s', [AFilename]), 'AppSourceHttpResponder');
   if TryGetSource(AFilename, FData) then
   begin
     AResponseInfo.ContentType := 'application/json';
@@ -267,6 +284,7 @@ var
 begin
   T := FSources.LockList;
   try
+    TKeymanSentryClient.Breadcrumb('default', Format('TryGetSource: Filename=%s count=%d', [Filename, T.Count]), 'AppSourceHttpResponder');
     for i := 0 to T.Count - 1 do
       if T[i].Filename = Filename then
       begin
@@ -281,6 +299,7 @@ end;
 
 function TAppSourceHttpResponder.GetSource(const Filename: string): string;
 begin
+  TKeymanSentryClient.Breadcrumb('default', Format('GetSource: Filename=%s', [Filename]), 'AppSourceHttpResponder');
   Assert(TryGetSource(Filename, Result),
     'TAppSourceHttpResponder.GetSource was asked for a file that was not registered: '+Filename);
 end;
@@ -289,6 +308,7 @@ function TAppSourceHttpResponder.IsSourceRegistered(const Filename: string): Boo
 var
   Data: string;
 begin
+  TKeymanSentryClient.Breadcrumb('default', Format('IsSourceRegistered: Filename=%s', [Filename]), 'AppSourceHttpResponder');
   Result := TryGetSource(Filename, Data);
 end;
 
@@ -300,6 +320,8 @@ var
 begin
   T := FSources.LockList;
   try
+    TKeymanSentryClient.Breadcrumb('default', Format('RegisterSource: Filename=%s Update=%s count=%d', [Filename, BoolToStr(Update,True), T.Count]), 'AppSourceHttpResponder');
+
     S.Filename := Filename;
     S.Data := Data;
 
@@ -326,6 +348,7 @@ var
 begin
   T := FSources.LockList;
   try
+    TKeymanSentryClient.Breadcrumb('default', Format('UnregisterSource: Filename=%s count=%d', [Filename, T.Count]), 'AppSourceHttpResponder');
     for i := 0 to T.Count - 1 do
       if T[i].Filename = Filename then
       begin

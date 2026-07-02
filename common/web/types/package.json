@@ -36,8 +36,6 @@
     "restructure": "3.0.1"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^20.4.1",
     "ajv": "^8.12.0",
     "ajv-cli": "^5.0.0",
     "ajv-formats": "^2.1.1",
@@ -54,7 +52,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keymanapp/keyman.git"
+    "url": "git+https://github.com/keymanapp/keyman.git",
+    "directory": "common/web/types"
   },
   "c8": {
     "all": true,
@@ -74,10 +73,10 @@
       "src/ldml-keyboard/unicodeset-parser-api.ts",
       "src/keyman-touch-layout/keyman-touch-layout-file-writer.ts",
       "src/osk/osk.ts",
+      "src/util/types.ts",
       "src/schemas/*",
       "tests/",
       "src/keyboard-object.ts",
-      "src/outputTarget.interface.ts",
       "src/*.d.ts",
       "src/main.ts",
       "src/schema-validators.ts",

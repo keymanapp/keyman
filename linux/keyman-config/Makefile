@@ -1,47 +1,10 @@
 #!/usr/bin/make
 
 default:
-	./build.sh clean build
+	echo "Use ./build.sh command instead of make!"
 
-install:
-	./build.sh install
-
-uninstall: # run as sudo
-	./build.sh uninstall
-
-clean:
-	./build.sh clean
-
-check:
-	./build.sh test
-
-dist: clean version
-	# TODO: remove this if when we no longer support Ubuntu 22.04 Jammy
-	if dpkg --compare-versions "$(lsb_release -r -s)" lt 24.04; then \
-		python3 setup.py sdist ; \
-	else \
-		python3 -m build --outdir build --sdist ; \
-	fi
-
-deb: dist
-	@KEYMAN_VERSION=$(shell echo `basename dist/*.gz .tar.gz|cut -d "-" -f2` > /tmp/keyman_version)
-	@echo KEYMAN_VERSION is $(shell cat /tmp/keyman_version)
-	@mkdir -p make_deb
-	cd make_deb && tar xf ../dist/keyman_config-$(shell cat /tmp/keyman_version).tar.gz && \
-		mv keyman_config-$(shell cat /tmp/keyman_version) keyman-config-$(shell cat /tmp/keyman_version) && \
-		tar cfz keyman-config_$(shell cat /tmp/keyman_version).orig.tar.gz keyman-config-$(shell cat /tmp/keyman_version) && \
-		cd keyman-config-$(shell cat /tmp/keyman_version) && cp -a ../../../debian . && dch -v$(shell cat /tmp/keyman_version)-1 ""
-	cd make_deb/keyman-config-$(shell cat /tmp/keyman_version) && debuild -us -uc
-	rm /tmp/keyman_version
-
-man:
-	./build-help.sh --man --no-reconf
-
-version_reconf:
-	cd .. && ./scripts/reconf.sh
-
-version: version_reconf
-	$(eval KEYMAN_VERSION := $(shell python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))
+version:
+	$(eval KEYMAN_VERSION := $(shell ./build.sh build > /dev/null && python3 -c "from keyman_config import __releaseversion__; print(__releaseversion__)"))
 
 # i18n
 
@@ -65,3 +28,15 @@ $(MOFILES): %/LC_MESSAGES/keyman-config.mo: %.po
 	msgfmt -v --check --output-file=$@ $^
 
 compile-po: $(MOFILES)
+
+create-test-po:
+	cd locale && \
+		msginit --locale=TEST --width=98 --no-translator --input keyman-config.pot --output-file=TEST.po && \
+		mv TEST.po TEST1.po && \
+		../../scripts/create-test-po.py TEST1.po TEST.po && \
+		rm TEST1.po
+
+test-po: create-test-po
+	mkdir -p locale/TEST/LC_MESSAGES
+	msgfmt -v --check --output-file=locale/TEST/LC_MESSAGES/keyman-config.mo locale/TEST.po
+	TEXTDOMAINDIR=./locale LANGUAGE=TEST ./km-config

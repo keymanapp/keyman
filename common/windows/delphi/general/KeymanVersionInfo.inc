@@ -1,6 +1,6 @@
 type
   TKeymanVersionInfo = record
-    // These fields match fields in /resources/build/build-utils.sh
+    // These fields match fields in /resources/build/builder-basic.inc.sh
     Version: string;        // 14.0.2
     VersionWin: string;     // 14.0.2.0
     VersionRelease: string; // 14.0

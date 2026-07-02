@@ -4,16 +4,16 @@
 
 ```ts
 
-import { CompilerCallbacks } from '@keymanapp/common-types';
-import { CompilerEvent } from '@keymanapp/common-types';
-import { CompilerOptions } from '@keymanapp/common-types';
-import { KeymanCompiler } from '@keymanapp/common-types';
-import { KeymanCompilerArtifactOptional } from '@keymanapp/common-types';
-import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
-import { KeymanCompilerResult } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
+import { CompilerEvent } from '@keymanapp/developer-utils';
+import { CompilerOptions } from '@keymanapp/developer-utils';
+import { KeymanCompiler } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifactOptional } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifacts } from '@keymanapp/developer-utils';
+import { KeymanCompilerResult } from '@keymanapp/developer-utils';
+import { LdmlKeyboardTypes } from '@keymanapp/common-types';
+import { ObjectWithCompileContext } from '@keymanapp/common-types';
 import { TouchLayout } from '@keymanapp/common-types';
-import { UnicodeSet } from '@keymanapp/common-types';
-import { UnicodeSetParser } from '@keymanapp/common-types';
 import { VisualKeyboard } from '@keymanapp/common-types';
 
 // Warning: (ae-internal-missing-underscore) The name "CompilerResultExtraGroup" should be prefixed with an underscore because the declaration is marked as @internal
@@ -39,16 +39,15 @@ export interface CompilerResultExtraStore {
 }
 
 // @public
-export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
-    constructor();
+export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSetParser {
     // @internal
     static fixNewPattern(pattern: string): string;
     init(callbacks: CompilerCallbacks, options: KmnCompilerOptions): Promise<boolean>;
     // @internal (undocumented)
-    parseUnicodeSet(pattern: string, rangeCount: number): UnicodeSet | null;
+    parseUnicodeSet(pattern: string, rangeCount: number, compileContext?: any): LdmlKeyboardTypes.UnicodeSet | null;
     run(infile: string, outfile: string): Promise<KmnCompilerResult>;
     // @internal (undocumented)
-    sizeUnicodeSet(pattern: string): number;
+    sizeUnicodeSet(pattern: string, compileContext?: any): number;
     // @internal
     testSentry(): any;
     verifyInitialized(): boolean;
@@ -135,18 +134,6 @@ export class KmnCompilerMessages {
     // (undocumented)
     static Error_90FeatureOnlyVirtualKeyDictionary: () => CompilerEvent;
     // (undocumented)
-    static ERROR_AnyInVirtualKeySection: number;
-    // (undocumented)
-    static Error_AnyInVirtualKeySection: () => CompilerEvent;
-    // (undocumented)
-    static ERROR_BeepInVirtualKeySection: number;
-    // (undocumented)
-    static Error_BeepInVirtualKeySection: () => CompilerEvent;
-    // (undocumented)
-    static ERROR_CallInVirtualKeySection: number;
-    // (undocumented)
-    static Error_CallInVirtualKeySection: () => CompilerEvent;
-    // (undocumented)
     static ERROR_CannotLoadIncludeFile: number;
     // (undocumented)
     static Error_CannotLoadIncludeFile: () => CompilerEvent;
@@ -195,21 +182,27 @@ export class KmnCompilerMessages {
     // (undocumented)
     static Error_ContextAndIndexInvalidInMatchNomatch: () => CompilerEvent;
     // (undocumented)
+    static ERROR_ContextExCannotReferenceIf: number;
+    // (undocumented)
+    static Error_ContextExCannotReferenceIf: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_ContextExCannotReferenceNul: number;
+    // (undocumented)
+    static Error_ContextExCannotReferenceNul: () => CompilerEvent;
+    // (undocumented)
     static ERROR_ContextExHasInvalidOffset: number;
     // (undocumented)
     static Error_ContextExHasInvalidOffset: () => CompilerEvent;
     // (undocumented)
-    static ERROR_ContextInVirtualKeySection: number;
-    // (undocumented)
-    static Error_ContextInVirtualKeySection: () => CompilerEvent;
-    // (undocumented)
     static ERROR_DuplicateGroup: number;
+    // Warning: (ae-forgotten-export) The symbol "KmcmpLibMessageParameters" needs to be exported by the entry point main.d.ts
+    //
     // (undocumented)
-    static Error_DuplicateGroup: () => CompilerEvent;
+    static Error_DuplicateGroup: (o: KmcmpLibMessageParameters) => CompilerEvent;
     // (undocumented)
     static ERROR_DuplicateStore: number;
     // (undocumented)
-    static Error_DuplicateStore: () => CompilerEvent;
+    static Error_DuplicateStore: (o: KmcmpLibMessageParameters) => CompilerEvent;
     // (undocumented)
     static ERROR_ExpansionMustBePositive: number;
     // (undocumented)
@@ -240,10 +233,6 @@ export class KmnCompilerMessages {
     static ERROR_IndexDoesNotPointToAny: number;
     // (undocumented)
     static Error_IndexDoesNotPointToAny: () => CompilerEvent;
-    // (undocumented)
-    static ERROR_IndexInVirtualKeySection: number;
-    // (undocumented)
-    static Error_IndexInVirtualKeySection: () => CompilerEvent;
     // (undocumented)
     static ERROR_InfileNotExist: number;
     // (undocumented)
@@ -303,10 +292,6 @@ export class KmnCompilerMessages {
     static ERROR_InvalidIndex: number;
     // (undocumented)
     static Error_InvalidIndex: () => CompilerEvent;
-    // (undocumented)
-    static ERROR_InvalidInVirtualKeySection: number;
-    // (undocumented)
-    static Error_InvalidInVirtualKeySection: () => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidKeyCode: number;
     // (undocumented)
@@ -386,7 +371,7 @@ export class KmnCompilerMessages {
     // (undocumented)
     static ERROR_InvalidTarget: number;
     // (undocumented)
-    static Error_InvalidTarget: () => CompilerEvent;
+    static Error_InvalidTarget: (o: KmcmpLibMessageParameters) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidToken: number;
     // (undocumented)
@@ -421,6 +406,47 @@ export class KmnCompilerMessages {
     static ERROR_LineTooLong: number;
     // (undocumented)
     static Error_LineTooLong: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_NameContainsInvalidCharacter: number;
+    // (undocumented)
+    static Error_NameContainsInvalidCharacter: (o: {
+        name: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_NameMustBeAtLeastOneCharLong: number;
+    // (undocumented)
+    static Error_NameMustBeAtLeastOneCharLong: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_NameMustBeAtMostNCharsLong: number;
+    // (undocumented)
+    static Error_NameMustBeAtMostNCharsLong: (o: {
+        name: string;
+        length: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_NameMustNotContainComma: number;
+    // (undocumented)
+    static Error_NameMustNotContainComma: (o: {
+        name: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_NameMustNotContainParentheses: number;
+    // (undocumented)
+    static Error_NameMustNotContainParentheses: (o: {
+        name: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_NameMustNotContainSpaces: number;
+    // (undocumented)
+    static Error_NameMustNotContainSpaces: (o: {
+        name: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_NameMustNotContainSquareBrackets: number;
+    // (undocumented)
+    static Error_NameMustNotContainSquareBrackets: (o: {
+        name: string;
+    }) => CompilerEvent;
     // (undocumented)
     static ERROR_NewContextGroupMustBeReadonly: number;
     // (undocumented)
@@ -467,10 +493,6 @@ export class KmnCompilerMessages {
     // (undocumented)
     static Error_OutputInReadonlyGroup: () => CompilerEvent;
     // (undocumented)
-    static ERROR_OutsInVirtualKeySection: number;
-    // (undocumented)
-    static Error_OutsInVirtualKeySection: () => CompilerEvent;
-    // (undocumented)
     static ERROR_OutsTooLong: number;
     // (undocumented)
     static Error_OutsTooLong: () => CompilerEvent;
@@ -499,9 +521,9 @@ export class KmnCompilerMessages {
     // (undocumented)
     static Error_StoreDoesNotExist: () => CompilerEvent;
     // (undocumented)
-    static ERROR_StringInVirtualKeySection: number;
+    static ERROR_TextBeforeOrAfterNulInOutput: number;
     // (undocumented)
-    static Error_StringInVirtualKeySection: () => CompilerEvent;
+    static Error_TextBeforeOrAfterNulInOutput: () => CompilerEvent;
     // (undocumented)
     static ERROR_TooManyIndexToKeyRefs: number;
     // (undocumented)
@@ -513,19 +535,20 @@ export class KmnCompilerMessages {
         keyId: string;
         platformName: string;
         layerId: string;
+        address: KeyAddress;
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_UnicodeSetHasProperties: number;
     // (undocumented)
-    static Error_UnicodeSetHasProperties: () => CompilerEvent;
+    static Error_UnicodeSetHasProperties: (compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_UnicodeSetHasStrings: number;
     // (undocumented)
-    static Error_UnicodeSetHasStrings: () => CompilerEvent;
+    static Error_UnicodeSetHasStrings: (compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_UnicodeSetSyntaxError: number;
     // (undocumented)
-    static Error_UnicodeSetSyntaxError: () => CompilerEvent;
+    static Error_UnicodeSetSyntaxError: (compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static ERROR_UnterminatedString: number;
     // (undocumented)
@@ -575,10 +598,6 @@ export class KmnCompilerMessages {
     // (undocumented)
     static Fatal_BadCallParams: () => CompilerEvent;
     // (undocumented)
-    static FATAL_Break: number;
-    // (undocumented)
-    static Fatal_Break: () => CompilerEvent;
-    // (undocumented)
     static FATAL_BufferOverflow: number;
     // (undocumented)
     static Fatal_BufferOverflow: () => CompilerEvent;
@@ -605,10 +624,6 @@ export class KmnCompilerMessages {
     // (undocumented)
     static Fatal_SomewhereIGotItWrong: () => CompilerEvent;
     // (undocumented)
-    static FATAL_UnableToWriteFully: number;
-    // (undocumented)
-    static Fatal_UnableToWriteFully: () => CompilerEvent;
-    // (undocumented)
     static FATAL_UnexpectedException: number;
     // (undocumented)
     static Fatal_UnexpectedException: (o: {
@@ -617,7 +632,7 @@ export class KmnCompilerMessages {
     // (undocumented)
     static FATAL_UnicodeSetOutOfRange: number;
     // (undocumented)
-    static Fatal_UnicodeSetOutOfRange: () => CompilerEvent;
+    static Fatal_UnicodeSetOutOfRange: (compileContext?: ObjectWithCompileContext) => CompilerEvent;
     // (undocumented)
     static HINT_IndexStoreLong: number;
     // (undocumented)
@@ -636,15 +651,11 @@ export class KmnCompilerMessages {
     // (undocumented)
     static HINT_UnreachableRule: number;
     // (undocumented)
-    static Hint_UnreachableRule: () => CompilerEvent;
+    static Hint_UnreachableRule: (o: KmcmpLibMessageParameters) => CompilerEvent;
     // (undocumented)
-    static INFO_EndOfFile: number;
+    static INFO_MinimumCoreEngineVersion: number;
     // (undocumented)
-    static Info_EndOfFile: () => CompilerEvent;
-    // (undocumented)
-    static INFO_Info: number;
-    // (undocumented)
-    static Info_Info: () => CompilerEvent;
+    static Info_MinimumCoreEngineVersion: (o: KmcmpLibMessageParameters) => CompilerEvent;
     // (undocumented)
     static WARN_ANSIInUnicodeGroup: number;
     // (undocumented)
@@ -776,6 +787,7 @@ export class KmnCompilerMessages {
         keyId: string;
         platformName: string;
         layerId: string;
+        address: KeyAddress;
     }) => CompilerEvent;
     // (undocumented)
     static WARN_TouchLayoutFontShouldBeSameForAllPlatforms: number;
@@ -789,6 +801,7 @@ export class KmnCompilerMessages {
         platformName: string;
         layerId: string;
         nextLayer: string;
+        address: KeyAddress;
     }) => CompilerEvent;
     // (undocumented)
     static WARN_TouchLayoutMissingRequiredKeys: number;
@@ -806,12 +819,14 @@ export class KmnCompilerMessages {
         platformName: string;
         layerId: string;
         label: string;
+        address: KeyAddress;
     }) => CompilerEvent;
     // (undocumented)
     static WARN_TouchLayoutUnidentifiedKey: number;
     // (undocumented)
     static Warn_TouchLayoutUnidentifiedKey: (o: {
         layerId: string;
+        address: KeyAddress;
     }) => CompilerEvent;
     // (undocumented)
     static WARN_UnicodeInANSIGroup: number;
@@ -889,6 +904,7 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
         keyId: string;
         platformName: string;
         layerId: string;
+        address: KeyAddress;
     }) => CompilerEvent;
     // (undocumented)
     static HINT_TouchLayoutUsesUnsupportedGesturesDownlevel: number;
@@ -897,9 +913,9 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
         keyId: string;
     }) => CompilerEvent;
     // (undocumented)
-    static INFO_MinimumEngineVersion: number;
+    static INFO_MinimumWebEngineVersion: number;
     // (undocumented)
-    static Info_MinimumEngineVersion: (o: {
+    static Info_MinimumWebEngineVersion: (o: {
         version: string;
     }) => CompilerEvent;
 }
@@ -954,5 +970,9 @@ interface StringResult {
     unicode: string;
     usages: StringRefUsage[] | string[];
 }
+
+// Warnings were encountered during analysis:
+//
+// src/compiler/kmn-compiler-messages.ts:468:103 - (ae-forgotten-export) The symbol "KeyAddress" needs to be exported by the entry point main.d.ts
 
 ```

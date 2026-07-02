@@ -114,9 +114,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Ɗemngal man fuu arti wa`inni</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Dasa kibod man ngam de`itina juutugo</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Waylutu na`ura man ngam a` de`itina dow bee les</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">Dasa kibod man ngam de`itina juutugo. Waylutu na`ura man ngam a` de`itina dow bee les.</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Lornu ɗum ko naftirta tum</string>
   <!-- Context: Keyman Web Browser -->

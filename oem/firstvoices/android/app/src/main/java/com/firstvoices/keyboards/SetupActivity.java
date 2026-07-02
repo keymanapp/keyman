@@ -3,6 +3,7 @@ package com.firstvoices.keyboards;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -24,104 +25,138 @@ import java.util.List;
 
 public class SetupActivity extends AppCompatActivity {
 
-    private ListView listView = null;
-    private SimpleAdapter listAdapter = null;
-    private ArrayList<HashMap<String, String>> list = null;
+  private ListView listView = null;
+  private SimpleAdapter listAdapter = null;
+  private ArrayList<HashMap<String, String>> list = null;
+  private static SharedPreferences prefs;
+  private static SharedPreferences.Editor editor;
 
-    private final String iconKey = "icon";
-    private final String textKey = "text";
-    private final String isEnabledKey = "isEnabled";
-    
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        final Context context = this;
-        setContentView(R.layout.setup_list_layout);
+  private final String iconKey = "icon";
+  private final String textKey = "text";
+  private final String isEnabledKey = "isEnabled";
 
-        listView = findViewById(R.id.listView);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+    final Context context = this;
+    setContentView(R.layout.setup_list_layout);
 
-        final ImageButton closeButton = findViewById(R.id.close_button);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                finish();
-            }
-        });
+    prefs = context.getSharedPreferences(
+      PreferencesManager.fv_prefs_name, Context.MODE_PRIVATE);
+    editor = prefs.edit();
 
-        list = new ArrayList<>();
-        HashMap<String, String> hashMap;
+    listView = findViewById(R.id.listView);
 
-        hashMap = new HashMap<>();
-        hashMap.put(iconKey, "0");
-        hashMap.put(textKey, "Enable 'FirstVoices'");
-        hashMap.put(isEnabledKey, "true");
-        list.add(hashMap);
+    final ImageButton closeButton = findViewById(R.id.close_button);
+    closeButton.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        finish();
+      }
+    });
 
-        hashMap = new HashMap<>();
-        hashMap.put(iconKey, "0");
-        hashMap.put(textKey, "Choose 'FirstVoices' as current input method");
-        hashMap.put(isEnabledKey, "false");
-        list.add(hashMap);
-        
-        String[] from = new String[]{ iconKey, textKey };
-        int[] to = new int[] { R.id.left_icon, R.id.text };
-        listAdapter = new SimpleAdapter(context, list, R.layout.setup_row_layout, from, to);
-        listView.setAdapter(listAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
-                    startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
-                }
-                else if (position == 1) {
-                    InputMethodManager imManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if(imManager != null) {
-                        imManager.showInputMethodPicker();
-                    } else {
-                        Log.e("setupActivity.onCreate", "Failed to get system service INPUT_METHOD_SERVICE");
-                    }
-                }
-            }
-        });
-    }
-    
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-    
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-    
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) {
-            String checkbox_off = String.valueOf(android.R.drawable.checkbox_off_background);
-            String checkbox_on = String.valueOf(android.R.drawable.checkbox_on_background);
+    list = new ArrayList<>();
+    HashMap<String, String> hashMap;
 
-            if (isEnabledSystemWide(this)) {
-                list.get(0).put(iconKey, checkbox_on);
-                list.get(1).put(isEnabledKey, "true");
-            }
-            else {
-                list.get(0).put(iconKey, checkbox_off);
-                list.get(1).put(isEnabledKey, "false");
-            }
+    hashMap = new HashMap<>();
+    hashMap.put(iconKey, "0");
+    hashMap.put(textKey, "Enable 'FirstVoices'");
+    hashMap.put(isEnabledKey, "true");
+    list.add(hashMap);
 
-            if (isDefaultKB(this))
-                list.get(1).put(iconKey, checkbox_on);
-            else
-                list.get(1).put(iconKey, checkbox_off);
+    hashMap = new HashMap<>();
+    hashMap.put(iconKey, "0");
+    hashMap.put(textKey, "Choose 'FirstVoices' as current input method");
+    hashMap.put(isEnabledKey, "false");
+    list.add(hashMap);
 
-            String[] from = new String[]{ iconKey, textKey };
-            int[] to = new int[] { R.id.left_icon, R.id.text };
-            listAdapter = new SimpleAdapter(this, list, R.layout.setup_row_layout, from, to);
-            listView.setAdapter(listAdapter);
+    hashMap = new HashMap<>();
+    hashMap.put(iconKey, "0");
+    hashMap.put(textKey, "Show On-Screen Keyboard when physical keyboard is connected");
+    hashMap.put(isEnabledKey, "true");
+    list.add(hashMap);
+
+    String[] from = new String[]{iconKey, textKey};
+    int[] to = new int[]{R.id.left_icon, R.id.text};
+    listAdapter = new SimpleAdapter(context, list, R.layout.setup_row_layout, from, to);
+    listView.setAdapter(listAdapter);
+    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (position == 0) {
+          startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
+        } else if (position == 1) {
+          InputMethodManager imManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+          if (imManager != null) {
+            imManager.showInputMethodPicker();
+          } else {
+            Log.e("setupActivity.onCreate", "Failed to get system service INPUT_METHOD_SERVICE");
+          }
+        } else if (position == 2) {
+          // Toggle Show On-Screen Keyboard setting
+          boolean showOSK = !isShowOSK();
+          if (editor != null) {
+            editor.putBoolean(PreferencesManager.oskWithPhysicalKeyboardKey,
+              showOSK);
+            editor.commit();
+          }
+
+          updateShowOSKCheckbox(showOSK);
         }
+        listAdapter.notifyDataSetChanged();
+      }
+    });
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+  }
+
+  @Override
+  public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    if (hasFocus) {
+      String checkbox_off = String.valueOf(android.R.drawable.checkbox_off_background);
+      String checkbox_on = String.valueOf(android.R.drawable.checkbox_on_background);
+
+      if (isEnabledSystemWide(this)) {
+        list.get(0).put(iconKey, checkbox_on);
+        list.get(1).put(isEnabledKey, "true");
+      } else {
+        list.get(0).put(iconKey, checkbox_off);
+        list.get(1).put(isEnabledKey, "false");
+      }
+
+      if (isDefaultKB(this))
+        list.get(1).put(iconKey, checkbox_on);
+      else
+        list.get(1).put(iconKey, checkbox_off);
+
+      updateShowOSKCheckbox(isShowOSK());
+
+      String[] from = new String[]{iconKey, textKey};
+      int[] to = new int[]{R.id.left_icon, R.id.text};
+      listAdapter = new SimpleAdapter(this, list, R.layout.setup_row_layout, from, to);
+      listView.setAdapter(listAdapter);
     }
+  }
+
+  private void updateShowOSKCheckbox(boolean showOSK) {
+    String checkbox_off = String.valueOf(android.R.drawable.checkbox_off_background);
+    String checkbox_on = String.valueOf(android.R.drawable.checkbox_on_background);
+
+    if (showOSK) {
+      list.get(2).put(iconKey, checkbox_on);
+    } else {
+      list.get(2).put(iconKey, checkbox_off);
+    }
+  }
 
     static boolean isEnabledSystemWide(Context context) {
         InputMethodManager imManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -148,5 +183,14 @@ public class SetupActivity extends AppCompatActivity {
     static boolean isDefaultKB(Context context) {
         String inputMethod = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD);
         return inputMethod.equals("com.firstvoices.keyboards/.SystemKeyboard");
+    }
+
+    static boolean isShowOSK() {
+      boolean showOSK = false;
+      if (prefs != null) {
+        showOSK = prefs.getBoolean(
+          PreferencesManager.oskWithPhysicalKeyboardKey, false);
+      }
+      return showOSK;
     }
 }

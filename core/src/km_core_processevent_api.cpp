@@ -15,7 +15,7 @@
 
 km_core_status
 km_core_event(
-  km_core_state *state,
+  km_core_state const *state,
   uint32_t event,
   void* data
 ) {
@@ -37,18 +37,24 @@ km_core_event(
       return KM_CORE_STATUS_INVALID_ARGUMENT;
   }
 
-  return state->processor().external_event(state, event, data);
+  km_core_status status = const_cast<km_core_state*>(state)->processor().external_event(const_cast<km_core_state*>(state), event, data);
+  const_cast<km_core_state*>(state)->apply_actions_and_merge_app_context();
+  return status;
 }
 
 km_core_status
-km_core_process_event(km_core_state *state,
+km_core_process_event(km_core_state const *state_,
                      km_core_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down,
                      uint16_t event_flags) {
-  assert(state != nullptr);
-  if(state == nullptr) {
+  assert(state_ != nullptr);
+  if(state_ == nullptr) {
     return KM_CORE_STATUS_INVALID_ARGUMENT;
+  }
+  km_core_state *state = const_cast<km_core_state*>(state_);
+  if (vk == KM_CORE_VKEY_BKSP && is_key_down) {
+    state->set_backspace_handled_internally(false);
   }
   km_core_status status = state->processor().process_event(state, vk, modifier_state, is_key_down, event_flags);
 
@@ -77,6 +83,10 @@ km_core_process_event(km_core_state *state,
   }
 
   state->apply_actions_and_merge_app_context();
+
+  if (vk == KM_CORE_VKEY_BKSP) {
+    state->set_backspace_handled_internally(!state->action_struct().emit_keystroke);
+  }
 
   return status;
 }

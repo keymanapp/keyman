@@ -138,7 +138,7 @@ export class KmpInfWriter {
 
   private saveKeyboards() {
     // keyboards
-    for(let i = 0; i < this.data.keyboards?.length ?? 0; i++) {
+    for(let i = 0; i < (this.data.keyboards?.length ?? 0); i++) {
       const keyboard = this.data.keyboards[i];
       this.addSection('Keyboard'+i.toString());
       this.addString('Name', keyboard.name);
@@ -154,7 +154,7 @@ export class KmpInfWriter {
         this.addString('DisplayFont', keyboard.displayFont);
       }
 
-      for(let j = 0; j < keyboard.languages?.length ?? 0; j++) {
+      for(let j = 0; j < (keyboard.languages?.length ?? 0); j++) {
         const language = keyboard.languages[j];
         this.addString('Language'+j.toString(), language.id+','+language.name);
       }

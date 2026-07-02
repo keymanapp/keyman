@@ -67,6 +67,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -85,7 +86,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.provider.Settings;
 import android.text.Html;
@@ -98,8 +98,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -118,6 +116,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private static final String TAG = "MainActivity";
 
+  private ConstraintLayout constraintLayout;
   private KMTextView textView;
   private final int minTextSize = 16;
   private final int maxTextSize = 72;
@@ -169,6 +168,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     checkHapticFeedback();
 
     setContentView(R.layout.activity_main);
+
+    constraintLayout = (ConstraintLayout)findViewById(R.id.constraintLayout);
+    setupEdgeToEdge(R.id.constraintLayout);
+    setupStatusBarColors(android.R.color.white, R.color.neutral_2);
 
     toolbar = (Toolbar) findViewById(R.id.titlebar);
     setSupportActionBar(toolbar);
@@ -616,16 +619,21 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     getTheme().resolveAttribute(android.R.attr.actionBarSize, outValue, true);
     int actionBarHeight = getResources().getDimensionPixelSize(outValue.resourceId);
 
-    // *** TO DO: Try to check if status bar is visible, set statusBarHeight to 0 if it is not visible ***
+    // Status bar height only used for portrait orientation
     int statusBarHeight = 0;
-    int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-    if (resourceId > 0)
-      statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+    if (lastOrientation == Configuration.ORIENTATION_PORTRAIT) {
+      // *** TO DO: Try to check if status bar is visible, set statusBarHeight to 0 if it is not visible ***
+      int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+      if (resourceId > 0) {
+        statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+      }
+    }
+    int navigationBarHeight = KMManager.getNavigationBarHeight(context, KeyboardType.KEYBOARD_TYPE_INAPP);
 
     Point size = KMManager.getWindowSize(context);
     int screenHeight = size.y;
-    Log.d(TAG, "Main resizeTextView bannerHeight: " + bannerHeight);
-    textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight);
+    textView.setHeight(
+      screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight - navigationBarHeight);
   }
 
   private void showInfo() {
@@ -864,6 +872,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private void displayUpdateChrome() {
     // TextView's default string is to update Chrome
+    TextView textView = (TextView)findViewById(R.id.kmWebViewChromeTextView);
+    textView.setText(String.format(getString(R.string.text_require_chrome_version),
+      WebViewUtils.KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME));
 
     Button button = (Button)findViewById(R.id.webViewChromeButton);
     button.setText(getString(R.string.button_update_chrome));

@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Keyman Configuration" \
@@ -45,15 +45,26 @@ function do_build() {
 }
 
 function do_build_data() {
+  builder_echo do_build_data
+
   replaceVersionStrings_Mkver xml/sentry.init.js.in xml/sentry.init.js
 
   rm -rf "$WINDOWS_PROGRAM_APP/xml"
   mkdir -p "$WINDOWS_PROGRAM_APP/xml"
   cp -r xml/* "$WINDOWS_PROGRAM_APP/xml/"
 
+  do_build_locale_index "locale"
+
   rm -rf "$WINDOWS_PROGRAM_APP/locale"
   mkdir -p "$WINDOWS_PROGRAM_APP/locale"
   cp -r locale/* "$WINDOWS_PROGRAM_APP/locale/"
+}
+
+function do_build_locale_index() {
+  builder_echo "do_build_locale_index $1"
+  local locale_root="$1"
+  local locale_index="$1/index.xml"
+  "$DEVTOOLS" -buildlocaleindex "$locale_root" "$locale_index"
 }
 
 function do_publish() {

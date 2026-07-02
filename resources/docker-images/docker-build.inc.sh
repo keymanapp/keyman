@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 # no hashbang for .inc.sh
 
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/node.inc.sh"
 
 _add_build_args() {
   local var=$1
@@ -30,7 +30,7 @@ convert_parameters_to_args() {
   build_version=
   local required_node_version keyman_default_distro
   # shellcheck disable=SC2034
-  required_node_version="$(_print_expected_node_version)"
+  required_node_version="$(_node_print_expected_version)"
   # shellcheck disable=SC2034
   keyman_default_distro="ubuntu"
 
@@ -63,11 +63,65 @@ is_default_values() {
 # Check that `docker buildx` is available
 check_buildx_available() {
   if ! docker --help | grep -q buildx; then
-    if [[ "${OSTYPE:-}" == "linux-gnu" ]]; then
-      builder_echo error "Docker buildx is not available. Please install Docker buildx to use this script. e.g. 'sudo apt install docker-buildx'"
+    if builder_is_linux; then
+      builder_echo error "Docker buildx is not available. Please install Docker buildx to use this script. E.g. 'sudo apt install docker-buildx'"
     else
       builder_echo error "Docker buildx is not available. Please install Docker buildx to use this script."
     fi
     exit 1
   fi
 }
+
+docker_wrapper() {
+  if [[ "${MSYSTEM:-}" == "MINGW64" ]]; then
+    # Prevent POSIX-to-Windows path conversion if running in Git Bash on Windows
+    # (https://github.com/git-for-windows/git/issues/577#issuecomment-166118846)
+    MSYS_NO_PATHCONV=1 docker "$@"
+  else
+    docker "$@"
+  fi
+}
+
+setup_docker() {
+  DOCKER_RUN_ARGS=()
+  if [[ "${MSYSTEM:-}" == "MINGW64" ]]; then
+    DOCKER_RUN_ARGS+=(--env DOCKER_RUN_AS_ROOT=1)
+  fi
+  if builder_is_running_on_gha ; then
+    DOCKER_RUN_ARGS+=(--env CHANGE_PERMISSIONS=1)
+  else
+    DOCKER_RUN_ARGS+=(-t)
+  fi
+
+  if builder_has_option --remote-debug; then
+    DOCKER_RUN_ARGS+=(-p 2345:2345)
+  fi
+}
+
+setup_container_registry() {
+  registry=${REGISTRY:-ghcr.io}
+  local username=${REGISTRY_USERNAME:-}
+  local password=${REGISTRY_PASSWORD:-}
+  registry_slash=''
+
+  builder_echo debug "Setting up container registry '${registry}'."
+
+  registry_slash="${registry}/"
+  registry_parameters="--registry ${registry}"
+  build_args+=("--build-arg=REGISTRY=${registry_slash}")
+
+  if [[ -n ${username:-} ]] ; then
+    if [[ -z ${password:-} ]] ; then
+      builder_echo debug "No password specified for container registry user '${username}'. Waiting for password on stdin."
+      read -r password
+    fi
+    docker_wrapper login "${registry}" -u "${username}" --password-stdin << EOF
+${password}
+EOF
+    registry_parameters="${registry_parameters} --username ${username} --password ${password}"
+  else
+    builder_echo debug "No username specified for container registry '${registry}'."
+  fi
+
+}
+

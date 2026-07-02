@@ -9,7 +9,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
@@ -25,7 +25,7 @@ builder_describe \
 
 builder_parse "$@"
 
-if ! is_windows; then
+if ! builder_is_windows; then
   builder_echo error "This script is intended to be run on Windows only."
   exit 1
 fi
@@ -41,7 +41,7 @@ function build_developer_action() {
 function _build_developer() {
   builder_echo start "build developer" "Building and testing Keyman Developer"
 
-  ./build.sh configure build test
+  builder_launch /developer/src/build.sh configure build test
 
   builder_echo end "build developer" success "Finished building and testing Keyman Developer"
 }
@@ -49,19 +49,19 @@ function _build_developer() {
 function _build_testkeyboards() {
   builder_echo start "build testkeyboards" "Building test keyboards"
 
-  "${KEYMAN_ROOT}/common/test/keyboards/build.sh" --zip-source --index
+  builder_launch /common/test/keyboards/build.sh --zip-source --index
 
   builder_echo end "build testkeyboards" success "Finished building test keyboards"
 }
 
 function publish_sentry_action() {
-  builder_echo start "publish" "Dry-run publish and api"
-  ./build.sh api publish --dry-run
-  builder_echo end "publish" "Dry-run publish and api"
+  builder_echo start "publish" "publish modules locally and prep api"
+  builder_launch /developer/src/build.sh api publish
+  builder_echo end "publish" "publish modules locally and prep api"
 
   builder_echo start "publish sentry" "Publishing debug information files to Sentry"
-  # TODO: move this into build.sh publish? re-scope --dry-run into build.sh?
-  "${KEYMAN_ROOT}/developer/src/tools/sentry-upload-difs.sh"
+  # TODO: move this into build.sh publish?
+  builder_launch /developer/src/tools/sentry-upload-difs.sh
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
 }
 

@@ -1,16 +1,8 @@
 # shellcheck shell=bash
 # Keyman is copyright (C) SIL Global. MIT License.
-
-# Returns 0 if the OS version is greater than or equal to the specified version.
-# Parameter:
-#   $1 - OS version to compare against (e.g., "20.04")
-is_os_version_or_higher() {
-  local OS_VERSION=$1
-
-  # we use `dpkg --compare-versions` to compare the current Ubuntu version
-  # shellcheck disable=SC2312
-  dpkg --compare-versions "$(lsb_release -r -s)" ge "${OS_VERSION}"
-}
+#
+# Shared functions for any builds that run on Linux agents,
+# e.g. linux, android, web, ...
 
 # Returns 0 if the specified package is installed.
 # Parameter:
@@ -25,7 +17,7 @@ _is_package_installed() {
 # Parameters:
 #   $* - List of package names to check and install (e.g., "lcov jq")
 ba_linux_check_and_install_packages() {
-  if ! is_ubuntu; then
+  if ! builder_is_linux; then
     return 0
   fi
 
@@ -59,7 +51,7 @@ ba_linux_install_nvm() {
     NVM_RELEASE=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep tag_name | cut -d : -f 2 | cut -d '"' -f 2)
     # shellcheck disable=SC2312
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_RELEASE}/install.sh | bash
-    set_variables_for_nvm
+    tc_set_variables_for_nvm
     nvm install --lts --default --save
     nvm use --lts
   fi
@@ -75,17 +67,29 @@ ba_linux_install_emscripten() {
     # shellcheck disable=SC2154
     . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
 
+    local EMSDK_DIR
+    if [[ ! -z "${EMSCRIPTEN_BASE:-}" ]] && [[ -d "${EMSCRIPTEN_BASE}" ]]; then
+      # EMSCRIPTEN_BASE points to emsdk/upstream/emscripten
+      EMSDK_DIR="$(realpath "${EMSCRIPTEN_BASE}/../..")"
+    else
+      EMSDK_DIR="${HOME}/emsdk"
+    fi
+
     builder_echo "Installing emscripten version ${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
     export EMSDK_KEEP_DOWNLOADS=1
+    if [[ -d "${EMSDK_DIR}" ]]; then
+      builder_echo "emsdk directory already exists at ${EMSDK_DIR}, skipping clone"
+    else
+      # shellcheck disable=SC2164
+      cd "$(dirname "${EMSDK_DIR}")"
+      git clone https://github.com/emscripten-core/emsdk.git
+    fi
     # shellcheck disable=SC2164
-    cd "${HOME}"
-    git clone https://github.com/emscripten-core/emsdk.git
-    # shellcheck disable=SC2164
-    cd emsdk
+    cd "${EMSDK_DIR}"
     ./emsdk install "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
     ./emsdk activate "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
   fi
-  set_variables_for_emscripten
+  tc_set_variables_for_emscripten
   builder_echo end "install emscripten" success "Finished checking and installing emscripten"
 }
 
@@ -103,15 +107,15 @@ ba_linux_start_xvfb() {
   local PID_FILE=/tmp/keymanweb-pids
   builder_echo "Starting Xvfb..."
   Xvfb -screen 0 1024x768x24 :33 &> /dev/null &
-  echo "kill -9 $! || true" > "${PID_FILE}"
+  echo "kill -9 $! &> /dev/null || true" > "${PID_FILE}"
   sleep 1
   builder_echo "Starting Xephyr..."
   DISPLAY=:33 Xephyr :32 -screen 1024x768 &> /dev/null &
-  echo "kill -9 $! || true" >> "${PID_FILE}"
+  echo "kill -9 $! &> /dev/null || true" >> "${PID_FILE}"
   sleep 1
   builder_echo "Starting metacity"
   metacity --display=:32 &> /dev/null &
-  echo "kill -9 $! || true" >> "${PID_FILE}"
+  echo "kill -9 $! &> /dev/null || true" >> "${PID_FILE}"
   export DISPLAY=:32
 }
 
@@ -122,4 +126,19 @@ ba_linux_stop_xvfb() {
     bash "${PID_FILE}"
     rm -f "${PID_FILE}"
   fi
+}
+
+# Returns 0 if the OS version is greater than or equal to the specified version.
+# Parameter:
+#   $1 - OS version to compare against (e.g., "20.04")
+ba_linux_is_os_version_or_higher() {
+  if ! builder_is_linux; then
+     builder_die "ba_linux_is_os_version_or_higher() is only implemented for Ubuntu"
+  fi
+
+  local OS_VERSION=$1
+
+  # we use `dpkg --compare-versions` to compare the current Ubuntu version
+  # shellcheck disable=SC2312
+  dpkg --compare-versions "$(lsb_release -r -s)" ge "${OS_VERSION}"
 }

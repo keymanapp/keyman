@@ -9,11 +9,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-helpers.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/includes/tc-windows.inc.sh"
 
@@ -31,7 +31,7 @@ builder_describe \
   "--help.keyman.com=HELP_KEYMAN_COM          path to help.keyman.com repository" \
   "--symbols-local-path=LOCAL_SYMBOLS_PATH    local path to symbols directory" \
   "--symbols-remote-path=REMOTE_SYMBOLS_PATH  remote path to symbols directory" \
-  "--symbols-subdir=SYMBOLS_SUBDIR            subdirectory containing symbols"
+  "--symbols-subdir=SYMBOLS_SUBDIR            subdirectory containing symbols [unused; TODO: remove in v20]"
 
 builder_parse "$@"
 
@@ -41,7 +41,7 @@ cd "${KEYMAN_ROOT}/developer/src"
 function _build_developer() {
   builder_echo start "build developer" "Building Keyman Developer"
 
-  ./build.sh configure build test api publish --npm-publish
+  builder_launch /developer/src/build.sh configure build test api publish
 
   builder_echo end "build developer" success "Finished building Keyman Developer"
 }
@@ -49,7 +49,7 @@ function _build_developer() {
 function _build_testkeyboards() {
   builder_echo start "build testkeyboards" "Building test keyboards"
 
-  "${KEYMAN_ROOT}/common/test/keyboards/build.sh"
+  builder_launch /common/test/keyboards/build.sh
 
   builder_echo end "build testkeyboards" success "Finished building test keyboards"
 }
@@ -57,33 +57,9 @@ function _build_testkeyboards() {
 function _publish_sentry() {
   builder_echo start "publish sentry" "Publishing debug information files to Sentry"
 
-  "${KEYMAN_ROOT}/developer/src/tools/sentry-upload-difs.sh"
+  builder_launch /developer/src/tools/sentry-upload-difs.sh
 
   builder_echo end "publish sentry" success "Finished publishing debug information files to Sentry"
-}
-
-function _download_symbol_server_index() {
-  # Download symbol server index from symbol server
-  builder_echo start "download symbol server index" "Downloading symbol server index"
-  (
-    mkdir -p "${LOCAL_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}"
-    cd "${LOCAL_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}"
-
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/lastid.txt" "."
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/history.txt" "."
-    tc_rsync_download "${REMOTE_SYMBOLS_PATH}/${SYMBOLS_SUBDIR}/server.txt" "."
-  )
-  builder_echo end "download symbol server index" success "Finished downloading symbol server index"
-}
-
-function _publish_new_symbols() {
-  # Publish new symbols to symbol server
-  builder_echo start "publish new symbols" "Publishing new symbols to symbol server"
-  (
-    cd "${LOCAL_SYMBOLS_PATH}"
-    tc_rsync_upload "." "${REMOTE_SYMBOLS_PATH}"
-  )
-  builder_echo end "publish new symbols" success "Finished publishing new symbols to symbol server"
 }
 
 function _publish_to_downloads_keyman_com() {
@@ -93,9 +69,9 @@ function _publish_to_downloads_keyman_com() {
   (
     cd "${KEYMAN_ROOT}/developer"
 
-    local UPLOAD_PATH KEYBOARDS_PATH KMCOMP_ZIP DEVELOPER_EXE DEBUG_ZIP COMPRESS_CMD
+    local UPLOAD_PATH KEYBOARDS_PATH KMCOMP_ZIP DEVELOPER_EXE DEBUG_ZIP
     # shellcheck disable=SC2154
-    UPLOAD_PATH="upload/${KEYMAN_VERSION}"
+    UPLOAD_PATH="${KEYMAN_ROOT}/developer/upload/${KEYMAN_VERSION}"
     KEYBOARDS_PATH="${UPLOAD_PATH}/keyboards"
     KMCOMP_ZIP="kmcomp-${KEYMAN_VERSION}.zip"
     DEVELOPER_EXE="keymandeveloper-${KEYMAN_VERSION}.exe"
@@ -104,17 +80,8 @@ function _publish_to_downloads_keyman_com() {
     rm -rf "${UPLOAD_PATH}"
     mkdir -p "${UPLOAD_PATH}"
 
-    (
-      cd bin
-      cp "${KEYMAN_ROOT}/common/schemas/keyboard_info/keyboard_info.schema.json" .
-
-      # shellcheck disable=SC2154
-      COMPRESS_CMD="${SEVENZ_HOME}/7z"
-
-      "${COMPRESS_CMD}" a -bd -bb0 "../${UPLOAD_PATH}/${KMCOMP_ZIP}" kmconvert.exe keyboard_info.schema.json xml/layoutbuilder/*.keyman-touch-layout projects/ server/
-    )
-
-    cp "release/${KEYMAN_VERSION}/${DEVELOPER_EXE}" "${UPLOAD_PATH}/"
+    cp "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${DEVELOPER_EXE}" "${UPLOAD_PATH}/"
+    cp "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${KMCOMP_ZIP}"    "${UPLOAD_PATH}/"
 
     write_download_info "${UPLOAD_PATH}" "${DEVELOPER_EXE}" "Keyman Developer" exe win
     write_download_info "${UPLOAD_PATH}" "${KMCOMP_ZIP}" "Keyman Developer Command-Line Compiler" zip win
@@ -122,12 +89,12 @@ function _publish_to_downloads_keyman_com() {
     mkdir -p "${KEYBOARDS_PATH}"
     cp -r "${KEYMAN_ROOT}/common/test/keyboards"/*/build/*.kmp "${KEYBOARDS_PATH}/"
 
-    if [[ -f "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" ]]; then
-      cp "release/${KEYMAN_VERSION}/${DEBUG_ZIP}" "${UPLOAD_PATH}/"
+    if [[ -f "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${DEBUG_ZIP}" ]]; then
+      cp "${KEYMAN_ROOT}/developer/release/${KEYMAN_VERSION}/${DEBUG_ZIP}" "${UPLOAD_PATH}/"
       write_download_info "${UPLOAD_PATH}" "${DEBUG_ZIP}" "Keyman Developer debug files" zip win
     fi
 
-    cd upload
+    cd "${KEYMAN_ROOT}/developer/upload"
     # shellcheck disable=SC2154
     tc_rsync_upload "${KEYMAN_VERSION}" "developer/${KEYMAN_TIER}"
   )
@@ -141,7 +108,7 @@ function build_developer_action() {
 }
 
 function publish_action() {
-  if ! is_windows; then
+  if ! builder_is_windows; then
     # requires Powershell, so currently only supported on Windows
     builder_echo error "This script is intended to be run on Windows only."
     return 1
@@ -153,11 +120,13 @@ function publish_action() {
   export RSYNC_ROOT
 
   _publish_sentry
-  download_symbol_server_index
-  publish_new_symbols
+  ba_win_download_symbol_server_index
+  ba_win_publish_new_symbols
   _publish_to_downloads_keyman_com
-  upload_help "api documentation" developer
+  tc_upload_help "api documentation" developer
 }
+
+export KEYMAN_SYMSTOREPATH="$LOCAL_SYMBOLS_PATH"
 
 if builder_has_action all; then
   build_developer_action

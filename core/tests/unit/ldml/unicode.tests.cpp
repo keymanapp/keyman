@@ -187,9 +187,20 @@ const std::string &block_unicode_ver) {
 inline const char *boolstr(bool b) {
   return b?"T":"f";
 }
+#endif
 
 void test_has_boundary_before() {
   std::cout << "= " << __FUNCTION__ << std::endl;
+
+  // Latin - #15505
+  test_assert(km::core::util::has_nfc_boundary_before(0x0065));
+  test_assert(!km::core::util::has_nfc_boundary_before(0x0301));
+
+  // Bengali - #15505
+  test_assert(km::core::util::has_nfc_boundary_before(0x0995));
+  test_assert(!km::core::util::has_nfc_boundary_before(0x09d7));
+
+#ifdef __EMSCRIPTEN__
   std::cout << "I see we are on Emscripten / wasm! Now we will do some additional tests." << std::endl;
   std::string icu4c_unicode(U_UNICODE_VERSION), header_unicode(KM_HASBOUNDARYBEFORE_UNICODE_VERSION),
               icu4c_icu(U_ICU_VERSION), header_icu(KM_HASBOUNDARYBEFORE_ICU_VERSION);
@@ -198,26 +209,26 @@ void test_has_boundary_before() {
   assert_basic_equal(icu4c_unicode, header_unicode);
   assert_basic_equal(icu4c_icu, header_icu);
 
-  std::cout << std::endl << "Now, let's make sure has_nfd_boundary_before() matches ICU." << std::endl;
+  std::cout << std::endl << "Now, let's make sure has_nfc_boundary_before() matches ICU." << std::endl;
 
   UErrorCode status           = U_ZERO_ERROR;
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
+  const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(status);
   UASSERT_SUCCESS(status);
 
   // now, test that hasBoundaryBefore is the same
   for (km_core_usv cp = 0; cp < km::core::kmx::Uni_MAX_CODEPOINT; cp++) {
-    auto km_hbb = km::core::util::has_nfd_boundary_before(cp);
-    auto icu_hbb = nfd->hasBoundaryBefore(cp);
+    auto km_hbb = km::core::util::has_nfc_boundary_before(cp);
+    auto icu_hbb = nfc->hasBoundaryBefore(cp);
 
     if (km_hbb != icu_hbb) {
       std::cerr << "Error: util_normalize_table.h said " << boolstr(km_hbb) << " but ICU said " << boolstr(icu_hbb) << " for "
-                << "has_nfd_boundary_before(0x" << std::hex << cp << std::dec << ")" << std::endl;
+                << "has_nfc_boundary_before(0x" << std::hex << cp << std::dec << ")" << std::endl;
     }
     test_assert(km_hbb == icu_hbb);
   }
+#endif
   std::cout << "All OK!" << std::endl;
 }
-#endif
 
 int test_all(const char *jsonpath, const char *packagepath, const char *blockspath) {
   std::cout << "= " << __FUNCTION__ << std::endl;
@@ -234,9 +245,7 @@ int test_all(const char *jsonpath, const char *packagepath, const char *blockspa
 
   test_unicode_versions(versions, package, block_unicode_ver);
 
-#ifdef __EMSCRIPTEN__
   test_has_boundary_before();
-#endif
 
   return EXIT_SUCCESS;
 }

@@ -2,12 +2,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-. "$KEYMAN_ROOT/developer/src/packages.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 builder_describe \
   "Keyman for Windows (app)" \
@@ -46,7 +44,7 @@ function do_prepublish() {
   if [[ ! -f "$DEVTOOLS" ]]; then
     # We'll build devtools here directly because we are before the configure /
     # build steps which would trigger it in via dependencies
-    "$KEYMAN_ROOT"/common/windows/delphi/tools/devtools/build.sh configure build prepublish
+    builder_launch /common/windows/delphi/tools/devtools/build.sh configure build prepublish
   fi
 
   #
@@ -56,7 +54,7 @@ function do_prepublish() {
   if [[ ! -f /common/windows/delphi/tools/test-klog/$WIN32_TARGET_PATH/test_klog.exe ]]; then
     # We'll build test_klog here directly because we are before the configure /
     # build steps which would trigger it in via dependencies
-    "$KEYMAN_ROOT"/common/windows/delphi/tools/test-klog/build.sh configure build prepublish
+    builder_launch /common/windows/delphi/tools/test-klog/build.sh configure build prepublish
   fi
 
   "$DEVTOOLS" -rt

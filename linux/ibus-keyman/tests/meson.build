@@ -25,6 +25,7 @@ test_env = [
 
 test_include_dirs = [
   core_include_dirs,
+  linux_include_dirs,
   include_directories('../../../core/tests/kmx_test_source'),
   include_directories('../src'),
   include_directories('..'),
@@ -40,7 +41,7 @@ test_exe = executable(
 subdir('dbus-test-server')
 
 env_file = '/tmp/env.txt'
-cleanup_file = '/tmp/ibus-keyman-test-pids'
+cleanup_file = '/tmp/ibus-keyman-test-cleanup'
 pid_file = '/tmp/ibus-keyman-test-pids.pids'
 
 setup_tests = find_program('setup-tests.sh', dirs: [meson.current_source_dir() / 'scripts'])
@@ -65,7 +66,7 @@ test(
 test(
   'teardown-x11',
   teardown_tests,
-  args: [cleanup_file],
+  args: [cleanup_file, '--x11'],
   priority: -19,
   is_parallel: false,
   protocol: 'exitcode'
@@ -85,7 +86,7 @@ if can_build_wayland
   test(
     'teardown-wayland',
     teardown_tests,
-    args: [cleanup_file],
+    args: [cleanup_file, '--wayland'],
     priority: -29,
     is_parallel: false,
     protocol: 'exitcode'

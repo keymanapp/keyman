@@ -15,7 +15,7 @@
     android:background="@android:color/white"
     android:gravity="start"
     android:layout_gravity="center_vertical"
-    android:text="@string/text_require_chrome_57"
+    android:text="@string/text_require_chrome_version"
     android:layout_marginStart="@dimen/button_playstore_margin"
     android:textSize="@dimen/update_chrome_label_textsize" />
 

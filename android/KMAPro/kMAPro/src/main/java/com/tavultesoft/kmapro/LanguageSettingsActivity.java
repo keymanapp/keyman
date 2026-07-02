@@ -25,10 +25,12 @@ import android.widget.TextView;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.preference.PreferenceManager;
 
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.DisplayLanguages;
 import com.keyman.engine.KeyboardPickerActivity;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.ModelPickerActivity;
@@ -43,7 +45,7 @@ import java.util.HashMap;
  * Keyman Settings --> Languages Settings --> Language Settings
  * Displays a list of installed keyboards and some lexical model switches.
  */
-public final class LanguageSettingsActivity extends AppCompatActivity {
+public final class LanguageSettingsActivity extends BaseActivity {
   private Context context;
   private static Toolbar toolbar = null;
   private static ListView listView = null;
@@ -65,6 +67,8 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     context = this;
     setContentView(R.layout.language_settings_list_layout);
+
+    setupEdgeToEdge(R.id.list_toolbar);
 
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
@@ -199,11 +203,19 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
         if (KMManager.hasConnection(context)){
           // Scenario 1: Connection to keyman.com catalog
           // Pass the BCP47 language code to the KMPBrowserActivity
+          SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+          String languageTag = prefs.getString(DisplayLanguages.displayLanguageKey, "");
+
           Intent i = new Intent(context, KMPBrowserActivity.class);
           i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
           i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
           i.putExtra("languageCode", lgCode);
           i.putExtra("languageName", lgName);
+          if (languageTag != null && !languageTag.isEmpty()) {
+            Bundle bundle = new Bundle();
+            bundle.putString("lang", languageTag);
+            i.putExtras(bundle);
+          }
           context.startActivity(i);
         /*
         } else if (KeyboardPickerActivity.hasKeyboardFromPackage()) {

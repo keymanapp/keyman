@@ -20,7 +20,7 @@ computer browsers.
 
 <!-- -->
 
-[What's New](whats-new)
+[What's New](whatsnew)
 :   What's new in Keyman Engine for Web 19.0
 
 <!-- -->

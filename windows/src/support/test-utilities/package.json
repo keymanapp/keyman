@@ -1,0 +1,11 @@
+{
+  "name": "test-utilities",
+  "version": "1.0.0",
+  "main": "bisect-setup-size.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "jszip": "^3.10.1"
+  }
+}

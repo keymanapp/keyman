@@ -41,6 +41,7 @@ function enableControls(enable) {
   });
 }
 
+let shouldSetupKeyman = false;
 let keymanInitialized = false;
 enableControls(false);
 
@@ -58,7 +59,13 @@ keyman.init({
 }).then(function() {
   keyman.attachToControl(document.getElementById('ta1'));
   enableControls(true);
+
   keymanInitialized = true;
+
+  if(shouldSetupKeyman) {
+    console.log('keyman.init after window.onload');
+    setupKeyman();
+  }
 });
 
 /* Initialization */
@@ -168,7 +175,6 @@ keyboardDropdown.onclick = (value) => {
   console.log('setting keyboard to '+value);
   keyman.setActiveKeyboard(value, 'en');
   ta1.focus();
-  refreshStatusKeyboard(value);
 };
 
 function buildKeyboardList() {
@@ -190,6 +196,15 @@ document.getElementById('ta1').addEventListener('input', logContent, false);
 */
 
 window.onload = function() {
+  if(keymanInitialized) {
+    console.log('keyman.init before window.onload');
+    setupKeyman();
+  } else {
+    shouldSetupKeyman = true;
+  }
+}
+
+function setupKeyman() {
   window.setTimeout(
     function () {
       keyman.moveToElement('ta1');
@@ -199,6 +214,8 @@ window.onload = function() {
   let newOSK = null;
   let deviceDropdown = null;
   let currentDevice = null;
+
+  checkKeyboardsAndModels(false);
 
   buildKeyboardList();
 
@@ -256,17 +273,14 @@ window.onload = function() {
     }
     keyboardDropdown.set(keyboardProperties.internalName);
     window.sessionStorage.setItem('current-keyboard', keyboardProperties.internalName);
+    refreshStatusKeyboard();
   });
 }
 
-function refreshStatusKeyboard(keyboard, model) {
+function refreshStatusKeyboard() {
   let statusKeyboard = document.getElementById('status-keyboard');
-  let activeKeyboard = keyman.core.activeKeyboard ? keyman.core.activeKeyboard.id : '';
-  let keyboards = keyman.getKeyboards();
-  for(let k of keyboards) {
-    if(k.InternalName == keyboard) activeKeyboard = k.Name;
-  }
-  statusKeyboard.innerText = activeKeyboard;
+  const debugInfo = keyman.getDebugInfo();
+  statusKeyboard.innerText = debugInfo.keyboard.id + ' ' + debugInfo.keyboard.version;
 }
 
 function refreshStatusModel(model) {
@@ -326,13 +340,16 @@ function handleKeyboardsAndModelsResponse(responseText, shouldReload) {
       console.log('setting active model to '+lastModel);
       keyman.setActiveKeyboard(currentKeyboard, 'en')
       selectModel(lastModel);
-      refreshStatusKeyboard(currentKeyboard);
       refreshStatusModel(lastModel);
     }, 10);
   }
 }
 
 function checkKeyboardsAndModels(shouldReload) {
+  if(!keymanInitialized) {
+    // setupKeyman will run the check after initialization
+    return false;
+  }
   let req=new XMLHttpRequest();
   console.log('Checking for updated keyboards and models ('+shouldReload+')');
   req.onreadystatechange = function() {
@@ -344,9 +361,8 @@ function checkKeyboardsAndModels(shouldReload) {
   }
   req.open("GET", "inc/keyboards.js", true);
   req.send(null);
+  return true;
 }
-
-checkKeyboardsAndModels(false);
 
 /* Lexical models */
 

@@ -6,6 +6,8 @@ import { KmnCompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
 import { compilerErrorFormatCode } from '@keymanapp/developer-utils';
 
 describe('Compiler UnicodeSet function', function() {
+  const callbacks = new TestCompilerCallbacks(this);
+
   it('should fixup "short" \\u{} escapes', function () {
     assert.equal(KmnCompiler.fixNewPattern(`\\u{A}`), `\\u000A`); // "
     assert.equal(KmnCompiler.fixNewPattern(`\\u{22}`), `\\u0022`); // "
@@ -24,14 +26,12 @@ describe('Compiler UnicodeSet function', function() {
 
   it('should start', async function() {
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
   });
 
   it('should compile a basic uset', async function() {
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
 
@@ -49,7 +49,6 @@ describe('Compiler UnicodeSet function', function() {
   });
   it('should compile a more complex uset', async function() {
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
 
@@ -69,7 +68,6 @@ describe('Compiler UnicodeSet function', function() {
   });
   it('should compile an even more complex uset', async function() {
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
 
@@ -96,7 +94,6 @@ describe('Compiler UnicodeSet function', function() {
   });
   it('should fail in various ways', async function() {
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
     // map from string to failing error

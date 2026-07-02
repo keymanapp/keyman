@@ -30,6 +30,7 @@ from keyman_config.keyboard_layouts_widget import KeyboardLayoutsWidget
 from keyman_config.list_installed_kmp import get_installed_kmp
 from keyman_config.options_widget import OptionsWidget
 from keyman_config.sentry_handling import SentryErrorHandling
+from keyman_config.support_widget import SupportWidget
 
 
 class ViewInstalledWindowBase(Gtk.Window):
@@ -74,14 +75,18 @@ class ViewInstalledWindowBase(Gtk.Window):
         filter_text.set_name(_("KMP files"))
         filter_text.add_pattern("*.kmp")
         dlg.add_filter(filter_text)
-        response = dlg.run()
-        if response != Gtk.ResponseType.OK:
-            dlg.destroy()
-            return
+        while True:
+            response = dlg.run()
+            if response != Gtk.ResponseType.OK:
+                dlg.destroy()
+                return
 
-        file = dlg.get_filename()
-        dlg.destroy()
-        self.restart(self.install_file(file))
+            file = dlg.get_filename()
+            if file and os.path.isfile(file) and os.path.splitext(file)[1] == '.kmp':
+                dlg.destroy()
+                self.restart(self.install_file(file))
+                return
+            # Loop until we have a valid file or the user cancels the dialog
 
     def install_file(self, kmpfile, language=None):
         installDlg = InstallKmpWindow(kmpfile, viewkmp=self, language=language)
@@ -150,6 +155,7 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         self.refresh_installed_kmp()
         stack.add_titled(KeyboardLayoutsWidget(self, self.store, self.restart), "KeyboardLayouts", _("Keyboard Layouts"))
         stack.add_titled(OptionsWidget(self.sentry), "Options", _("Options"))
+        stack.add_titled(SupportWidget(), "Support", _("Support"))
         return outerHbox
 
     def _add_app_buttons(self):

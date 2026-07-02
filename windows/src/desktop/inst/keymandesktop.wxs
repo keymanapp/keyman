@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
   <Product UpgradeCode="c70af17c-8b9e-47a1-a099-b65aee3dc8b4" Manufacturer="SIL International"
            Id="*" Name="Keyman $(var.RELEASE)" Version="$(var.KEYMAN_VERSION)" Language="1033">
     <Package Keywords="Keyman,Keyman for Windows,Keyboard,Engine"
@@ -50,11 +50,40 @@
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.KEYMAN_VERSION)" IncludeMinimum="no" Property="NEWERFOUND" />
     </Upgrade>
 
+    <!--
+    MD: 25 Sep 2025
+
+    Change Keyman shortcuts to standard Windows shortcuts, rather than
+    advertised shortcuts, to work around a problem with advertised shortcuts,
+    elevated custom actions, and non-admin users, as described in #14791.
+
+    The problem is related to advertised shortcuts in Windows Installer. When
+    you have an advertised shortcut, the first use of the shortcut triggers a
+    repair to prepare the app for use in the new user's context. And now, with
+    Aug 2025 Windows security patch KB5063878, tweaked in Sep 2025, this
+    triggers an elevation dialog, which the non-admin user cannot work around.
+
+    This means that the shortcuts will be regular Windows shortcut files rather
+    than advertised shortcuts, and are added to
+    `%ProgramData%\Microsoft\Windows\Start Menu\Programs\Keyman for Windows`
+    (so, available for all users on that machine, but will not follow a user
+    across machines).
+
+    * DISABLEADVTSHORTCUTS: https://learn.microsoft.com/en-us/windows/win32/msi/disableadvtshortcuts
+    * Shortcut advertisement: https://learn.microsoft.com/en-us/windows/win32/msi/advertisement
+    -->
+    <Property Id='DISABLEADVTSHORTCUTS' Value='1' />
+
     <Property Id='OLDINSTALLDIR'>
       <RegistrySearch Id='oldinstalldir_search' Key='Software\Keyman\Keyman Desktop' Root='HKLM' Name='root path' Type='raw' />
     </Property>
 
     <Property Id='OnlineProductID' Value='30' />
+
+
+    <!-- CE38CB16_4448_4432_851B_B3FCE3AF464F is the GUID for the keymaneengine merge 
+         module package; this makes the WIX_NATIVE_MACHINE property available to it -->
+    <SetProperty Id="WIX_NATIVE_MACHINE.CE38CB16_4448_4432_851B_B3FCE3AF464F" Value="[WIX_NATIVE_MACHINE]" Before="LaunchConditions"/>
 
     <Directory Id="TARGETDIR" Name="SourceDir" DiskId="1">
 
@@ -302,6 +331,7 @@
     <Property Id="ALLUSERS">1</Property>
 
     <UIRef Id="WixUI_FeatureTree"/>
+    <PropertyRef Id="WIX_NATIVE_MACHINE" />
 
     <Icon Id="appicon.ico" SourceFile="..\branding\appicon.ico" />
     <Icon Id="KMSHELL.ico" SourceFile="..\branding\cfgicon.ico" />

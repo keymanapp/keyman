@@ -19,7 +19,9 @@ import { fileURLToPath } from 'url';
 /**
  * Creates a MessageEvent (for inter-worker communication), with the given data payload.
  *
- * @param {*} data
+ * @template {T}
+ * @param {T} data
+ * @returns {T}
  */
 export function createMessageEventWithData(data) {
   return { data };

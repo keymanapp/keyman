@@ -55,11 +55,13 @@ type
     InstallSize: Integer;
   end;
 
+  TInstallUILevel = (uiSilent, uiProgressOnly, uiFull);
+
   TfrmRun = class(TSetupForm)
   public
     procedure cmdExitClick(Sender: TObject);
     procedure lblTitleClick(Sender: TObject);
-    procedure cmdInstallKeymanDesktopClick(Sender: TObject);
+    procedure cmdInstallKeymanDeveloperClick(Sender: TObject);
 
     procedure FormCreate(Sender: TObject); override;
     procedure FormShow(Sender: TObject); override;
@@ -71,17 +73,13 @@ type
     FDownloadFilename: WideString;
     FDownloadURL: WideString;
     FNewVersion, FInstalledVersion, FInstallerVersion: TMSIInfo;
-    //FInstalledVersion: WideString;
     FContinueSetup: Boolean;
     FWhiteBrush: THandle;
     FErrorLog: TStream;
     FPromptForReboot: Boolean;  // I3355   // I3500
-    FSilent: Boolean;
+    FUILevel: TInstallUILevel;
     FOfflineByRequest: Boolean;
     FOnline: Boolean;
-    //FInstalledProductCode: WideString;
-    //FInstallerProductCode: WideString;
-    //FNewProductCode: WideString;
 
     procedure LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean = True);
 
@@ -107,7 +105,7 @@ type
     function DialogID: Integer; override;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function DoInstall(Silent, PromptForReboot: Boolean): Boolean;  // I3355   // I3500
+    function DoInstall(UILevel: TInstallUILevel; PromptForReboot: Boolean): Boolean;  // I3355   // I3500
     property ContinueSetup: Boolean read FContinueSetup write FContinueSetup;
     property Offline: Boolean read FOfflineByRequest write SetOfflineByRequest;
   end;
@@ -225,7 +223,7 @@ end;
 function TfrmRun.InstallNewVersion: Boolean;
 begin
   Result := False;
-  if not FSilent and (MessageDlgW(FInstallInfo.Text(ssQueryUpdateVersion, [FNewVersion.InstallSize div 1024, FNewVersion.Version]),  // I2680
+  if (FUILevel = uiFull) and (MessageDlgW(FInstallInfo.Text(ssQueryUpdateVersion, [FNewVersion.InstallSize div 1024, FNewVersion.Version]),  // I2680
       mtConfirmation, mbOkCancel, 0) = mrCancel) then
     Exit;
 
@@ -320,12 +318,12 @@ end;
 procedure TfrmRun.WMUserFormShown(var Message: TMessage);
 begin
   if FContinueSetup then
-    DoInstall(False, True);  // I3355   // I3500
+    DoInstall(uiFull, True);  // I3355   // I3500
 end;
 
-procedure TfrmRun.cmdInstallKeymanDesktopClick(Sender: TObject);
+procedure TfrmRun.cmdInstallKeymanDeveloperClick(Sender: TObject);
 begin
-  if DoInstall(False, True) then	// I1901 and I2680.4  // I3355   // I3500
+  if DoInstall(uiFull, True) then	// I1901 and I2680.4  // I3355   // I3500
     ModalResult := mrOk;
 end;
 
@@ -392,11 +390,10 @@ begin
   end;
 end;
 
-function TfrmRun.DoInstall(Silent, PromptForReboot: Boolean): Boolean;  // I1901  // I3355   // I3500
+function TfrmRun.DoInstall(UILevel: TInstallUILevel; PromptForReboot: Boolean): Boolean;  // I1901  // I3355   // I3500
 begin
   FPromptForReboot := PromptForReboot;  // I3355   // I3500
-  FSilent := Silent;
-
+  FUILevel := UILevel;
 
   SetCursor(LoadCursor(0, IDC_WAIT));
   try
@@ -671,8 +668,10 @@ begin
 
     FCacheFileName := CacheMSIFile(ExtPath + FInstallInfo.MSIFileName);  // I3310
 
-    if FSilent then
+    if FUILevel = uiSilent then
       MsiSetInternalUI(INSTALLUILEVEL_NONE, nil)
+    else if FUILevel = uiProgressOnly then
+      MsiSetInternalUI(INSTALLUILEVEL_BASIC, nil)
     else
       MsiSetInternalUI(INSTALLUILEVEL_FULL, nil);
     res := MsiInstallProductW(PWideChar(FCacheFileName), PWideChar('DISABLEFINALOPTIONS=1 '+ReinstallMode));
@@ -694,16 +693,13 @@ begin
     end;
   end;
 
-  if not FSilent then
+  if FUILevel = uiFull then
     MsiSetInternalUI(INSTALLUILEVEL_FULL, nil);
 
   if FNewVersion.Filename <> '' then
   begin
     //Run the setup app silently  // I2680.5
     TUtilExecute.WaitForProcess('"'+ExtPath + FNewVersion.FileName+'" -s -o', ExtPath, SW_SHOW, WaitFor);  // I3349
-    //if not FSilent then
-    //  MsiSetInternalUI(INSTALLUILEVEL_BASIC, nil);
-    //CheckMSIResult(MsiApplyPatchW(PWideChar(ExtPath + FNewVersion.Filename), nil, INSTALLTYPE_DEFAULT, ''));
   end;
 end;
 
@@ -712,7 +708,7 @@ function TfrmRun.ProcessCommand(ID, NotificationCode: Integer;
 begin
   Result := True;
   case ID of
-    IDOK: cmdInstallKeymanDesktopClick(Self);
+    IDOK: cmdInstallKeymanDeveloperClick(Self);
     IDCANCEL: cmdExitClick(Self);
     else Result := False;
   end;
@@ -727,7 +723,7 @@ procedure TfrmRun.LogError(const msg: WideString; ShowDialogIfNotSilent: Boolean
 const
   nl: WideString = #13#10;
 begin
-  if not FSilent and ShowDialogIfNotSilent then
+  if (FUILevel = uiFull) and ShowDialogIfNotSilent then
     ShowMessageW(msg);
   if not Assigned(FErrorLog) then
   begin

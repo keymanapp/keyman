@@ -60,14 +60,19 @@ The link file also appears locally.
 ##### Port lookup table
 After this, you can access the website at the following ports:
 
-| Website        |          URL          |  with website-local-proxy running | Docker Container Name  |
-|----------------|-----------------------|-----------------------------------|------------------------|
-| keyman.com     | http://localhost:8053 | http://keyman.com.localhost       | keyman-website         |
-| s.keyman.com   | http://localhost:8054 | http://s.keyman.com.localhost     | s-keyman-website       |
-| help.keyman    | http://localhost:8055 | http://help.keyman.com.localhost  | help-keyman-website    |
-| keymanweb.com  | http://localhost:8057 | http://keymanweb.com.localhost    | web-keyman-website     |
-|                |                       | http://web.keyman.com.localhost   |                        |
-| api.keyman.com | http://localhost:8058 | http://api.keyman.com.localhost   | api-keyman-com-website |
+| Website            |          URL          |  with website-local-proxy running          | Docker Container Name  |
+|--------------------|-----------------------|--------------------------------------------|------------------------|
+| keyman.com         | http://localhost:8053 | http://keyman.com.localhost                | keyman-website         |
+| s.keyman.com       | http://localhost:8054 | http://s.keyman.com.localhost              | s-keyman-website       |
+| help.keyman        | http://localhost:8055 | http://help.keyman.com.localhost           | help-keyman-website    |
+| keymanweb.com      | http://localhost:8057 | http://keymanweb.com.localhost             | web-keyman-website     |
+|                    |                       | http://web.keyman.com.localhost            |                        |
+| api.keyman.com     | http://localhost:8058 | http://api.keyman.com.localhost            | api-keyman-com-website |
+| status.keyman.com* | http://localhost:8060 | http://status-backend.keyman.com.localhost | status-keyman-website  |
+|                    | http://localhost:8061 | http://status.keyman.com.localhost         | status-keyman-public   |
+
+\* Note that status.keyman.com runs in two containers in development to allow for live reload and separation of logs for backend and frontend.
+In production, only port 8060 is used.
 
 #### Remove the Docker container and image
 1. Run `./build.sh clean`.
@@ -92,19 +97,68 @@ Refer to **Port lookup table** above for Docker container names
 
 ---------
 
+## How to run composer updates
+
+The Docker containers are setup with multi-stage images, so you will need to
+target the composer-builder stage if you want to execute composer commands such
+as `composer update` or `composer audit`. The following scripts show how to do
+this; here the same id is used for the image tag and the container name for simplicity:
+
+On macOS, Linux:
+
+```bash
+COMPOSER_ID=composer-temp
+# setup
+docker build -f Dockerfile --target composer-builder --tag $COMPOSER_ID .
+docker run -v "$(pwd):/var/www/html/" --name $COMPOSER_ID --user root --rm -d $COMPOSER_ID
+# run commands with `docker exec`, e.g.:
+#  docker exec $COMPOSER_ID    composer audit
+#  docker exec $COMPOSER_ID    composer update
+#  docker exec $COMPOSER_ID    composer update --lock
+# copy modified files to mounted volume:
+docker exec $COMPOSER_ID    cp composer.lock /var/www/html/
+docker exec $COMPOSER_ID    cp composer.json /var/www/html/
+# cleanup
+docker stop $COMPOSER_ID
+docker rmi $COMPOSER_ID
+```
+
+On git bash for Windows, paths must start with `//`, e.g. `//$(pwd)`, `//var/www/html/`:
+
+```bash
+COMPOSER_ID=composer-temp
+# setup
+docker build -f Dockerfile --target composer-builder --tag $COMPOSER_ID .
+docker run -v "//$(pwd):/var/www/html/" --name $COMPOSER_ID --user root --rm -d $COMPOSER_ID
+# run commands with `docker exec`, e.g.:
+#  docker exec $COMPOSER_ID    composer audit
+#  docker exec $COMPOSER_ID    composer update
+#  docker exec $COMPOSER_ID    composer update --lock
+# copy modified files to mounted volume:
+docker exec $COMPOSER_ID    cp composer.lock //var/www/html/
+docker exec $COMPOSER_ID    cp composer.json //var/www/html/
+# cleanup
+docker stop $COMPOSER_ID
+docker rmi $COMPOSER_ID
+```
+
+
+
+---------
+
 ## Website Dependencies
 
 The table below shows server-side dependencies for each website
 
-|Website               | Depends On           |
-|----------------------|-------------         |
-| s.keyman.com         | <br><br>             |
-| downloads.keyman.com | <br><br>             |
-| api.keyman.com       | downloads.keyman.com<br>s.keyman.com |
-| keymanweb.com        | api.keyman.com       |
+| Website              | Depends On                             |
+|----------------------|----------------------------------------|
+| s.keyman.com         | <br><br>                               |
+| downloads.keyman.com | <br><br>                               |
+| api.keyman.com       | downloads.keyman.com<br>s.keyman.com   |
+| keymanweb.com        | api.keyman.com                         |
 | keyman.com           | api.keyman.com<br>downloads.keyman.com |
 | help.keyman.com      | api.keyman.com<br>downloads.keyman.com |
-
+| status.keyman.com    | api.keyman.com<br>downloads.keyman.com |
 
 ---------
 

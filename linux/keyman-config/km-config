@@ -71,7 +71,7 @@ if __name__ == '__main__':
         download_and_install_package(args.url)
     else:
         # Workaround for bug in webkit2gtk (#12587)
-        if not 'WEBKIT_DISABLE_DMABUF_RENDERER' in os.environ:
+        if 'WEBKIT_DISABLE_DMABUF_RENDERER' not in os.environ:
             os.environ['WEBKIT_DISABLE_DMABUF_RENDERER'] = '1'
 
         w = ViewInstalledWindow()

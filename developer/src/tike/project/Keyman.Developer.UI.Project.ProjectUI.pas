@@ -29,12 +29,16 @@ function LoadGlobalProjectUI(pt: TProjectType; AFilename: string): TProjectUI;
 procedure FreeGlobalProjectUI;
 function IsGlobalProjectUIReady: Boolean;
 function CreateTempGlobalProjectUI(pt: TProjectType): TProjectUI;
+function VerifyNewProjectPathWithUser(const BasePath, ProjectID: string): Boolean;
 
 implementation
 
 uses
   System.Hash,
   System.SysUtils,
+  System.UITypes,
+  Vcl.Controls,
+  Vcl.Dialogs,
   Winapi.Windows,
 
   Keyman.Developer.System.KeymanDeveloperPaths,
@@ -144,13 +148,33 @@ end;
 
 procedure UnlockProject;
 begin
-  if not hLockFile = INVALID_HANDLE_VALUE then
+  if hLockFile = INVALID_HANDLE_VALUE then
   begin
     Exit;
   end;
 
   CloseHandle(hLockFile);
   hLockFile := INVALID_HANDLE_VALUE;
+end;
+
+function VerifyNewProjectPathWithUser(const BasePath, ProjectID: string): Boolean;
+var
+  ProjectFolder: string;
+begin
+  if not DirectoryExists(BasePath) then
+  begin
+    if MessageDlg('The target folder '+BasePath+' does not exist. Create it now?', mtConfirmation, mbOkCancel, 0) = mrCancel then
+      Exit(False);
+  end;
+
+  ProjectFolder := IncludeTrailingPathDelimiter(BasePath) + ProjectID;
+  if DirectoryExists(ProjectFolder) then
+  begin
+    MessageDlg('The project folder '+ProjectFolder+' already exists. Please choose a different folder or delete it in File Explorer.', mtError, [mbOk], 0);
+    Exit(False);
+  end;
+
+  Result := True;
 end;
 
 end.

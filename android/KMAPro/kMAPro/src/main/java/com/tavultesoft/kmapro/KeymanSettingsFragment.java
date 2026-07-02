@@ -6,6 +6,7 @@ package com.tavultesoft.kmapro;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.inputmethod.InputMethodManager;
@@ -20,6 +21,7 @@ import androidx.preference.SwitchPreference;
 import com.keyman.engine.DisplayLanguages;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.data.Dataset;
+import com.tavultesoft.kmapro.PreferencesManager;
 
 import java.util.HashMap;
 
@@ -104,6 +106,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     adjustKeyboardHeight.setKey(AdjustKeyboardHeightActivity.adjustKeyboardHeightKey);
     adjustKeyboardHeight.setTitle(getString(R.string.adjust_keyboard_height));
     adjustKeyboardHeight.setWidgetLayoutResource(R.layout.preference_height_icon_layout);
+    adjustKeyboardHeight.setSummary(AdjustKeyboardHeightActivity.createKeyboardHeightString(context));
     Intent adjustKeyboardHeightIntent = new Intent(context, AdjustKeyboardHeightActivity.class);
     adjustKeyboardHeight.setIntent(adjustKeyboardHeightIntent);
 
@@ -157,6 +160,31 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
       }
     });
 
+    SwitchPreference oskWithPhysicalKeyboardPreference = new SwitchPreference(context);
+    oskWithPhysicalKeyboardPreference.setKey(KeymanSettingsActivity.oskWithPhysicalKeyboardKey);
+    oskWithPhysicalKeyboardPreference.setTitle(getString(R.string.show_osk));
+    oskWithPhysicalKeyboardPreference.setSummary(getString(R.string.show_osk_hint));
+
+    SharedPreferences prefs = context.getSharedPreferences(
+      PreferencesManager.kma_prefs_name, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    boolean showOSK = prefs.getBoolean(
+      KeymanSettingsActivity.oskWithPhysicalKeyboardKey, false);
+    oskWithPhysicalKeyboardPreference.setDefaultValue(showOSK);
+
+    oskWithPhysicalKeyboardPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+      @Override
+      public boolean onPreferenceChange(Preference preference, Object newValue) {
+        if (newValue == null) {
+          return false;
+        }
+
+        editor.putBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, (boolean)newValue);
+        editor.commit();
+        return true;
+      }
+    });
+
     SwitchPreference hapticFeedbackPreference = new SwitchPreference(context);
     hapticFeedbackPreference.setKey(KeymanSettingsActivity.hapticFeedbackKey);
     hapticFeedbackPreference.setTitle(getString(R.string.haptic_feedback));
@@ -198,6 +226,8 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     screen.addPreference(adjustKeyboardHeight);
     screen.addPreference(adjustLongpressDelay);
+
+    screen.addPreference(oskWithPhysicalKeyboardPreference);
     screen.addPreference(spacebarTextPreference);
 
     screen.addPreference(hapticFeedbackPreference);
@@ -239,5 +269,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
 
     // Update the language / keyboard count when we return to this menu from deeper levels.
     languagesPreference.setTitle(getInstalledLanguagesText());
+
+    adjustKeyboardHeight.setSummary(AdjustKeyboardHeightActivity.createKeyboardHeightString(context));
   }
 }

@@ -2,10 +2,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-source "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+source "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 source "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 builder_describe "Installation files for FirstVoices Keyboards" \
@@ -15,14 +15,14 @@ builder_describe "Installation files for FirstVoices Keyboards" \
 # NOTE: not using deps here because we will only do this in the 'publish' phase
 # after all other builds complete
 
-builder_describe_outputs \
-  publish       /windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION}.exe
+builder_if_release_build_level builder_describe_outputs \
+  publish       /windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION_FOR_FILENAME}.exe
 
 builder_parse "$@"
 
 . "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 . "$KEYMAN_ROOT/resources/build/win/wix.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/zip.inc.sh"
+. "$KEYMAN_ROOT/resources/build/zip.inc.sh"
 
 # In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
 if [[ -z ${KEYMAN_TIER+x} ]]; then
@@ -74,7 +74,7 @@ function do_publish() {
     -sice:ICE82 -sice:ICE80 \
     -dWixUILicenseRtf=License.rtf \
     -out firstvoices.msi \
-    -ext WixUIExtension firstvoices.wixobj desktopui.wixobj
+    -ext WixUIExtension -ext WixUtilExtension firstvoices.wixobj desktopui.wixobj
 
   #
   # Sign the installation archive
@@ -85,7 +85,7 @@ function do_publish() {
   # Build self-extracting archive
   #
   create-setup-inf
-  wzzip firstvoices.zip firstvoices.msi license.html setup.inf setuptitle.png fv_all.kmp
+  add_zip_files firstvoices.zip firstvoices.msi license.html setup.inf setuptitle.png fv_all.kmp
   rm -f setup.inf
   cat "$WINDOWS_PROGRAM_APP/setup-redist.exe" firstvoices.zip > firstvoices.exe
   rm -f firstvoices.zip
@@ -95,7 +95,7 @@ function do_publish() {
   #
   wrap-signcode //d "FirstVoices Keyboards" firstvoices.exe
 
-  copy-installer
+  builder_if_release_build_level copy-installer
 }
 
 function copy-installer() {
@@ -103,9 +103,9 @@ function copy-installer() {
 
   mkdir -p "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}"
   cp firstvoices.msi "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices.msi"
-  cp firstvoices.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION}.exe"
+  cp firstvoices.exe "$KEYMAN_ROOT/windows/release/${KEYMAN_VERSION}/firstvoices-${KEYMAN_VERSION_FOR_FILENAME}.exe"
 
-  builder_if_release_build_level verify-installer-signatures
+  verify-installer-signatures
 }
 
 function verify-installer-signatures() {

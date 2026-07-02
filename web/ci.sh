@@ -4,15 +4,16 @@
 # building the Keyman Engine for Web.
 #
 
-# set -x
+# TODO: merge this with resources/teamcity/web scripts
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/ci/pull-requests.inc.sh"
 
 # This script runs from its own folder
@@ -23,6 +24,7 @@ cd "${THIS_SCRIPT_PATH}"
 S_KEYMAN_COM=
 
 builder_describe "CI processes for Keyman Engine for Web releases (KMW)." \
+  "@/common/web/sentry-manager" \
   "@/web/src/tools/building/sourcemap-root prepare:s.keyman.com" \
   "build" \
   "test                         Runs all unit tests" \
@@ -63,22 +65,24 @@ function build_action() {
   #               - also useful when validating this script on a local dev machine!
   # - build:      then do the ACTUAL build.
   # one option:
-  ./build.sh configure clean build
+  builder_launch /web/build.sh configure clean build
 
-  # Upload the sentry-configuration engine used by the mobile apps to sentry
-  # Also, clean 'em first.
-  for sourcemap in "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"*.map; do
-    node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --clean
-  done
-  web_sentry_upload "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/"
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    # Upload the sentry-configuration engine used by the mobile apps to sentry
+    # Also, clean 'em first.
+    for sourcemap in "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/"*.map; do
+      node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --clean
+    done
+    web_sentry_upload "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/"
 
-  # And, of course, the main build-products too
-  web_sentry_upload "${KEYMAN_ROOT}/web/build/app/webview/release/"
-  web_sentry_upload "${KEYMAN_ROOT}/web/build/publish/release/"
+    # And, of course, the main build-products too
+    web_sentry_upload "${KEYMAN_ROOT}/web/build/app/webview/release/"
+    web_sentry_upload "${KEYMAN_ROOT}/web/build/publish/release/"
+  fi
 }
 
 function test_action() {
-  ./build.sh test
+  builder_launch /web/build.sh test
 }
 
 function post_test_action() {
@@ -154,32 +158,12 @@ function prepare_downloads_keyman_com_action() {
 
   mkdir -p "${UPLOAD_PATH}"
 
-  # On Windows, we use 7-zip (SEVENZ_HOME env var).  On other platforms, we use zip.
-
-  COMPRESS_CMD=
-  COMPRESS_ADD=
-
-  # Marc's preference; use $SEVENZ_HOME and have the BAs set up with THAT as an env var.
-  if [[ ! -z "${SEVENZ_HOME+x}" ]]; then
-    COMPRESS_CMD="${SEVENZ_HOME}/7z"
-    COMPRESS_ADD="a -bd -bb0 -r" # add, hide progress, log level 0, recursive
-  fi
-
-  if [[ -z "${COMPRESS_CMD}" ]] ; then
-    if command -v zip &> /dev/null; then
-      # Note:  does not support within-archive renames!
-      COMPRESS_CMD=zip
-      COMPRESS_ADD="-r"
-    else
-      builder_die "7z and zip commands are both unavailable"
-    fi
-  fi
-
-  pushd build/publish
-  # Zip both the 'debug' and 'release' configurations together.
-  # shellcheck disable=SC2086
-  "${COMPRESS_CMD}" ${COMPRESS_ADD} "${ZIP}" ./*
-  popd
+  (
+    # shellcheck disable=2164
+    cd build/publish
+    # Zip both the 'debug' and 'release' configurations together.
+    add_zip_files -q -r "${ZIP}" ./*
+  )
 
   # --- Second action artifact - the 'static' folder (hosted user testing on downloads.keyman.com) ---
 

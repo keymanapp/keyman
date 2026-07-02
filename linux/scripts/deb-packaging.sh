@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2154 # (variables are set in build-utils.sh)
+# shellcheck disable=SC2154 # (variables are set in builder-basic.inc.sh)
 # Actions for creating a Debian source package and verifying the API.
 # Used by deb-packaging.yml and api-verification.yml GHAs.
 
 set -eu
 shopt -s inherit_errexit
 
+# Avoid timing reports as we don't have node in this script
+export _builder_timings=false
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "${KEYMAN_ROOT}/linux/scripts/verify_api.inc.sh"

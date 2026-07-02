@@ -2,10 +2,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-source "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+source "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 source "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
 builder_describe "Installation files for Keyman Developer" \
@@ -16,13 +16,13 @@ builder_describe "Installation files for Keyman Developer" \
 # after all other builds complete
 
 builder_describe_outputs \
-  publish       /developer/src/inst/keymandeveloper-${KEYMAN_VERSION}.exe
+  publish       /developer/src/inst/keymandeveloper-${KEYMAN_VERSION_FOR_FILENAME}.exe
 
 builder_parse "$@"
 
-. "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/wix.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/zip.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/win/environment.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/win/wix.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 
 # In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
 if [[ -z ${KEYMAN_TIER+x} ]]; then
@@ -78,7 +78,7 @@ function do_publish() {
   # Copy the installation archive
   #
 
-  copy-kmdev
+  copy-keymandeveloper-installer-to-artifacts
 
   builder_if_release_build_level verify-installer-signatures
 }
@@ -87,8 +87,8 @@ function do_test() {
   verify-node-installer-version
 }
 
-function copy-kmdev() {
-  builder_heading copy-kmdev
+function copy-keymandeveloper-installer-to-artifacts() {
+  builder_heading copy-keymandeveloper-installer-to-artifacts
 
   mkdir -p "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}"
 
@@ -96,7 +96,7 @@ function copy-kmdev() {
   make-kmc-install-zip
 
   cp -f "$DEVELOPER_ROOT/src/inst/keymandeveloper.msi" "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}/keymandeveloper.msi"
-  cp -f "$DEVELOPER_ROOT/src/inst/keymandeveloper-${KEYMAN_VERSION}.exe" "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}/keymandeveloper-${KEYMAN_VERSION}.exe"
+  cp -f "$DEVELOPER_ROOT/src/inst/keymandeveloper-${KEYMAN_VERSION_FOR_FILENAME}.exe" "$DEVELOPER_ROOT/release/${KEYMAN_VERSION}/keymandeveloper-${KEYMAN_VERSION_FOR_FILENAME}.exe"
 }
 
 function verify-program-signatures() {
@@ -233,36 +233,33 @@ function make-installer() {
   echo "Version=$KEYMAN_VERSION" >> setup.inf
   echo "MSIFileName=keymandeveloper.msi" >> setup.inf
   echo "Title=Keyman Developer ${KEYMAN_VERSION_WITH_TAG}" >>setup.inf
-  wzzip setup.zip keymandeveloper.msi setup.inf
-  cat "$DEVELOPER_PROGRAM/setup.exe" setup.zip > "keymandeveloper-$KEYMAN_VERSION.exe"
-  wrap-signcode //d "Keyman Developer" "keymandeveloper-$KEYMAN_VERSION.exe"
+  add_zip_files setup.zip keymandeveloper.msi setup.inf
+  cat "$DEVELOPER_PROGRAM/setup.exe" setup.zip > "keymandeveloper-$KEYMAN_VERSION_FOR_FILENAME.exe"
+  wrap-signcode //d "Keyman Developer" "keymandeveloper-$KEYMAN_VERSION_FOR_FILENAME.exe"
 
   #
   # Zip the files we distribute as part of the standalone kmc distro into release\$Version\kmcomp-$Version.zip
   #
 }
 
-# TODO: rename this to keyman-developer-cli-$Version.zip
-KMC_ZIP="$DEVELOPER_ROOT/release/$KEYMAN_VERSION/kmcomp-$KEYMAN_VERSION.zip"
-
 function make-kmc-install-zip() {
   builder_heading make-kmc-install-zip
 
   copy-schemas
-  cd "$DEVELOPER_ROOT/bin"
+  (
+    # shellcheck disable=2164
+    cd "${DEVELOPER_ROOT}/bin"
 
-  wzzip -bd -bb0 "$KMC_ZIP" \
-    kmconvert.exe \
-    sentry.dll sentry.x64.dll \
-    kmdecomp.exe \
-    keyboard_info.schema.json \
-    kmp.schema.json \
-    keyman-touch-layout.spec.json keyman-touch-layout.clean.spec.json \
-    xml/layoutbuilder/*.keyman-touch-layout \
-    projects/* \
-    server/*
+    # TODO: rename this to keyman-developer-cli-$Version.zip
+    local KMCOMP_ZIP="${DEVELOPER_ROOT}/release/${KEYMAN_VERSION}/kmcomp-${KEYMAN_VERSION_FOR_FILENAME}.zip"
 
-  cd "$THIS_SCRIPT_PATH"
+    add_zip_files "${KMCOMP_ZIP}" -q -r \
+      kmconvert.exe \
+      keyboard_info.schema.json \
+      xml/layoutbuilder/*.keyman-touch-layout \
+      projects/ \
+      server/
+  )
 }
 
 # TODO: are these required?

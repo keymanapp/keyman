@@ -1,0 +1,39 @@
+#!/usr/bin/python3
+
+import argparse
+import sys
+
+from keyman_config import add_standard_arguments, initialize_logging, initialize_sentry
+from keyman_config.diag_report import get_diagnostic_report
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Generate a diagnostic report of Keyman and system configuration. '
+                    'This report can be used for troubleshooting Keyman issues.')
+    parser.add_argument('-o', '--output', metavar='FILE',
+                        help='write report to FILE instead of stdout')
+    add_standard_arguments(parser)
+
+    args = parser.parse_args()
+
+    initialize_logging(args)
+    initialize_sentry()
+
+    report = get_diagnostic_report()
+
+    if args.output:
+        try:
+            with open(args.output, 'w', encoding='utf-8') as f:
+                f.write(report)
+                f.write('\n')
+            print(f"Diagnostic report written to {args.output}")
+        except IOError as e:
+            print(f"Error writing to file: {e}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        print(report)
+
+
+if __name__ == "__main__":
+    main()

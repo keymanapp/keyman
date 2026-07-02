@@ -2,10 +2,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-source "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+source "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 builder_describe "Installation files for Keyman Engine for Windows" \
   clean configure build test publish
@@ -20,7 +20,6 @@ builder_parse "$@"
 
 . "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 . "$KEYMAN_ROOT/resources/build/win/wix.inc.sh"
-. "$KEYMAN_ROOT/resources/build/win/zip.inc.sh"
 
 # In dev environments, we'll hack the tier to alpha; CI sets this for us in real builds.
 if [[ -z ${KEYMAN_TIER+x} ]]; then

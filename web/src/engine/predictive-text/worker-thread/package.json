@@ -10,6 +10,9 @@
     "./worker-main.wrapped.min.js": {
       "types": "./build/lib/worker-main.wrapped.d.ts",
       "default": "./build/lib/worker-main.wrapped.min.js"
+    },
+    "./test-index": {
+      "default": "./build/obj/test-index.js"
     }
   },
   "imports": {
@@ -30,14 +33,12 @@
     "@keymanapp/resources-gosh": "*",
     "c8": "^7.12.0",
     "combine-source-map": "^0.8.0",
-    "mocha-teamcity-reporter": "^4.0.0",
     "typescript": "^5.4.5"
   },
   "dependencies": {
     "@keymanapp/keyman-version": "*",
     "@keymanapp/models-templates": "*",
     "@keymanapp/models-wordbreakers": "*",
-    "@keymanapp/web-utils": "*",
     "es6-shim": "^0.35.5",
     "string.prototype.codepointat": "^0.2.1",
     "string.prototype.startswith": "^0.2.0"

@@ -64,6 +64,8 @@ public class KMHelpFileActivity extends BaseActivity {
     }
 
     setContentView(R.layout.activity_help_file_layout);
+    setupEdgeToEdge(R.id.help_file_layout);
+    setupStatusBarColors(android.R.color.white, android.R.color.white);
 
     Bundle bundle = getIntent().getExtras();
     pkgID = "";

@@ -5,11 +5,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
 
 builder_describe "Build Keyman kmc-generate module" \
   "@/common/web/keyman-version" \
@@ -17,9 +18,7 @@ builder_describe "Build Keyman kmc-generate module" \
   "@/common/web/types" \
   "@/developer/src/common/web/test-helpers" \
   "@/developer/src/common/web/utils" \
-  clean configure build api test publish \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  clean configure build api test
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -38,8 +37,7 @@ do_build() {
 }
 
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action build      do_build
 builder_run_action api        api-extractor run --local --verbose
-builder_run_action test       builder_do_typescript_tests
-builder_run_action publish    builder_publish_npm
+builder_run_action test       typescript_run_eslint_mocha_tests

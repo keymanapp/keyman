@@ -50,7 +50,7 @@ do_configure() {
     STANDARD_MESON_ARGS="$STANDARD_MESON_ARGS --cross-file wasm.defs.build --cross-file wasm.build --default-library static"
   fi
 
-  if [[ $target =~ ^(x86|x64)$ ]]; then
+  if [[ $target =~ ^(x86|x64|arm64)$ ]]; then
     cmd //C build.bat $target $BUILDER_CONFIGURATION configure $BUILD_BAT_keyman_core_tests "${builder_extra_params[@]}"
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
@@ -69,7 +69,7 @@ do_configure() {
 do_build() {
   local target=$1
   builder_start_action build:$target || return 0
-  if [[ $target =~ ^(x86|x64)$ ]]; then
+  if [[ $target =~ ^(x86|x64|arm64)$ ]]; then
     cmd //C build.bat $target $BUILDER_CONFIGURATION build "${builder_extra_params[@]}"
   elif $MESON_LOW_VERSION; then
     pushd "$MESON_PATH" > /dev/null
@@ -88,10 +88,10 @@ do_build() {
 do_test() {
   local target=$1
   builder_start_action test:$target || return 0
-  if [[ $target =~ ^(x86|x64)$ ]]; then
+  if [[ $target =~ ^(x86|x64|arm64)$ ]]; then
     cmd //C build.bat $target $BUILDER_CONFIGURATION test $testparams
   else
-    if [[ $target == wasm ]] && [[ $BUILDER_OS == mac ]]; then
+    if [[ $target == wasm ]] && builder_is_macos; then
       # 11794 -- parallel tests failing on some mac build agents; temporary
       # mitigation until we diagnose root cause
       meson test -j 1 -C "$MESON_PATH" $testparams
@@ -136,7 +136,7 @@ do_uninstall() {
 # ----------------------------------------------------------------------------
 
 build_meson_cross_file_for_wasm() {
-  if [ $BUILDER_OS == win ]; then
+  if builder_is_windows; then
     local R=$(cygpath -w $(echo $EMSCRIPTEN_BASE) | sed 's_\\_\\\\_g')
   else
     local R=$(echo $EMSCRIPTEN_BASE | sed 's_/_\\/_g')

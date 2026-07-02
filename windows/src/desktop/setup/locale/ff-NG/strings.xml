@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="ssLanguageName" comment="User interface language name in the UI language">Ɗemngal Fulfulde</string>
+  <string name="ssLanguageNameInEnglish" comment="User interface language name in English">Fulfulde Nigeria</string>
   <string name="ssApplicationTitle">$APPNAME $VERSION Wa`uggo</string>
   <string name="ssTitle">Wa`unu $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION wa`aama no haandi.</string>

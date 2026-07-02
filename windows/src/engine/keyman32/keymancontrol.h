@@ -47,6 +47,18 @@
 
 #define KMC_PROFILECHANGED  18  // 9.0.426.0   // I3933
 
+#define KMC_HINTRESPONSE        19       // 14.0 HIWORD(wParam) = ModalResult, lParam = hint enum
+
+#define KMC_WATCHDOG_FAKEFREEZE       20  // 19.0 - pause Keyman for 5 seconds for debug purposes to test stability
+#define KMC_WATCHDOG_KEYEVENT         21  // 19.0 - let the LowLevelHookWatchDog know that input has happened on another thread
+#define KMC_WATCHDOG_HOOK_REINSTALL   22  // 19.0 - tell master controller about hook reinstall events
+
+// KMC_WATCHDOG_HOOK_REINSTALL event types
+#define WHR_TIMING         0  // 19.0 - report on timing
+#define WHR_INIT_FAILURE   1  // 19.0 - hook failed to (re)install
+#define WHR_UNINIT_FAILURE 2  // 19.0 - hook failed to uninstall
+
+
 #define PC_UPDATE 0                   // Tell Keyman to update its display of active keyboard
 #define PC_UPDATE_LANGUAGESWITCH 1    // Tell Keyman to update its display of active keyboard and then open language switch form
 #define PC_HOTKEYCHANGE 2             // Tell Keyman that a hotkey was pressed to switch keyboard

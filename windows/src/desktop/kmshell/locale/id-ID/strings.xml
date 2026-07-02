@@ -626,10 +626,6 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKLanguageCode" comment="The language code for the current translation">id</string>
-  <!-- Context: _LanguageInfo -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDefaultLanguageCode" comment="The default language code for this product.  This should be the language that the product is created in. For Keyman this must stay 'en', for all translations.">en</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -863,7 +859,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Informasi debug Keyman akan disimpan di %LOCALAPPDATA%\Keyman\Diag\system#.etl (# adalah angka). Anda perlu keluar dari Keynman sebelum mencoba menghapus berkas ini.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Informasi debug Keyman akan disimpan di %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (# adalah angka). Anda perlu keluar dari Keynman sebelum mencoba menghapus berkas ini.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

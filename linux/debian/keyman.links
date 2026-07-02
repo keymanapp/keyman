@@ -1,4 +1,5 @@
 /usr/share/keyman-config/km-config /usr/bin/km-config
+/usr/share/keyman-config/km-diag-report /usr/bin/km-diag-report
 /usr/share/keyman-config/km-kvk2ldml /usr/bin/km-kvk2ldml
 /usr/share/keyman-config/km-package-get /usr/bin/km-package-get
 /usr/share/keyman-config/km-package-install /usr/bin/km-package-install

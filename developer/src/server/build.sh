@@ -3,10 +3,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
 builder_describe "Build Keyman Developer Server" \
@@ -17,6 +18,7 @@ builder_describe "Build Keyman Developer Server" \
   configure \
   build \
   test \
+  "run         Run Server in dev mode" \
   "installer   Prepare for Keyman Developer installer" \
   publish \
   ":server     Keyman Developer Server main program" \
@@ -49,11 +51,7 @@ function clean_server() {
 }
 
 function configure_server() {
-  verify_npm_setup
-  # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
-  # TODO: this is horrible; is there a way we can avoid this?
-  rm -f "$KEYMAN_ROOT"/node_modules/ngrok/bin/ngrok
-  rm -f "$KEYMAN_ROOT"/node_modules/ngrok/bin/ngrok.exe
+  node_select_version_and_npm_ci
 }
 
 function build_addins() {
@@ -128,9 +126,6 @@ function installer_server() {
 
   pushd "$PRODBUILDTEMP"
   npm install --omit=dev --omit=optional
-  # See https://github.com/bubenshchykov/ngrok/issues/254, https://github.com/bubenshchykov/ngrok/pull/255
-  rm -f node_modules/ngrok/bin/ngrok
-  rm -f node_modules/ngrok/bin/ngrok.exe
   popd
 
   # Dependencies are required in build/ but we need to copy them in manually
@@ -164,11 +159,16 @@ function publish_server() {
   wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/trayicon/addon.x64.node"
 }
 
+function run_server() {
+  node .
+}
+
 builder_run_action clean:server        clean_server
 builder_run_action configure:server    configure_server
 builder_run_action build:addins        build_addins
 builder_run_action build:server        build_server
 builder_run_action test:server         test_server
+builder_run_action run:server          run_server
 # builder_run_action test:addins       # no op
 builder_run_action installer:server    installer_server # TODO: rename to install-prep
 builder_run_action publish:server      publish_server

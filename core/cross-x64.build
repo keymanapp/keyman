@@ -1,0 +1,17 @@
+[host_machine]
+system = 'windows'
+subsystem = 'windows'
+cpu_family = 'x86_64'
+cpu = 'x86_64'
+endian = 'little'
+
+[binaries]
+c = 'cl'
+cpp = 'cl'
+ar = 'lib'
+ld = 'link'
+strip = 'llvm-strip'
+pkgconfig = 'pkg-config'
+
+[properties]
+needs_exe_wrapper = false

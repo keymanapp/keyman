@@ -651,10 +651,6 @@ Jokku\?</string>
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKLanguageCode" comment="The language code for the current translation">ful</string>
-  <!-- Context: _LanguageInfo -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDefaultLanguageCode" comment="The default language code for this product.  This should be the language that the product is created in. For Keyman this must stay 'en', for all translations.">en</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -888,10 +884,10 @@ Jokku\?</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">L\'information de débogage de Keyman sera stockée sur le Bureau dans un fichier texte nommé %LOCALAPPDATA%\Keyman\Diag\system#.etl.  Vous devez quitter Keyman avant de lire ou de supprimer ce fichier.
-  
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">L\'information de débogage de Keyman sera stockée sur le Bureau dans un fichier texte nommé %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl.  Vous devez quitter Keyman avant de lire ou de supprimer ce fichier.
+
   ATTENTION. Ce fichier peut devenir important très rapidement.  Activer le débogage ralentira le sytème et ne doit être fait qu\'à la demande du support Tavultesoft.
-  
+
   CONFIDENTIALITÉ: Veuillez noter que le fichier journal de débogage enregistre toutes les frappes que vous exécutez.  Vous ne devez activer le journal de débogage que pendant la durée de la session de débogage ou de diagnostic, et vous devez effacer le fichier  [Bureau]\keymanlog\system.log file dès que possible.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->

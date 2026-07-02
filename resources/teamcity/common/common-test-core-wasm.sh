@@ -7,7 +7,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 
@@ -19,4 +19,4 @@ builder_describe \
 
 builder_parse "$@"
 
-builder_run_action all  "${KEYMAN_ROOT}/core/build.sh" configure,build,test:wasm
+builder_run_action all  builder_launch /core/build.sh configure,build,test:wasm

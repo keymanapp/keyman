@@ -33,7 +33,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keymanapp/keyman.git"
+    "url": "git+https://github.com/keymanapp/keyman.git",
+    "directory": "common/web/langtags"
   },
   "sideEffects": false
 }

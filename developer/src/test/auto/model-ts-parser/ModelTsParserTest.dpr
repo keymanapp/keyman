@@ -11,6 +11,7 @@ uses
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
+  DUnitX.Loggers.TeamCity in '..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas',
   Keyman.System.Test.LexicalModelParserTest in 'Keyman.System.Test.LexicalModelParserTest.pas',
   Keyman.Developer.System.LexicalModelParser in '..\..\..\tike\main\Keyman.Developer.System.LexicalModelParser.pas',
   Keyman.Developer.System.LexicalModelParserTypes in '..\..\..\tike\main\Keyman.Developer.System.LexicalModelParserTypes.pas';
@@ -54,6 +55,8 @@ begin
       System.Readln;
     end;
     {$ENDIF}
+
+    DUnitX.Loggers.TeamCity.ReportToTeamCity;
   except
     on E: Exception do
       System.Writeln(E.ClassName, ': ', E.Message);

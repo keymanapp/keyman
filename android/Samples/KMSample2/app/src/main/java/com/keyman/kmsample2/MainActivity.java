@@ -1,6 +1,5 @@
 package com.keyman.kmsample2;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
@@ -11,13 +10,20 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
+import com.keyman.engine.BaseActivity;
+
+public class MainActivity extends BaseActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     setTheme(R.style.AppTheme);
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+    setupEdgeToEdge(R.id.constraintLayout);
+    setupStatusBarColors(    // Inset colors for Android API < 35
+      android.R.color.black, // Color for status bar on top
+      android.R.color.white  // Color for navigation bar on bottom
+    );
 
     Button button1 = (Button) findViewById(R.id.button1);
     button1.setOnClickListener(new View.OnClickListener() {

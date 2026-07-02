@@ -325,9 +325,7 @@ class UninstallKmpTests(unittest.TestCase):
         self.mockUninstallDir = self._setupMock('keyman_config.uninstall_kmp._uninstall_dir')
         self.mockGetMetaData = self._setupMock('keyman_config.uninstall_kmp.get_metadata')
         self.mockCustomKeyboardsClass = self._setupMock('keyman_config.uninstall_kmp.CustomKeyboards')
-        self.mockGetKeymanConfigService = self._setupMock('keyman_config.uninstall_kmp.get_keyman_config_service')
-        self.mockKeymanConfigServiceManager = Mock()
-        self.mockGetKeymanConfigService.return_value = self.mockKeymanConfigServiceManager
+        self.mockKeyboardListChanged = self._setupMock('keyman_config.uninstall_kmp.keyboard_list_changed')
 
     def _setupMock(self, arg0):
         patcher = patch(arg0)
@@ -341,9 +339,6 @@ class UninstallKmpTests(unittest.TestCase):
         keyboards = [{'id': 'foo1', 'languages': [{'id': 'en'}]}, {'id': 'bar2', 'languages': [{'id': 'fr'}]}]
         self.mockGetMetaData.return_value = (None, None, None, keyboards, None)
 
-        keyboardListChangedMock = Mock()
-        self.mockKeymanConfigServiceManager.keyboard_list_changed = keyboardListChangedMock
-
         # Execute
         uninstall_kmp('foo', False, True)
 
@@ -351,5 +346,4 @@ class UninstallKmpTests(unittest.TestCase):
         self.mockUninstallKeyboardsFromIbus.assert_called_once_with(keyboards, '/tmp/foo')
         self.mockUninstallDir.assert_called()
         self.assertEqual(mockCustomKeyboardsInstance.remove.call_count, 2)
-        self.assertEqual(keyboardListChangedMock.call_count, 1)
-
+        self.mockKeyboardListChanged.assert_called_once()

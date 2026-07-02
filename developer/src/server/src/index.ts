@@ -1,17 +1,16 @@
 import * as fs from 'node:fs';
-import * as os from 'node:os';
 import * as path from 'node:path';
 import chalk from 'chalk';
 import express from 'express';
 import multer from 'multer';
 import * as ws from 'ws';
 import { KeymanSentry } from './KeymanSentry.js';
-import { configuration } from './config.js';
+import { standardPaths } from './standardPaths.js';
 import { environment } from './environment.js';
 import setupRoutes from './routes.js';
 import { shutdown } from './shutdown.js';
 import { initTray } from './tray.js';
-import { loadOptions } from './options.js';
+import { getOption, loadOptions } from './options.js';
 
 const options = {
   ngrokLog: false,   // Set this to true if you need to see ngrok logs in the console
@@ -19,12 +18,12 @@ const options = {
 
 /* Lock file - report on PID and prevent multiple instances cleanly */
 
-console.log(`Starting Keyman Developer Server ${environment.versionWithTag}, listening on port ${configuration.port}.`);
-
 // We need to load the Keyman Developer options before attempting to initialize
 // Sentry. `loadOptions` silently suppresses exceptions and returns a default
 // set of options if an error occurs.
 await loadOptions();
+
+console.log(`Starting Keyman Developer Server ${environment.versionWithTag}, listening on port ${getOption('web host port')}.`);
 
 KeymanSentry.init();
 try {
@@ -77,15 +76,18 @@ export async function run() {
 
   setupRoutes(app, upload, wsServer, environment);
 
-  /* Start the server */
+  /* Start the web server */
 
   let server = null;
   try {
-    server = app.listen(configuration.port);
+    server = app.listen(getOption("web host port"));
   } catch(err) {
     console.error(err);
     // TODO handle and cleanup EADDRINUSE, throw anything else
+    return;
   }
+
+  /* Attach the web socket server */
 
   server.on('upgrade', (request, socket, head) => {
     wsServer.handleUpgrade(request, socket, head, socket => {
@@ -95,46 +97,67 @@ export async function run() {
 
   /* Launch ngrok if enabled */
 
-  configuration.ngrokEndpoint = '';
+  standardPaths.ngrokEndpoint = '';
+  if(getOption("server use ngrok")) {
+    await startNGrok();
+  }
 
-  if(configuration.useNgrok
-    && os.platform() == 'win32'
-    && fs.existsSync(path.join(configuration.ngrokBinPath, 'ngrok.exe'))
-  ) {
-    const ngrok: any = await import('ngrok');
-    (async function() {
-      configuration.ngrokEndpoint = await ngrok.connect({
-        proto: 'http',
-        addr: configuration.port,
-        authtoken: configuration.ngrokToken,
-        binPath: () => configuration.ngrokBinPath,
-        onLogEvent: (msg: string) => {
-          if(options.ngrokLog) {
-            console.log(chalk.cyan(('\n'+msg).split('\n').join('\n[ngrok] ').trim()));
-          }
-        },
-        onStatusChange: (state: string) => {
-          if(state == 'connected') {
-            setTimeout(async () => {
-              const api = ngrok.getApi();
-              const tunnels = await api.listTunnels();
-              configuration.ngrokEndpoint = tunnels.tunnels[0]?.public_url ?? '';
-              console.log(chalk.blueBright('ngrok tunnel established at %s'), configuration.ngrokEndpoint);
-            }, 1000);
-          } else if(state == 'closed') {
-            configuration.ngrokEndpoint = '';
-            console.log(chalk.blueBright('ngrok tunnel closed'));
-          }
+  /* Load the tray icon */
+
+  tray.start(getOption("web host port"), standardPaths.ngrokEndpoint);
+}
+
+async function loadNGrok() {
+  try {
+    return await import('@ngrok/ngrok');
+  } catch(e) {
+    // ngrok can fail import if it cannot load its dependent binary library,
+    // either because it is missing or because it has missing dependencies
+    // itself. But we don't want to crash the server if that happens
+    console.error(e);
+    return null;
+  }
+}
+
+async function startNGrok() {
+  console.log('Attempting to start ngrok');
+  const ngrok = await loadNGrok();
+  if(!ngrok) {
+    return false;
+  }
+
+  try {
+    let started = false;
+    const listener = await ngrok.forward({
+      proto: 'http',
+      addr: getOption("web host port"),
+      authtoken: getOption("server ngrok token"),
+      onLogEvent: (msg: string) => {
+        if(options.ngrokLog) {
+          console.log(chalk.cyan(('\n'+msg).split('\n').join('\n[ngrok] ').trim()));
         }
-      });
-      console.log(chalk.blueBright('ngrok tunnel initially established at %s'), configuration.ngrokEndpoint);
-      tray.start(configuration.port, configuration.ngrokEndpoint);
-    })();
+      },
+      onStatusChange: (state: string) => {
+        if(state == 'connected' && started) {
+          // We only announce reconnection after initial start
+          standardPaths.ngrokEndpoint = listener.url() ?? '';
+          console.log(chalk.blueBright('ngrok tunnel reconnected at %s'), standardPaths.ngrokEndpoint);
+        } else if(state == 'closed') {
+          standardPaths.ngrokEndpoint = '';
+          console.log(chalk.blueBright('ngrok tunnel closed'));
+        }
+      }
+    });
+    started = true;
+    standardPaths.ngrokEndpoint = listener.url() ?? "";
+    console.log(chalk.blueBright('ngrok tunnel established at %s'), standardPaths.ngrokEndpoint);
+  } catch(e) {
+    standardPaths.ngrokEndpoint = '';
+    console.error(chalk.red('ngrok tunnel failed to connect with an error: %s'), e);
+    return false;
   }
-  else {
-    /* Load the tray icon */
-    tray.start(configuration.port, configuration.ngrokEndpoint);
-  }
+
+  return true;
 }
 
 function getRunningInstancePid(pidFilename: string) {
@@ -146,8 +169,8 @@ function getRunningInstancePid(pidFilename: string) {
 }
 
 function writeLockFile() {
-  const lockFilename = configuration.lockFilename.replaceAll(/[\\\/]/g, path.sep);
-  const pidFilename = configuration.pidFilename.replaceAll(/[\\\/]/g, path.sep);
+  const lockFilename = standardPaths.lockFilename.replaceAll(/[\\\/]/g, path.sep);
+  const pidFilename = standardPaths.pidFilename.replaceAll(/[\\\/]/g, path.sep);
 
   // console.debug(`Testing existence of ${lockFilename}`);
   if(fs.existsSync(lockFilename)) {

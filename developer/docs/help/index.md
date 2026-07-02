@@ -8,7 +8,7 @@ and tutorials, and full reference information.
 
 ## Guides and Tutorials
 -   [What is Keyman Developer?](guides/intro)
--   [What's new in 19.0](whats-new)
+-   [What's new in 19.0](whatsnew)
 -   [Developing Keyman keyboard layouts](guides/develop)
 -   [Testing Keyman keyboards](guides/test)
 -   [Distributing Keyman keyboards](guides/distribute)
@@ -18,7 +18,7 @@ and tutorials, and full reference information.
 ## Reference
 -   [Keyman keyboard language reference](../language/reference)
 -   [Keyman keyboard language guide](../language/guide)
--   [Customising Keyman Engine for Desktop](../engine/desktop)
+-   [Customising Keyman Engine for Windows](../engine/windows)
 -   [Error codes, File types and Tools](reference/)
 -   [Keyman Developer user interface](context/)
 -   [Additional Notes](main/)
@@ -31,8 +31,8 @@ and tutorials, and full reference information.
 
 -   [Keyboard Quality White Paper](/developer/whitepaper1.1.pdf)
 -   [Knowledge Base](/kb)
--   [Keyman Desktop Help](/products/desktop)
--   [Keyman Engine for Desktop](/developer/engine/desktop/current-version/)
+-   [Keyman for Windows Help](/products/windows)
+-   [Keyman Engine for Windows](/developer/engine/windows/current-version/)
 -   [Keyman Engine for Web](/developer/engine/web/)
 -   [Keyman Engine for iPhone and iPad](/developer/engine/iphone-and-ipad/current-version/)
 -   [Keyman Engine for Android](/developer/engine/android/current-version/)

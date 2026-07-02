@@ -3,10 +3,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 ################################ Main script ################################
 
@@ -34,6 +34,10 @@ builder_parse "$@"
 
 builder_run_child_actions clean configure build test install uninstall
 
+clean_action() {
+  rm -rf debian/patches
+}
+
 test_action() {
   if builder_has_option --open; then
     builder_echo "Opening coverage reports in browser..."
@@ -41,5 +45,6 @@ test_action() {
   fi
 }
 
+builder_run_action  clean       clean_action
 builder_run_action  test        test_action
 builder_run_action  test:help   check-markdown  "${KEYMAN_ROOT}/linux/docs/help"

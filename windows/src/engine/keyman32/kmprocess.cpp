@@ -131,7 +131,7 @@ BOOL ProcessHook()
         _td->lpActiveKeyboard->lpCoreKeyboardState,
         KM_CORE_DEBUG_CONTEXT_CACHED
       );
-      SendDebugMessageFormatW(L"Key %s: %hs Context '%s'",
+      SendDebugMessageFormatW(L"Key %s: %hs Core Cached Context '%s'",
         _td->state.isDown ? L"pressed" : L"released",
         Debug_VirtualKey(_td->state.vkey), debug_context);
       km_core_cu_dispose(debug_context);

@@ -270,7 +270,7 @@ export function WriteCompiledKeyboard(
 	// Write the groups out
 
   // I853 - begin unicode missing causes crash
-  if (keyboard.startGroup.unicode == 0xFFFFFFFF) {
+  if (keyboard.startGroup.unicode == -1 || keyboard.startGroup.unicode == 0xFFFFFFFF) {
     callbacks.reportMessage(KmwCompilerMessages.Error_InvalidBegin());
     return null;
   }

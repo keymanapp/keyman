@@ -38,4 +38,4 @@ The On-Screen Keyboard module is exposed to the developer as `window.keyman.osk`
 :   Determine whether or not the OSK has been moved from its default position by the user.
 
 [Class Names and Identifiers for On-Screen Keyboard and Other KeymanWeb Elements](classes)
-:   The appearance of the KeymanWeb on-screen keyboard, menu amd other elements can be customized by a web designer by redefining (or adding to) the default styles.
+:   The appearance of the KeymanWeb on-screen keyboard, menu and other elements can be customized by a web designer by redefining (or adding to) the default styles.

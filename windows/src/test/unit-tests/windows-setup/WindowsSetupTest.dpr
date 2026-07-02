@@ -11,6 +11,7 @@ uses
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
+  DUnitX.Loggers.TeamCity in '..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas',
   Keyman.System.Test.InstallInfoTest in 'Keyman.System.Test.InstallInfoTest.pas',
   Keyman.Setup.System.InstallInfo in '..\..\..\desktop\setup\Keyman.Setup.System.InstallInfo.pas',
   PackageInfo in '..\..\..\..\..\common\windows\delphi\packages\PackageInfo.pas',
@@ -75,6 +76,8 @@ begin
       System.Readln;
     end;
     {$ENDIF}
+
+    DUnitX.Loggers.TeamCity.ReportToTeamCity;
   except
     on E: Exception do
       System.Writeln(E.ClassName, ': ', E.Message);

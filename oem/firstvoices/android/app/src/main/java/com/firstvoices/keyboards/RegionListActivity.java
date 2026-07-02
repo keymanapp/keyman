@@ -10,10 +10,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import com.keyman.engine.BaseActivity;
 
-public final class RegionListActivity extends AppCompatActivity {
+public final class RegionListActivity extends BaseActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -23,6 +23,8 @@ public final class RegionListActivity extends AppCompatActivity {
 
         // Setup layout
         setContentView(R.layout.activity_list_layout);
+        setupEdgeToEdge(R.id.activity_list_layout);
+
         final Toolbar toolbar = findViewById(R.id.list_toolbar);
         final TextView textView = findViewById(R.id.bar_title);
         textView.setText(R.string.regions);

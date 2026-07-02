@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO: this is currently a no-op. Eliminate or fix.
+
 # compares the version of this branch (in ../VERSION.md) to the
 #	version in the Xcode project file of the subproject named in $1
 # returns zero if they are the same, non-zero if not the same or a problem occurs
@@ -7,7 +9,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 #TODO:

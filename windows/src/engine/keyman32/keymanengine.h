@@ -140,8 +140,6 @@ BOOL LoadlpKeyboard(int i);
 PSTR wstrtostr(PCWSTR in);
 PWSTR strtowstr(PSTR in);
 
-WCHAR MapVirtualKeys(WORD keyCode, UINT shiftFlags);
-
 void SelectApplicationIntegration();   // I4287
 
 void PostDummyKeyEvent();  // I3301 - Handle I3250 regression with inadvertent menu activation with Alt keys   // I3534   // I4844
@@ -259,9 +257,9 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "..\..\..\..\common\windows\cpp\include\keynames.h"
 #include "..\..\..\include\kmtip_guids.h"
 
-#include "..\..\..\..\common\windows\cpp\include\crc32.h"
-
 #include "k32_tsf.h"
+#include "k32_visualkeyboardinterface.h"
+#include "LowLevelHookWatchDog.h"
 
 void ReportActiveKeyboard(WORD wCommand);   // I3933   // I3949
 void SelectKeyboardHKL(DWORD hkl, BOOL foreground);  // I3933   // I3949   // I4271
@@ -271,5 +269,7 @@ void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
 
 BOOL SetupCoreEnvironment(km_core_option_item **test_env_opts);
 void DeleteCoreEnvironment(km_core_option_item *test_env_opts);
+
+BOOL RestartLowLevelHook();
 
 #endif  // _KEYMANENGINE_H

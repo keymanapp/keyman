@@ -15,8 +15,8 @@ enum km_core_event_flags {
   KM_CORE_EVENT_FLAG_DEFAULT = 0,
   KM_CORE_EVENT_FLAG_TOUCH = 1,
 };
-
 ```
+
 ## Values
 
 `KM_CORE_EVENT_FLAG_DEFAULT`

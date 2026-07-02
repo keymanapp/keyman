@@ -19,9 +19,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.keyman.engine.BaseActivity;
 import com.keyman.engine.data.Dataset;
 import com.keyman.engine.data.adapters.AdapterFilter;
 import com.keyman.engine.data.adapters.NestedAdapter;
@@ -36,7 +36,7 @@ import java.util.List;
  * Keyman Settings --> Languages Settings
  * Displays a list of installed languages and a count of their associated installed keyboards.
  */
-public final class LanguagesSettingsActivity extends AppCompatActivity {
+public final class LanguagesSettingsActivity extends BaseActivity {
 
   private Context context;
   private static Toolbar toolbar = null;
@@ -52,6 +52,8 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     context = this;
     setContentView(R.layout.languages_settings_list_layout);
+
+    setupEdgeToEdge(R.id.languages_list_layout);
 
     toolbar = (Toolbar) findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);

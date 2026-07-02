@@ -58,7 +58,11 @@ generate_uuid() {
 
 run_in_vs_env() {
   (
-    builder_echo heading "### visual_studio: $@"
+    if [[ "${1-x}" == "--quiet" ]]; then
+      shift
+    else
+      builder_echo heading "### visual_studio: $*"
+    fi
     source "$KEYMAN_ROOT/resources/build/win/visualstudio_environment.inc.sh"
     "$@"
   )
@@ -66,7 +70,11 @@ run_in_vs_env() {
 
 run_in_delphi_env() {
   (
-    builder_echo heading "### delphi: $@"
+    if [[ "${1-x}" == "--quiet" ]]; then
+      shift
+    else
+      builder_echo heading "### delphi: $*"
+    fi
     source "$KEYMAN_ROOT/resources/build/win/delphi_environment.inc.sh"
     "$@"
   )
@@ -127,6 +135,10 @@ wrap-signcode() {
 }
 
 wrap-symstore() {
+  local target="$1"
+  local slasht="$2"
+  local product="$3"
+
   if builder_is_ci_build && builder_is_ci_build_level_build; then
     builder_echo "Skipping symstore - buildLevel=build"
     return 0
@@ -139,10 +151,10 @@ wrap-symstore() {
 
   "$ProgramFilesx86/Windows Kits/10/Debuggers/x64/symstore.exe" \
     add \
-    //s "$KEYMAN_SYMSTOREPATH" \
+    //s "$(cygpath -w "$KEYMAN_SYMSTOREPATH")" \
     //v "$KEYMAN_VERSION_WIN" \
     //c "Version: $KEYMAN_VERSION_WITH_TAG" \
-    //compress //f "$@"
+    //compress //f "$(cygpath -w "$target")" "$slasht" "$product"
 }
 
 wrap-mt() {

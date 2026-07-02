@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/help_file_layout"
+  android:fitsSystemWindows="true"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:orientation="vertical">
@@ -9,36 +12,28 @@
   <WebView
     android:id="@+id/kmHelpFileWebView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="0dp"
     android:layout_below="@+id/titlebar"
-    android:layout_above="@+id/buttonBar" />
-
-  <LinearLayout
-    android:id="@+id/buttonBar"
-    style="?android:attr/buttonBarStyle"
-    android:layout_alignParentBottom="true"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
-
-    <!-- Spacer to pad buttons to the right -->
-    <View
-      android:layout_width="0dp"
-      android:layout_height="0dp"
-      android:layout_weight="1" />
+    app:layout_constraintTop_toBottomOf="@id/titlebar"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintBottom_toTopOf="@+id/finishButton" />
 
     <Button
-      android:id="@+id/finishButton"
+      android:id="@id/finishButton"
       style="@style/Widget.AppCompat.Button.Borderless.Colored"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="@string/label_ok"
+      android:layout_marginStart="10dp"
+      android:layout_marginEnd="15dp"
+      android:layout_gravity="end"
       android:elevation="1dp"
       android:singleLine="true"
-      android:layout_marginStart="10dp" android:layout_marginEnd="15dp">
-      <requestFocus/>
+      android:text="@string/label_ok"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="1.0">
+
+      <requestFocus />
     </Button>
 
-  </LinearLayout>
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

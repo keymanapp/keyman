@@ -3,25 +3,24 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include our resource functions; they're pretty useful!
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
-
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
-verify_on_mac
 
 builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad." \
   "@/web/src/app/webview        build" \
-  "@/web/src/engine/sentry-manager  build" \
+  "@/common/web/sentry-manager  build" \
   "clean" \
   "configure" \
   "build" \
   "--sim-artifact  Also outputs a simulator-friendly test artifact corresponding to the build"
 
 builder_parse "$@"
+
+mac_verify_on_mac
 
 CONFIG="Release"
 if builder_is_debug_build; then
@@ -50,7 +49,7 @@ XCODEFLAGS="-quiet -configuration $CONFIG"
 XCODEFLAGS_EXT="$XCODEFLAGS -derivedDataPath \"$DERIVED_DATA\" -workspace ../keymanios.xcworkspace"
 
 CODE_SIGN=
-if builder_is_debug_build; then
+if builder_is_debug_build || ( builder_is_ci_build && ! builder_is_ci_build_level_release ); then
   CODE_SIGN="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO ${DEV_TEAM:-} CODE_SIGN_ENTITLEMENTS= CODE_SIGNING_ALLOWED=NO"
 fi
 
@@ -103,11 +102,12 @@ function update_bundle ( ) {
   KMW_PRODUCT="$KEYMAN_ROOT/web/build/app/webview/$CONFIG"
   KMW_RESOURCES="$KEYMAN_ROOT/web/build/app/resources"
 
-  #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
+  # Copy relevant KeymanWeb resources; this list is also in Storage.swift
+  cp "$KMW_RESOURCES/osk/globe-hint.css"        "$BUNDLE_PATH/globe-hint.css"
   cp "$KMW_RESOURCES/osk/kmwosk.css"            "$BUNDLE_PATH/kmwosk.css"
   cp "$KMW_RESOURCES/osk/keymanweb-osk.ttf"     "$BUNDLE_PATH/keymanweb-osk.ttf"
   cp "$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
-  cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
+  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
 }
 
 # First things first - update our dependencies.
@@ -125,7 +125,7 @@ function build_engine() {
 
   rm -rf "$BUILD_PATH/$CONFIG-universal"
 
-  run_xcodebuild $XCODEFLAGS_EXT \
+  mac_xcodebuild $XCODEFLAGS_EXT \
             $CODE_SIGN \
             -scheme KME-universal \
             KEYMAN_VERSION=$KEYMAN_VERSION \
@@ -133,7 +133,9 @@ function build_engine() {
             KEYMAN_VERSION_ENVIRONMENT=$KEYMAN_VERSION_ENVIRONMENT \
             UPLOAD_SENTRY=$UPLOAD_SENTRY
 
-  assertDirExists "$KEYMAN_XCFRAMEWORK"
+  if ! [[ -d "${KEYMAN_XCFRAMEWORK}" ]]; then
+    builder_die "Build failed: directory '${KEYMAN_XCFRAMEWORK}' missing"
+  fi
 }
 
 builder_run_action clean         do_clean

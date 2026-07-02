@@ -2,11 +2,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
 
 builder_describe "Build Keyman common file types module" \
   "@/core/include/ldml" \
@@ -14,10 +15,7 @@ builder_describe "Build Keyman common file types module" \
   "configure" \
   "build" \
   "clean" \
-  "test" \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "test"
 
 builder_describe_outputs \
   configure   /common/web/types/src/schemas/kpj.schema.ts \
@@ -76,26 +74,7 @@ function compile_schemas() {
 
 function do_configure() {
   compile_schemas
-  verify_npm_setup
-}
-
-function do_test() {
-  local MOCHA_FLAGS=
-
-  if builder_is_running_on_teamcity; then
-    # we're running in TeamCity
-    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
-  fi
-
-  eslint .
-  tsc --build tests
-
-  readonly C8_THRESHOLD=60
-
-  # Excludes are defined in package.json
-  c8 -skip-full --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
-  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
-  builder_echo warning "Please increase threshold in build.sh as test coverage improves."
+  node_select_version_and_npm_ci
 }
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -103,5 +82,4 @@ function do_test() {
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/schemas/ ./node_modules/ ./obj/
 builder_run_action configure  do_configure
 builder_run_action build      tsc --build
-builder_run_action test       do_test
-builder_run_action publish    builder_publish_npm
+builder_run_action test       typescript_run_eslint_mocha_tests 60

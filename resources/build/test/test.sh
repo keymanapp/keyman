@@ -2,13 +2,16 @@
 
 set -eu
 
+# Avoid timing reports in unit tests
+export _builder_timings=false
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-basic.inc.sh"
 # END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 cd "$THIS_SCRIPT_PATH"
 
@@ -109,7 +112,7 @@ builder_parse_test() {
 }
 
 builder_describe \
-  "Tests the build-utils.sh builder functions. This is merely an example." \
+  "Tests the builder-basic.inc.sh builder functions. This is merely an example." \
   "clean        Cleans up any build artifacts" \
   "build        Do some building" \
   "test         Does some test stuff" \
@@ -127,7 +130,7 @@ builder_describe \
 builder_parse_test "clean:app test:engine" "--power" clean:app test:engine --power
 
 if builder_has_option --power; then
-  echo "PASS: --power option found"
+  builder_echo green "  ✓ PASS: --power option found"
 else
   builder_die "FAIL: --power option not found"
 fi
@@ -135,7 +138,7 @@ fi
 builder_parse_test "clean:app test:engine" "--zoom" clean:app test:engine -z
 
 if builder_has_option --zoom; then
-  echo "PASS: --zoom option found"
+  builder_echo green "  ✓ PASS: --zoom option found"
 else
   builder_die "FAIL: --zoom option not found"
 fi
@@ -147,7 +150,7 @@ function verify_option() {
 
   if builder_has_option ${OPTIONNAME}; then
     if [[ ${!VARIABLE} == ${EXPECTED} ]]; then
-      echo "PASS: ${OPTIONNAME} option variable \$${VARIABLE} has expected value '${EXPECTED}'"
+      builder_echo green "  ✓ PASS: ${OPTIONNAME} option variable \$${VARIABLE} has expected value '${EXPECTED}'"
     else
       builder_die "FAIL: ${OPTIONNAME} option variable \$${VARIABLE} had value '${!VARIABLE}' but should have had '${EXPECTED}'"
     fi
@@ -197,7 +200,7 @@ fi
 if [[ "${builder_ignored_options[@]}" != "--some-other-option" ]]; then
   builder_die "FAIL: --builder-ignore-unknown-options did not collect --some-other-option"
 fi
-echo "PASS: --builder-ignore-unknown-options, --some-other-option was collected but ignored"
+builder_echo green "  ✓ PASS: --builder-ignore-unknown-options, --some-other-option was collected but ignored"
 
 # Test short form option with --builder-ignore-unknown-options
 builder_parse --builder-ignore-unknown-options -x
@@ -207,21 +210,21 @@ fi
 if [[ "${builder_ignored_options[@]}" != "-x" ]]; then
   builder_die "FAIL: --builder-ignore-unknown-options '${builder_ignored_options[@]}' did not collect -x"
 fi
-echo "PASS: --builder-ignore-unknown-options, -x was collected but ignored"
+builder_echo green "  ✓ PASS: --builder-ignore-unknown-options, -x was collected but ignored"
 
 # Test long form option without --builder-ignore-unknown-options
 (builder_parse --some-other-option >/dev/null) && EXIT_CODE=0 || EXIT_CODE=$?
 if [[ $EXIT_CODE != 64 ]]; then
   builder_die "FAIL: without --builder-ignore-unknown-options, --some-other-option parameter should not have been recognized"
 fi
-echo "PASS: without --builder-ignore-unknown-options, --some-other-option was not a recognized parameter"
+builder_echo green "  ✓ PASS: without --builder-ignore-unknown-options, --some-other-option was not a recognized parameter"
 
 # Test short form option without --builder-ignore-unknown-options
 (builder_parse -x >/dev/null) && EXIT_CODE=0 || EXIT_CODE=$?
 if [[ $EXIT_CODE != 64 ]]; then
   builder_die "FAIL: without --builder-ignore-unknown-options, -x parameter should not have been recognized"
 fi
-echo "PASS: without --builder-ignore-unknown-options, -x was not a recognized parameter"
+builder_echo green "  ✓ PASS: without --builder-ignore-unknown-options, -x was not a recognized parameter"
 
 # Test that ignored options variables are correct without --builder-ignore-unknown-options
 builder_parse test
@@ -243,7 +246,7 @@ if [[ $KEYMAN_VERSION_ENVIRONMENT == "local" ]]; then
   expected="$(builder_echo grey "Local build environment detected:  setting --debug")"$'\n'"$(builder_echo setmark "test.sh parameters: <--feature xyzzy --bar abc --baz def test --debug>")"
 fi
 if [[ "${parse_output[*]}" != "${expected}" ]]; then
-  builder_die "FAIL: Wrong output for '--feature xyzzy --bar abc --baz def test':\n  Actual  : ${parse_output[*]}\n  Expected: ${expected}"
+  builder_die "FAIL: Wrong output for '--feature xyzzy --bar abc --baz def test':\n  Actual  : '${parse_output[*]}'\n  Expected: '${expected}'"
 fi
 
 #----------------------------------------------------------------------
@@ -300,12 +303,12 @@ function builder_echo_start_end_tests() {
   TEAMCITY_GIT_PATH=""
   _builder_debug_internal=false
   _builder_is_child=0
-  expected=""
+  expected="$(builder_echo heading "description")"
   result=$(builder_echo start "foo" "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo start foo description' (no debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
   fi
-  expected=""
+  expected="$(builder_echo success "description")"
   result=$(builder_echo end "foo" success "description")
   if [[ "${result[*]}" != "${expected}" ]]; then
     builder_die "FAIL: Wrong output for 'builder_echo end foo success description' (no debug, is child):\n  Actual  : ${result[*]}\n  Expected: ${expected}"
@@ -436,7 +439,7 @@ echo
   # Finally, run with --help so we can see what it looks like; note:
   # builder_parse calls `exit 0` on a --help run, so running in a subshell
   echo -e "${COLOR_BLUE}## Testing --help${COLOR_RESET}"
-  builder_parse --no-color --help
+  builder_parse --no-color --help --no-timings
 ) || builder_die "FAIL: builder-parse unexpectedly returned failure code $?"
 
 echo -e "${COLOR_GREEN}======================================================${COLOR_RESET}"

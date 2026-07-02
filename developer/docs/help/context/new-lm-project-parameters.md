@@ -11,29 +11,44 @@ information following the file layout used in the [Keyman lexical-models reposit
 ### Parameters
 
 Author Name
-:   The name of the developer of the lexical model.
+
+:   **Required.** The name of the developer of the lexical model.
 
 Model Name
-:   The descriptive name of the lexical model. This should be a unique
-    name to distinguish this lexical model from others in the same
+
+:   **Required.** The descriptive name of the lexical model. This should be a
+    unique name to distinguish this lexical model from others in the same
     language.
 
 Copyright
-:   A copyright string for the model. This will be set in the the
-    package metadata, and where appropriate in documentation and
+
+:   A copyright string for the model, excluding copyright year(s). This will be
+    set in the the package metadata, and where appropriate in documentation and
     metadata.
 
+Full Copyright
+
+:   The same copyright string for the keyboard, including copyright year.
+
 Version
-:   The initial version number of the model should usually be left at
-    1.0. This will be set also in the package metadata, and where
-    appropriate in documentation and metadata. The version string is
-    made of `major revision`.`minor revision`. When releasing
-    significant updates to the model, increment the major revision (e.g.
-    2.0). Increment the minor revision (e.g. 1.1) for small changes to
-    the model.
+
+:   **Required.** The initial version number of the model should usually be left
+    at 1.0. This will be set also in the package metadata, and where appropriate
+    in documentation and metadata. The version string is made of `major
+    revision`.`minor revision`. When releasing significant updates to the model,
+    increment the major revision (e.g. 2.0). Increment the minor revision (e.g.
+    1.1) for small changes to the model.
 
 Languages
-:   Specifies the default BCP 47 language tags which will be added to
-    the [package metadata](../reference/file-types/metadata) and project
+
+:   **Required.** Specifies the default BCP 47 language tags which will be added
+    to the [package metadata](../reference/file-types/metadata) and project
     metadata. In order to install and use a lexical model with a Keyman
     keyboard, the BCP 47 language tags for both must be identical.
+
+Path
+
+:   **Required.** Specifies the base path where the project folder will be
+    created. The project folder name will be the model ID. If the folder already
+    exists, then you will be prompted before Keyman Developer overwrites files
+    inside it.

@@ -4,11 +4,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 # ################################ Main script ################################
 
@@ -24,7 +23,7 @@ JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\
 
 builder_describe "Builds Keyman Engine for Android." \
   "@/web/src/app/webview" \
-  "@/web/src/engine/sentry-manager" \
+  "@/common/web/sentry-manager" \
   "clean" \
   "configure" \
   "build" \
@@ -82,7 +81,7 @@ if builder_start_action build:engine; then
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
-  cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
+  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
 
   echo "Copying es6-shim polyfill"
   cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$ENGINE_ASSETS/es6-shim.min.js"

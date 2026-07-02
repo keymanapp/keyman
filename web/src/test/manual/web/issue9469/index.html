@@ -36,11 +36,11 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
-		    attachType:'auto'
+      keyman.init({
+        attachType:'auto'
       }).then(function() {
-        kmw.addKeyboards({id:'test9469',name:'test9469',languages:{id:'en',name:'English'}, filename:'test9469/build/test9469.js'});
+        keyman.addKeyboards({id:'test9469',name:'test9469',languages:{id:'en',name:'English'},
+          filename:'../../../../../build/test-resources/keyboards/test9469.js'});
 
         var pageRef = (window.location.protocol == 'file:')
           ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
@@ -50,7 +50,7 @@
           languages: ['en'],
           path: (pageRef + "../prediction-mtnt/nrc.en.mtnt.model.js")
         };
-        kmw.addModel(modelStub);
+        keyman.addModel(modelStub);
       });
 
       function togglePredictions() {

@@ -3,16 +3,21 @@
 This is a guide for how the various Keyman `npm` packages are developed
 and published.
 
-`npm` packages are published on the CI (continuous integration) server.
-Currently, we're using TeamCity for this.
+`npm` packages are published through CI (continuous integration). This is done
+through the `.github/workflows/npm-publish.yml` GitHub Action.
 
 Packages are **never** published from a developer's machine.
 
 ## List of current published npm packages
 
+* See `resources/build/ci/npm-packages.inc.sh` for an authoritative list.
+
 * `@keymanapp/common-types` -- located at `common/web/types`
 * `@keymanapp/keyman-version` -- located at `common/web/keyman-version`
 * `@keymanapp/kmc` -- located at `developer/src/kmc`
+* `@keymanapp/kmc-analyze` -- located at `developer/src/kmc-analyze`
+* `@keymanapp/kmc-copy` -- located at `developer/src/kmc-copy`
+* `@keymanapp/kmc-generate` -- located at `developer/src/kmc-generate`
 * `@keymanapp/kmc-keyboard-info` -- located at `developer/src/kmc-keyboard-unfo`
 * `@keymanapp/kmc-kmn` -- located at `developer/src/kmc-kmn`
 * `@keymanapp/kmc-ldml` -- located at `developer/src/kmc-ldml`
@@ -20,6 +25,7 @@ Packages are **never** published from a developer's machine.
 * `@keymanapp/kmc-model-info` -- located at `developer/src/kmc-model-info`
 * `@keymanapp/kmc-package` -- located at `developer/src/kmc-package`
 * `@keymanapp/langtags` -- located at `common/web/langtags`
+* `@keymanapp/ldml-keyboard-constants` -- located at `core/include/dml`
 
 ### Deprecated npm packages
 
@@ -34,22 +40,16 @@ Packages are **never** published from a developer's machine.
 
 ### In general
 
-Before publishing, a package must be **built** and **tested** on the CI
-server.
-
-This is typically done with:
+Before publishing, a package must be **built** and **tested**. This is typically
+done with:
 
 ```bash
 ./build.sh configure build test
 ```
 
-Once the build succeeds and the tests pass, you can publish! Use the following
-script for this (**only on the CI server**!); during this, the version is set in
-`package.json`:
-
-```bash
-./build.sh publish
-```
+Once the build succeeds and the tests pass, you can publish! Add the package to
+`resources/build/ci/npm-packages.inc.sh` and it will be published in the next
+alpha release build.
 
 It is then uploaded to the npm package directory. **Ensure that the compiled
 sources are included in the tarball**. For example:
@@ -94,26 +94,5 @@ npm notice 740B   tsconfig.json
 npm notice 449B   tsconfig.kmc-base.json
 ```
 
-For every release of **Keyman Developer**, the CI publishes a release of
-`@keymanapp/kmc`. The version number is locked with the particular version of
-Keyman Developer.
+For every release build, CI publishes a release of all packages.
 
-### `builder_publish_npm`
-
-Publishes the package in `cwd` to npm
-
-If the `--dry-run` option is available and specified as a command-line
-parameter, will do a dry run
-
-Note that `package.json` will be dirty after this command, as the `version`
-field will be added to it, and @keymanapp dependency versions will also be
-modified. This change should not be committed to the repository.
-
-If --npm-publish is set:
-* then builder_publish_npm publishes to the public registry
-* else builder_publish_npm creates a local tarball which can be used to test
-
-```bash
-  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-  builder_publish_npm
-```

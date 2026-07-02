@@ -7,11 +7,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.preference.PreferenceManager;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,11 +25,13 @@ import android.os.Bundle;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.DisplayLanguages;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.data.KeyboardController;
 import com.keyman.engine.util.MapCompat;
 
-public class KeymanSettingsInstallActivity extends AppCompatActivity {
+public class KeymanSettingsInstallActivity extends BaseActivity {
   private static final String TAG = "SettingsInstallActivity";
   private static ArrayList<HashMap<String, String>> installOptionList = null;
   private static Typeface titleFont = null;
@@ -45,6 +48,8 @@ public class KeymanSettingsInstallActivity extends AppCompatActivity {
     context = this;
 
     setContentView(R.layout.activity_list_layout);
+    setupEdgeToEdge(R.id.list_toolbar);
+
     final Toolbar toolbar = findViewById(R.id.list_toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -125,12 +130,19 @@ public class KeymanSettingsInstallActivity extends AppCompatActivity {
         HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String languageTag = prefs.getString(DisplayLanguages.displayLanguageKey, "");
         // Install from keyman.com
         if (itemTitle.equals(getString(R.string.install_from_keyman_dot_com))) {
           if (KMManager.hasConnection(context)) {
             Intent i = new Intent(context, KMPBrowserActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            if (languageTag != null && !languageTag.isEmpty()) {
+              Bundle bundle = new Bundle();
+              bundle.putString("lang", languageTag);
+              i.putExtras(bundle);
+            }
             context.startActivity(i);
           }  else {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);

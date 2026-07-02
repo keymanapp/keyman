@@ -1,9 +1,9 @@
 import { applyTransform, buildMergedTransform, Token } from '@keymanapp/models-templates';
-import { KMWString } from '@keymanapp/web-utils';
+import { KMWString } from 'keyman/common/web-utils';
 
 import { ClassicalDistanceCalculation, EditOperation } from './classical-calculation.js';
 import { SearchSpace } from './distance-modeler.js';
-import TransformUtils from '../transformUtils.js';
+import { TransformUtils } from '../transformUtils.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { tokenizeTransform, tokenizeTransformDistribution } from './transform-tokenization.js';
 import { LexicalModelTypes } from '@keymanapp/common-types';
@@ -356,8 +356,8 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
     // Inverted order, since 'match' existed before our new context.
     let mapping = ClassicalDistanceCalculation.computeDistance(
-      matchContext.map(value => ({key: value})),
-      tokenizedContext.map(value => ({key: value.text})),
+      matchContext,
+      tokenizedContext.map(value => value.text),
       // Must be at least 2, as adding a single whitespace after a token tends
       // to add two tokens: one for whitespace, one for the empty token to
       // follow it.
@@ -629,7 +629,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     };
   }
 
-  private static modelContextState(
+  static modelContextState(
     tokenizedContext: Token[],
     lexicalModel: LexicalModel
   ): TrackedContextState {

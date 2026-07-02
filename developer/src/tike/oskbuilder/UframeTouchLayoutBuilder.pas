@@ -95,6 +95,7 @@ type
     procedure CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
     procedure UnregisterSources;
+    procedure TouchLayoutMessage(Sender: TObject; const Message: string);
   protected
     function GetHelpTopic: string; override;
 
@@ -140,7 +141,9 @@ uses
   xmldoc,
 
   Keyman.Developer.System.HelpTopics,
+  Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter,
+  Keyman.Developer.UI.Project.ProjectFileUI,
 
   CharacterDragObject,
   CharMapDropTool,
@@ -309,6 +312,11 @@ begin
     else Result := s <> FSavedLayoutJS;
 end;
 
+procedure TframeTouchLayoutBuilder.TouchLayoutMessage(Sender: TObject; const Message: string);
+begin
+  LogMessage(plsError, FFilename, Message, 0, 0);
+end;
+
 function TframeTouchLayoutBuilder.Load(const AFilename: string; ALoadFromTemplate, ALoadFromString: Boolean): Boolean;
 var
   FLastFilename: string;
@@ -355,8 +363,16 @@ begin
 
     with TStringList.Create do
     try
-      LoadFromFile(FBaseFileName, TEncoding.UTF8);
-      FNewLayoutJS := Text;
+      try
+        LoadFromFile(FBaseFileName, TEncoding.UTF8);
+        FNewLayoutJS := Text;
+      except
+        on E:Exception do
+        begin
+          ShowMessage(E.Message);
+          Exit(False);
+        end;
+      end;
     finally
       Free;
     end;
@@ -364,6 +380,7 @@ begin
 
   FTouchLayout := TTouchLayout.Create;   // I3642
   try
+    FTouchLayout.OnMessage := TouchLayoutMessage;
     if not FTouchLayout.Load(FNewLayoutJS) then
     begin
       FLastError := FTouchLayout.LoadError;   // I4083

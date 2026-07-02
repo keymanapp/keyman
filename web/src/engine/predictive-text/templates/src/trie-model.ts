@@ -25,7 +25,7 @@
 // Worth noting:  we're starting to get quite a 'library' of common model/LMLayer functionality.
 // Should probably make a 'lm-utils' submodule.
 
-import { KMWString, PriorityQueue } from "@keymanapp/web-utils";
+import { KMWString, PriorityQueue } from "keyman/common/web-utils";
 import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";
@@ -84,23 +84,23 @@ export interface TrieModelOptions {
   punctuation?: LexicalModelPunctuation;
 }
 
-class Traversal implements LexiconTraversal {
+export class Traversal implements LexiconTraversal {
   /**
    * The lexical prefix corresponding to the current traversal state.
    */
-  prefix: String;
+  readonly prefix: string;
 
   /**
    * The current traversal node.  Serves as the 'root' of its own sub-Trie,
    * and we cannot navigate back to its parent.
    */
-  root: Node;
+  readonly root: Node;
 
   /**
    * The max weight for the Trie being 'traversed'.  Needed for probability
    * calculations.
    */
-  totalWeight: number;
+  readonly totalWeight: number;
 
   constructor(root: Node, prefix: string, totalWeight: number) {
     this.root = root;
@@ -108,7 +108,7 @@ class Traversal implements LexiconTraversal {
     this.totalWeight = totalWeight;
   }
 
-  child(char: string): LexiconTraversal | undefined {
+  child(char: string): Traversal | undefined {
     // May result for blank tokens resulting immediately after whitespace.
     if(char == '') {
       return this;
@@ -153,7 +153,7 @@ class Traversal implements LexiconTraversal {
     }
   }
 
-  *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
+  *children(): Generator<{char: string, traversal: () => Traversal}> {
     let root = this.root;
 
     // We refer to the field multiple times in this method, and it doesn't change.
@@ -269,7 +269,7 @@ class Traversal implements LexiconTraversal {
  * prefix searches within words, however they are not very good
  * at predicting the next word.
  */
-export default class TrieModel implements LexicalModel {
+export class TrieModel implements LexicalModel {
   configuration?: Configuration;
   private _trie: Trie;
   readonly breakWords: WordBreakingFunction;
@@ -352,7 +352,7 @@ export default class TrieModel implements LexicalModel {
     return this.breakWords;
   }
 
-  public traverseFromRoot(): LexiconTraversal {
+  public traverseFromRoot(): Traversal {
     return this._trie.traverseFromRoot();
   }
 };
@@ -448,7 +448,7 @@ class Trie {
     this.totalWeight = totalWeight;
   }
 
-  public traverseFromRoot(): LexiconTraversal {
+  public traverseFromRoot(): Traversal {
     return new Traversal(this.root, '', this.totalWeight);
   }
 

@@ -23,25 +23,28 @@ on:
 # baseRef:     The ref of the previous commit. For a PR the same as `baseBranch`.
 # user:        The user that triggered the build or created the PR
 # isTestBuild: false for Releases, otherwise true
+# skipApiCheck: true to skip the API check, otherwise false
 
 env:
   COLOR_GREEN: "\e[32m"
   GH_TOKEN: ${{ github.token }}
   STATUS_CONTEXT: 'Ubuntu Packaging'
+  STATUS_CONTEXT_SOURCE_VERIFICATION: 'Linux source verification'
   DEBFULLNAME: 'Keyman GHA packager'
   DEBEMAIL: 'support@keyman.com'
+  _builder_timings: false
 
 jobs:
   sourcepackage:
     name: Build source package
-    if: github.repository == 'keymanapp/keyman'
+    if: github.repository == 'keymanapp/keyman' || github.event.client_payload.force
     runs-on: ubuntu-24.04
     outputs:
       KEYMAN_VERSION: ${{ steps.version_step.outputs.KEYMAN_VERSION }}
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
 
@@ -86,7 +89,14 @@ jobs:
       shell: bash
       run: |
         THIS_SCRIPT="$GITHUB_WORKSPACE/.github/workflows/deb-packaging.yml"
-        . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+        if [[ -f "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh" ]]; then
+          . "${THIS_SCRIPT%/*}/../../resources/build/builder-basic.inc.sh"
+        else
+          # TODO: remove following block post v19 release (file was renamed in v19 alpha)
+          if [[ -f "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh" ]]; then
+            . "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+          fi
+        fi
         echo "KEYMAN_VERSION=${KEYMAN_VERSION:-${VERSION}}" >> $GITHUB_OUTPUT
 
     - name: Set prerelease tag as output parameter
@@ -112,7 +122,7 @@ jobs:
         echo "- $(find . -name keyman_\*.dsc)" >> $GITHUB_STEP_SUMMARY
 
     - name: Store source package
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
       with:
         name: keyman-srcpkg
         path: |
@@ -127,11 +137,11 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [jammy, noble, plucky]
+        dist: [jammy, noble, questing]
 
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
         sparse-checkout: '.github/actions/'
@@ -153,11 +163,11 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [questing]
+        dist: [devel]
 
     steps:
     - name: Checkout
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         ref: '${{ github.event.client_payload.buildSha }}'
         sparse-checkout: '.github/actions/'
@@ -177,28 +187,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # - name: Download Artifacts
-    #   uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-    #   with:
-    #     path: artifacts
-    #     merge-multiple: true
-
-    # - name: Install dependencies
-    #   run: |
-    #     sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8 genisoimage python3-distro-info
-
-    # - name: Build test image
-    #   run: |
-    #     cd "${GITHUB_WORKSPACE}/artifacts"
-    #     autopkgtest-buildvm-ubuntu-cloud -v --release=jammy
-
-    # - name: Run tests
-    #   run: |
-    #     cd "${GITHUB_WORKSPACE}/artifacts"
-    #     autopkgtest -B *.deb keyman_*.dsc -- qemu autopkgtest-jammy-amd64.img
-    - name: Ignore
+    - name: Free disk space
       run: |
-        echo "Ignored for now - until working solution is in place (#13777)"
+        # Free disk space by removing some large directories that we don't use (#15171)
+        # see https://dev.to/mathio/squeezing-disk-space-from-github-actions-runners-an-engineers-guide-3pjg
+
+        # Remove Android SDKs (frees 12 GB on Ubuntu 24.04)
+        sudo rm -rf /usr/local/lib/android
+
+        # Remove Haskell (GHC) (frees 6.4 GB)
+        sudo rm -rf /usr/local/.ghcup
+
+        # Remove CodeQL and other toolcaches (frees 5.8 GB)
+        sudo rm -rf /opt/hostedtoolcache
+
+        # Remove .NET SDKs (frees 4.0 GB)
+        sudo rm -rf /usr/share/dotnet
+
+    - name: Download Source Artifacts
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      with:
+        name: keyman-srcpkg
+        path: artifacts
+
+    - name: Download Binary Artifacts
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      with:
+        path: artifacts
+        pattern: keyman-binarypkgs-*
+        merge-multiple: true
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install autopkgtest qemu-system qemu-utils autodep8 genisoimage python3-distro-info
+
+    - name: Build test image
+      run: |
+        cd "${GITHUB_WORKSPACE}/artifacts"
+        sudo chown ${USER} /dev/kvm
+        autopkgtest-buildvm-ubuntu-cloud -v --release=$(lsb_release -c -s)
+
+    - name: Run tests
+      run: |
+        # Tests are defined in linux/debian/tests/test-build
+        cd "${GITHUB_WORKSPACE}/artifacts"
+        DIST="$(lsb_release -c -s)"
+        autopkgtest -B *${DIST}*.deb keyman_*.dsc -- qemu autopkgtest-${DIST}-amd64.img
 
   deb_signing:
     name: Sign source and binary packages
@@ -247,7 +282,7 @@ jobs:
         echo "::endgroup::"
 
     - name: Download Artifacts
-      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
         name: keyman-signedpkgs
 
@@ -309,7 +344,7 @@ jobs:
 
     steps:
     - name: Download Artifacts
-      uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
         path: artifacts
         pattern: keyman-*
@@ -325,9 +360,10 @@ jobs:
         echo "GIT_BRANCH=${{ github.event.client_payload.branch }}" >> artifacts/env
         echo "GIT_BASE_BRANCH=${{ github.event.client_payload.baseBranch }}" >> artifacts/env
         echo "GIT_USER=${{ github.event.client_payload.user }}" >> artifacts/env
+        echo "SKIP_API_CHECK=${{ github.event.client_payload.skipApiCheck }}" >> artifacts/env
 
     - name: Cache artifacts
-      uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+      uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
         path: |
           artifacts
@@ -368,3 +404,112 @@ jobs:
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description="$MSG" \
           -f context="$STATUS_CONTEXT"
+
+  #---------------------------------------------------------------------------------------------
+  source_verification:
+    name: Verify source tarball and Linux source package
+    if: github.repository == 'keymanapp/keyman' || github.event.client_payload.force
+    needs: sourcepackage
+    runs-on: ubuntu-latest
+    outputs:
+      KEYMAN_VERSION: ${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}
+      HAS_VERIFY_SOURCE: ${{ steps.check_requirements.outputs.HAS_VERIFY_SOURCE }}
+
+    steps:
+    - name: Set pending status on PR builds
+      id: set_status
+      if: github.event.client_payload.isTestBuild == 'true'
+      shell: bash
+      run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
+          -f state='pending' \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description='Linux source verification started' \
+          -f context="$STATUS_CONTEXT_SOURCE_VERIFICATION"
+
+    - name: Checkout
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        ref: '${{ github.event.client_payload.buildSha }}'
+        fetch-depth: 0
+        clean: false
+        path: ${{ github.workspace }}/keyman/
+
+    # TODO: Remove after release of Keyman 19
+    - name: Check requirements
+      id: check_requirements
+      shell: bash
+      run: |
+        if [[ -f "${GITHUB_WORKSPACE}/keyman/linux/scripts/verify_source.sh" ]]; then
+          echo "HAS_VERIFY_SOURCE=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Install devscripts
+      if: steps.check_requirements.outputs.HAS_VERIFY_SOURCE == 'true'
+      uses: ./keyman/.github/actions/apt-install
+      with:
+        packages: devscripts equivs
+
+    - name: Install dependencies
+      if: steps.check_requirements.outputs.HAS_VERIFY_SOURCE == 'true'
+      run: |
+        cd ${{ github.workspace }}/keyman/linux
+        ./scripts/deb-packaging.sh --gha dependencies
+
+    - name: Verify source tarball
+      if: steps.check_requirements.outputs.HAS_VERIFY_SOURCE == 'true'
+      shell: bash
+      run: |
+        cd ${{ github.workspace }}/keyman/linux
+        ./scripts/verify_source.sh --source-only --target-dir "${{ github.workspace }}/keyman-${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}"
+
+    - name: Verify Ubuntu source package
+      if: steps.check_requirements.outputs.HAS_VERIFY_SOURCE == 'true'
+      shell: bash
+      run: |
+        cd ${{ github.workspace }}/keyman/linux
+        ./scripts/verify_source.sh --no-create-tarball --launchpad-only --target-dir "${{ github.workspace }}/keyman-${{ needs.sourcepackage.outputs.KEYMAN_VERSION }}"
+
+  set_status_source_verification:
+    name: Set result status of source verification on PR builds
+    needs: [source_verification]
+    runs-on: ubuntu-latest
+    if: ${{ always() && github.event.client_payload.isTestBuild == 'true' && (github.repository == 'keymanapp/keyman' || github.event.client_payload.force) }}
+    steps:
+    - name: Requirements not met
+      if: needs.source_verification.result == 'success' && needs.source_verification.outputs.HAS_VERIFY_SOURCE != 'true'
+      run: |
+        echo "RESULT=success" >> $GITHUB_ENV
+        echo "MSG=Linux source verification requirements not met" >> $GITHUB_ENV
+
+    - name: Set success
+      if: needs.source_verification.result == 'success' && needs.source_verification.outputs.HAS_VERIFY_SOURCE == 'true'
+      run: |
+        echo "RESULT=success" >> $GITHUB_ENV
+        echo "MSG=Linux source verification succeeded" >> $GITHUB_ENV
+
+    - name: Set cancelled
+      if: needs.source_verification.result == 'cancelled'
+      run: |
+        echo "RESULT=error" >> $GITHUB_ENV
+        echo "MSG=Linux source verification cancelled" >> $GITHUB_ENV
+
+    - name: Set failure
+      if: needs.source_verification.result == 'failure'
+      run: |
+        echo "RESULT=failure" >> $GITHUB_ENV
+        echo "MSG=Linux source verification failed" >> $GITHUB_ENV
+
+    - name: Set final status
+      run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ github.event.client_payload.buildSha }} \
+          -f state="$RESULT" \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description="$MSG" \
+          -f context="$STATUS_CONTEXT_SOURCE_VERIFICATION"

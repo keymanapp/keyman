@@ -7,7 +7,7 @@ import { KmnCompiler } from '../../src/main.js';
 import { CompilerErrorNamespace } from '@keymanapp/developer-utils';
 
 describe('KmwCompilerMessages', function () {
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   it('should have a valid KmwCompilerMessages object', function() {
     return verifyCompilerMessagesObject(KmwCompilerMessages, CompilerErrorNamespace.KmwCompiler);
@@ -43,6 +43,12 @@ describe('KmwCompilerMessages', function () {
 
   it('should generate HINT_TouchLayoutUsesUnsupportedGesturesDownlevel if the touch layout has gestures but the keyboard is an old version', async function() {
     await testForMessage(this, ['kmw', 'validate_gesture.kmn'], KmwCompilerMessages.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel);
+  });
+
+  // ERROR_InvalidBegin (from KmnCompilerMessages, but in KeymanWeb compiler context)
+
+  it('should generate ERROR_InvalidBegin if the keyboard has no "begin unicode" statement', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'ansi.kmn'], KmwCompilerMessages.ERROR_InvalidBegin);
   });
 
   // TODO: other messages

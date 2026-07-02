@@ -1,0 +1,18 @@
+# shellcheck disable=SC2148
+# No hashbang for bash completion scripts! They are intended to be sourced, not executed.
+
+_km-diag-report_completions()
+{
+    local cur opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    opts="-h --help -o --output -v --verbose -vv --veryverbose --version"
+
+    if [[ ${cur} == -* ]] ; then
+        # shellcheck disable=SC2207
+        COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
+        return 0
+    fi
+}
+
+complete -F _km-diag-report_completions km-diag-report

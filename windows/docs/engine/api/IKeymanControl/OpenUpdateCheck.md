@@ -4,7 +4,7 @@ title: IKeymanControl::OpenUpdateCheck() Method
 
 ## Introduction
 
-The `IKeymanControl::OpenUpdateCheck()` method opens Keyman Desktop
+The `IKeymanControl::OpenUpdateCheck()` method opens Keyman for Windows
 online update check tool.
 
 ## Specification

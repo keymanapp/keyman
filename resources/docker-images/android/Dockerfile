@@ -2,7 +2,8 @@
 # Keyman is copyright (C) SIL Global. MIT License.
 
 ARG BASE_VERSION=default
-FROM keymanapp/keyman-base-ci:${BASE_VERSION}
+ARG REGISTRY=
+FROM ${REGISTRY}keymanapp/keyman-base-ci:${BASE_VERSION}
 LABEL org.opencontainers.image.authors="SIL Global."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman Android Build Image"
@@ -35,10 +36,26 @@ EOF
 # Finish bashwrapper script and adjust permissions
 RUN <<EOF cat >> /usr/bin/bashwrapper
 
+if [[ -v CHANGE_PERMISSIONS ]]; then
+  uid=\$(stat -c "%u" /home/build/build)
+  gid=\$(stat -c "%g" /home/build/build)
+  if [[ "\${uid}" != "\$(id -u)" && "\${gid}" != "\$(id -g)" ]]; then
+    echo "Adjusting build directory ownership to uid/gid \$(id -un):\$(id -gn)"
+    sudo chown -R build:build /home/build/build
+  fi
+fi
+
 if [[ "\$@" =~ test ]] && [ -f /usr/bin/run-tests.sh ]; then
   /usr/bin/run-tests.sh "\${@:-bash}"
 else
   "\${@:-bash}"
+fi
+
+if [[ -v CHANGE_PERMISSIONS ]]; then
+  if [[ "\${uid}" != "\$(id -u)" && "\${gid}" != "\$(id -g)" ]]; then
+    echo "Reverting build directory ownership to uid/gid \${uid}:\${gid}"
+    sudo chown -R \${uid}:\${gid} /home/build/build
+  fi
 fi
 EOF
 

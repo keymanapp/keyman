@@ -3,18 +3,19 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 SUBPROJECT_NAME=app/ui
 . "$KEYMAN_ROOT/web/common.inc.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
 
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's desktop form-factor keyboard selection modules." \
-  "@/web/src/app/browser build" \
-  "@/web/src/tools/building/sourcemap-root" \
+  "@/web/src/app/browser                    build" \
+  "@/web/src/tools/building/sourcemap-root  build" \
   "clean" \
   "configure" \
   "build" \
@@ -47,14 +48,14 @@ compile_and_copy() {
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/ui"
 
   types=(button float toggle toolbar)
-  for type in ${types[@]}
+  for type in "${types[@]}"
   do
     filename="kmwui${type}"
-    $BUNDLE_CMD    "${BUILD_ROOT}/obj/$filename.js" \
+    node_es_bundle "${BUILD_ROOT}/obj/$filename.js" \
       --out        "${BUILD_ROOT}/debug/$filename.js" \
       --sourceRoot "@keymanapp/keyman/web/build/app/ui/debug"
 
-    $BUNDLE_CMD    "${BUILD_ROOT}/obj/$filename.js" \
+    node_es_bundle "${BUILD_ROOT}/obj/$filename.js" \
       --out        "${BUILD_ROOT}/release/$filename.js" \
       --sourceRoot "@keymanapp/keyman/web/build/app/ui/release" \
       --minify
@@ -67,7 +68,7 @@ compile_and_copy() {
   prepare
 }
 
-builder_run_action configure verify_npm_setup
+builder_run_action configure node_select_version_and_npm_ci
 builder_run_action clean do_clean
 builder_run_action build compile_and_copy
 

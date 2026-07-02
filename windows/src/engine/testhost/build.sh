@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Test application for interacting with Keyman Engine" \
@@ -15,6 +15,7 @@ builder_parse "$@"
 source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 WIN32_TARGET="$WIN32_TARGET_PATH/testhost.exe"
 X64_TARGET="$X64_TARGET_PATH/testhost.exe"
+ARM64_TARGET="$ARM64_TARGET_PATH/testhost.exe"
 
 builder_describe_outputs \
   configure:project    /resources/build/win/delphi_environment_generated.inc.sh \
@@ -31,6 +32,7 @@ function do_build() {
   create-windows-output-folders
   vs_msbuild testhost.vcxproj //t:Build "//p:Platform=Win32"
   vs_msbuild testhost.vcxproj //t:Build "//p:Platform=x64"
+  vs_msbuild testhost.vcxproj //t:Build "//p:Platform=arm64"
   # Note, we don't copy this to bin
 }
 

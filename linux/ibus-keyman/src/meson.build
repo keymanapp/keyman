@@ -13,6 +13,7 @@ engine_files = files(
 
 include_dirs = [
   core_include_dirs,
+  linux_include_dirs,
   include_directories('..'),
   include_directories(meson.current_build_dir() / '..'),
 ]

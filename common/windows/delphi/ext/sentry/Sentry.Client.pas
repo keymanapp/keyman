@@ -10,6 +10,8 @@ uses
   Winapi.Windows,
 
   jwaimagehlp,
+  jwantstatus,
+  jwawinbase,
 
   sentry;
 
@@ -229,20 +231,41 @@ var
   Skip: Integer;
   LastMask: WORD;
 begin
-  // Floating point state may be broken here, so let's mask it out and continue
-  // We'll restore state afterwards
-  LastMask := Get8087CW;
-  Set8087CW_Threadsafe($1332);
+  try
+    if (ExceptionInfo.ExceptionRecord.ExceptionCode <> EXCEPTION_ACCESS_VIOLATION) and
+        (ExceptionInfo.ExceptionRecord.ExceptionCode <> EXCEPTION_ILLEGAL_INSTRUCTION) and
+        (ExceptionInfo.ExceptionRecord.ExceptionCode <> EXCEPTION_PRIV_INSTRUCTION) and
+        (ExceptionInfo.ExceptionRecord.ExceptionCode <> EXCEPTION_POSSIBLE_DEADLOCK) and
+        (ExceptionInfo.ExceptionRecord.ExceptionCode <> EXCEPTION_IN_PAGE_ERROR) and
+        (ExceptionInfo.ExceptionRecord.ExceptionCode <> EXCEPTION_STACK_OVERFLOW) and
+        (ExceptionInfo.ExceptionRecord.ExceptionCode <> STATUS_INVALID_PARAMETER) and
+        (ExceptionInfo.ExceptionRecord.ExceptionCode <> cDelphiException) then
+    begin
+      // These are the most common exceptions we wish to catch; we won't get
+      // call stacks for any other exception types, but we will still log
+      // important exceptions
+       Exit(0);
+    end;
 
-  if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
-    then Skip := DELPHI_FRAMES_TO_SKIP
-    else Skip := 0;
-  CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
+    // Floating point state may be broken here, so let's mask it out and continue
+    // We'll restore state afterwards
+    LastMask := Get8087CW;
+    Set8087CW_Threadsafe($1332);
 
-  // Restore FP state
-  Set8087CW_Threadsafe(LastMask);
+    if ExceptionInfo.ExceptionRecord.ExceptionCode = cDelphiException
+      then Skip := DELPHI_FRAMES_TO_SKIP
+      else Skip := 0;
+    CaptureStackTraceForException(ExceptionInfo.ExceptionRecord.ExceptionAddress, ExceptionInfo, Skip);
 
-  Result := 0; //EXCEPTION_CONTINUE_SEARCH;
+    // Restore FP state
+    Set8087CW_Threadsafe(LastMask);
+
+    Result := 0; //EXCEPTION_CONTINUE_SEARCH;
+  except
+    // Silently handle errors here because we can't do anything with them;
+    // we'll just get no stack
+    Result := 0;
+  end;
 end;
 
 constructor TSentryClient.Create(AOptions: TSentryClientOptions; const ALogger: string; AFlags: TSentryClientFlags);

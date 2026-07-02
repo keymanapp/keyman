@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="ssLanguageName" comment="User interface language name in the UI language">Waha</string>
+  <string name="ssLanguageNameInEnglish" comment="User interface language name in English">Waha</string>
   <string name="ssApplicationTitle">$APPNAME $VERSION Setup</string>
   <string name="ssTitle">An fa t $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION fan falo jama.</string>

@@ -44,6 +44,7 @@ type
     class function KeyboardsInstallDir: string; static;
     class function KeymanConfigStaticHttpFilesPath(const filename: string = ''): string; static;
     class function KeymanCustomisationPath: string; static;
+    class function KeymanLocalePath: string; static;
     class function KeymanCoreLibraryPath(const Filename: string): string; static;
     class function CEFPath: string; static; // Chromium Embedded Framework
     class function CEFDataPath(const mode: string): string; static;
@@ -389,13 +390,27 @@ begin
   Result := Result + filename;
 end;
 
+class function TKeymanPaths.KeymanLocalePath: string;
+var
+  keyman_root: string;
+begin
+  // Look up KEYMAN_ROOT development variable -- if found and executable
+  // within that path then use that as source path
+  if TKeymanPaths.RunningFromSource(keyman_root) then
+  begin
+    Exit(keyman_root + 'windows\src\desktop\kmshell\locale\');
+  end;
+
+  Result := TKeymanPaths.KeymanDesktopInstallPath('locale\');
+end;
+
 class function TKeymanPaths.KeymanCustomisationPath: string;
 var
   keyman_root: string;
 begin
   // On developer machines, if we are running within the source repo, then use
   // those paths
-  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT');
+  keyman_root := GetEnvironmentVariable('KEYMAN_ROOT').Replace('/', '\');
   if (keyman_root <> '') and SameText(keyman_root, ParamStr(0).Substring(0, keyman_root.Length)) then
   begin
     // Source repo, bin folder

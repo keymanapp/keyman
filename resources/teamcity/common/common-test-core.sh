@@ -8,7 +8,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
@@ -22,11 +22,11 @@ builder_describe \
 
 builder_parse "$@"
 
-if is_ubuntu; then
+if builder_is_linux; then
   ARCH=arch
-elif is_windows; then
+elif builder_is_windows; then
   ARCH=win
-elif is_macos; then
+elif builder_is_macos; then
   ARCH=mac
 else
   builder_echo error "Unknown architecture"
@@ -34,7 +34,8 @@ else
 fi
 
 function do_all() {
-  "${KEYMAN_ROOT}/core/build.sh" configure,build,test:${ARCH}
+  builder_launch /core/tools/ldml-const-builder/build.sh clean,configure,build,run,test
+  builder_launch /core/build.sh configure,build,test:${ARCH}
 }
 
 builder_run_action  all  do_all

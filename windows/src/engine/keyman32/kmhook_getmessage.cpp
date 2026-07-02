@@ -146,10 +146,19 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
   }
 
   if ((mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN || mp->message == WM_KEYUP || mp->message == WM_SYSKEYUP)) {   // I4642
+
+    // To help our low level keyboard hook recover if system load causes it to
+    // be uninstalled, we tell the controller process that we should have seen a
+    // keystroke event in the low level keyboard hook; this gets passed into the
+    // LowLevelHookWatchDog via keyman.exe
+    if(mp->message == WM_KEYDOWN || mp->message == WM_SYSKEYDOWN) {
+      Globals::PostMasterController(wm_keyman_control, KMC_WATCHDOG_KEYEVENT, 0);
+    }
+
     BYTE scan = KEYMSG_LPARAM_SCAN(mp->lParam);
+    BYTE keyTransitionEvent = KEYMSG_FLAG_TRANSITION(mp->lParam);
     CheckScheduledRefresh();
-    _td->LastScanCode = scan;
-    _td->LastKey = mp->wParam;
+    UpdateLastKeyCache(_td, mp->wParam, scan, keyTransitionEvent);
 
     switch (mp->wParam) {
     case VK_MENU:
@@ -165,15 +174,21 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
     if (mp->wParam != VK_BACK) {
       if(scan == SCAN_FLAG_KEYMAN_KEY_EVENT) {
         mp->lParam = (mp->lParam & 0xFF00FFFFL) | (MapVirtualKey((UINT)mp->wParam, 0) << 16);
+        if (mp->wParam == VK_CAPITAL) {
+          ProcessToggleChange(VK_CAPITAL);
+        }
+        SendDebugMessageFormat("WMKEY=%x Clear `SCAN_FLAG_KEYMAN_KEY_EVENT`  wParam=%x lParam=%x Set LastKey=%x LastScanCode=%x LastTransition=%x",
+            mp->message, mp->wParam, mp->lParam, _td->LastKey, _td->LastScanCode, _td->LastTransition);
       }
     }
   }
 
   // I1337 - move mousewheel message checking before the PM_REMOVE handling - otherwise we can't pre-modify the message
-  // TODO: Move to WH_MOUSE_LL proc in main process
+  // TODO: Move to WH_MOUSE_LL proc in main process?
   if(mp->message == WM_MOUSEWHEEL)
   {
-    HWND hwndMouseWheel = FindWindow("TfrmVisualKeyboard", NULL);
+    // TODO: move most of this logic to k32_visualkeyboardinterface.cpp
+    HWND hwndMouseWheel = GetVisualKeyboardWindow();
     if(hwndMouseWheel && GetWindowThreadProcessId(mp->hwnd, NULL) != GetWindowThreadProcessId(hwndMouseWheel, NULL))
     {
       RECT rcMouseWheel;

@@ -1,5 +1,6 @@
 project('ibus-keyman', 'c', 'cpp',
         version: files('../../VERSION.md'),
+        default_options: ['cpp_std=c++17'],
         license: 'GPL-2+',
         meson_version: '>=1.0')
 
@@ -53,6 +54,10 @@ core_include_dirs = [
   include_directories('../../core/include'),
   include_directories('../../common/include'),
   include_directories('../../core/build/arch' / get_option('buildtype') / 'include'),
+]
+
+linux_include_dirs = [
+  include_directories('../include')
 ]
 
 subdir('icons')

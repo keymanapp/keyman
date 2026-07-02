@@ -4,8 +4,8 @@ rem Build agents have a separate signtime script. We don't use 'call' here so
 rem executing that script will terminate this one.
 if exist c:\codesign\signtime.bat c:\codesign\signtime.bat %1 %2 %3 %4 %5 %6 %7 %8
 
-set SERVERLIST=(http://timestamp.comodoca.com/authenticode http://timestamp.verisign.com/scripts/timstamp.dll http://timestamp.globalsign.com/scripts/timestamp.dll http://tsa.starfieldtech.com)
-set RFC3161SERVERLIST=(http://timestamp.comodoca.com/rfc3161)
+set SERVERLIST=(http://timestamp.digicert.com http://timestamp.sectigo.com)
+set RFC3161SERVERLIST=(http://timestamp.digicert.com http://timestamp.sectigo.com)
 set SIGNTOOL=%1
 set PFX_SHA1=%2
 set PFX_SHA256=%3

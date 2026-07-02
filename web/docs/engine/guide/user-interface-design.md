@@ -96,8 +96,9 @@ less suitable.
       <p>The include for this interface is <code>&lt;script src="kmwuitoolbar.js"&gt;</code>.</p>
       <p>To select where the interface will be displayed on your page, add the following element where desired:  <code>&lt;div id="KeymanWebControl" display="block"&gt;&lt;/div&gt;</code>, as with the Button Interface above.</p>
       <p>A live example of the KeymanWeb Toolbar Interface is available on the <a href="http://keymanweb.com">KeymanWeb Demo Site</a>.  For information on how your site users will interact with the Toolbar Interface, <a href="../ui/ui-toolbar">click here</a>.</p>
-
     </td>
   </tr>
 
 </table>
+
+[Previous: Get Started](get-started) | [Next: What is a Keyboard?](what-is-a-keyboard)

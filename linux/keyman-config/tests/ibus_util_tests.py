@@ -2,7 +2,7 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from keyman_config.ibus_util import _get_ibus_version, get_ibus_bus, install_to_ibus, uninstall_from_ibus
+from keyman_config.ibus_util import get_ibus_version, get_ibus_bus, install_to_ibus, uninstall_from_ibus
 
 
 @patch('keyman_config.ibus_util.IBus.Bus')
@@ -100,7 +100,7 @@ class IbusUtilTests(unittest.TestCase):
         )
 
         # Execute
-        ibus_version = _get_ibus_version()
+        ibus_version = get_ibus_version()
 
         # Verify
         self.assertEqual(ibus_version, '1.5.28')

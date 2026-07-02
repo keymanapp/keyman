@@ -9,11 +9,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # shellcheck disable=SC2154
-. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/teamcity/android/android-actions.inc.sh"
 
 ################################ Main script ################################
@@ -29,9 +29,7 @@ builder_parse "$@"
 cd "${KEYMAN_ROOT}/android"
 
 function do_build() {
-  "${KEYMAN_ROOT}/android/build.sh" \
-    configure,build:engine,sample1,sample2,keyboardharness \
-    --debug
+  builder_launch /android/build.sh  configure,build:engine,sample1,sample2,keyboardharness
 }
 
 if builder_has_action all; then

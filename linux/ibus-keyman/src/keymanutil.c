@@ -447,20 +447,19 @@ keyman_get_keyboard_options_fromdconf(
   const gchar *package_id,
   const gchar *keyboard_id
 ) {
-    g_message(__FUNCTION__);
+  g_debug("%s: loading keyboard options from DConf for %s/%s", __FUNCTION__, package_id, keyboard_id);
 
-    // Obtain keyboard options from DConf
-    g_autofree gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, package_id, keyboard_id);
-    GSettings *child_settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
-    gchar **options = NULL;
-    if (child_settings != NULL)
-    {
-        options = g_settings_get_strv(child_settings, KEYMAN_DCONF_OPTIONS_KEY);
-    }
+  // Obtain keyboard options from DConf
+  g_autofree gchar* path    = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, package_id, keyboard_id);
+  GSettings* child_settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
+  gchar** options           = NULL;
+  if (child_settings != NULL) {
+    options = g_settings_get_strv(child_settings, KEYMAN_DCONF_OPTIONS_KEY);
+  }
 
-    g_object_unref(G_OBJECT(child_settings));
+  g_object_unref(G_OBJECT(child_settings));
 
-    return options;
+  return options;
 }
 
 /**
@@ -525,7 +524,8 @@ keyman_put_keyboard_options_todconf(
     const gchar *option_key,
     const gchar *option_value
 ) {
-  g_message(__FUNCTION__);
+  g_message("%s: saving keyboard option to DConf for %s/%s: %s=%s",
+    __FUNCTION__, package_id, keyboard_id, option_key, option_value);
   if (package_id == NULL || keyboard_id == NULL || option_key == NULL || option_value == NULL) {
     return;
   }
@@ -562,7 +562,7 @@ keyman_put_keyboard_options_todconf(
   g_autofree gchar *path              = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, package_id, keyboard_id);
   g_autoptr(GSettings) child_settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
   if (child_settings != NULL) {
-    g_message("writing keyboard options to DConf");
+    g_debug("%s: writing keyboard options to DConf to %s", __FUNCTION__, path);
     g_settings_set_strv(child_settings, KEYMAN_DCONF_OPTIONS_KEY, (const gchar *const *)options);
   }
 

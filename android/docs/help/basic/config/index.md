@@ -49,6 +49,9 @@ Click on this to [adjust the keyboard height](adjust-keyboard-height).
 
 Click on this to [adjust the delay time](adjust-longpress-delay) for a longpress gesture.
 
+## Show On-Screen Keyboard
+By default, Android 16 (Baklava) and later versions won't display the On-Screen keyboard if a physical keyboard is connected. When enabled, show the Keyman system keyboard even if a physical keyboard is connected.
+
 ## Spacebar Caption
 Click on this to [change the displayed keyboard name](spacebar-caption) on the spacebar.
 

@@ -53,8 +53,8 @@ define("language.keyman", ["require", "exports"], function (require, exports) {
           [/\[/, { token: 'tag', bracket: '@open', next: '@virtualKey' } ],
 
           // strings
-          [/"([^"]|\\.)*$/, 'string.invalid' ],  // non-teminated string
-          [/'([^']|\\.)*$/, 'string.invalid' ],  // non-teminated string
+          [/"([^"])*$/, 'string.invalid' ],  // non-teminated string
+          [/'([^'])*$/, 'string.invalid' ],  // non-teminated string
           [/"/,  { token: 'string.quote', bracket: '@open', next: '@stringDouble' } ],
           [/'/,  { token: 'string.quote', bracket: '@open', next: '@stringSingle' } ],
         ],

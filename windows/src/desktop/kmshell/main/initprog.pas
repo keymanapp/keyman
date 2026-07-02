@@ -70,7 +70,7 @@ uses
   Windows, Controls, SysUtils, Classes, ErrorControlledRegistry, Forms, MessageIdentifiers, MessageIdentifierConsts, keymanapi_TLB;
 
 procedure Run;
-procedure Main(Owner: TComponent = nil);
+function Main(Owner: TComponent = nil): TModalResult;
 
 
 type
@@ -164,10 +164,11 @@ procedure ShowKeyboardWelcome(PackageName: WideString); forward;  // I2569
 procedure PrintKeyboard(KeyboardName: WideString); forward;  // I2329
 function ProcessBackgroundUpdate(FMode: TKMShellMode; FSilent: Boolean): Boolean; forward;
 
-procedure Main(Owner: TComponent = nil);
+function Main(Owner: TComponent = nil): TModalResult;
 var
   frmMain: TfrmMain;
 begin
+  Result := mrNone;
   if not Assigned(Owner) then
   begin
     UfrmWebContainer.CreateForm(TfrmMain, frmMain);
@@ -180,7 +181,7 @@ begin
   begin
     with TfrmMain.Create(Owner) do
     try
-      ShowModal;
+      Result := ShowModal;
     finally
       Free;
     end;
@@ -668,8 +669,11 @@ function ShouldSendToBUpdateSM(FSilent: Boolean; BUpdateSM: TUpdateStateMachine;
 // UI elements from the state machine we have bring some of logic here.
 var
   frmStartInstall: TfrmStartInstall;
+  ValidateReadyToInstall: Boolean;
 begin
-  if not FSilent and BUpdateSM.ReadyToInstall and
+  ValidateReadyToInstall := BUpdateSM.ValidateReadyToInstall;
+
+  if not FSilent and ValidateReadyToInstall and
      (FMode in [fmStart, fmSplash, fmMain, fmAbout,
                 fmHelp, fmShowHelp, fmSettings, fmBoot]) then
   begin
@@ -680,7 +684,7 @@ begin
       frmStartInstall.Free;
     end;
   end
-  else if FSilent and BUpdateSM.ReadyToInstall then
+  else if FSilent and ValidateReadyToInstall then
     Result := False
   else
     Result := True;
@@ -722,10 +726,10 @@ begin
       else
       begin
         // Since Package upgrade and Keyman upgrade share the installing state
-        // the presence of the following package related switches means we 
+        // the presence of the following package related switches means we
         // should skip running the update state machine HandleKmShell event
         SkipBUpdate := (FMode in [
-          fmInstallTip, fmInstallTipsForPackages, 
+          fmInstallTip, fmInstallTipsForPackages,
           fmRegisterTip, fmUpgradeKeyboards,
           fmUpgradeMnemonicLayout
         ]);
