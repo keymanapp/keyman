@@ -13,9 +13,10 @@ path differs.
 
 This doc is a delta on top of [windows.md](windows.md) — read that
 first for repository layout, base dependencies, and the standard
-build. The source-compat patches Delphi 11/12 need to compile ship
-via [PR #16043](https://github.com/keymanapp/keyman/pull/16043); make
-sure it's merged or applied before proceeding here.
+build. Delphi 11/12 also needs a small set of source-compat patches
+under `common/windows/delphi/`; those are documented in
+[windows.md § Delphi requirements](windows.md#windows-platform-dependencies)
+and are separate from the CE-specific work below.
 
 ## 1. Prerequisites (delta from windows.md)
 
@@ -63,9 +64,11 @@ fresh shell to pick the values up.
 `build.sh` passes `-U/-I/-R` flags to `dcc32` that the IDE never sees.
 Without them, opening any Keyman `.dproj` fails with `F1026 File not
 found: jvcl.inc` / `jedi.inc` / `jcl.inc`. Register the paths once in
-the per-user registry — they mirror `DELPHIINCLUDES` in
-[`resources/build/win/delphi_flags.inc.sh`](../../resources/build/win/delphi_flags.inc.sh),
-so if that file gains or drops paths, update this recipe to match.
+the per-user registry. The first six paths mirror `DELPHIINCLUDES` in
+[`resources/build/win/delphi_flags.inc.sh`](../../resources/build/win/delphi_flags.inc.sh);
+the remaining eleven JCL / JVCL / jedi paths are IDE-only (the CLI
+compiler resolves them via `.dproj` `<UsePackage>` and vendored `.inc`
+lookups) and have no equivalent in `delphi_flags.inc.sh`.
 
 **Close Delphi first** — the IDE caches this value at startup.
 
@@ -169,22 +172,26 @@ the debug manifest. Not committed. Revert with
 
 ## 6. Debugging
 
+Nothing here is CE-specific — the same debugging setup applies under
+Pro. Included as a landing point because there's no dedicated doc
+for it yet:
+
 * **DLLs (kmcomapi, keymanhp):** Run → Parameters → **Host
   Application** = `<Keyman install path>\kmshell.exe`.
 * **Long-running processes (kmshell, TSF text service):** Run →
   **Attach to Process**.
 * **C++ engine pieces (keyman32, kmtip, mcompile):** Visual Studio →
-  Attach to Process; load `.pdb` from `windows/bin/`. Note that
-  stepping between `keyman.exe` (Delphi) and `keyman32.dll` (C++) is
-  not straightforward — `windbg` can bridge but is out of scope here.
+  Attach to Process; load `.pdb` from `windows/bin/`. Stepping
+  between `keyman.exe` (Delphi) and `keyman32.dll` (C++) requires
+  `windbg` — out of scope here.
 
 ## 7. Troubleshooting
 
 Source-compilation errors from Delphi 11/12 compat
 (`E2003 Undeclared identifier: 'null'`, `E2029 Declaration expected`,
-`E2012 Type of expression must be BOOLEAN`) are addressed by
-[PR #16043](https://github.com/keymanapp/keyman/pull/16043) — make
-sure that PR is applied.
+`E2012 Type of expression must be BOOLEAN`) are addressed by the
+source-compat patches described in
+[windows.md § Delphi requirements](windows.md#windows-platform-dependencies).
 
 ### `This version of the product does not support command line compiling`
 
