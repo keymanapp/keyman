@@ -17,10 +17,6 @@ build. The source-compat patches Delphi 11/12 need to compile ship
 via [PR #16043](https://github.com/keymanapp/keyman/pull/16043); make
 sure it's merged or applied before proceeding here.
 
-> [!IMPORTANT]
-> Registry edits (§3) and the manifest patch (§5) are local-only.
-> Revert before opening any PR — CI runs against Delphi 10.3.
-
 ## 1. Prerequisites (delta from windows.md)
 
 * **Delphi 12 Athens Community Edition** from
@@ -29,27 +25,29 @@ sure it's merged or applied before proceeding here.
   install, select **DUnit Unit Testing Frameworks** (Keyman test
   projects require it). Launch the IDE once after install so the
   per-user `BDS\23.0` registry hive gets populated.
-* **Keyman 19 (official release)** from https://keyman.com/desktop.
-  Required, not optional: `TKeymanPaths.KeymanDesktopInstallPath()`
-  runtime-checks `C:\Program Files (x86)\Keyman\Keyman Desktop\` for
-  support files. Without an install, kmshell dies at startup with
-  `SKApplicationTitle has had a fatal error` before its main form
-  appears.
+* **Keyman 19 (official release)** from https://keyman.com/windows is
+  strongly recommended — it populates the Keyman install-path registry
+  key that kmshell reads via `TKeymanPaths.KeymanDesktopInstallPath()`,
+  which simplifies the debugging setup and gives you a working system
+  to overlay dev binaries onto. It's possible to debug individual
+  components without an official install, but each component then
+  needs its support files located manually.
 
 ## 2. Environment variables
 
-Set both, persistently:
+Set both:
 
-```powershell
-[Environment]::SetEnvironmentVariable('KEYMAN_DELPHI_VERSION', '23.0', 'User')
-[Environment]::SetEnvironmentVariable('KEYMAN_DELPHI_CE', '1', 'User')
+```bat
+SETX KEYMAN_DELPHI_VERSION 23.0
+SETX KEYMAN_DELPHI_CE 1
 ```
 
 * `KEYMAN_DELPHI_VERSION` (from #16043) tells `build.sh` and the
   builder platform probe to look at `Studio\23.0\` instead of the
   default `Studio\20.0\`. Without it, `win,delphi`-gated targets are
   silently skipped on a Delphi-12-only machine.
-* `KEYMAN_DELPHI_CE=1` (this PR) makes `delphi_msbuild` prompt:
+* `KEYMAN_DELPHI_CE=1` (this PR) makes `delphi_msbuild` prompt at
+  each Delphi step:
 
   ```
   Delphi CE: CLI compilation is not available.
@@ -57,15 +55,17 @@ Set both, persistently:
   Enter to continue (or Ctrl-C to abort).
   ```
 
-Open a fresh shell after `SetEnvironmentVariable` for the values to
-be visible.
+`SETX` is persistent but does not affect the current shell — open a
+fresh shell to pick the values up.
 
 ## 3. Delphi IDE Library Search Paths
 
 `build.sh` passes `-U/-I/-R` flags to `dcc32` that the IDE never sees.
 Without them, opening any Keyman `.dproj` fails with `F1026 File not
 found: jvcl.inc` / `jedi.inc` / `jcl.inc`. Register the paths once in
-the per-user registry.
+the per-user registry — they mirror `DELPHIINCLUDES` in
+[`resources/build/win/delphi_flags.inc.sh`](../../resources/build/win/delphi_flags.inc.sh),
+so if that file gains or drops paths, update this recipe to match.
 
 **Close Delphi first** — the IDE caches this value at startup.
 
@@ -119,8 +119,9 @@ Delphi → Library** in the IDE.
 Keyman's repo has several cross-project dependencies not expressed
 in `.dproj` / `.groupproj` files — a Delphi tool emits code consumed
 by another Delphi project, or one project's `.res` embeds another's
-`.exe`. Under the standard flow `build.sh` sequences these
-invisibly; under CE you must respect them at IDE-prompt time.
+`.exe`. `build.sh` sequences these correctly; under CE you just
+accept the IDE prompts in the order the script issues them. Below is
+a reference of what each prompt is producing for what dependent:
 
 | # | Producer → Consumer | Failure if skipped |
 |---|---------------------|---------------------|
@@ -129,29 +130,18 @@ invisibly; under CE you must respect them at IDE-prompt time.
 | b | `build_standards_data.exe` → TIKE.dproj | `F1026 File not found: 'Keyman.System.Standards.BCP47SubtagRegistry.pas'` |
 | c | `tsysinfox64.exe` → `tsysinfo_x64.res` → tsysinfo.dproj | `F1026 File not found: 'tsysinfo_x64.res'` |
 | d | `kmcmplib` (CLI build) → TIKE runtime | `"kmcmplib-19.dll not found"` at runtime |
-| e | keyman.dproj → kmshell.dproj runtime | `"Keyman failed to start"` when enabling a keyboard |
+| e | keyman.dproj → kmshell.dproj runtime | `"Keyman failed to start"` when launching Keyman |
 | f | `regsvr32 kmcomapi.dll` → kmshell startup | `Class not registered {CF46549D-...}` (`REGDB_E_CLASSNOTREG`) |
 
 All generated `.pas` files are `.gitignored` and must be regenerated
 after `git clean -fdx`.
 
-The canonical CE build order:
-
-1. CLI-build everything CLI-buildable: `./core/build.sh build`,
-   `./developer/src/kmcmplib/build.sh build`, TypeScript modules,
-   `./web/build.sh`. C++ engine pieces can wait.
-2. `cd common/windows/delphi/tools/devtools && ./build.sh build`
-   (prompted for IDE build; codegen (a) runs after Enter).
-3. `cd common/windows/delphi/tools/build_standards_data && ./build.sh build`
-   (prompted for IDE; codegen (b) runs after Enter).
-4. `cd windows/src/engine && ./build.sh build` — `build.sh` handles
-   dependency (c) by building `tsysinfox64.dproj` before
-   `tsysinfo.dproj`; just accept prompts in order.
-5. `cd windows/src/desktop && ./build.sh build`.
-6. `cd developer/src && ./build.sh build`.
-7. **Elevated Git Bash:** `cd windows/src/engine && ./build.sh install`,
-   then `cd windows/src/desktop && ./build.sh install`. Handles (f)
-   automatically.
+Run `./build.sh build` in each child directory (or at the repo root
+to fan out) with `KEYMAN_DELPHI_CE=1` set — the script drives the
+order and prompts you at each Delphi step. Then, from an **elevated
+Git Bash**: `windows/src/engine/build.sh install` and
+`windows/src/desktop/build.sh install` overlay the dev binaries and
+register `kmcomapi.dll` for dependency (f).
 
 > [!IMPORTANT]
 > After an IDE build following any `.res`, manifest, version, or icon
@@ -161,44 +151,40 @@ The canonical CE build order:
 ## 5. Local-only: uiAccess strip for overlaid keyman.exe
 
 Windows refuses to launch unsigned binaries declaring
-`uiAccess="true"` (error 8235). The overlay workflow (§4 step 7)
-replaces the installed signed `keyman.exe` with an unsigned dev
-build, so uiAccess must be turned off for the overlay to launch.
-**Do not commit:**
+`uiAccess="true"` (error 8235). To run an unsigned dev `keyman.exe`,
+swap in the pre-existing non-elevated manifest:
 
-```powershell
-$f = 'C:\Projects\keyman\keyman\windows\src\engine\keyman\manifest.in'
-(Get-Content $f) -replace 'uiAccess="true"', 'uiAccess="false"' | Set-Content $f -Encoding UTF8
+```bash
+cd windows/src/engine/keyman
+./build.sh debug-manifest
 ```
 
-Then Clean + Build `keyman.dproj` and re-run
-`windows/src/engine/build.sh install` elevated.
+That copies `debug-manifest.in` over `manifest.in` and regenerates
+`manifest.res`. Then Clean + Build `keyman.dproj` in the IDE and
+re-run `windows/src/engine/build.sh install` elevated.
 
-Trade-off: keyboard injection into elevated apps stops working until
-uiAccess is restored and the binary is signed via Keyman's test-cert
-pipeline.
-
-Revert with `git checkout -- windows/src/engine/keyman/manifest.in`.
+Trade-off: keyboard injection into elevated apps stops working under
+the debug manifest. Not committed. Revert with
+`git checkout -- windows/src/engine/keyman/manifest.in`.
 
 ## 6. Debugging
 
-* **DLLs (kmcomapi, keymanhp) and library projects:** Run →
-  Parameters → **Host Application** =
-  `C:\Program Files (x86)\Keyman\Keyman Desktop\kmshell.exe`.
+* **DLLs (kmcomapi, keymanhp):** Run → Parameters → **Host
+  Application** = `<Keyman install path>\kmshell.exe`.
 * **Long-running processes (kmshell, TSF text service):** Run →
-  **Attach to Process**. Full symbols work only after overlay (§4
-  step 7); without overlay the IDE loads source but line numbers
-  won't match.
+  **Attach to Process**.
 * **C++ engine pieces (keyman32, kmtip, mcompile):** Visual Studio →
-  Attach to Process; load `.pdb` from `windows/bin/`.
+  Attach to Process; load `.pdb` from `windows/bin/`. Note that
+  stepping between `keyman.exe` (Delphi) and `keyman32.dll` (C++) is
+  not straightforward — `windbg` can bridge but is out of scope here.
 
 ## 7. Troubleshooting
 
-Source-compilation errors (`E2010 Cardinal/Boolean`, `E2003 Undeclared
-identifier 'OldCreateOrder' / 'null'`, `E2029 Declaration expected`,
-`E2012 Type of expression must be BOOLEAN`) are handled by
-[PR #16043](https://github.com/keymanapp/keyman/pull/16043) — apply
-that PR first.
+Source-compilation errors from Delphi 11/12 compat
+(`E2003 Undeclared identifier: 'null'`, `E2029 Declaration expected`,
+`E2012 Type of expression must be BOOLEAN`) are addressed by
+[PR #16043](https://github.com/keymanapp/keyman/pull/16043) — make
+sure that PR is applied.
 
 ### `This version of the product does not support command line compiling`
 
@@ -239,8 +225,10 @@ JVCL `run/` (or `design/`) missing from Library Search Path. See §3.
 
 ### `SKApplicationTitle has had a fatal error` on kmshell launch
 
-Keyman 19 official isn't installed. Install from
-https://keyman.com/desktop.
+kmshell can't find the Keyman install-path registry key it reads via
+`TKeymanPaths.KeymanDesktopInstallPath()`. Either install Keyman 19
+from https://keyman.com/windows so the key is populated, or set up
+the required support files manually alongside the dev build.
 
 ### `Class not registered {CF46549D-...}` on kmshell launch
 
@@ -256,17 +244,3 @@ Windows blocked an unsigned `uiAccess="true"` binary. See §5.
 CEF4Delphi_Binary checkout doesn't match `common/windows/CEF_VERSION.md`.
 Not CE-specific — fix per
 [windows.md § KEYMAN_CEF4DELPHI_ROOT](windows.md#keyman_cef4delphi_root).
-
-## 8. Reverting before a PR
-
-```bash
-git status              # only intentional changes
-git diff -- '*.res'     # empty (preflight .res are local)
-```
-
-Restore the manifest and Library Search Paths:
-
-```powershell
-git checkout -- windows/src/engine/keyman/manifest.in
-reg import delphi-library-paths.backup.reg
-```
