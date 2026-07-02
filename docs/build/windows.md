@@ -257,6 +257,12 @@ of appropriate node versions during builds.
     for a short time. (We are actively working to remove Delphi dependencies
     given the licensing issues with using it.)
 
+  * If you only have access to a **Delphi Community Edition** (e.g. Delphi 12 CE),
+    see [windows-delphi-ce.md](windows-delphi-ce.md) for an IDE-based workflow
+    that papers over the missing command-line compiler. The shell-script knob
+    (`KEYMAN_DELPHI_CE=1`) described there is local-only and not required for
+    the standard 10.3 / Pro flow.
+
   Start Delphi IDE once after installation as it will create various environment
   files and take you through required registration.
 
