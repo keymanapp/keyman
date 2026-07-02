@@ -253,7 +253,6 @@ export class KmnFileWriter {
 
         if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
           const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-
           if (characterMessage !== null) {
             versionOutputCharacter = characterMessage.character;
             warnText[2] = characterMessage.message;
