@@ -68,7 +68,6 @@
 
 #include <kmcmplibapi.h>
 
-#include "../../../../core/src/kmx/kmx_conversion.h"
 #include "compfile.h"
 #include <kmn_compiler_errors.h>
 #include <cuchar>
@@ -78,6 +77,7 @@
 #include "cp1252.h"
 #include "virtualcharkeys.h"
 
+#include "../../../../common/include/km_vkey.h"
 #include "../../../../common/include/vkeys.h"
 #include "../../../../common/include/keymanversion.h"
 
