@@ -145,6 +145,7 @@ uses
   UILanguages,
   uninstall,
   UpgradeMnemonicLayout,
+  utilexecute,
   utilfocusappwnd,
   utilkmshell,
   Keyman.System.UpdateStateMachine,
@@ -393,6 +394,7 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
+  ShellExitCode: Cardinal;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -540,9 +542,19 @@ begin
       end;
 
     fmBaseKeyboard:   // I4169
-      if ConfigureBaseKeyboard
-        then ExitCode := 0
-        else ExitCode := 1;
+      begin
+        if kmcom.SystemInfo.IsAdministrator then
+        begin
+          if TUtilExecute.CreateProcessAsShellUser(ParamStr(0), '"'+ParamStr(0)+'" -basekeyboard', True, ShellExitCode) then
+            ExitCode := ShellExitCode
+          else
+            ExitCode := 1;
+          Exit;
+        end
+        else if ConfigureBaseKeyboard
+          then ExitCode := 0
+          else ExitCode := 1;
+      end;
 
     fmInstall:
       if TInstallFile.Execute(KeyboardFileNames, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile)
