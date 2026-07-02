@@ -257,6 +257,12 @@ of appropriate node versions during builds.
     for a short time. (We are actively working to remove Delphi dependencies
     given the licensing issues with using it.)
 
+  * If you have Delphi 11 or 12 with a CLI-capable license (Professional or
+    higher), set `KEYMAN_DELPHI_VERSION` to the Studio path — `22.0` for
+    Delphi 11, `23.0` for Delphi 12 — before running `build.sh`. The default
+    (`20.0`, Delphi 10.3) is preserved when the variable is unset, so CI is
+    unaffected.
+
   Start Delphi IDE once after installation as it will create various environment
   files and take you through required registration.
 
