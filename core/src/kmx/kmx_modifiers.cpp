@@ -6,7 +6,7 @@
 
 using namespace km::core;
 using namespace kmx;
-using namespace km_vk;
+using namespace km::vkey;
 
 #define MAX_RSHIFT 24
 #define MAX_KSHIFT 18

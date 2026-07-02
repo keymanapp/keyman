@@ -5,7 +5,7 @@
 
 using namespace km::core;
 using namespace kmx;
-using namespace km_vk;
+using namespace km::vkey;
 
 /* This array is lifted from preservedkeymap.cpp */
 

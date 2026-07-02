@@ -23,7 +23,7 @@
 #include "imlib.h"
 #include "../../../../common/include/km_vkey.h"
 
-using namespace km_vk;
+using namespace km::vkey;
 
 HWND hwnd;
 HWND hwndChild;

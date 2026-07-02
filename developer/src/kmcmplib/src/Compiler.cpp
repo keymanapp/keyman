@@ -121,7 +121,7 @@
 #define SUBLANGID(lgid)        ((uint16_t)(lgid) >> 10)
 
 using namespace kmcmp;
-using namespace km_vk;
+using namespace km::vkey;
 
   KMX_BOOL AWarnDeprecatedCode_GLOBAL_LIB;
 

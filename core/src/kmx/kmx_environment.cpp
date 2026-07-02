@@ -9,7 +9,7 @@
 
 using namespace km::core;
 using namespace kmx;
-using namespace km_vk;
+using namespace km::vkey;
 
 namespace {
   km_core_cu const

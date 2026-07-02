@@ -38,7 +38,7 @@
 // _S2 which version? here from chore/developer/scatteredCode/cleanup_VKeys
 //#include "../../../common/windows/cpp/include/vkeys.h"
 #include "../../../common/include/km_vkey.h"
-using namespace km_vk;
+using namespace km::vkey;
 
 //_S2 ========
 // _S2 which version? here from master

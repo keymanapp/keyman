@@ -42,7 +42,7 @@
 
 using namespace km::core::ldml;
 using namespace km::core::kmx;
-using namespace km_vk;
+using namespace km::vkey;
 
 void
 prepend_hex_oct(std::u32string &str, char32_t x) {

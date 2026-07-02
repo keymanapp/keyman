@@ -26,7 +26,7 @@
  */
 
 using namespace km::core::kmx;
-using namespace km_vk;
+using namespace km::vkey;
 
 km_core_option_item test_env_opts[] =
 {
