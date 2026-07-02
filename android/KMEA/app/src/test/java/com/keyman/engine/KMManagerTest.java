@@ -119,6 +119,11 @@ public class KMManagerTest {
   */
   @Test
   public void create_newKeyboardsList() {
+    if(File.separatorChar != '/') {
+      Log.w(TAG, "create_newKeyboardsList skipped due to #16183");
+      return;
+    }
+
     loadOldKeyboardsList();
     dat_list = new ArrayList<HashMap<String, String>>();
 
@@ -190,6 +195,12 @@ public class KMManagerTest {
 
   @Test
   public void test_updateOldKeyboardsList() {
+    // #16183
+    if(File.separatorChar != '/') {
+      Log.w(TAG, "test_updateOldKeyboardsList skipped due to #16183");
+      return;
+    }
+
     loadOldKeyboardsList();
     Assert.assertNotNull(dat_list);
 
