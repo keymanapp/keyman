@@ -5,18 +5,18 @@ title: KMManager.getKeyboardOskFontFilename()
 ## Summary
 
 The **`getKeyboardOskFontFilename()`** method returns the selected
-keyboard's OSK font filename.
+keyboard's OSK font filename and full path.
 
 ## Syntax
 
-``` javascript
+``` java
 KMManager.getKeyboardOskFontFilename()
 ```
 
 ### Returns
 
-Returns the selected keyboard's OSK font filename as `String` if it has
-any, empty string otherwise.
+Returns the selected keyboard's OSK font filename and full path as
+`String` if it has any, empty string otherwise.
 
 ## Description
 
@@ -29,8 +29,8 @@ Use this method to get the OSK font filename of the selected keyboard.
 The following script illustrate the use of
 `getKeyboardOskFontFilename()`:
 
-``` javascript
- String oskFontFilename = KMManager.getKeyboardOskFontFilename();
+``` java
+String oskFontFilename = KMManager.getKeyboardOskFontFilename();
 ```
 
 ## See also
