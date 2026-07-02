@@ -84,7 +84,7 @@
 //#include "../../../../common/windows/cpp/include/keymanversion.h"
 //#include "../../../../common/windows/cpp/include/crc32.h"
 //#include "../../../../common/windows/cpp/include/ConvertUTF.h"
-#include "../../../../common/include/keyman_vkey.h"
+#include "../../../../common/include/km_vkey.h"
 
 //_S2 ========
 //_S2 which version? here from master

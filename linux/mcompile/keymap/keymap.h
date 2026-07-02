@@ -15,7 +15,7 @@
 #include <vector>
 #include "km_u16.h"
 #include <cassert>
-#include "../../../common/include/keyman_vkey.h"
+#include "../../../common/include/km_vkey.h"
 
 
 enum ShiftState {

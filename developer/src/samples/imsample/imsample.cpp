@@ -21,7 +21,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include "imlib.h"
-#include "../../../../common/include/keyman_vkey.h"
+#include "../../../../common/include/km_vkey.h"
 
 using namespace km_vk;
 

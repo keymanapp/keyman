@@ -1,7 +1,7 @@
 
 #include "pch.h"
 #include "CharToKeyConversion.h"
-#include "../../../../common/include/keyman_vkey.h"
+#include "../../../../common/include/km_vkey.h"
 
 /* Following VKeys come from Windows */
 

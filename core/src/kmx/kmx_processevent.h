@@ -23,7 +23,7 @@
 #include "kmx_options.h"
 #include "kmx_environment.h"
 #include "kmx_debugger.h"
-#include "../../../common/include/keyman_vkey.h"
+#include "../../../common/include/km_vkey.h"
 
 /***************************************************************************/
 

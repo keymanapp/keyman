@@ -1,10 +1,9 @@
 /*
  * Keyman is copyright (C) SIL International. MIT License.
- * Create Date: 16 Jul 2025
+ * Create Date: 2 Jul 2026
  * Author:      Sabine Schmitt
  * VKCodes for keyman
  */
-
 
 namespace km_vk {
 
