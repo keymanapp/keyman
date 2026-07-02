@@ -5,6 +5,7 @@
  * VKCodes for keyman
  */
 
+
 namespace km_vk {
 
 #define VK_LBUTTON          0x01
