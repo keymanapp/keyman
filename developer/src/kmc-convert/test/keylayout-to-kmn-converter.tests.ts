@@ -60,14 +60,13 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test.keylayout'],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
-       await  sut.run(makePathToFixture(files[0]));
-       // assert.isTrue(compilerTestCallbacks.messages.length === 1 && compilerTestCallbacks.messages[0].code === 5292037);
+        await  sut.run(makePathToFixture(files[0]));
         assert.isTrue(compilerTestCallbacks.messages.length === 0);
         await sut.run(makePathToFixture(files[0]));
         assert.equal(compilerTestCallbacks.messages.length, 0);
-       });
-     });
-   });
+      });
+    });
+  });
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [

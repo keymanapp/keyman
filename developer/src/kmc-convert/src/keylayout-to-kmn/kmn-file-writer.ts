@@ -334,7 +334,6 @@ export class KmnFileWriter {
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         let versionOutputCharacter;
 
-
         const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
@@ -426,6 +425,147 @@ export class KmnFileWriter {
       }
     }
     return data;
+  }
+
+  /**
+   * @brief  take a child object of RuleReview and return the appropriate warning message array
+   * @param  inObj : an object containing filtered data for a specified comparison
+   * @param  posWarning : index specifying to which element of the warning message array a warning message will be added:
+   * outMsg[0]: Warning for part 1 of a rule (e.g. modifier_prev_dk + key_prev_dk > prev_dk)
+   * outMsg[1]: Warning for part 2 of a rule (e.g. (prev_dk +) modifier_dk + key_dk > dk)
+   * outMsg[2]: Warning for part 3 of a rule (e.g. (dk +) modifier+key > output)
+   * see here on parts of a rule:
+   * https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.16sx096j6jmy
+   * @return outMsg the warning message array for all parts
+   */
+  public createWarningText(inObj: RuleReview, posWarning: number = 2): string[] {
+
+    const outMsg = [...inObj.warningMessages];
+
+    if (inObj.compare_type === 'unav_C0_C1') {
+      outMsg[posWarning] = 'unavailable modifier ';
+    }
+
+    if (inObj.compare_type === 'unav_C2') {
+      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
+      if (inObj.Dk_modifier) {
+        outMsg[1] = 'unavailable modifier ';
+        outMsg[2] = 'unavailable superior rule ( ['
+          + inObj.Dk_modifier + ' '
+          + inObj.Dk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[1]
+          + inObj.dk_id[1]
+          + ') ) : ';
+      }
+
+      if (inObj.modifier) {
+        outMsg[2] = 'unavailable modifier ';
+      }
+    }
+
+    if (inObj.compare_type === 'unav_C3') {
+
+      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
+      if (inObj.prevDk_modifier) {
+        outMsg[0] = 'unavailable modifier ';
+        outMsg[1] = 'unavailable superior rule ( ['
+          + inObj.prevDk_modifier + ' '
+          + inObj.prevDk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
+          + ') ) : ';
+      }
+
+
+      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
+      if (inObj.Dk_modifier) {
+        outMsg[1] += 'unavailable modifier ';
+        outMsg[2] = 'unavailable superior rule ( ['
+          + inObj.Dk_modifier + ' '
+          + inObj.Dk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[1]
+          + inObj.dk_id[1]
+          + ') ) : ';
+      }
+
+      if (inObj.modifier) {
+        outMsg[2] = 'unavailable modifier ';
+      }
+    }
+
+    if (inObj.compare_type === 'amb_1_1' || inObj.compare_type === 'dup_1_1') {
+
+      outMsg[posWarning] = inObj.warningMessages[posWarning]
+        + ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        + (inObj.isEarlier ? 'earlier' : 'later')
+        + ': [' + inObj.modifier + ' ' + inObj.key + ']  >  \''
+        + inObj.output + '\' ';
+    }
+
+
+    if (inObj.compare_type === 'amb_2_2' || inObj.compare_type === 'dup_2_2'
+      || inObj.compare_type === 'amb_2_1'
+      || inObj.compare_type === 'amb_2_4') {
+
+      const textsegment = (
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        + (inObj.isEarlier ? 'earlier' : 'later')
+        + ': [' + inObj.Dk_modifier + ' ' + inObj.Dk_key + ']  >  dk('
+        + inObj.dk_prefix[1] + inObj.dk_id[1] + ') ');
+
+      if (outMsg[posWarning].indexOf(textsegment) === -1)
+        outMsg[posWarning] += textsegment;
+    }
+
+
+    if (inObj.compare_type === 'amb_4_4' || inObj.compare_type === 'dup_4_4'
+      || inObj.compare_type === 'amb_4_1'
+      || inObj.compare_type === 'amb_4_2') {
+
+      const textsegment = (
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        + (inObj.isEarlier ? 'earlier' : 'later')
+        + ': [' + inObj.prevDk_modifier + ' ' + inObj.prevDk_key + ']  >  dk('
+        + inObj.dk_prefix[0] + inObj.dk_id[0] + ') ');
+
+      if (outMsg[posWarning].indexOf(textsegment) === -1)
+        outMsg[posWarning] += textsegment;
+    }
+
+
+    if (inObj.compare_type === 'amb_5_5' || inObj.compare_type === 'dup_5_5') {
+
+      const textsegment = (
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        + (inObj.isEarlier ? 'earlier' : 'later')
+        + ': dk(' + inObj.dk_prefix[0] + inObj.dk_id[0] + ") + ["
+        + inObj.Dk_modifier + " " + inObj.Dk_key + "]  >  "
+        + 'dk(' + inObj.dk_prefix[1] + inObj.dk_id[1] + ") ");
+
+      if (outMsg[1].indexOf(textsegment) === -1)
+        outMsg[1] += textsegment;
+    }
+
+
+    if (inObj.compare_type === 'amb_6_3' || inObj.compare_type === 'dup_6_3'
+      || inObj.compare_type === 'amb_3_3' || inObj.compare_type === 'dup_3_3'
+      || inObj.compare_type === 'amb_6_6' || inObj.compare_type === 'dup_6_6') {
+
+      const textsegment = (
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        + (inObj.isEarlier ? 'earlier' : 'later')
+        + ': dk(' + inObj.dk_prefix[1] + inObj.dk_id[1] + ") + ["
+        + inObj.modifier + " " + inObj.key + "]  >  \'"
+        + inObj.output + "\' ");
+
+      if (outMsg[posWarning].indexOf(textsegment) === -1)
+        outMsg[posWarning] += textsegment;
+    }
+
+    return outMsg;
   }
 
   /**
