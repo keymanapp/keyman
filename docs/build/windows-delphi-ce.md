@@ -33,6 +33,21 @@ and are separate from the CE-specific work below.
   to overlay dev binaries onto. It's possible to debug individual
   components without an official install, but each component then
   needs its support files located manually.
+* **Test signing certificates** — one-time setup. Several `build.sh`
+  scripts run `signtool.exe` against test certificates at
+  `common/windows/delphi/tools/certificates/`. If the `.pfx` files
+  don't exist, the `wrap-signcode` step fails with
+  `SignTool Error: File not found: ...keymantest-sha1.pfx`. Generate
+  them once via:
+
+  ```bash
+  ./common/windows/delphi/tools/certificates/build.sh certificates
+  ```
+
+  This runs `makecert` + `pvk2pfx` from the Windows SDK and installs
+  two Keyman test-CA root certificates into your current-user cert
+  store (via `certutil -user -addstore Root`). To clean up later:
+  `certutil -user -delstore Root "Keyman Test CA"` and the SHA1 variant.
 
 ## 2. Environment variables
 
@@ -58,6 +73,23 @@ SETX KEYMAN_DELPHI_CE 1
 
 `SETX` is persistent but does not affect the current shell — open a
 fresh shell to pick the values up.
+
+> [!CAUTION]
+> **Verify these variables are set in every terminal you build from.**
+> If `KEYMAN_DELPHI_CE` is unset, `delphi_msbuild` falls through to
+> `msbuild.exe` which — on Delphi CE — reports `Build succeeded` with
+> a small `Time Elapsed` line but produces **no output**. Downstream
+> `cp` / `mv` / `sentrytool_delphiprep` / `mt.exe` steps then fail
+> with confusing "file not found" errors on paths where Delphi never
+> actually wrote anything. If you see a suspiciously fast Delphi
+> build followed by a missing-file error, check this first:
+>
+> ```bash
+> echo "KEYMAN_DELPHI_CE='$KEYMAN_DELPHI_CE' KEYMAN_DELPHI_VERSION='$KEYMAN_DELPHI_VERSION'"
+> ```
+>
+> Both must be set. If either is empty, `export` them in the current
+> shell before rerunning any `build.sh`.
 
 ## 3. Delphi IDE Library Search Paths
 
@@ -128,13 +160,13 @@ a reference of what each prompt is producing for what dependent:
 
 | # | Producer → Consumer | Failure if skipped |
 |---|---------------------|---------------------|
-| a | `devtools.exe -buildmessageconstants` → keyman.dproj, kmshell.dproj | `F1026 File not found: 'MessageIdentifierConsts.pas'` |
-| a | `devtools.exe -buildsetupstrings` → setup.dproj | `F1026 File not found: 'Keyman.Setup.System.Locale.<bcp47>.pas'` |
-| b | `build_standards_data.exe` → TIKE.dproj | `F1026 File not found: 'Keyman.System.Standards.BCP47SubtagRegistry.pas'` |
-| c | `tsysinfox64.exe` → `tsysinfo_x64.res` → tsysinfo.dproj | `F1026 File not found: 'tsysinfo_x64.res'` |
-| d | `kmcmplib` (CLI build) → TIKE runtime | `"kmcmplib-19.dll not found"` at runtime |
+| a | `windows/src/global/delphi/build.sh` → `devtools -buildmessageconstants` → `MessageIdentifierConsts.pas` consumed by keyman.dproj, kmshell.dproj, plus `keyman_components.bpl` → `windows/lib/` | `F1026 File not found: 'MessageIdentifierConsts.pas'` OR `File ... keyman_components.bpl does not exist` |
+| a' | `windows/src/desktop/setup/build.sh` → `devtools -buildsetupstrings` → ~32 `Keyman.Setup.System.Locale.<bcp47>.pas` consumed by setup.dproj | `F1026 File not found: 'Keyman.Setup.System.Locale.<bcp47>.pas'` |
+| b | `common/windows/delphi/tools/build_standards_data/build.sh` → 5 BCP-47 registry `.pas` files → TIKE.dproj | `F1026 File not found: 'Keyman.System.Standards.BCP47SubtagRegistry.pas'` |
+| c | `windows/src/engine/tsysinfo/build.sh` → auto-invokes tsysinfox64 publish, copies exe, runs `rc.exe` → `tsysinfo_x64.res` embedded by tsysinfo.dproj | `F1026 File not found: 'tsysinfo_x64.res'` |
+| d | `developer/src/kmcmplib/build.sh build` → `kmcmplib-19.dll` needed by TIKE runtime | `"kmcmplib-19.dll not found"` at runtime |
 | e | keyman.dproj → kmshell.dproj runtime | `"Keyman failed to start"` when launching Keyman |
-| f | `regsvr32 kmcomapi.dll` → kmshell startup | `Class not registered {CF46549D-...}` (`REGDB_E_CLASSNOTREG`) |
+| f | `regsvr32 kmcomapi.dll` (both Win32 and Win64 variants) → kmshell startup | `Class not registered {CF46549D-...}` (`REGDB_E_CLASSNOTREG`) |
 
 All generated `.pas` files are `.gitignored` and must be regenerated
 after `git clean -fdx`.
@@ -145,6 +177,31 @@ order and prompts you at each Delphi step. Then, from an **elevated
 Git Bash**: `windows/src/engine/build.sh install` and
 `windows/src/desktop/build.sh install` overlay the dev binaries and
 register `kmcomapi.dll` for dependency (f).
+
+### Multi-platform Delphi packages (kmcomapi)
+
+`kmcomapi.dproj` gets built **twice** by its `build.sh` — once for
+Win32 (`kmcomapi.dll`), once for Win64 (`kmcomapi.x64.dll`, renamed
+post-build). Two consecutive CE prompts fire for the same `.dproj`.
+Between them, **change Delphi's Platform dropdown**: first prompt →
+Win32, second prompt → Win64. If you build both as Win32, the Win64
+output isn't produced and the script fails at `mv: cannot stat
+'bin/Win64/Debug/kmcomapi.dll'`.
+
+### Full clean before rebuild if you see debug-section errors
+
+`sentrytool_delphiprep` can fail on a partially-built `.dll`/`.exe`
+with `ERROR: This executable has a debug section. Not able to update
+this file.` This happens when Delphi produced a partial binary with
+an already-populated debug section (usually from a prior attempt).
+Wipe the project's build state fully:
+
+```bash
+rm -rf windows/src/engine/<project>/bin windows/src/engine/<project>/obj
+```
+
+Then rerun that project's `build.sh` and rebuild in Delphi from
+scratch.
 
 > [!IMPORTANT]
 > After an IDE build following any `.res`, manifest, version, or icon
@@ -199,11 +256,19 @@ CE block on `dcc32`. Set `KEYMAN_DELPHI_CE=1` (§2). If `build.sh`
 still tries to invoke Delphi as a transitive dep, build the upstream
 tool first or pass `--no-deps`.
 
-### `F1026 File not found: MessageIdentifierConsts.pas` / `Keyman.Setup.System.Locale.<bcp47>.pas`
+### `File ...\windows\lib\keyman_components.bpl does not exist` / `F1026 File not found: MessageIdentifierConsts.pas`
 
-Codegen (a). Ensure devtools was built via `build.sh build` (not just
-opened in the IDE) — the wrapper is what runs codegen after the IDE
-prompt.
+Codegen (a). Run `./windows/src/global/delphi/build.sh build` — that
+script builds `keyman_components.dproj` (produces `keyman_components.bpl`
+at `windows/lib/`) AND runs `devtools -buildmessageconstants` to
+regenerate `MessageIdentifierConsts.pas`. Neither is produced by
+`devtools/build.sh` on its own.
+
+### `F1026 File not found: Keyman.Setup.System.Locale.<bcp47>.pas`
+
+Codegen (a'). Run `./windows/src/desktop/setup/build.sh build` —
+that script's post-build runs `devtools -buildsetupstrings` to
+regenerate the ~32 locale `.pas` files.
 
 ### `F1026 File not found: Keyman.System.Standards.BCP47SubtagRegistry.pas`
 
@@ -251,3 +316,44 @@ Windows blocked an unsigned `uiAccess="true"` binary. See §5.
 CEF4Delphi_Binary checkout doesn't match `common/windows/CEF_VERSION.md`.
 Not CE-specific — fix per
 [windows.md § KEYMAN_CEF4DELPHI_ROOT](windows.md#keyman_cef4delphi_root).
+
+### `Build succeeded... Time Elapsed 00:00:0X.XX` in terminal, then `cp: cannot stat '...'` / `File ... does not exist`
+
+`KEYMAN_DELPHI_CE` isn't set in the shell that ran `build.sh`, so
+`delphi_msbuild` invoked `msbuild.exe` directly. On CE that produces
+a fake success with no output. See §2 for the shell-verification
+step — this is the single most common failure signature in the whole
+CE workflow.
+
+### `SignTool Error: File not found: ...keymantest-sha1.pfx`
+
+Test-signing certificates never generated. Run once:
+`./common/windows/delphi/tools/certificates/build.sh certificates`
+(see §1).
+
+### `ERROR: This executable has a debug section. Not able to update this file.`
+
+`sentrytool_delphiprep` complaining about a residual debug section
+from a partial prior build. Fully wipe the project's `bin/` and
+`obj/` and rebuild from scratch (see §4 sub-section).
+
+### `mv: cannot stat 'bin/Win64/Debug/<lib>.dll'`
+
+You built kmcomapi (or another multi-platform Delphi package) with
+Delphi's Platform dropdown set to Win32 for both CE prompts. The
+second prompt is for Win64 — toggle the dropdown between the two
+prompts. See §4 "Multi-platform Delphi packages".
+
+### `EVariantTypeCastError: Could not convert variant of type (Null)` in `devtools -ai`
+
+Pre-Delphi-12-fix. Ensure you have the source-compat patches from
+[PR #16043](https://github.com/keymanapp/keyman/pull/16043) —
+specifically `common/windows/delphi/tools/devtools/DevIncludePaths.pas`
+— which handles Delphi 12's empty `<PropertyGroup/>` in `EnvOptions.proj`.
+Rebuild devtools in Delphi 12 CE after applying.
+
+### `E2010 Incompatible types: 'TCustFile' and 'TObject'` in `CustomisationStorage.pas`
+
+Delphi 12 Win64 (`dcc64`) specific — same PR #16043 also patches
+`windows/src/global/delphi/cust/CustomisationStorage.pas` for this.
+Only surfaces when building `kmcomapi.dproj` for Win64.
