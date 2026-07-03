@@ -1,14 +1,12 @@
-//***************************************************** */
 
 /*
- * Keyman is 2025 copyright (C) SIL International. MIT License.
+ * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Created by S. Schmitt on 2026-01-19
  *
  * util for conversion functions for Keyman
  *
  */
-
 
 /**
  * @brief  function to convert a character, numeric character reference or a unicode value to a character or unicode Codepoint

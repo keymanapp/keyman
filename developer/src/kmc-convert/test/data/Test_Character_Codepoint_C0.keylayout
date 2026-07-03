@@ -36,7 +36,6 @@
             <key code="2" output="&#x42;"/>         <!-- C0-> html hex entity -->
             <key code="3" output="&#67;"/>          <!-- C0-> html dec entity -->
             <key code="4" output="&#x0044;"/>         <!-- C0-> unicode -->
-            <key code="5" output="&"/>              <!-- C0-> special: ampersand -->
             <key code="6" output="&#x10FFFF;"/>       <!-- C0-> special: last unicode -->
             <key code="7" output="&#x19;"/>         <!-- C0-> special: codepoint + warning -->
 
@@ -47,7 +46,6 @@
             <key code="2" output="&#x1250;"/>                  
             <key code="3" output="&#4680;"/>        
             <key code="4" output="&#x1244;"/>
-            <key code="5" output="&&"/>              <!-- C0-> special: double ampersand -->
             <key code="6" output="&#xE000;"/>
             <key code="7" output="&#x20;"/>         
         </keyMap>
@@ -58,7 +56,6 @@
             <key code="2" output="&#x1F60E;"/>      
             <key code="3" output="&#128508;"/>      
             <key code="4" output="&#x1F61E;"/>
-            <key code="5" output="&;"/>              <!-- C0-> special: ampersand ; -->
             <key code="6" output="&#xD799;"/>
             <key code="7" output="&#x21;"/>         
         </keyMap>
@@ -69,7 +66,6 @@
             <key code="2" output="&#x1E99;"/>       
             <key code="3" output="&#7844;"/>        
             <key code="4" output="&#x1E99;"/>
-            <key code="5" output="&&;"/>             <!-- C0-> special: double ampersand ; -->
             <key code="6" output="&gt;"/>
             <key code="7" output="&lt;"/>
         </keyMap>
