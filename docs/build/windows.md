@@ -184,8 +184,8 @@ In bash, run the following commands:
 cd /c/Projects/keyman
 git clone https://github.com/emscripten-core/emsdk
 cd emsdk
-emsdk install 3.1.58
-emsdk activate 3.1.58
+emsdk install 3.1.64
+emsdk activate 3.1.64
 cd upstream/emscripten
 npm install
 ```
@@ -195,8 +195,8 @@ If you are updating an existing install of Emscripten:
 ```bash
 cd emsdk
 git pull
-emsdk install 3.1.58
-emsdk activate 3.1.58
+emsdk install 3.1.64
+emsdk activate 3.1.64
 cd upstream/emscripten
 npm install
 ```
