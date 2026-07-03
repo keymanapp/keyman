@@ -61,6 +61,7 @@ struct KeyboardSearchView: NSViewRepresentable {
                  preferences: WKWebpagePreferences,
                  decisionHandler: @escaping @MainActor (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
       
+      print("deciding navigation based on action")
       
       if let url = navigationAction.request.url {
         print("webView navigationAction.request.url: \(url)")
@@ -75,7 +76,7 @@ struct KeyboardSearchView: NSViewRepresentable {
       
       // check if URL ends with a target file extension
       if let url = navigationAction.request.url {
-        if url.pathExtension.lowercased() == KeymanPaths.keyman17PackageExtension {
+        if url.pathExtension.lowercased() == KeymanPaths.keymanPackageFileExtension {
           decisionHandler(.download, preferences)
           print("webView found .kmp, called decisionHandler for download")
           return
@@ -85,15 +86,30 @@ struct KeyboardSearchView: NSViewRepresentable {
       decisionHandler(.allow, preferences)
     }
     
+    /**
+     * decide whether the navigation should be allowed, canceled or result in a download
+     */
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping @MainActor (WKNavigationResponsePolicy) -> Void) {
-      print("webView decidePolicyFor:decisionHandler: called")
+      print("deciding navigation based on response")
       
       if navigationResponse.canShowMIMEType {
         decisionHandler(.allow)
       } else {
-        decisionHandler(.download)
+        guard let keymanSettings = self.settings else {
+          print("webView decidePolicyFor:decisionHandler: no settings")
+          decisionHandler(.cancel)
+          return
+        }
+        
+        // if a download is already in progress then stop another from starting
+        if keymanSettings.isDownloadInProgress() {
+          print("download already in progress, download canceled")
+          decisionHandler(.cancel)
+        } else {
+          decisionHandler(.download)
+        }
       }
     }
     
@@ -110,8 +126,17 @@ struct KeyboardSearchView: NSViewRepresentable {
     }
     
     func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String, completionHandler: @escaping @MainActor @Sendable (URL?) -> Void) {
-      print("download started")
-      downloadFileUrl = settings?.getDownloadUrlForPackageName(packageName: suggestedFilename)
+      print("download initiated")
+      
+      guard let keymanSettings = self.settings else {
+        print("tried to access settings before they were intialized in updateNSView")
+        return
+      }
+      
+      // notify settings that a keyboard download is beginning and get the URL to
+      // the temporary folder where it should be downloaded
+      
+      downloadFileUrl = keymanSettings.preparePackageDownload(kmpFileName: suggestedFilename)
       if let downloadFileUrl {
         completionHandler(downloadFileUrl)
       } else {
@@ -123,8 +148,7 @@ struct KeyboardSearchView: NSViewRepresentable {
       if let downloadFileUrl {
         print("Download of \(downloadFileUrl.path()) was successful.")
         if let settings {
-          print("settings: \(settings)")
-          settings.installPackage(packageUrl: downloadFileUrl)
+          settings.packageDownloadComplete(kmpFileUrl: downloadFileUrl)
         }
       }
     }

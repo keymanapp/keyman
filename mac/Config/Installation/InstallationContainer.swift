@@ -39,7 +39,12 @@ public class InstallationContainer : ObservableObject {
     }
     
     self.defaultsRepository = defaultsRepo
-    inputMethodUtil = InputMethodUtil()
+
+    do {
+      try inputMethodUtil = InputMethodUtil()
+    } catch {
+      fatalError("Unable to access group container path for InputMethodUtil.")
+    }
     
     self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
     self.isInputMethodInstalled = self.installationCheck.isInputMethodInstalled

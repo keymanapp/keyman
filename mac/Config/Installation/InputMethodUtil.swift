@@ -12,10 +12,6 @@ import Carbon.HIToolbox
 import AppKit
 import KeymanSettings
 
-extension Notification.Name {
-  static let accessCheck = Notification.Name("com.keyman.accessibility.state")
-}
-
 public enum KeymanVersionCheckError: Error {
   case inputMethodNotFound
   case versionNotFound
@@ -41,8 +37,8 @@ public class InputMethodUtil {
   let kAccessCommand = "access"
   let kCheckCommand = "check"
   
-  public init() {
-    self.pathUtil = KeymanPaths()
+  public init() throws {
+    try self.pathUtil = KeymanPaths()
   }
   
   /**
