@@ -387,7 +387,7 @@ public class WebBrowserActivity extends BaseActivity {
     super.onResume();
     if (webView != null) {
       if (didFinishLoading) {
-        String fontFilename = getKeyboardTextFontFilename();
+        String fontFilename = getKeyboardTextFontFilenameOnly();
         if (!loadedFont.equals(fontFilename)) {
           webView.reload();
         }
@@ -436,7 +436,7 @@ public class WebBrowserActivity extends BaseActivity {
   /**
    * Returns the filename without path of the display font of the current keyboard.
    */
-  private String getKeyboardTextFontFilename() {
+  private String getKeyboardTextFontFilenameOnly() {
     String fontPath = KMManager.getKeyboardTextFontFilename();
     if (fontPath == null || fontPath.isEmpty()) {
       return "";
@@ -445,7 +445,7 @@ public class WebBrowserActivity extends BaseActivity {
   }
 
   private void loadFont() {
-    String font = getKeyboardTextFontFilename();
+    String font = getKeyboardTextFontFilenameOnly();
     if (!font.isEmpty()) {
       loadedFont = font;
       String fontUrl = String.format("%s%s", fontBaseUri, font);
