@@ -39,8 +39,8 @@ The following script illustrate the use of `getFontTypeface()`:
 
 ``` java
     KMTextView textView = (KMTextView) findViewById(R.id.kmTextView);
-    Typeface fontTypeface = KMManager.getFontTypeface(this,
-      getDir("data", Context.MODE_PRIVATE).toString() + File.separator + "aava1.ttf");
+    String textFontFilename = KMManager.getKeyboardTextFontFilename();
+    Typeface fontTypeface = KMManager.getFontTypeface(this, textFontFilename);
     textView.setTypeface(fontTypeface);
 ```
 

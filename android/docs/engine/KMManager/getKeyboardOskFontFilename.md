@@ -16,7 +16,14 @@ KMManager.getKeyboardOskFontFilename()
 ### Returns
 
 Returns the selected keyboard's OSK font filename and full path as
-`String` if it has any, empty string otherwise.
+`String` if it has any, empty string otherwise. Note that the
+on-screen keyboard will fallback to the keyboard text font if
+no OSK font is specified.
+
+The OSK font should not be used for a text view, because some
+OSK fonts are appropriate for use only in the on screen keyboard;
+see [`&displayMap`](/developer/language/reference/displaymap) for
+reference.
 
 ## Description
 
