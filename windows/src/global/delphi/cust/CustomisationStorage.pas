@@ -157,8 +157,13 @@ end;
 { TCustFileList }
 
 function TCustFileList.AddCustFile: TCustFile;
+var
+  NewObj: TObject;
 begin
-  Result := Items[inherited Add(FObjectClass.Create)];
+  // Delphi 12 dcc64 rejects the inline form with E2010 'TCustFile' and 'TObject';
+  // splitting via a local TObject makes the widening explicit.
+  NewObj := FObjectClass.Create;
+  Result := Items[inherited Add(NewObj)];
 end;
 
 constructor TCustFileList.Create(AObjectClass: TCustFileClass);
