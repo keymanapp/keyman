@@ -18,9 +18,9 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
 export class ConverterMessages {
 
   static ERROR_FileNotFound = SevError | 0x0003;
-  static Error_FileNotFound = (o: { inputFilename: string; }) => m(
+  static Error_FileNotFound = (o?: { inputFilename: string | null; }) => m(
     this.ERROR_FileNotFound,
-    `Input filename '${def(o.inputFilename)}' does not exist or could not be loaded.`
+    `Input filename '${def(o?.inputFilename)}' does not exist or could not be loaded.`
   );
 
   static ERROR_InvalidFile = SevError | 0x0004;

@@ -68,9 +68,9 @@ export class Converter implements KeymanCompiler {
       return null;
     }
 
-    const ConverterClass = ConverterClassFactory.find(inputFilename, outputFilename);
+    const ConverterClass = ConverterClassFactory.find(inputFilename, outputFilename ?? '.kmn');
     if (!ConverterClass) {
-      this.callbacks.reportMessage(ConverterMessages.Error_NoConverterFound({ inputFilename, outputFilename }));
+      this.callbacks.reportMessage(ConverterMessages.Error_NoConverterFound({ inputFilename, outputFilename: outputFilename ?? '' }));
       return null;
     }
 

@@ -60,7 +60,7 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test.keylayout'],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
-        sut.run(makePathToFixture(files[0]));
+        await  sut.run(makePathToFixture(files[0]));
         assert.isTrue(compilerTestCallbacks.messages.length === 0);
         await sut.run(makePathToFixture(files[0]));
         assert.equal(compilerTestCallbacks.messages.length, 0);
@@ -96,7 +96,7 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_undefinedAction.keylayout'],
     ].forEach(function (files) {
       it(files + " should give Error: undefined action detected", async function () {
-        sut.run(makePathToFixture(files[0]));
+        await sut.run(makePathToFixture(files[0]));
         assert.equal(compilerTestCallbacks.messages.length, 1);
         assert.equal(compilerTestCallbacks.messages[0].code, 5292040);
       });
