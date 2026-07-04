@@ -10,6 +10,10 @@ import SwiftUI
 import Combine
 import KeymanSettings
 
+public extension Notification.Name {
+  static let installationRepairNeeded = Notification.Name("com.keyman.installation.repair.needed")
+}
+
 @MainActor // run on the main actor since data is published directly to the UI
 public class InstallationContainer : ObservableObject {
   // if the installer was run, then installed and current should be true

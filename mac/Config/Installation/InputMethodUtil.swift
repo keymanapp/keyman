@@ -22,6 +22,8 @@ public enum KeymanInvocationError: Error {
   case inputMethodCouldNotBeInvoked
 }
 
+public let kAccessibilityPermissionGrantedMessage = "granted"
+
 public class InputMethodUtil {
   public let keymanInputMethodApplicationName = "Keyman.app"
 
@@ -29,8 +31,7 @@ public class InputMethodUtil {
   public var accessibilityPermissionGranted: Bool? = nil
   fileprivate let pathUtil: KeymanPaths
   fileprivate var observer: NSObjectProtocol?
-  
-  
+
   let kMigrateCommand = "migrate"
   let kAccessCommand = "access"
   let kCheckCommand = "check"

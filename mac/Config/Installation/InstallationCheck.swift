@@ -64,7 +64,7 @@ public class InstallationCheck {
     DistributedNotificationCenter.default().addObserver(
       self,
       selector: #selector(self.handlePermissionNotification(_:)),
-      name: NSNotification.Name.accessCheckResponse,
+      name: NSNotification.Name.accessCheck,
       object: nil // Observe notifications from any sender
     )
     // MAC-CONFIG_TODO: add timeout?
