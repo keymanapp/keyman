@@ -16,26 +16,25 @@ public class PackageDownload {
   let temporaryKmpFileLocation: URL
   let temporaryPackageLocation: URL
   let installPackageLocation: URL
-  let packageToReplace: KeymanPackage?
-  var packageToInstall: KeymanPackage?
+  let installedPackages: [KeymanPackage]    // needed to check for existing package after download
+  var packageToInstall: KeymanPackage?      // the newly downloaded package
+  var packageToReplace: KeymanPackage?      // the package to replace, if it exists
+
   fileprivate let packageRepository: PackageRepo
   
-  public init(filename: String, packageName: String, packageRepo: PackageRepo, replacing existingPackage: KeymanPackage? = nil) {
+  public init(filename: String, packageName: String, packageRepo: PackageRepo, installedPackages: [KeymanPackage]) {
     self.packageRepository = packageRepo
     self.temporaryKmpFileLocation = self.packageRepository.getDownloadUrl(for: filename)
     self.temporaryPackageLocation = self.packageRepository.getUnzipDestinationUrl(for: packageName)
     self.installPackageLocation = self.packageRepository.getInstallationUrlForPackageName(packageName: packageName)
-    self.packageToReplace = existingPackage
+    self.installedPackages = installedPackages
+    
+    // cannot be initialized until after download when packageName of new package is known
+    self.packageToReplace = nil
   }
   
   /**
-   * Indicates that a package has been downloaded and specifies where it is downloaded,
-   * and, optionally, the package (of the same type) that it is replacing.
-   * In response, this function unzips the package to the temporary location and
-   * decides whether the package should be installed.
-   * - If this package is not replacing a package, then it is installed.
-   * - If this package is replacing an older package, the new package replaces the old.
-   * - If this package is replacing an older package, then the user is notified to confirm.
+   * Indicates that a package has been downloaded and is ready to be unzipped and installed
    */
   public func packageDownloadComplete(for kmpFileUrl: URL) {
     print ("packageDownloadComplete \(kmpFileUrl)")
@@ -57,11 +56,17 @@ public class PackageDownload {
     self.packageToInstall = newPackage
   }
   
+  /**
+   * Decides whether the package should be installed.
+   * - If this package is not replacing a package, then it is installed.
+   * - If this package is replacing an older package, the new package replaces the old.
+   * - If this package is replacing an older package, then the user is notified to confirm.
+   */
   func handleNewPackage() throws {
-    // if this install is replacing an existing package,
-    // check with the user before allowing a downgrade
-    if let _ = self.packageToReplace {
+    // first check whether this install is replacing an existing package,
+    if self.checkForExistingPackage() {
       if self.replacingInstalledPackageWithEarlierVersion() {
+        // check with the user before allowing a downgrade
         self.sendNotificationToConfirmPackageDowngrade()
       } else {
         try self.replaceExistingPackageWithNewPackage()
@@ -69,6 +74,19 @@ public class PackageDownload {
     } else {
       try self.installNewPackage()
     }
+  }
+  
+  /**
+   * Check whether a package of the same name is already installed which may be replaced.
+   */
+  func checkForExistingPackage() -> Bool {
+    var packageExists = false
+    
+    if let package = self.installedPackages.first(where: { $0.packageName == self.packageToInstall?.packageName }) {
+      self.packageToReplace = package
+      packageExists = true
+    }
+    return packageExists
   }
   
   func sendNotificationToConfirmPackageDowngrade() {
@@ -79,6 +97,17 @@ public class PackageDownload {
     )
   }
   
+  func installNewPackage() throws {
+    try self.movePackageFromTemporaryToInstalled()
+    try self.deleteDownloadedKmpFile()
+
+    NotificationCenter.default.post(
+      name: .newPackageInstalled,
+      object: nil,
+      userInfo: nil
+    )
+  }
+
   func replaceExistingPackageWithNewPackage() throws {
     try self.deleteInstalledPackage()
     try self.deleteDownloadedKmpFile()
@@ -91,21 +120,18 @@ public class PackageDownload {
     )
   }
   
-  func installNewPackage() throws {
-    try FileManager.default.moveItem(at: self.temporaryPackageLocation, to: self.installPackageLocation)
+  /**
+   * Clean up the downloaded .kmp file and package folder
+   */
+  func cancelInstallation() throws {
     try self.deleteDownloadedKmpFile()
-
-    NotificationCenter.default.post(
-      name: .newPackageInstalled,
-      object: nil,
-      userInfo: nil
-    )
+    try self.deleteInstalledPackage()
   }
-  
+
   func deleteInstalledPackage() throws {
     try FileManager.default.removeItem(at: self.installPackageLocation)
   }
-  
+
   func movePackageFromTemporaryToInstalled() throws {
     try FileManager.default.moveItem(at: self.temporaryPackageLocation, to: self.installPackageLocation)
   }
@@ -114,6 +140,10 @@ public class PackageDownload {
     try FileManager.default.removeItem(at: self.temporaryKmpFileLocation)
   }
   
+  func deleteDownloadedPackage() throws {
+    try FileManager.default.removeItem(at: self.temporaryPackageLocation)
+  }
+
   func replacingInstalledPackageWithEarlierVersion() -> Bool {
     // MAC-CONFIG-TODO: implement package version comparison
     if let existingPackage = self.packageToReplace, let newPackage = self.packageToInstall {

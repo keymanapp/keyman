@@ -107,7 +107,6 @@ public class SettingsContainer : ObservableObject {
         self, selector: #selector(existingPackageReplaced(_:)),
         name: .packageReplaced, object: nil
     )
-
   }
   
   @objc func newPackageInstalled(_ notification: Notification) {
@@ -116,13 +115,35 @@ public class SettingsContainer : ObservableObject {
     self.packageDownload = nil
   }
 
-  
   @objc func existingPackageReplaced(_ notification: Notification) {
     print("existingPackageReplaced notification received")
-    self.addInstalledPackage()
+    self.replaceInstalledPackage()
+    self.packageDownload = nil
+  }
+  
+  /**
+   * Called in response to user confirming downgrade of package
+   */
+  public func userConfirmedPackageDowngrade() {
+    self.replaceInstalledPackage()
     self.packageDownload = nil
   }
 
+  /**
+   * Called in response to user canceling downgrade of package
+   */
+  public func userCanceledPackageDowngrade() {
+    if let download = self.packageDownload {
+      do {
+        try download.cancelInstallation()
+      } catch {
+        print("downgrade cancelled but failed to cancel installation")
+      }
+    }
+  
+    self.packageDownload = nil
+  }
+  
   // MAC-CONFIG-TODO: delete test code
   public func debug() {
     self.installedPackages .forEach { package in
@@ -163,11 +184,7 @@ public class SettingsContainer : ObservableObject {
     // package name is filename minus .kmp extension
     let packageName = kmpFileName.replacingOccurrences(of: ".kmp", with: "")
     
-    // see if a package of the same name is already installed which may be replaced
-    // if it does, pass it to the PackageDownload
-    let existingPackage = self.findPackage(with: packageName)
-    
-    let packageDownload = PackageDownload(filename: kmpFileName, packageName: packageName, packageRepo: self.packageRepository, replacing: existingPackage)
+    let packageDownload = PackageDownload(filename: kmpFileName, packageName: packageName, packageRepo: self.packageRepository, installedPackages: self.installedPackages)
 
     self.packageDownload = packageDownload
     return packageDownload.temporaryKmpFileLocation
@@ -186,7 +203,7 @@ public class SettingsContainer : ObservableObject {
   /**
    * The package is approved for installation, so add it to the package list and update the UserDefaults for enabled keyboards
    */
-  public func addInstalledPackage() {
+  func addInstalledPackage() {
     if let package = self.packageDownload?.packageToInstall {
       self.installedPackages.append(package)
       self.addEnabledKeyboards(for: package)
@@ -194,21 +211,20 @@ public class SettingsContainer : ObservableObject {
   }
   
   /**
-   * The package is approved for installation, so add it to the package list and update the UserDefaults for enabled keyboards
+   * The package is approved for installation, so replace the package of the same name in the package list.
+   * Also update the UserDefaults for enabled keyboards because the new package is enabled by default, and the existing may be disabled
    */
-  public func replaceInstalledPackage() {
+  func replaceInstalledPackage() {
     if let package = self.packageDownload?.packageToInstall {
       if let index = self.installedPackages.firstIndex(where: { $0.packageName == package.packageName }) {
-          print("Found package.packageName at index: \(index)")
         self.installedPackages[index] = package
-        
         self.addEnabledKeyboards(for: package)
       } else {
-          print("Package '\(package.packageName)' not found for replacement")
+        print("Error: package '\(package.packageName)' not found for replacement")
       }
     }
   }
-
+  
   /**
    *  for each enabled keyboard in the package being installed, add it to the enabled keyboards set and save it in the UserDefaults
    */
