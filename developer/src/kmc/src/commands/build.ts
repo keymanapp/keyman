@@ -36,6 +36,7 @@ export function declareBuild(program: Command) {
   buildCommand.command('file [infile...]', {isDefault: true})
     .description(`Compile one or more source files or projects ('file' subcommand is default).`)
     .option('--for-publishing', 'Verify that project meets @keymanapp repository requirements')
+    .option('--publish-only', 'Only run the for-publishing validation, skip all other build steps')
     .addHelpText('after', `
 Supported file types:
 * folder: Keyman project in folder

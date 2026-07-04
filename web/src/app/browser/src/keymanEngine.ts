@@ -257,7 +257,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *                activationPending (bool):   KMW being activated
    *                activated         (bool):   KMW active
    *
-   * See https://help.keyman.com/developer/engine/web/16.0/reference/core/getUIState
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getUIState
    */
   public getUIState(): FocusStateAPIObject {
     return this.contextManager.focusAssistant.getUIState();
@@ -266,7 +266,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
   /**
    * Set or clear the IsActivatingKeymanWebUI flag (exposed function)
    *
-   * See https://help.keyman.com/developer/engine/web/16.0/reference/core/activatingUI
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/activatingUI
    *
    * @param       {(boolean|number)}  state  Activate (true,false)
    */
@@ -275,35 +275,41 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
   }
 
   /**
-   * Function     setKeyboardForControl
-   * Scope        Public
-   * @param       {Element}    Pelem    Control element
-   * @param       {string|null=}    Pkbd     JSKeyboard (Clears the set keyboard if set to null.)
-   * @param       {string|null=}     Plc      Language Code
-   * Description  Set default keyboard for the control
+   * Associate control with independent keyboard settings initialized to a specific keyboard.
+   * The pair of `keyboard` and `languageCode` (if not `null`) must refer to a
+   * registered keyboard stub.
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/setKeyboardForControl
+   *
+   * @param       {Element}       elem          The control element to be managed manually
+   * @param       {string|null=}  keyboard      The id of a keyboard, consisting of the word
+   *                                            `Keyboard_` followed by the internal keyboard
+   *                                            name. For a keyboard with the internal name
+   *                                            `laokeys` this would be `Keyboard_laokeys`.
+   *                                            If `null` clears the set keyboard.
+   * @param       {string|null=}  languageCode  A BCP47 language code which was used when
+   *                                            registering the keyboard stub.
    */
-  public setKeyboardForControl(Pelem: HTMLElement, Pkbd?: string, Plc?: string): void {
-    if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
+  public setKeyboardForControl(elem: HTMLElement, keyboard?: string, languageCode?: string): void {
+    if(elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
     }
 
-    if(!this.isAttached(Pelem)) {
-      console.error("KeymanWeb is not attached to element " + Pelem);
+    if(!this.isAttached(elem)) {
+      console.error("KeymanWeb is not attached to element " + elem);
       return;
     }
 
     let stub = null;
-    if(Pkbd) {
-      stub = this.keyboardRequisitioner.cache.getStub(Pkbd, Plc);
+    if(keyboard) {
+      stub = this.keyboardRequisitioner.cache.getStub(keyboard, languageCode);
       if(!stub) {
-        throw new Error(`No keyboard has been registered with id ${Pkbd} and language code ${Plc}.`);
+        throw new Error(`No keyboard has been registered with id ${keyboard} and language code ${languageCode}.`);
       }
     }
 
-    this.contextManager.setKeyboardForTextStore(Pelem._kmwAttachment.textStore, Pkbd, Plc);
+    this.contextManager.setKeyboardForTextStore(elem._kmwAttachment.textStore, keyboard, languageCode);
   }
 
   /**

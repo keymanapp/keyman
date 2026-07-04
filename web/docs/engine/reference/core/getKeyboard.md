@@ -8,7 +8,7 @@ Get keyboard meta data for the selected keyboard and language.
 
 ## Syntax
 
-```c
+```js
 keyman.getKeyboard(keyboardName, languageCode)
 ```
 
@@ -75,5 +75,5 @@ The `keyboard` object contains the following members:
 :   `string` *optional*
 :   The font packaged with the keyboard to properly display specialized OSK characters.
 
-## See also 
+## See also
 - [keyman.addKeyboards()](addKeyboards) and its documentation about keyboard specification objects.
