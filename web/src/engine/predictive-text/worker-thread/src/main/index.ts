@@ -32,7 +32,6 @@
 /// <reference types="@keymanapp/lm-message-types" />
 
 import * as models from './models/index.js';
-import * as correction from './correction/index.js';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { KMWString } from "keyman/common/web-utils";
 
@@ -237,11 +236,25 @@ export class LMLayerWorker {
       }
 
       let compositor = this.transitionToReadyState(model);
+      const autoInsert = compositor.punctuation.insertAfterWord;
+
       // This test allows models to directly specify the property without it being auto-overridden by
       // this default.
-      if(configuration.wordbreaksAfterSuggestions === undefined) {
-        configuration.wordbreaksAfterSuggestions = (compositor.punctuation.insertAfterWord != '');
+      if(configuration.appendsWordbreaks === undefined) {
+        // If we automatically insert something after a suggestion, that implies
+        // it serves as a wordbreaking token.
+        if(autoInsert != '') {
+          configuration.appendsWordbreaks = {
+            breakingMarks: [autoInsert, '.', ',', ';', ':', '?', '!']
+          };
+        } // else leave undefined (falsy) - it has unusual wordbreaking patterns,
+          // so avoid further assumptions.
+      } else if(autoInsert != '') {
+        // If it's auto-inserted after a suggestion, we treat it as an
+        // implied wordbreaking mark.  This array may safely have duplicates.
+        configuration.appendsWordbreaks.breakingMarks.push(autoInsert);
       }
+      compositor.setConfiguration(configuration);
       this.cast('ready', { configuration });
     } catch (err) {
       this.error("loadModel failed!", err);
@@ -316,8 +329,8 @@ export class LMLayerWorker {
           // This is far more encapsulated and likely more secure... and the former point means this is
           // easier to bundle and more optimizable when bundling than direct eval.
           // Reference: https://esbuild.github.io/link/direct-eval
-          const modelLoader = new Function('LMLayerWorker', 'models', 'correction', 'wordBreakers', code);
-          modelLoader(_this, models, correction, wordBreakers);
+          const modelLoader = new Function('LMLayerWorker', 'models', 'wordBreakers', code);
+          modelLoader(_this, models, wordBreakers);
         }
       }
     };
@@ -367,9 +380,9 @@ export class LMLayerWorker {
             });
             break;
           case 'revert':
-            var {reversion, context} = payload;
+            var {reversion, context, appendedOnly} = payload;
 
-            compositor.applyReversion(reversion, context).then((suggestions) => {
+            compositor.applyReversion(reversion, context, appendedOnly).then((suggestions) => {
               this.cast('postrevert', {
                 token: payload.token,
                 suggestions: suggestions
@@ -377,8 +390,8 @@ export class LMLayerWorker {
             });
             break;
           case 'reset-context':
-            var {context} = payload;
-            compositor.resetContext(context);
+            var {context, stateId} = payload;
+            compositor.resetContext(context, stateId);
             break;
           default:
             throw new Error(`invalid message; expected one of {'predict', 'wordbreak', 'accept', 'revert', 'reset-context', 'unload'} but got ${payload.message}`);
@@ -419,8 +432,6 @@ export class LMLayerWorker {
     scope['LMLayerWorker'] = worker;
     // @ts-ignore
     scope['models'] = models;
-    // @ts-ignore
-    scope['correction'] = correction;
     // @ts-ignore
     scope['wordBreakers'] = wordBreakers;
 
