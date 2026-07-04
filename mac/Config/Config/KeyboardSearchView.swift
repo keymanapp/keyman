@@ -18,6 +18,7 @@ struct KeyboardSearchView: NSViewRepresentable {
   // note that the EnvironmentObject is not available within init (if we were to implement that)
   // it is injected just before makeNSView and updateNSView are called
   
+  // MAC-CONFIG-TODO: build URL rather than hard-code
   let searchURL = URL(string: "https://keyman.com/go/macos/14.0/download-keyboards/?version=19.0.284")!
 
 
@@ -119,17 +120,18 @@ struct KeyboardSearchView: NSViewRepresentable {
     }
     
     func webView(_ webView: WKWebView,
-                 navigationAction: WKNavigationAction,
-                 didCommit download: WKDownload) {
-      print("webView navigationAction:didCommit called")
+                 navigationResponse: WKNavigationResponse,
+                 didBecome download: WKDownload) {
+      print("webView navigationResponse:didBecome called")
       download.delegate = self
     }
-    
+
     func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String, completionHandler: @escaping @MainActor @Sendable (URL?) -> Void) {
       print("download initiated")
       
       guard let keymanSettings = self.settings else {
         print("tried to access settings before they were intialized in updateNSView")
+        completionHandler(nil)
         return
       }
       
@@ -140,7 +142,8 @@ struct KeyboardSearchView: NSViewRepresentable {
       if let downloadFileUrl {
         completionHandler(downloadFileUrl)
       } else {
-        print("could not find Keyman packages directory")
+        print("could not prepare package for download")
+        completionHandler(nil)
       }
     }
     
@@ -158,12 +161,12 @@ struct KeyboardSearchView: NSViewRepresentable {
     func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
       print("Download failed with error: \(error.localizedDescription)")
     }
-  }
-  
-  func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-      // The web process crashed. Reload the webview safely here.
-      print("WebKit process terminated unexpectedly: reloading content...")
-      webView.reload()
+
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        // The web process crashed. Reload the webview safely here.
+        print("WebKit process terminated unexpectedly: reloading content...")
+        webView.reload()
+    }
   }
 }
 

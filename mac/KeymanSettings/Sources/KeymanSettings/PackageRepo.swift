@@ -20,4 +20,5 @@ public protocol PackageRepo {
   func getDownloadUrl(for kmpFilename: String) -> URL
   func getUnzipDestinationUrl(for packageName: String) -> URL
   func getInstallationUrlForPackageName(packageName: String) -> URL
+  func cleanupTempDirectory()
 }

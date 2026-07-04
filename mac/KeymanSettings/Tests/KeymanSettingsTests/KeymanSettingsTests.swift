@@ -26,7 +26,7 @@ import Foundation
     
     settingsContainer.loadPackages()
     
-    #expect(settingsContainer.findPackage(packageId: packageRepo.testPackageId) != nil)
+    #expect(settingsContainer.findPackage(with: packageRepo.testPackageId) != nil)
     #expect(defaultsRepo.readEnabledKeyboards().contains(moabiteKeyboardKey))
   }
   
@@ -37,8 +37,8 @@ import Foundation
     settingsContainer.loadPackages()
     
     // verify that we can find that test package and cannot find the null package
-    #expect(settingsContainer.findPackage(packageId: packageRepo.testPackageId) != nil)
-    #expect(settingsContainer.findPackage(packageId: packageRepo.nullPackageId) == nil)
+    #expect(settingsContainer.findPackage(with: packageRepo.testPackageId) != nil)
+    #expect(settingsContainer.findPackage(with: packageRepo.nullPackageId) == nil)
   }
   
   @Test("Check remove package") @MainActor func testRemovePackage() async throws {
@@ -48,9 +48,9 @@ import Foundation
     settingsContainer.loadPackages()
     
     // verify that we cannot find the test package after removing it
-    #expect(settingsContainer.findPackage(packageId: packageRepo.testPackageId) != nil)
+    #expect(settingsContainer.findPackage(with: packageRepo.testPackageId) != nil)
     settingsContainer.removePackage(at: 0)
-    #expect(settingsContainer.findPackage(packageId: packageRepo.testPackageId) == nil)
+    #expect(settingsContainer.findPackage(with: packageRepo.testPackageId) == nil)
   }
   
   /**
@@ -78,7 +78,7 @@ import Foundation
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
     
     settingsContainer.loadPackages()
-    let package = try #require(settingsContainer.findPackage(packageId: packageRepo.testPackageId))
+    let package = try #require(settingsContainer.findPackage(with: packageRepo.testPackageId))
     
     // the hittite keyboard is initialized as disabled
     #expect(!package.isKeyboardEnabled(keyboardKey: hittiteKeyboardKey))

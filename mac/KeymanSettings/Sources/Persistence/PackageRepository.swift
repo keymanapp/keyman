@@ -74,11 +74,12 @@ public class PackageRepository: PackageRepo {
       let package = KeymanPackage(packageSource: source)
       do {
         try package.validate()
+
+        // only install packages that pass validation
+        installedPackages.append(package)
       } catch {
         print("** package '\(source.packageName)' is not valid: \(error.localizedDescription)")
       }
-      // only install packages that pass validation
-      installedPackages.append(package)
     }
     
     return installedPackages
@@ -136,6 +137,29 @@ public class PackageRepository: PackageRepo {
     }
   }
   
+  /**
+   * Delete all the files in the temp directory
+   */
+  public func cleanupTempDirectory() {
+    let fileManager = FileManager.default
+    
+    do {
+      let fileURLs = try fileManager.contentsOfDirectory(
+        at: self.pathUtil.keyman19TempDirectory,
+        includingPropertiesForKeys: nil,
+        options: .skipsHiddenFiles
+      )
+      
+      for fileURL in fileURLs {
+        try fileManager.removeItem(at: fileURL)
+      }
+      
+      print("successfully cleared temp directory")
+    } catch {
+      print("error clearing temp directory: \(error.localizedDescription)")
+    }
+  }
+
   /**
    * get the url to where the specified kmp file should be downloaded
    */

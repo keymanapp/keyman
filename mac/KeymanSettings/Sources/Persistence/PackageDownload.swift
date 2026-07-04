@@ -11,6 +11,7 @@
 
 import Foundation
 
+@MainActor // run on the main actor as it is called from SettingsContainer
 public class PackageDownload {
   //  let packageName: String
   let temporaryKmpFileLocation: URL
@@ -31,6 +32,10 @@ public class PackageDownload {
     
     // cannot be initialized until after download when packageName of new package is known
     self.packageToReplace = nil
+    
+    // MAC-CONFIG-TODO: should we resume a download if the app was quit or killed before completing a keyboard install?
+    // if any packages are remaining from an earlier download, delete them
+    self.packageRepository.cleanupTempDirectory()
   }
   
   /**
@@ -125,7 +130,7 @@ public class PackageDownload {
    */
   func cancelInstallation() throws {
     try self.deleteDownloadedKmpFile()
-    try self.deleteInstalledPackage()
+    try self.deleteDownloadedPackage()
   }
 
   func deleteInstalledPackage() throws {

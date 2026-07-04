@@ -80,6 +80,9 @@ class DefaultsRepoStub: DefaultsRepo {
  * stores them in memory with no access to disk
  */
 class PackageRepoStub: PackageRepo {
+  func cleanupTempDirectory() {
+  }
+  
   func unzipKmpFile(at kmpFileUrl: URL, to packageDestinationUrl: URL) throws {
   }
   
