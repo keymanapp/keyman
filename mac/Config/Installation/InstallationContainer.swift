@@ -49,9 +49,39 @@ public class InstallationContainer : ObservableObject {
     self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
     self.isInputMethodInstalled = self.installationCheck.isInputMethodInstalled
     self.isInputMethodCurrent = self.installationCheck.isInputMethodCurrent
-    self.installationState = self.installationCheck.evaluate()
+    self.installationState = self.installationCheck.installationState
+
+    self.registerObservers()
   }
+
   
+  /**
+   * register the observer to listen for a notification from the InstallationCheck to
+   * repair the current installation
+   */
+  func registerObservers() {
+    print("InstallationContainer registerObservers")
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(self.handleRepairNeeded(_:)),
+      name: NSNotification.Name.installationRepairNeeded,
+      object: nil // Observe notifications from any sender
+    )
+  }
+
+  /**
+   * called when `NSNotification.Name.installationRepairNeeded` is received
+   */
+  @objc func handleRepairNeeded(_ notification: Notification) {
+    print("handleRepairNeeded")
+    // Extract message from the notification if available
+    if let newState = notification.object as? InstallationState {
+      self.installationState = newState
+    } else {
+      print("handleRepairNeeded received but did not include new InstallationState")
+    }
+  }
+
   /**
    * Returns true if the Accessibility permission has been granted by the user for the Keyman input method.
    * This is an optional return value because it is only set in response to a call to `checkAccessibilityPermissionGranted`
@@ -198,10 +228,17 @@ public class InstallationContainer : ObservableObject {
   /**
    * for testing purposes, replace the InstallationState with a new object set for a new installation
    */
-  func resetInstallation() {
+  func forceResetInstallation() {
       self.installationState = InstallationCheck(defaultsRepo: self.defaultsRepository, inputMethodUtil: self.inputMethodUtil).createInstallationStateForNewInstallation()
   }
   
+  /**
+   * for testing purposes, validate the installation
+   */
+  func forceValidateInstallation() {
+    self.installationCheck.startValidation()
+  }
+
   /**
    * return the last time the system was booted
    */
@@ -237,9 +274,9 @@ public class InstallationContainer : ObservableObject {
   }
   
 
-/**
- * register may need to happen before enabling
- */
+  /**
+   * register may need to happen before enabling
+   */
   public func registerKeymanInputMethod() -> Bool {
     let success = self.inputMethodUtil.registerKeymanInputMethod()
     print("registerKeymanInputMethod suceeded: \(success)")
@@ -326,20 +363,6 @@ public class InstallationContainer : ObservableObject {
     return requested
   }
 
-  
-  /**
-   * run Keyman as a separate process with its full Input Method functionality
-   */
-  public func runKeymanInputMethod() -> Bool {
-    do {
-      try self.inputMethodUtil.runKeymanInputMethod()
-      return true
-    } catch {
-      print("runKeymanInputMethod error: \(error)")
-      return false
-    }
-  }
-  
   /**
    * kill the Keyman Input Method process
    */

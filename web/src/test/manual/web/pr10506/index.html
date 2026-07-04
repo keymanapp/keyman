@@ -36,9 +36,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType: 'auto'
+      }).then(function() {
+        loadKeyboards();
       });
 
     </script>
@@ -49,7 +50,7 @@
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards();'>
+  <body>
     <h2>KeymanWeb Test Page - Key-cap scaling / font-load delay interactions</h2>
     <p>To run the test, simply change from the default (English) keyboard to the "Special" keyboard.</p>
     <p>When things are working properly, the base keys on the "Special" keyboard should contain

@@ -63,7 +63,7 @@ describe('LanguageProcessor', function() {
       assert.isTrue(languageProcessor.mayPredict);
 
       // Some aspects of initialization must wait until after construction and overall
-      // load of the core.  See /web/source/kmwbase.ts, in the final IIFE.
+      // load of the core.
       assert.isOk(languageProcessor.lmEngine);
     });
   });

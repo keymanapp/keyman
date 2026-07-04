@@ -36,15 +36,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType: 'auto'
-      });
-
-      function loadKeyboards() {
-        var kmw=keyman;
-
-        kmw.addKeyboards({
+      }).then(function() {
+        keyman.addKeyboards({
           id:'multigroup',
           name:'Multigroup Test',
           languages:{
@@ -54,12 +49,12 @@
           },
           filename:'multigroup.js'
         });
-      }
+      });
     </script>
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards();'>
+  <body>
     <h2>KeymanWeb Sample Page - deadkeys and multiple groups Testing</h2>
     <p>See <a href='https://github.com/keymanapp/keyman/issues/920'>issue #920</a> for details on what this test
     is all about. Both ;e and .e should produce ə but ;e uses a deadkey and fails.</p>
