@@ -93,7 +93,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import androidx.core.content.ContextCompat;
 
@@ -306,6 +306,12 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       @Override
       public void onDrawerClosed(View drawerView) {
         textView.callOnClick();
+        if (navigationView != null) {
+          View menuView = navigationView.getChildAt(0);
+          if (menuView instanceof RecyclerView) {
+            ((RecyclerView) menuView).scrollToPosition(0);
+          }
+        }
       }
     });
 
