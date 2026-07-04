@@ -80,7 +80,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.setSpacebarText(spacebarText);
 
     // Set the system keyboard HTML banner
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM, isDarkMode());
 
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsKeys.HAPTIC_FEEDBACK, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
@@ -176,7 +176,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (KMManager.getPredictionsSuspended(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       KMManager.setBannerOptions(false);
       // Set the system keyboard HTML banner
-      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM, isDarkMode());
     } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
       // Check if predictions needs to be re-enabled per Settings preference
       Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
@@ -282,7 +282,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onKeyboardChanged(String newKeyboard) {
     // Refresh banner theme
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM, isDarkMode());
     KMManager.showSystemKeyboard();
     sendCurrentFontName();
   }
@@ -290,7 +290,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onKeyboardShown() {
     // Refresh banner theme
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM, isDarkMode());
   }
 
   @Override
@@ -348,5 +348,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public boolean onKeyLongPress(int keyCode, KeyEvent event) {
     return interpreter.onKeyLongPress(keyCode, event);
+  }
+  private boolean isDarkMode() {
+    return (getResources().getConfiguration().uiMode &
+      Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
   }
 }

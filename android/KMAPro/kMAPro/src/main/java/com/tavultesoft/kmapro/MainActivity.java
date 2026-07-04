@@ -233,9 +233,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         int flags = window.getDecorView().getSystemUiVisibility();
 
-        boolean isDarkMode = (getResources().getConfiguration().uiMode &
-            Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
-
+        boolean isDarkMode = isDarkMode();
+        
         if (!isDarkMode) {
           flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         } else {
@@ -710,6 +709,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     view.getGlobalVisibleRect(bounds);
     return bounds.contains((int) ev.getRawX(), (int) ev.getRawY());
   }
+  private boolean isDarkMode() {
+    return (getResources().getConfiguration().uiMode &
+      Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+  }
 
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
@@ -727,7 +730,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   @Override
   public void onKeyboardShown() {
     // Refresh banner theme
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_INAPP);
+    boolean isDarkMode = isDarkMode();
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_INAPP, isDarkMode);
     resizeTextView(true);
     updateKeyboardToolbarPosition();
     if (textPopupToggleButton != null) {
