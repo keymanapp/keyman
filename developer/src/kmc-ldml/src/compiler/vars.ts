@@ -1,4 +1,4 @@
-import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
+import { KMXPlusVersion, SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { ObjectWithCompileContext } from "@keymanapp/common-types";
 import { LDMLKeyboard, CompilerCallbacks } from '@keymanapp/developer-utils';
@@ -29,8 +29,8 @@ export class VarsCompiler extends SectionCompiler {
     return defaults;
   }
 
-  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
-    super(source, callbacks);
+  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks, targetVersion: KMXPlusVersion) {
+    super(source, callbacks, targetVersion);
   }
 
   public validate(): boolean {
