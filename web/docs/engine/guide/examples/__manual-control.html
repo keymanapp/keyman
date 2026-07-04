@@ -11,7 +11,7 @@
         languages: { id: 'lo', name: 'Lao' },
         filename: "./js/laokeys.js"
       });
-      keyman.setActiveKeyboard('laokeys');
+      await keyman.setActiveKeyboard('laokeys');
       keyman.osk.hide();
     });
 
@@ -30,8 +30,8 @@
 
 <p><img style="border: solid 1px black; padding: 2px 2px 3px 2px" src='js/kmicon.png' alt='KeymanWeb' onclick='KWControlClick()' id='KWControl' /></p>
 
-<p><input type='text' id='multilingual' name='multilingual' size="40" /></p>
-<p><textarea cols='40' rows='5'></textarea></p>
+<p><input type='text' id='multilingual' name='multilingual' size="40" data-testid='multilingual'/></p>
+<p><textarea cols='40' rows='5' data-testid='textarea'></textarea></p>
 
 <a href="manual-control">Back to Document</a>
 </form>

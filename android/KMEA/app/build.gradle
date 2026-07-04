@@ -72,6 +72,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.16.1'
     implementation 'io.sentry:sentry-android:8.19.1'
     implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.webkit:webkit:1.14.0'
 
     // Robolectric
     testImplementation 'androidx.test.ext:junit:1.2.1'
