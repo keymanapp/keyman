@@ -92,12 +92,6 @@
             app:actionLayout="@layout/nav_right_icon_item" />
 
         <item
-            android:id="@+id/nav_help_active_keyboard"
-            android:icon="@drawable/ic_info_outline"
-            android:title="@string/drawer_title_active_keyboard_help_fallback"
-            app:actionLayout="@layout/nav_right_icon_item" />
-
-        <item
             android:id="@+id/action_update_keyboards"
             android:icon="@drawable/ic_cloud_download_mode"
             android:title="@string/drawer_menu_update_keyboards" />

@@ -1336,8 +1336,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       startActivity(new Intent(context, InfoActivity.class));
     } else if (id == R.id.nav_palette) {
       openThemeDialog();
-    } else if (id == R.id.nav_about_current_keyboard || id == R.id.nav_help_active_keyboard) {
-      showCurrentKeyboardSettings();
     }
 
     return true;
@@ -1427,7 +1425,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       getString(R.string.drawer_subtitle_about_current_keyboard));
     updateThemeDrawerSubtitle(navigationView);
     updateCurrentKeyboardDrawerSubtitle(navigationView);
-    updateActiveKeyboardHelpDrawerItem(navigationView);
   }
 
   private void updateCurrentKeyboardDrawerItemTitle(NavigationView navigationView) {
@@ -1453,27 +1450,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         navigationView,
         R.id.nav_palette,
         getString(R.string.drawer_subtitle_theme, getThemeModeLabel())
-    );
-  }
-
-  private void updateActiveKeyboardHelpDrawerItem(NavigationView navigationView) {
-    MenuItem menuItem = navigationView.getMenu().findItem(R.id.nav_help_active_keyboard);
-    if (menuItem == null) {
-      return;
-    }
-
-    String keyboardName = getCurrentKeyboardDisplayName();
-    if (keyboardName.equals(getString(R.string.drawer_about_no_active_keyboard))) {
-      menuItem.setTitle(getString(R.string.drawer_title_active_keyboard_help_fallback));
-      setDrawerItemSubtitle(navigationView, R.id.nav_help_active_keyboard, keyboardName);
-      return;
-    }
-
-    menuItem.setTitle(getString(R.string.drawer_title_active_keyboard_help, keyboardName));
-    setDrawerItemSubtitle(
-        navigationView,
-        R.id.nav_help_active_keyboard,
-        getString(R.string.drawer_subtitle_active_keyboard_help, keyboardName)
     );
   }
 
