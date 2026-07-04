@@ -130,7 +130,7 @@ export function getResourcePath(config: ViewConfiguration) {
   if(config.isEmbedded) {
     resourcePathExt = '';
   }
-  return `${config.pathConfig.resources}/${resourcePathExt}`
+  return `${config.pathConfig.resources}${resourcePathExt}`
 }
 
 export abstract class OSKView
@@ -267,6 +267,7 @@ export abstract class OSKView
 
     for(const sheetFile of OSKView.STYLESHEET_FILES) {
       const sheetHref = `${resourcePath}${sheetFile}`;
+
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
     }
 
@@ -856,7 +857,7 @@ export abstract class OSKView
       isEmbedded: this.config.isEmbedded,
       specialFont: {
         family: 'SpecialOSK',
-        files: [`${resourcePath}/keymanweb-osk.ttf`],
+        files: [`${resourcePath}keymanweb-osk.ttf`],
         path: '' // Not actually used.
       },
       gestureParams: this.config.gestureParams
