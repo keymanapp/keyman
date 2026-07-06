@@ -10,17 +10,18 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString } from 'keyman/common/web-utils';
 
-import { ContextToken } from './context-token.js';
+import { ContextToken, ContextTokenLike } from './context-token.js';
 import { TransformUtils } from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
+import { LegacyQuotientRoot } from './legacy-quotient-root.js';
+import { LegacyQuotientSpur } from './legacy-quotient-spur.js';
 import { PathInputProperties } from './search-quotient-node.js';
 import { TransitionEdge } from './tokenization-subsets.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
-import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 
 // May be able to "get away" with 2 & 5 or so, but having extra will likely help
 // with edit path stability.
@@ -154,38 +155,11 @@ export class ContextTokenization {
    */
   readonly tokens: ContextToken[];
 
-  /**
-   * Denotes whether or not the transition to this tokenization added or deleted
-   * any tokens.
-   */
-  readonly transitionEdits?: {
-    addedNewTokens: boolean,
-    removedOldTokens: boolean,
-    // NOTE:  slated for removal in an upcoming PR.  Exists in this form to
-    // facilitate factorization of the changes into smaller bodies of work.
-    editedTokenCount: number
-  };
-
-  /**
-   * The portion of edits from the true input keystroke that are not part of the
-   * final entry in `token`.  If `null`, all edits are considered part of the
-   * final token's contents.
-   *
-   * If the final token is new due to a newly-introduced wordboundary traversed
-   * by the keystroke, this will generally be set to an empty transform that
-   * 'finalizes' the previous tail token.
-   *
-   * (Refer to #12494 for an example case.)
-   */
-  readonly taillessTrueKeystroke: Transform;
-
   constructor(priorToClone: ContextTokenization);
   constructor(tokens: ContextToken[]);
-  constructor(tokens: ContextToken[], alignment: TransitionEdge, taillessTrueKeystroke: Transform);
+  constructor(tokens: ContextToken[], alignment: TransitionEdge);
   constructor(
-    param1: ContextToken[] | ContextTokenization,
-    tokenizationPath?: TransitionEdge,
-    taillessTrueKeystroke?: Transform
+    param1: ContextToken[] | ContextTokenization
   ) {
     if(!(param1 instanceof ContextTokenization)) {
       const tokens = param1;
@@ -193,19 +167,9 @@ export class ContextTokenization {
         throw new Error("ContextTokenization requires at least one existing ContextToken");
       }
       this.tokens = [].concat(tokens);
-      if(tokenizationPath) {
-        this.transitionEdits = {
-          addedNewTokens: tokenizationPath?.inputs[0].sample.has(1) ?? false,
-          removedOldTokens: (tokenizationPath?.alignment.removedTokenCount ?? 0) > 0,
-          editedTokenCount: tokenizationPath?.inputs[0].sample.size
-        }
-      }
-      this.taillessTrueKeystroke = taillessTrueKeystroke;
     } else {
       const priorToClone = param1;
       this.tokens = priorToClone.tokens.map((entry) => new ContextToken(entry));
-      this.transitionEdits = priorToClone.transitionEdits ? {...priorToClone.transitionEdits} : null;
-      this.taillessTrueKeystroke = priorToClone.taillessTrueKeystroke;
     }
   }
 
@@ -256,9 +220,14 @@ export class ContextTokenization {
 
     // Assumption:  deleteLeft is always empty.  (There's nothing to the left;
     // we apply on that side.)
+
+    // This can occur during a context-reset or similar operation that would
+    // repeat the same prediction state.  We build clean tokenizations here,
+    // bereft of `preservationTransform` data and other data about the original
+    // state's input.
     if(TransformUtils.isEmpty(transform)) {
       // No edits needed?  Why retokenize?
-      return new ContextTokenization(this);
+      return new ContextTokenization(this.tokens);
     }
 
     // Step 1: build a window for window-start retokenization in case the context-window slid.
@@ -380,7 +349,7 @@ export class ContextTokenization {
   }
 
   /**
-   * Given the existing tokenization and an incoming input `Transform`, this
+   * Given this existing tokenization and an incoming input `Transform`, this
    * method precomputes how both the current, pre-application tokenization will
    * be altered and how the incoming Transform will be tokenized.
    *
@@ -397,158 +366,7 @@ export class ContextTokenization {
     transform: Transform,
     edgeOptions?: EdgeWindowOptions
   ): TokenizationTransitionEdits {
-    // Step 4:  now that our window's been properly updated, determine what the
-    // input's effects on the context is.
-    //
-    // Context does not slide within this function.
-    //
-    // Assumption:  this alignment cannot fail; we KNOW there's a solid
-    // before-and-after relationship here, and we can base it on the results of
-    // a prior syncToSourceWindow call.
-    //
-    // We don't wish to do the full tokenization here - we only want to check
-    // over the last few tokens that might reasonably shift.  We also want to
-    // batch effects.
-
-    // Do not mutate the original transform; it can cause unexpected assertion
-    // effects in unit tests.
-    const edgeTransform = {...transform, deleteRight: transform.deleteRight || 0};
-    const edgeWindow = buildEdgeWindow(this.tokens, edgeTransform, false, edgeOptions);
-    const {
-      retokenizationText,
-      editBoundary,
-      sliceIndex: edgeSliceIndex
-    } = edgeWindow;
-    // Prevent mutation of the original return property.
-    const stackedDeletes = edgeWindow.deleteLengths.slice();
-
-    const tokenize = determineModelTokenizer(lexicalModel);
-    const postTokenization = tokenize({left: retokenizationText + transform.insert, startOfBuffer: true, endOfBuffer: true}).left.map(t => t.text);
-    if(postTokenization.length == 0) {
-      postTokenization.push('');
-    }
-    const { stackedInserts, firstInsertPostIndex } = traceInsertEdits(postTokenization, transform);
-
-    // What does the edge's retokenization look like when we remove the inserted portions?
-    const retokenizedEdge = postTokenization.slice(0, firstInsertPostIndex);
-    const insertBoundaryToken = postTokenization[firstInsertPostIndex];
-
-    // Note:  requires that helpers have not mutated `stackedInserts`.
-    const uninsertedBoundaryToken = KMWString.substring(insertBoundaryToken, 0, KMWString.lastIndexOf(insertBoundaryToken, stackedInserts[0]));
-
-    // Do not preserve empty tokens here, even if tokenization normally would produce one.
-    // It's redundant and replaceable for tokenization batching efforts.
-    if(uninsertedBoundaryToken != '') {
-      retokenizedEdge.push(uninsertedBoundaryToken);
-    }
-
-    // We've found the root token within the root context state to which deletes (and inserts)
-    // may be applied.
-    // We've also found the last post-application token to which transform changes contributed.
-    // How do these indices line up - we need to properly construct and index our transforms,
-    // but 'merge' and 'split' edits can mess up that indexing.
-
-    const currentTokens = this.tokens;
-    const preTokenization = currentTokens
-      .slice(edgeSliceIndex, editBoundary.tokenIndex+1)
-      .map(t => t.exampleInput);
-
-    // Determine the effects of splits & merges as applied to the original
-    // cached context state.
-    const { mergeOffset, splitOffset, editPath, merges, splits } = analyzePathMergesAndSplits(
-      preTokenization,
-      postTokenization.slice(0, firstInsertPostIndex+1)
-    );
-
-    /*
-     * Final steps:  We can now safely index the transforms.  Let's do it!
-     * 1. Determine the first index a Transform may align to
-     * 2. Build the transforms
-     *
-     * Notes:
-     * - text applied to the end of a 'merged' token at the tail:  should have
-     *   index 0, not -1.
-     *   - pretokenization index will mismatch by -1: -SUM(merge size - 1)
-     *   - Ex: can + ' + t => can't
-     *          -1   0          0
-     * - text applied to the end of a 'split' token at the tail:  should also
-     *   have index 0, not 1.
-     *   - posttokenization index will mismatch by +1: SUM(split size - 1)
-     *   - new token after 'split':  index 1
-     *   - Ex: can' + ? => can + ' + ?
-     *          0          -1    0   1
-     *
-     * The first transform applies at the end of the retokenized zone and its
-     * associated index.  The question:  were there deletes that occurred?
-     */
-
-    const lastEditedPreTokenIndex = editBoundary.tokenIndex - edgeSliceIndex;
-    let shiftDeletes = false;
-    // first popped entry == 0 - a delete no-op.
-    if(stackedDeletes[stackedDeletes.length - 1] == 0) {
-      // the boundary indices found by both methods above differ
-      if(lastEditedPreTokenIndex + mergeOffset != firstInsertPostIndex + splitOffset) {
-        shiftDeletes = true;
-      }
-
-      // there are no inserts, so we don't affect the boundary token we landed on.
-      if(stackedDeletes.length > 1 && transform.insert == '') {
-        shiftDeletes = true;
-      }
-    }
-
-    if(shiftDeletes) {
-      // Do not add a zero-length delete if we're not actually altering the
-      // corresponding token at all.
-      stackedDeletes.pop();
-    }
-
-    // The first delete always applies to index 0. If the built edge window
-    // omits a context-final empty-string, adjust the tokenization indices
-    // accordingly.
-    const tailIndex = 0 - (stackedDeletes.length - 1) + (editBoundary.omitsEmptyToken ? -1 : 0);
-    // Mutates stackedInserts, stackedDeletes.
-    const baseRemovedTokenCount = Math.max(0, stackedDeletes.length - stackedInserts.length);
-    const transformMap = assembleTransforms(stackedInserts, stackedDeletes, tailIndex);
-
-    // If there's an empty transform in the 0 position and we already know we're
-    // dropping tokens - and only deleting - we're dropping an
-    // otherwise-untracked empty token - make sure it's included!
-    const droppedFinalTransform = baseRemovedTokenCount > 0 && transform.insert == '' && TransformUtils.isEmpty(transformMap.get(0));
-    // Past that, if we have more delete entries than insert entries for our transforms, we
-    // dropped some tokens outright.
-    const removedTokenCount = baseRemovedTokenCount + (droppedFinalTransform ? 1 : 0);
-
-    // Final step:  check for any unexpected boundary shifts not mappable to 'merge' / 'split'
-    // and not caused by transforms.  All transforms always apply in sequence at the end.
-    const unmappedEdits: EditTuple<EditOperation>[] = [];
-    for(let i = 0; i < editPath.length - transformMap.size; i++) {
-      const op = editPath[i].op;
-      switch(op) {
-        case 'merge':
-        case 'split':
-          // already calculated
-          // can fall through to the `continue;` line.
-        case 'match':
-          continue;
-        default:
-          // Should only be substitutions here.
-          // We may wish to add extra analysis in the future when supporting
-          // prediction from multiple competing tokenizations.
-          unmappedEdits.push(editPath[i] as EditTuple<EditOperation>);
-      }
-    }
-
-    return {
-      alignment: {
-        edgeWindow: {...edgeWindow, retokenization: retokenizedEdge},
-        merges,
-        splits,
-        unmappedEdits,
-        removedTokenCount
-      },
-      tokenizedTransform: transformMap,
-    };
+    return mapWhitespacedTokenization(this.tokens, lexicalModel, transform, edgeOptions);
   }
 
   /**
@@ -603,7 +421,7 @@ export class ContextTokenization {
       tokenization.push(token);
     }
 
-    return new ContextTokenization(this.tokens.slice(0, sliceIndex).concat(tokenization), null, this.taillessTrueKeystroke);
+    return new ContextTokenization(this.tokens.slice(0, sliceIndex).concat(tokenization));
   }
 
   /**
@@ -684,8 +502,10 @@ export class ContextTokenization {
         inputSource.segment.end = appliedLength;
       }
 
-      affectedToken = new ContextToken(affectedToken);
-      affectedToken.addInput(inputSource, distribution);
+      affectedToken = new ContextToken(
+        new LegacyQuotientSpur(affectedToken.searchModule, distribution, inputSource),
+        affectedToken.isPartial
+      );
 
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;
@@ -696,11 +516,7 @@ export class ContextTokenization {
       affectedToken = null;
     }
 
-    return new ContextTokenization(
-      this.tokens.slice(0, sliceIndex).concat(tailTokenization),
-      null,
-      determineTaillessTrueKeystroke(transitionEdge)
-    );
+    return new ContextTokenization(this.tokens.slice(0, sliceIndex).concat(tailTokenization));
   }
 }
 
@@ -808,6 +624,184 @@ interface RetokenizedEdgeWindow extends EdgeWindow {
 }
 
 /**
+ * Given an existing tokenization and an incoming input `Transform`, this
+ * method precomputes how both the current, pre-application tokenization will
+ * be altered and how the incoming Transform will be tokenized.
+ *
+ * This function is able to operate with a reduced interface, not requiring
+ * the full ContextToken/ContextState/etc subsystem and its related
+ * SearchQuotientNode requirements.
+ *
+ * Note that this method is designed for use with languages that employ
+ * classical space-based wordbreaking.  Do not use it for languages that need
+ * dictionary-based wordbreaking support!
+ * @param tokens
+ * @param lexicalModel
+ * @param transform
+ * @param edgeOptions
+ * @returns
+ */
+export function mapWhitespacedTokenization(
+  tokens: ContextTokenLike[],
+  lexicalModel: LexicalModel,
+  transform: Transform,
+  edgeOptions?: EdgeWindowOptions
+): TokenizationTransitionEdits {
+  // Step 4:  now that our window's been properly updated, determine what the
+  // input's effects on the context is.
+  //
+  // Context does not slide within this function.
+  //
+  // Assumption:  this alignment cannot fail; we KNOW there's a solid
+  // before-and-after relationship here, and we can base it on the results of
+  // a prior syncToSourceWindow call.
+  //
+  // We don't wish to do the full tokenization here - we only want to check
+  // over the last few tokens that might reasonably shift.  We also want to
+  // batch effects.
+
+  // Do not mutate the original transform; it can cause unexpected assertion
+  // effects in unit tests.
+  const edgeTransform = {...transform, deleteRight: transform.deleteRight || 0};
+  const edgeWindow = buildEdgeWindow(tokens, edgeTransform, false, edgeOptions);
+  const {
+    retokenizationText,
+    editBoundary,
+    sliceIndex: edgeSliceIndex
+  } = edgeWindow;
+  // Prevent mutation of the original return property.
+  const stackedDeletes = edgeWindow.deleteLengths.slice();
+
+  const tokenize = determineModelTokenizer(lexicalModel);
+  const postTokenization = tokenize({left: retokenizationText + transform.insert, startOfBuffer: true, endOfBuffer: true}).left.map(t => t.text);
+  if(postTokenization.length == 0) {
+    postTokenization.push('');
+  }
+  const { stackedInserts, firstInsertPostIndex } = traceInsertEdits(postTokenization, transform);
+
+  // What does the edge's retokenization look like when we remove the inserted portions?
+  const retokenizedEdge = postTokenization.slice(0, firstInsertPostIndex);
+  const insertBoundaryToken = postTokenization[firstInsertPostIndex];
+
+  // Note:  requires that helpers have not mutated `stackedInserts`.
+  const uninsertedBoundaryToken = KMWString.substring(insertBoundaryToken, 0, KMWString.lastIndexOf(insertBoundaryToken, stackedInserts[0]));
+
+  // Do not preserve empty tokens here, even if tokenization normally would produce one.
+  // It's redundant and replaceable for tokenization batching efforts.
+  if(uninsertedBoundaryToken != '') {
+    retokenizedEdge.push(uninsertedBoundaryToken);
+  }
+
+  // We've found the root token within the root context state to which deletes (and inserts)
+  // may be applied.
+  // We've also found the last post-application token to which transform changes contributed.
+  // How do these indices line up - we need to properly construct and index our transforms,
+  // but 'merge' and 'split' edits can mess up that indexing.
+
+  const currentTokens = tokens;
+  const preTokenization = currentTokens
+    .slice(edgeSliceIndex, editBoundary.tokenIndex+1)
+    .map(t => t.exampleInput);
+
+  // Determine the effects of splits & merges as applied to the original
+  // cached context state.
+  const { mergeOffset, splitOffset, editPath, merges, splits } = analyzePathMergesAndSplits(
+    preTokenization,
+    postTokenization.slice(0, firstInsertPostIndex+1)
+  );
+
+  /*
+    * Final steps:  We can now safely index the transforms.  Let's do it!
+    * 1. Determine the first index a Transform may align to
+    * 2. Build the transforms
+    *
+    * Notes:
+    * - text applied to the end of a 'merged' token at the tail:  should have
+    *   index 0, not -1.
+    *   - pretokenization index will mismatch by -1: -SUM(merge size - 1)
+    *   - Ex: can + ' + t => can't
+    *          -1   0          0
+    * - text applied to the end of a 'split' token at the tail:  should also
+    *   have index 0, not 1.
+    *   - posttokenization index will mismatch by +1: SUM(split size - 1)
+    *   - new token after 'split':  index 1
+    *   - Ex: can' + ? => can + ' + ?
+    *          0          -1    0   1
+    *
+    * The first transform applies at the end of the retokenized zone and its
+    * associated index.  The question:  were there deletes that occurred?
+    */
+
+  const lastEditedPreTokenIndex = editBoundary.tokenIndex - edgeSliceIndex;
+  let shiftDeletes = false;
+  // first popped entry == 0 - a delete no-op.
+  if(stackedDeletes[stackedDeletes.length - 1] == 0) {
+    // the boundary indices found by both methods above differ
+    if(lastEditedPreTokenIndex + mergeOffset != firstInsertPostIndex + splitOffset) {
+      shiftDeletes = true;
+    }
+
+    // there are no inserts, so we don't affect the boundary token we landed on.
+    if(stackedDeletes.length > 1 && transform.insert == '') {
+      shiftDeletes = true;
+    }
+  }
+
+  if(shiftDeletes) {
+    // Do not add a zero-length delete if we're not actually altering the
+    // corresponding token at all.
+    stackedDeletes.pop();
+  }
+
+  // The first delete always applies to index 0. If the built edge window
+  // omits a context-final empty-string, adjust the tokenization indices
+  // accordingly.
+  const tailIndex = 0 - (stackedDeletes.length - 1) + (editBoundary.omitsEmptyToken ? -1 : 0);
+  // Mutates stackedInserts, stackedDeletes.
+  const baseRemovedTokenCount = Math.max(0, stackedDeletes.length - stackedInserts.length);
+  const transformMap = assembleTransforms(stackedInserts, stackedDeletes, tailIndex);
+
+  // If there's an empty transform in the 0 position and we already know we're
+  // dropping tokens - and only deleting - we're dropping an
+  // otherwise-untracked empty token - make sure it's included!
+  const droppedFinalTransform = baseRemovedTokenCount > 0 && transform.insert == '' && TransformUtils.isEmpty(transformMap.get(0));
+  // Past that, if we have more delete entries than insert entries for our transforms, we
+  // dropped some tokens outright.
+  const removedTokenCount = baseRemovedTokenCount + (droppedFinalTransform ? 1 : 0);
+
+  // Final step:  check for any unexpected boundary shifts not mappable to 'merge' / 'split'
+  // and not caused by transforms.  All transforms always apply in sequence at the end.
+  const unmappedEdits: EditTuple<EditOperation>[] = [];
+  for(let i = 0; i < editPath.length - transformMap.size; i++) {
+    const op = editPath[i].op;
+    switch(op) {
+      case 'merge':
+      case 'split':
+        // already calculated
+        // can fall through to the `continue;` line.
+      case 'match':
+        continue;
+      default:
+        // Should only be substitutions here.
+        // We may wish to add extra analysis in the future when supporting
+        // prediction from multiple competing tokenizations.
+        unmappedEdits.push(editPath[i] as EditTuple<EditOperation>);
+    }
+  }
+
+  return {
+    alignment: {
+      edgeWindow: {...edgeWindow, retokenization: retokenizedEdge},
+      merges,
+      splits,
+      unmappedEdits,
+      removedTokenCount
+    },
+    tokenizedTransform: transformMap,
+  };
+}
+
+/**
  * Constructs a window on one side of the represented context that is aligned to
  * existing tokenization.
  * @param currentTokens  Tokens from an existing ContextTokenization
@@ -821,7 +815,7 @@ interface RetokenizedEdgeWindow extends EdgeWindow {
  * @returns
  */
 export function buildEdgeWindow(
-  currentTokens: ContextToken[],
+  currentTokens: ContextTokenLike[],
   // Requires deleteRight be explicitly set.
   transform: Transform & { deleteRight: number },
   applyAtFront: boolean,
@@ -1207,61 +1201,4 @@ export function assembleTransforms(stackedInserts: string[], stackedDeletes: num
   }
 
   return transformMap;
-}
-
-/**
- * Used to construct and represent the part of the incoming transform that does
- * not land as part of the final token in the resulting context.  This component
- * should be preserved by any suggestions that get applied.
- * @param tokenizationAnalysis Precomputed metadata about a potential transition
- * from a pre-transition context tokenization to a post-transition context
- * tokenization
- * @returns
- */
-export function determineTaillessTrueKeystroke(tokenizationAnalysis: TransitionEdge) {
-  // undefined by default; we haven't yet determined if we're still affecting
-  // the same token that was the tail in the previous tokenization state.
-  let taillessTrueKeystroke: Transform;
-
-  // If tokens were inserted, emit an empty transform; this prevents
-  // suggestions from replacing the "current" token.
-  const bestTokenizedInput = tokenizationAnalysis.inputs[0].sample;
-  if(bestTokenizedInput.has(1)) {
-    // Sets a default transform that will be returned even if the main
-    // transform body lies entirely within a new token.
-    taillessTrueKeystroke = { insert: '', deleteLeft: 0 };
-
-    // While the .size() > 1 case could also land here, it is ALSO covered
-    // by the loop that follows, without fail.
-  }
-
-  const transformKeys = [...tokenizationAnalysis.inputs[0].sample.keys()];
-  transformKeys.pop();
-
-  for(let i of transformKeys) {
-    /*
-      * Thinking ahead to multitokenization:
-      *
-      * If what we have is not on the "true" tokenization, then... we need to
-      * do multitoken effects, right?  We're basing new suggestions based on a
-      * state that does not currently exist!  We'd need to enforce THAT state,
-      * *then* do the suggestion!
-      * - Which gets fun if we auto-apply such a case, as the new "true" tokenization
-      *   no longer results directly from the true input.
-      *
-      * If we give tokens unique IDs on first creation, we could backtrace to
-      * find the most recent common ancestor.
-      * - simple cases (same 'token', but different input transform lengths/effects)
-      *   will have the same prior token ID
-      */
-    const primaryInput = tokenizationAnalysis.inputs[0].sample.get(i);
-    if(!taillessTrueKeystroke) {
-      taillessTrueKeystroke = {...primaryInput};
-    } else {
-      taillessTrueKeystroke.insert += primaryInput.insert;
-      taillessTrueKeystroke.deleteLeft += primaryInput.deleteLeft;
-    }
-  }
-
-  return taillessTrueKeystroke;
 }

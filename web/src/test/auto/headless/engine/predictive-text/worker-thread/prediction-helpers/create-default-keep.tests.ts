@@ -12,7 +12,7 @@ import { assert } from 'chai';
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
-import { CorrectionPredictionTuple, createDefaultKeep, models, SuggestionSimilarity } from "@keymanapp/lm-worker/test-index";
+import { CompositedIntermediatePrediction, createDefaultKeep, models, SuggestionSimilarity } from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -91,8 +91,48 @@ const testModelWithCasing = new DummyModel({
   // No suggestions needed here, so we don't define any.
 });
 
-describe('produceKeep', () => {
-  it(`creates an 'exact'-match suggestion based on primary input and current context`, () => {
+describe('createDefaultKeep', () => {
+  it(`creates an 'exact'-match suggestion based on context when no change occurs and no match is found`, () => {
+    const transformId = 314159;
+
+    const context: Context = {
+      left: 'appl',
+      right: '',
+      startOfBuffer: true,
+      endOfBuffer: true
+    };
+
+    const expectedKeep: CompositedIntermediatePrediction = {
+      components: {
+        prediction: {
+          transform: {
+            insert: 'appl',
+            deleteLeft: 4,
+            id: transformId
+          },
+          transformId,
+          displayAs: '<appl>',
+          matchesModel: false,
+          tag: 'keep'
+        },
+        correction: 'appl'
+      },
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
+    };
+
+    const tuple = createDefaultKeep(testModelWithCasing, context, { sample: { insert: '', deleteLeft: 0, id: transformId }, p: 1});
+    assert.deepEqual(tuple, expectedKeep);
+  });
+
+  it(`creates an 'exact'-match suggestion based on simple primary input`, () => {
     const context: Context = {
       left: 'iphon',
       right: '',
@@ -108,13 +148,9 @@ describe('produceKeep', () => {
       p: 1
     };
 
-    const expectedKeep: CorrectionPredictionTuple = {
-      correction: {
-        sample: 'iphone',
-        p: 1
-      },
-      prediction: {
-        sample: {
+    const expectedKeep: CompositedIntermediatePrediction = {
+      components: {
+        prediction: {
           transform: {
             insert: 'iphone',
             deleteLeft: 5
@@ -123,10 +159,237 @@ describe('produceKeep', () => {
           matchesModel: false,
           tag: 'keep'
         },
-        p: 1
+        correction: 'iphone'
       },
-      totalProb: 1,
-      matchLevel: SuggestionSimilarity.exact
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
+    };
+
+    const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);
+    assert.deepEqual(tuple, expectedKeep);
+  });
+
+  it(`creates an 'exact'-match suggestion based on full word after a backspace`, () => {
+    const context: Context = {
+      left: 'iphone ',
+      right: '',
+      startOfBuffer: true,
+      endOfBuffer: true
+    };
+
+    const trueInput: ProbabilityMass<Transform> = {
+      sample: {
+        insert: '',
+        deleteLeft: 1
+      },
+      p: 1
+    };
+
+    const expectedKeep: CompositedIntermediatePrediction = {
+      components: {
+        prediction: {
+          transform: {
+            insert: 'iphone',
+            deleteLeft: 7
+          },
+          displayAs: '<iphone>',
+          matchesModel: false,
+          tag: 'keep'
+        },
+        correction: 'iphone'
+      },
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
+    };
+
+    const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);
+    assert.deepEqual(tuple, expectedKeep);
+  });
+
+  it(`creates an 'exact'-match suggestion based on complex deletion`, () => {
+    const context: Context = {
+      left: 'iphone a',
+      right: '',
+      startOfBuffer: true,
+      endOfBuffer: true
+    };
+
+    const trueInput: ProbabilityMass<Transform> = {
+      sample: {
+        insert: 'e',
+        deleteLeft: 3
+      },
+      p: 1
+    };
+
+    const expectedKeep: CompositedIntermediatePrediction = {
+      components: {
+        prediction: {
+          transform: {
+            insert: 'iphone',
+            deleteLeft: 8
+          },
+          displayAs: '<iphone>',
+          matchesModel: false,
+          tag: 'keep'
+        },
+        correction: 'iphone'
+      },
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
+    };
+
+    const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);
+    assert.deepEqual(tuple, expectedKeep);
+  });
+
+  it(`creates an 'exact'-match suggestion based on complex insertion`, () => {
+    const context: Context = {
+      left: 'iphon',
+      right: '',
+      startOfBuffer: true,
+      endOfBuffer: true
+    };
+
+    const trueInput: ProbabilityMass<Transform> = {
+      sample: {
+        insert: 'es and',
+        deleteLeft: 0
+      },
+      p: 1
+    };
+
+    const expectedKeep: CompositedIntermediatePrediction = {
+      components: {
+        prediction: {
+          transform: {
+            insert: 'iphones and',
+            deleteLeft: 5
+          },
+          displayAs: '<and>',
+          matchesModel: false,
+          tag: 'keep'
+        },
+        correction: 'and'
+      },
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
+    };
+
+    const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);
+    assert.deepEqual(tuple, expectedKeep);
+  });
+
+  it(`creates an 'exact'-match suggestion based on complex replacement`, () => {
+    const context: Context = {
+      left: 'iphone ',
+      right: '',
+      startOfBuffer: true,
+      endOfBuffer: true
+    };
+
+    const trueInput: ProbabilityMass<Transform> = {
+      sample: {
+        insert: 's',
+        deleteLeft: 1
+      },
+      p: 1
+    };
+
+    const expectedKeep: CompositedIntermediatePrediction = {
+      components: {
+        prediction: {
+          transform: {
+            insert: 'iphones',
+            deleteLeft: 7
+          },
+          displayAs: '<iphones>',
+          matchesModel: false,
+          tag: 'keep'
+        },
+        correction: 'iphones'
+      },
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
+    };
+
+    const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);
+    assert.deepEqual(tuple, expectedKeep);
+  });
+
+  it(`creates an empty 'exact'-match suggestion after adding a wordbreak`, () => {
+    const context: Context = {
+      left: 'iphon',
+      right: '',
+      startOfBuffer: true,
+      endOfBuffer: true
+    };
+
+    const trueInput: ProbabilityMass<Transform> = {
+      sample: {
+        insert: 'e ',
+        deleteLeft: 0
+      },
+      p: 1
+    };
+
+    const expectedKeep: CompositedIntermediatePrediction = {
+      components: {
+        prediction: {
+          transform: {
+            insert: 'iphone ',
+            deleteLeft: 5
+          },
+          displayAs: '<>',
+          matchesModel: false,
+          tag: 'keep'
+        },
+        correction: ''
+      },
+      metadata: {
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1 * 1
+        },
+        autoSelectable: false,
+        matchLevel: SuggestionSimilarity.exact
+      }
     };
 
     const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);

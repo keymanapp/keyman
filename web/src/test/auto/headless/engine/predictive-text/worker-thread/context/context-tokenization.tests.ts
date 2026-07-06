@@ -26,9 +26,9 @@ import {
   ExtendedEditOperation,
   generateSubsetId,
   models,
-  TransitionEdge,
   SearchQuotientSpur,
-  traceInsertEdits
+  traceInsertEdits,
+  LegacyQuotientSpur
 } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
@@ -50,13 +50,15 @@ function toTransformToken(text: string, transformId?: number) {
   let isWhitespace = text == ' ';
   let token = ContextToken.fromRawText(plainModel, '');
   const textAsTransform = { insert: text, deleteLeft: 0, id: idSeed };
-  token.addInput({
+  token = new ContextToken(new LegacyQuotientSpur(
+    token.searchModule,
+    [ { sample: textAsTransform, p: 1 } ], {
     segment: {
       transitionId: textAsTransform.id,
       start: 0
     }, bestProbFromSet: 1,
     subsetId: generateSubsetId()
-  }, [ { sample: textAsTransform, p: 1 } ]);
+  }));
   token.isWhitespace = isWhitespace;
   return token;
 }
@@ -97,7 +99,6 @@ describe('ContextTokenization', function() {
       let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
-      assert.isNotOk(tokenization.transitionEdits);
       assert.equal(tokenization.tail.exampleInput, 'day');
       assert.isFalse(tokenization.tail.isWhitespace);
     });
@@ -105,36 +106,11 @@ describe('ContextTokenization', function() {
     it("constructs from a token array + alignment data", () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       const tokens = rawTextTokens.map((text => toTransformToken(text)));
-      const emptyTransform = { insert: '', deleteLeft: 0, deleteRight: 0 };
 
-      // We _could_ flesh this out a bit more... but it's not really needed for this test.
-      const edgeWindow = buildEdgeWindow(tokens, emptyTransform, false, testEdgeWindowSpec);
-      let transitionEdits: TransitionEdge = {
-        alignment: {
-          merges: [],
-          splits: [],
-          unmappedEdits: [],
-          edgeWindow: {...edgeWindow, retokenization: rawTextTokens.slice(edgeWindow.sliceIndex)},
-          removedTokenCount: 0
-        },
-        inputs: [{sample: (() => {
-          const map = new Map<number, Transform>();
-          map.set(0, emptyTransform);
-          return map;
-        })(), p: 1}],
-        inputSubsetId: generateSubsetId()
-      };
-
-      let tokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
+      let tokenization = new ContextTokenization(tokens);
 
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
-      assert.isOk(tokenization.transitionEdits);
-      assert.deepEqual(tokenization.transitionEdits, {
-        addedNewTokens: false,
-        removedOldTokens: false,
-        editedTokenCount: 1
-      });
       assert.equal(tokenization.tail.exampleInput, 'day');
       assert.isFalse(tokenization.tail.isWhitespace);
     });
@@ -142,27 +118,7 @@ describe('ContextTokenization', function() {
     it('clones', () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       const tokens = rawTextTokens.map((text => toTransformToken(text)));
-      const emptyTransform = { insert: '', deleteLeft: 0, deleteRight: 0 };
-
-      // We _could_ flesh this out a bit more... but it's not really needed for this test.
-      const edgeWindow = buildEdgeWindow(tokens, emptyTransform, false, testEdgeWindowSpec);
-      let transitionEdits: TransitionEdge = {
-        alignment: {
-          merges: [],
-          splits: [],
-          unmappedEdits: [],
-          edgeWindow: {...edgeWindow, retokenization: rawTextTokens.slice(edgeWindow.sliceIndex)},
-          removedTokenCount: 0
-        },
-        inputs: [{sample: (() => {
-          const map = new Map<number, Transform>();
-          map.set(0, emptyTransform);
-          return map;
-        })(), p: 1}],
-        inputSubsetId: generateSubsetId()
-      };
-
-      let baseTokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
+      let baseTokenization = new ContextTokenization(tokens);
       let cloned = new ContextTokenization(baseTokenization);
 
       assert.sameOrderedMembers(

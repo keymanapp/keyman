@@ -38,7 +38,7 @@ enum TimedTaskTypes {
   CORRECTING = 2
 }
 
-enum PathEdge {
+export enum PathEdge {
   ROOT = 'root',
   INSERTION = 'insertion',
   DELETION = 'deletion',
@@ -162,7 +162,7 @@ export class SearchNode {
    * Notes the edit operation used for the most recent edge in the node's
    * represented search path.
    */
-  private readonly lastEdgeType: PathEdge;
+  readonly lastEdgeType: PathEdge;
 
   constructor(rootTraversal: LexiconTraversal, spaceId: number, toKey?: (arg0: string) => string);
   constructor(node: SearchNode, spaceId?: number, edgeType?: PathEdge);
@@ -276,7 +276,11 @@ export class SearchNode {
    * character not seen in the input, as if the user accidentally skipped typing
    * it.  No new input will be expected, but the search will continue one
    * character deeper in the backing lexicon.
-   * @param spaceId
+   * @param spaceId A unique identifier associated with the SearchQuotientNode
+   * that calls this method and processes the resulting SearchNodes.
+   *
+   * If left empty, the nodes will be associated with the same SearchQuotientNode
+   * as this instance.
    * @returns An array of SearchNodes corresponding to lexical entries that are
    * prefixed with the lexicon entry represented by the current Node's
    * matchSequence text.

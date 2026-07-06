@@ -1,15 +1,13 @@
 import * as models from '@keymanapp/models-templates';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { TransformUtils } from './transformUtils.js';
-import { applySuggestionCasing, correctAndEnumerate, createDefaultKeep, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
-import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
+import { applySuggestionCasing, composeIntermediatePredictions, correctAndEnumerate, createDefaultKeep, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
+import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
 import { ContextTracker } from './correction/context-tracker.js';
 import { DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL } from './correction/distance-modeler.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 
-import CasingForm = LexicalModelTypes.CasingForm;
 import Configuration = LexicalModelTypes.Configuration;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
@@ -125,24 +123,6 @@ export class ModelCompositor {
     const transformId = inputTransform.id;
     this.initContextTracker(context, transformId);
 
-    const allowBksp = TransformUtils.isBackspace(inputTransform);
-    const allowWhitespace = TransformUtils.isWhitespace(inputTransform);
-
-    const postContext = models.applyTransform(inputTransform, context);
-
-    // TODO:  It would be best for the correctAndEnumerate method to return the
-    // suggestion's prefix, as it already has lots of logic oriented to this.
-    // The context-tracker used there with v14+ models can determine this more
-    // robustly.
-    const truePrefix = this.wordbreak(postContext);
-    // Only use of `truePrefix`.
-    const basePrefix = (allowBksp || allowWhitespace) ? truePrefix : this.wordbreak(context);
-
-    // Used to restore whitespaces if operations would remove them.
-    const currentCasing: CasingForm = lexicalModel.languageUsesCasing
-      ? detectCurrentCasing(lexicalModel, postContext)
-      : null;
-
     // Section 1:  determine 'prediction roots' - enumerate corrections from most to least likely,
     // searching for results that yield viable predictions from the model.
 
@@ -160,18 +140,22 @@ export class ModelCompositor {
     // Properly capitalizes the suggestions based on the existing context casing state.
     // This may result in duplicates if multiple casing options exist within the
     // lexicon for a word.  (Example:  "Apple" the company vs "apple" the fruit.)
-    for(let tuple of rawPredictions) {
-      if(currentCasing && currentCasing != 'lower') {
-        applySuggestionCasing(tuple.prediction.sample, basePrefix, this.lexicalModel, currentCasing);
+    if(lexicalModel.languageUsesCasing) {
+      for(let tuple of rawPredictions) {
+        tuple.components.forEach((component) => applySuggestionCasing(component, this.lexicalModel));
       }
     }
 
+    // what if... we fuse suggestions together here, after the 'apply casing' step?
+    // deduplication, etc function fine from a fused-prediction perspective here.
+
     // We want to dedupe before trimming the list so that we can present a full set
     // of viable distinct suggestions if available.
-    const deduplicatedSuggestionTuples = dedupeSuggestions(this.lexicalModel, rawPredictions, context);
+    const deduplicatedSuggestionTuples = dedupeSuggestions(this.lexicalModel, composeIntermediatePredictions(rawPredictions), context);
 
     // Needs "casing" to be applied first.
-    const hasExistingKeep = processSimilarity(this.lexicalModel, deduplicatedSuggestionTuples, context, transformDistribution[0]);
+    const postContext = postContextState?.context ?? models.applyTransform(inputTransform, context);
+    const hasExistingKeep = processSimilarity(this.lexicalModel, deduplicatedSuggestionTuples, context, postContext);
 
     // If no existing suggestion directly matches the user-visible version of
     // the token, also add a 'keep' suggestion (with `.matchesModel = false`)
@@ -217,6 +201,12 @@ export class ModelCompositor {
           suggestions.unshift(reversion)
         }
       }
+    }
+
+    if(suggestions.filter((s) => s.tag == 'keep').length > 1) {
+      throw new Error(`Unexpected state:  multiple keep suggestions exist: ${JSON.stringify(suggestions.filter((s) => s.tag == 'keep'))}`);
+    } else if(suggestions.filter((s) => s.tag == 'revert').length > 1) {
+      throw new Error(`Unexpected state:  multiple revert suggestions exist! ${JSON.stringify(suggestions.filter((s) => s.tag == 'revert'))}`);
     }
 
     // Store the suggestions on the final token of the current context state (if it exists).
