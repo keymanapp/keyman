@@ -1,12 +1,14 @@
 /*
- * Keyman is copyright (C) SIL International. MIT License.
+ * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Lists all the available converters and finds matching converter
  */
-import { KeylayoutToKmnConverter } from './keylayout-to-kmn/keylayout-to-kmn-converter.js';
+import { KeylayoutToKmnConverter } from './kmc-convert-convert/keylayout-to-kmn-converter.js';
+import { XkbToKmnConverter } from './kmc-convert-convert/xkb-to-kmn-converter.js';
 
 const converters = [
   KeylayoutToKmnConverter,
+  XkbToKmnConverter,
 ];
 
 export class ConverterClassFactory {

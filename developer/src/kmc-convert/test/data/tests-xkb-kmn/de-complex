@@ -1,0 +1,47 @@
+// Common Latin alphabet layout
+// 0x1001E9E on key key <AE12>, key <AC10> , key <LSGT> added for testing purposes by SAB
+// can now process 
+//              comments ( // and /* */)
+//              different key.type
+//              defined xkb_symbols block
+//              read variant from variable
+default xkb_symbols "basic" {
+
+    key <AE01>	{ [   /*some comment in the middle*/      1,     exclam,  onesuperior,   exclamdown ]	}; 
+    key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	}; // some comment at the end
+    key <AE03>	{ [         3,    section, threesuperior,    sterling ]	};
+    key <AD04>	{ [         r,    /*a comment in the middle*/       R,    paragraph,   registered ]	}; // plus some comment at the end
+    
+    key <AE11> {type[Group1]="FOUR_LEVEL_PLUS_LOCK",  symbols[Group1]=
+                  [ssharp, question, backslash, questiondown, B ]};
+
+
+    key.type[Group1] = "EIGHT_LEVEL";
+    // t,T,ŧ ,Ŧ ,ṭ,ṫ,ţ,ᵗ
+            key <AD05>	{ [ t, T,  tslash,Tslash ,U1E6D ,U1E6B ,U0163 ,U1D57]	};
+            
+    key.type[Group1] = "ONE_LEVEL";
+            key <AD06> { [Z] };
+            key <AD07> { [U] };
+            key <AD08> { [I] };   
+   // key <AD06>	{ [         z,          Z,    leftarrow,          yen ]	};
+   // key <AD07>	{ [         u,          U,    downarrow,      uparrow ]	};
+   // key <AD08>	{ [         i,          I,   rightarrow,     idotless ]	};
+    
+    key.type[Group1] = "DEFAULT_LEVEL";
+    key <AD09>	{ [         o,          O,       oslash,     Ooblique ]	};
+    key <AD10>	{ [         p,          P,        thorn,        THORN ]	};
+       
+};
+
+
+partial alphanumeric_keys
+xkb_symbols "deadtilde" {
+    // previous standard German layout with tilde as dead key
+
+    include "de(basic)"
+    name[Group1]="German (dead tilde)";
+
+    key <AD12>	{ [      plus,   asterisk,   dead_tilde,  dead_macron ]	};
+};
+
