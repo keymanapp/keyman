@@ -45,12 +45,10 @@
       // Thank you to https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
       const alertType = (new URLSearchParams(window.location.search)).get("useAlerts") != "false";
 
-      var kmw=window.keyman;
-
-      // Test adding keyboards before kmw.init get deferred
+      // Test adding keyboards before keyman.init get deferred
       addKeyboards('french','@he');
 
-      kmw.init({
+      keyman.init({
         attachType: 'auto',
         useAlerts: alertType
       }).then(function() {
