@@ -98,7 +98,7 @@ describe('KmnFileWriter', function () {
       [[new Rule("C3", 'UNAVAILABLE_prev_dk', 'K_D', 0, 0, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'UNAVAIL', 'K_C', new TextEncoder().encode('D'),)],
       ['c WARNING: unavailable modifier : here: '],
       ['c WARNING: unavailable modifier : here: '],
-      ['c WARNING: unavailable modifier : here: ']],
+      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) : unavailable modifier : here: ']],
 
       [[new Rule("C3", 'CAPS', 'K_D', 0, 0, 'RALT', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
       [''],

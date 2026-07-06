@@ -6,9 +6,9 @@
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def } from '@keymanapp/developer-utils';
 
 const Namespace = CompilerErrorNamespace.Converter;
-//const SevInfo = CompilerErrorSeverity.Info | Namespace;
+// const SevInfo = CompilerErrorSeverity.Info | Namespace;
 // const SevHint = CompilerErrorSeverity.Hint | Namespace;
-const SevWarn = CompilerErrorSeverity.Warn | Namespace;
+// const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 // const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
@@ -75,12 +75,6 @@ export class ConverterMessages {
   static Error_UnableToParse = () => m(
     this.ERROR_UnableToParse,
     `Input data could not be parsed.`
-  );
-
-  static WARN_EmptyOutput = SevWarn | 0x000D;
-  static Warn_EmptyOutput =(o: { keymapIndex: string, key: string, KeyName: string; }) => m(
-    this.WARN_EmptyOutput,
-    `Key has empty output (possibly caused by use of html entity) at keyMap index ${def(o.keymapIndex)} on Keycode ${def(o.key)} (${def(o.KeyName)})`
   );
 
 }

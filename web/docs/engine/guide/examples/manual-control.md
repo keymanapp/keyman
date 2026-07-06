@@ -10,21 +10,19 @@ Include the following script in the HEAD of your page:
 
 ```js
 <script>
-  /* SetupDocument: Called when the page finishes loading */
-  function SetupDocument()
-  {
-    /* Make sure that Keyman is initialized (we can't guarantee initialization order) */
-    keyman.init().then(function () {
-      /* Prevents automatic display of the onscreen keyboard. (default automatic) */
-      keyman.osk.hide();
-      /* Select the LaoKeys keyboard */
+    keyman.init().then(async function() {
+      await keyman.addKeyboards({
+        id: "laokeys",
+        name: "Lao (Phonetic)",
+        languages:{id:'lo',name:'Lao'},
+        filename: "./js/laokeys.js"
+      });
       keyman.setActiveKeyboard('laokeys');
+      keyman.osk.hide();
     });
-  }
 
   /* KWControlClick: Called when user clicks on the KWControl IMG */
-  function KWControlClick()
-  {
+  function KWControlClick() {
     if(keyman.osk.isEnabled()) {
       keyman.osk.hide();
     } else {
@@ -40,16 +38,9 @@ Also include the following HTML code:
 ```html
 <head>
     <!-- Load the KeymanWeb engine -->
-    <script src="keymanweb.js" type="text/javascript"></script>
-    <!-- Load the LaoKeys keyboard stub -->
-    <script src="laokeys_load.js" type="text/javascript"></script>
+    <script src="https://s.keyman.com/kmw/engine/17.0.331/keymanweb.js" type="text/javascript"></script>
 </head>
-
-<!-- When the page has finished loading, activate the LaoKeys keyboard, see above -->
-<body onload="SetupDocument()">
 ```
-
-- File: [laokeys_load.js](js/laokeys_load.js)
 
 And finally, include the control img for KeymanWeb:
 
@@ -61,9 +52,11 @@ And finally, include the control img for KeymanWeb:
 ## API References
 
 On programmatically setting the keyboard:
+
 - [`keyman.setActiveKeyboard()`](../../reference/core/setActiveKeyboard).
 
 On managing the visibility of the OSK:
+
 - [`keyman.osk.hide()`](../../reference/osk/hide)
 - [`keyman.osk.show()`](../../reference/osk/show).
 
