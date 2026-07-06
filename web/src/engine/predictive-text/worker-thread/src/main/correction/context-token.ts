@@ -10,7 +10,7 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { SearchQuotientNode, PathInputProperties } from "./search-quotient-node.js";
-import { TokenSplitMap } from "./context-tokenization.js";
+import { TokenSplitMapping } from "./context-tokenization.js";
 import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
 import { LegacyQuotientRoot } from "./legacy-quotient-root.js";
 import { generateSubsetId } from './tokenization-subsets.js';
@@ -199,7 +199,7 @@ export class ContextToken {
    * @param lexicalModel
    * @returns
    */
-  split(split: TokenSplitMap): ContextToken[] {
+  split(split: TokenSplitMapping): ContextToken[] {
     // Split from tail to head - leave as much 'head' intact as possible at each
     // step, rather than needing to reconstruct the tail multiple times.
     const splitSpecs = split.matches.slice();
