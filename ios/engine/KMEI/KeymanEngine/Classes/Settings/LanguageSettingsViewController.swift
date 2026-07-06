@@ -119,6 +119,8 @@ class LanguageSettingsViewController: UITableViewController {
     self.doAutocorrectionsSwitch?.isHidden = !(value && mayCorrect)
     self.doAutocorrectionsLabel?.isEnabled = value && mayCorrect
     self.correctionsCell?.isUserInteractionEnabled = value
+    
+    refreshModelIfNeeded()
   }
   
   @objc
