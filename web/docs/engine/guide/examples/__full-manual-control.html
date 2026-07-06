@@ -24,13 +24,13 @@ keyman.init().then(async function() {
   }
   document.f.multilingual.focus();
 
-  keyman.setActiveKeyboard('', '');
+  await keyman.setActiveKeyboard('', '');
 });
 
-function KWControlChange() {
+async function KWControlChange() {
   var name = KWControl.value.substr(0, KWControl.value.indexOf("$$"));
   var languageCode = KWControl.value.substr(KWControl.value.indexOf("$$") + 2);
-  keyman.setActiveKeyboard(name, languageCode);
+  await keyman.setActiveKeyboard(name, languageCode);
   document.f.multilingual.focus();
 }
 
@@ -40,7 +40,7 @@ function KWControlChange() {
 <h1>Manual Control - Custom Interface</h1>
 <form name='f' action='.' method='post'>
 
-  <p>Keyboard: <select id='KWControl' onchange='KWControlChange()'><option value=''>English</option></select></p>
+  <p><label for='KWControl'>Keyboard:</label> <select id='KWControl' onchange='KWControlChange()'><option value=''>English</option></select></p>
 
 <p><input type='text' id='multilingual' name='multilingual' size="40" placeholder="id='multilingual'"/></p>
 </form>

@@ -13,6 +13,7 @@ samples/KMSample2/KeymanEngine.xcframework
 samples/KMSample2/build
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanios.js
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanweb-osk.ttf
+engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/globe-hint.css
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/kmwosk.css
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keyman.js.map
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanweb-webview.js

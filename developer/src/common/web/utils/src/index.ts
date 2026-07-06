@@ -79,3 +79,5 @@ export { getFontFamily, getFontFamilySync } from './font-family.js';
 export * as ValidIds from './valid-ids.js';
 
 export * as ProjectLoader from './project-loader.js';
+
+export { optionsManager, KeymanDeveloperOption, KeymanDeveloperOptions, KeymanDeveloperOptionsPath } from './keyman-developer-options.js';
