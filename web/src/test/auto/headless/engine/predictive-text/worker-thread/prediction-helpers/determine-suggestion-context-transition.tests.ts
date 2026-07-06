@@ -150,7 +150,7 @@ describe('determineContextTransition', () => {
       }
     };
 
-    compositor.acceptSuggestion(applied_testing, baseContext, { insert: '', deleteLeft: 0 });
+    compositor.acceptSuggestion(applied_testing, baseContext, { insert: '', deleteLeft: 0, id: applied_testing.transform.id });
     const acceptingTransition = tracker.latest;
 
     const inputDistribution: Distribution<Transform> = [{sample: applied_testing.appendedTransform, p: 1}];
@@ -203,7 +203,7 @@ describe('determineContextTransition', () => {
     };
     baseTransition.final.suggestions = [pred_testing];
 
-    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0 });
+    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0, id: pred_testing.transform.id });
 
     const inputDistribution: Distribution<Transform> = [{sample: { insert: 'a', deleteLeft: 0, id: 5 }, p: 1}];
 
@@ -262,7 +262,7 @@ describe('determineContextTransition', () => {
     };
     baseTransition.final.suggestions = [pred_testing];
 
-    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0 });
+    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0, id: pred_testing.transform.id });
 
     const inputDistribution: Distribution<Transform> = [{sample: { insert: 'a', deleteLeft: 0, id: 5 }, p: 1}];
 
@@ -323,7 +323,7 @@ describe('determineContextTransition', () => {
     };
     baseTransition.final.suggestions = [pred_testing];
 
-    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0 });
+    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0, id: pred_testing.transform.id });
 
     const inputDistribution: Distribution<Transform> = [{sample: { insert: 'a', deleteLeft: 0, id: 5 }, p: 1}];
 
@@ -396,7 +396,7 @@ describe('determineContextTransition', () => {
     };
     baseTransition.final.suggestions = [pred_testing];
 
-    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0 });
+    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0, id: pred_testing.transform.id });
 
     const inputDistribution: Distribution<Transform> = [{sample: { insert: 'a', deleteLeft: 0, id: 5 }, p: 1}];
 
