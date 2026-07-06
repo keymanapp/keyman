@@ -48,15 +48,6 @@ interface EditTokenMappingHalf {
  */
 interface SplitTokenMappingHalf extends EditTokenMappingHalf {
   /**
-   * The index of the affected token.
-   */
-  index: number,
-  /**
-   * The token's most likely represented text.
-   */
-  text: string,
-
-  /**
    * The codepoint index within the original token at which the split-off token
    * begins.
    */
