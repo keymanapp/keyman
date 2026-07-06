@@ -33,7 +33,7 @@ const getPullRequestInformation = async (
   return commit_id;
 };
 
-interface PRInformation {
+export interface PRInformation {
   title: string;
   number: number;
   version?: string;
