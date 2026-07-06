@@ -173,10 +173,11 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.stepstone.stepper:material-stepper:4.3.1'
+    implementation 'androidx.webkit:webkit:1.14.0'
     implementation files('libs/keyman-engine.aar')
     implementation 'io.sentry:sentry-android:8.19.1'
     implementation 'androidx.preference:preference:1.2.1'
-    implementation "com.android.installreferrer:installreferrer:2.2"
+    implementation 'com.android.installreferrer:installreferrer:2.2'
 
     // Add dependency for generating QR Codes
     // (Even though it's embedded in KMEA, because we're manually copying keyman-engine.aar,
