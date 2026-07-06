@@ -50,7 +50,6 @@ export class InputProcessor {
     this.contextDevice = device;
     this.jsKbdProcessor = new JSKeyboardProcessor(device, options);
     this._keyboardProcessor = this.jsKbdProcessor;
-    this.coreKbdProcessor = new CoreKeyboardProcessor(device, options.baseLayout);
     this._languageProcessor = new LanguageProcessor(predictiveWorkerFactory, this.contextCache);
   }
 
