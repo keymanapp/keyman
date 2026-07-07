@@ -214,12 +214,13 @@ import Foundation
 }
 
 @Suite("Read Keyman package") struct KeymanPackageRepositoryTests {
-  let packageRepo = PackageRepository()
+  let packageRepo: PackageRepository
   let kmpUrl: URL
   let source: PackageSource?
   let fakePackageUrl: URL = URL(fileURLWithPath: "/fake/test/destination/amharic-fake")
 
   fileprivate init() async throws {
+    try packageRepo = PackageRepository()
     self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
     source = try packageRepo.readPackage(packageDirectoryUrl: fakePackageUrl, kmpFileUrl: self.kmpUrl)
   }
@@ -254,12 +255,13 @@ import Foundation
    * Ensure that Keyboard objects are correctly created from Keyboardsource
    */
   @Suite("Check keyboard state") struct KeyboardStateTests {
-    let packageRepo = PackageRepository()
+    let packageRepo: PackageRepository
     let kmpUrl: URL
     let packageSource: PackageSource?
     let fakePackageUrl: URL = URL(fileURLWithPath: "/fake/test/destination/amharic-fake")
     
     fileprivate init() async throws {
+      try packageRepo = PackageRepository()
       self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
       self.packageSource = try packageRepo.readPackage(packageDirectoryUrl: fakePackageUrl, kmpFileUrl: self.kmpUrl)
     }

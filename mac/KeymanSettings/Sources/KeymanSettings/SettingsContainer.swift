@@ -87,7 +87,10 @@ public class SettingsContainer : ObservableObject {
     self.registerObservers()
   }
   
-  public init(defaultsRepo: DefaultsRepo, packageRepo: PackageRepo) {
+  /**
+   * initializer only for use with unit tests, allows injection of stubs for `DefaultsRepo` and `PackageRepo`
+   */
+  init(defaultsRepo: DefaultsRepo, packageRepo: PackageRepo) {
     self.defaultsRepository = defaultsRepo
     self.packageRepository = packageRepo
     self.selectedKeyboard = self.defaultsRepository.readSelectedKeyboard()
@@ -95,6 +98,9 @@ public class SettingsContainer : ObservableObject {
     self.installedPackages = []
   }
   
+  /**
+   * register observers to handle notifications
+   */
   func registerObservers() {
     // for installation of a new package
     NotificationCenter.default.addObserver(
@@ -109,12 +115,18 @@ public class SettingsContainer : ObservableObject {
     )
   }
   
+  /**
+   * called for `newPackageInstalled` notification
+   */
   @objc func newPackageInstalled(_ notification: Notification) {
     print("newPackageInstalled notification received")
     self.addInstalledPackage()
     self.packageDownload = nil
   }
 
+  /**
+   * called for `packageReplaced` notification
+   */
   @objc func existingPackageReplaced(_ notification: Notification) {
     print("existingPackageReplaced notification received")
     self.replaceInstalledPackage()
@@ -122,7 +134,7 @@ public class SettingsContainer : ObservableObject {
   }
   
   /**
-   * Called in response to user confirming downgrade of package
+   * Called when user approves the downgrade of package
    */
   public func userConfirmedPackageDowngrade() {
     self.replaceInstalledPackage()
@@ -130,7 +142,7 @@ public class SettingsContainer : ObservableObject {
   }
 
   /**
-   * Called in response to user canceling downgrade of package
+   * Called when user chooses to cancel downgrade of package
    */
   public func userCanceledPackageDowngrade() {
     if let download = self.packageDownload {

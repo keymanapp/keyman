@@ -3,8 +3,8 @@
  *
  * Created by Shawn Schantz on 2026-06-30
  *
- * Tracks the state of a package being downloaded with helpful functions
- * to derive its temporary download location, compare it to an
+ * Tracks the state of a package being downloaded with functions
+ * to derive its temporary download location, compare it to a
  * package of the same type if it exists and replace or delete depending
  * on its version and user feedback.
  */
@@ -13,14 +13,13 @@ import Foundation
 
 @MainActor // run on the main actor as it is called from SettingsContainer
 public class PackageDownload {
-  //  let packageName: String
   let temporaryKmpFileLocation: URL
   let temporaryPackageLocation: URL
   let installPackageLocation: URL
   let installedPackages: [KeymanPackage]    // needed to check for existing package after download
   var packageToInstall: KeymanPackage?      // the newly downloaded package
   var packageToReplace: KeymanPackage?      // the package to replace, if it exists
-
+  
   fileprivate let packageRepository: PackageRepo
   
   public init(filename: String, packageName: String, packageRepo: PackageRepo, installedPackages: [KeymanPackage]) {
@@ -49,10 +48,14 @@ public class PackageDownload {
       try self.handleNewPackage()
     } catch {
       print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
-      // MAC-CONFIG-TODO: send notification that installation failed
+      // MAC-CONFIG-TODO: handle error
+      // send notification that installation failed?
     }
   }
   
+  /**
+   * Unzip the and load the downloaded package
+   */
   func unzipDownloadedPackage(for kmpFileUrl: URL) throws {
     try self.packageRepository.unzipKmpFile(at: kmpFileUrl, to: self.temporaryPackageLocation)
     
@@ -94,6 +97,9 @@ public class PackageDownload {
     return packageExists
   }
   
+  /**
+   * Send a notification that an attempt to downgrade a package has been detected
+   */
   func sendNotificationToConfirmPackageDowngrade() {
     NotificationCenter.default.post(
       name: .packageDowngradeRequested,
@@ -102,17 +108,23 @@ public class PackageDownload {
     )
   }
   
+  /**
+   * Install the newly downloaded package (no existing package to replace)
+   */
   func installNewPackage() throws {
     try self.movePackageFromTemporaryToInstalled()
     try self.deleteDownloadedKmpFile()
-
+    
     NotificationCenter.default.post(
       name: .newPackageInstalled,
       object: nil,
       userInfo: nil
     )
   }
-
+  
+  /**
+   * Replace the existing installed package with the newly download package
+   */
   func replaceExistingPackageWithNewPackage() throws {
     try self.deleteInstalledPackage()
     try self.deleteDownloadedKmpFile()
@@ -132,29 +144,58 @@ public class PackageDownload {
     try self.deleteDownloadedKmpFile()
     try self.deleteDownloadedPackage()
   }
-
+  
+  /**
+   * Delete the existing installed package that matches the downloaded package
+   */
   func deleteInstalledPackage() throws {
     try FileManager.default.removeItem(at: self.installPackageLocation)
   }
-
+  
+  /**
+   * Move the downloaded package into the keyman packages directory
+   */
   func movePackageFromTemporaryToInstalled() throws {
     try FileManager.default.moveItem(at: self.temporaryPackageLocation, to: self.installPackageLocation)
   }
   
+  /**
+   * Delete the downloaded .kmp file from the temp directory
+   */
   func deleteDownloadedKmpFile() throws {
     try FileManager.default.removeItem(at: self.temporaryKmpFileLocation)
   }
   
+  /**
+   * Delete the downloaded package from the temp directory
+   */
   func deleteDownloadedPackage() throws {
     try FileManager.default.removeItem(at: self.temporaryPackageLocation)
   }
-
+  
+  /**
+   * Determine whether the new package is older than the currently installed package
+   */
   func replacingInstalledPackageWithEarlierVersion() -> Bool {
-    // MAC-CONFIG-TODO: implement package version comparison
-    if let existingPackage = self.packageToReplace, let newPackage = self.packageToInstall {
-      return existingPackage.packageVersion > newPackage.packageVersion
-    } else {
+    var downgrade = false
+    
+    guard let installedVersion = self.packageToReplace?.packageVersion,
+          let newVersion = self.packageToInstall?.packageVersion else {
       return false
     }
+    
+    let comparisonResult = newVersion.compare(installedVersion, options: .numeric)
+    
+    if comparisonResult == .orderedAscending {
+      // downgrade detected
+      downgrade = true
+      print("downgrade: new version is older than installed version")
+    } else if comparisonResult == .orderedDescending {
+      print("upgrade: new version is newer than installed version")
+    } else {
+      print("new and installed versions are identical")
+    }
+    
+    return downgrade
   }
 }
