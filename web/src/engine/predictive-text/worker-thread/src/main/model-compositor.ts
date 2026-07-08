@@ -239,9 +239,9 @@ export class ModelCompositor {
     // Step 1:  re-use the original input Transform as the reversion's Transform.
     // The Web engine will restore the original state of the context before accepting
     // and before reverting; all we need to do is put the original keystroke back in place.
-    let reversionTransform: Transform = originalInput ?? { insert: '', deleteLeft: 0, id: suggestion.transform.id };
-    // clone the transform to prevent aliasing
-    reversionTransform = {...reversionTransform};
+    let reversionTransform: Transform = originalInput 
+      ? { ...originalInput } 
+      : { insert: '', deleteLeft: 0, id: suggestion.transform.id };
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
     const postContext = originalInput ? models.applyTransform(originalInput, context) : context;
