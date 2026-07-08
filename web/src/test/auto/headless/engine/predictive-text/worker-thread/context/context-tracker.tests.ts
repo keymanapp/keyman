@@ -34,7 +34,7 @@ describe('ContextTracker', function() {
           deleteLeft: 0,
           id: 15
         },
-        transformId: 2,
+        transitionId: 2,
         id: 1,
         displayAs: 'world'
       };
