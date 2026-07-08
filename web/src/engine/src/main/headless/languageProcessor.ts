@@ -306,10 +306,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Find the state of the context at the time the suggestion was generated.
     // This may refer to the context before an input keystroke or before application
     // of a predictive suggestion.
-    //
-    // Reversions use the additive inverse of the id token of the Transcription being
-    // reverted to.
-    const reversionId = appendedOnly ? reversion.appendedTransform.id : -reversion.transform.id;
+    const reversionId = appendedOnly ? reversion.appendedTransform.id : reversion.transform.id;
     const original = this.getPredictionState(reversionId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");

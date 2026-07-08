@@ -239,9 +239,9 @@ export class ModelCompositor {
     // Step 1:  re-use the original input Transform as the reversion's Transform.
     // The Web engine will restore the original state of the context before accepting
     // and before reverting; all we need to do is put the original keystroke back in place.
-    let reversionTransform: Transform = originalInput ?? { insert: '', deleteLeft: 0 };
-    // clone the transform to prevent aliasing
-    reversionTransform = {...reversionTransform};
+    let reversionTransform: Transform = originalInput 
+      ? { ...originalInput } 
+      : { insert: '', deleteLeft: 0, id: suggestion.transform.id };
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
     const postContext = originalInput ? models.applyTransform(originalInput, context) : context;
@@ -265,9 +265,6 @@ export class ModelCompositor {
     // Since we're outside of the standard `predict` control path, we'll need to
     // set the Reversion's ID directly.
     let reversion = toAnnotatedSuggestion(this.lexicalModel, firstConversion, 'revert');
-    if(suggestion.transform.id != null) {
-      reversion.transform.id = -suggestion.transform.id;
-    }
     if(suggestion.id != null) {
       // Since a reversion inverts its source suggestion, we set its ID to be the
       // additive inverse of the source suggestion's ID.  Makes easy mapping /
@@ -331,11 +328,8 @@ export class ModelCompositor {
     let compositor = this;
     let suggestions: Promise<Suggestion[]>;
     let fallbackSuggestions = async function() {
-      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, context);
+      const suggestions = await compositor.predict({insert: '', deleteLeft: 0, id: reversion.transform.id}, context);
       suggestions.forEach(function(suggestion) {
-        // A reversion's transform ID is the additive inverse of its original suggestion;
-        // we revert to the state of said original suggestion.
-        suggestion.transform.id = -reversion.transform.id;
         // Prevent auto-selection of any suggestion immediately after a reversion.
         // It's fine after at least one keystroke, but not before.
         suggestion.autoAccept = false;
@@ -352,7 +346,7 @@ export class ModelCompositor {
     // Note that the base reversion's .transform.id will predate the appendedTransform id
     // used to add whitespace (if one existed), so reverting to the base ID's associated
     // context also reverts the appendedTransform.
-    const baseTransitionId = -reversion.transform.id;
+    const baseTransitionId = reversion.transform.id;
     let originalTransition = this.contextTracker.findAndRevert(baseTransitionId);
 
     if(appendedOnly) {

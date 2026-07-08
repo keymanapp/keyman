@@ -685,7 +685,8 @@ describe('ModelCompositor', function() {
       // of the Context when the suggestion is built.
       let postTransform = {
         insert: 'l',
-        deleteLeft: 0
+        deleteLeft: 0,
+        id: baseSuggestion.transform.id
       }
 
       let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
@@ -727,7 +728,8 @@ describe('ModelCompositor', function() {
       // of the Context when the suggestion is built.
       let postTransform = {
         insert: 'l',
-        deleteLeft: 0
+        deleteLeft: 0,
+        id: baseSuggestion.id
       }
 
       let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
@@ -804,7 +806,8 @@ describe('ModelCompositor', function() {
       // of the Context when the suggestion is built.
       let postTransform = {
         insert: 'i',
-        deleteLeft: 1
+        deleteLeft: 1,
+        id: baseSuggestion.transform.id
       }
 
       let reversion = acceptanceTest(englishPunctuation, baseSuggestion, baseContext, postTransform);
@@ -860,7 +863,8 @@ describe('ModelCompositor', function() {
       // of the Context when the suggestion is built.
       let postTransform = {
         insert: 'i',
-        deleteLeft: 1
+        deleteLeft: 1,
+        id: baseSuggestion.transform.id
       }
 
       let model = new models.DummyModel({punctuation: englishPunctuation});
@@ -918,7 +922,7 @@ describe('ModelCompositor', function() {
       let baseSuggestion = initialSuggestions[1];
       baseSuggestion.appendedTransform.id = 15; // set an id for the applied transform.
       let reversion = compositor.acceptSuggestion(baseSuggestion, baseContext, postTransform);
-      assert.equal(reversion.transform.id, -baseSuggestion.transform.id);
+      assert.equal(reversion.transform.id, baseSuggestion.transform.id);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
@@ -965,7 +969,7 @@ describe('ModelCompositor', function() {
       assert.equal(compositor.contextTracker.unitTestEndPoints.cache().size, 2);
       let contextIds = compositor.contextTracker.unitTestEndPoints.cache().keys();
 
-      assert.equal(reversion.transform.id, -baseSuggestion.transform.id);
+      assert.equal(reversion.transform.id, baseSuggestion.transform.id);
       assert.equal(reversion.id, -baseSuggestion.id);
 
       const appliedContextState = compositor.contextTracker.unitTestEndPoints.cache().get(15);
