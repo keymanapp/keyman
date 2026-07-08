@@ -70,7 +70,7 @@ public class SettingsContainer : ObservableObject {
     } catch UserDefaultsError.unknownSuite {
       fatalError("Defaults group container not found.")
     } catch {
-      fatalError("Unable to access defaults in group container.")
+      fatalError("Unable to access defaults in group container: \(error.localizedDescription).")
     }
     
     self.selectedKeyboard = self.defaultsRepository.readSelectedKeyboard()

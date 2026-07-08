@@ -21,13 +21,12 @@ struct KeyboardSearchView: NSViewRepresentable {
   // MAC-CONFIG-TODO: build URL rather than hard-code
   let searchURL = URL(string: "https://keyman.com/go/macos/14.0/download-keyboards/?version=19.0.284")!
 
-
-  // Creates the Coordinator to handle WebKit delegate methods
+  /** Creates the Coordinator to handle WebKit delegate methods */
   func makeCoordinator() -> Coordinator {
     Coordinator()
   }
   
-  // Creates the underlying NSView (WKWebView) for macOS
+  /** Creates the underlying NSView (WKWebView) for macOS */
   func makeNSView(context: Context) -> WKWebView {
     print("makeNSView called")
     let webView = WKWebView()
@@ -45,7 +44,6 @@ struct KeyboardSearchView: NSViewRepresentable {
    * This is a safe place to pass the SettingsContainer to the Coordinator
    * as the environment has been loaded by now.
    */
-  
   func updateNSView(_ nsView: WKWebView, context: Context) {
     if context.coordinator.settings == nil {
       context.coordinator.settings = self.settings
@@ -75,6 +73,7 @@ struct KeyboardSearchView: NSViewRepresentable {
         return
       }
       
+      // MAC-CONFIG-TODO: is this necessary or is download attribute enough to identify
       // check if URL ends with a target file extension
       if let url = navigationAction.request.url {
         if url.pathExtension.lowercased() == KeymanPaths.keymanPackageFileExtension {
@@ -87,9 +86,7 @@ struct KeyboardSearchView: NSViewRepresentable {
       decisionHandler(.allow, preferences)
     }
     
-    /**
-     * decide whether the navigation should be allowed, canceled or result in a download
-     */
+    /** decide whether the navigation should be allowed, canceled or result in a download */
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping @MainActor (WKNavigationResponsePolicy) -> Void) {

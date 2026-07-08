@@ -47,7 +47,7 @@ public class InstallationContainer : ObservableObject {
     do {
       try inputMethodUtil = InputMethodUtil()
     } catch {
-      fatalError("Unable to access group container path for InputMethodUtil.")
+      fatalError("Unable to access group container path for InputMethodUtil: \(error.localizedDescription).")
     }
     
     self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)

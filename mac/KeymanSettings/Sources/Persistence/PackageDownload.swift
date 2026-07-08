@@ -68,7 +68,7 @@ public class PackageDownload {
    * Decides whether the package should be installed.
    * - If this package is not replacing a package, then it is installed.
    * - If this package is replacing an older package, the new package replaces the old.
-   * - If this package is replacing an older package, then the user is notified to confirm.
+   * - If this package is replacing a newer package, then the user is notified to confirm.
    */
   func handleNewPackage() throws {
     // first check whether this install is replacing an existing package,
