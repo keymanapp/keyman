@@ -804,10 +804,20 @@ final class KMKeyboard extends WebView {
     }
   }
 
+  /**
+   * Return the root URL for the data folder. Even though this is a local
+   * location this returns a URL with a magic domain so that it can be
+   * loaded with fetch() in the webview.
+   */
   private String getDataRootUrl() {
     return WebViewUtils.buildAssetUrl("");
   }
 
+  /**
+   * Return the root path for the data folder as a file path. This should be
+   * used where the file is not loaded through the webview, but is instead
+   * used by the app directly.
+   */
   private String getDataRootPath() {
     return context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
   }
@@ -925,15 +935,13 @@ final class KMKeyboard extends WebView {
       return "";
     }
 
-    if (FileUtils.hasFontExtension(font)) {
-      String fontRoot = KMManager.isDefaultFont(font) ? getDataRootPath() : getPackageRootPath(packageID);
-      return fontRoot + font;
+    if (!FileUtils.hasFontExtension(font)) {
+      // QUESTION: do we log this?
+      return "";
     }
 
-    // REVIEW: Do we have to do anything if font is a JSONObject?
-    // See makeFontObj.
-
-    return "";
+    String fontRoot = KMManager.isDefaultFont(font) ? getDataRootPath() : getPackageRootPath(packageID);
+    return fontRoot + font;
   }
 
   @SuppressLint("InflateParams")
