@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.252 alpha 2026-07-08
+
+* chore(linux): reorder buttons on kmp install window (#16210)
+* refactor(web): rename `keymanweb` to `keyman` in UI modules (#16174)
+* chore: remove deprecated "X-UA-Compatible" and "apple-mobile-web-app-capable" metas (#16176)
+* fix(android): refactor `KMLog` - simplification and added resilience (#16152)
+* fix(android): differentiate between fontPath and fontUrl in Keyman Engine for Android (#16188)
+* fix(web): fixes cookie unit-tests and path for OSK resources during testing (#16209)
+
 ## 19.0.251 alpha 2026-07-02
 
 * fix(android): skip test on Windows that triggers androidx WebKit bug (#16184)
