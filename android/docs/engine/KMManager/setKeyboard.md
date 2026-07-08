@@ -35,8 +35,8 @@ normally returned by [`getKeyboardInfo()`](getKeyboardInfo).
 
 ```java
 KMManager.setKeyboard(String packageID, String keyboardID, String languageID)
-KMManager.setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont)
-KMManager.setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String kFont, String kOskFont, String displayName)
+KMManager.setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String textFont, String oskFont)
+KMManager.setKeyboard(String packageID, String keyboardID, String languageID, String keyboardName, String languageName, String textFont, String oskFont, String displayName)
 ```
 
 ### Parameters
@@ -56,12 +56,12 @@ KMManager.setKeyboard(String packageID, String keyboardID, String languageID, St
 `languageName`
 : Name of the associated language.
 
-`kFont`
-: Filename or description of the font to type with the keyboard. Can be `null`
+`textFont`
+: Filename of the font to type with the keyboard. Can be `null`
   or empty string.
 
-`kOskFont`
-: Filename or description of the font displayed on the keyboard. Can be `null`
+`oskFont`
+: Filename of the font displayed on the keyboard. Can be `null`
   or empty string.
 
 `displayName`
