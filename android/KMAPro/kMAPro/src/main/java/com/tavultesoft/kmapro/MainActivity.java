@@ -565,9 +565,20 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (menu == null) {
       return;
     }
-    final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
-    if (_keyboardupdate != null && anUpdateCount > 0) {
-      _keyboardupdate.setVisible(true);
+    // 1. Update the Top Action Bar Menu
+    if (menu != null) {
+      final MenuItem toolbarUpdate = menu.findItem(R.id.action_update_keyboards);
+      if (toolbarUpdate != null) {
+        toolbarUpdate.setVisible(anUpdateCount > 0);
+      }
+    }
+    
+    // 2. Update the Drawer/Sidebar Navigation Menu
+    if (navigationView != null) {
+      final MenuItem drawerUpdate = navigationView.getMenu().findItem(R.id.action_update_keyboards);
+      if (drawerUpdate != null) {
+        drawerUpdate.setVisible(anUpdateCount > 0);
+      }
     }
   }
 
@@ -609,8 +620,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         public void propertyChange(PropertyChangeEvent evt) {
           if(!evt.getPropertyName().equals("updateCount"))
             return;
-          updateUpdateCountIndicator(
-            evt.getNewValue()==null?0:(Integer) evt.getNewValue());
+          int count = KMManager.getUpdateTool().getOpenUpdateCount();
+          updateUpdateCountIndicator(count);
         }
       }
     );
@@ -647,11 +658,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       KMManager.getUpdateTool().executeOpenUpdates();
       // Dismiss icon
       updateUpdateCountIndicator(0);
-      final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
-      if (_keyboardupdate != null && _keyboardupdate.isVisible()) {
-        _keyboardupdate.setVisible(false);
-      }
-
       return true;
     } else if (item.getItemId() == R.id.action_sidebar) {
       if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
@@ -1316,10 +1322,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     } else if (id == R.id.action_update_keyboards) {
       KMManager.getUpdateTool().executeOpenUpdates();
       updateUpdateCountIndicator(0);
-      final MenuItem keyboardUpdate = navigationView.getMenu().findItem(R.id.action_update_keyboards);
-      if (keyboardUpdate != null && keyboardUpdate.isVisible()) {
-        keyboardUpdate.setVisible(false);
-      }
     } else if (id == R.id.action_settings) {
       showSettings();
     } else if (id == R.id.nav_installed_languages) {
@@ -1340,8 +1342,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       startActivity(new Intent(context, InfoActivity.class));
     } else if (id == R.id.nav_palette) {
       openThemeDialog();
+    } else if (id == R.id.nav_about_current_keyboard) {
+      showCurrentKeyboardSettings();
     }
-
     return true;
   }
 
