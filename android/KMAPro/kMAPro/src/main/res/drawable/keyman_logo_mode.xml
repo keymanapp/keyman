@@ -9,6 +9,7 @@
 
     <item
         android:left="15dp"
+        android:right="15dp"
         android:width="125dp"
         android:height="28dp">
         <bitmap
