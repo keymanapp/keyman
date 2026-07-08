@@ -183,7 +183,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     AppCompatDelegate.setDefaultNightMode(savedMode);
     getDelegate().applyDayNight();
     super.onCreate(savedInstanceState);
+    KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
     setContentView(R.layout.activity_main);
+    constraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
+
+    setupEdgeToEdge(R.id.constraintLayout);
     context = this;
 
     checkSendCrashReport();
@@ -201,8 +205,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       KMManager.setDebugMode(true);
     }
 
-    // Verify WebView installed and enabled before attempting to initialize KMManager
-    KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
 
     KMManager.executeResourceUpdate(this);
 
@@ -214,15 +216,12 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
     checkHapticFeedback();
 
-    setContentView(R.layout.activity_main);
-
     NavigationView navView = findViewById(R.id.nav_view);
     DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
     int width = (int) (displayMetrics.widthPixels * 0.80);
     navView.getLayoutParams().width = width;
     navView.requestLayout();
 
-    constraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       Window window = getWindow();
       window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -325,6 +324,11 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     textView.setSelection(textView.getText().length());
 
     initializeKeyboardToolbar();
+
+    textView.post(() -> {
+      KMManager.onConfigurationChanged(this.getResources().getConfiguration());
+      KMManager.getKeyboardHeight(this);
+    });
 
     // Check WebView enabled and Chrome version
     SystemWebViewStatus webViewStatus = WebViewUtils.getSystemWebViewStatus(context);
