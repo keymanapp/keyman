@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.253 alpha 2026-07-09
+
+* fix(web): resync model in `set osk()` (as used by Server) (#16127)
+* chore(developer): consolidate api-extractor usage in Developer (#16135)
+
 ## 19.0.252 alpha 2026-07-08
 
 * chore(linux): reorder buttons on kmp install window (#16210)
