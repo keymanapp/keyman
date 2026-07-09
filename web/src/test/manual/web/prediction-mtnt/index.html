@@ -36,16 +36,15 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
 		    attachType:'auto'
       }).then(function() {
-        kmw.addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'}, filename:'../us-1.0.js'});
-        kmw.addKeyboards({id:'lao_2008_basic',name:'Lao',languages:{id:'lo',name:'Lao'}, filename:'../lao_2008_basic-1.2.js'});
-        kmw.addKeyboards('sil_euro_latin@en');
-        kmw.addKeyboards({id:'ye_old_ten_key',name:'Classic 10-key',languages:{id:'en',name:'English'},
+        keyman.addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'}, filename:'../us-1.0.js'});
+        keyman.addKeyboards({id:'lao_2008_basic',name:'Lao',languages:{id:'lo',name:'Lao'}, filename:'../lao_2008_basic-1.2.js'});
+        keyman.addKeyboards('sil_euro_latin@en');
+        keyman.addKeyboards({id:'ye_old_ten_key',name:'Classic 10-key',languages:{id:'en',name:'English'},
           filename:('../keyboards/ye_old_ten_key/build/ye_old_ten_key.js')});
-        kmw.addKeyboards({id:'gesture_prototyping',name:'Gesture prototyping',languages:{id:'en',name:'English'},
+        keyman.addKeyboards({id:'gesture_prototyping',name:'Gesture prototyping',languages:{id:'en',name:'English'},
           filename:('../keyboards/gesture_prototyping/build/gesture_prototyping.js')});
 
         // Ensure the URL we prefix to the page's path is the page's directory, not including
@@ -59,7 +58,7 @@
           languages: ['en'],
           path: (pageRef + "nrc.en.mtnt.model.js")
         };
-        kmw.addModel(modelStub);
+        keyman.addModel(modelStub);
       });
 
       function togglePredictions() {

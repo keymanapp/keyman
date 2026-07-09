@@ -36,9 +36,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType: 'auto'
+      }).then(function() {
+        loadKeyboards();
       });
 
     </script>
@@ -49,7 +50,7 @@
   </head>
 
 <!-- Sample page HTML -->
-  <body onload='loadKeyboards();'>
+  <body>
     <h2>KeymanWeb Sample Page - Mixed Case of TTF font files</h2>
     <p>Previously, KMW was not applying .TTF fonts on mobile devices.</p>
     <p>See <a href='https://github.com/keymanapp/keyman/issues/1332'>issue #1332</a>
