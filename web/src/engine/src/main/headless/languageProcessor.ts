@@ -224,13 +224,13 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Find the state of the context at the time the suggestion was generated.
     // This may refer to the context before an input keystroke or before application
     // of a predictive suggestion.
-    const original = this.getPredictionState(suggestion.transformId);
+    const original = this.getPredictionState(suggestion.transform.id);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
       return null;
     }
 
-    this.recentTranscriptions.rewindTo(suggestion.transformId);
+    this.recentTranscriptions.rewindTo(suggestion.transform.id);
 
     // Apply the Suggestion!
 
@@ -312,10 +312,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Find the state of the context at the time the suggestion was generated.
     // This may refer to the context before an input keystroke or before application
     // of a predictive suggestion.
-    //
-    // Reversions use the additive inverse of the id token of the Transcription being
-    // reverted to.
-    const reversionId = appendedOnly ? reversion.appendedTransform.id : -reversion.transformId;
+    const reversionId = appendedOnly ? reversion.appendedTransform.id : reversion.transform.id;
     const original = this.getPredictionState(reversionId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");

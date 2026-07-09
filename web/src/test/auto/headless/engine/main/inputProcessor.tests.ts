@@ -283,9 +283,8 @@ describe('InputProcessor', function() {
       [],
       [
         {
-          transform: { insert: 'testing', deleteLeft: 4 },
+          transform: { insert: 'testing', deleteLeft: 4, id: 0 },
           appendedTransform: { insert: ' ', deleteLeft: 0 },
-          transformId: 0, // will be overwritten by the DummyModel to match the transition ID.
           id: 1,
           displayAs: 'testing'
         }
