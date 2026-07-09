@@ -21,6 +21,43 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
+  describe('Run kmc-convert with or without outputfile name', async function () {
+
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const infile = '../data/Test.keylayout';
+    [
+      [makePathToFixture('../data/Test.kmn')],
+      [],
+      [makePathToFixture('../data/Test_OtherOutputName.kmn')],
+    ].forEach(function (files) {
+      it(infile + " should run ", async function () {
+        await NodeAssert.doesNotReject(async () => sut.run(makePathToFixture(infile), files[0]));
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+      });
+    });
+  });
+
+  describe('RunTestFiles resulting in errors', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    [
+      [makePathToFixture('../data/Test_DifferentAmountOfMapSelectInKeyMapERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingkeyERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingkeyMapERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingLayoutsERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingmodifierMapERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingkeyMapSetERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingActionsERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingTerminatorsERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingAllERROR.keylayout')],
+      //[makePathToFixture('../data/Test_characters.keylayout')],
+    ].forEach(function (files) {
+      it(files + " should give an error ", async function () {
+        sut.run(files[0]);
+        assert.isTrue(compilerTestCallbacks.messages.length > 0);
+      });
+    });
+  });
+
   describe('RunSpecialTestFiles', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -61,13 +98,10 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         sut.run(makePathToFixture(files[0]));
-       // assert.isTrue(compilerTestCallbacks.messages.length === 1 && compilerTestCallbacks.messages[0].code === 5292037);
-        assert.isTrue(compilerTestCallbacks.messages.length === 0);
-        await sut.run(makePathToFixture(files[0]));
         assert.equal(compilerTestCallbacks.messages.length, 0);
-       });
-     });
-   });
+      });
+    });
+  });
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -97,7 +131,7 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test_undefinedAction.keylayout'],
     ].forEach(function (files) {
       it(files + " should give Error: undefined action detected", async function () {
-         sut.run(makePathToFixture(files[0]));
+        sut.run(makePathToFixture(files[0]));
         assert.equal(compilerTestCallbacks.messages.length, 1);
         assert.equal(compilerTestCallbacks.messages[0].code, 5292040);
       });

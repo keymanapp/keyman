@@ -14,7 +14,6 @@ import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from '.
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
-
 describe('KmnFileWriter', function () {
 
   before(function () {
@@ -67,47 +66,10 @@ describe('KmnFileWriter', function () {
     });
   });
 
-  describe('convertToUnicodeCharacter ', function () {
-    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    [
-      ["&#x61;", 'a'],
-      ["&#x1234;", 'ሴ'],
-      ["&#x1F60E;", '😎'],
-      ["&#x0002;", '\u0002'],
-      ["&#x1000000;", undefined],
-      ["&#97;", 'a'],
-      ["&#4660;", 'ሴ'],
-      ["&#128518;", '😆'],
-      ["&#0003;", '\u0003'],
-      ["&#1000000;", '󴉀'],
-      ["U+0061", 'a'],
-      ["U+1234", 'ሴ'],
-      ["U+1F60E", '😎'],
-      ["U+0001", '\u0001'],
-      ["U+1000000;", undefined],
-      ["&commat;", undefined],
-      ["a", 'a'],
-      ["ሴ", 'ሴ'],
-      ['😎', '😎'],
-      ["W̊", "W̊"],
-      ["ab", 'ab'],
-      ["", ''],
-      ["␤", '␤'],
-      ["␕", '␕'],
-      ["", ''],
-      [undefined, undefined],
-      [null, undefined]
-    ].forEach(function (values) {
-      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = sutW.convertToUnicodeCharacter(values[0] as string);
-        assert.equal(result, values[1]);
-      });
-    });
-  });
 
   describe('reviewRules messages', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
-    [/*
+    [
       [[new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'UNAVAILABLE', 'K_A', new TextEncoder().encode('A'))],
       [''],
       [''],
@@ -133,15 +95,10 @@ describe('KmnFileWriter', function () {
       ['c WARNING: unavailable modifier : here: '],
       ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) : here: ']],
 
-*/
-
       [[new Rule("C3", 'UNAVAILABLE_prev_dk', 'K_D', 0, 0, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'UNAVAIL', 'K_C', new TextEncoder().encode('D'),)],
       ['c WARNING: unavailable modifier : here: '],
       ['c WARNING: unavailable modifier : here: '],
       ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) : unavailable modifier : here: ']],
-
-
-
 
       [[new Rule("C3", 'CAPS', 'K_D', 0, 0, 'RALT', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
       [''],

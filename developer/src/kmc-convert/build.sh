@@ -47,4 +47,3 @@ do_test() {
 }
 
 builder_run_action test        do_test
-builder_run_action publish     ci_publish_npm

@@ -11,6 +11,7 @@ import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from './keylayout-to-kmn-converter.js';
 import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { convertUtil } from '@keymanapp/common-types';
 
 interface MessageCharacter {
   message: string;
@@ -191,9 +192,10 @@ export class KmnFileWriter {
         if ((k > 1) && (uniqueDataRules[k - 1].key !== uniqueDataRules[k].key) && (uniqueDataRules[k - 1].ruleType === uniqueDataRules[k].ruleType)) {
           data += '\n';
         }
-
         // use of Unicode Character vs Unicode Codepoint;
-        // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
+        // we always print out the Unicode Character  (A, W̊, 😎, ... ).
+        // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
+        // and add a warning about the use of control characters
         let versionOutputCharacter;
         const warnText = this.reviewRules(uniqueDataRules, k);
 
@@ -256,9 +258,10 @@ export class KmnFileWriter {
     for (let k = 0; k < uniqueDataRules.length; k++) {
 
       if (uniqueDataRules[k].ruleType === "C2") {
-
         // use of Unicode Character vs Unicode Codepoint;
-        // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
+        // we always print out the Unicode Character  (A, W̊, 😎, ... ).
+        // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
+        // and add a warning about the use of control characters
         let versionOutputCharacter;
         const warnText = this.reviewRules(uniqueDataRules, k);
 
@@ -343,11 +346,11 @@ export class KmnFileWriter {
 
     for (let k = 0; k < uniqueDataRules.length; k++) {
       if (uniqueDataRules[k].ruleType === "C3") {
-
         // use of Unicode Character vs Unicode Codepoint;
-        // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
+        // we always print out the Unicode Character  (A, W̊, 😎, ... ).
+        // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
+        // and add a warning about the use of control characters
         let versionOutputCharacter;
-
         const warnText = this.reviewRules(uniqueDataRules, k);
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
@@ -1772,7 +1775,8 @@ export class KmnFileWriter {
       msg_control = "Use of a control character ";
     }
     else {
-      out.character = this.convertToUnicodeCharacter(ctr);;
+      const uni_conv = new convertUtil.UnicodeCharacterConversion();
+      out.character = uni_conv.convert(ctr) ?? "";
     }
 
     // add a warning message
@@ -1787,104 +1791,7 @@ export class KmnFileWriter {
     return out;
   }
 
-  // TODO: move to util in PR 14569
-  /**
-   * @brief  function to convert a numeric character reference or a unicode value to a unicode character e.g. &#x63 -> c;  U+1F60E -> 😎
-   * @param  inputString the value that will converted
-   * @return a unicode character like 'c', 'ሴ', '😎' or undefined if inputString is not recognized
-   */
-  public convertToUnicodeCharacter(inputString: string): string {
 
-
-    // null, undefined will later be refused for conversion
-    if (inputString == null || inputString == undefined) {
-      return undefined;
-    }
-
-    //  U+ followed by 1.-6. hex digits will later be used for conversion
-    const m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(inputString);
-
-    // invalid U+ ( U+ followed by anything) will later be refused for conversion
-    const m_uni_inv = /^(U\+)+(.?)+$/i.exec(inputString);
-
-    // &#x followed by 1.-6. hex digits will later be used for conversion
-    const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(inputString);
-
-    // &# followed by 1.-6. decimal digits will later be used for conversion
-    const m_dec = /^&#([0-9]{1,7});$/.exec(inputString);
-
-    // & followed by gt, lt, quot, amp, apos will later be used for conversion
-    const m_nam = /^&(gt|lt|quot|amp|apos);$/i.exec(inputString);
-
-    //  &# followed by anything will later be refused for conversion
-    const m_html_inv = /^(&#)+(.?)+$/i.exec(inputString);
-
-    // one or more characters except starting with U+ or & will later be used for conversion
-    const m_chr = /^(?!U\+|&).+$/i.exec(inputString);
-
-    // '&', '&#','&#x', or 'U+' with or without ; will later be refused for conversion
-    const m_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+|(U\+)+;?)$|^$/i.exec(inputString);
-
-    // valid 'U+xxxx'
-    if (m_uni) {
-      const codePoint_u = parseInt(m_uni[1], 16);
-      // Reject surrogates and invalid codepoints
-      if ((codePoint_u >= 0xD800 && codePoint_u <= 0xDFFF) || codePoint_u > 0x10FFFF) {
-        return undefined;
-      }
-      return String.fromCodePoint(codePoint_u);
-    }
-
-    // invalid 'U+xxxx'
-    else if (m_uni_inv) {
-      return undefined;
-    }
-
-    // valid '&#x...'
-    else if (m_hex) {
-      const codePoint_h = parseInt(m_hex[1], 16);
-      // Reject surrogates and invalid codepoints
-      if ((codePoint_h >= 0xD800 && codePoint_h <= 0xDFFF) || codePoint_h > 0x10FFFF) {
-        return undefined;
-      }
-      return String.fromCodePoint(codePoint_h);
-    }
-    // valid '&#...'
-    else if (m_dec) {
-      const codePoint_d = parseInt(m_dec[1], 10);
-      // Reject surrogates and invalid codepoints
-      if ((codePoint_d >= 0xD800 && codePoint_d <= 0xDFFF) || codePoint_d > 0x10FFFF) {
-        return undefined;
-      }
-      return String.fromCodePoint(codePoint_d);
-    }
-    // valid '&gt', '&lt',..
-    else if (m_nam) {
-      switch (m_nam[1].toLowerCase()) {
-        case 'gt': return '>';
-        case 'lt': return '<';
-        case 'quot': return '"';
-        case 'amp': return '&';
-        case 'apos': return "'";
-        default: return undefined;
-      }
-    }
-    // invalid  '&...'
-    else if (m_html_inv) {
-      return undefined;
-    }
-
-    // single 'U+', '&', ''
-    else if (m_chr_inv) {
-      return inputString;
-    }
-
-    // if no matches so far, check for one or more characters ('a','ab', 'ẘ','😎', '😎😎',  )
-    else if (m_chr) {
-      return inputString;
-    }
-    return undefined;
-  }
   /** @internal */
   public unitTestEndpoints = {
     reviewRules: this.reviewRules.bind(this),

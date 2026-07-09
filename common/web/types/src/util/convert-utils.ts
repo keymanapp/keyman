@@ -1,0 +1,173 @@
+
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by S. Schmitt on 2026-01-19
+ *
+ * util for conversion functions for Keyman
+ *
+ */
+
+import { util } from '@keymanapp/common-types';
+
+export class UnicodeCharacterConversion {
+    // &#x followed by 1.-6. hex digits will later be used for conversion
+    private static re_hex = /^&#x([0-9a-f]{1,6});$/i;
+
+    // &# followed by 1.-6. decimal digits will later be used for conversion
+    private static re_dec = /^&#([0-9]{1,7});$/;
+
+    // & followed by gt, lt, quot, amp, apos will later be used for conversion
+    private static re_nam = /^&(gt|lt|quot|amp|apos);$/i;
+
+    //  &# followed by anything will later be refused for conversion
+    private static re_html_inv = /^(&#)+(.?)+$/i;
+
+    // one or more characters except starting & will later be used for conversion
+    private static re_chr = /^(?!&).+$/i;
+
+    // '&', '&#','&#x' with or without ; will later be refused for conversion
+    private static re_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+;?)$|^$/i;
+
+
+    public convert(inputString: string): string | undefined {
+        const m_hex = UnicodeCharacterConversion.re_hex.exec(inputString);
+        const m_dec = UnicodeCharacterConversion.re_dec.exec(inputString);
+        const m_nam = UnicodeCharacterConversion.re_nam.exec(inputString);
+        const m_html_inv = UnicodeCharacterConversion.re_html_inv.exec(inputString);
+        const m_chr = UnicodeCharacterConversion.re_chr.exec(inputString);
+        const m_chr_inv = UnicodeCharacterConversion.re_chr_inv.exec(inputString);
+
+        // valid '&#x...'
+        if (m_hex) {
+            const codePoint_h = parseInt(m_hex[1], 16);
+            // Reject surrogates and invalid codepoints
+            if (!(util.isValidUnicode(codePoint_h))) {
+                return undefined;
+            }
+            return String.fromCodePoint(codePoint_h);
+        }
+
+        // valid '&#...'
+        else if (m_dec) {
+            const codePoint_d = parseInt(m_dec[1], 10);
+            // Reject surrogates and invalid codepoints
+            if (!(util.isValidUnicode(codePoint_d))) {
+                return undefined;
+            }
+            return String.fromCodePoint(codePoint_d);
+        }
+
+        // valid '&gt', '&lt',..
+        else if (m_nam) {
+            switch (m_nam[1]) {
+                case 'gt': return '>';
+                case 'lt': return '<';
+                case 'quot': return '"';
+                case 'amp': return '&';
+                case 'apos': return "'";
+                default: return undefined;
+            }
+        }
+        // invalid  '&...'
+        else if (m_html_inv) {
+            return undefined;
+        }
+
+        // single '&', ''
+        else if (m_chr_inv) {
+            return inputString;
+        }
+
+        // if no matches so far, check for one or more characters ('a','ab', 'ẘ','😎', '😎😎',  )
+        else if (m_chr) {
+            return inputString;
+        }
+
+        return undefined;
+    }
+};
+/**
+ * @brief  function to convert a character, numeric character reference or a unicode value to a character or unicode Codepoint
+ *         if input is a valid single character or Codepoint like 'c','ä', 'ሴ', 'ẘ', '😎',  the same character or Codepoint is returned (e.g. 'c' -> 'c', '😎' -> '😎')
+ *         if input is a valid multi character/Codepoint string like 'ab', 'abcde', '😎😆',  the same string is returned (e.g. 'abcde' -> 'abcde' ,  😎😆 ->😎😆 )
+ *         if input is a valid numeric character reference in hex or decimal, the corresponding character or unicode Codepoint is returned (e.g. &#x1F60E; -> 😎)
+ *         if input is a one of the named character reference  &gt; &lt; &amp; &quot; &apos;, the corresponding character is returned ( e.g. '&gt;'  -> '>')
+ * @param  inputString the string or stringvalue that will converted
+ * @return the input character/Codepoint if input is a valid character/Codepoint
+ *         a converted character if input is a valid Unicode value, numeric character reference in hex or decimal, or named character reference
+ *         or undefined if input is null or undefined, half a surrogate pair, or not recognized
+ */
+export function convertToUnicodeCharacter(inputString: string): string | undefined {
+
+    // null, undefined will later be refused for conversion
+    if (inputString == null || inputString == undefined) {
+        return undefined;
+    }
+    // &#x followed by 1.-6. hex digits will later be used for conversion
+    const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(inputString);
+
+    // &# followed by 1.-6. decimal digits will later be used for conversion
+    const m_dec = /^&#([0-9]{1,7});$/.exec(inputString);
+
+    // & followed by gt, lt, quot, amp, apos will later be used for conversion
+    const m_nam = /^&(gt|lt|quot|amp|apos);$/i.exec(inputString);
+
+    //  &# followed by anything will later be refused for conversion
+    const m_html_inv = /^(&#)+(.?)+$/i.exec(inputString);
+
+    // one or more characters except starting & will later be used for conversion
+    const m_chr = /^(?!&).+$/i.exec(inputString);
+
+    // '&', '&#','&#x' with or without ; will later be refused for conversion
+    const m_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+;?)$|^$/i.exec(inputString);
+
+    // valid '&#x...'
+    if (m_hex) {
+        const codePoint_h = parseInt(m_hex[1], 16);
+
+        if (!(util.isValidUnicode(codePoint_h))) {
+            return undefined;
+        }
+        return String.fromCodePoint(codePoint_h);
+    }
+
+    // valid '&#...'
+    else if (m_dec) {
+        const codePoint_d = parseInt(m_dec[1], 10);
+
+        if (!(util.isValidUnicode(codePoint_d))) {
+            return undefined;
+        }
+        return String.fromCodePoint(codePoint_d);
+    }
+
+    // valid '&gt', '&lt',..
+    else if (m_nam) {
+        switch (m_nam[1]) {
+            case 'gt': return '>';
+            case 'lt': return '<';
+            case 'quot': return '"';
+            case 'amp': return '&';
+            case 'apos': return "'";
+            default: return undefined;
+        }
+    }
+
+    // invalid  '&...'
+    else if (m_html_inv) {
+        return undefined;
+    }
+
+    // single '&', ''
+    else if (m_chr_inv) {
+        return inputString;
+    }
+
+    // if no matches so far, check for one or more characters ('a','ab', 'ẘ','😎', '😎😎',  )
+    else if (m_chr) {
+        return inputString;
+    }
+
+    return undefined;
+}
