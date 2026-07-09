@@ -228,6 +228,7 @@ export class KeylayoutToKmnConverter {
           // ...............e. g. <key code="1" output="s"/> ...............................................................................
           // ...............................................................................................................................
 
+          // Todo-kmc-convert will be removed before merge into PR 12564 
           if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] === "") {
             /* this.callbacks.reportMessage(ConverterMessages.Warn_EmptyOutput({
              keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['index'],
@@ -1002,8 +1003,6 @@ export class KeylayoutToKmnConverter {
         }
       }
     }
-
-    //.............................................................................
 
     // remove duplicates
     const uniqueactionOutputBehaviorKey = actionOutputBehaviorKeyModi.reduce((unique, o) => {

@@ -17,7 +17,7 @@ interface MessageCharacter {
   message: string;
   character: string;
 };
-// Todo-kmc-convert edit interface
+// Todo-kmc-convert edit interface see PR 16073
 interface RuleReview {
   warningMessage_0: string;
   warningMessages_1: string;
@@ -40,21 +40,7 @@ interface RuleReview {
   output: string;
 
 };
-//interface UnavailableModifier /*extends RuleReview*/ {
-/*interface UnavailableModifier {
-  type: 'UnavailableModifier';
-  isEarlier: boolean;
-  isused: boolean;
-  context: string;
-  prevDK_modifier: string;
-  prevDK_key: string;
-  DK_modifier: string;
-  DK_key: string;
-  modifier: string;
-  key: string;
-  output: string;
-  warningMessage: string[];
-};*/
+
 interface RuleReview {
   type: 'RuleReview';
   isEarlier: boolean;
@@ -480,50 +466,6 @@ export class KmnFileWriter {
       warningMessages: ['', '', ''],
     };
 
-    /* const resultWarnings: UnavailableModifier = {
-       type: 'UnavailableModifier',
-       isused: false,
-       isEarlier: false,
-       context: '',
-       prevDK_modifier: '',
-       prevDK_key: '',
-       DK_modifier: '',
-       DK_key: '',
-       modifier: '',
-       key: '',
-       output: '',
-       warningMessage: Array(3).fill("")
-     };*/
-    /*const resultAll: RuleReview = {
-      type: 'RuleReview',
-      isused: false,
-      isEarlier: false,
-      context: '',
-      prevDK_modifier: '',
-      prevDK_key: '',
-      DK_modifier: '',
-      DK_key: '',
-      modifier: '',
-      key: '',
-      output: '',
-      warningMessage: Array(3).fill("")
-    };*/
-
-    /*            
-      resultWarnings.type = '';
-      resultWarnings.isused = true;
-      resultWarnings.prevDK_key = rule[index].prevDeadkey;
-      resultWarnings.prevDK_modifier = rule[index].modifierPrevDeadkey;
-      resultWarnings.DK_modifier = rule[index].modifierDeadkey;
-      resultWarnings.DK_key = rule[index].deadkey;
-      resultWarnings.modifier = rule[index].modifierKey;
-      resultWarnings.key = rule[index].key;
-      resultWarnings.output = new TextDecoder().decode(rule[index].output);
-      resultWarnings.warningMessage[0] = "";
-      resultWarnings.warningMessage[1] = "";
-      resultWarnings.warningMessage[2] = "";
-      */
-
     const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
     const warningText: string[] = Array(3).fill("");
 
@@ -554,17 +496,6 @@ export class KmnFileWriter {
           + rule[index].idDeadkey
           + ") ) : ";
 
-        /* resultWarnings.warningMessages[1] = "unavailable modifier : ";
-         resultWarnings.hasWarning_1 = true;
-         resultWarnings.warningMessages[2] = "unavailable superior rule ( ["
-           + rule[index].modifierDeadkey + " "
-           + rule[index].deadkey
-           + "]  >  dk(A"
-           + rule[index].idDeadkey
-           + ") ) : ";
-         resultWarnings.hasWarning_2 = true;*/
-
-
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
         resultWarnings.DK_modifier = rule[index].modifierDeadkey;
@@ -583,9 +514,6 @@ export class KmnFileWriter {
 
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
         warningText[2] = "unavailable modifier : ";
-
-        /* resultWarnings.warningMessages[2] = "unavailable modifier : ";
-         resultWarnings.hasWarning_2 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -622,29 +550,7 @@ export class KmnFileWriter {
           + "]  >  dk(B"
           + rule[index].idDeadkey
           + ") ) : ";
-        /* resultWarnings.warningMessages[0] = "unavailable modifier : ";
-         resultWarnings.hasWarning_0 = true;
- 
-         resultWarnings.warningMessages[1] = "unavailable superior rule ( ["
-           + rule[index].modifierPrevDeadkey + " "
-           + rule[index].prevDeadkey
-           + "]  >  dk(A"
-           + rule[index].idPrevDeadkey
-           + ") ) : ";
-         resultWarnings.hasWarning_1 = true;
-         resultWarnings.warningMessages[2] = "unavailable superior rules ( ["
-           + rule[index].modifierPrevDeadkey + " "
-           + rule[index].prevDeadkey
-           + "]  >  dk(A"
-           + rule[index].idPrevDeadkey
-           + ") ) and ( dk(A" +
-           + rule[index].idPrevDeadkey + ") ["
-           + rule[index].modifierDeadkey + " "
-           + rule[index].deadkey
-           + "]  >  dk(B"
-           + rule[index].idDeadkey
-           + ") ) : ";*/
-
+       
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
         resultWarnings.prevDK_key = rule[index].prevDeadkey;
@@ -685,17 +591,7 @@ export class KmnFileWriter {
           + rule[index].deadkey
           + "]  >  dk(B"
           + rule[index].idDeadkey
-          + ") ) : ";
-        /*resultWarnings.warningMessages[1] = "unavailable modifier : ";
-        resultWarnings.hasWarning_1 = true;
-        resultWarnings.warningMessages[2] = "unavailable superior rule ( ["
-          + rule[index].modifierDeadkey + " "
-          + rule[index].deadkey
-          + "]  >  dk(B"
-          + rule[index].idDeadkey
-          + ") ) : ";
-        resultWarnings.hasWarning_2 = true;*/
-
+          + ") ) : ";       
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -717,8 +613,6 @@ export class KmnFileWriter {
 
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
         warningText[2] += "unavailable modifier : ";
-        /*resultWarnings.warningMessages[2] += "unavailable modifier : ";
-        resultWarnings.hasWarning_2 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -785,15 +679,6 @@ export class KmnFileWriter {
             + "]  >  dk(C"
             + amb_2_1[0].idDeadkey
             + ") ");
-        /* resultWarnings.warningMessages[2] = resultWarnings.warningMessages[2] + ("ambiguous rule: later: ["
-           + amb_4_1[0].modifierPrevDeadkey
-           + " "
-           + amb_4_1[0].prevDeadkey
-           + "]  >  dk(C"
-           + amb_2_1[0].idDeadkey
-           + ") ");
-         resultWarnings.hasWarning_2 = true;*/
-
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -822,16 +707,7 @@ export class KmnFileWriter {
             + "]  >  dk(A"
             + amb_2_1[0].idDeadkey
             + ") ");
-        /* resultWarnings.warningMessages[2] = resultWarnings.warningMessages[2]
-           + ("ambiguous rule: later: ["
-             + amb_2_1[0].modifierDeadkey
-             + " "
-             + amb_2_1[0].deadkey
-             + "]  >  dk(A"
-             + amb_2_1[0].idDeadkey
-             + ") ");
-         resultWarnings.hasWarning_2 = true;*/
-
+        
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
         resultWarnings.prevDK_key = rule[index].prevDeadkey;
@@ -862,17 +738,7 @@ export class KmnFileWriter {
             + "]  >  \'"
             + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output)).character
             + "\' ");
-        /* resultWarnings.warningMessages[2] = resultWarnings.warningMessages[2]
-           + ("ambiguous rule: earlier: ["
-             + amb_1_1[0].modifierKey
-             + " "
-             + amb_1_1[0].key
-             + "]  >  \'"
-             + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output)).character
-             + "\' ");
-         resultWarnings.hasWarning_2 = true;*/
-
-
+       
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
         resultWarnings.prevDK_key = rule[index].prevDeadkey;
@@ -902,16 +768,7 @@ export class KmnFileWriter {
             + "]  >  \'"
             + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output)).character
             + "\' ");
-        /* resultWarnings.warningMessages[2] = resultWarnings.warningMessages[2]
-           + ("duplicate rule: earlier: ["
-             + dup_1_1[0].modifierKey
-             + " "
-             + dup_1_1[0].key
-             + "]  >  \'"
-             + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output)).character
-             + "\' ");
-         resultWarnings.hasWarning_2 = true;*/
-
+       
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
         resultWarnings.prevDK_key = rule[index].prevDeadkey;
@@ -931,11 +788,6 @@ export class KmnFileWriter {
             + "\' ");
       }
     }
-
-    /* console.log("compare", ((resultWarnings.warningMessage[0] === warningText[0])
-       && (resultWarnings.warningMessage[1] === warningText[1])
-       && (resultWarnings.warningMessage[2] === warningText[2])));*/
-
 
     if (rule[index].ruleType === "C2") {
 
@@ -995,15 +847,6 @@ export class KmnFileWriter {
             + "]  >  dk(C"
             + amb_2_2[0].idDeadkey
             + ") ");
-        /*resultWarnings.warningMessages[1] = resultWarnings.warningMessages[1]
-          + ("ambiguous rule: earlier: ["
-            + amb_2_2[0].modifierDeadkey
-            + " "
-            + amb_2_2[0].deadkey
-            + "]  >  dk(C"
-            + amb_2_2[0].idDeadkey
-            + ") ");
-        resultWarnings.hasWarning_1 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -1034,14 +877,6 @@ export class KmnFileWriter {
             + "]  >  dk(C"
             + dup_2_2[0].idDeadkey
             + ") ");
-        /* resultWarnings.warningMessages[1] = resultWarnings.warningMessages[1] + ("duplicate rule: earlier: ["
-           + dup_2_2[0].modifierDeadkey
-           + " "
-           + dup_2_2[0].deadkey
-           + "]  >  dk(C"
-           + dup_2_2[0].idDeadkey
-           + ") ");
-         resultWarnings.hasWarning_1 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -1073,17 +908,6 @@ export class KmnFileWriter {
             + "]  >  \'"
             + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output)).character
             + "\' ");
-        /* resultWarnings.warningMessages[2] = resultWarnings.warningMessages[2]
-           + ("ambiguous rule: earlier: dk(A"
-             + amb_3_3[0].idDeadkey
-             + ") + ["
-             + amb_3_3[0].modifierKey
-             + " "
-             + amb_3_3[0].key
-             + "]  >  \'"
-             + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output)).character
-             + "\' ");
-         resultWarnings.hasWarning_2 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -1117,16 +941,6 @@ export class KmnFileWriter {
             + "]  >  \'"
             + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output)).character
             + "\' ");
-        /* resultWarnings.warningMessages[2] = resultWarnings.warningMessages[2] + ("duplicate rule: earlier: dk(A"
-           + dup_3_3[0].idDeadkey
-           + ") + ["
-           + dup_3_3[0].modifierKey
-           + " "
-           + dup_3_3[0].key
-           + "]  >  \'"
-           + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output)).character
-           + "\' ");
-         resultWarnings.hasWarning_2 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -1158,15 +972,6 @@ export class KmnFileWriter {
             + "]  >  dk(C"
             + amb_4_2[0].idPrevDeadkey
             + ") ");
-        /* resultWarnings.warningMessages[0] = resultWarnings.warningMessages[0]
-           + ("ambiguous rule: later: ["
-             + amb_4_2[0].modifierPrevDeadkey
-             + " "
-             + amb_4_2[0].prevDeadkey
-             + "]  >  dk(C"
-             + amb_4_2[0].idPrevDeadkey
-             + ") ");
-         resultWarnings.hasWarning_0 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -1290,14 +1095,6 @@ export class KmnFileWriter {
             + "]  >  dk(A"
             + amb_2_4[0].idDeadkey
             + ") ");
-        /*resultWarnings.warningMessages[0] = resultWarnings.warningMessages[0] + ("ambiguous rule: earlier: ["
-          + amb_2_4[0].modifierDeadkey
-          + " "
-          + amb_2_4[0].deadkey
-          + "]  >  dk(A"
-          + amb_2_4[0].idDeadkey
-          + ") ");
-        resultWarnings.hasWarning_0 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -1329,17 +1126,6 @@ export class KmnFileWriter {
             + "]  >  \'"
             + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output)).character
             + "\' ");
-        /*resultWarnings.warningMessages[1] = resultWarnings.warningMessages[1]
-          + ("ambiguous rule: earlier: dk(C"
-            + amb_6_3[0].idDeadkey
-            + ") + ["
-            + amb_6_3[0].modifierKey
-            + " "
-            + amb_6_3[0].key
-            + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output)).character
-            + "\' ");
-        resultWarnings.hasWarning_1 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -1373,17 +1159,6 @@ export class KmnFileWriter {
             + "]  >  \'"
             + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output)).character
             + "\' ");
-        /* resultWarnings.warningMessages[1] = resultWarnings.warningMessages[1]
-           + ("duplicate rule: earlier: dk(C"
-             + dup_6_3[0].idDeadkey
-             + ") + ["
-             + dup_6_3[0].modifierKey
-             + " "
-             + dup_6_3[0].key
-             + "]  >  \'"
-             + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output)).character
-             + "\' ");
-         resultWarnings.hasWarning_1 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -1415,14 +1190,6 @@ export class KmnFileWriter {
             + "]  >  dk(C"
             + amb_4_4[0].idPrevDeadkey
             + ") ");
-        /* resultWarnings.warningMessages[0] = resultWarnings.warningMessages[0] + ("ambiguous rule: earlier: ["
-           + amb_4_4[0].modifierPrevDeadkey
-           + " "
-           + amb_4_4[0].prevDeadkey
-           + "]  >  dk(C"
-           + amb_4_4[0].idPrevDeadkey
-           + ") ");
-         resultWarnings.hasWarning_0 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -1451,14 +1218,6 @@ export class KmnFileWriter {
             + "]  >  dk(C"
             + dup_4_4[0].idPrevDeadkey
             + ") ");
-        /* resultWarnings.warningMessages[0] = resultWarnings.warningMessages[0] + ("duplicate rule: earlier: ["
-           + dup_4_4[0].modifierPrevDeadkey
-           + " "
-           + dup_4_4[0].prevDeadkey
-           + "]  >  dk(C"
-           + dup_4_4[0].idPrevDeadkey
-           + ") ");
-         resultWarnings.hasWarning_0 = true;*/
 
         resultWarnings.type = 'RuleReview';
         resultWarnings.isused = true;
@@ -1489,16 +1248,6 @@ export class KmnFileWriter {
             + "]  >  dk(B"
             + amb_5_5[0].idDeadkey
             + ") ");
-       /* resultWarnings.warningMessages[1] = resultWarnings.warningMessages[1] + ("ambiguous rule: earlier: dk(B"
-          + amb_5_5[0].idPrevDeadkey
-          + ") + ["
-          + amb_5_5[0].modifierDeadkey
-          + " "
-          + amb_5_5[0].deadkey
-          + "]  >  dk(B"
-          + amb_5_5[0].idDeadkey
-          + ") ");
-        resultWarnings.hasWarning_1 = true;*/
             
           resultWarnings.type = 'RuleReview';
           resultWarnings.isused = true;
@@ -1531,16 +1280,6 @@ export class KmnFileWriter {
             + "]  >  dk(B"
             + dup_5_5[0].idDeadkey
             + ") ");
-       /* resultWarnings.warningMessages[1] = resultWarnings.warningMessages[1] + ("duplicate rule: earlier: dk(B"
-          + dup_5_5[0].idPrevDeadkey
-          + ") + ["
-          + dup_5_5[0].modifierDeadkey
-          + " "
-          + dup_5_5[0].deadkey
-          + "]  >  dk(B"
-          + dup_5_5[0].idDeadkey
-          + ") ");
-        resultWarnings.hasWarning_1 = true;*/
             
           resultWarnings.type = 'RuleReview';
           resultWarnings.isused = true;
@@ -1584,20 +1323,6 @@ export class KmnFileWriter {
           + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output)).character
           + "\' ");
         resultWarnings.hasWarning_2 = true;
-        /*      resultAll      
-          resultWarnings.type = '';
-          resultWarnings.isused = true;
-          resultWarnings.prevDK_key = rule[index].prevDeadkey;
-          resultWarnings.prevDK_modifier = rule[index].modifierPrevDeadkey;
-          resultWarnings.DK_modifier = rule[index].modifierDeadkey;
-          resultWarnings.DK_key = rule[index].deadkey;
-          resultWarnings.modifier = rule[index].modifierKey;
-          resultWarnings.key = rule[index].key;
-          resultWarnings.output = new TextDecoder().decode(rule[index].output);
-          resultWarnings.warningMessage[0] = "";
-          resultWarnings.warningMessage[1] = "";
-          resultWarnings.warningMessage[2] = "";
-          */
       }
 
       if (dup_6_6.length > 0) {
@@ -1611,16 +1336,6 @@ export class KmnFileWriter {
             + "]  >  \'"
             + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output)).character
             + "\' ");
-       /* resultWarnings.warningMessages[2] = resultWarnings.warningMessages[2] + ("duplicate rule: earlier: dk(B"
-          + dup_6_6[0].idDeadkey
-          + ") + ["
-          + dup_6_6[0].modifierKey
-          + " "
-          + dup_6_6[0].key
-          + "]  >  \'"
-          + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output)).character
-          + "\' ");
-        resultWarnings.hasWarning_2 = true;*/
             
           resultWarnings.type = 'RuleReview';
           resultWarnings.isused = true;
@@ -1651,21 +1366,7 @@ export class KmnFileWriter {
     // if both happens, nothing would be written, therefore this messsage
 
     const extraWarning = "PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  ";
- /*      resultAll      
-        resultWarnings.type = '';
-        resultWarnings.isused = true;
-        resultWarnings.prevDK_key = rule[index].prevDeadkey;
-        resultWarnings.prevDK_modifier = rule[index].modifierPrevDeadkey;
-        resultWarnings.DK_modifier = rule[index].modifierDeadkey;
-        resultWarnings.DK_key = rule[index].deadkey;
-        resultWarnings.modifier = rule[index].modifierKey;
-        resultWarnings.key = rule[index].key;
-        resultWarnings.output = new TextDecoder().decode(rule[index].output);
-        resultWarnings.warningMessage[0] = "";
-        resultWarnings.warningMessage[1] = "";
-        resultWarnings.warningMessage[2] = "";
-        */
-
+ 
     if (warningText[0] !== "") {
       warningText[0] = "c WARNING: " + warningText[0] + "here: ";
      
@@ -1709,12 +1410,6 @@ export class KmnFileWriter {
         resultWarnings.warningMessages[2] = resultWarnings.warningMessages[2] + extraWarning;
       }
     }
-
-    /*
-         warningText[0] = resultWarnings.warningMessage[0]
-         warningText[1] = resultWarnings.warningMessage[1]
-         warningText[2] =resultWarnings.warningMessage[2]*/
-
 
     warningText[0] = resultWarnings.warningMessages[0];
     warningText[1] = resultWarnings.warningMessages[1];

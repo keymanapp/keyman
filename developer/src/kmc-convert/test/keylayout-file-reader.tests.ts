@@ -61,15 +61,13 @@ describe('KeylayoutFileReader', function () {
     it('validate() should return false on null as input', async function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_noActionWhen.keylayout');
-      //const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
       const validated = sutR.validate(null, inputFilename);
       assert.isFalse(validated);
     });
     it('validate() should return false on undefined as input', async function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_noActionWhen.keylayout');
-      //const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      const validated = sutR.validate(undefined, inputFilename);
+       const validated = sutR.validate(undefined, inputFilename);
       assert.isFalse(validated);
     });
   });

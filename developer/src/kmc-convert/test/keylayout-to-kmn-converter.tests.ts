@@ -49,7 +49,6 @@ describe('KeylayoutToKmnConverter', function () {
       [makePathToFixture('../data/Test_MissingActionsERROR.keylayout')],
       [makePathToFixture('../data/Test_MissingTerminatorsERROR.keylayout')],
       [makePathToFixture('../data/Test_MissingAllERROR.keylayout')],
-      //[makePathToFixture('../data/Test_characters.keylayout')],
     ].forEach(function (files) {
       it(files + " should give an error ", async function () {
         sut.run(files[0]);
