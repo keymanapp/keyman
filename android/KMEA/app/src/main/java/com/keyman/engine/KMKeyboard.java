@@ -660,15 +660,15 @@ final class KMKeyboard extends WebView {
   }
 
   public boolean setKeyboard(String packageID, String keyboardID, String languageID,
-                             String keyboardName, String languageName, String textFontName,
-                             String oskFontName) {
+                             String keyboardName, String languageName, String textFontFilename,
+                             String oskFontFilename) {
     return setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName,
-                       textFontName, oskFontName, null);
+                       textFontFilename, oskFontFilename, null);
   }
 
   public boolean setKeyboard(String packageID, String keyboardID, String languageID,
-                             String keyboardName, String languageName, String textFontName,
-                             String oskFontName, String displayName) {
+                             String keyboardName, String languageName, String textFontFilename,
+                             String oskFontFilename, String displayName) {
     if (packageID == null || keyboardID == null || languageID == null || keyboardName == null || languageName == null) {
       return false;
     }
@@ -691,8 +691,8 @@ final class KMKeyboard extends WebView {
       languageID = kbInfo.getLanguageID();
       keyboardName = kbInfo.getKeyboardName();
       languageName = kbInfo.getLanguageName();
-      textFontName = kbInfo.getFont();
-      oskFontName = kbInfo.getOSKFont();
+      textFontFilename = kbInfo.getFont();
+      oskFontFilename = kbInfo.getOSKFont();
       retVal = false;
 
       // Keyboard changed, so determine version again
@@ -700,14 +700,14 @@ final class KMKeyboard extends WebView {
         KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
     }
 
-    if(oskFontName == null || oskFontName.isEmpty())
-      oskFontName = textFontName;
+    if(oskFontFilename == null || oskFontFilename.isEmpty())
+      oskFontFilename = textFontFilename;
 
-    JSONObject textFont = makeFontObject(textFontName, packageID);
-    JSONObject oskFont = makeFontObject(oskFontName, packageID);
+    JSONObject textFont = makeFontObject(textFontFilename, packageID);
+    JSONObject oskFont = makeFontObject(oskFontFilename, packageID);
 
-    textFontPath = getFontFilename(textFontName, packageID);
-    oskFontPath = getFontFilename(oskFontName, packageID);
+    textFontPath = getFontFilename(textFontFilename, packageID);
+    oskFontPath = getFontFilename(oskFontFilename, packageID);
 
     String kbKey = KMString.format("%s_%s", languageID, keyboardID);
 
