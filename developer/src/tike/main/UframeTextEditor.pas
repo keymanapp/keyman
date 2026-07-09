@@ -486,7 +486,12 @@ procedure TframeTextEditor.LoadFileInBrowser(const AData: string);
   function GenerateNewFilename: string;
   begin
     Inc(FInitialFilenameIndex);
-    Result := '*texteditor*'+IntToStr(FInitialFilenameIndex);
+    Result := '*texteditor';
+    if Owner <> nil then
+      Result := Result + '*' + Owner.ClassName;
+    if Parent <> nil then
+      Result := Result + '*' + Parent.Name;
+    Result := Result + '*'+IntToStr(FInitialFilenameIndex);
   end;
   function EncodeFont(const prefix: string; f: TFont): string;
   begin

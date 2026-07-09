@@ -319,6 +319,23 @@ function TVisualKeyboardToTouchLayoutConverter.SetupModifierKeysForImportedLayou
 
     for l in p.Layers do
     begin
+      // Find the Shift key and assign the next layer
+      k := l.FindKeyById('K_SHIFT');
+      if Assigned(k) then
+      begin
+        if l.id = 'default' then
+        begin
+          k.NextLayer := 'shift';
+        end
+        else
+        begin
+          // All layers other than default will return to default layer
+          // when shift is pressed, because we do not currently map
+          // shift+other mod layers with use of the Shift key in the import
+          k.NextLayer := 'default';
+        end;
+      end;
+
       // Find the Ctrl key for the layer
       k := l.FindKeyById('K_LCONTROL');
       if not Assigned(k) then

@@ -117,7 +117,7 @@ describe('CookieSerializer', function () {
 
     it('finds all matching cookies starting with TestCookie_', () => {
       const result = CookieSerializer.loadAllMatching(/^TestCookie_/);
-      assert.deepEqual(result, [
+      assert.sameDeepMembers(result, [
         { name: COOKIE_ID_1, value: { COOKIE_ID_1: 'foobar1' } },
         { name: COOKIE_ID_2, value: { COOKIE_ID_2: 'foobar2' } }
       ]);
@@ -125,7 +125,7 @@ describe('CookieSerializer', function () {
 
     it('finds all matching cookies containing Cookie', () => {
       const result = CookieSerializer.loadAllMatching(/Cookie/);
-      assert.deepEqual(result, [
+      assert.sameDeepMembers(result, [
         { name: COOKIE_ID_1, value: { COOKIE_ID_1: 'foobar1' } },
         { name: COOKIE_ID_2, value: { COOKIE_ID_2: 'foobar2' } },
         { name: NONMATCHING_COOKIE_ID, value: { NONMATCHING_COOKIE_ID: 'foobar3' } }
@@ -134,7 +134,7 @@ describe('CookieSerializer', function () {
 
     it('returns empty array if no matching cookies', () => {
       const result = CookieSerializer.loadAllMatching(/^UnknownCookie_/);
-      assert.deepEqual(result, []);
+      assert.sameDeepMembers(result, []);
     });
   });
 });
