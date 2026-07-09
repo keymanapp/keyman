@@ -108,14 +108,15 @@ class LanguageSettingsViewController: UITableViewController {
   func refreshSwitchVisibility() {
     let userDefaults = Storage.active.userDefaults
     
-    let mayCorrect = userDefaults.correctSettingForLanguage(languageID: self.language.id)
-    self.doCorrectionsSwitch?.isHidden = !mayCorrect
-    self.doCorrectionsLabel?.isEnabled = mayCorrect
+    let mayPredict = userDefaults.predictSettingForLanguage(languageID: self.language.id)
+    self.doCorrectionsSwitch?.isHidden = !mayPredict
+    self.doCorrectionsLabel?.isEnabled = mayPredict
+    self.correctionsCell?.isUserInteractionEnabled = mayPredict
     
-    let mayAutoCorrect = userDefaults.autocorrectSettingForLanguage(languageID: self.language.id)
-    self.doAutocorrectionsSwitch?.isHidden = !(mayCorrect && mayAutoCorrect)
-    self.doAutocorrectionsLabel?.isEnabled = mayCorrect && mayAutoCorrect
-    self.correctionsCell?.isUserInteractionEnabled = mayCorrect
+    let mayCorrect = userDefaults.correctSettingForLanguage(languageID: self.language.id)
+    self.doAutocorrectionsSwitch?.isHidden = !(mayPredict && mayCorrect)
+    self.doAutocorrectionsLabel?.isEnabled = mayPredict && mayCorrect
+    self.autocorrectionsCell?.isUserInteractionEnabled = mayPredict && mayCorrect
   }
   
   @objc
@@ -195,9 +196,7 @@ class LanguageSettingsViewController: UITableViewController {
             selector: #selector(self.correctionSwitchValueChanged)
           )
 
-          // Disable interactivity if the prediction toggle is set to 'off'.
-          doCorrectionsSwitch!.isHidden = !userDefaults.predictSettingForLanguage(languageID: self.language.id)
-          cell.isUserInteractionEnabled = userDefaults.predictSettingForLanguage(languageID: self.language.id)
+          refreshSwitchVisibility()
         } else if 2 == indexPath.row {
           autocorrectionsCell = cell
           doAutocorrectionsSwitch = UISwitch()
@@ -209,11 +208,7 @@ class LanguageSettingsViewController: UITableViewController {
             selector: #selector(self.autocorrectionSwitchValueChanged)
           )
 
-          // Disable interactivity if the prediction or correction toggle is set to 'off'.
-          let mayPredict = userDefaults.predictSettingForLanguage(languageID: self.language.id)
-          let mayCorrect = userDefaults.correctSettingForLanguage(languageID: self.language.id)
-          doAutocorrectionsSwitch!.isHidden = !(mayPredict && mayCorrect)
-          cell.isUserInteractionEnabled = mayPredict && mayCorrect
+          refreshSwitchVisibility()
         } else { // rows 3 and 4
           cell.accessoryType = .disclosureIndicator
       }
