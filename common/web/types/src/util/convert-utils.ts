@@ -8,6 +8,8 @@
  *
  */
 
+import { util } from '@keymanapp/common-types';
+
 /**
  * @brief  function to convert a character, numeric character reference or a unicode value to a character or unicode Codepoint
  *         if input is a valid single character or Codepoint like 'c','ä', 'ሴ', 'ẘ', '😎',  the same character or Codepoint is returned (e.g. 'c' -> 'c', '😎' -> '😎')
@@ -46,24 +48,27 @@ export function convertToUnicodeCharacter(inputString: string): string | undefin
     // valid '&#x...'
     if (m_hex) {
         const codePoint_h = parseInt(m_hex[1], 16);
+
         // Reject surrogates and invalid codepoints
-        if ((codePoint_h >= 0xD800 && codePoint_h <= 0xDFFF) || codePoint_h > 0x10FFFF) {
+        if (!(util.isValidUnicode(codePoint_h))) {
             return undefined;
         }
         return String.fromCodePoint(codePoint_h);
     }
+
     // valid '&#...'
     else if (m_dec) {
         const codePoint_d = parseInt(m_dec[1], 10);
+
         // Reject surrogates and invalid codepoints
-        if ((codePoint_d >= 0xD800 && codePoint_d <= 0xDFFF) || codePoint_d > 0x10FFFF) {
+        if (!(util.isValidUnicode(codePoint_d))) {
             return undefined;
         }
         return String.fromCodePoint(codePoint_d);
     }
     // valid '&gt', '&lt',..
     else if (m_nam) {
-        switch (m_nam[1].toLowerCase()) {
+        switch (m_nam[1]) {
             case 'gt': return '>';
             case 'lt': return '<';
             case 'quot': return '"';

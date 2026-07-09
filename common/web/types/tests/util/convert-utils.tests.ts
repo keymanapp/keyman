@@ -5,6 +5,7 @@ import { convertUtil } from '@keymanapp/common-types';
 describe('convert-utils', function () {
   describe('convertToUnicodeCharacter', function () {
     [
+      ["a&gt;b", 'a&gt;b'],
       ["<", '<'],
       ["a", 'a'],
       ["ሴ", 'ሴ'],
@@ -26,6 +27,7 @@ describe('convert-utils', function () {
       ["&#4660;", 'ሴ'],
       ["&#7835;", "ẛ"],
       ["&#128518;", '😆'],
+      ["&#x1F606;", '😆'],
       ["&#0003;", '\u0003'],
       ["&#1000000;", '󴉀'],
       ["&commat;", undefined],
@@ -53,8 +55,8 @@ describe('convert-utils', function () {
       ["&#x;", undefined],
       ['&##', undefined],
       ['&##;', undefined],
-      ["&#x10FFFF;", "􏿿"],
-      ["&#1114111;", "􏿿"],
+      ["&#x10FFFF;", undefined],
+      ["&#1114111;", undefined],
       ["&#x110000;", undefined],
       ["&#x1000000;", undefined],
       ['&#1234;56', undefined],
