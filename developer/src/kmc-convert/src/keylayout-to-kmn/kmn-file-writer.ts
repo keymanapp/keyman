@@ -1775,7 +1775,8 @@ export class KmnFileWriter {
       msg_control = "Use of a control character ";
     }
     else {
-      out.character = convertUtil.convertToUnicodeCharacter(ctr) ?? "";
+      const uni_conv = new convertUtil.UnicodeCharacterConversion();
+      out.character = uni_conv.convert(ctr) ?? "";
     }
 
     // add a warning message
