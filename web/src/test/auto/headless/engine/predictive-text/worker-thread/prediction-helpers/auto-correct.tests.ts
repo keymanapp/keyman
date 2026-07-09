@@ -16,7 +16,7 @@ describe('predictionAutoSelect', () => {
     assert.sameDeepOrderedMembers(predictions, originalPredictions);
   });
 
-  it(`selects solitary 'keep' suggestion that does match the model`, () => {
+  it(`selects nothing if solitary 'keep' suggestion does match the model`, () => {
     const predictions: CorrectionPredictionTuple[] = [
       {
         correction: {
@@ -44,7 +44,7 @@ describe('predictionAutoSelect', () => {
     assert.sameDeepOrderedMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
-    assert.isOk(autoselected);
+    assert.isNotOk(autoselected);
   });
 
   it(`does not select suggestions if the root correction has no letters`, () => {
@@ -127,7 +127,7 @@ describe('predictionAutoSelect', () => {
     assert.isNotOk(autoselected);
   });
 
-  it(`selects 'keep' suggestion that does match the model over any alternatives`, () => {
+  it(`selects nothing for 'keep' suggestion that does match the model even with alternatives`, () => {
     const keepSuggestion: CorrectionPredictionTuple = {
       correction: {
         sample: 'thin',
@@ -210,7 +210,7 @@ describe('predictionAutoSelect', () => {
     assert.sameDeepMembers(predictions, originalPredictions);
 
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
-    assert.equal(autoselected, keepSuggestion);
+    assert.isNotOk(autoselected);
   });
 
   it(`selects solitary non-'keep' suggestion when 'keep' does not match model`, () => {
