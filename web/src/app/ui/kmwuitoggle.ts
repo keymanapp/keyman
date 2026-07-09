@@ -22,14 +22,14 @@ interface Owned<T> {
   _owningObject?: T;
 }
 
-const keymanweb=window.keyman;
+const keyman=window.keyman;
 
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
-if(!keymanweb) {
+if(!keyman) {
   throw new Error("`keyman` global is missing; Keyman Engine for Web script has not been loaded");
-} else if(!keymanweb.ui?.name) {
+} else if(!keyman.ui?.name) {
   /********************************/
   /*                              */
   /* Toggle User Interface Code   */
@@ -47,8 +47,8 @@ if(!keymanweb) {
 
   try {
     // Declare KeymanWeb, OnScreen Keyboard and Util objects
-    //var dbg=keymanweb['debug'];
-    const util = keymanweb.util;
+    //var dbg=keyman['debug'];
+    const util = keyman.util;
 
     // Disable UI for touch devices
     if(util.isTouchDevice()) {
@@ -99,14 +99,14 @@ if(!keymanweb) {
 
         // We don't want to shift the controller to something that's not an input element,
         // but do want to account for window.event's data when legitimate.
-        if(window.event && keymanweb.isAttached(window.event.srcElement as HTMLElement)) {
+        if(window.event && keyman.isAttached(window.event.srcElement as HTMLElement)) {
           someElement=window.event.srcElement as HTMLElement;
         }
 
         if(focusing) {
           this.controller.style.display = 'block';
         } else {
-          if(!(keymanweb.getUIState().activationPending) && !this.controllerHovered) {
+          if(!(keyman.getUIState().activationPending) && !this.controllerHovered) {
             this.controller.style.display = 'none';
           }
         }
@@ -145,7 +145,7 @@ if(!keymanweb) {
       }
 
       registerEvents() {
-        const osk = keymanweb.osk;
+        const osk = keyman.osk;
 
         if(!osk) {
           return;
@@ -171,13 +171,13 @@ if(!keymanweb) {
        **/
       readonly switchOsk = () => {
         // Check that user control of OSK is allowed
-        if((keymanweb.getActiveKeyboard() == '') || keymanweb.isCJK()) {
+        if((keyman.getActiveKeyboard() == '') || keyman.isCJK()) {
           return;
         }
 
-        if(keymanweb.osk) {
-          const newState = !keymanweb.osk.isEnabled();
-          keymanweb.osk.show(newState);
+        if(keyman.osk) {
+          const newState = !keyman.osk.isEnabled();
+          keyman.osk.show(newState);
 
           // Also, indicate that the OSK is intentionally hidden.
           this.oskButton._setSelected(newState);
@@ -188,7 +188,7 @@ if(!keymanweb) {
        * Toggle a single keyboard on or off - KMW button control event
        **/
       readonly switchSingleKbd = async () => {
-        const _v = keymanweb.getActiveKeyboard() == '';
+        const _v = keyman.getActiveKeyboard() == '';
         let nLastKbd=0, kbdName='', lgCode='';
 
         if(_v) {
@@ -202,10 +202,10 @@ if(!keymanweb) {
 
           kbdName = this.keyboards[nLastKbd]._InternalName;
           lgCode = this.keyboards[nLastKbd]._LanguageCode;
-          await keymanweb.setActiveKeyboard(kbdName,lgCode);
+          await keyman.setActiveKeyboard(kbdName,lgCode);
           this.lastActiveKeyboard = nLastKbd;
         } else {
-          await keymanweb.setActiveKeyboard('');
+          await keyman.setActiveKeyboard('');
         }
 
         if(this.kbdButton) {
@@ -217,7 +217,7 @@ if(!keymanweb) {
        * Switch to the next keyboard in the list - KMW button control event
        **/
       readonly switchNextKbd = async () => {
-        let _v = (keymanweb.getActiveKeyboard() == '');
+        let _v = (keyman.getActiveKeyboard() == '');
         let kbdName='', lgCode='';
 
         if(_v) {
@@ -227,16 +227,16 @@ if(!keymanweb) {
 
           kbdName = this.keyboards[0]._InternalName;
           lgCode = this.keyboards[0]._LanguageCode;
-          await keymanweb.setActiveKeyboard(kbdName,lgCode);
+          await keyman.setActiveKeyboard(kbdName,lgCode);
           this.lastActiveKeyboard = 0;
         } else {
           if(this.lastActiveKeyboard == this.keyboards.length-1) {
-            await keymanweb.setActiveKeyboard('');
+            await keyman.setActiveKeyboard('');
             _v = false;
           } else {
             kbdName = this.keyboards[++this.lastActiveKeyboard]._InternalName;
             lgCode = this.keyboards[this.lastActiveKeyboard]._LanguageCode;
-            await keymanweb.setActiveKeyboard(kbdName,lgCode);
+            await keyman.setActiveKeyboard(kbdName,lgCode);
             _v = true;
           }
         }
@@ -329,7 +329,7 @@ if(!keymanweb) {
           };
 
           private __click = () => {
-            keymanweb.activatingUI(false); // Clear activating UI flag once click is acknowledged
+            keyman.activatingUI(false); // Clear activating UI flag once click is acknowledged
             if(this._onclick != null) {
                 return this._onclick();
             }
@@ -337,7 +337,7 @@ if(!keymanweb) {
           };
 
           private __mousedown = () => {
-            keymanweb.activatingUI(true);  // Set activating UI flag (to manage focus/blur) on any UI mouse down event
+            keyman.activatingUI(true);  // Set activating UI flag (to manage focus/blur) on any UI mouse down event
             this._down = true;
             this.__updatestyle();
             return false;
@@ -350,7 +350,7 @@ if(!keymanweb) {
 
 
           _setSelected(_value: boolean) {
-            keymanweb.activatingUI(false); // Always clear activating UI flag after selecting UI
+            keyman.activatingUI(false); // Always clear activating UI flag after selecting UI
             this._selected = _value;
             this.__updatestyle();
           };
@@ -408,7 +408,7 @@ if(!keymanweb) {
        **/
       initialize() {
         //Never initialize before KMW!
-        if(!keymanweb.initialized || util.isTouchDevice()) {
+        if(!keyman.initialized || util.isTouchDevice()) {
           return;
         }
 
@@ -488,13 +488,13 @@ if(!keymanweb) {
        * Description  Rebuild the UI and keyboard list
        **/
       readonly updateKeyboardList = () => {
-        if(!(keymanweb.initialized || this.initialized)) {
+        if(!(keyman.initialized || this.initialized)) {
           return; //TODO: may want to restart the timer??
         }
 
         this.updateList = false;
 
-        const _kbds=keymanweb.getKeyboards();
+        const _kbds=keyman.getKeyboards();
         const imgPath=util.getOption('resources') +'ui/toggle/';
 
         // Check the number of installed keyboards to determine whether or not we will have a dropdown
@@ -542,14 +542,14 @@ if(!keymanweb) {
         }
 
         // Highlight the last active keyboard
-        let activeKeyboard = keymanweb.getActiveKeyboard();
+        let activeKeyboard = keyman.getActiveKeyboard();
         let activeLanguage = '';
         if (activeKeyboard) {
-          activeLanguage = keymanweb.getActiveLanguage();
+          activeLanguage = keyman.getActiveLanguage();
         } else {
           // savedKeyboard is only correct if we use global keyboard settings,
           // otherwise it's set to the first keyboard in the list
-          const savedKeyboard = keymanweb.getSavedKeyboard().split(':');
+          const savedKeyboard = keyman.getSavedKeyboard().split(':');
           activeKeyboard = savedKeyboard[0];
           activeLanguage = savedKeyboard[1];
         }
@@ -578,8 +578,8 @@ if(!keymanweb) {
           languageCode = this.keyboards[kbdIndex]._LanguageCode;
         }
 
-        await keymanweb.setActiveKeyboard(name, languageCode);
-        keymanweb.focusLastActiveElement();
+        await keyman.setActiveKeyboard(name, languageCode);
+        keyman.focusLastActiveElement();
         this.kbdButton._setSelected(name != '');
         if (kbdIndex >= 0) {
           this.lastActiveKeyboard = kbdIndex;
@@ -734,7 +734,7 @@ if(!keymanweb) {
 
         // Add loaded keyboards to the menu
         this.keyboards = [];
-        const keyboards = keymanweb.getKeyboards();
+        const keyboards = keyman.getKeyboards();
         const added: Record<string, number> = {};
         for (let kbdIndex = 0; kbdIndex < keyboards.length; kbdIndex++) {
           if (!added[keyboards[kbdIndex].InternalName]) {
@@ -761,25 +761,25 @@ if(!keymanweb) {
 
 
     // Actually assign our UI module to the active Keyman engine.
-    const ui = keymanweb.ui = new ToggleUI();
+    const ui = keyman.ui = new ToggleUI();
 
     // CTRL-K_SLASH:  toggles to and from default keyboard
-    keymanweb.addHotKey(191, 0x20, ui.switchSingleKbd);
+    keyman.addHotKey(191, 0x20, ui.switchSingleKbd);
 
     // SHIFT-CTRL-K_SLASH:  cycles among available keyboards in sequence
-    keymanweb.addHotKey(191, 0x30, ui.switchNextKbd);
+    keyman.addHotKey(191, 0x30, ui.switchNextKbd);
 
     // ALT-K_SLASH:  Hides the OSK
-    keymanweb.addHotKey(191, 0x40, ui.switchOsk);
+    keyman.addHotKey(191, 0x40, ui.switchOsk);
 
     // // Initialize after KMW is fully initialized
-    // keymanweb['addEventListener']('loaduserinterface', ui.initialize);
+    // keyman['addEventListener']('loaduserinterface', ui.initialize);
 
-    keymanweb.addEventListener('controlfocused',function(params){
+    keyman.addEventListener('controlfocused',function(params){
       ui.doFocus(params.target, true, params.activeControl);
     });
 
-    keymanweb.addEventListener('controlblurred',function(params){
+    keyman.addEventListener('controlblurred',function(params){
       ui.doFocus(params.target, false, null);
     });
 
@@ -789,7 +789,7 @@ if(!keymanweb) {
      * Set a timer to update the UI keyboard list on timeout after each keyboard is registered,
      * thus updating only once when only if multiple keyboards are registered together
      */
-    keymanweb.addEventListener('keyboardregistered', function(p) {
+    keyman.addEventListener('keyboardregistered', function(p) {
       ui.updateList = true;
       if(ui.updateTimer) {
         clearTimeout(ui.updateTimer);
@@ -803,7 +803,7 @@ if(!keymanweb) {
      *
      * Update menu selection and control OSK display appropriately
      */
-    keymanweb.addEventListener('keyboardchange', function(p) {
+    keyman.addEventListener('keyboardchange', function(p) {
       ui.updateMenu(p.internalName, p.languageCode);
     });
 
