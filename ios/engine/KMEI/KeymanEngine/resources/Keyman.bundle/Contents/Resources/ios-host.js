@@ -331,7 +331,7 @@ function enableSuggestions(model, mayPredict, mayCorrect, mayAutocorrect) {
     // the moment we actually register the new model.
     keyman.core.languageProcessor.mayPredict = mayPredict;
     keyman.core.languageProcessor.mayCorrect = mayCorrect;
-    keyman.core.languageProcessor.mayAutocorrect = mayAutocorrect;
+    keyman.core.languageProcessor.mayAutoCorrect = mayAutocorrect;
 
     keyman.addModel(model);
 }
