@@ -152,13 +152,13 @@
 "menu-langsettings-title" = "%@ Settings";
 
 /* Label for the toggle that enables corrections that is displayed within a language-specific settings menu */
-"menu-langsettings-toggle-correct" = "Enable corrections";
+"menu-langsettings-toggle-correct" = "Offer corrections";
 
 /* Label for the toggle that enables auto-corrections that is displayed within a language-specific settings menu */
-"menu-langsettings-toggle-autocorrect" = "Enable autocorrections";
+"menu-langsettings-toggle-autocorrect" = "Apply corrections automatically";
 
 /* Label for the toggle that enables predictions that is displayed within a language-specific settings menu */
-"menu-langsettings-toggle-predict" = "Enable predictions";
+"menu-langsettings-toggle-predict" = "Offer word completions";
 
 /* Help message for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
 "menu-lexical-model-install-message" = "Would you like to install this dictionary?";

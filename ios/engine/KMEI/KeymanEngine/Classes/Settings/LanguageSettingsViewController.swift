@@ -105,21 +105,26 @@ class LanguageSettingsViewController: UITableViewController {
     }
   }
   
+  func refreshSwitchVisibility() {
+    let userDefaults = Storage.active.userDefaults
+    
+    let mayCorrect = userDefaults.correctSettingForLanguage(languageID: self.language.id)
+    self.doCorrectionsSwitch?.isHidden = !mayCorrect
+    self.doCorrectionsLabel?.isEnabled = mayCorrect
+    
+    let mayAutoCorrect = userDefaults.autocorrectSettingForLanguage(languageID: self.language.id)
+    self.doAutocorrectionsSwitch?.isHidden = !(mayCorrect && mayAutoCorrect)
+    self.doAutocorrectionsLabel?.isEnabled = mayCorrect && mayAutoCorrect
+    self.correctionsCell?.isUserInteractionEnabled = mayCorrect
+  }
+  
   @objc
   func predictionSwitchValueChanged(source: UISwitch) {
     let value = source.isOn;
     let userDefaults = Storage.active.userDefaults
     userDefaults.set(predictSetting: value, forLanguageID: self.language.id)
 
-    // Reactively set the corrections switch interactivity state.
-    self.doCorrectionsSwitch?.isHidden = !value
-    self.doCorrectionsLabel?.isEnabled = value
-    
-    let mayCorrect = userDefaults.autocorrectSettingForLanguage(languageID: self.language.id)
-    self.doAutocorrectionsSwitch?.isHidden = !(value && mayCorrect)
-    self.doAutocorrectionsLabel?.isEnabled = value && mayCorrect
-    self.correctionsCell?.isUserInteractionEnabled = value
-    
+    refreshSwitchVisibility()
     refreshModelIfNeeded()
   }
   
@@ -129,11 +134,7 @@ class LanguageSettingsViewController: UITableViewController {
     let userDefaults = Storage.active.userDefaults
     userDefaults.set(correctSetting: value, forLanguageID: self.language.id)
     
-    // This may only be triggered if the predict toggle is on,
-    // so we can rely on just the input value.
-    self.doAutocorrectionsSwitch?.isHidden = !value
-    self.doAutocorrectionsLabel?.isEnabled = value
-    
+    refreshSwitchVisibility()
     refreshModelIfNeeded()
   }
   
