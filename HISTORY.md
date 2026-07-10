@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.254 alpha 2026-07-10
+
+* fix(android): handle blank keyboard tap properly (#16217)
+* fix(web): define IME interfaces in `KeyboardInterfaceBase` (#16170)
+
 ## 19.0.253 alpha 2026-07-09
 
 * fix(web): resync model in `set osk()` (as used by Server) (#16127)
