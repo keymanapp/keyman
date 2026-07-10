@@ -17,9 +17,6 @@ title: KeymanWeb Reference
 [KeymanWeb Output Functions](interface)
 :   KeymanWeb exposes its keyboard interface object through `window.keyman.interface`, providing a number of functions for low-level processing of input, context and output.
 
-[KeymanWeb Compatibility Functions](compatibility)
-:   The following KeymanWeb core functions have been retained for compatibility with existing custom keyboards, but should not be used in any new keyboards or user interfaces. Equivalent new function calls are indicated.
-
 [Desktop User Interfaces](ui)
 :   Four different KeymanWeb user interfaces for desktop browsers are included, allowing users to select and enable keyboard mapping from a list of installed keyboards, and to control the visibility of the On-Screen Keyboard.
 
