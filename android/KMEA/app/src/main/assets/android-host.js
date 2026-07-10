@@ -22,10 +22,6 @@ sentryManager.init();
 
 window.addEventListener('load', init, false);
 
-function loadDefaultKeyboard() {
-  notifyHost('reloadAfterError');
-}
-
 function init() {
   //document.body.style.backgroundColor="transparent";
   //window.console.log('Device type = '+device);
@@ -82,7 +78,17 @@ function init() {
   keyman.addEventListener('keyboardchange', setIsChiral);
   keyman.core.languageProcessor.on('statechange', onStateChange);
 
-  document.body.addEventListener('touchend', loadDefaultKeyboard);
+  // If the keyboard fails to display, this usually indicates that a Javascript
+  // error has occurred, perhaps in the active keyboard. So we have a last-gasp
+  // fallback in that situation; if the user touches the blank document, we will
+  // attempt to reload the default keyboard.
+  document.addEventListener('touchend', () => {
+    // The error will be reported through to Sentry if the user has error
+    // reporting enabled; breadcrumbs can give us helpful details on possible
+    // root causes for the error
+    window.console.error('user touched the document body, which can only happen if the keyboard was not presented. This is usually caused by another error.');
+    notifyHost('reloadAfterError');
+  });
 
   notifyHost('pageLoaded');
 }
