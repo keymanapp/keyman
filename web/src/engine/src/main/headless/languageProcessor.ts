@@ -1,6 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
-import { Transcription, TextStoreLanguageProcessorInterface, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { Transcription, TextStoreLanguageProcessorInterface, SyntheticTextStore, ProcessorAction } from 'keyman/engine/keyboard';
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import { ContextWindow } from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
@@ -21,7 +21,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   private _mayPredict: boolean = true;
   private _mayCorrect: boolean = true;
-  private _mayAutoCorrect: boolean = false; // initialized to false - #12767
+  private _mayAutoCorrect: boolean = true;
 
   private _state: StateChangeEnum = 'inactive';
 
@@ -162,6 +162,16 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     return this.lmEngine.wordbreak(context);
   }
 
+  public hasState(transitionId: number) {
+    return !!this.recentTranscriptions.get(transitionId);
+  }
+
+  /**
+   * When called, this requests the worker to generate predictions for the transcribed
+   * context transition.
+   * @param transcription
+   * @param layerId
+   */
   public predict(transcription: Transcription, layerId: string): Promise<Suggestion[]> {
     if(!this.isActive) {
       return null;
@@ -188,9 +198,17 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
    *                        required because layerid can be changed by PostKeystroke
    * @returns
    */
-  public applySuggestion(suggestion: Suggestion, textStore: TextStoreLanguageProcessorInterface, getLayerId: ()=>string): Promise<Reversion> {
+  public applySuggestion(
+    suggestion: Suggestion,
+    textStore: TextStoreLanguageProcessorInterface,
+    getLayerId: () => string,
+    processorAction: ProcessorAction
+  ): {
+    reversion: Promise<Reversion>,
+    appendedProcessorAction?: ProcessorAction
+  } {
     if(!textStore) {
-      throw new Error("Accepting suggestions requires a destination TextStore instance.");
+      throw "Accepting suggestions requires a destination TextStore instance."
     }
 
     if(!this.isActive) {
@@ -206,64 +224,83 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Find the state of the context at the time the suggestion was generated.
     // This may refer to the context before an input keystroke or before application
     // of a predictive suggestion.
-    const original = this.getPredictionState(suggestion.transformId);
+    const original = this.getPredictionState(suggestion.transform.id);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
       return null;
-    } else {
-      // Apply the Suggestion!
-
-      // Step 1:  determine the final output text
-      const final = SyntheticTextStore.from(original.preInput, false);
-      final.apply(suggestion.transform);
-
-      // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
-      // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
-      // values as needed for use with their IME interfaces.
-      const transform = final.buildTransformFrom(textStore);
-      textStore.apply(transform);
-
-      // Tell the banner that a suggestion was applied, so it can call the
-      // keyboard's PostKeystroke entry point as needed
-      this.emit('suggestionapplied', textStore);
-
-      // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
-      // replacing the suggestion transform with the original input text.
-      const preApply = SyntheticTextStore.from(original.preInput, false);
-      preApply.apply(original.transform);
-
-      // Builds the reversion option according to the loaded lexical model's known
-      // syntactic properties.
-      const suggestionContext = new ContextWindow(original.preInput, this.configuration, getLayerId());
-
-      // We must accept the Suggestion from its original context, which was before
-      // `original.transform` was applied.
-      let reversionPromise: Promise<Reversion> = this.lmEngine.acceptSuggestion(suggestion, suggestionContext, original.transform);
-
-      // Also, request new prediction set based on the resulting context.
-      reversionPromise = reversionPromise.then((reversion) => {
-        const mappedReversion: Reversion = {
-          // By mapping back to the original Transcription that generated the Suggestion,
-          // the input will be automatically rewound to the preInput state.
-          transform: original.transform,
-          // The ID part is critical; the reversion can't be applied without it.
-          transformId: -original.token, // reversions use the additive inverse.
-          displayAs: reversion.displayAs,  // The real reason we needed to call the LMLayer.
-          id: reversion.id,
-          tag: reversion.tag
-        }
-        // // If using the version from lm-layer:
-        // let mappedReversion = reversion;
-        // mappedReversion.transformId = reversionTranscription.token;
-        this.predictFromTextStore(textStore, getLayerId());
-        return mappedReversion;
-      });
-
-      return reversionPromise;
     }
+
+    this.recentTranscriptions.rewindTo(suggestion.transform.id);
+
+    // Apply the Suggestion!
+
+    // Step 1:  determine the intermediate and final output texts
+    const intermediate = SyntheticTextStore.from(original.preInput, false);
+    let finalTranscription: Transcription;
+    let resultAction: ProcessorAction;
+    intermediate.apply(suggestion.transform);
+    let final = intermediate;
+    if(suggestion.appendedTransform) {
+      final = SyntheticTextStore.from(intermediate);
+      final.apply(suggestion.appendedTransform);
+
+      // Build the intermediate state - we may return here via reversion.
+
+      // This condition is met when auto-correct is triggered by a (non-spacebar)
+      // word-breaking mark.  In this case, this application also matches the
+      // correct Transcription for the keystroke, so we need to build it here.
+      if(processorAction?.transcription?.transform == suggestion.appendedTransform) {
+        finalTranscription = final.buildTranscriptionFrom(
+          intermediate,
+          processorAction.transcription.keystroke,
+          false,
+          processorAction.transcription.alternates
+        );
+
+        // Preserve all prior ProcessorAction properties; only replace the Transcription.
+        resultAction = new ProcessorAction();
+        Object.assign(resultAction, processorAction);
+        resultAction.transcription = finalTranscription;
+      } else {
+        // Simple case - a direct application of the suggestion (via banner or space key)
+        finalTranscription = final.buildTranscriptionFrom(intermediate, null, false);
+      }
+      // Somewhere here, save-state the intermediate state!
+      // It's fine to do even if it's for a keystroke-based version; it'll just
+      // override itself in the cache if recorded again.
+      this.recordTranscription(finalTranscription);
+      // We set the appended transform with its own ID before passing it off to the predictive-text worker.
+      suggestion.appendedTransform.id = finalTranscription.token;
+    }
+
+    // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
+    // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
+    // values as needed for use with their IME interfaces.
+    const transform = final.buildTransformFrom(textStore);
+    textStore.apply(transform);
+
+    // Tell the banner that a suggestion was applied, so it can call the
+    // keyboard's PostKeystroke entry point as needed
+    this.emit('suggestionapplied', textStore);
+
+    // Build a 'reversion' Transcription that can be used to undo this apply() if needed,
+    // replacing the suggestion transform with the original input text.
+    const preApply = SyntheticTextStore.from(original.preInput, false);
+    preApply.apply(original.transform);
+
+    // Builds the reversion option according to the loaded lexical model's known
+    // syntactic properties.
+    const suggestionContext = new ContextWindow(original.preInput, this.configuration, getLayerId());
+
+    // We must accept the Suggestion from its original context, which was before
+    // `original.transform` was applied.
+    return {
+      reversion: this.lmEngine.acceptSuggestion(suggestion, suggestionContext, original.transform),
+      appendedProcessorAction: resultAction
+    };
   }
 
-  public applyReversion(reversion: Reversion, textStore: TextStoreLanguageProcessorInterface) {
+  public applyReversion(reversion: Reversion, textStore: TextStoreLanguageProcessorInterface, appendedOnly?: boolean) {
     if(!textStore) {
       throw new Error("Accepting suggestions requires a destination TextStore instance.");
     }
@@ -275,20 +312,22 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     // Find the state of the context at the time the suggestion was generated.
     // This may refer to the context before an input keystroke or before application
     // of a predictive suggestion.
-    //
-    // Reversions use the additive inverse of the id token of the Transcription being
-    // reverted to.
-    const original = this.getPredictionState(-reversion.transformId);
+    const reversionId = appendedOnly ? reversion.appendedTransform.id : reversion.transform.id;
+    const original = this.getPredictionState(reversionId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
       return Promise.resolve([] as Suggestion[]);
     }
 
+    this.recentTranscriptions.rewindTo(reversionId);
+
     // Apply the Reversion!
 
     // Step 1:  determine the final output text
     const final = SyntheticTextStore.from(original.preInput, false);
-    final.apply(reversion.transform); // Should match original.transform, actually. (See applySuggestion)
+    if(!appendedOnly) {
+      final.apply(reversion.transform); // Should match original.transform, actually. (See applySuggestion)
+    } // else: the retrieved transcription matches the applied Suggestion's root, without the appended part.
 
     // Step 2:  build a final, master Transform that will produce the desired results from the CURRENT state.
     // In embedded mode, both Android and iOS are best served by calculating this transform and applying its
@@ -297,7 +336,11 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     textStore.apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-    const promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
+    const promise = this.currentPromise = this.lmEngine.revertSuggestion(
+      reversion,
+      new ContextWindow(final, this.configuration, null),
+      appendedOnly
+    );
     // If the "current Promise" is as set above, clear it.
     // If another one has been triggered since... don't.
     promise.then(() => this.currentPromise = (this.currentPromise == promise) ? null : this.currentPromise);
@@ -324,13 +367,18 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       return null;
     }
 
+    // We record the current context state before any prediction requests...
     const context = new ContextWindow(transcription.preInput, this.configuration, layerId);
     this.recordTranscription(transcription);
 
+    // ... even those triggered by context-resets.
     if(resetContext) {
-      this.lmEngine.resetContext(context);
+      this.lmEngine.resetContext(context, transcription.token);
     }
 
+    // The "may correct" setting is enforced here, in the main Web engine - not
+    // in the worker.  As the desired setting may vary language-to-language,
+    // we'd rather do this than reconfigure the worker constantly.
     let alternates = transcription.alternates;
     if(!this.mayCorrect || !alternates || alternates.length == 0) {
       alternates = [{
@@ -344,6 +392,12 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
     return promise.then((suggestions: Suggestion[]) => {
       if(promise == this.currentPromise) {
+        if(!this.mayAutoCorrect) {
+          // We disable the auto-accept flag here, rather than in the worker -
+          // that way, we don't need to reconfigure the worker when settings
+          // change.
+          suggestions.forEach((s) => delete s.autoAccept);
+        }
         const result = new ReadySuggestions(suggestions, transform.id);
         this.emit("suggestionsready", result);
         this.currentPromise = null;
@@ -440,33 +494,6 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public get wordbreaksAfterSuggestions() {
-    return this.configuration.wordbreaksAfterSuggestions;
-  }
-
-  public tryAcceptSuggestion(source: string): boolean {
-    if(!this.isActive) {
-      return false;
-    }
-
-    // The object below is to facilitate a pass-by-reference on the boolean flag,
-    // allowing the event's handler to signal if whitespace has been added via
-    // auto-applied suggestion that should be blocked on the next keystroke.
-    const returnObj = {shouldSwallow: false};
-    this.emit('tryaccept', source, returnObj);
-
-    return returnObj.shouldSwallow ?? false;
-  }
-
-  public tryRevertSuggestion(): boolean {
-    if(!this.isActive) {
-      return false;
-    }
-
-    // If and when we do auto-revert, the suggestion is to pass this object to the event and
-    // denote any mutations to the contained value.
-    //let returnObj = {shouldSwallow: false};
-    this.emit('tryrevert');
-
-    return false;
+    return this.configuration?.appendsWordbreaks;
   }
 }
