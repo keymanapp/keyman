@@ -937,15 +937,11 @@ end;
 
 //== { TJclEvent } ===========================================================
 
-// Keyman local patch: Delphi 11/12 compat (vendored JCL). Explicit BOOL() casts
-// added below to satisfy Delphi 12's stricter implicit-Boolean->BOOL conversion.
-// Backwards-compatible with Delphi 10.3 (BOOL is an ordinal-preserving typecast).
-// On JCL refresh from upstream: re-apply if upstream hasn't picked up the cast.
 constructor TJclEvent.Create(SecAttr: PSecurityAttributes; Manual, Signaled: Boolean; const Name: string);
 begin
   inherited Create;
   FName := Name;
-  FHandle := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.CreateEvent(SecAttr, BOOL(Manual), BOOL(Signaled), PChar(FName));
+  FHandle := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.CreateEvent(SecAttr, Manual, Signaled, PChar(FName));
   if FHandle = 0 then
     raise EJclEventError.CreateRes(@RsSynchCreateEvent);
   FExisted := GetLastError = ERROR_ALREADY_EXISTS;
@@ -956,7 +952,7 @@ constructor TJclEvent.Open(Access: Cardinal; Inheritable: Boolean;
 begin
   FName := Name;
   FExisted := True;
-  FHandle := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.OpenEvent(Access, BOOL(Inheritable), PChar(Name));
+  FHandle := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.OpenEvent(Access, Inheritable, PChar(Name));
   if FHandle = 0 then
     raise EJclEventError.CreateRes(@RsSynchOpenEvent);
 end;
@@ -984,7 +980,7 @@ constructor TJclWaitableTimer.Create(SecAttr: PSecurityAttributes;
 begin
   FName := Name;
   FResume := False;
-  FHandle := CreateWaitableTimer(SecAttr, BOOL(Manual), PChar(Name));
+  FHandle := CreateWaitableTimer(SecAttr, Manual, PChar(Name));
   if FHandle = 0 then
     raise EJclWaitableTimerError.CreateRes(@RsSynchCreateWaitableTimer);
   FExisted := GetLastError = ERROR_ALREADY_EXISTS;
@@ -1004,7 +1000,7 @@ begin
   FExisted := True;
   FName := Name;
   FResume := False;
-  FHandle := OpenWaitableTimer(Access, BOOL(Inheritable), PChar(Name));
+  FHandle := OpenWaitableTimer(Access, Inheritable, PChar(Name));
   if FHandle = 0 then
     raise EJclWaitableTimerError.CreateRes(@RsSynchOpenWaitableTimer);
 end;
@@ -1052,7 +1048,7 @@ constructor TJclSemaphore.Open(Access: Cardinal; Inheritable: Boolean;
 begin
   FName := Name;
   FExisted := True;
-  FHandle := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.OpenSemaphore(Access, BOOL(Inheritable), PChar(Name));
+  FHandle := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.OpenSemaphore(Access, Inheritable, PChar(Name));
   if FHandle = 0 then
     raise EJclSemaphoreError.CreateRes(@RsSynchOpenSemaphore);
 end;
@@ -1079,7 +1075,7 @@ constructor TJclMutex.Create(SecAttr: PSecurityAttributes; InitialOwner: Boolean
 begin
   inherited Create;
   FName := Name;
-  FHandle := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.CreateMutex(SecAttr, BOOL(InitialOwner), PChar(Name));
+  FHandle := JclWin32.CreateMutex(SecAttr, InitialOwner, PChar(Name));
   if FHandle = 0 then
     raise EJclMutexError.CreateRes(@RsSynchCreateMutex);
   FExisted := GetLastError = ERROR_ALREADY_EXISTS;
@@ -1090,7 +1086,7 @@ begin
   inherited Create;
   FName := Name;
   FExisted := True;
-  FHandle := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.OpenMutex(Access, BOOL(Inheritable), PChar(Name));
+  FHandle := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.OpenMutex(Access, Inheritable, PChar(Name));
   if FHandle = 0 then
     raise EJclMutexError.CreateRes(@RsSynchOpenMutex);
 end;

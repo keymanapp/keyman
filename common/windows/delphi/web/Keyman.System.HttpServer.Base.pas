@@ -51,9 +51,10 @@ begin
   // workaround stays applied conservatively.
 {$IFNDEF VER330}
 {$IFNDEF VER340}
+  {$MESSAGE WARN 'TODO: Check if Indy URL UTF-8 handling is still needed with Delphi 10.4/11.0/12.0'}
 {$IFNDEF VER350}
 {$IFNDEF VER360}
-  ERROR! Check if this is still needed with Delphi update
+  {$MESSAGE ERROR 'Check if Indy URL UTF-8 handling is still needed with Delphi update'}
 {$ENDIF}
 {$ENDIF}
 {$ENDIF}
