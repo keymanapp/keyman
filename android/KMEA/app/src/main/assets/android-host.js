@@ -82,12 +82,14 @@ function init() {
   // error has occurred, perhaps in the active keyboard. So we have a last-gasp
   // fallback in that situation; if the user touches the blank document, we will
   // attempt to reload the default keyboard.
-  document.addEventListener('touchend', () => {
-    // The error will be reported through to Sentry if the user has error
-    // reporting enabled; breadcrumbs can give us helpful details on possible
-    // root causes for the error
-    window.console.error('user touched the document body, which can only happen if the keyboard was not presented. This is usually caused by another error.');
-    notifyHost('reloadAfterError');
+  document.addEventListener('touchend', (event) => {
+    if(event.target == document.documentElement) {
+      // The error will be reported through to Sentry if the user has error
+      // reporting enabled; breadcrumbs can give us helpful details on possible
+      // root causes for the error
+      window.console.error('user touched the document body, which can only happen if the keyboard was not presented. This is usually caused by another error.');
+      notifyHost('reloadAfterError');
+    }
   });
 
   notifyHost('pageLoaded');
