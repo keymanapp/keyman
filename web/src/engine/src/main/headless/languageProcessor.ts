@@ -166,6 +166,12 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     return !!this.recentTranscriptions.get(transitionId);
   }
 
+  /**
+   * When called, this requests the worker to generate predictions for the transcribed
+   * context transition.
+   * @param transcription
+   * @param layerId
+   */
   public predict(transcription: Transcription, layerId: string): Promise<Suggestion[]> {
     if(!this.isActive) {
       return null;
@@ -370,6 +376,9 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       this.lmEngine.resetContext(context, transcription.token);
     }
 
+    // The "may correct" setting is enforced here, in the main Web engine - not
+    // in the worker.  As the desired setting may vary language-to-language,
+    // we'd rather do this than reconfigure the worker constantly.
     let alternates = transcription.alternates;
     if(!this.mayCorrect || !alternates || alternates.length == 0) {
       alternates = [{
@@ -383,6 +392,12 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
     return promise.then((suggestions: Suggestion[]) => {
       if(promise == this.currentPromise) {
+        if(!this.mayAutoCorrect) {
+          // We disable the auto-accept flag here, rather than in the worker -
+          // that way, we don't need to reconfigure the worker when settings
+          // change.
+          suggestions.forEach((s) => delete s.autoAccept);
+        }
         const result = new ReadySuggestions(suggestions, transform.id);
         this.emit("suggestionsready", result);
         this.currentPromise = null;
