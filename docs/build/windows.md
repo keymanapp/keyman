@@ -262,6 +262,12 @@ of appropriate node versions during builds.
     Delphi 11, `23.0` for Delphi 12 — before running `build.sh`. The default
     (`20.0`, Delphi 10.3) is preserved when the variable is unset.
 
+  * If you only have access to a **Delphi Community Edition** (e.g. Delphi 12 CE),
+    see [windows-delphi-ce.md](windows-delphi-ce.md) for an IDE-based workflow
+    that papers over the missing command-line compiler. The shell-script knob
+    (`KEYMAN_DELPHI_CE=1`) described there is local-only and not required for
+    the standard 10.3 / Pro flow.
+
   Start Delphi IDE once after installation as it will create various environment
   files and take you through required registration.
 
@@ -317,6 +323,31 @@ of appropriate node versions during builds.
   * Add the `C:\Projects\keyman\keyman\windows\lib` folder in the Keyman
     repository to your `PATH` environment variable. This is required for
     Keyman's design-time packages to load in Delphi.
+
+### Delphi build-order dependencies
+
+Several Keyman projects have cross-project dependencies not expressed in
+`.dproj` / `.groupproj` files — a Delphi tool emits code consumed by another
+Delphi project, or one project's `.res` embeds another's `.exe`. `build.sh`
+sequences these correctly; they matter if you build projects individually or
+out of order (for example in the IDE). What each build step produces, and for
+which dependent:
+
+| # | Producer → Consumer | Failure if skipped |
+|---|---------------------|---------------------|
+| a | `windows/src/global/delphi/build.sh` → `devtools -buildmessageconstants` → `MessageIdentifierConsts.pas` consumed by keyman.dproj, kmshell.dproj, plus `keyman_components.bpl` → `windows/lib/` | `F1026 File not found: 'MessageIdentifierConsts.pas'` OR `File ... keyman_components.bpl does not exist` |
+| a' | `windows/src/desktop/setup/build.sh` → `devtools -buildsetupstrings` → ~32 `Keyman.Setup.System.Locale.<bcp47>.pas` consumed by setup.dproj | `F1026 File not found: 'Keyman.Setup.System.Locale.<bcp47>.pas'` |
+| b | `common/windows/delphi/tools/build_standards_data/build.sh` → 5 BCP-47 registry `.pas` files → TIKE.dproj | `F1026 File not found: 'Keyman.System.Standards.BCP47SubtagRegistry.pas'` |
+| c | `windows/src/engine/tsysinfo/build.sh` → auto-invokes tsysinfox64 publish, copies exe, runs `rc.exe` → `tsysinfo_x64.res` embedded by tsysinfo.dproj | `F1026 File not found: 'tsysinfo_x64.res'` |
+All generated `.pas` files are `.gitignored` and must be regenerated after
+`git clean -fdx`.
+
+Distinct from build order, a few components must be **installed or registered
+to run** (not to compile): `kmcomapi.dll` registered via `regsvr32` (or
+`windows/src/engine/kmcomapi/build.sh install`), `kmcmplib-19.dll` present for
+Keyman Developer, and `keyman.exe` / `kmshell.exe` able to launch. Missing
+these surfaces as **runtime** errors — `Class not registered`,
+`kmcmplib-19.dll not found`, `"Keyman failed to start"` — not build errors.
 
 ### KEYMAN_CEF4DELPHI_ROOT
 
