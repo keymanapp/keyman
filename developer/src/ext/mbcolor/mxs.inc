@@ -7,10 +7,8 @@
      {$define DELPHI_10_UP}
     {$endif}
 
-    // Keyman local patch: Delphi 11/12 compat (vendored mbcolor). Without
-    // these blocks DELPHI_*_UP flags are never defined on VER350/VER360,
-    // which causes HTMLColors.pas to drop "uses Variants" and fail to
-    // resolve the Null constant. On mbcolor refresh: re-apply if needed.
+    // Keyman patch (D11/12, vendored mbcolor): define DELPHI_*_UP on VER350/VER360
+    // too, else HTMLColors.pas drops "uses Variants" and Null won't resolve.
     {$ifdef VER350}
      {$define DELPHI_5_UP}
      {$define DELPHI_6_UP}
