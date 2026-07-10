@@ -27,17 +27,7 @@ builder_describe_outputs \
 
 #### Resource paths ####
 
-BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
-
-TEMPLATES_SRC="$KEYMAN_ROOT/common/models/templates/build/lib/index.mjs"
-TEMPLATES_MAP="$KEYMAN_ROOT/common/models/templates/build/lib/index.mjs"
-WORDBREAKING_SRC="$KEYMAN_ROOT/common/models/wordbreakers/build/lib/index.mjs"
-WORDBREAKING_MAP="$KEYMAN_ROOT/common/models/wordbreakers/build/lib/index.mjs"
-
-SENTRY_MANAGER_SRC="$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"
-SENTRY_MANAGER_MAP="$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js.map"
-SENTRY_SRC="$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js"
-SENTRY_MAP="$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js.map"
+BUNDLE_CMD="node $KEYMAN_ROOT/common/tools/es-bundling/build/common-bundle.mjs"
 
 #### Build action definitions ####
 
@@ -59,13 +49,13 @@ function do_copy() {
 
   mkdir -p "$WORDBREAK_DEMO_TARGET"
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/src/predictive-text/templates/build/obj/index.js" \
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/src/engine/predictive-text/templates/build/obj/index.js" \
     --out        "${WORDBREAK_DEMO_TARGET}/templates.js" \
     --format esm
 
   # One of the functions (timedPromise) is quite helpful for automated testing, even in the DOM.
   # So, to make sure it's easily-accessible for the DOM-based tests...
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/src/predictive-text/wordbreakers/build/obj/index.js" \
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/src/engine/predictive-text/wordbreakers/build/main/obj/index.js" \
     --out        "${WORDBREAK_DEMO_TARGET}/wordbreakers.js" \
     --format esm
 }
