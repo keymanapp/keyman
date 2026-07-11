@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.255 alpha 2026-07-11
+
+* maint(android): use KEYMAN_TIER instead of TIER.md (#16219)
+* feat(ios): add keyman-version to package-version check (#16138)
+* docs(web): cleanup of index pages and page titles (#16171)
+* feat(android): add keyman-version to package-version check (#16139)
+
 ## 19.0.254 alpha 2026-07-10
 
 * fix(android): handle blank keyboard tap properly (#16217)
