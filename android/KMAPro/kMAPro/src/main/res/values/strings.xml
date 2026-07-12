@@ -13,6 +13,11 @@
   <!-- Context: Menu Action -->
   <string name="action_web" comment="Menu action to open Keyman browser">Web Browser</string>
 
+    <!-- Context: Keyman Settings menu titles -->
+  <string name="setup_title" comment="Section title for Sidebar">Setup</string>
+  <string name="preferences_title" comment="Section title for Sidebar">Preferences</string>
+  <string name="help_title" comment="Section title for Sidebar">Help</string>
+
   <!-- Context: Navigation drawer subtitles -->
 
   <string name="drawer_subtitle_spacebar_caption" comment="Subtitle for Spacebar caption drawer item">Show keyboard name on spacebar</string>
@@ -94,7 +99,7 @@
   <string name="add_a_keyboard" comment="Menu item to add a keyboard">Add a keyboard for your language</string>
 
   <!-- Context: Get Started menu -->
-  <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">Enable Keyman as system-wide keyboard</string>
+  <string name="system_keyboard" comment="Menu item to system keyboard">System keyboards</string>
 
   <!-- Context: Get Started menu -->
   <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">Set Keyman as default keyboard</string>

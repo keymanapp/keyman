@@ -101,7 +101,7 @@ public class GetStartedActivity extends BaseActivity {
 
     hashMap = new HashMap<String, String>();
     hashMap.put(iconKey, "0");
-    hashMap.put(textKey, getString(R.string.enable_system_keyboard));
+    hashMap.put(textKey, getString(R.string.system_keyboard));
     hashMap.put(isEnabledKey, "true");
     list.add(hashMap);
 

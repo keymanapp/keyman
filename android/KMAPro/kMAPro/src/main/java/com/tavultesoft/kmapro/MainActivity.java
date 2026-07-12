@@ -281,8 +281,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     updateInstalledLanguagesDrawerTitle(navigationView);
     initializeDrawerItemSubtitles(navigationView);
     initializeDrawerToggleOptions(navigationView);
-    initializeDrawerCheckboxOptions(navigationView);
-    refreshDrawerSystemKeyboardCheckboxes(navigationView);
 
     drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
 
@@ -441,7 +439,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     super.onResume();
 
     if (navigationView != null) {
-      refreshDrawerSystemKeyboardCheckboxes(navigationView);
       updateCurrentKeyboardDrawerItemTitle(navigationView);
       updateInstalledLanguagesDrawerTitle(navigationView);
       initializeDrawerItemSubtitles(navigationView);
@@ -1319,10 +1316,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private boolean handleDrawerNavigationItemSelected(int id) {
-    if (id == R.id.nav_checkbox_enable_system_keyboard) {
+    if (id == R.id.system_keyboard) {
       startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
-    } else if (id == R.id.nav_checkbox_set_default_keyboard) {
-      showDefaultKeyboardPickerFromMainPage();
     } else if (id == R.id.action_update_keyboards) {
       KMManager.getUpdateTool().executeOpenUpdates();
       updateUpdateCountIndicator(0);
@@ -1590,32 +1585,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
     menuItem.setTitle(fullTitle);
-  }
-
-  private void initializeDrawerCheckboxOptions(NavigationView navigationView) {
-    bindDrawerCheckboxAction(navigationView, R.id.nav_checkbox_enable_system_keyboard,
-        () -> {
-          if (drawerLayout != null) {
-            drawerLayout.closeDrawers();
-          }
-          startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
-        });
-
-    bindDrawerCheckboxAction(navigationView, R.id.nav_checkbox_set_default_keyboard,
-        this::showDefaultKeyboardPickerFromMainPage);
-  }
-
-  private void showDefaultKeyboardPickerFromMainPage() {
-    Intent pickerIntent = new Intent(this, GetStartedActivity.class);
-    pickerIntent.putExtra(GetStartedActivity.openDefaultKeyboardPickerOnlyKey, true);
-    startActivity(pickerIntent);
-  }
-
-  private void refreshDrawerSystemKeyboardCheckboxes(NavigationView navigationView) {
-    setDrawerCheckboxState(navigationView, R.id.nav_checkbox_enable_system_keyboard,
-        SystemIMESettings.isEnabledAsSystemKB(context));
-    setDrawerCheckboxState(navigationView, R.id.nav_checkbox_set_default_keyboard,
-        SystemIMESettings.isDefaultKB(context));
   }
 
   private void bindDrawerSwitch(NavigationView navigationView, int menuItemId, boolean defaultValue,
