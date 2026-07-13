@@ -182,6 +182,7 @@ function _builder_basic_print_version_utils_debug() {
     fi
 
     if [[ ${_builder_basic_environment_printed:-false} == true ]]; then
+        # report this only once per build
         return
     fi
 
