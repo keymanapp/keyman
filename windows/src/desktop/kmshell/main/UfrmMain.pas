@@ -818,28 +818,45 @@ var
   ShellPath : string;
   FResult, InstallNow: Boolean;
   frmStartInstallNow: TfrmStartInstall;
-  IsMetered: Boolean;
+  IsMetered, DownloadRequired, RestartRequired: Boolean;
   InstallCase: TInstallCase;
+  BUpdateSM: TUpdateStateMachine;
 begin
   InstallNow := True;
   IsMetered := TNetworkConnection.IsMetered;
+  RestartRequired := HasKeymanRun;
+
+  BUpdateSM := TUpdateStateMachine.Create(False);
+  try
+    DownloadRequired := BUpdateSM.IsDownloadRequired;
+  finally
+    BUpdateSM.Free;
+  end;
 
   // If a restart is required (HasKeymanRun == True)
   // OR it is a Metered connection warn the user and allow
   // them to cancel their request to Install Now.
+  // Untill TODO: #13711 is implemented also let the user know
+  // that the update will be downloaded in the background.
+  // before the install starts. Once #13711 change the message
+  // to just be a download is required.
   // Otherwise start installing with out pop-up warnings.
   InstallCase := TInstallCase.icNone;
-  if HasKeymanRun and not IsMetered then
+  if DownloadRequired and RestartRequired and IsMetered then
   begin
-    InstallCase := TInstallCase.icRestartRequiredNotMetered;
+    InstallCase := TInstallCase.icDownloadRestartMetered;
   end
-  else if HasKeymanRun and IsMetered then
+  else if DownloadRequired and RestartRequired and not IsMetered then
   begin
-    InstallCase := TInstallCase.icRestartRequiredMetered;
+    InstallCase := TInstallCase.icDownloadRestart;
   end
-  else if (not HasKeymanRun) and IsMetered then
+  else if DownloadRequired and not RestartRequired and not IsMetered then
   begin
-     InstallCase := TInstallCase.icNoInstallMessageMetered;
+    InstallCase := TInstallCase.icDownload;
+  end
+  else if DownloadRequired and not RestartRequired and IsMetered then
+  begin
+     InstallCase := TInstallCase.icDownloadMetered;
   end;
 
   // Render dialog if conditions require it

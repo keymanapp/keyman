@@ -24,19 +24,21 @@ type
   // The 4 valid installation form scenarios plus a None case for validation
   TInstallCase = (
     icNone, // Not a valid case, can be used as check before calling creating form
-    icRestartRequiredMetered,
-    icRestartRequiredNotMetered,
-    icReadyToInstallNotMetered, // Metered warning never needed if ReadyToInstall
-    icNoInstallMessageMetered
+    icDownloadRestartMetered,
+    icDownloadRestart,
+    icDownload,
+    icReadyToInstall, // Metered warning never needed if ReadyToInstall
+    icDownloadMetered
   );
 
   TfrmStartInstall = class(TfrmKeymanBase)
     cmdInstall: TButton;
     cmdLater: TButton;
     lblUpdateMessage: TLabel;
+    lblDownloadRequired: TLabel;
     imgKeymanLogo: TImage;
-    shpMeteredWarning: TShape;
     lblMeteredWarning: TLabel;
+    imgCaution: TImage;
     procedure FormCreate(Sender: TObject);
   private
     FScenario: TInstallCase;
@@ -70,35 +72,50 @@ begin
   cmdLater.Caption := MsgFromId(S_Later);
 
   // Default UI configuration state - metered warnings hidden initially
-  lblUpdateMessage.Visible := True;
+  lblUpdateMessage.Visible := False;
+  lblDownloadRequired.Visible := False;
   lblMeteredWarning.Visible := False;
-  shpMeteredWarning.Visible := False;
+  imgCaution.Visible := False;
 
   case FScenario of
-    icRestartRequiredMetered:
+    icDownloadRestartMetered:
     begin
       lblUpdateMessage.Caption := MsgFromId(S_Update_Restart_Req);
+      lblUpdateMessage.Visible := True;
+      lblDownloadRequired.Caption := MsgFromId(S_Update_Download_Required);
+      lblDownloadRequired.Visible := True;
       lblMeteredWarning.Caption := MsgFromId(S_Metered_Warning);
       lblMeteredWarning.Visible := True;
-      shpMeteredWarning.Visible := True;
+      imgCaution.Visible := True;
     end;
 
-    icRestartRequiredNotMetered:
+    icDownloadRestart:
     begin
       lblUpdateMessage.Caption := MsgFromId(S_Update_Restart_Req);
+      lblUpdateMessage.Visible := True;
+      lblDownloadRequired.Caption := MsgFromId(S_Update_Download_Required);
+      lblDownloadRequired.Visible := True;
     end;
 
-    icReadyToInstallNotMetered:
+    icDownload:
+    begin
+      lblDownloadRequired.Caption := MsgFromId(S_Update_Download_Required);
+      lblDownloadRequired.Visible := True;
+    end;
+
+    icReadyToInstall:
     begin
       lblUpdateMessage.Caption := MsgFromId(S_Ready_To_Install);
+      lblUpdateMessage.Visible := True;
     end;
 
-    icNoInstallMessageMetered:
+    icDownloadMetered:
     begin
-      lblUpdateMessage.Visible := False;
+      lblDownloadRequired.Caption := MsgFromId(S_Update_Download_Required);
+      lblDownloadRequired.Visible := True;
       lblMeteredWarning.Caption := MsgFromId(S_Metered_Warning);
       lblMeteredWarning.Visible := True;
-      shpMeteredWarning.Visible := True;
+      imgCaution.Visible := True;
     end;
   end;
 end;

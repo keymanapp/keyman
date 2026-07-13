@@ -102,6 +102,14 @@ type
      * @returns True  if the Keyman is ready to install.
      *)
     function ValidateReadyToInstall: Boolean;
+    (**
+     * Is a download load of the updates required
+     * One use case is by the UI to warn the user in foreground manual update
+     * that the update needs to be downloaded
+     *
+     * @returns True  if in the UpdateAvailable or Downloading State
+     *)
+    function IsDownloadRequired: Boolean;
     function IsInstallingState: Boolean;
 
     function GetAutomaticUpdates: Boolean;
@@ -590,6 +598,13 @@ end;
 function TUpdateStateMachine.IsInstallingState: Boolean;
 begin
   Result := (CurrentState is InstallingState);
+end;
+
+function TUpdateStateMachine.IsDownloadRequired: Boolean;
+begin
+  Result :=
+    (CurrentState is UpdateAvailableState) or
+    (CurrentState is DownloadingState);
 end;
 
 // base implmentation to be overiden
