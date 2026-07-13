@@ -1,0 +1,39 @@
+{
+  "id": "javascript_error",
+  "name": "javascript_error",
+  "license": "mit",
+  "authorName": "Marc Durdin",
+  "description": "<p>javascript_error test keyboard</p>",
+  "languages": {
+    "amf": {
+      "examples": [],
+      "languageName": "Hamer-Banne",
+      "displayName": "Hamer-Banne"
+    }
+  },
+  "lastModifiedDate": "2026-07-13T07:51:37.473Z",
+  "packageFilename": "javascript_error.kmp",
+  "packageFileSize": 6898,
+  "jsFilename": "javascript_error.js",
+  "jsFileSize": 20557,
+  "packageIncludes": [
+    "visualKeyboard",
+    "welcome",
+    "documentation"
+  ],
+  "version": "1.0",
+  "encodings": [
+    "unicode"
+  ],
+  "platformSupport": {
+    "windows": "full",
+    "macos": "full",
+    "linux": "full",
+    "desktopWeb": "full",
+    "ios": "full",
+    "android": "full",
+    "mobileWeb": "full"
+  },
+  "minKeymanVersion": "10.0",
+  "helpLink": "https://help.keyman.com/keyboard/javascript_error"
+}

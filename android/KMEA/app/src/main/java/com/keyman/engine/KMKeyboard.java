@@ -310,7 +310,7 @@ final class KMKeyboard extends WebView {
           // This duplicates the sendKMWError message, which itself duplicates the reporting now
           // managed by sentry-manager on the js side in patch in #6890. It does not give us
           // additional useful information. So we don't re-send to Sentry.
-          sendError(packageID, keyboardID, "", false);
+          sendError(packageID, keyboardID, "", null);
         }
 
         return true;
@@ -601,7 +601,11 @@ final class KMKeyboard extends WebView {
     }
 
     if (!KMManager.shouldAllowSetKeyboard() || kbInfo == null) {
-      sendError(packageID, keyboardID, languageID, true);
+      if(!KMManager.shouldAllowSetKeyboard()) {
+        sendError(packageID, keyboardID, languageID, "setKeyboard.short failed with shouldAllowSetKeyboard == false");
+      } else {
+        sendError(packageID, keyboardID, languageID, "setKeyboard.short failed with kbInfo == null");
+      }
       kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       retVal = false;
     } else {
@@ -632,7 +636,7 @@ final class KMKeyboard extends WebView {
 
     if (!KMManager.shouldAllowSetKeyboard() ||
         (packageID.equals(KMManager.KMDefault_UndefinedPackageID) && keyboardVersion == null)) {
-      sendError(packageID, keyboardID, languageID, true);
+      sendError(packageID, keyboardID, languageID, "prepareKeyboardSwitch");
       Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       packageID = kbInfo.getPackageID();
       keyboardID = kbInfo.getKeyboardID();
@@ -684,7 +688,11 @@ final class KMKeyboard extends WebView {
 
     if (!KMManager.shouldAllowSetKeyboard() ||
         (packageID.equals(KMManager.KMDefault_UndefinedPackageID) && keyboardVersion == null)) {
-      sendError(packageID, keyboardID, languageID, true);
+      if(!KMManager.shouldAllowSetKeyboard()) {
+        sendError(packageID, keyboardID, languageID, "setKeyboard.full failed with shouldAllowSetKeyboard == false");
+      } else {
+        sendError(packageID, keyboardID, languageID, "setKeyboard.full failed with packageID == KMDefault_UndefinedPackageID and keyboardVersion == null");
+      }
       Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       packageID = kbInfo.getPackageID();
       keyboardID = kbInfo.getKeyboardID();
@@ -780,26 +788,24 @@ final class KMKeyboard extends WebView {
   }
 
   public boolean getChirality() {
-
     return this.isChiral;
-
   }
 
-  // Display localized Toast notification that keyboard selection failed, so loading default keyboard.
-  // Also sends a message to Sentry (not localized)
-  private void sendError(String packageID, String keyboardID, String languageID, boolean reportToSentry) {
+  /**
+   * Display localized Toast notification that keyboard selection failed, so
+   * loading default keyboard. Also sends a message to Sentry (not localized)
+   */
+  private void sendError(String packageID, String keyboardID, String languageID, String sentryMessage) {
     this.currentKeyboardErrorReports++;
 
     if(this.currentKeyboardErrorReports == 1) {
-      BaseActivity.makeToast(context, R.string.fatal_keyboard_error_short, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
+      BaseActivity.makeToast(context, R.string.fatal_keyboard_error, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
     }
 
-    if(this.currentKeyboardErrorReports < 5 && DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled() && reportToSentry) {
-      // We'll only report up to 5 errors in a given keyboard to avoid spamming
-      // errors and using unnecessary bandwidth doing so
-      // Don't use localized string R.string.fatal_keyboard_error msg for Sentry
-      String msg = KMString.format("Error in keyboard %1$s:%2$s for %3$s language.",
-        packageID, keyboardID, languageID);
+    if(this.currentKeyboardErrorReports < 5 && sentryMessage != null && DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+      // We'll only report up to 5 errors in a given keyboard to avoid spamming errors and using unnecessary bandwidth doing so
+      String msg = KMString.format("Script error in keyboard webview\nContext: %4$s\nActive package: %1$s\nActive keyboard: %2$s\nActive language: %3$s",
+        packageID, keyboardID, languageID, sentryMessage);
       Sentry.captureMessage(msg);
     }
   }
