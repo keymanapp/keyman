@@ -72,7 +72,7 @@ In the future the architecture of kmc-convert will look like this:
 
 ![image](kmc_convert_future_architecture.png)
 
-As a start we first focus on a conversion where datra is stored in an array instead of using an AST as described below
+As a start we first focus on a conversion where data is stored in an array instead of using an AST as described below
 
 ### Data is read from a .keylayout file using KeymanXmlReader
 
