@@ -49,6 +49,22 @@ struct ConfigView: View {
           ForEach(Array(settings.installedPackages.enumerated()), id: \.offset) { index, package in
             VStack {
               HStack(alignment: .center, spacing: 10) {
+                VStack(spacing: 16) {
+                    Text("Scan to visit website:")
+                        .font(.headline)
+                    
+                  if let qrImage = package.generateSharePackageQRCode(size: 250) {
+                        Image(nsImage: qrImage)
+                            .interpolation(.none) // important: keeps the QR edges sharp
+                            .resizable()
+                            .frame(width: 250, height: 250)
+                            .background(Color.white) // ensures good scanning contrast
+                    } else {
+                        Text("Failed to generate QR Code")
+                            .foregroundColor(.red)
+                    }
+                }
+                .padding()
                 Text(package.packageName)
                   .font(.headline)
                 Text(package.packageVersion)

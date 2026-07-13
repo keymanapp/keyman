@@ -9,6 +9,9 @@
 
 import Foundation
 import AppKit
+import Cocoa
+import CoreImage
+import CoreImage.CIFilterBuiltins
 
 public class KeymanPackage: Identifiable, Hashable, Equatable {
   static let defaultImage: NSImage? = {
@@ -26,14 +29,20 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   // the URL of the kmp.json file for the package
   
   public let keyboards: [Keyboard]
+  public let fonts: [String]
   public let packageName: String
   public let packageVersion: String
   
+  public let author: String?
   public let copyright: String?
   public let jsonFileUrl: URL
   public let readmeFileUrl: URL?
+  public let helpFileUrl: URL?      // named welcomeFile in kmp.json
   public let graphicFileUrl: URL?
   public let graphicImage: NSImage?
+  
+  public var sharePackageUrl: URL?
+  public var shareQrCode: NSImage?
   
   /**
    * create a KeymanPackage object using the PackageSource object created from the kmp.json
@@ -42,6 +51,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     self.id = UUID()
     self.packageName = packageSource.info.name.description
     self.packageVersion = packageSource.info.version.description
+    self.author = packageSource.info.author?.description
     self.copyright = packageSource.info.copyright?.description
     self.sourceDirectoryUrl = packageSource.directoryUrl!
     self.jsonFileUrl = packageSource.kmpJsonFileUrl!
@@ -52,11 +62,34 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     } else {
       self.readmeFileUrl = nil
     }
-    
+
+    if let helpFilename = packageSource.helpFilename {
+      let fileUrl = sourceDirectoryUrl.appendingPathComponent(helpFilename)
+      self.helpFileUrl = fileUrl
+    } else {
+      self.helpFileUrl = nil
+    }
+
     self.graphicFileUrl = KeymanPackage.buildGraphicFileUrl(source: packageSource)
     self.graphicImage = KeymanPackage.loadImage(imageUrl: self.graphicFileUrl)
     
+    self.sharePackageUrl = KeymanPackage.buildSharePackageUrl(packageUrl: self.sourceDirectoryUrl)
+ 
     self.keyboards = KeymanPackage.buildKeyboardsArray(packageSource: packageSource)
+    
+    // build font array by looping through keyboard array
+    var fontNames: Set<String> = []
+    for keyboard in self.keyboards {
+      if let oskFontName = keyboard.oskFont {
+        fontNames.insert(oskFontName)
+      }
+      if let displayFontName = keyboard.displayFont {
+        fontNames.insert(displayFontName)
+      }
+    }
+    self.fonts = fontNames.sorted()
+    print("help url: \(self.helpFileUrl?.path ?? "nil")")
+    print("fonts: \(fontNames) for package: \(self.packageName)")
   }
   
   /**
@@ -78,17 +111,20 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   /**
    * initializer that does not rely on package source -- provided to create unit test data
    */
-  public init(sourceDirectoryUrl: URL, keyboards: [Keyboard], packageName: String, packageVersion: String, copyright: String? = nil, jsonFileUrl: URL, readmeFileUrl: URL? = nil, graphicFileUrl: URL? = nil, graphicImage: NSImage? = nil) {
+  public init(sourceDirectoryUrl: URL, keyboards: [Keyboard], packageName: String, packageVersion: String, author: String? = nil, copyright: String? = nil, jsonFileUrl: URL, readmeFileUrl: URL? = nil, helpFileUrl: URL? = nil, graphicFileUrl: URL? = nil, graphicImage: NSImage? = nil) {
     self.id = UUID()
     self.sourceDirectoryUrl = sourceDirectoryUrl
     self.keyboards = keyboards
     self.packageName = packageName
     self.packageVersion = packageVersion
+    self.author = author
     self.copyright = copyright
     self.jsonFileUrl = jsonFileUrl
     self.readmeFileUrl = readmeFileUrl
+    self.helpFileUrl = helpFileUrl
     self.graphicFileUrl = graphicFileUrl
     self.graphicImage = graphicImage
+    self.fonts = []
   }
   
   /**
@@ -167,6 +203,43 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     return packageImage
   }
   
+  
+  /**
+   * build the URL to the executable inside the specified Input Method app
+   */
+  static func buildSharePackageUrl(packageUrl: URL) -> URL? {
+    return URL(string: "https://\(KeymanPaths.keymanDomain)/go/keyboard/\(packageUrl.lastPathComponent)/share")
+  }
+
+  /**
+   * generate a QR code for sharing the Keyman Package URL
+   */
+  public func generateSharePackageQRCode(size: CGFloat = 300) -> NSImage? {
+    guard let data = self.sharePackageUrl?.absoluteString.data(using: .utf8) else { return nil }
+    
+    // initialize the built-in Apple QR filter
+    let filter = CIFilter.qrCodeGenerator()
+    filter.message = data
+    filter.correctionLevel = "M"
+    
+    guard let rawQRImage = filter.outputImage else { return nil }
+    
+    // calculate scaling factor to ensure crisp rendering of QR code
+    let rawWidth = rawQRImage.extent.width
+    guard rawWidth > 0 else { return nil }
+    let scale = size/rawWidth
+    
+    // apply transform to scale up without blurring (use interpolation = none in SwiftUI image)
+    let scaledQRImage = rawQRImage.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+    
+    // convert the CIImage to a macOS NSImage
+    let rep = NSCIImageRep(ciImage: scaledQRImage)
+    let nsImage = NSImage(size: NSSize(width: size, height: size))
+    nsImage.addRepresentation(rep)
+    
+    return nsImage
+  }
+
   /**
    * provided for Hashable conformance
    */

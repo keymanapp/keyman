@@ -171,13 +171,13 @@ import Foundation
   
   @Test("Check Keyman 19 container data directory") func testKeyman19ContainerDataDirectory() async throws {
     #expect(true)
-    let containerDirectory = try #require(KeymanPaths().keyman19ContainerDirectory)
+    let containerDirectory = try KeymanPaths().keyman19ContainerDirectory
     #expect(containerDirectory.absoluteString.hasSuffix("Group%20Containers/group.com.keyman/"))
   }
   
   @Test("Check Keyman 19 packages directory") func testKeyman19KeyboardsDirectory() async throws {
     #expect(true)
-    let keyboardsDirectory = try #require(KeymanPaths().keyman19PackagesDirectory)
+    let keyboardsDirectory = try KeymanPaths().keyman19PackagesDirectory
     #expect(keyboardsDirectory.absoluteString.hasSuffix("Group%20Containers/group.com.keyman/Library/Application%20Support/Keyman-Packages/"))
   }
 }
