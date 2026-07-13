@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.256 alpha 2026-07-13
+
+* fix(android): add permissions for Sentry and set default keyboard (#16216)
+* maint(resources): add extra debug reporting for builder (#16230)
+
 ## 19.0.255 alpha 2026-07-11
 
 * maint(android): use KEYMAN_TIER instead of TIER.md (#16219)
