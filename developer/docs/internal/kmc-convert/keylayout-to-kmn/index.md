@@ -1,15 +1,15 @@
 ---
-title: Keyman Developer kmc-convert keylayout -> kmn
+title: Keyman Developer - kmc-convert - keylayout -> kmn
 ---
 
 ## Structure of a keylayout file
 A minimal example of a keylayout might look like this:
 
-![image](Structure_Keylayout.png)
+![image](structure_keylayout.png)
  _structure of a .keylayout file_
 
  - A **modifierMap** defines a set of (multiple) behaviours (keyMapSelect)
- - A **keyMapSelect** defines a set of (multiple) modifier combinations. If multiple modifier combinations are defined, they all react in the same way e.g. pressing ‘CAPS’ or ‘SHIFT CAPS’ has the same effect.
+ - A **keyMapSelect** defines a set of (multiple) modifier combinations. If multiple modifier combinations are defined, they all react in the same way e.g. pressing 'CAPS' or 'SHIFT CAPS' has the same effect.
  - A **keyMapSet** defines a set of (multiple) keyMap. The number of KeyMapSets corresponds to the number of ModifierMaps.
  - A **keyMap** defines a set of (multiple) keys, their output and their action
 Actions define a set of (multiple) action
@@ -35,16 +35,16 @@ _3 modifier/key combinations of a rule_
 
  - C0: modifier/Keycode -> output
  - C1: modifier/Keycode-> action -> output
- - C2: modifier/Keycode-> action -> state:none-next ‘X’ -> state ‘X’ -> output
- - C3: modifier/Keycode-> action -> state:none-next ‘X’ -> state ‘X’ - next ‘Y’ ->  state ‘Y’ -> output
+ - C2: modifier/Keycode-> action -> state:none-next 'X' -> state 'X' -> output
+ - C3: modifier/Keycode-> action -> state:none-next 'X' -> state 'X' - next 'Y' ->  state 'Y' -> output
 
 
 ###### Note that 1:N relationships may exist in each part of the chain e.g.:
  - One output can be achieved using multiple modifier/Keycode
  - One output can be achieved using multiple actions
  - One action can be achieved using multiple modifier/Keycode
- - One output can be achieved using multiple state ‘X’
- - One state ‘Y’ can be achieved using multiple state ‘X’ - next ‘Y’
+ - One output can be achieved using multiple state 'X'
+ - One state 'Y' can be achieved using multiple state 'X' - next 'Y'
 
 
 
@@ -61,7 +61,7 @@ _minimal example C2_
 ![image](rule_c2_keylayout_how_to_read.png)
 _minimal example C2_
 
-![image](minimal_C3.png)
+![image](minimal_c3.png)
  _minimal example C3_
 
 ***
@@ -72,7 +72,7 @@ In the future the architecture of kmc-convert will look like this:
 
 ![image](kmc_convert_future_architecture.png)
 
-As a start we first focus on a conversion where datra is stored in an array instead of using an AST as described below
+As a start we first focus on a conversion where data is stored in an array instead of using an AST as described below
 
 ### Data is read from a .keylayout file using KeymanXmlReader
 
@@ -86,10 +86,10 @@ After reading data and finding all possible modifier-key combinations specified 
 
 If a second or first modifier/key combination is not used the appropriate elements will not contain data
 
-![image](Rule.png)
+![image](rule.png)
 _rule object containing data for all rules_
 
-In Rule[ ] each “Rule” is an Object and represents a case C0-C3. This ‘Data’ might look like that:
+In Rule[ ] each “Rule” is an Object and represents a case C0-C3. This 'Data' might look like that:
 
 ![image](rule_table.png)
 _rule object containing data for all rules_
@@ -97,12 +97,12 @@ _rule object containing data for all rules_
 Since multiple modifier-key combinations might lead to the same output, several elements might have the same output. 
 Also, since each key might be used with several behaviours and we allow multiple modifiers for each behaviour, we easily can get a vast amount of rules.
 
-For example, the character  ‘S’ in a C0/C1 rule of the above example might be achieved with (only) two combinations
+For example, the character  'S' in a C0/C1 rule of the above example might be achieved with (only) two combinations
  - **SHIFT + K_S**
  - **CAPS +  K_S**
 
 
-For example, the character  ‘Â’ in a C3 rule of the above example could be achieved through several combinations:
+For example, the character  'Ã' in a C3 rule of the above example could be achieved through several combinations:
  - NCAPS RALT K_8  	+  NCAPS RALT K_U 	+ SHIFT NCAPS K_A
  - NCAPS RALT K_8  	+  NCAPS RALT K_U 	+ SHIFT CAPS K_A
 
@@ -221,7 +221,7 @@ _warning for ambiguous C0/C1 rules_
 
 If a rule has more than part3 specified (= C2 or C3 rule) and part 1 or part 2 of this rule is ambiguous with respect to part3 of a C0/C1 rule, **we use the later occurrence of the ambiguous rule pair** (e.g.  [CAPS K_A]  >  dk(A1)) and comment out the earlier occurrence in the C0/C1 rule ( e.g. + [CAPS K_A]  >  'A' ). 
 
-![image](warningC2C3.png)
+![image](warningc2c3.png)
 _warning for ambiguous C2/C3 rules_
 
 This is necessary because it would be pointless to comment out the earlier parts (part 1 or part 2) if part 3 depends on part 1 or part 2. In that case all parts dependent on earlier parts of a rule would be obsolete if the earlier part of that rule would not be available.
