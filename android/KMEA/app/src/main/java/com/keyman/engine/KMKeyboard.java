@@ -926,22 +926,22 @@ final class KMKeyboard extends WebView {
 
   /**
    * Return the full path to the font file. If the font is invalid, return empty string.
-   * @param font String - Font filename
+   * @param fontFilename String - Font filename
    * @param packageID String - Package ID
-   * @return String - Full local path to the font file. If font is invalid, return "".
+   * @return String - Full path to the font file. If fontFilename is invalid, return "".
    */
-  private String getFontFilename(String font, String packageID) {
-    if(font == null || font.equals("")) {
+  private String getFontFilename(String fontFilename, String packageID) {
+    if(fontFilename == null || fontFilename.equals("")) {
       return "";
     }
 
-    if (!FileUtils.hasFontExtension(font)) {
+    if (!FileUtils.hasFontExtension(fontFilename)) {
       // QUESTION: do we log this?
       return "";
     }
 
-    String fontRoot = KMManager.isDefaultFont(font) ? getDataRootPath() : getPackageRootPath(packageID);
-    return fontRoot + font;
+    String fontRoot = KMManager.isDefaultFont(fontFilename) ? getDataRootPath() : getPackageRootPath(packageID);
+    return fontRoot + fontFilename;
   }
 
   @SuppressLint("InflateParams")
