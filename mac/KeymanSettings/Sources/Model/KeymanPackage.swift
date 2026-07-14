@@ -27,7 +27,10 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   // the URL of the directory in which the package is contained
   public let sourceDirectoryUrl: URL
   // the URL of the kmp.json file for the package
-  
+  public let jsonFileUrl: URL
+  // the URL for downloading the package from keyman.com
+  public let sharePackageUrl: URL?
+
   public let keyboards: [Keyboard]
   public let fonts: [String]
   public let packageName: String
@@ -35,14 +38,13 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   
   public let author: String?
   public let copyright: String?
-  public let jsonFileUrl: URL
+  // the URL of the readme file within the package
   public let readmeFileUrl: URL?
-  public let helpFileUrl: URL?      // named welcomeFile in kmp.json
+  // the URL of the help file within the package, named 'welcomeFile' in kmp.json
+  public let helpFileUrl: URL?
+  // the URL of the graphic file within the package
   public let graphicFileUrl: URL?
   public let graphicImage: NSImage?
-  
-  public var sharePackageUrl: URL?
-  public var shareQrCode: NSImage?
   
   /**
    * create a KeymanPackage object using the PackageSource object created from the kmp.json
@@ -75,27 +77,19 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     
     self.sharePackageUrl = KeymanPackage.buildSharePackageUrl(packageUrl: self.sourceDirectoryUrl)
  
-    self.keyboards = KeymanPackage.buildKeyboardsArray(packageSource: packageSource)
+    let keyboardsArray = KeymanPackage.buildKeyboardsArray(packageSource: packageSource)
+    self.keyboards = keyboardsArray
     
-    // build font array by looping through keyboard array
-    var fontNames: Set<String> = []
-    for keyboard in self.keyboards {
-      if let oskFontName = keyboard.oskFont {
-        fontNames.insert(oskFontName)
-      }
-      if let displayFontName = keyboard.displayFont {
-        fontNames.insert(displayFontName)
-      }
-    }
-    self.fonts = fontNames.sorted()
+    self.fonts = KeymanPackage.buildFontNamesArray(keyboards: keyboardsArray)
+    
     print("help url: \(self.helpFileUrl?.path ?? "nil")")
-    print("fonts: \(fontNames) for package: \(self.packageName)")
+    print("fonts: \(self.fonts) for package: \(self.packageName)")
   }
   
   /**
    * build an array of Keyboard objects using the array of KeyboardSource object created from the kmp.json
    */
-  private static func buildKeyboardsArray (packageSource: PackageSource) -> [Keyboard] {
+  private static func buildKeyboardsArray(packageSource: PackageSource) -> [Keyboard] {
     var keyboardsArray = [Keyboard]()
     
     if let keyboards = packageSource.keyboards, let directoryUrl = packageSource.directoryUrl {
@@ -107,13 +101,30 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     
     return keyboardsArray
   }
-  
+
+  /**
+   * build an array of all the fonts used by the specified array of keyboards
+   */
+  private static func buildFontNamesArray(keyboards: [Keyboard]) -> [String] {
+    var fontNames: Set<String> = []
+    for keyboard in keyboards {
+      if let oskFontName = keyboard.oskFont {
+        fontNames.insert(oskFontName)
+      }
+      if let displayFontName = keyboard.displayFont {
+        fontNames.insert(displayFontName)
+      }
+    }
+    return fontNames.sorted()
+  }
+
   /**
    * initializer that does not rely on package source -- provided to create unit test data
    */
-  public init(sourceDirectoryUrl: URL, keyboards: [Keyboard], packageName: String, packageVersion: String, author: String? = nil, copyright: String? = nil, jsonFileUrl: URL, readmeFileUrl: URL? = nil, helpFileUrl: URL? = nil, graphicFileUrl: URL? = nil, graphicImage: NSImage? = nil) {
+  public init(sourceDirectoryUrl: URL, sharePackageUrl: URL? = nil, keyboards: [Keyboard], packageName: String, packageVersion: String, author: String? = nil, copyright: String? = nil, jsonFileUrl: URL, readmeFileUrl: URL? = nil, helpFileUrl: URL? = nil, graphicFileUrl: URL? = nil, graphicImage: NSImage? = nil) {
     self.id = UUID()
     self.sourceDirectoryUrl = sourceDirectoryUrl
+    self.sharePackageUrl = sharePackageUrl
     self.keyboards = keyboards
     self.packageName = packageName
     self.packageVersion = packageVersion

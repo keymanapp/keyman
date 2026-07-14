@@ -38,8 +38,6 @@ public class Keyboard: Identifiable, Hashable, Equatable {
     self.keyboardDirectoryUrl = directoryUrl
     self.kmxFileUrl = Keyboard.deriveKmxFileUrl(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
     self.keyboardKey = Keyboard.deriveKeyboardSettingsKey(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
-    
-//    print("keyboard created for: \(keyboardSource.id) \r   with kmxFileUrl: \(self.kmxFileUrl) \r   and settingsKey: \(self.keyboardKey)")
   }
   
   /**

@@ -19,7 +19,8 @@ struct ConfigView: View {
         Image(systemName: "keyboard")
           .imageScale(.large)
           .foregroundColor(.accentColor)
-        Text("keyboard count = \(settings.installedPackages.count)")
+        Text("multiple keyboard package count = \(settings.singleKeyboardPackages.count)")
+        Text("single keyboard package count = \(settings.multiKeyboardPackages.count)")
         Button("debug") {
           settings.debug()
         }
@@ -46,7 +47,7 @@ struct ConfigView: View {
       
       ScrollView {
         VStack(alignment: .leading, spacing: 6) {
-          ForEach(Array(settings.installedPackages.enumerated()), id: \.offset) { index, package in
+          ForEach(Array(settings.singleKeyboardPackages.enumerated()), id: \.offset) { index, package in
             VStack {
               HStack(alignment: .center, spacing: 10) {
                 VStack(spacing: 16) {
@@ -72,7 +73,7 @@ struct ConfigView: View {
                 // Example of Icon-Only Button
                 Spacer()
                 Button(action: {
-                  settings.removePackage(at: index)
+                  settings.removeInstalledPackage(at: index)
                 }) {
                   Label("remove", systemImage: "trash.fill")
                 }
