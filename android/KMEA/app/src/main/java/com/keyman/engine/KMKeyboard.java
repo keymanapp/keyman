@@ -84,7 +84,7 @@ final class KMKeyboard extends WebView {
    */
   protected static KMManager.BannerType currentBanner = KMManager.BannerType.HTML;
 
-  private static String txtFontPath = "";
+  private static String textFontPath = "";
   private static String oskFontPath = "";
   private final String fontUndefined = "undefined";
   private GestureDetector gestureDetector;
@@ -549,7 +549,7 @@ final class KMKeyboard extends WebView {
    * @return String
    */
   public static String textFontFilename() {
-    return txtFontPath;
+    return textFontPath;
   }
 
   /**
@@ -664,15 +664,15 @@ final class KMKeyboard extends WebView {
   }
 
   public boolean setKeyboard(String packageID, String keyboardID, String languageID,
-                             String keyboardName, String languageName, String kFont,
-                             String kOskFont) {
+                             String keyboardName, String languageName, String textFontFilename,
+                             String oskFontFilename) {
     return setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName,
-                       kFont, kOskFont, null);
+                       textFontFilename, oskFontFilename, null);
   }
 
   public boolean setKeyboard(String packageID, String keyboardID, String languageID,
-                             String keyboardName, String languageName, String kFont,
-                             String kOskFont, String displayName) {
+                             String keyboardName, String languageName, String textFontFilename,
+                             String oskFontFilename, String displayName) {
     if (packageID == null || keyboardID == null || languageID == null || keyboardName == null || languageName == null) {
       return false;
     }
@@ -699,8 +699,8 @@ final class KMKeyboard extends WebView {
       languageID = kbInfo.getLanguageID();
       keyboardName = kbInfo.getKeyboardName();
       languageName = kbInfo.getLanguageName();
-      kFont = kbInfo.getFont();
-      kOskFont = kbInfo.getOSKFont();
+      textFontFilename = kbInfo.getFont();
+      oskFontFilename = kbInfo.getOSKFont();
       retVal = false;
 
       // Keyboard changed, so determine version again
@@ -708,14 +708,14 @@ final class KMKeyboard extends WebView {
         KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
     }
 
-    if(kOskFont == null || kOskFont.isEmpty())
-      kOskFont = kFont;
+    if(oskFontFilename == null || oskFontFilename.isEmpty())
+      oskFontFilename = textFontFilename;
 
-    JSONObject jDisplayFont = makeFontObject(kFont, packageID);
-    JSONObject jOskFont = makeFontObject(kOskFont, packageID);
+    JSONObject textFont = makeFontObject(textFontFilename, packageID);
+    JSONObject oskFont = makeFontObject(oskFontFilename, packageID);
 
-    txtFontPath = getFontFilename(kFont, packageID);
-    oskFontPath = getFontFilename(kOskFont, packageID);
+    textFontPath = getFontFilename(textFontFilename, packageID);
+    oskFontPath = getFontFilename(oskFontFilename, packageID);
 
     String kbKey = KMString.format("%s_%s", languageID, keyboardID);
 
@@ -730,8 +730,8 @@ final class KMKeyboard extends WebView {
       reg.put("KF", keyboardUrl);
       reg.put("KP", packageID);
 
-      if (jDisplayFont != null) reg.put("KFont", jDisplayFont);
-      if (jOskFont != null) reg.put("KOskFont", jOskFont);
+      if (textFont != null) reg.put("KFont", textFont);
+      if (oskFont != null) reg.put("KOskFont", oskFont);
       if (displayName != null) reg.put("displayName", displayName);
     } catch(JSONException e) {
       KMLog.LogException(TAG, "", e);
@@ -932,22 +932,22 @@ final class KMKeyboard extends WebView {
 
   /**
    * Return the full path to the font file. If the font is invalid, return empty string.
-   * @param font String - Font filename
+   * @param fontFilename String - Font filename
    * @param packageID String - Package ID
-   * @return String - Full path to the font file. If font is invalid, return "".
+   * @return String - Full path to the font file. If fontFilename is invalid, return "".
    */
-  private String getFontFilename(String font, String packageID) {
-    if(font == null || font.equals("")) {
+  private String getFontFilename(String fontFilename, String packageID) {
+    if(fontFilename == null || fontFilename.equals("")) {
       return "";
     }
 
-    if (!FileUtils.hasFontExtension(font)) {
+    if (!FileUtils.hasFontExtension(fontFilename)) {
       // QUESTION: do we log this?
       return "";
     }
 
-    String fontRoot = KMManager.isDefaultFont(font) ? getDataRootPath() : getPackageRootPath(packageID);
-    return fontRoot + font;
+    String fontRoot = KMManager.isDefaultFont(fontFilename) ? getDataRootPath() : getPackageRootPath(packageID);
+    return fontRoot + fontFilename;
   }
 
   @SuppressLint("InflateParams")
