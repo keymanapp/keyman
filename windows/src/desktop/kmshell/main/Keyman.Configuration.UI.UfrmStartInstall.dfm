@@ -184,12 +184,13 @@ object frmStartInstall: TfrmStartInstall
     ParentColor = False
     ParentFont = False
     Transparent = False
+    Layout = tlCenter
     Visible = False
     WordWrap = True
   end
   object imgCaution: TImage
     Left = 32
-    Top = 240
+    Top = 245
     Width = 38
     Height = 38
     Picture.Data = {
