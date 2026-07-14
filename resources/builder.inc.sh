@@ -1756,9 +1756,9 @@ _builder_parse_expanded_parameters() {
   fi
 
   if builder_is_debug_build; then
-    BUILDER_CONFIGURATION=debug
+    export BUILDER_CONFIGURATION=debug
   else
-    BUILDER_CONFIGURATION=release
+    export BUILDER_CONFIGURATION=release
   fi
 
   _builder_print_internal_debug_info
