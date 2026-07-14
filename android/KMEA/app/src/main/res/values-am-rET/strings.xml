@@ -80,8 +80,6 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">የእገዛ ፋይልን ለማየት ፋይል ፕሮቫይደሩ ቤተ መጽሐፍት ያስፈልገዋል %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">የገበታ ሰሌዳ ፋታል ችግር ዝርዝር %1$s:%2$s ለ %3$s ቋንቋ፤ መደበኛ ቋንቋ ጭኗል።</string>
-    <!-- Context: Fatal keyboard error.  -->
-    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">የፊደል ገበታ ሰሌዳው ችግር %1$s:%2$s ለ %3$s ቋንቋ።</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">ተያያዥነት ያለውን መዝገበ ቃላት ለመጫን እየፈተሸ ነው።</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">የሚወርደውን መዝገበ ቃላት ከኪይማን ሰርቨር ጋር መገናኘት አልተቻለም</string>
