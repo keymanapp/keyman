@@ -857,6 +857,10 @@ begin
   else if DownloadRequired and not RestartRequired and IsMetered then
   begin
      InstallCase := TInstallCase.icDownloadMetered;
+  end
+  else if not DownloadRequired and RestartRequired and not IsMetered then
+  begin
+     InstallCase := TInstallCase.icRestart;
   end;
 
   // Render dialog if conditions require it

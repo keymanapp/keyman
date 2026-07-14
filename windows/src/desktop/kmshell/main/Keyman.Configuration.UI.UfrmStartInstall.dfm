@@ -20,8 +20,9 @@ object frmStartInstall: TfrmStartInstall
   object lblUpdateMessage: TLabel
     Left = 32
     Top = 80
-    Width = 392
-    Height = 17
+    Width = 523
+    Height = 41
+    AutoSize = False
     Caption = 'An update to Keyman has been downloaded and is ready to install.'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -37,7 +38,7 @@ object frmStartInstall: TfrmStartInstall
     Width = 523
     Height = 65
     AutoSize = False
-    Caption =
+    Caption = 
       'The update has not yet been downloaded. Keyman Configuration wil' +
       'l close, and it will be downloaded in the background before cont' +
       'inuing installation.'
@@ -171,7 +172,7 @@ object frmStartInstall: TfrmStartInstall
     Width = 471
     Height = 65
     AutoSize = False
-    Caption =
+    Caption = 
       'You\'#39're on a metered connection. Downloading now may incur data ' +
       'charges'
     Color = clBtnFace

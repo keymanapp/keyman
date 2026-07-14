@@ -21,14 +21,15 @@ uses
   Vcl.Imaging.pngimage;
 
 type
-  // The 4 valid installation form scenarios plus a None case for validation
+  // The 6 valid installation form scenarios plus a None case for validation
   TInstallCase = (
     icNone, // Not a valid case, can be used as check before calling creating form
     icDownloadRestartMetered,
     icDownloadRestart,
     icDownload,
-    icReadyToInstall, // Metered warning never needed if ReadyToInstall
-    icDownloadMetered
+    icDownloadMetered,
+    icRestart,
+    icReadyToInstall // Metered warning never needed if ReadyToInstall
   );
 
   TfrmStartInstall = class(TfrmKeymanBase)
@@ -42,6 +43,7 @@ type
     procedure FormCreate(Sender: TObject);
   private
     FScenario: TInstallCase;
+    procedure UpdateLayout;
   public
     constructor Create(
       AOwner: TComponent;
@@ -63,6 +65,18 @@ begin
   Assert(AScenario <> icNone, 'Invalid install case');
   FScenario := AScenario;
   inherited Create(AOwner);
+end;
+
+procedure TfrmStartInstall.UpdateLayout;
+const
+  CompactClientHeight = 260;
+  ButtonBottomMargin = 13;
+begin
+  if not lblMeteredWarning.Visible then
+    ClientHeight := CompactClientHeight;
+
+  cmdInstall.Top := ClientHeight - cmdInstall.Height - ButtonBottomMargin;
+  cmdLater.Top := cmdInstall.Top;
 end;
 
 procedure TfrmStartInstall.FormCreate(Sender: TObject);
@@ -103,6 +117,12 @@ begin
       lblDownloadRequired.Visible := True;
     end;
 
+    icRestart:
+    begin
+      lblUpdateMessage.Caption := MsgFromId(S_Update_Restart_Req);
+      lblUpdateMessage.Visible := True;
+    end;
+
     icReadyToInstall:
     begin
       lblUpdateMessage.Caption := MsgFromId(S_Ready_To_Install);
@@ -118,6 +138,8 @@ begin
       imgCaution.Visible := True;
     end;
   end;
+
+  UpdateLayout;
 end;
 
 end.
