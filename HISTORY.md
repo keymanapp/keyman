@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.257 alpha 2026-07-14
+
+* chore(linux): remove questing, add stonking (#16236)
+* chore(android): cleanup Android build scripts and artifact filenames (#16234)
+* chore(web): declare scope for stubAndKeyboardCache members (#16221)
+* fix(android): improve clarity of keyboard script error popup (#16228)
+* chore(android): log legacy cloud keyboards (#16237)
+* chore(android): cleanup font variable names, remove obsolete code (#16211)
+
 ## 19.0.256 alpha 2026-07-13
 
 * fix(android): add permissions for Sentry and set default keyboard (#16216)
