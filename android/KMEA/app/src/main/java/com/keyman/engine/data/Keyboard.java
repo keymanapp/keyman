@@ -49,9 +49,7 @@ public class Keyboard extends LanguageResource implements Serializable {
    */
   public Keyboard(JSONObject installedObj) {
     this.fromJSON(installedObj);
-    if (!FileUtils.hasFontExtension(this.font)) {
-      logLegacyKeyboard(this.font);
-    }
+    logIfLegacyKeyboard();
   }
 
   /**
@@ -83,9 +81,7 @@ public class Keyboard extends LanguageResource implements Serializable {
       this.helpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink,
         KMString.format(HELP_URL_FORMATSTR, HELP_URL_HOST, this.resourceID, this.version));
 
-      if (!FileUtils.hasFontExtension(this.font)) {
-        logLegacyKeyboard(this.font);
-      }
+      logIfLegacyKeyboard();
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Keyboard exception parsing JSON: ", e);
     }
@@ -104,10 +100,8 @@ public class Keyboard extends LanguageResource implements Serializable {
     this.font = (font != null) ? font : "";
     this.oskFont = (oskFont != null) ? oskFont : "";
 
-    if (!FileUtils.hasFontExtension(this.font)) {
-      logLegacyKeyboard(this.font);
-    }
-   }
+    logIfLegacyKeyboard();
+  }
 
   public Keyboard(Keyboard k) {
     super(k.getPackageID(), k.getKeyboardID(), k.getKeyboardName(),
@@ -119,20 +113,9 @@ public class Keyboard extends LanguageResource implements Serializable {
     this.displayName = k.getDisplayName();
   }
 
-  private void logLegacyKeyboard(String font) {
-    if (font == null || font.isEmpty()) {
-      return;
-    }
-    try {
-      // Create a Sentry log entry if there are still users out there that use
-      // legacy cloud keyboard. See KMKeyboard.makeFontObject().
-      JSONObject fontObj = new JSONObject(font);
-      Object obj = fontObj.get(KMManager.KMKey_FontFiles);
-      if (obj instanceof String || obj instanceof JSONArray) {
-        KMLog.LogInfo(TAG, "Constructing legacy keyboard: " + this.packageID + "/" + this.resourceID);
-      }
-    } catch (JSONException e) {
-      // Not a JSON object, so it's not a legacy keyboard.
+  private void logIfLegacyKeyboard() {
+    if (this.packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      KMLog.LogInfo(TAG, "Constructing legacy keyboard: " + this.resourceID);
     }
   }
 
