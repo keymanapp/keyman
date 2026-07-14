@@ -233,7 +233,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         int flags = window.getDecorView().getSystemUiVisibility();
 
         boolean isDarkMode = isDarkMode();
-        
+
         if (!isDarkMode) {
           flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         } else {
@@ -250,7 +250,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setLogo(R.drawable.keyman_logo);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
-    // For Darkmode - once switched to dark mode, the logo becomes white 
+    // For Darkmode - once switched to dark mode, the logo becomes white
     getSupportActionBar().setLogo(R.drawable.keyman_logo_mode);
     getSupportActionBar().setBackgroundDrawable(getActionBarDrawable(this));
 
@@ -573,7 +573,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         toolbarUpdate.setVisible(anUpdateCount > 0);
       }
     }
-    
+
     // 2. Update the Drawer/Sidebar Navigation Menu
     if (navigationView != null) {
       final MenuItem drawerUpdate = navigationView.getMenu().findItem(R.id.action_update_keyboards);
@@ -857,7 +857,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   public void downloadKMP(String packageId, String bcp47, KmpInstallMode installMode) {
     Uri downloadUri = bcp47 == null ?
-      Uri.parse(KMString.format("https://keyman.com/go/package/download/%s", new Object[] { packageId })) : 
+      Uri.parse(KMString.format("https://keyman.com/go/package/download/%s", new Object[] { packageId })) :
       Uri.parse(KMString.format("https://keyman.com/go/package/download/%s?bcp47=%s", new Object[] { packageId, bcp47 }));
     downloadKMP(downloadUri, installMode);
   }
@@ -1316,7 +1316,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   private boolean handleDrawerNavigationItemSelected(int id) {
-    if (id == R.id.system_keyboard) {
+    if (id == R.id.system_keyboards) {
       startActivity(new Intent(Settings.ACTION_INPUT_METHOD_SETTINGS));
     } else if (id == R.id.action_update_keyboards) {
       KMManager.getUpdateTool().executeOpenUpdates();

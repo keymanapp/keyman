@@ -99,7 +99,10 @@
   <string name="add_a_keyboard" comment="Menu item to add a keyboard">Add a keyboard for your language</string>
 
   <!-- Context: Get Started menu -->
-  <string name="system_keyboard" comment="Menu item to system keyboard">System keyboards</string>
+  <string name="system_keyboards" comment="Menu item to open system keyboards">System keyboards</string>
+
+  <!-- Context: Get Started menu -->
+  <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">Enable Keyman as system-wide keyboard</string>
 
   <!-- Context: Get Started menu -->
   <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">Set Keyman as default keyboard</string>
@@ -314,7 +317,7 @@
 
   <!-- Context: anywhere -->
   <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
-  
+
   <!-- Context: Menu title -->
   <string name="menu_title" comment="Title for overflow/menu button">Menu</string>
 </resources>

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
-  
+
     <item android:title="@string/setup_title">
         <menu>
             <group android:id="@+id/nav_group_setup">
@@ -78,9 +78,9 @@
                     android:title="@string/theme" />
 
                 <item
-                    android:id="@+id/system_keyboard"
+                    android:id="@+id/system_keyboards"
                     android:icon="@drawable/ic_keyboard_default"
-                    android:title="@string/system_keyboard"
+                    android:title="@string/system_keyboards"
                     app:actionLayout="@layout/nav_right_icon_item" />
             </group>
         </menu>
