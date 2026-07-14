@@ -425,7 +425,7 @@ _builder_failure_trap() {
 #
 _builder_cleanup_deps() {
   if ! builder_is_dep_build && ! builder_is_child_build && [[ ! -z ${_builder_deps_built+x} ]]; then
-    if $_builder_debug_internal; then
+    if builder_is_debug_internal; then
       builder_echo_debug "Dependencies that were built:"
       cat "$_builder_deps_built"
     fi
@@ -1722,18 +1722,6 @@ _builder_parse_expanded_parameters() {
     _builder_add_chosen_action_target_dependencies
   fi
 
-  if $_builder_debug_internal; then
-    builder_echo_debug "Selected actions and targets:"
-    for e in "${_builder_chosen_action_targets[@]}"; do
-      builder_echo_debug "* $e"
-    done
-    builder_echo_debug
-    builder_echo_debug "Selected options:"
-    for e in "${_builder_chosen_options[@]}"; do
-      builder_echo_debug "* $e"
-    done
-  fi
-
   if builder_is_dep_build; then
     _builder_verify_expected_sub_process_variables
   elif builder_is_child_build; then
@@ -1772,6 +1760,8 @@ _builder_parse_expanded_parameters() {
   else
     BUILDER_CONFIGURATION=release
   fi
+
+  _builder_print_internal_debug_info
 
   # Now that we've successfully parsed options adhering to the _builder spec, we may activate our
   # action_failure and action_hanging traps.  (We don't want them active on scripts not yet using
@@ -2080,7 +2070,7 @@ _builder_do_build_deps() {
       $_builder_offline \
       $_builder_build_deps \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
-      if $_builder_debug_internal; then
+      if builder_is_debug_internal; then
         builder_echo success "## Dependency $dep$dep_target for $_builder_matched_action_name completed successfully"
       fi
     ) || (
@@ -2149,6 +2139,9 @@ builder_is_full_dep_build() {
 # returns `0` if the current build script has at least one dependency.
 #
 builder_has_dependencies() {
+  if [[ ${_builder_deps:-false} == false ]]; then
+    return 1
+  fi
   if [[ ${#_builder_deps[@]} -eq 0 ]]; then
     return 1
   fi
@@ -2245,17 +2238,29 @@ _builder_report_dependencies() {
 # returns `0` if we should be verbose in output
 #
 builder_verbose() {
-  if [[ $builder_verbose == --verbose ]]; then
+  if [[ ${builder_verbose:-} == --verbose ]]; then
     return 0
   fi
   return 1
 }
 
 #
-# returns `0` if we are doing a debug build
+# Returns `0` if we are doing a debug build. Not the same as
+# `builder_is_debug_internal`.
 #
 builder_is_debug_build() {
-  if [[ $builder_debug == --debug ]]; then
+  if [[ ${builder_debug:-} == --debug ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns `0` if builder internal debug reporting is enabled. This is not the
+# same as a debug build.
+#
+builder_is_debug_internal() {
+  if $_builder_debug_internal; then
     return 0
   fi
   return 1
@@ -2539,6 +2544,82 @@ _builder_get_operating_system() {
   readonly BUILDER_OS
 }
 
+function _builder_echo_function_result() {
+  if $1; then
+    printf "  %-40s%s\n" "$1:" true
+  else
+    printf "  %-40s%s\n" "$1:" false
+  fi
+}
+
+function _builder_print_internal_debug_info() {
+  if ! builder_is_debug_internal && ! builder_is_ci_build; then
+    return
+  fi
+
+  if [[ ${_builder_internal_debug_info_printed:-false} == false ]]; then
+    builder_echo start builder_debug "Builder internal debug information"
+
+    # For CI builds, we report this only once per build; for internal debug
+    # builds, it prints for every child/dep build also
+    echo -e "${COLOR_TEAL}Selected actions and targets${COLOR_RESET}"
+    for e in "${_builder_chosen_action_targets[@]}"; do
+      echo "  $e"
+    done
+
+    echo
+    echo -e "${COLOR_TEAL}Selected options${COLOR_RESET}"
+    for e in "${_builder_chosen_options[@]}"; do
+      echo "  $e"
+    done
+
+    echo
+    echo -e "${COLOR_TEAL}Builder configuration${COLOR_RESET}"
+    _builder_echo_function_result         builder_is_debug_build
+    _builder_echo_function_result         builder_verbose
+
+    echo
+    echo -e "${COLOR_TEAL}Builder CI information${COLOR_RESET}"
+    _builder_echo_function_result         builder_is_ci_build
+    _builder_echo_function_result         builder_is_ci_release_build
+    _builder_echo_function_result         builder_is_ci_test_build
+    _builder_echo_function_result         builder_is_ci_build_level_release
+    _builder_echo_function_result         builder_is_ci_build_level_build
+
+    echo
+    echo -e "${COLOR_TEAL}Builder platform information${COLOR_RESET}"
+    _builder_echo_function_result         builder_is_running_on_docker
+    _builder_echo_function_result         builder_is_running_on_gha
+    _builder_echo_function_result         builder_is_running_on_teamcity
+    _builder_echo_function_result         builder_is_windows
+    _builder_echo_function_result         builder_is_macos
+    _builder_echo_function_result         builder_is_linux
+  fi
+
+  if builder_is_debug_internal; then
+    # This may change in sub-project builds, so we print it every time,
+    # but we won't print it in CI to prevent logs exploding; note that
+    # the builder_debug header will not be printed each time; that is
+    # "by design"
+    echo
+    echo -e "${COLOR_TEAL}Builder dependency internal data${COLOR_RESET}"
+    _builder_echo_function_result         builder_is_dep_build
+    _builder_echo_function_result         builder_is_child_build
+    _builder_echo_function_result         builder_is_quick_dep_build
+    _builder_echo_function_result         builder_is_full_dep_build
+    _builder_echo_function_result         builder_has_dependencies
+  fi
+
+  if [[ ${_builder_internal_debug_info_printed:-false} == false ]]; then
+    builder_echo end builder_debug success "Builder internal debug information"
+
+    if builder_is_ci_build; then
+      # In CI builds, we will only print the debug info once
+      export _builder_internal_debug_info_printed=true
+    fi
+  fi
+}
+
 ################################################################################
 # Final initialization
 ################################################################################
@@ -2557,6 +2638,6 @@ if [ -z ${_builder_debug_internal+x} ]; then
   _builder_debug_internal=false
 fi
 
-if $_builder_debug_internal; then
-  builder_echo_debug "Command line: $0 $@"
+if builder_is_debug_internal; then
+  builder_echo_debug "Command line: $0 $*"
 fi
