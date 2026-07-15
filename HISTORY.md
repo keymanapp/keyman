@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.258 alpha 2026-07-15
+
+* chore(android): remove doc for non-existing deprecated functions (#16244)
+
 ## 19.0.257 alpha 2026-07-14
 
 * chore(linux): remove questing, add stonking (#16236)
