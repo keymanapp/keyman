@@ -31,8 +31,9 @@ HandleError(const MSIHANDLE& hInstall, const std::wstring& messagePrefix) {
   MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
   return errorCode;
 }
-
-__declspec(dllexport) DWORD EnginePostInstall(MSIHANDLE hInstall) {
+#include <fstream>
+extern "C" __declspec(dllexport) UINT WINAPI EnginePostInstall(MSIHANDLE hInstall)
+{
   HANDLE hFile;
 
   // Find %appdata% path
@@ -195,7 +196,7 @@ void UnregisterTIPAndItsProfiles(const CLSID& AClsid) {
   pInputProcessorProfiles->Unregister(AClsid);
 }
 
-extern "C" __declspec(dllexport) unsigned int PreUninstall() {
+extern "C" __declspec(dllexport) UINT PreUninstall( MSIHANDLE hInstall ) {
   // Initialize COM
   HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
   if (SUCCEEDED(hr)) {

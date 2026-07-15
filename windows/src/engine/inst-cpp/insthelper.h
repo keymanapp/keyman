@@ -3,6 +3,6 @@
 #include <Msi.h>
 
 extern "C" unsigned int HandleError(const MSIHANDLE& hInstall, const std::wstring& messagePrefix);
-__declspec(dllexport) DWORD EnginePostInstall(MSIHANDLE hInstall);
+__declspec(dllexport) UINT WINAPI EnginePostInstall(MSIHANDLE hInstall);
 
-extern "C" __declspec(dllexport) unsigned int PreUninstall();
+extern "C" __declspec(dllexport) UINT WINAPI PreUninstall(MSIHANDLE hInstall);
