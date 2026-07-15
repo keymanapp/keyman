@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
-    <item android:title="@string/setup_title">
+    <item android:title="@string/keyboards_and_languages_title">
         <menu>
             <group android:id="@+id/nav_group_setup">
                 <item
@@ -25,12 +25,24 @@
                     android:title="@string/install_keyboard_or_dictionary"
                     app:actionLayout="@layout/nav_right_icon_item" />
 
+                <item
+                    android:id="@+id/system_keyboards"
+                    android:icon="@drawable/ic_keyboard_default"
+                    android:title="@string/system_keyboards"
+                    app:actionLayout="@layout/nav_right_icon_item" />
+
             </group>
         </menu>
     </item>
     <item android:title="@string/preferences_title">
         <menu>
             <group android:id="@+id/nav_group_preferences">
+                <item
+                    android:id="@+id/action_get_started"
+                    android:title="@string/get_started"
+                    app:showAsAction="always"
+                    android:icon="@drawable/ic_rocket" />
+
                 <item
                     android:id="@+id/nav_display_language"
                     android:icon="@drawable/ic_translate"
@@ -61,12 +73,6 @@
                     app:actionLayout="@layout/nav_switch_item" />
 
                 <item
-                    android:id="@+id/action_get_started"
-                    android:icon="@drawable/ic_action_get_started"
-                    android:title="@string/drawer_menu_show_get_started"
-                    app:actionLayout="@layout/nav_switch_item" />
-
-                <item
                     android:id="@+id/nav_toggle_send_crash_report"
                     android:icon="@drawable/ic_warning"
                     android:title="@string/show_send_crash_report"
@@ -77,11 +83,6 @@
                     android:icon="@drawable/ic_palette"
                     android:title="@string/theme" />
 
-                <item
-                    android:id="@+id/system_keyboards"
-                    android:icon="@drawable/ic_keyboard_default"
-                    android:title="@string/system_keyboards"
-                    app:actionLayout="@layout/nav_right_icon_item" />
             </group>
         </menu>
     </item>

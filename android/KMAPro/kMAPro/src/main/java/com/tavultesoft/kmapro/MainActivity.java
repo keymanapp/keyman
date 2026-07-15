@@ -267,8 +267,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       @Override
       public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.nav_toggle_show_osk || id == R.id.action_get_started
-            || id == R.id.nav_toggle_send_crash_report) {
+        if (id == R.id.nav_toggle_show_osk || id == R.id.nav_toggle_send_crash_report) {
           toggleDrawerSwitch(navigationView, id);
           return true;
         }
@@ -1331,6 +1330,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       startActivity(new Intent(context, KeymanSettingsInstallActivity.class));
     } else if (id == R.id.nav_display_language) {
       startActivity(new Intent(context, KeymanSettingsLocalizeActivity.class));
+    } else if (id == R.id.action_get_started) {
+      startActivity(new Intent(context, GetStartedActivity.class));
     } else if (id == R.id.nav_keyboard_height) {
       startActivity(new Intent(context, AdjustKeyboardHeightActivity.class));
     } else if (id == R.id.nav_longpress_delay) {
@@ -1392,17 +1393,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
           public void onChanged(boolean isChecked) {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean(KeymanSettingsKeys.OSK_WITH_PHYSICAL_KEYBOARD, isChecked);
-            editor.apply();
-          }
-        });
-
-    bindDrawerSwitch(navigationView, R.id.action_get_started,
-        prefs.getBoolean(GetStartedActivity.showGetStartedKey, true),
-        new SwitchChangeHandler() {
-          @Override
-          public void onChanged(boolean isChecked) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean(GetStartedActivity.showGetStartedKey, isChecked);
             editor.apply();
           }
         });
