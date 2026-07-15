@@ -81,9 +81,6 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     self.keyboards = keyboardsArray
     
     self.fonts = KeymanPackage.buildFontNamesArray(keyboards: keyboardsArray)
-    
-    print("help url: \(self.helpFileUrl?.path ?? "nil")")
-    print("fonts: \(self.fonts) for package: \(self.packageName)")
   }
   
   /**

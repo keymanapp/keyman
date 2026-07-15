@@ -22,8 +22,9 @@ import Foundation
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
     
-    #expect(settingsContainer.installedPackages.isEmpty)
-    
+    #expect(settingsContainer.multiKeyboardPackages.isEmpty)
+    #expect(settingsContainer.singleKeyboardPackages.isEmpty)
+
     settingsContainer.loadPackages()
     
     #expect(settingsContainer.findInstalledPackage(with: packageRepo.testPackageId) != nil)
