@@ -12,7 +12,13 @@ import Foundation
 
 public protocol PackageRepo {
   func keyman19SharedDataDirectoryExists() -> Bool
-  func createKeyman19SharedDataDirectories()
-  func loadPackages() -> [KeymanPackage]
+  func createKeyman19SharedDataDirectoriesIfNeeded() throws
+  func loadAllPackages() -> [KeymanPackage]
   func deletePackage(package: KeymanPackage)
+  func unzipKmpFile(at kmpFileUrl: URL, to packageDestinationUrl: URL) throws
+  func loadSinglePackage(packageUrl: URL) throws -> KeymanPackage
+  func getDownloadUrl(for kmpFilename: String) -> URL
+  func getUnzipDestinationUrl(for packageName: String) -> URL
+  func getInstallationUrlForPackageName(packageName: String) -> URL
+  func cleanupTempDirectory()
 }

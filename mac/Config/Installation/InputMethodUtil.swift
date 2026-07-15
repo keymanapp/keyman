@@ -12,13 +12,6 @@ import Carbon.HIToolbox
 import AppKit
 import KeymanSettings
 
-public let kAccessibilityPermissionGrantedMessage = "granted"
-
-extension Notification.Name {
-  static let accessCheckResponse = Notification.Name("com.keyman.accessibility.state")
-  static let installationRepairNeeded = Notification.Name("com.keyman.installation.repair.needed")
-}
-
 public enum KeymanVersionCheckError: Error {
   case inputMethodNotFound
   case versionNotFound
@@ -29,6 +22,8 @@ public enum KeymanInvocationError: Error {
   case inputMethodCouldNotBeInvoked
 }
 
+public let kAccessibilityPermissionGrantedMessage = "granted"
+
 public class InputMethodUtil {
   public let keymanInputMethodApplicationName = "Keyman.app"
 
@@ -36,14 +31,13 @@ public class InputMethodUtil {
   public var accessibilityPermissionGranted: Bool? = nil
   fileprivate let pathUtil: KeymanPaths
   fileprivate var observer: NSObjectProtocol?
-  
-  
+
   let kMigrateCommand = "migrate"
   let kAccessCommand = "access"
   let kCheckCommand = "check"
   
-  public init() {
-    self.pathUtil = KeymanPaths()
+  public init() throws {
+    try self.pathUtil = KeymanPaths()
   }
   
   /**

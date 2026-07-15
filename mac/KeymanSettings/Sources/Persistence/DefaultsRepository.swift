@@ -31,7 +31,7 @@ public class DefaultsRepository: DefaultsRepo {
   let kTimeRestartRequested = "KMTimeRestartRequested"
 
   public init(suiteName: String) throws(Error) {
-    self.pathUtil = KeymanPaths()
+    try self.pathUtil = KeymanPaths()
     self.defaultsSuiteName = suiteName
     
     // create defaults for the suite
