@@ -22,6 +22,8 @@ empty string otherwise.
 
 Use this method to get the font filename of the selected keyboard.
 
+Deprecated. Use `getKeyboardTextFontFilename()` instead.
+
 ## Examples
 
 ### Example: Using `getKeyboardFontFilename()`
@@ -34,5 +36,6 @@ The following script illustrate the use of `getKeyboardFontFilename()`:
 
 ## See also
 
+-   [`getKeyboardTextFontFilename()`](getKeyboardTextFontFilename)
 -   [`getKeyboardFontTypeface()` (Deprecated)](getKeyboardFontTypeface)
 -   [`getFontTypeface()`](getFontTypeface)

@@ -130,7 +130,7 @@ export function getResourcePath(config: ViewConfiguration) {
   if(config.isEmbedded) {
     resourcePathExt = '';
   }
-  return `${config.pathConfig.resources}/${resourcePathExt}`
+  return `${config.pathConfig.resources}${resourcePathExt}`
 }
 
 export abstract class OSKView
@@ -267,6 +267,7 @@ export abstract class OSKView
 
     for(const sheetFile of OSKView.STYLESHEET_FILES) {
       const sheetHref = `${resourcePath}${sheetFile}`;
+
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
     }
 
@@ -300,19 +301,17 @@ export abstract class OSKView
 
   private setBaseMouseEventListeners() {
     this._Box.onmouseenter = (e) => {
-      if(this.mouseEnterPromise) {
-        // The chain was somehow interrupted, with the mouseleave never occurring!
-        this.mouseEnterPromise.resolve();
-      }
+      // Ensure that previous promise resolves, if the chain was somehow
+      // interrupted, with the mouseleave never occurring
+      this.mouseEnterPromise?.resolve();
 
       this.mouseEnterPromise = new ManagedPromise<void>();
       this.emit('pointerinteraction', this.mouseEnterPromise.corePromise);
     };
 
     this._Box.onmouseleave = (e) => {
-      this.mouseEnterPromise.resolve();
+      this.mouseEnterPromise?.resolve();
       this.mouseEnterPromise = null;
-      // focusAssistant.setMaintainingFocus(false);
     };
   }
 
@@ -856,7 +855,7 @@ export abstract class OSKView
       isEmbedded: this.config.isEmbedded,
       specialFont: {
         family: 'SpecialOSK',
-        files: [`${resourcePath}/keymanweb-osk.ttf`],
+        files: [`${resourcePath}keymanweb-osk.ttf`],
         path: '' // Not actually used.
       },
       gestureParams: this.config.gestureParams
