@@ -89,10 +89,11 @@ public class DefaultsRepository: DefaultsRepo {
    * The input method will receive this and reload the enabled keyboards.
    */
   func sendKeyboardsChangedNotification() {
-    DistributedNotificationCenter.default.post(
-      name: .keyboardsChanged,
+    DistributedNotificationCenter.default().postNotificationName (
+      .keyboardsChanged,
       object: nil,
-      userInfo: nil
+      userInfo: nil,
+      deliverImmediately: true
     )
   }
 
