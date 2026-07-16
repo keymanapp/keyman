@@ -218,6 +218,8 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     return URL(string: "https://\(KeymanPaths.keymanDomain)/go/keyboard/\(packageUrl.lastPathComponent)/share")
   }
 
+  // MAC-CONFIG-TODO: cache QR code image, but must be size specific
+
   /**
    * generate a QR code for sharing the Keyman Package URL
    */
