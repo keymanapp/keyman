@@ -81,8 +81,21 @@ public class DefaultsRepository: DefaultsRepo {
    */
   public func writeEnabledKeyboards(enabledKeyboardsArray: [String]) {
     self.groupDefaults.set(enabledKeyboardsArray, forKey: kEnabledKeyboardsKey)
+    self.sendKeyboardsChangedNotification()
   }
   
+  /**
+   * Send a distributed notification that the keyboards have changed.
+   * The input method will receive this and reload the enabled keyboards.
+   */
+  func sendKeyboardsChangedNotification() {
+    DistributedNotificationCenter.default.post(
+      name: .keyboardsChanged,
+      object: nil,
+      userInfo: nil
+    )
+  }
+
   /**
    * return the selected keyboard from the UserDefaults
    * The selected keyboard is the one that Keyman is applying for each keydown event.
