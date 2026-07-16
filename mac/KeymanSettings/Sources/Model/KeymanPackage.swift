@@ -211,9 +211,8 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     return packageImage
   }
   
-  
   /**
-   * build the URL to the executable inside the specified Input Method app
+   * build the URL where the keyboard can be installed from the Keyman website
    */
   static func buildSharePackageUrl(packageUrl: URL) -> URL? {
     return URL(string: "https://\(KeymanPaths.keymanDomain)/go/keyboard/\(packageUrl.lastPathComponent)/share")
