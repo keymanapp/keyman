@@ -323,9 +323,23 @@ public class SettingsContainer : ObservableObject {
   /**
    * remove/uninstall the package at the specified index
    */
-  public func removeInstalledPackage(at index: Int) {
-    let package = self.installedPackages[index]
-    
+  public func removeSingleKeyboardPackage(at index: Int) {
+    let package = self.singleKeyboardPackages[index]
+    self.removeInstalledPackage(package: package)
+  }
+  
+  /**
+   * remove/uninstall the package at the specified index
+   */
+  public func removeMultipleKeyboardPackage(at index: Int) {
+    let package = self.multiKeyboardPackages[index]
+    self.removeInstalledPackage(package: package)
+  }
+
+  /**
+   * remove the installed package
+   */
+  func removeInstalledPackage(package: KeymanPackage) {
     // will removing this package cause the removal of any enabled keyboards?
     let removingEnabledKeyboards = !package.getEnabledKeyboardsKeys().isEmpty
     
@@ -333,14 +347,16 @@ public class SettingsContainer : ObservableObject {
     self.packageRepository.deletePackage(package: package)
     
     // remove package from installed packages list
-    _ = self.installedPackages.remove(at: index)
+    if let index = self.installedPackages.firstIndex(where: { $0.packageName == package.packageName }) {
+      self.installedPackages.remove(at: index)
+    }
     
     // if we removed any enabled keyboards, then update settings
     if removingEnabledKeyboards {
       self.saveKeyboardState()
     }
   }
-  
+
   /**
    * returns true if the keyboard is enabled
    * when enabled, the keyboard appears in the Keyman sub menu in the mac

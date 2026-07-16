@@ -19,8 +19,8 @@ struct ConfigView: View {
         Image(systemName: "keyboard")
           .imageScale(.large)
           .foregroundColor(.accentColor)
-        Text("multiple keyboard package count = \(settings.singleKeyboardPackages.count)")
-        Text("single keyboard package count = \(settings.multiKeyboardPackages.count)")
+        Text("multiple keyboard package count = \(settings.multiKeyboardPackages.count)")
+        Text("single keyboard package count = \(settings.singleKeyboardPackages.count)")
         Button("debug") {
           settings.debug()
         }
@@ -73,7 +73,7 @@ struct ConfigView: View {
                 // Example of Icon-Only Button
                 Spacer()
                 Button(action: {
-                  settings.removeInstalledPackage(at: index)
+                  settings.removeSingleKeyboardPackage(at: index)
                 }) {
                   Label("remove", systemImage: "trash.fill")
                 }
