@@ -4,7 +4,11 @@
   * Notes: Enable checking for metered connection and background data restrictions.
 *)
 unit Keyman.Configuration.Util.NetworkConnection;
-
+(**
+  *  Winapi.Networking.Connectivity uses TWinRTImportHelper this means
+  *  ROInitialize does not need to be called when using this unit
+  *  as it is already managed.
+  *)
 interface
 
 
@@ -41,9 +45,9 @@ type
 implementation
 
 uses
+  Sentry.Client,
   System.SysUtils,
   Winapi.CommonTypes,
-  Winapi.WinRT,
   Winapi.Networking.Connectivity;
 
 class function TNetworkConnection.IsMetered: Boolean;
@@ -68,7 +72,10 @@ begin
       // If the WinRT network APIs are unavailable or throw (e.g. unusual
       // Windows SKUs, containers, Network List Manager service stopped),
       // treat the connection as non-metered so updates are not blocked.
-      Result := False;
+      begin
+        Result := False;
+        SentryHandleException(E);
+      end;
   end;
 end;
 
@@ -90,7 +97,10 @@ begin
   except
     on E: Exception do
       // See IsMetered: default to not-restricted if the WinRT APIs throw.
-      Result := False;
+      begin
+        Result := False;
+        SentryHandleException(E);
+      end;
   end;
 end;
 
