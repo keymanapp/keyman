@@ -80,6 +80,24 @@ class DefaultsRepoStub: DefaultsRepo {
  * stores them in memory with no access to disk
  */
 class PackageRepoStub: PackageRepo {
+  func cleanupTempDirectory() {
+  }
+  
+  func unzipKmpFile(at kmpFileUrl: URL, to packageDestinationUrl: URL) throws {
+  }
+  
+  func getDownloadUrl(for kmpFilename: String) -> URL {
+    return URL(fileURLWithPath: "")
+  }
+  
+  func getUnzipDestinationUrl(for packageName: String) -> URL {
+    return URL(fileURLWithPath: "")
+  }
+  
+  func getInstallationUrlForPackageName(packageName: String) -> URL {
+    return URL(fileURLWithPath: "")
+  }
+  
   public let nullPackageId = UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   public var testPackageId = UUID(uuid: (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
   
@@ -87,7 +105,7 @@ class PackageRepoStub: PackageRepo {
     true
   }
   
-  func createKeyman19SharedDataDirectories() {
+  func createKeyman19SharedDataDirectoriesIfNeeded() throws {
     // do nothing
   }
   
@@ -114,10 +132,6 @@ class PackageRepoStub: PackageRepo {
   }
   
   func getDownloadUrlForPackageName(packageName: String) -> URL? {
-    return nil
-  }
-  
-  func installPackage(packageUrl: URL) throws -> URL? {
     return nil
   }
   

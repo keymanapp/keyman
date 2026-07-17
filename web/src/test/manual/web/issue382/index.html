@@ -36,18 +36,18 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType:'auto'
-      });
-      kmw.addKeyboards({
-        id:'issue382',
-        name:'Keycap Scaling Test with a really long name in order to also test captions',
-        languages:{
-          id:'en',
-          name:'English'
-        },
-        filename:'./issue382.js'
+      }).then(function() {
+        keyman.addKeyboards({
+          id:'issue382',
+          name:'Keycap Scaling Test with a really long name in order to also test captions',
+          languages:{
+            id:'en',
+            name:'English'
+          },
+          filename:'./issue382.js'
+        });
       });
     </script>
 

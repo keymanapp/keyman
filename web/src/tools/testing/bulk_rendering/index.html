@@ -31,23 +31,22 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
         attachType:'auto'
       }).then(function() {
-        kmw.addKeyboards();
+        keyman.addKeyboards();
       });
 
 
       function runRenderer() {
         var renderer_poll = function() {
-          if(kmw.getKeyboards().length == 0) {
+          if(keyman.getKeyboards().length == 0) {
             // Waiting for KeymanWeb to load keyboards
             window.setTimeout(function() {
               renderer_poll();
             }, 1000);
           } else {
-            kmw_renderer.run(document.getElementById('allLayers').checked, document.getElementById('filter').value);
+            keyman_renderer.run(document.getElementById('allLayers').checked, document.getElementById('filter').value);
           }
         }
 

@@ -30,14 +30,22 @@ import Foundation
  *          keyman19PackagesDirectory: '~/Library/Group Containers/group.com.keyman/Library/Application Support/Keyman-Packages'
  */
 
+public enum KeymanPathError: Error {
+  case groupContainerNotFound
+}
+
 public struct KeymanPaths {
   // MAC-CONFIG-TODO: move to input method util?
   static public let keymanBundleId = "keyman.inputmethod.Keyman"
   static public let configBundleId = "com.keyman.config"
   static public let groupId = "group.com.keyman"
   
+  static public let keymanDomain = "keyman.com"
+  static public let keymanHelpDomain = "help.keyman.com"
+  static public let keymanApiDomain = "api.keyman.com"
+
     // keyman file extensions
-  static public let keyman17PackageExtension: String = "kmp"
+  static public let keymanPackageFileExtension: String = "kmp"
 
   static private let preKeyman19PackagesDirectoryName = "Keyman-Keyboards"
   static private let keymanSubdirectoryName = keymanBundleId
@@ -45,7 +53,8 @@ public struct KeymanPaths {
   // keyman 19 directory names
   static private let containerPreferencesPartialPath = "Library/Preferences"
   static private let containerPackagesPartialPath = "Library/Application Support/Keyman-Packages"
-  
+  static private let containerTempPartialPath = "Library/Application Support/temp"
+
   // keyman 17 and earlier
   let keyman17DocumentsDirectory: URL?
   let keyman17PackagesDirectory: URL?
@@ -56,12 +65,17 @@ public struct KeymanPaths {
   let keyman18PackagesDirectory: URL?
   
   // current directories for keyman 19
-  let keyman19PackagesDirectory: URL?
-  let keyman19DataDirectory: URL?
-  let keyman19ContainerDirectory: URL?
-  let keyman19PreferencesDirectory: URL?
+  let keyman19ContainerDirectory: URL
+  let keyman19PackagesDirectory: URL
+  let keyman19TempDirectory: URL
+  let keyman19PreferencesDirectory: URL
   
-  public init() {
+  /**
+   * Build the paths to the Keyman data locations
+   * throws `KeymanPathError` if the group container directory cannot be located
+   * The app cannot function without access to where the Keyman packages are stored.
+   */
+  public init() throws {
     let documentsDir = KeymanPaths.buildDocumentsUrl()
     self.keyman17DocumentsDirectory = documentsDir
     
@@ -74,17 +88,13 @@ public struct KeymanPaths {
     self.keyman18DataDirectory = keyman18DataDir
     self.keyman18PackagesDirectory = KeymanPaths.buildKeyman18PackagesUrl(data: keyman18DataDir)
     
-    let containerDir = KeymanPaths.buildContainerUrl()
+    guard let containerDir = KeymanPaths.buildContainerUrl() else { throw KeymanPathError.groupContainerNotFound }
     self.keyman19ContainerDirectory = containerDir
-    
-    self.keyman19DataDirectory = containerDir
-    
     self.keyman19PreferencesDirectory = KeymanPaths.buildContainerPreferencesUrl(container: containerDir)
     
     
-    let keyman19PackagesDir = KeymanPaths.buildKeyman19PackagesUrl(container: containerDir)
-    self.keyman19PackagesDirectory = keyman19PackagesDir
-    
+    self.keyman19PackagesDirectory = KeymanPaths.buildKeyman19PackagesUrl(container: containerDir)
+    self.keyman19TempDirectory = KeymanPaths.buildKeyman19TempUrl(container: containerDir)
     //self.logPaths()
   }
   
@@ -126,6 +136,9 @@ public struct KeymanPaths {
     }
   }
   
+  /**
+   * build the URL to the executable inside the specified Input Method app
+   */
   public func buildInputMethodExecutableUrl(fileName:String) -> URL? {
     if let inputMethodUrl = self.buildInputMethodPathUrl(fileName: fileName) {
       let executableName = inputMethodUrl.deletingPathExtension().lastPathComponent
@@ -220,25 +233,24 @@ public struct KeymanPaths {
   /**
    * build the URL to the preference directory inside the app group container
    */
-  private static func buildContainerPreferencesUrl(container: URL?) -> URL? {
-    if let containerUrl = container {
-      return containerUrl.appendingPathComponent(containerPreferencesPartialPath, isDirectory: true)
-    } else {
-      return nil
-    }
+  private static func buildContainerPreferencesUrl(container: URL) -> URL {
+    return container.appendingPathComponent(containerPreferencesPartialPath, isDirectory: true)
   }
   
   /**
    * build the URL to the packages directory inside the app group container directory
    */
-  private static func buildKeyman19PackagesUrl(container: URL?) -> URL? {
-    if let containerUrl = container {
-      return containerUrl.appendingPathComponent(KeymanPaths.containerPackagesPartialPath, isDirectory: true)
-    } else {
-      return nil
-    }
+  private static func buildKeyman19PackagesUrl(container: URL) -> URL {
+    return container.appendingPathComponent(KeymanPaths.containerPackagesPartialPath, isDirectory: true)
   }
   
+  /**
+   * build the URL to the temp directory inside the app group container directory
+   */
+  private static func buildKeyman19TempUrl(container: URL) -> URL {
+    return container.appendingPathComponent(KeymanPaths.containerTempPartialPath, isDirectory: true)
+  }
+
   // MAC-CONFIG-TODO: remove
   fileprivate func checkContainerUrl() -> Bool {
     var containerValid = false

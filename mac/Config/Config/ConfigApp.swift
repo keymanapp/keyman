@@ -11,8 +11,8 @@ import KeymanSettings
 
 @main
 struct ConfigApp: App {
-  var settings = SettingsContainer()
-  var installation = InstallationContainer()
+  @StateObject var settings = SettingsContainer()
+  @StateObject var installation = InstallationContainer()
   @Environment(\.openWindow) private var openWindow
   
   var body: some Scene {
