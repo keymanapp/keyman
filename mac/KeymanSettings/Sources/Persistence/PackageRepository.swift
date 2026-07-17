@@ -54,8 +54,10 @@ public class PackageRepository: PackageRepo {
   fileprivate let packageFileName = "kmp.json"
   fileprivate let pathUtil: KeymanPaths
   
-  public init() {
-    self.pathUtil = KeymanPaths()
+  public init() throws {
+    self.pathUtil = try KeymanPaths()
+    
+    try self.createKeyman19SharedDataDirectoriesIfNeeded()
   }
   
   /**
@@ -72,11 +74,12 @@ public class PackageRepository: PackageRepo {
       let package = KeymanPackage(packageSource: source)
       do {
         try package.validate()
+
+        // only install packages that pass validation
+        installedPackages.append(package)
       } catch {
         print("** package '\(source.packageName)' is not valid: \(error.localizedDescription)")
       }
-      // only install packages that pass validation
-      installedPackages.append(package)
     }
     
     return installedPackages
@@ -88,6 +91,7 @@ public class PackageRepository: PackageRepo {
    *
    */
   public func loadSinglePackage(packageUrl: URL) throws -> KeymanPackage {
+    print("loadSinglePackage from url: \(packageUrl)")
     guard let source =  try readPackageFromDirectory(packageDirectoryUrl: packageUrl) else { throw InstallPackageError.invalidUrl }
       
     let package = KeymanPackage(packageSource: source)
@@ -110,96 +114,90 @@ public class PackageRepository: PackageRepo {
   
   /**
    * Creates the directory tree where packages are stored under the standard 'Group Containers' directory
+   * Also creates the temp directory used for keyboard installation
    */
-  public func createKeyman19SharedDataDirectories() {
-    if let keyboardDirectory = pathUtil.keyman19PackagesDirectory {
-      
-      do {
-        // create the directory if it doesn't already exist
-        if !FileManager.default.fileExists(atPath: keyboardDirectory.path) {
-          try FileManager.default.createDirectory(at: keyboardDirectory, withIntermediateDirectories: true, attributes: nil)
-          //          ConfigLogger.shared.testLogger.debug("Created directory: \(keyboardDirectory.path)")
-          print("Created directory: \(keyboardDirectory.path)")
-        } else {
-          print("Directory already exists: \(keyboardDirectory.path)")
-        }
-      } catch {
-        print("Error creating directory: \(error.localizedDescription)")
-      }
+  public func createKeyman19SharedDataDirectoriesIfNeeded() throws {
+    let packageDirectory = pathUtil.keyman19PackagesDirectory
+    let packageTempDirectory = pathUtil.keyman19TempDirectory
+
+    // create the keyman-packages directory if it doesn't already exist
+    if !FileManager.default.fileExists(atPath: packageDirectory.path) {
+      try FileManager.default.createDirectory(at: packageDirectory, withIntermediateDirectories: true, attributes: nil)
+      print("Created directory: \(packageDirectory.path)")
     } else {
-      print("Unable to create directory, Group Container URL not found.")
+      print("Directory already exists: \(packageDirectory.path)")
+    }
+
+    // create the temp directory if it doesn't already exist
+    if !FileManager.default.fileExists(atPath: packageTempDirectory.path) {
+      try FileManager.default.createDirectory(at: packageTempDirectory, withIntermediateDirectories: true, attributes: nil)
+      print("Created directory: \(packageTempDirectory.path)")
+    } else {
+      print("Directory already exists: \(packageTempDirectory.path)")
     }
   }
   
-  // MAC-CONFIG-TODO: delete
   /**
-   * for group container testing purposes to check directory access
+   * Delete all the files in the temp directory
    */
-  func writeTestFileToContainer() {
-    if let keyboardDirectory = self.pathUtil.keyman19PackagesDirectory {
-      print("About to write to: \(keyboardDirectory.path)")
+  public func cleanupTempDirectory() {
+    let fileManager = FileManager.default
+    
+    do {
+      let fileURLs = try fileManager.contentsOfDirectory(
+        at: self.pathUtil.keyman19TempDirectory,
+        includingPropertiesForKeys: nil,
+        options: .skipsHiddenFiles
+      )
       
-      do {
-        // Example: Save a file to the shared directory
-        let fileURL = keyboardDirectory.appendingPathComponent("bogus-kmp.txt")
-        let data = "Not a .kmp file".data(using: .utf8)
-        try data?.write(to: fileURL)
-        print("Wrote data to shared file: \(fileURL.path)")
-        
-      } catch {
-        print("Error writing file to shared directory: \(error.localizedDescription)")
+      for fileURL in fileURLs {
+        try fileManager.removeItem(at: fileURL)
       }
-    } else {
-      print("App Group container URL not found. Check your entitlements and provisioning profiles.")
+      
+      print("successfully cleared temp directory")
+    } catch {
+      print("error clearing temp directory: \(error.localizedDescription)")
     }
   }
- 
+
   /**
-   * get the url for where the specified package should be downloaded
+   * get the url to where the specified kmp file should be downloaded
    */
-  public func getDownloadUrlForPackageName(packageName: String) -> URL? {
-    var downloadFileUrl: URL? = nil
-    
-    if let packagesUrl = self.pathUtil.keyman19PackagesDirectory {
-      downloadFileUrl = packagesUrl.appendingPathComponent(packageName)
-    }
-    
-    return downloadFileUrl
+  public func getDownloadUrl(for kmpFilename: String) -> URL {
+    return self.pathUtil.keyman19TempDirectory.appendingPathComponent(kmpFilename)
+  }
+
+  /**
+   * get the url to where the specified package should initially be unzipped
+   */
+  public func getUnzipDestinationUrl(for packageName: String) -> URL {
+    return self.pathUtil.keyman19TempDirectory.appendingPathComponent(packageName)
+  }
+  /**
+   * get the url to where the specified package should be installed
+   */
+  public func getInstallationUrlForPackageName(packageName: String) -> URL {
+    return self.pathUtil.keyman19PackagesDirectory.appendingPathComponent(packageName)
   }
 
   /**
    * install keyboard at specified URL
    */
-  public func installPackage(packageUrl: URL) throws -> URL? {
-    print ("install package \(packageUrl)")
-    var destinationUrl: URL? = nil
-    
-    let fileManager = FileManager.default
-    
+  public func unzipKmpFile(at kmpFileUrl: URL, to packageDestinationUrl: URL) throws {
     do {
-      // set destination to full path but without the .kmp extension
-      let packageDestinationUrl = packageUrl.deletingPathExtension()
-      
-      try fileManager.unzipItem(at: packageUrl, to: packageDestinationUrl)
-      destinationUrl = packageDestinationUrl
+      try FileManager.default.unzipItem(at: kmpFileUrl, to: packageDestinationUrl)
       print("Successfully unzipped the file!")
     } catch {
       print("Extraction failed: \(error.localizedDescription)")
       throw InstallPackageError.unzipError
     }
-    
-    return destinationUrl
   }
 
   /**
    * Check to see whether the shared Keyman data directory exists under 'Library/Group Containers/'
    */
   public func keyman19SharedDataDirectoryExists() -> Bool {
-    guard let packagesUrl = self.pathUtil.keyman19PackagesDirectory else {
-      return false
-    }
-    
-    return self.directoryExistsAtPath(directoryUrl: packagesUrl)
+    return self.directoryExistsAtPath(directoryUrl: self.pathUtil.keyman19PackagesDirectory)
   }
   
   /**
@@ -215,11 +213,7 @@ public class PackageRepository: PackageRepo {
    * read packages at Keyman 19 location, inside Group Containers directory
    */
   func readKeymanPackagesForKeyman19() -> [PackageSource] {
-    guard let packagesUrl = self.pathUtil.keyman19PackagesDirectory else {
-      return []
-    }
-    
-    return readPackageSource(packageDirectoryUrl: packagesUrl)
+    return readPackageSource(packageDirectoryUrl: self.pathUtil.keyman19PackagesDirectory)
   }
   
   /**
@@ -260,6 +254,7 @@ public class PackageRepository: PackageRepo {
    * check the specified directory for the kmp.json file and read it if it exists
    */
   func readPackageFromDirectory(packageDirectoryUrl: URL) throws -> PackageSource? {
+    print("readPackageFromDirectory from url: \(packageDirectoryUrl)")
     var packageSource: PackageSource? = nil
     let kmpJsonFileUrl = packageDirectoryUrl.appendingPathComponent(packageFileName)
     

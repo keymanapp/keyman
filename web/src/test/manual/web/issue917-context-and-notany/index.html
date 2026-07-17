@@ -36,11 +36,10 @@
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
-      var kmw=window.keyman;
-      kmw.init({
+      keyman.init({
 		    attachType:'auto'
       }).then(function() {
-        kmw.addKeyboards({id:'test_917',name:'test_917',languages:{id:'en',name:'English'}, filename:'test_917/build/test_917.js'});
+        keyman.addKeyboards({id:'test_917',name:'test_917',languages:{id:'en',name:'English'}, filename:'test_917/build/test_917.js'});
       });
 
     </script>

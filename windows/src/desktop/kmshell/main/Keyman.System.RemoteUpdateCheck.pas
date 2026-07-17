@@ -158,6 +158,7 @@ begin
     try
       http.Fields.Add('version', ansistring(CKeymanVersionInfo.Version));
       http.Fields.Add('tier', ansistring(CKeymanVersionInfo.Tier));
+      http.Fields.Add('update', '1'); // This is checking for an update
       if FForce then
         http.Fields.Add('manual', '1')
       else

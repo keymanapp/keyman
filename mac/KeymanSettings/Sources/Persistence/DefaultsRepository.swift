@@ -31,7 +31,7 @@ public class DefaultsRepository: DefaultsRepo {
   let kTimeRestartRequested = "KMTimeRestartRequested"
 
   public init(suiteName: String) throws(Error) {
-    self.pathUtil = KeymanPaths()
+    try self.pathUtil = KeymanPaths()
     self.defaultsSuiteName = suiteName
     
     // create defaults for the suite
@@ -40,10 +40,6 @@ public class DefaultsRepository: DefaultsRepo {
     }
     
     self.groupDefaults = userDefaults
-  }
-  
-  public func installationStateExists() -> Bool {
-    return self.groupDefaults.object(forKey: "kInstallationState") != nil
   }
   
   /**
@@ -85,8 +81,22 @@ public class DefaultsRepository: DefaultsRepo {
    */
   public func writeEnabledKeyboards(enabledKeyboardsArray: [String]) {
     self.groupDefaults.set(enabledKeyboardsArray, forKey: kEnabledKeyboardsKey)
+    self.sendKeyboardsChangedNotification()
   }
   
+  /**
+   * Send a distributed notification that the keyboards have changed.
+   * The input method will receive this and reload the enabled keyboards.
+   */
+  func sendKeyboardsChangedNotification() {
+    DistributedNotificationCenter.default().postNotificationName (
+      .keyboardsChanged,
+      object: nil,
+      userInfo: nil,
+      deliverImmediately: true
+    )
+  }
+
   /**
    * return the selected keyboard from the UserDefaults
    * The selected keyboard is the one that Keyman is applying for each keydown event.

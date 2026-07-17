@@ -18,15 +18,15 @@ struct KeyboardSearchView: NSViewRepresentable {
   // note that the EnvironmentObject is not available within init (if we were to implement that)
   // it is injected just before makeNSView and updateNSView are called
   
+  // MAC-CONFIG-TODO: build URL rather than hard-code
   let searchURL = URL(string: "https://keyman.com/go/macos/14.0/download-keyboards/?version=19.0.284")!
 
-
-  // Creates the Coordinator to handle WebKit delegate methods
+  /** Creates the Coordinator to handle WebKit delegate methods */
   func makeCoordinator() -> Coordinator {
     Coordinator()
   }
   
-  // Creates the underlying NSView (WKWebView) for macOS
+  /** Creates the underlying NSView (WKWebView) for macOS */
   func makeNSView(context: Context) -> WKWebView {
     print("makeNSView called")
     let webView = WKWebView()
@@ -44,7 +44,6 @@ struct KeyboardSearchView: NSViewRepresentable {
    * This is a safe place to pass the SettingsContainer to the Coordinator
    * as the environment has been loaded by now.
    */
-  
   func updateNSView(_ nsView: WKWebView, context: Context) {
     if context.coordinator.settings == nil {
       context.coordinator.settings = self.settings
@@ -61,6 +60,7 @@ struct KeyboardSearchView: NSViewRepresentable {
                  preferences: WKWebpagePreferences,
                  decisionHandler: @escaping @MainActor (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
       
+      print("deciding navigation based on action")
       
       if let url = navigationAction.request.url {
         print("webView navigationAction.request.url: \(url)")
@@ -73,9 +73,10 @@ struct KeyboardSearchView: NSViewRepresentable {
         return
       }
       
+      // MAC-CONFIG-TODO: is this necessary or is download attribute enough to identify
       // check if URL ends with a target file extension
       if let url = navigationAction.request.url {
-        if url.pathExtension.lowercased() == KeymanPaths.keyman17PackageExtension {
+        if url.pathExtension.lowercased() == KeymanPaths.keymanPackageFileExtension {
           decisionHandler(.download, preferences)
           print("webView found .kmp, called decisionHandler for download")
           return
@@ -85,15 +86,28 @@ struct KeyboardSearchView: NSViewRepresentable {
       decisionHandler(.allow, preferences)
     }
     
+    /** decide whether the navigation should be allowed, canceled or result in a download */
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping @MainActor (WKNavigationResponsePolicy) -> Void) {
-      print("webView decidePolicyFor:decisionHandler: called")
+      print("deciding navigation based on response")
       
       if navigationResponse.canShowMIMEType {
         decisionHandler(.allow)
       } else {
-        decisionHandler(.download)
+        guard let keymanSettings = self.settings else {
+          print("webView decidePolicyFor:decisionHandler: no settings")
+          decisionHandler(.cancel)
+          return
+        }
+        
+        // if a download is already in progress then stop another from starting
+        if keymanSettings.isDownloadInProgress() {
+          print("download already in progress, download canceled")
+          decisionHandler(.cancel)
+        } else {
+          decisionHandler(.download)
+        }
       }
     }
     
@@ -103,19 +117,30 @@ struct KeyboardSearchView: NSViewRepresentable {
     }
     
     func webView(_ webView: WKWebView,
-                 navigationAction: WKNavigationAction,
-                 didCommit download: WKDownload) {
-      print("webView navigationAction:didCommit called")
+                 navigationResponse: WKNavigationResponse,
+                 didBecome download: WKDownload) {
+      print("webView navigationResponse:didBecome called")
       download.delegate = self
     }
-    
+
     func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String, completionHandler: @escaping @MainActor @Sendable (URL?) -> Void) {
-      print("download started")
-      downloadFileUrl = settings?.getDownloadUrlForPackageName(packageName: suggestedFilename)
+      print("download initiated")
+      
+      guard let keymanSettings = self.settings else {
+        print("tried to access settings before they were intialized in updateNSView")
+        completionHandler(nil)
+        return
+      }
+      
+      // notify settings that a keyboard download is beginning and get the URL to
+      // the temporary folder where it should be downloaded
+      
+      downloadFileUrl = keymanSettings.preparePackageDownload(kmpFileName: suggestedFilename)
       if let downloadFileUrl {
         completionHandler(downloadFileUrl)
       } else {
-        print("could not find Keyman packages directory")
+        print("could not prepare package for download")
+        completionHandler(nil)
       }
     }
     
@@ -123,8 +148,7 @@ struct KeyboardSearchView: NSViewRepresentable {
       if let downloadFileUrl {
         print("Download of \(downloadFileUrl.path()) was successful.")
         if let settings {
-          print("settings: \(settings)")
-          settings.installPackage(packageUrl: downloadFileUrl)
+          settings.packageDownloadComplete(kmpFileUrl: downloadFileUrl)
         }
       }
     }
@@ -134,12 +158,12 @@ struct KeyboardSearchView: NSViewRepresentable {
     func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
       print("Download failed with error: \(error.localizedDescription)")
     }
-  }
-  
-  func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-      // The web process crashed. Reload the webview safely here.
-      print("WebKit process terminated unexpectedly: reloading content...")
-      webView.reload()
+
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        // The web process crashed. Reload the webview safely here.
+        print("WebKit process terminated unexpectedly: reloading content...")
+        webView.reload()
+    }
   }
 }
 

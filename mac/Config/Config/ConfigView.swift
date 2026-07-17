@@ -19,7 +19,8 @@ struct ConfigView: View {
         Image(systemName: "keyboard")
           .imageScale(.large)
           .foregroundColor(.accentColor)
-        Text("keyboard count = \(settings.installedPackages.count)")
+        Text("multiple keyboard package count = \(settings.singleKeyboardPackages.count)")
+        Text("single keyboard package count = \(settings.multiKeyboardPackages.count)")
         Button("debug") {
           settings.debug()
         }
@@ -46,9 +47,25 @@ struct ConfigView: View {
       
       ScrollView {
         VStack(alignment: .leading, spacing: 6) {
-          ForEach(Array(settings.installedPackages.enumerated()), id: \.offset) { index, package in
+          ForEach(Array(settings.singleKeyboardPackages.enumerated()), id: \.offset) { index, package in
             VStack {
               HStack(alignment: .center, spacing: 10) {
+                VStack(spacing: 16) {
+                    Text("Scan to visit website:")
+                        .font(.headline)
+                    
+                  if let qrImage = package.generateSharePackageQRCode(size: 250) {
+                        Image(nsImage: qrImage)
+                            .interpolation(.none) // important: keeps the QR edges sharp
+                            .resizable()
+                            .frame(width: 250, height: 250)
+                            .background(Color.white) // ensures good scanning contrast
+                    } else {
+                        Text("Failed to generate QR Code")
+                            .foregroundColor(.red)
+                    }
+                }
+                .padding()
                 Text(package.packageName)
                   .font(.headline)
                 Text(package.packageVersion)
@@ -56,7 +73,7 @@ struct ConfigView: View {
                 // Example of Icon-Only Button
                 Spacer()
                 Button(action: {
-                  settings.removePackage(at: index)
+                  settings.removeInstalledPackage(at: index)
                 }) {
                   Label("remove", systemImage: "trash.fill")
                 }
