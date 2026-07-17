@@ -36,9 +36,7 @@ public class InstallationCheck {
     }
     
     self.configurationVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
-    // MAC-CONFIG-TODO: uncomment next line, hard-coded for testing
-    //self.isInputMethodCurrent = self.inputMethodVersion == self.configurationVersion
-    self.isInputMethodCurrent = true
+    self.isInputMethodCurrent = self.inputMethodVersion == self.configurationVersion
   }
   
   /**
