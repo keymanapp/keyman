@@ -11,6 +11,7 @@ import com.keyman.engine.KMManager;
 import com.keyman.engine.KeyboardPickerActivity;
 import com.keyman.engine.R;
 import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.data.CloudRepository;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.data.KeyboardController;
 import com.keyman.engine.data.LexicalModel;
@@ -188,7 +189,6 @@ public class CloudDataJsonUtil {
   }
 
   public static void processLexicalModelPackageUpdateJSON(Context aContext, JSONObject pkgData, List<Bundle> updateBundles) {
-    boolean saveModelsList = false;
     // Parse for lexical model package updates
     if (pkgData.has(CDKey_Models)) {
       try {
@@ -201,18 +201,11 @@ public class CloudDataJsonUtil {
             String cloudVersion = cloudModelObj.getString(CDKey_Version);
             String cloudKMP = cloudModelObj.getString(CDKey_KMP);
             // Valid lexical model package exists. See if lexical model list needs to be updated
-            // Valid keyboard package exists. See if keyboard list needs to be updated
-            int index = KeyboardPickerActivity.getLexicalModelIndex(aContext, lexicalModelID);
-            if (index != -1) {
-              HashMap<String, String> lmInfo = KeyboardPickerActivity.getLexicalModelInfo(aContext, index);
-              String version = lmInfo.get(KMManager.KMKey_Version);
+            ArrayList<HashMap<String, String>> lmInfos = KeyboardPickerActivity.getLexicalModelsMatchingId(aContext, lexicalModelID);
+            for (HashMap<String, String> lmInfo : lmInfos) {
+              String version = lmInfo.get(KMManager.KMKey_LexicalModelVersion);
               if (lexicalModelID.equalsIgnoreCase(lmInfo.get(KMManager.KMKey_LexicalModelID)) &&
-                  (FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER) &&
-                  (!MapCompat.getOrDefault(lmInfo, KMManager.KMKey_KMPLink, "").equalsIgnoreCase(cloudKMP))) {
-                // Update keyboard with the latest KMP link
-                lmInfo.put(KMManager.KMKey_KMPLink, cloudKMP);
-                KeyboardPickerActivity.addLexicalModel(aContext, lmInfo);
-
+                  (FileUtils.compareVersions(cloudVersion, version) == FileUtils.VERSION_GREATER)) {
                 // Update bundle list
                 LexicalModel lm = new LexicalModel(
                   lmInfo.get(KMManager.KMKey_PackageID),
@@ -220,13 +213,29 @@ public class CloudDataJsonUtil {
                   lmInfo.get(KMManager.KMKey_LexicalModelName),
                   lmInfo.get(KMManager.KMKey_LanguageID),
                   lmInfo.get(KMManager.KMKey_LanguageName),
-                  lmInfo.get(KMManager.KMKey_Version),
+                  lmInfo.get(KMManager.KMKey_LexicalModelVersion),
                   lmInfo.get(KMManager.KMKey_CustomHelpLink),
                   lmInfo.get(KMManager.KMKey_KMPLink));
-                Bundle bundle = new Bundle(lm.buildDownloadBundle());
-                updateBundles.add(bundle);
+                String updateKMP = lm.getUpdateKMP();
+                if (cloudLinkIsNewer(updateKMP, cloudKMP)) {
+                  // Update lexical model info with the latest KMP link after appending languageID
+                  String languageID = lm.getLanguageID();
+                  String link = String.format("%s&bcp47=%s", cloudKMP, languageID);
+                  lmInfo.put(KMManager.KMKey_KMPLink, link);
+                  KeyboardPickerActivity.addLexicalModel(aContext, lmInfo);
+                  lm.setUpdateKMP(link);
+                  updateKMP = link;
+                  LexicalModel cached = CloudRepository.shared.getLexicalModel(aContext, languageID, lexicalModelID);
+                  if (cached != null) {
+                    cached.setUpdateKMP(link);
+                  }
+                }
 
-                saveModelsList = true;
+                if (updateKMP != null && !updateKMP.isEmpty()) {
+                  // Update bundle list for update notifications
+                  Bundle bundle = new Bundle(lm.buildDownloadBundle());
+                  updateBundles.add(bundle);
+                }
               }
             }
           }
@@ -367,14 +376,13 @@ public class CloudDataJsonUtil {
       return false;
     }
 
+    if (updateKMP == null || updateKMP.isEmpty()) {
+      return true;
+    }
+
     try {
-      Uri cloudLink = Uri.parse(cloudKMP);
-
-      if (updateKMP == null || updateKMP.isEmpty()) {
-        return true;
-      }
-
       Uri localLink = Uri.parse(updateKMP);
+      Uri cloudLink = Uri.parse(cloudKMP);
 
       boolean pathsMatch = localLink.getLastPathSegment().equalsIgnoreCase(cloudLink.getLastPathSegment());
       boolean cloudVersionNewer = FileUtils.compareVersions(

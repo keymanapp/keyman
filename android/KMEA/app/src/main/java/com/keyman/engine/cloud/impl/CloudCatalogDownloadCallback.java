@@ -154,6 +154,7 @@ public class CloudCatalogDownloadCallback implements ICloudDownloadCallback<Data
 
     // The actual update check
     CloudDataJsonUtil.processKeyboardPackageUpdateJSON(context, jsonTuple.packagesJSON, updateBundles);
+    CloudDataJsonUtil.processLexicalModelPackageUpdateJSON(context, jsonTuple.packagesJSON, updateBundles);
 
     // Only add installed kmp keyboards
     aDataSet.keyboards.clear();

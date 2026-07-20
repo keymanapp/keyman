@@ -21,6 +21,7 @@ import com.keyman.engine.cloud.CloudDownloadMgr;
 import com.keyman.engine.packages.JSONUtils;
 import com.keyman.engine.util.BCP47;
 import com.keyman.engine.util.DownloadFileUtils;
+import com.keyman.engine.util.FileUtils;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.VersionUtils;
 
@@ -158,10 +159,23 @@ public class CloudRepository {
    * @return LexicalModel of an associated lexical model. Null if no match found
    */
   public LexicalModel getAssociatedLexicalModel(@NonNull Context context, String languageID) {
+    return getLexicalModel(context, languageID, null);
+  }
+
+  /**
+   * Get the lexical model with modelID associated with the given language ID. If
+   * modelID is null, return the first model associated with languageID. Available
+   * models are from the cloud catalog and locally installed models.
+   * @param context Context
+   * @param languageID String of the language ID to search
+   * @param modelID    String of the lexical model ID.
+   * @return LexicalModel of an associated lexical model. Null if no match found.
+   */
+  public LexicalModel getLexicalModel(@NonNull Context context, String languageID, String modelID) {
     if (memCachedDataset != null) {
       for (int i=0; i < memCachedDataset.lexicalModels.getCount(); i++) {
         LexicalModel lm = memCachedDataset.lexicalModels.getItem(i);
-        if (BCP47.languageEquals(lm.getLanguageID(), languageID)) {
+        if (BCP47.languageEquals(lm.getLanguageID(), languageID) && (modelID == null || modelID.equals(lm.getLexicalModelID()))) {
           return lm;
         }
       }
@@ -253,6 +267,41 @@ public class CloudRepository {
     downloadMetaDataFromServer(context,updateHandler,onSuccess,onFailure);
   }
 
+  private void mergeLexicalModels(Dataset.LexicalModels datasetModels, List<LexicalModel> newModels) {
+    if (newModels == null) {
+      return;
+    }
+
+    List<LexicalModel> existingModels = new ArrayList<>(datasetModels.asList());
+    List<LexicalModel> mergedModels = new ArrayList<>();
+
+    // Process all incoming models
+    for (LexicalModel newModel : newModels) {
+      LexicalModel existingMatch = null;
+      for (int i = 0; i < existingModels.size(); i++) {
+        if (newModel.equals(existingModels.get(i))) {
+          existingMatch = existingModels.remove(i);
+          break;
+        }
+      }
+
+      if (existingMatch != null) {
+        if (FileUtils.compareVersions(existingMatch.getVersion(), newModel.getVersion()) != FileUtils.VERSION_LOWER) {
+          mergedModels.add(existingMatch);
+        } else {
+          mergedModels.add(newModel);
+        }
+      } else {
+        mergedModels.add(newModel);
+      }
+    }
+
+    // Add remaining existing models that weren't matched
+    mergedModels.addAll(existingModels);
+
+    datasetModels.clear();
+    datasetModels.addAll(mergedModels);
+  }
 
   /**
    * precache dataset and notify callbacks if no update from cloud api services is necessary.
@@ -286,11 +335,13 @@ public class CloudRepository {
       languageCodes.add(installedSet.getItem(i).code);
     }
 
+    // add all models from installed set
+    memCachedDataset.lexicalModels.addAll(installedSet.lexicalModels.asList());
+
     // Get kmp.json info from installed (adhoc and cloud) models.
     // Consolidate kmp.json info from packages/
     JSONObject kmpLanguagesArray = wrapKmpKeyboardJSON(JSONUtils.getLanguages());
     JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
-    final boolean fromKMP = true;
 
     try {
       if (kmpLanguagesArray.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).
@@ -298,7 +349,7 @@ public class CloudRepository {
         memCachedDataset.keyboards.addAll(CloudDataJsonUtil.processKeyboardJSON(kmpLanguagesArray, true));
       }
       if (kmpLexicalModelsArray.length() > 0) {
-        memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray, fromKMP));
+        mergeLexicalModels(memCachedDataset.lexicalModels, CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray, true));
       }
     } catch (Exception e) {
       KMLog.LogException(TAG, "preCacheDataSet error ", e);

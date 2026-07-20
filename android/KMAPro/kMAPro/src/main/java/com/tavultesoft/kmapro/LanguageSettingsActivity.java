@@ -159,14 +159,19 @@ public final class LanguageSettingsActivity extends BaseActivity {
       @Override
       public void onClick(View v) {
         // Start ModelPickerActivity
+        Intent intent = new Intent(context, ModelPickerActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         Bundle bundle = new Bundle();
-        bundle.putString(KMManager.KMKey_LanguageID, lgCode);
-        bundle.putString(KMManager.KMKey_LanguageName, lgName);
-        bundle.putString(KMManager.KMKey_CustomHelpLink, customHelpLink);
-        Intent i = new Intent(context, ModelPickerActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        i.putExtras(bundle);
-        startActivity(i);
+        HashMap<String, String> lmInfo = KMManager.getAssociatedLexicalModel(lgCode);
+        if (lmInfo != null) {
+          bundle.putSerializable(KMManager.KMKey_LexicalModel, lmInfo);
+        } else {
+          bundle.putString(KMManager.KMKey_LanguageID, lgCode);
+          bundle.putString(KMManager.KMKey_LanguageName, lgName);
+          bundle.putString(KMManager.KMKey_CustomHelpLink, customHelpLink);
+        }
+        intent.putExtras(bundle);
+        startActivity(intent);
       }
     });
 
