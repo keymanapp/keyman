@@ -7,8 +7,8 @@ interface to control the appearance and behavior of user interface
 elements. Standard event-processing requires all arguments to be passed
 as an array (object) with named member variables.
 
-Two components of Keyman Engine for Web specify events: 
-* `keyman` object -- the main component
+Two components of Keyman Engine for Web specify events:
+* `keyman` object -- the core component
 * `keyman.osk` object -- the on-screen keyboard component
 
 Object events are handled in user code by passing the handler entry to

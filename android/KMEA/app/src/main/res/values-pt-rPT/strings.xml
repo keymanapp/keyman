@@ -80,8 +80,6 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      Biblioteca de FileProvider necessária para ver o arquivo de ajuda: %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Erro fatal de teclado com %1$s:%2$s para %3$s idioma. Carregando o teclado padrão.</string>
-    <!-- Context: Fatal keyboard error.  -->
-    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Erro no teclado %1$s:%2$s para %3$s idioma.</string>
     <!-- Context: Alert Dialog body: System WebView not installed -->
     <string name="body_install_webview" comment="Notification when WebView not installed">        Keyman requer que o WebView seja instalado.\"</string>
     <!-- Context: Alert Dialog body: System WebView installed but not enabled -->
