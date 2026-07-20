@@ -76,5 +76,5 @@ function do_test() {
 }
 
 builder_run_action build      do_build
-builder_run_action api        api-extractor run --local --verbose
+builder_run_action api        typescript_run_api_extractor developer/src/kmc-kmn main.d.ts
 builder_run_action test       do_test
