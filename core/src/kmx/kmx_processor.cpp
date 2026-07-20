@@ -5,6 +5,7 @@
 
 using namespace km::core;
 using namespace kmx;
+using namespace km::vkey;
 
 
 static KMX_BOOL ContextItemsFromAppContext(KMX_WCHAR *buf, km_core_context_item** outPtr)

@@ -10,6 +10,7 @@
 
 using namespace km::core;
 using namespace kmx;
+using namespace km::vkey;
 
 void KMX_DebugItems::push_item(
   uint8_t type,

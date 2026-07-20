@@ -77,6 +77,7 @@
 #include "cp1252.h"
 #include "virtualcharkeys.h"
 
+#include "../../../../common/include/km_vkey.h"
 #include "../../../../common/include/vkeys.h"
 #include "../../../../common/include/keymanversion.h"
 
@@ -109,6 +110,7 @@
 #define SUBLANGID(lgid)        ((uint16_t)(lgid) >> 10)
 
 using namespace kmcmp;
+using namespace km::vkey;
 
   KMX_BOOL AWarnDeprecatedCode_GLOBAL_LIB;
 
