@@ -13,10 +13,15 @@ import KeymanSettings
 struct MainConfigView: View {
   @EnvironmentObject var settings: SettingsContainer
   @State private var isShowingSheet = false
-  @State private var packageToDeleteIndex: Int?
+  @State private var selectedPackage: KeymanPackage?
+  @State private var isShowingAlert = false
+    
+  private func showAlert(for package: KeymanPackage) -> Void {
+    isShowingAlert = true
+    selectedPackage = package
+  }
   
   var body: some View {
-    
     Button {
       isShowingSheet = true
     } label: {
@@ -32,7 +37,7 @@ struct MainConfigView: View {
       // FEAT/MAC/CONFIG-WINDOW TODO: Make width and height percentages
     }
     
-    List(Array(zip(settings.installedPackages.indices, settings.installedPackages)), id: \.1.id) { index, package in
+    List(Array(zip(settings.singleKeyboardPackages.indices, settings.singleKeyboardPackages)), id: \.1.id) { index, package in
       ForEach(package.keyboards) { keyboard in
         DisclosureGroup {
           Text("Keyboard Info Goes Here")
@@ -41,37 +46,32 @@ struct MainConfigView: View {
             
             Text(keyboard.name)
               .font(.title2)
-            
+
             Spacer()
-            
+
             // view keyboard info button
             PackageButtonView(action: { print("View info") }, label: "View info", systemImage: "info.circle", helpText: "View info")
-            
+
             // delete keyboard button
-            PackageButtonView(action: { packageToDeleteIndex = index }, label: "Delete keyboard", systemImage: "trash", helpText: "Delete keyboard")
-            // FEAT/MAC/CONFIG-WINDOW TODO: Extract and clean up alert modifier
-            .alert("Are you sure you want to delete the keyboard '\(package.packageName)'?",
-                   isPresented: Binding(
-                    get: { packageToDeleteIndex == index },
-                    set: { if !$0 { packageToDeleteIndex = nil } }
-                   )) {
-                // cancel button
-                Button("Cancel", role: .cancel) {
-                  packageToDeleteIndex = nil
-                }
-                // delete button
-                Button("Delete", role: .destructive) {
-                  settings.removePackage(at: index)
-                  packageToDeleteIndex = nil
-                }
-                   } message: {
-                     Text("You can't undo this action.")
-                   }
-            
+            PackageButtonView(action: { showAlert(for: package) }, label: "Delete keyboard", systemImage: "trash", helpText: "Delete keyboard")
           }
         }
       }
     }
+    // FEAT?/MAC/CONFIG-WINDOW TODO: Make the alert title display the keyboard name
+    .alert("Are you sure you want to delete the keyboard \"\(selectedPackage?.packageName ?? "")\"?",
+             isPresented: $isShowingAlert,
+             presenting: selectedPackage) { package in
+        
+        Button("Cancel", role: .cancel) { }
+        
+        Button("Delete", role: .destructive) {
+          // FEAT/MAC/CONFIG-WINDOW TODO: Make removeInstalledPackage based on id
+          //settings.removeInstalledPackage(at: index)
+        }
+      } message: { package in
+        Text("You can't undo this action.")
+      }
     .padding()
   }
 }
