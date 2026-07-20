@@ -150,6 +150,7 @@ type
     procedure DoRefresh;
     procedure Update_CheckNow;
     procedure Update_ApplyNow;
+    procedure Update_CheckBox;
 
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
@@ -354,6 +355,7 @@ begin
 
   else if command = 'update_checknow' then Update_CheckNow
   else if command = 'update_applynow' then Update_ApplyNow
+  else if command = 'update_checkbox' then Update_CheckBox
 
   else if command = 'contact_support' then Support_ContactSupport(params)   // I4390
 
@@ -847,6 +849,44 @@ begin
       // return of "Keyman Configuration".
   end;
 end;
+
+procedure TfrmMain.Update_CheckBox;
+var
+
+begin
+  // Using the string that contains which kbd or version is not to update
+  // we write a cache file that says which updates we do not want
+  // The New version and old version should be used to identify
+  // For Keyman this will be of the form New Version:Keyman 19.0.72
+  // old version : 19.0.70
+  // New Version >Keyboard EuroLatin (SIL) 3.0.3<    Old Version: >3.0.0<
+  // Keyman package: Keyman 19.0.74 Old Version: 19.0.72
+  // in the text tag the first word/s is the product name and the last string is
+  // the version.
+  {
+  "rejected_updates": {
+    "bundle": {
+      "version": "19.0.74",
+      "stability": "alpha",
+      "declined": true
+    },
+    "keyboards": {
+      "sil_euro_latin": {
+        "version": "3.0.3",
+        "declined": true
+      },
+      "another_keyboard_id": {
+        "version": "1.2.0",
+        "declined": true
+      }
+    }
+  }
+}
+
+
+
+end;
+
 
 procedure TfrmMain.TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
