@@ -218,7 +218,7 @@ export class InfrastructureMessages {
     `${def(o.relativeFilename)} failed to validate.`
   )});
 
-  static ERROR_InvalidTargetVersion = SevError | 0x0029;
+  static ERROR_InvalidTargetVersion = SevError | 0x002C;
   static Error_InvalidTargetVersion = (o:{targetVersion:string}) => m(
     this.ERROR_InvalidTargetVersion,
     `Target version parameter '${def(o.targetVersion)}' is not a valid Keyman version.`,
