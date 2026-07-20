@@ -15,9 +15,8 @@ CFBundleDisplayName = "Keyman";
  */
 
 // NOTE: Do not put version-related strings in here. The following are now computed based
-//  on User-Defined Build Setting variables such as PRODUCT_VERSION and COPYRIGHT_STRING_RIGHTS
+//  on the User-Defined Build Setting variables PRODUCT_VERSION and COPYRIGHT_STRING
 //
-//NSHumanReadableCopyright = "Copyright © 2018 SIL International. All rights reserved.";
+//NSHumanReadableCopyright = "Copyright © SIL Global. All rights reserved.";
 //CFBundleShortVersionString = "10.0";
 //CFBundleVersion = "10.0";
-//CFBundleGetInfoString = "Keyman 10.0 for macOS, Copyright 2018, SIL International";
