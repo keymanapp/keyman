@@ -11,7 +11,7 @@ the *On-Screen Keyboard* module, a *Utility function* library, or one of the sta
 Interface* modules.
 
 A *KeymanWeb* instance is automatically constructed when you include the compiled KeymanWeb
-script (kmw-release.js) in your web page source.
+script in your web page source.
 
 The *KeymanWeb API* comprises the following objects:
 
@@ -26,3 +26,13 @@ The *KeymanWeb API* comprises the following objects:
 
 - *User Interface*
 :   Exposed as [`keyman.ui`](ui).
+
+The *KeymanWeb Keyboard API* provides endpoints for KeymanWeb keyboards to
+interact with KeymanWeb. This API should not be used by website code.
+
+- *Interface*
+:   Exposed as [`keyman.interface`](interface)
+
+The KeymanWeb Keyboard API publishes a deprecated global `KeymanWeb` which is
+the same as `keyman.interface`. Use `keyman.interface` in preference to
+`KeymanWeb`.

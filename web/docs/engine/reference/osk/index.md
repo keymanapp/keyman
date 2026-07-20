@@ -1,5 +1,5 @@
 ---
-title: On-Screen Keyboard Module
+title: `keyman.osk` - On-Screen Keyboard Module
 ---
 
 The On-Screen Keyboard module is exposed to the developer as `window.keyman.osk`.
