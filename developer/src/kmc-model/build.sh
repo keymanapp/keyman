@@ -12,7 +12,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe "Keyman kmc Lexical Model Compiler module" \
   "@/common/web/keyman-version" \
   "@/developer/src/common/web/test-helpers" \
-  "@/web/src/engine/predictive-text/templates/ test" \
+  "@/web/src/engine/predictive-text/templates/" \
   "clean" \
   "configure" \
   "build" \
