@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.259 alpha 2026-07-20
+
+* docs(web): fix typos following #16170 (#16225)
+
 ## 19.0.258 alpha 2026-07-15
 
 * chore(android): remove doc for non-existing deprecated functions (#16244)
