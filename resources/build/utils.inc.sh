@@ -21,7 +21,7 @@ _utils_inc_sh=1
 write_download_info() {
   local UPLOAD_DIR="$1"
   local ARTIFACT_FILENAME="$2"
-  local ARTFIACT_NAME="$3"
+  local ARTIFACT_NAME="$3"
   local ARTIFACT_TYPE="$4"
   local PLATFORM="$5"
 
@@ -50,7 +50,7 @@ write_download_info() {
   # shellcheck disable=SC2016,SC2154
   DOWNLOAD_INFO=$(
     "${JQ}" -n \
-    --arg NAME "${ARTFIACT_NAME}" \
+    --arg NAME "${ARTIFACT_NAME}" \
     --arg BUILD_NUMBER "${KEYMAN_VERSION}" \
     --arg DATE "${DATE}" \
     --arg PLATFORM "${PLATFORM}" \
