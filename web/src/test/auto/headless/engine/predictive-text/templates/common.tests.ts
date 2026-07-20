@@ -22,8 +22,7 @@ describe('Common utility functions', function() {
 
       let final = {
         insert: 'applebanana',
-        deleteLeft: 0,
-        deleteRight: 0
+        deleteLeft: 0
       };
 
       let mergedTransform = models.buildMergedTransform(apple, banana);
@@ -43,8 +42,7 @@ describe('Common utility functions', function() {
 
       let final = {
         insert: 'applebanana',
-        deleteLeft: 2,
-        deleteRight: 0
+        deleteLeft: 2
       };
 
       let mergedTransform = models.buildMergedTransform(apple, banana);
@@ -64,8 +62,7 @@ describe('Common utility functions', function() {
 
       let final = {
         insert: 'bananapple',  // the 'apple' transform removes the final 'a' from 'banana'.
-        deleteLeft: 0,
-        deleteRight: 0
+        deleteLeft: 0
       };
 
       let mergedTransform = models.buildMergedTransform(banana, apple);
@@ -85,8 +82,7 @@ describe('Common utility functions', function() {
 
       let final = {
         insert: 'bananapple',  // the 'apple' transform removes the final 'a' from 'banana'.
-        deleteLeft: 2,
-        deleteRight: 0
+        deleteLeft: 2
       };
 
       let mergedTransform = models.buildMergedTransform(banana, apple);

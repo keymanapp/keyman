@@ -1,20 +1,36 @@
-export { ClassicalDistanceCalculation } from './correction/classical-calculation.js';
+export { ClassicalDistanceCalculation, EditOperation, EditTuple, forNewIndices } from './correction/classical-calculation.js';
+export * from './correction/context-state.js';
+export * from './correction/context-token.js';
+export * from './correction/context-tokenization.js';
 export { ContextTracker } from './correction/context-tracker.js';
-export * as correction from './correction/index.js';
+export { ContextTransition } from './correction/context-transition.js';
+export * from './correction/correction-searchable.js';
+export * from './correction/correction-result-mapping.js';
+export * from './correction/distance-modeler.js';
+export * from './correction/deletion-quotient-spur.js';
+export * from './correction/insertion-quotient-spur.js';
+export * from './correction/substitution-quotient-spur.js';
+export * from './correction/execution-timer.js';
+export * from './correction/search-quotient-cluster.js';
+export * from './correction/search-quotient-spur.js';
+export * from './correction/search-quotient-node.js';
+export * from './correction/legacy-quotient-root.js';
+export * from './correction/legacy-quotient-spur.js';
+export * from './correction/quotient-node-finalizer.js';
+export * from './correction/search-quotient-root.js';
+export { ExtendedEditOperation, SegmentableDistanceCalculation } from './correction/segmentable-calculation.js';
+export * from './correction/tokenization-corrector.js';
+export * from './correction/tokenization-subsets.js';
+export * from './correction/transition-helpers.js';
+export * from './correction/token-result-mapping.js';
+export * from './correction/tokenization-result-mapping.js';
 export {
     determinePunctuationFromModel, determineModelWordbreaker,
     determineModelTokenizer, detectCurrentCasing
 } from './model-helpers.js';
 export * as models from './models/index.js';
 export { ModelCompositor } from './model-compositor.js';
-export { tokenizeTransform, tokenizeTransformDistribution } from './correction/transform-tokenization.js';
-export {
-    AUTOSELECT_PROPORTION_THRESHOLD, CORRECTION_SEARCH_THRESHOLDS,
-    CorrectionPredictionTuple, SuggestionSimilarity, tupleDisplayOrderSort,
-    correctAndEnumerate, shouldStopSearchingEarly, predictFromCorrections,
-    applySuggestionCasing, toAnnotatedSuggestion, predictionAutoSelect,
-    dedupeSuggestions, finalizeSuggestions, processSimilarity
-} from './predict-helpers.js';
+export * from './predict-helpers.js';
 export { TransformUtils } from './transformUtils.js'
 export { LMLayerWorker } from './index.js'
 export { TransformSubset, subsetByInterval, subsetByChar, mergeSubset } from './transform-subsets.js';
