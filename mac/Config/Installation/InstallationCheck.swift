@@ -15,6 +15,15 @@
 import Foundation
 import KeymanSettings
 
+public enum InstallationPhase {
+  case inputMethodMissing
+  case inputMethodOutdated
+  case newInstallation
+  case activeInstallation
+  case installationComplete
+  case installationRepairNeeded
+}
+
 @MainActor
 public class InstallationCheck {
   public let isInputMethodInstalled: Bool
@@ -25,6 +34,35 @@ public class InstallationCheck {
   fileprivate let defaultsRepository: DefaultsRepo
   fileprivate let inputMethodUtil: InputMethodUtil
 
+  // a simple representation of the install state
+  // provided so UI knows what to present to the user
+  public var installationPhase: InstallationPhase {
+    if !isInputMethodInstalled {
+      return .inputMethodMissing
+    } else if !isInputMethodCurrent {
+      return .inputMethodOutdated
+    }
+    
+    if let state = self.installationState {
+      if state.isComplete {
+        return .installationComplete
+      } else {
+        if state.isNew {
+          return .newInstallation
+        } else if state.isRepair {
+          return .installationRepairNeeded
+        } else {
+          return .activeInstallation
+        }
+      }
+    } else {
+      // in case that installationState (optional) == nil
+      // will never reach this case because if it is nil
+      // we return inputMethodMissing or inputMethodOutdated
+      return .newInstallation
+    }
+  }
+  
   public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil) {
     self.defaultsRepository = defaultsRepo
     self.inputMethodUtil = inputMethodUtil
@@ -43,6 +81,8 @@ public class InstallationCheck {
     self.installationState = self.loadState()
     
     self.registerObservers()
+    
+    self.sendIncompleteNotificationsIfNecessary()
     
     if self.isValidationNeeded() {
       self.startValidation()
@@ -68,6 +108,28 @@ public class InstallationCheck {
       object: nil // Observe notifications from any sender
     )
     // MAC-CONFIG_TODO: add timeout?
+  }
+  
+  /**
+   * If the installation is incomplete, send notifications so that the UI
+   * can present the user with the necessary steps to complete the installation.
+   */
+  func sendIncompleteNotificationsIfNecessary() {
+    if !self.isInputMethodInstalled {
+      NotificationCenter.default.post(name: .inputMethodMissing, object: nil)
+    } else if !self.isInputMethodCurrent {
+      NotificationCenter.default.post(name: .inputMethodOutdated, object: nil)
+    } else {
+      if let state = self.installationState {
+        if state.isNew {
+          if !state.isComplete {
+            NotificationCenter.default.post(name: .newInstallation, object: nil)
+          }
+        } else if !state.isComplete {
+          NotificationCenter.default.post(name: .activeInstallation, object: nil)
+        }
+      }
+    }
   }
   
   /**
@@ -105,7 +167,7 @@ public class InstallationCheck {
   func prepareToRepair(newState: InstallationState) {
     self.defaultsRepository.writeInstallationState(newState.toUserDefaultsDictionary())
     self.installationState = newState
-    NotificationCenter.default.post(name: .installationRepairNeeded, object: newState)
+    NotificationCenter.default.post(name: .installationRepairEvaluated, object: newState)
   }
 
   /**
@@ -115,6 +177,7 @@ public class InstallationCheck {
    *  completed or
    *  in progress
    * 2. creating a new installation
+   * 
    */
   public func loadState() -> InstallationState? {
     var installationState: InstallationState

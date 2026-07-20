@@ -23,10 +23,22 @@ public class InstallationState {
   // this list of tasks that make up this installation
   public var tasks: Set<InstallationTask>
   
+  /**
+   * The installation is complete if all its tasks are complete.
+   * Returns true if the tasks list is empty, but it should never be empty.
+   */
   public var isComplete: Bool {
     tasks.allSatisfy(\.isComplete)
   }
-  
+
+  /**
+   * The installation is new if this is not a repair and no tasks are complete.
+   * Returns true if the tasks list is empty, but it should never be empty.
+   */
+  public var isNew: Bool {
+    return !isRepair && tasks.allSatisfy{ !$0.isComplete }
+  }
+
   init(version: String, dateRestartRequested: Date? = nil, isRepair: Bool = false, tasks: Set<InstallationTask>) {
     self.keymanVersion = version
     self.dateRestartRequested = dateRestartRequested

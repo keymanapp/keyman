@@ -77,6 +77,7 @@ struct InstallView: View {
       .padding()
     }
     .padding()
+//    .onReceive(NotificationCenter.default.publisher(for: .inputMethodMissing), perform: {_ in print("input method missing")})
   }
 }
 
