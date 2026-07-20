@@ -81,7 +81,6 @@ type
     procedure optWriteString(const nm, value: string);
     procedure optWriteBool(const nm: string; value: Boolean);
     procedure optWriteInt(const nm: string; value: Integer);
-    procedure WriteServerConfigurationJson;
     class function Get_Initial_DefaultProjectPath: string; static;
     function BackOffAndSaveJson(const Filename: string; const JSON: TJSONObject): Boolean;
   public
@@ -476,8 +475,6 @@ begin
   finally
     FreeAndNil(json);
   end;
-
-  WriteServerConfigurationJson;
 end;
 
 function TKeymanDeveloperOptions.BackOffAndSaveJson(const Filename: string; const JSON: TJSONObject): Boolean;
@@ -511,23 +508,6 @@ begin
     TKeymanSentryClient.Instance.ReportMessage('TKeymanDeveloperOptions: Failed to write '+Filename+' after '+IntToStr(Max_Retries)+' tries');
 
   Result := False;
-end;
-
-procedure TKeymanDeveloperOptions.WriteServerConfigurationJson;
-var
-  o: TJSONObject;
-begin
-  o := TJSONObject.Create;
-  try
-    o.AddPair('port', TJSONNumber.Create(FServerDefaultPort));
-    o.AddPair('ngrokToken', FServerNgrokToken);
-    o.AddPair('useNgrok', TJSONBool.Create(FServerUseNgrok));
-    o.AddPair('ngrokVisible', TJSONBool.Create(FServerServerShowConsoleWindow));
-    ForceDirectories(TKeymanDeveloperPaths.ServerDataPath);
-    BackOffAndSaveJSON(TKeymanDeveloperPaths.ServerDataPath + TKeymanDeveloperPaths.S_ServerConfigJson, o);
-  finally
-    o.Free;
-  end;
 end;
 
 procedure TKeymanDeveloperOptions.optWriteBool(const nm: string; value: Boolean);

@@ -58,3 +58,52 @@ typescript_run_eslint_mocha_tests() {
     echo "##teamcity[flowFinished flowId='unit_tests']"
   fi
 }
+
+#
+# Run api-extractor, preparing config files for each folder. As the config files
+# are largely identical for each project, we copy them in rather than
+# duplicating them across the repo (as that is hard to maintain over time)
+#
+# NOTE: this is setup only for Developer projects at this time as outputs go
+# into developer/docs and developer/build; future generalization requires
+# changing only report_temp and report_folder parameters.
+#
+# See also: /common/tools/api-extractor/README.md
+#
+typescript_run_api_extractor() {
+  project_path="$1"
+  index_d_ts="$2"
+
+  # tsdoc config file must be in same folder as tsconfig.json
+  cp "${KEYMAN_ROOT}/common/tools/api-extractor/tsdoc.template.json" "${THIS_SCRIPT_PATH}/tsdoc.json"
+
+  # api-extractor configuration must be stored in a file, so patch the
+  # file with the relevant parameters
+
+  if builder_is_windows; then
+    # replace \ with / on Windows in KEYMAN_ROOT path, so we don't end up with
+    # silly unescaped strings in JSON
+    keyman_root="$(echo "$KEYMAN_ROOT" | sed "s=\\\=/=g")"
+  else
+    keyman_root="${KEYMAN_ROOT}"
+  fi
+
+  # For now, these two variables are Developer-specific
+  report_temp="$keyman_root/developer/build/api"
+  report_folder="$keyman_root/developer/docs/api/etc"
+  export project_path index_d_ts keyman_root report_temp report_folder
+
+  envsubst "\$keyman_root,\$project_path,\$index_d_ts,\$report_temp,\$report_folder" \
+    < "${KEYMAN_ROOT}/common/tools/api-extractor/api-extractor.template.json" \
+    > "${THIS_SCRIPT_PATH}/api-extractor.json"
+
+  export -n project_path index_d_ts keyman_root report_temp report_folder
+
+  api-extractor run \
+    --local \
+    --verbose \
+    --config "${THIS_SCRIPT_PATH}/api-extractor.json"
+
+  rm "${THIS_SCRIPT_PATH}/tsdoc.json"
+  rm "${THIS_SCRIPT_PATH}/api-extractor.json"
+}

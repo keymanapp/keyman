@@ -11,14 +11,14 @@ declare global {
   }
 }
 
-const keymanweb=window.keyman;
+const keyman=window.keyman;
 
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
-if(!keymanweb) {
+if(!keyman) {
   throw new Error("`keyman` global is missing; Keyman Engine for Web script has not been loaded");
-} else if(!keymanweb.ui?.name) {
+} else if(!keyman.ui?.name) {
 
   /********************************/
   /*                              */
@@ -37,8 +37,8 @@ if(!keymanweb) {
 
   try {
     // Declare KeymanWeb, OnScreen keyboard and Util objects
-    const util=keymanweb.util;
-    // var dbg=keymanweb['debug'];
+    const util=keyman.util;
+    // var dbg=keyman['debug'];
 
     // Disable UI for touch devices
     if(util.isTouchDevice()) {
@@ -78,8 +78,8 @@ if(!keymanweb) {
        * Highlight the currently active keyboard in the list of keyboards
        **/
       private _ShowSelected() {
-        const kbd=keymanweb.getActiveKeyboard();
-        const lgc=keymanweb.getActiveLanguage();
+        const kbd=keyman.getActiveKeyboard();
+        const lgc=keyman.getActiveLanguage();
         const kList = this._KeymanWeb_KbdList.childNodes;
         const _r = /^KMWSel_(.*)\$(.*)$/;
 
@@ -135,13 +135,13 @@ if(!keymanweb) {
             _k.className='selected';
           }
           this._KMWSel = _k;
-          await keymanweb.setActiveKeyboard(_name,_lgc);
+          await keyman.setActiveKeyboard(_name,_lgc);
         } else {
           _name=null;
         }
 
-        keymanweb.focusLastActiveElement();
-        const osk = keymanweb.osk;
+        keyman.focusLastActiveElement();
+        const osk = keyman.osk;
         if(osk && osk.isEnabled()) {
           osk.show(true);
         }
@@ -156,17 +156,17 @@ if(!keymanweb) {
        * @param       {Event}    e     event
        */
       readonly _SelectorMouseDown = (e: MouseEvent) => {
-        const x=keymanweb.getLastActiveElement();
+        const x=keyman.getLastActiveElement();
 
         // Set the focus to an input field, to get correct OSK display behaviour
         if(!x) {
           this._FocusFirstInput();
         } else {
-          keymanweb.focusLastActiveElement();
+          keyman.focusLastActiveElement();
         }
 
-        if(keymanweb.activatingUI) {
-          keymanweb.activatingUI(1);
+        if(keyman.activatingUI) {
+          keyman.activatingUI(1);
         }
       }
 
@@ -176,13 +176,13 @@ if(!keymanweb) {
        * @param       {Event}    e     event
        */
       readonly _SelectorMouseUp = (e: MouseEvent) => {
-        const x=keymanweb.getLastActiveElement();
+        const x=keyman.getLastActiveElement();
 
         // Set the focus to an input field, to get correct OSK display behaviour
         if(!x) {
           this._FocusFirstInput();
         } else {
-          keymanweb.focusLastActiveElement();
+          keyman.focusLastActiveElement();
         }
       }
 
@@ -195,8 +195,8 @@ if(!keymanweb) {
         // highlight the currently active keyboard
         this._ShowSelected();
 
-        if(keymanweb.activatingUI) {
-          keymanweb.activatingUI(1);
+        if(keyman.activatingUI) {
+          keyman.activatingUI(1);
         }
 
         document.getElementById("kmwico_li").className="sfhover";
@@ -253,8 +253,8 @@ if(!keymanweb) {
        * @param       {Event}    e     event
        */
       private readonly _SelectorMouseOut = (e: MouseEvent) => {
-        if(keymanweb.activatingUI) {
-          keymanweb.activatingUI(0);
+        if(keyman.activatingUI) {
+          keyman.activatingUI(0);
         }
         document.getElementById("kmwico_li").className="sfunhover";
       }
@@ -265,24 +265,24 @@ if(!keymanweb) {
        * @param       {?string=}  _name     current keyboard name
        */
       private _ShowKeyboardButton(_name?: string) {
-        let kbdName = keymanweb.getActiveKeyboard();
+        let kbdName = keyman.getActiveKeyboard();
         const kbdId = document.getElementById("KMW_Keyboard");
         if(arguments.length > 0) {
           kbdName = _name;
         }
 
         if(kbdId) {
-          if((kbdName == '') || keymanweb.isCJK()) {
+          if((kbdName == '') || keyman.isCJK()) {
             kbdId.className='kmw_disabled';
           } else {
-            const osk = keymanweb.osk;
+            const osk = keyman.osk;
             kbdId.className = osk && osk.isEnabled() ? 'kmw_show' : 'kmw_hide';
           }
         }
       }
 
       registerEvents() {
-        const osk = keymanweb.osk;
+        const osk = keyman.osk;
         if(!osk) {
           return;
         }
@@ -290,7 +290,7 @@ if(!keymanweb) {
          * UI Functions called by KeymanWeb or OSK
          */
         osk.addEventListener('show', (oskPosition) => {
-          const t=keymanweb.getLastActiveElement();
+          const t=keyman.getLastActiveElement();
           if(t) {
             if(!oskPosition['userLocated']) {
               oskPosition['x'] = util.getAbsoluteX(t);
@@ -321,7 +321,7 @@ if(!keymanweb) {
        **/
       readonly _ShowKeymanWebKeyboard = () => {
         const kbdId=document.getElementById("KMW_Keyboard");
-        const osk = keymanweb.osk;
+        const osk = keyman.osk;
 
         if((kbdId.className!='kmw_disabled') && osk && osk.show) {
           if(osk.isEnabled()) {
@@ -334,7 +334,7 @@ if(!keymanweb) {
           window.event.returnValue=false;
         }
 
-        keymanweb.focusLastActiveElement();
+        keyman.focusLastActiveElement();
         return false;
       }
 
@@ -348,7 +348,7 @@ if(!keymanweb) {
         }
 
         //Never initialize UI before KMW (parameters will be undefined)
-        if(!keymanweb.initialized) {
+        if(!keyman.initialized) {
           this.initTimer = window.setTimeout(this.initialize, 50);
           return;
         }
@@ -417,7 +417,7 @@ if(!keymanweb) {
         // Even tag `release-web-stable-2.0` turns up results only for this specific sourcefile.
         // Thus, in essence:  if(true) { /* ... */ }
         // @ts-ignore
-        if(!keymanweb['iOS']) {
+        if(!keyman['iOS']) {
           const _li = util.createElement('li');
           const _a = util.createElement('a');
           const _img = util.createElement('img');
@@ -468,7 +468,7 @@ if(!keymanweb) {
         util.attachDOMEvent(_sfEl,'mouseup',this._SelectorMouseUp);
 
         this.registerEvents();
-        keymanweb.focusLastActiveElement();  	//TODO: this needs to be extended - if no element is active, try and identify an enabled input element
+        keyman.focusLastActiveElement();  	//TODO: this needs to be extended - if no element is active, try and identify an enabled input element
       }
 
       shutdown() {
@@ -493,7 +493,7 @@ if(!keymanweb) {
           this._KeymanWeb_KbdList.removeChild(this._KeymanWeb_KbdList.childNodes[i-1]);
         }
 
-        const kbds=keymanweb.getKeyboards();
+        const kbds=keyman.getKeyboards();
         if(kbds.length > 0) {
           for(let i:number=0; i<kbds.length; i++) {
             this.registerKeyboard(
@@ -659,7 +659,7 @@ if(!keymanweb) {
 `
     }
 
-    const ui = keymanweb.ui = new UIButton();
+    const ui = keyman.ui = new UIButton();
 
     /**
      * Keyboard registration event handler
@@ -667,7 +667,7 @@ if(!keymanweb) {
      * Set a timer to update the UI keyboard list on timeout after each keyboard is registered,
      * thus updating only once when only if multiple keyboards are registered together
      */
-    keymanweb.addEventListener('keyboardregistered', function(p) {
+    keyman.addEventListener('keyboardregistered', function(p) {
       ui.updateList = true;
       if(ui.updateTimer) {
         clearTimeout(ui.updateTimer);
