@@ -32,6 +32,7 @@ free to propose changes to this document in a pull request.
 [Style Guides](#style-guides)
   * [Principles of Keyman Code Changes](#principles-of-keyman-code-changes)
   * [Pull Request and Commit Workflow](#pull-request-and-commit-workflow)
+  * [Large Language Model usage policy](#large-language-model-usage-policy)
   * [Code Style Guide](#code-style-guide)
   * [User Testing](#user-testing)
   * [Documentation Style Guide](#documentation-style-guide)
@@ -310,6 +311,10 @@ We can review your pull request faster if you follow these guidelines:
 
 * [Pull Request and Commit workflow
   wiki](https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes)
+
+### Large Language Model usage policy
+
+* [LLM Usage Policy](docs/policies/llm-usage-policy.md)
 
 ### Code Style Guide
 
