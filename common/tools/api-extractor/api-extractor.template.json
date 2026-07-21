@@ -1,0 +1,15 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
+  "extends": "$keyman_root/common/tools/api-extractor/api-extractor.base.json",
+  "mainEntryPointFilePath": "<projectFolder>/build/src/$index_d_ts",
+  "docModel": {
+    "enabled": true,
+    "projectFolderUrl": "http://github.com/keymanapp/keyman/tree/master/$project_path",
+    "apiJsonFilePath": "$report_temp/<unscopedPackageName>.api.json"
+  },
+  "apiReport": {
+    "enabled": true,
+    "reportFolder": "$report_folder/",
+    "reportTempFolder": "$report_temp/"
+  }
+}
