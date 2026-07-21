@@ -2328,7 +2328,8 @@ builder_describe_platform() {
   # Detect delphi compiler (see also delphi_environment.inc.sh)
   if builder_is_windows; then
     local ProgramFilesx86="$(cygpath -w -F 42)"
-    if [[ -x "$(cygpath -u "$ProgramFilesx86\\Embarcadero\\Studio\\20.0\\bin\\dcc32.exe")" ]]; then
+    local _delphi_version="${KEYMAN_DELPHI_VERSION:-20.0}"
+    if [[ -x "$(cygpath -u "$ProgramFilesx86\\Embarcadero\\Studio\\$_delphi_version\\bin\\dcc32.exe")" ]]; then
       builder_installed_tools+=(delphi)
     fi
   fi

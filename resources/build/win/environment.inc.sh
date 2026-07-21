@@ -99,7 +99,44 @@ tds2dbg() {
   builder_if_release_build_level "$TDS2DBG" "$@"
 }
 
+# Detect Delphi Community Edition by probing dcc32. Cached per shell.
+# Sets _KEYMAN_DELPHI_IS_CE=1 if the installed Delphi refuses CLI compilation,
+# leaves it empty otherwise (Pro/Enterprise, or no Delphi at all).
+_KEYMAN_DELPHI_CE_PROBED=""
+_KEYMAN_DELPHI_IS_CE=""
+_probe_delphi_ce() {
+  [[ -n "$_KEYMAN_DELPHI_CE_PROBED" ]] && return
+  _KEYMAN_DELPHI_CE_PROBED=1
+  local version dcc32 output
+  version="${KEYMAN_DELPHI_VERSION:-20.0}"
+  dcc32="$(cygpath -u "$ProgramFilesx86\\Embarcadero\\Studio\\$version\\bin\\dcc32.exe")"
+  [[ -x "$dcc32" ]] || return
+  # dcc32.exe on CE prints "This version of the product does not support command
+  # line compiling." and exits non-zero. On Pro/Enterprise it accepts args.
+  output="$("$dcc32" 2>&1 || true)"
+  if [[ "$output" == *"does not support command line compiling"* ]]; then
+    _KEYMAN_DELPHI_IS_CE=1
+  fi
+}
+
 delphi_msbuild() {
+  # When KEYMAN_DELPHI_CE=1 the Delphi Community Edition blocks CLI
+  # compilation. Pause and prompt the developer to build in the IDE.
+  if [[ "${KEYMAN_DELPHI_CE:-}" == "1" ]]; then
+    local project="${1:-<project.dproj>}"
+    builder_echo warning "Delphi CE: CLI compilation is not available."
+    builder_echo warning "Please build ${project} in the Delphi IDE now, then press Enter to continue (or Ctrl-C to abort)."
+    read -r _
+    return 0
+  fi
+  # Guard: if the developer is on CE but forgot to set KEYMAN_DELPHI_CE=1,
+  # msbuild.exe below silently reports "Build succeeded" without producing any
+  # output, and downstream cp/mv/mt.exe/sentrytool then fail with confusing
+  # "file not found" errors. Detect and fail loudly instead.
+  _probe_delphi_ce
+  if [[ "$_KEYMAN_DELPHI_IS_CE" == "1" ]]; then
+    builder_die "Delphi Community Edition detected at Studio\\${KEYMAN_DELPHI_VERSION:-20.0}\\ but KEYMAN_DELPHI_CE is not set. CE blocks CLI compilation; msbuild would fake a success with no output. Run: export KEYMAN_DELPHI_CE=1 (see docs/build/windows-delphi-ce.md)."
+  fi
   run_in_delphi_env msbuild.exe "$@" "$DELPHI_MSBUILD_FLAG_DEBUG"
 }
 

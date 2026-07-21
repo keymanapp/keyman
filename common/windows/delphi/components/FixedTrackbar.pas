@@ -64,13 +64,19 @@ end;
 
   Tested on VER320 (10.2)
   Tested on VER330 (10.3) - 29 Oct 2019 - mcdurdin
+  Not yet fully verified against Vcl.Grids.pas in VER350 (11) or VER360 (12);
+  IFNDEF arms added to unblock compilation, override behaviour retained as-is.
 }
 
 {$IFNDEF VER340}
 {$MESSAGE WARN 'Not yet checked against Delphi 10.4'}
 {$IFNDEF VER330}
 {$IFNDEF VER320}
+{$IFNDEF VER350}
+{$IFNDEF VER360}
 {$MESSAGE ERROR 'Check that this fix is still applicable for a new version of Delphi. Checked against Delphi 10.2, 10.3' }
+{$ENDIF}
+{$ENDIF}
 {$ENDIF}
 {$ENDIF}
 {$ENDIF}

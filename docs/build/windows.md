@@ -184,8 +184,8 @@ In bash, run the following commands:
 cd /c/Projects/keyman
 git clone https://github.com/emscripten-core/emsdk
 cd emsdk
-emsdk install 3.1.58
-emsdk activate 3.1.58
+emsdk install 3.1.64
+emsdk activate 3.1.64
 cd upstream/emscripten
 npm install
 ```
@@ -195,8 +195,8 @@ If you are updating an existing install of Emscripten:
 ```bash
 cd emsdk
 git pull
-emsdk install 3.1.58
-emsdk activate 3.1.58
+emsdk install 3.1.64
+emsdk activate 3.1.64
 cd upstream/emscripten
 npm install
 ```
@@ -256,6 +256,17 @@ of appropriate node versions during builds.
     only really use the Professional Edition, which can be used on a trial basis
     for a short time. (We are actively working to remove Delphi dependencies
     given the licensing issues with using it.)
+
+  * If you have Delphi 11 or 12 with a CLI-capable license (Professional or
+    higher), set `KEYMAN_DELPHI_VERSION` to the Studio path — `22.0` for
+    Delphi 11, `23.0` for Delphi 12 — before running `build.sh`. The default
+    (`20.0`, Delphi 10.3) is preserved when the variable is unset.
+
+  * If you only have access to a **Delphi Community Edition** (e.g. Delphi 12 CE),
+    see [windows-delphi-ce.md](windows-delphi-ce.md) for an IDE-based workflow
+    that papers over the missing command-line compiler. The shell-script knob
+    (`KEYMAN_DELPHI_CE=1`) described there is local-only and not required for
+    the standard 10.3 / Pro flow.
 
   Start Delphi IDE once after installation as it will create various environment
   files and take you through required registration.
