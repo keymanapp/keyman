@@ -1,3 +1,13 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton (date of creation lost)
+ *
+ * This file provides the main interface between the worker and the lexical
+ * model or models in active use, providing methods for text-prediction,
+ * application of suggestions, and reversion of previously-applied suggestions.
+ */
+
 import * as models from '@keymanapp/models-templates';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
@@ -239,8 +249,8 @@ export class ModelCompositor {
     // Step 1:  re-use the original input Transform as the reversion's Transform.
     // The Web engine will restore the original state of the context before accepting
     // and before reverting; all we need to do is put the original keystroke back in place.
-    let reversionTransform: Transform = originalInput 
-      ? { ...originalInput } 
+    let reversionTransform: Transform = originalInput
+      ? { ...originalInput }
       : { insert: '', deleteLeft: 0, id: suggestion.transform.id };
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
