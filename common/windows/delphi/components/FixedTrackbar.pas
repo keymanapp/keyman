@@ -64,16 +64,16 @@ end;
 
   Tested on VER320 (10.2)
   Tested on VER330 (10.3) - 29 Oct 2019 - mcdurdin
+  TODO: Not yet fully verified against Vcl.Grids.pas in VER350 (11) or VER360 (12)
 }
 
-{$IFNDEF VER340}
-{$MESSAGE WARN 'Not yet checked against Delphi 10.4'}
-{$IFNDEF VER330}
-{$IFNDEF VER320}
+{$IF Defined(VER340) or Defined(VER350) or Defined(VER360)}
+{$MESSAGE WARN 'TODO: Trackbar scrolling on bottom cell not yet checked against Delphi 10.4, 11.0 or 12.0'}
+{$ELSEIF Defined(VER320) or Defined(VER330)}
+// Tested on Delphi 10.2 (VER320) and 10.3 (VER330)
+{$ELSE}
 {$MESSAGE ERROR 'Check that this fix is still applicable for a new version of Delphi. Checked against Delphi 10.2, 10.3' }
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
+{$IFEND}
 
 procedure TTntFixedDrawGrid.MouseDown(Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
