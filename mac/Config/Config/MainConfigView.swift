@@ -4,7 +4,7 @@
  * Created by Gabriel Schantz on 2026-06-29
  *
  * Main view used for configuring Keyman
- * TODO: Finish writing file summary
+ * FEAT/MAC/CONFIG-WINDOW TODO: Finish writing file summary
  */
 
 import SwiftUI
@@ -13,8 +13,8 @@ import KeymanSettings
 struct MainConfigView: View {
   @EnvironmentObject var settings: SettingsContainer
   @State private var isShowingSheet = false
-  @State private var selectedPackage: KeymanPackage?
   @State private var isShowingAlert = false
+  @State private var selectedPackage: KeymanPackage?
     
   private func showAlert(for package: KeymanPackage) -> Void {
     isShowingAlert = true
@@ -40,7 +40,7 @@ struct MainConfigView: View {
     List(Array(zip(settings.singleKeyboardPackages.indices, settings.singleKeyboardPackages)), id: \.1.id) { index, package in
       ForEach(package.keyboards) { keyboard in
         DisclosureGroup {
-          Text("Keyboard Info Goes Here")
+          KeyboardInfoView(for: package)
         } label: {
           HStack {
             
@@ -49,11 +49,11 @@ struct MainConfigView: View {
 
             Spacer()
 
-            // view keyboard info button
-            PackageButtonView(action: { print("View info") }, label: "View info", systemImage: "info.circle", helpText: "View info")
+            // see keyboard help button
+            IconButtonView(action: { print("See help") }, label: "See help", systemImage: "questionmark.circle", helpText: "See help")
 
             // delete keyboard button
-            PackageButtonView(action: { showAlert(for: package) }, label: "Delete keyboard", systemImage: "trash", helpText: "Delete keyboard")
+            IconButtonView(action: { showAlert(for: package) }, label: "Delete keyboard", systemImage: "trash", helpText: "Delete keyboard")
           }
         }
       }
