@@ -10,8 +10,14 @@ import SwiftUI
 import Combine
 import KeymanSettings
 
+// in-app notifications sent
 public extension Notification.Name {
-  static let installationRepairNeeded = Notification.Name("com.keyman.installation.repair.needed")
+  static let inputMethodMissing = Notification.Name("input.method.missing")
+  static let inputMethodOutdated = Notification.Name("input.method.outdated")
+  static let newInstallation = Notification.Name("new.installation")
+  static let activeInstallation = Notification.Name("active.installation")
+  static let installationRepairEvaluated = Notification.Name("installation.repair.evaluated")
+  static let installationRepairNeeded = Notification.Name("installation.repair.needed")
 }
 
 @MainActor // run on the main actor since data is published directly to the UI
@@ -23,6 +29,10 @@ public class InstallationContainer : ObservableObject {
   public var isCurrentInputMethodInstalled : Bool {
     isInputMethodInstalled && isInputMethodCurrent
   }
+  public var installationPhase: InstallationPhase {
+    return self.installationCheck.installationPhase
+  }
+  
   // installationState describes the remaining tasks to complete the installation
   @Published public var installationState: InstallationState?
 
@@ -54,7 +64,7 @@ public class InstallationContainer : ObservableObject {
     self.isInputMethodInstalled = self.installationCheck.isInputMethodInstalled
     self.isInputMethodCurrent = self.installationCheck.isInputMethodCurrent
     self.installationState = self.installationCheck.installationState
-
+    
     self.registerObservers()
   }
 
@@ -67,20 +77,25 @@ public class InstallationContainer : ObservableObject {
     print("InstallationContainer registerObservers")
     NotificationCenter.default.addObserver(
       self,
-      selector: #selector(self.handleRepairNeeded(_:)),
-      name: NSNotification.Name.installationRepairNeeded,
+      selector: #selector(self.handleRepairDetermined(_:)),
+      name: NSNotification.Name.installationRepairEvaluated,
       object: nil // Observe notifications from any sender
     )
   }
 
   /**
-   * called when `NSNotification.Name.installationRepairNeeded` is received
+   * called when `NSNotification.Name.installationRepairEvaluated` is received
    */
-  @objc func handleRepairNeeded(_ notification: Notification) {
-    print("handleRepairNeeded")
+  @objc func handleRepairDetermined(_ notification: Notification) {
+    print("handleRepairDetermined")
     // Extract message from the notification if available
     if let newState = notification.object as? InstallationState {
       self.installationState = newState
+      
+      // now that the repair has been determined, we can notify that a repair is needed
+      // so that the repair UI can presented to the user
+      
+      NotificationCenter.default.post(name: .installationRepairNeeded, object: nil, userInfo: nil)
     } else {
       print("handleRepairNeeded received but did not include new InstallationState")
     }
@@ -229,6 +244,7 @@ public class InstallationContainer : ObservableObject {
     return hasRestarted
   }
   
+  // MAC-CONFIG-TODO: delete test code
   /**
    * for testing purposes, replace the InstallationState with a new object set for a new installation
    */
