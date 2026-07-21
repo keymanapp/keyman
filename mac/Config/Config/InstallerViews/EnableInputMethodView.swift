@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct EnableInputMethodView: View {
-  @Binding var currentPage: NewInstallView.InstallPage
   @EnvironmentObject var installation: InstallationContainer
   let namespace: Namespace.ID
   
@@ -60,7 +59,7 @@ struct EnableInputMethodView: View {
         .tint(.blue)
         .clipShape(Capsule())
 
-        ContinueButton(currentPage: $currentPage, nextPage: .allowSecurityPermission)
+        ContinueButton()
       }
     }
   }

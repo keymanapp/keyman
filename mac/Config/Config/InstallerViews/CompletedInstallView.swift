@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct CompletedInstallView: View {
-  @Binding var currentPage: NewInstallView.InstallPage
   @EnvironmentObject var installation: InstallationContainer
   @Environment(\.dismiss) private var dismiss
   let namespace: Namespace.ID
@@ -43,7 +42,7 @@ struct CompletedInstallView: View {
 
           .frame(maxWidth: .infinity, alignment: .leading)
         
-        ContinueButton(currentPage: $currentPage, nextPage: .initial)
+        ContinueButton()
       }
     }
   }

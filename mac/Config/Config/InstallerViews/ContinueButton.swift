@@ -6,21 +6,22 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ContinueButton: View {
-  @Binding var currentPage: NewInstallView.InstallPage
-  var nextPage : NewInstallView.InstallPage
-  
     var body: some View {
-      Button {
-          withAnimation(.smooth(duration: 0.5)) {
-              currentPage = nextPage
-          }
-      } label: {
-          Text("Continue")
-              .padding(.horizontal, 16)
-              .padding(.vertical, 4)
-      }
-      .clipShape(Capsule())
+        Button {
+          NotificationCenter.default.post(name: Notification.Name("advancePage"), object: nil)
+          
+        } label: {
+            Text("Continue")
+                .padding(.horizontal, 16)
+                .padding(.vertical, 4)
+        }
+        .clipShape(Capsule())
     }
+}
+
+extension Notification.Name {
+    static let advancePage = Notification.Name("advancePage")
 }
