@@ -3,13 +3,13 @@
  *
  * Created by Gabriel Schantz on 2026-07-03
  *
- * Extracted views used to compose smaller views in MainConfigView
- * TODO: Finish writing file summary
+ * View for icon buttons
+ * FEAT/MAC/CONFIG-WINDOW TODO: Finish writing file summary
  */
 
 import SwiftUI
 
-public struct PackageButtonView: View {
+public struct IconButtonView: View {
   let action: () -> Void
   let label: String
   let systemImage: String
@@ -27,7 +27,7 @@ public struct PackageButtonView: View {
     .buttonStyle(.bordered)
     .clipShape(.circle)
     .contentShape(Capsule())
-    // feat/mac/config-window TODO: Decide proper help text for usages of PackageButtonView...
+    // FEAT/MAC/CONFIG-WINDOW TODO: Decide proper help text for usages of PackageButtonView...
     .help(helpText)
     
   }
