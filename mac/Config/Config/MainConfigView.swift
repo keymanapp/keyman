@@ -15,7 +15,10 @@ struct MainConfigView: View {
   @State private var isShowingSheet = false
   @State private var isShowingAlert = false
   @State private var selectedPackage: KeymanPackage?
-    
+   
+  /**
+   * Sets isShowingAlert to true and assigns the state variable selectedPackage the KeymanPackage passed in as a parameter
+   */
   private func showAlert(for package: KeymanPackage) -> Void {
     isShowingAlert = true
     selectedPackage = package
@@ -37,7 +40,7 @@ struct MainConfigView: View {
       // FEAT/MAC/CONFIG-WINDOW TODO: Make width and height percentages
     }
     
-    List(Array(zip(settings.singleKeyboardPackages.indices, settings.singleKeyboardPackages)), id: \.1.id) { index, package in
+    List(settings.singleKeyboardPackages, id: \.id) { package in
       ForEach(package.keyboards) { keyboard in
         DisclosureGroup {
           KeyboardInfoView(for: package)
@@ -58,7 +61,6 @@ struct MainConfigView: View {
         }
       }
     }
-    // FEAT?/MAC/CONFIG-WINDOW TODO: Make the alert title display the keyboard name
     .alert("Are you sure you want to delete the keyboard \"\(selectedPackage?.packageName ?? "")\"?",
              isPresented: $isShowingAlert,
              presenting: selectedPackage) { package in
