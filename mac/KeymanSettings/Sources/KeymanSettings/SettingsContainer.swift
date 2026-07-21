@@ -299,9 +299,9 @@ public class SettingsContainer : ObservableObject {
   /**
    * find the installed package with the specified UUID
    */
-  public func findInstalledPackage(with packageId: UUID) -> KeymanPackage? {
-    guard let package = self.installedPackages.first(where: { $0.id == packageId }) else {
-      print ("Error: could not find package with ID: \(packageId)")
+  public func findInstalledPackage(with id: UUID) -> KeymanPackage? {
+    guard let package = self.installedPackages.first(where: { $0.id == id }) else {
+      print ("Error: could not find package with UUID: \(id)")
       return nil
     }
     
@@ -321,19 +321,15 @@ public class SettingsContainer : ObservableObject {
   }
 
   /**
-   * remove/uninstall the package at the specified index
+   * remove/uninstall the package with the specified UUID
    */
-  public func removeSingleKeyboardPackage(at index: Int) {
-    let package = self.singleKeyboardPackages[index]
-    self.removeInstalledPackage(package: package)
-  }
-  
-  /**
-   * remove/uninstall the package at the specified index
-   */
-  public func removeMultipleKeyboardPackage(at index: Int) {
-    let package = self.multiKeyboardPackages[index]
-    self.removeInstalledPackage(package: package)
+  public func removeInstalledPackage(with id: UUID) {
+    
+    if let package = findInstalledPackage(with: id) {
+      self.removeInstalledPackage(package: package)
+    } else {
+      print("could not find package with id: \(id)")
+    }
   }
 
   /**
