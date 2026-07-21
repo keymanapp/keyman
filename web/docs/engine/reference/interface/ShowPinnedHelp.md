@@ -9,10 +9,10 @@ Shows the on-screen keyboard and locks it at the resulting location.
 ## Syntax
 
 ```js
-keyman.interface.ShowPinnedHelp(x, y);
-keyman.interface.showPinnedHelp(x, y);
-KeymanWeb.ShowPinnedHelp(x, y);
-KeymanWeb.showPinnedHelp(x, y);
+keyman.interface.ShowPinnedHelp();
+keyman.interface.showPinnedHelp();
+KeymanWeb.ShowPinnedHelp();
+KeymanWeb.showPinnedHelp();
 ```
 
 ### Parameters

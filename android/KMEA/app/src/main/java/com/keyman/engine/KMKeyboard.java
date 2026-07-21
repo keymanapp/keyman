@@ -84,7 +84,7 @@ final class KMKeyboard extends WebView {
    */
   protected static KMManager.BannerType currentBanner = KMManager.BannerType.HTML;
 
-  private static String txtFontPath = "";
+  private static String textFontPath = "";
   private static String oskFontPath = "";
   private final String fontUndefined = "undefined";
   private GestureDetector gestureDetector;
@@ -310,7 +310,7 @@ final class KMKeyboard extends WebView {
           // This duplicates the sendKMWError message, which itself duplicates the reporting now
           // managed by sentry-manager on the js side in patch in #6890. It does not give us
           // additional useful information. So we don't re-send to Sentry.
-          sendError(packageID, keyboardID, "", false);
+          sendError(packageID, keyboardID, "", null);
         }
 
         return true;
@@ -549,7 +549,7 @@ final class KMKeyboard extends WebView {
    * @return String
    */
   public static String textFontFilename() {
-    return txtFontPath;
+    return textFontPath;
   }
 
   /**
@@ -601,7 +601,11 @@ final class KMKeyboard extends WebView {
     }
 
     if (!KMManager.shouldAllowSetKeyboard() || kbInfo == null) {
-      sendError(packageID, keyboardID, languageID, true);
+      if(!KMManager.shouldAllowSetKeyboard()) {
+        sendError(packageID, keyboardID, languageID, "setKeyboard.short failed with shouldAllowSetKeyboard == false");
+      } else {
+        sendError(packageID, keyboardID, languageID, "setKeyboard.short failed with kbInfo == null");
+      }
       kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       retVal = false;
     } else {
@@ -632,7 +636,7 @@ final class KMKeyboard extends WebView {
 
     if (!KMManager.shouldAllowSetKeyboard() ||
         (packageID.equals(KMManager.KMDefault_UndefinedPackageID) && keyboardVersion == null)) {
-      sendError(packageID, keyboardID, languageID, true);
+      sendError(packageID, keyboardID, languageID, "prepareKeyboardSwitch");
       Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       packageID = kbInfo.getPackageID();
       keyboardID = kbInfo.getKeyboardID();
@@ -660,15 +664,15 @@ final class KMKeyboard extends WebView {
   }
 
   public boolean setKeyboard(String packageID, String keyboardID, String languageID,
-                             String keyboardName, String languageName, String kFont,
-                             String kOskFont) {
+                             String keyboardName, String languageName, String textFontFilename,
+                             String oskFontFilename) {
     return setKeyboard(packageID, keyboardID, languageID, keyboardName, languageName,
-                       kFont, kOskFont, null);
+                       textFontFilename, oskFontFilename, null);
   }
 
   public boolean setKeyboard(String packageID, String keyboardID, String languageID,
-                             String keyboardName, String languageName, String kFont,
-                             String kOskFont, String displayName) {
+                             String keyboardName, String languageName, String textFontFilename,
+                             String oskFontFilename, String displayName) {
     if (packageID == null || keyboardID == null || languageID == null || keyboardName == null || languageName == null) {
       return false;
     }
@@ -684,15 +688,19 @@ final class KMKeyboard extends WebView {
 
     if (!KMManager.shouldAllowSetKeyboard() ||
         (packageID.equals(KMManager.KMDefault_UndefinedPackageID) && keyboardVersion == null)) {
-      sendError(packageID, keyboardID, languageID, true);
+      if(!KMManager.shouldAllowSetKeyboard()) {
+        sendError(packageID, keyboardID, languageID, "setKeyboard.full failed with shouldAllowSetKeyboard == false");
+      } else {
+        sendError(packageID, keyboardID, languageID, "setKeyboard.full failed with packageID == KMDefault_UndefinedPackageID and keyboardVersion == null");
+      }
       Keyboard kbInfo = KeyboardController.getInstance().getKeyboardInfo(0);
       packageID = kbInfo.getPackageID();
       keyboardID = kbInfo.getKeyboardID();
       languageID = kbInfo.getLanguageID();
       keyboardName = kbInfo.getKeyboardName();
       languageName = kbInfo.getLanguageName();
-      kFont = kbInfo.getFont();
-      kOskFont = kbInfo.getOSKFont();
+      textFontFilename = kbInfo.getFont();
+      oskFontFilename = kbInfo.getOSKFont();
       retVal = false;
 
       // Keyboard changed, so determine version again
@@ -700,14 +708,14 @@ final class KMKeyboard extends WebView {
         KMManager.getLatestKeyboardFileVersion(getContext(), packageID, keyboardID) : null;
     }
 
-    if(kOskFont == null || kOskFont.isEmpty())
-      kOskFont = kFont;
+    if(oskFontFilename == null || oskFontFilename.isEmpty())
+      oskFontFilename = textFontFilename;
 
-    JSONObject jDisplayFont = makeFontObject(kFont, packageID);
-    JSONObject jOskFont = makeFontObject(kOskFont, packageID);
+    JSONObject textFont = makeFontObject(textFontFilename, packageID);
+    JSONObject oskFont = makeFontObject(oskFontFilename, packageID);
 
-    txtFontPath = getFontFilename(kFont, packageID);
-    oskFontPath = getFontFilename(kOskFont, packageID);
+    textFontPath = getFontFilename(textFontFilename, packageID);
+    oskFontPath = getFontFilename(oskFontFilename, packageID);
 
     String kbKey = KMString.format("%s_%s", languageID, keyboardID);
 
@@ -722,8 +730,8 @@ final class KMKeyboard extends WebView {
       reg.put("KF", keyboardUrl);
       reg.put("KP", packageID);
 
-      if (jDisplayFont != null) reg.put("KFont", jDisplayFont);
-      if (jOskFont != null) reg.put("KOskFont", jOskFont);
+      if (textFont != null) reg.put("KFont", textFont);
+      if (oskFont != null) reg.put("KOskFont", oskFont);
       if (displayName != null) reg.put("displayName", displayName);
     } catch(JSONException e) {
       KMLog.LogException(TAG, "", e);
@@ -780,26 +788,24 @@ final class KMKeyboard extends WebView {
   }
 
   public boolean getChirality() {
-
     return this.isChiral;
-
   }
 
-  // Display localized Toast notification that keyboard selection failed, so loading default keyboard.
-  // Also sends a message to Sentry (not localized)
-  private void sendError(String packageID, String keyboardID, String languageID, boolean reportToSentry) {
+  /**
+   * Display localized Toast notification that keyboard selection failed, so
+   * loading default keyboard. Also sends a message to Sentry (not localized)
+   */
+  private void sendError(String packageID, String keyboardID, String languageID, String sentryMessage) {
     this.currentKeyboardErrorReports++;
 
     if(this.currentKeyboardErrorReports == 1) {
-      BaseActivity.makeToast(context, R.string.fatal_keyboard_error_short, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
+      BaseActivity.makeToast(context, R.string.fatal_keyboard_error, Toast.LENGTH_LONG, packageID, keyboardID, languageID);
     }
 
-    if(this.currentKeyboardErrorReports < 5 && DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled() && reportToSentry) {
-      // We'll only report up to 5 errors in a given keyboard to avoid spamming
-      // errors and using unnecessary bandwidth doing so
-      // Don't use localized string R.string.fatal_keyboard_error msg for Sentry
-      String msg = KMString.format("Error in keyboard %1$s:%2$s for %3$s language.",
-        packageID, keyboardID, languageID);
+    if(this.currentKeyboardErrorReports < 5 && sentryMessage != null && DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+      // We'll only report up to 5 errors in a given keyboard to avoid spamming errors and using unnecessary bandwidth doing so
+      String msg = KMString.format("Script error in keyboard webview\nContext: %4$s\nActive package: %1$s\nActive keyboard: %2$s\nActive language: %3$s",
+        packageID, keyboardID, languageID, sentryMessage);
       Sentry.captureMessage(msg);
     }
   }
@@ -926,22 +932,22 @@ final class KMKeyboard extends WebView {
 
   /**
    * Return the full path to the font file. If the font is invalid, return empty string.
-   * @param font String - Font filename
+   * @param fontFilename String - Font filename
    * @param packageID String - Package ID
-   * @return String - Full path to the font file. If font is invalid, return "".
+   * @return String - Full path to the font file. If fontFilename is invalid, return "".
    */
-  private String getFontFilename(String font, String packageID) {
-    if(font == null || font.equals("")) {
+  private String getFontFilename(String fontFilename, String packageID) {
+    if(fontFilename == null || fontFilename.equals("")) {
       return "";
     }
 
-    if (!FileUtils.hasFontExtension(font)) {
+    if (!FileUtils.hasFontExtension(fontFilename)) {
       // QUESTION: do we log this?
       return "";
     }
 
-    String fontRoot = KMManager.isDefaultFont(font) ? getDataRootPath() : getPackageRootPath(packageID);
-    return fontRoot + font;
+    String fontRoot = KMManager.isDefaultFont(fontFilename) ? getDataRootPath() : getPackageRootPath(packageID);
+    return fontRoot + fontFilename;
   }
 
   @SuppressLint("InflateParams")
