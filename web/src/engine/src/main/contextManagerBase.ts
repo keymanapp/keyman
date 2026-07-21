@@ -365,7 +365,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
         const completionPromise = new ManagedPromise<Error>();
         this.emit('keyboardasyncload', requestedStub, completionPromise.corePromise);
 
-        const keyboardPromise = this.keyboardCache.fetchKeyboardForStub(requestedStub);
+        const keyboardPromise = this.keyboardCache.fetchKeyboard(requestedStub.KI);
         const timeoutPromise = new Promise<Keyboard>((resolve, reject) => {
           const timeoutMsg = `Sorry, the ${requestedStub.name} keyboard for ${requestedStub.langName} is not currently available.`;
           window.setTimeout(() => reject(new Error(timeoutMsg)), ContextManagerBase.TIMEOUT_THRESHOLD);
