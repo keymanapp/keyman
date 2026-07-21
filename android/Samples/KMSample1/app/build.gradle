@@ -2,6 +2,9 @@ plugins {
     id 'com.android.application'
 }
 
+ext.rootPath = '../../../'
+apply from: "$rootPath/version.gradle"
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
@@ -17,13 +20,22 @@ android {
         noCompress "kmp"
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId "com.keyman.kmsample1"
         minSdkVersion 21
         targetSdkVersion 35
-        versionCode 1
-        versionName "1.0"
+
+        // KEYMAN_VERSION_CODE, KEYMAN_VERSION_NAME, KEYMAN_VERSION_FOR_FILENAME from version.gradle
+        versionCode KEYMAN_VERSION_CODE as Integer
+        versionName KEYMAN_VERSION_NAME
+        buildConfigField "String", "KEYMAN_VERSION_ENVIRONMENT", "\""+KEYMAN_VERSION_ENVIRONMENT+"\""
+        archivesBaseName = "KMSample1-$KEYMAN_VERSION_FOR_FILENAME"
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -40,7 +52,6 @@ android {
 
 repositories {
     google()
-
 }
 
 dependencies {
