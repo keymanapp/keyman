@@ -16,8 +16,10 @@ import CoreImage.CIFilterBuiltins
 public class KeymanPackage: Identifiable, Hashable, Equatable {
   static let defaultImage: NSImage? = {
     var image: NSImage? = nil
-    if let imageUrl = Bundle.main.url(forResource: "SideImage", withExtension: "bmp") {
-      image = NSImage(contentsOf: imageUrl)
+    if let imageUrl = Bundle.module.url(forResource: "SideImage", withExtension: "bmp") {
+        image = NSImage(contentsOf: imageUrl)
+    } else {
+        print("Error: Could not find SideImage.bmp in the module bundle.")
     }
     return image
   }()
@@ -37,6 +39,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   public let packageVersion: String
   
   public let author: String?
+  public let websiteUrl: URL?
   public let copyright: String?
   // the URL of the readme file within the package
   public let readmeFileUrl: URL?
@@ -54,6 +57,11 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     self.packageName = packageSource.info.name.description
     self.packageVersion = packageSource.info.version.description
     self.author = packageSource.info.author?.description
+    if let websiteUrlString = packageSource.info.website?.url {
+      self.websiteUrl = URL(string: websiteUrlString)
+    } else {
+      self.websiteUrl = nil
+    }
     self.copyright = packageSource.info.copyright?.description
     self.sourceDirectoryUrl = packageSource.directoryUrl!
     self.jsonFileUrl = packageSource.kmpJsonFileUrl!
@@ -118,7 +126,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   /**
    * initializer that does not rely on package source -- provided to create unit test data
    */
-  public init(sourceDirectoryUrl: URL, sharePackageUrl: URL? = nil, keyboards: [Keyboard], packageName: String, packageVersion: String, author: String? = nil, copyright: String? = nil, jsonFileUrl: URL, readmeFileUrl: URL? = nil, helpFileUrl: URL? = nil, graphicFileUrl: URL? = nil, graphicImage: NSImage? = nil) {
+  public init(sourceDirectoryUrl: URL, sharePackageUrl: URL? = nil, keyboards: [Keyboard], packageName: String, packageVersion: String, author: String? = nil, website: URL? = nil, copyright: String? = nil, jsonFileUrl: URL, readmeFileUrl: URL? = nil, helpFileUrl: URL? = nil, graphicFileUrl: URL? = nil, graphicImage: NSImage? = nil) {
     self.id = UUID()
     self.sourceDirectoryUrl = sourceDirectoryUrl
     self.sharePackageUrl = sharePackageUrl
@@ -126,6 +134,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     self.packageName = packageName
     self.packageVersion = packageVersion
     self.author = author
+    self.websiteUrl = website
     self.copyright = copyright
     self.jsonFileUrl = jsonFileUrl
     self.readmeFileUrl = readmeFileUrl

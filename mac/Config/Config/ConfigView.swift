@@ -54,11 +54,11 @@ struct ConfigView: View {
                     Text("Scan to visit website:")
                         .font(.headline)
                     
-                  if let qrImage = package.generateSharePackageQRCode(size: 250) {
+                  if let qrImage = package.generateSharePackageQRCode(size: 200) {
                         Image(nsImage: qrImage)
                             .interpolation(.none) // important: keeps the QR edges sharp
                             .resizable()
-                            .frame(width: 250, height: 250)
+                            .frame(width: 200, height: 200)
                             .background(Color.white) // ensures good scanning contrast
                     } else {
                         Text("Failed to generate QR Code")
@@ -72,6 +72,12 @@ struct ConfigView: View {
                   .font(.subheadline)
                 // Example of Icon-Only Button
                 Spacer()
+                if let nsImage = package.graphicImage {
+                  Image(nsImage: nsImage)
+                    .resizable() // Allows resizing
+                    .scaledToFit() // Maintains original aspect ratio
+                    .frame(maxWidth: 140, maxHeight: 250) // Controls the bounds
+                }
                 Button(action: {
                   settings.removeSingleKeyboardPackage(at: index)
                 }) {
