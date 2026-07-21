@@ -578,11 +578,6 @@ export async function correctAndEnumerate(
     // Corrections obtained:  now to predict from them!
     const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
 
-    // If our 'match' results in fully deleting the new token, reject it and try again.
-    if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
-      continue;
-    }
-
     // If our 'match' fully replaces the token, reject it and try again.
     if(match.matchSequence.length != 0 && match.matchSequence.length == match.knownCost) {
       continue;
@@ -608,6 +603,12 @@ export async function correctAndEnumerate(
     const costFactor = (tokenization.tail.inputCount <= 1) ? ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT : 1;
 
     const predictions = buildAndMapPredictions(transition, tokenization, match, costFactor);
+
+    // Backspaces that cause the whole context to become empty do not reflect the backspace transform
+    // within the search space.  We correct for that here.
+    if(tokenization.tail.searchModule.codepointLength == 0 && inputTransform.deleteLeft > 0) {
+      predictions.forEach((p) => p.prediction.sample.transform.deleteLeft += inputTransform.deleteLeft);
+    }
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
@@ -1076,6 +1077,9 @@ export function finalizeSuggestions(
       // root; we need to remove that preserved delete-left here.
       if(presDL > 0) {
         mergedTransform.deleteLeft -= presDL;
+      }
+      if(prediction.sample.transform.id !== undefined) {
+        mergedTransform.id = prediction.sample.transform.id;
       }
 
       // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.

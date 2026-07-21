@@ -708,8 +708,19 @@ export class ContextTokenization {
       affectedToken = null;
     }
 
+    // Backspace handling - emptying context via backspace or erasing _part_ of
+    // a whitespace token can erase the tokenization-final empty token usually
+    // used for word-initial suggestions.
+    //
+    // We re-add it here so that suggestions can be presented to the user as
+    // normal.
+    const tokenSequence = this.tokens.slice(0, sliceIndex).concat(tailTokenization);
+    if(tokenSequence.length == 0 || tokenSequence[tokenSequence.length - 1]?.isWhitespace) {
+      tokenSequence.push(new ContextToken(new LegacyQuotientRoot(lexicalModel)));
+    }
+
     return new ContextTokenization(
-      this.tokens.slice(0, sliceIndex).concat(tailTokenization),
+      tokenSequence,
       null,
       determineTaillessTrueKeystroke(transitionEdge)
     );
