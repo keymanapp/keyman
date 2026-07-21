@@ -66,8 +66,7 @@ struct MainConfigView: View {
         Button("Cancel", role: .cancel) { }
         
         Button("Delete", role: .destructive) {
-          // FEAT/MAC/CONFIG-WINDOW TODO: Make removeInstalledPackage based on id
-          //settings.removeInstalledPackage(at: index)
+          settings.removeInstalledPackage(with: package.id)
         }
       } message: { package in
         Text("You can't undo this action.")
