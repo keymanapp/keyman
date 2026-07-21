@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
     android:layout_marginBottom="@dimen/activity_splash_bottom"
     android:gravity="bottom"
     android:orientation="vertical">
 
-    <!-- Overlay text fields below logos -->
     <TextView
         android:id="@+id/splash_version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="@string/splash_blank"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="@dimen/activity_splash_textsize" />
 
     <TextView
@@ -21,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="@string/splash_blank"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="@dimen/activity_splash_textsize" />
 
 </LinearLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque">
+
+    <!-- background color -->
+    <item android:drawable="@color/branded_logo_bg" />
+
+    <!-- product logos -->
+    <item
+        android:bottom="@dimen/product_logo_bottom"
+        >
+        <bitmap
+            android:src="@drawable/keyman_logo_splash_dark_mode"
+            android:gravity="center"/>
+    </item>
+
+    <item>
+        <bitmap
+            android:src="@drawable/sil_logo_color_tai_heritage_pro"
+            android:gravity="center"/>
+    </item>
+
+    <!-- Text will be overlayed by SplashScreenActivity -->
+
+</layer-list>
