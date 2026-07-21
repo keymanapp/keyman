@@ -144,6 +144,7 @@ var
   doc: IXMLDocument;
   sn, node: IXMLNode;
   IncludePath: string;
+  Condition: string;
   I: Integer;
 begin
   if not FileExists(ProjectXMLFileName) then
@@ -159,16 +160,20 @@ begin
   for I := 0 to node.ChildNodes.Count - 1 do
   begin
     sn := node.ChildNodes[I];
+    // Delphi 12 EnvOptions.proj emits an empty <PropertyGroup/> without a
+    // Condition attribute; convert defensively via VarToStrDef so a Null or
+    // Empty variant returns '' instead of raising EVariantTypeCastError in Pos().
+    Condition := VarToStrDef(sn.Attributes['Condition'], '');
     if (sn.NodeName = 'PropertyGroup') and
-      not VarIsNull(sn.Attributes['Condition']) and
-      ((Pos('Win32', sn.Attributes['Condition']) > 0) or
-      (Pos('Win64', sn.Attributes['Condition']) > 0)) then
+      ((Pos('''Win32''', Condition) > 0) or (Pos('''Win64''', Condition) > 0)) then
     begin
-      IncludePath := sn.ChildNodes['DelphiBrowsingPath'].NodeValue;
+      // Guard against empty child nodes (e.g. <DelphiBrowsingPath/>) whose
+      // NodeValue is Null on Delphi 12 and can't coerce to a string directly.
+      IncludePath := VarToStrDef(sn.ChildNodes['DelphiBrowsingPath'].NodeValue, '');
       if AddPathToIncludePath(IncludePath, Path) then
         sn.ChildNodes['DelphiBrowsingPath'].nodeValue := IncludePath;
 
-      IncludePath := sn.ChildNodes['DelphiLibraryPath'].NodeValue;
+      IncludePath := VarToStrDef(sn.ChildNodes['DelphiLibraryPath'].NodeValue, '');
       if AddPathToIncludePath(IncludePath, Path) then
         sn.ChildNodes['DelphiLibraryPath'].nodeValue := IncludePath;
     end;
@@ -256,6 +261,7 @@ var
   doc: IXMLDocument;
   node: IXMLNode;
   ProjectFileName: string;
+  Condition: string;
   I: Integer;
   sn: IXMLNode;
 begin
@@ -296,10 +302,11 @@ begin
     for I := 0 to node.ChildNodes.Count - 1 do
     begin
       sn := node.ChildNodes[I];
+      // See AddPathToProjectXML: guard against Delphi 12's empty
+      // <PropertyGroup/> where Attributes['Condition'] returns a Null variant.
+      Condition := VarToStrDef(sn.Attributes['Condition'], '');
       if (sn.NodeName = 'PropertyGroup') and
-        not VarIsNull(sn.Attributes['Condition']) and
-        ((Pos('Win32', sn.Attributes['Condition']) > 0) or
-        (Pos('Win64', sn.Attributes['Condition']) > 0)) then
+        ((Pos('''Win32''', Condition) > 0) or (Pos('''Win64''', Condition) > 0)) then
       begin
         sn.ChildNodes['DelphiBrowsingPath'].NodeValue := SDefault_DelphiBrowsingPath;
         sn.ChildNodes['DelphiLibraryPath'].NodeValue := SDefault_DelphiSearchPath;
