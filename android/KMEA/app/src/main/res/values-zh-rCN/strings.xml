@@ -78,8 +78,6 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      需要文件提供者文库来查看帮助文件： %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">       %1$s键盘错误:%2$s为%3$s 语言。正在加载默认键盘。</string>
-    <!-- Context: Fatal keyboard error.  -->
-    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      对于 %3$s 语言，键盘出现错误 %1$s:%2$s 。</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">正在检查相关字典以下载</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">    无法连接到 Keyman 服务器以检查要下载的相关字典</string>
