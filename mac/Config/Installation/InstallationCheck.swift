@@ -37,7 +37,7 @@ public class InstallationCheck {
       self.inputMethodVersion = "unknown"
     }
     
-    self.configurationVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+    self.configurationVersion = ConfigAppUtil.configAppVersion()
     self.isInputMethodCurrent = InstallationCheck.isVersionCurrent(inputMethodVersion: self.inputMethodVersion, configurationVersion: self.configurationVersion)
     
     self.installationState = self.loadState()

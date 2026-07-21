@@ -40,10 +40,23 @@ public enum SettingsError: Error {
 
 @MainActor // run on the main actor since data is published directly to the UI
 public class SettingsContainer : ObservableObject {
-  // packages are loaded from disk, each package may contain one or more keyboard
-  @Published public var installedPackages: [KeymanPackage]
+  // installed packages are loaded from disk, each package may contain one or more keyboard
+  fileprivate var installedPackages: [KeymanPackage] {
+    didSet {
+      self.updatePackageArrays()
+    }
+  }
+  
+  // Maintain two arrays for use by configuration views.
+  // One is for packages with single keyboards and one for packages with multiple keyboards.
+  // Each array is sorted alphabetically by package name.
+  // These arrays are updated by a property observer on installedPackages.
+  // (Consider installedPackages as the source of truth and these arrays for presentation purposes.)
+  @Published public private(set) var singleKeyboardPackages: [KeymanPackage]
+  @Published public private(set) var multiKeyboardPackages: [KeymanPackage]
+
   // when a new package is downloaded, it is tracked here
-  public var packageDownload: PackageDownload? = nil
+  public private(set) var packageDownload: PackageDownload? = nil
   
   fileprivate let packageRepository: PackageRepo
   fileprivate let defaultsRepository: DefaultsRepo
@@ -53,6 +66,11 @@ public class SettingsContainer : ObservableObject {
   fileprivate var selectedKeyboard: String
   
   public init() {
+    // initialize arrays before loading packages
+    self.singleKeyboardPackages = []
+    self.multiKeyboardPackages = []
+    self.installedPackages = []
+
     // create the package repository, gaining access to the app group container directory
     do {
       try self.packageRepository = PackageRepository()
@@ -72,11 +90,12 @@ public class SettingsContainer : ObservableObject {
     } catch {
       fatalError("Unable to access defaults in group container: \(error.localizedDescription).")
     }
-    
+
     self.selectedKeyboard = self.defaultsRepository.readSelectedKeyboard()
-    
-    // first load all the installed packages from disk
-    self.installedPackages = []
+
+    // load all the installed packages from disk
+    // though we are in the initializer, didset will be called to update
+    // the two dependent package arrays because of the call to this helper method
     self.loadPackages()
     
     // next, apply the settings to the packages
@@ -95,6 +114,8 @@ public class SettingsContainer : ObservableObject {
     self.packageRepository = packageRepo
     self.selectedKeyboard = self.defaultsRepository.readSelectedKeyboard()
     
+    self.singleKeyboardPackages = []
+    self.multiKeyboardPackages = []
     self.installedPackages = []
   }
   
@@ -114,7 +135,7 @@ public class SettingsContainer : ObservableObject {
         name: .packageReplaced, object: nil
     )
   }
-  
+
   /**
    * called for `newPackageInstalled` notification
    */
@@ -133,6 +154,27 @@ public class SettingsContainer : ObservableObject {
     self.packageDownload = nil
   }
   
+  /**
+   * Whenever the installedPackages array changes, recreate the two subarrays
+   */
+  public func updatePackageArrays() {
+    self.singleKeyboardPackages = []
+    self.multiKeyboardPackages = []
+    
+    // divide the installedPackages array into two separate arrays based on whether they have one or more keyboards
+    let partitionedPackages = self.installedPackages.reduce(into: (single: [KeymanPackage](), multiple: [KeymanPackage]())) { result, element in
+      if element.keyboards.count == 1 {
+        result.single.append(element)
+      } else if element.keyboards.count > 1 {
+        result.multiple.append(element)
+      }
+    }
+    
+    // sort subarrays alphabetically, without regard to case, using the 'packageName' property
+    self.singleKeyboardPackages = partitionedPackages.single.sorted { $0.packageName.caseInsensitiveCompare($1.packageName) == .orderedAscending }
+    self.multiKeyboardPackages = partitionedPackages.multiple.sorted { $0.packageName.caseInsensitiveCompare($1.packageName) == .orderedAscending }
+  }
+
   /**
    * Called when user approves the downgrade of package
    */
@@ -257,9 +299,9 @@ public class SettingsContainer : ObservableObject {
   /**
    * find the installed package with the specified UUID
    */
-  public func findPackage(with packageId: UUID) -> KeymanPackage? {
-    guard let package = self.installedPackages.first(where: { $0.id == packageId }) else {
-      print ("Error: could not find package with ID: \(packageId)")
+  public func findInstalledPackage(with id: UUID) -> KeymanPackage? {
+    guard let package = self.installedPackages.first(where: { $0.id == id }) else {
+      print ("Error: could not find package with UUID: \(id)")
       return nil
     }
     
@@ -269,7 +311,7 @@ public class SettingsContainer : ObservableObject {
   /**
    * find the installed package with the specified package name
    */
-  public func findPackage(with packageName: String) -> KeymanPackage? {
+  public func findInstalledPackage(with packageName: String) -> KeymanPackage? {
     guard let package = self.installedPackages.first(where: { $0.packageName == packageName }) else {
       print ("Error: could not find package with name: \(packageName)")
       return nil
@@ -279,11 +321,21 @@ public class SettingsContainer : ObservableObject {
   }
 
   /**
-   * remove/uninstall the package at the specified index
+   * remove/uninstall the package with the specified UUID
    */
-  public func removePackage(at index: Int) {
-    let package = self.installedPackages[index]
+  public func removeInstalledPackage(with id: UUID) {
     
+    if let package = findInstalledPackage(with: id) {
+      self.removeInstalledPackage(package: package)
+    } else {
+      print("could not find package with id: \(id)")
+    }
+  }
+
+  /**
+   * remove the installed package
+   */
+  func removeInstalledPackage(package: KeymanPackage) {
     // will removing this package cause the removal of any enabled keyboards?
     let removingEnabledKeyboards = !package.getEnabledKeyboardsKeys().isEmpty
     
@@ -291,20 +343,22 @@ public class SettingsContainer : ObservableObject {
     self.packageRepository.deletePackage(package: package)
     
     // remove package from installed packages list
-    _ = self.installedPackages.remove(at: index)
+    if let index = self.installedPackages.firstIndex(where: { $0.packageName == package.packageName }) {
+      self.installedPackages.remove(at: index)
+    }
     
     // if we removed any enabled keyboards, then update settings
     if removingEnabledKeyboards {
       self.saveKeyboardState()
     }
   }
-  
+
   /**
    * returns true if the keyboard is enabled
    * when enabled, the keyboard appears in the Keyman sub menu in the mac
    */
   public func isKeyboardEnabled(packageId: UUID, keyboardKey: String) -> Bool {
-    guard let package = self.findPackage(with: packageId) else {
+    guard let package = self.findInstalledPackage(with: packageId) else {
       print ("Could not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey)")
       return false
     }
@@ -317,7 +371,7 @@ public class SettingsContainer : ObservableObject {
    * enable or disable the keyboard
    */
   public func setKeyboardEnabled(packageId: UUID, keyboardKey: String, enabled: Bool) {
-    guard let package = self.findPackage(with: packageId) else {
+    guard let package = self.findInstalledPackage(with: packageId) else {
       print ("Could not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey)")
       return
     }
