@@ -304,9 +304,9 @@ public class SettingsContainer : ObservableObject {
   /**
    * find the installed package with the specified UUID
    */
-  public func findInstalledPackage(with packageId: UUID) -> KeymanPackage? {
-    guard let package = self.installedPackages.first(where: { $0.id == packageId }) else {
-      print ("Error: could not find package with ID: \(packageId)")
+  public func findInstalledPackage(with id: UUID) -> KeymanPackage? {
+    guard let package = self.installedPackages.first(where: { $0.id == id }) else {
+      print ("Error: could not find package with UUID: \(id)")
       return nil
     }
     
@@ -326,11 +326,21 @@ public class SettingsContainer : ObservableObject {
   }
 
   /**
-   * remove/uninstall the package at the specified index
+   * remove/uninstall the package with the specified UUID
    */
-  public func removeInstalledPackage(at index: Int) {
-    let package = self.installedPackages[index]
+  public func removeInstalledPackage(with id: UUID) {
     
+    if let package = findInstalledPackage(with: id) {
+      self.removeInstalledPackage(package: package)
+    } else {
+      print("could not find package with id: \(id)")
+    }
+  }
+
+  /**
+   * remove the installed package
+   */
+  func removeInstalledPackage(package: KeymanPackage) {
     // will removing this package cause the removal of any enabled keyboards?
     let removingEnabledKeyboards = !package.getEnabledKeyboardsKeys().isEmpty
     
@@ -338,14 +348,16 @@ public class SettingsContainer : ObservableObject {
     self.packageRepository.deletePackage(package: package)
     
     // remove package from installed packages list
-    _ = self.installedPackages.remove(at: index)
+    if let index = self.installedPackages.firstIndex(where: { $0.packageName == package.packageName }) {
+      self.installedPackages.remove(at: index)
+    }
     
     // if we removed any enabled keyboards, then update settings
     if removingEnabledKeyboards {
       self.saveKeyboardState()
     }
   }
-  
+
   /**
    * returns true if the keyboard is enabled
    * when enabled, the keyboard appears in the Keyman sub menu in the mac

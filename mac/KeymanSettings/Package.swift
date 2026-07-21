@@ -25,16 +25,19 @@ let package = Package(
         .target(
             name: "KeymanSettings",
             dependencies: [
-                .product(name: "ZIPFoundation", package: "ZIPFoundation")
+              .product(name: "ZIPFoundation", package: "ZIPFoundation")
             ],
-            path: "Sources"
+            path: "Sources",
+            resources: [
+              .process("Resources")
+            ]
         ),
         .testTarget(
             name: "KeymanSettingsTests",
             dependencies: ["KeymanSettings"],
             path: "Tests",
             resources: [
-               .copy("Resources/amharic.kmp.json") // The test data files, copy files without modifying them
+              .copy("Resources/amharic.kmp.json") // The test data files, copy files without modifying them
             ]
         ),
     ]
