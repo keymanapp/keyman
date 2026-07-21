@@ -79,7 +79,7 @@ struct ConfigView: View {
                     .frame(maxWidth: 140, maxHeight: 250) // Controls the bounds
                 }
                 Button(action: {
-                  settings.removeSingleKeyboardPackage(at: index)
+                  settings.removeInstalledPackage(with: package.id)
                 }) {
                   Label("remove", systemImage: "trash.fill")
                 }
