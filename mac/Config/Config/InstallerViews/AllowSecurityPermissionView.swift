@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct AllowSecurityPermissionView: View {
-  
-  @Binding var currentPage: NewInstallView.InstallPage
   @EnvironmentObject var installation: InstallationContainer
   let namespace: Namespace.ID
   
@@ -31,8 +29,8 @@ struct AllowSecurityPermissionView: View {
         .interpolation(.high)
         .resizable()
         .scaledToFit()
-        .frame(height: 180)
-        .padding(.horizontal, 100)
+        .frame(height: 130)
+        .padding(.bottom, 8)
       
       Text("Toggle Keyman.app to provide it with necessary control in System Settings > Privacy & Security > Accessibility.")
         .multilineTextAlignment(.center)
@@ -59,7 +57,7 @@ struct AllowSecurityPermissionView: View {
         .tint(.blue)
         .clipShape(Capsule())
 
-        ContinueButton(currentPage: $currentPage, nextPage: .completed)
+        ContinueButton()
       }
     }
   }

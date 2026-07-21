@@ -1,23 +1,27 @@
 //
-//  InitialInstallView.swift
+//  InitialView.swift
 //  Config
 //
 //  Created by Eli Schantz on 7/1/26.
 //
 
 import SwiftUI
+import Foundation
 
-struct InitialInstallView: View {
-  @Binding var currentPage: NewInstallView.InstallPage
+
+struct InitialView: View {
+  
   @EnvironmentObject var installation: InstallationContainer
   @Environment(\.dismiss) private var dismiss
+  @Binding var notifiedViews: [InstallPage]
   let namespace: Namespace.ID
+  
   var versionText: String {
-      if let version = installation.installationState?.keymanVersion {
-          return "Version: \(version)              "
-      } else {
-          return "No version to display"
-      }
+    if let version = installation.installationState?.keymanVersion {
+      return "Version: \(version)              "
+    } else {
+      return "No version to display"
+    }
   }
   
   var body: some View {
@@ -29,7 +33,6 @@ struct InitialInstallView: View {
       KeymanLogo(namespace: namespace)
       
       
-
       Text(versionText)
         .foregroundStyle(.secondary)
       
@@ -43,8 +46,7 @@ struct InitialInstallView: View {
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
         
-        ContinueButton(currentPage: $currentPage, nextPage: .enableInputMethod)
-
+        ContinueButton()
       }
     }
   }

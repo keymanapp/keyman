@@ -35,7 +35,7 @@ struct ConfigApp: App {
     
     
     Window("New Installation", id: "new install") {
-      NewInstallView()
+      ParentInstallView()
         .environmentObject(installation)
     }
     .defaultSize(width: 500, height: 400)

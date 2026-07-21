@@ -12,7 +12,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "PermissionRequiredDark.png",
+      "filename" : "EnableKeymanDark.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -28,7 +28,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "PermissionRequiredDark 1.png",
+      "filename" : "EnableKeymanDark 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
@@ -44,7 +44,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "PermissionRequiredDark 2.png",
+      "filename" : "EnableKeymanDark 2.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
