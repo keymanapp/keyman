@@ -1,7 +1,7 @@
 import { Transcription } from "keyman/engine/keyboard";
 import { RewindableCache } from "keyman/common/web-utils";
 
-const TRANSCRIPTION_BUFFER_SIZE = 10;
+const TRANSCRIPTION_BUFFER_SIZE = 20;
 
 export class TranscriptionCache extends RewindableCache<Transcription> {
   constructor() {
