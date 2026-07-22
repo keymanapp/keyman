@@ -5,7 +5,7 @@ import { searchForProperty, WordBreakProperty } from '@keymanapp/models-wordbrea
 
 import { TransformUtils } from './transformUtils.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
-import { ContextTokenLike } from './correction/context-token.js';
+import { ContextToken, ContextTokenLike } from './correction/context-token.js';
 import { ContextTokenization } from './correction/context-tokenization.js';
 import { ContextTracker } from './correction/context-tracker.js';
 import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
@@ -601,6 +601,80 @@ export function determineTokenizedCorrectionSequence(
     ...suggestionParams,
     applyInPost: (entry) => {}
   };
+}
+
+/**
+ * Given the base 'display' tokenization and an array of target tokenizations
+ * for a context transition, this method determines the range needed for
+ * correction-search processes and builds the appropriate
+ * `TokenizationCorrector` instances for the search.
+ * @param transition
+ * @param tokenizations
+ * @param configuration  Allows custom configuration for selecting correctable
+ * tokens within each TokenizationCorrector.  Intended for use with unit
+ * testing.
+ * @returns
+ */
+export function prepareTokenizationSearch(
+  transition: ContextTransition,
+  tokenizations: ContextTokenization[],
+  configuration?: {
+    /**
+     * Should return true if the input index is within the appropriate range for
+     * correction.  When called, the index of the first token in correction
+     * range will be provided to `rangeStart`.
+     * @param index
+     * @param rangeStart
+     */
+    rangeValidator?: (index: number, rangeStart: number) => boolean,
+    /**
+     * Should return true if the token represents text valid for text correction
+     * processes, regardless of position.
+     * @param token
+     * @returns
+     */
+    correctableValidator?: (token: ContextToken) => boolean
+  }
+) {
+  // Goal - determine what parts of each tokenization are searchable & prep them for correcion-search.
+  const tokenizationAnalyses = tokenizations.map((tokenization) => {
+    return {
+      tokenization: tokenization,
+      analysis: determineSuggestionRange(transition.base.displayTokenization.tokens, tokenization.tokens, (a, b) => a.spaceId == b.spaceId)
+    };
+  });
+
+  const biggestCommonRemoval = tokenizationAnalyses.reduce(
+    (biggest, current) => biggest.length > current.analysis.tokensToRemove.length ? biggest : current.analysis.tokensToRemove,
+    [] as ContextTokenLike[]
+  );
+
+  configuration ??= {};
+  // If a custom range validator is set, just use that one.
+  const rangeValidator = configuration.rangeValidator;
+
+  configuration.correctableValidator ??= (token) => (token.codepointLength == 0 || correctionValidForAutoSelect(token.exampleInput));
+  const tokenizationSetup = tokenizationAnalyses.map((tuple) => {
+    // These tokens are unaffected by the input whatsoever, though their
+    // probability may affect thresholding for the non-locked tokens.
+    const unaffectedTokenCount = biggestCommonRemoval.length - tuple.analysis.tokensToRemove.length;
+    // Unaffected tokens should still be part of the correction range; they'll just
+    // be marked noncorrectable.
+    const mutatedLength = tuple.analysis.tokensToPredict.length + unaffectedTokenCount;
+
+    configuration.rangeValidator = rangeValidator ?? ((index, rangeStart) => {
+      return index >= rangeStart        // is a modified token
+        && index == mutatedLength - 1   // TEMP: adjacent to the caret (TO BE REMOVED)
+    });
+    return new TokenizationCorrector(tuple.tokenization, mutatedLength, (token, index) => {
+       // is within range for correction
+      return configuration.rangeValidator(index, unaffectedTokenCount)
+        // and is eligible for text-correction
+        && configuration.correctableValidator(token);
+    });
+  });
+
+  return tokenizationSetup;
 }
 
 /**
