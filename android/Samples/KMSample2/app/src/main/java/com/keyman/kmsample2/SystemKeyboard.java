@@ -57,6 +57,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       KMManager.KMDefault_KeyboardFont,  // Font for KMSample2
       KMManager.KMDefault_KeyboardFont); // Font for OSK
     KMManager.addKeyboard(this, kbInfo);
+    KMManager.setDefaultKeyboard(kbInfo); // Workaround for #16215
 
     // Add a dictionary
     HashMap<String, String>lexicalModelInfo = new HashMap<String, String>();
