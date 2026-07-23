@@ -13,7 +13,6 @@ import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import { ModelCompositor } from './model-compositor.js';
 import { getBestTokenMatches } from './correction/distance-modeler.js';
-import { TokenResultMapping } from './correction/token-result-mapping.js';
 
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
@@ -459,7 +458,8 @@ export function determineSuggestionRange(
 export function buildAndMapPredictions(
   transition: ContextTransition,
   tokenization: ContextTokenization,
-  match: Readonly<TokenResultMapping>,
+  // Originally, Readonly<TokenResultMapping> - but we only need these two components here.
+  match: Readonly<{matchString: string, totalCost: number}>,
   costFactor: number
 ): CorrectionPredictionTuple[] {
   const model = transition.final.model;
@@ -492,6 +492,13 @@ export function buildAndMapPredictions(
     // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
     // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
   });
+
+  // Backspaces that shorten a multi-codepoint whitespace token are not handled well by default.
+  // As a new empty token is placed at the end for such cases, we can detect and handle such cases.
+  const inputTransform = transition.inputDistribution?.[0].sample ?? { insert: '', deleteLeft: 0 };
+  if(tokenization.tokens.length > 1 && tokenization.tail.searchModule.codepointLength == 0 && inputTransform.deleteLeft > 0) {
+    predictions.forEach((p) => p.prediction.sample.transform.deleteLeft += inputTransform.deleteLeft);
+  }
 
   return predictions;
 }
@@ -603,12 +610,6 @@ export async function correctAndEnumerate(
     const costFactor = (tokenization.tail.inputCount <= 1) ? ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT : 1;
 
     const predictions = buildAndMapPredictions(transition, tokenization, match, costFactor);
-
-    // Backspaces that cause the whole context to become empty do not reflect the backspace transform
-    // within the search space.  We correct for that here.
-    if(tokenization.tail.searchModule.codepointLength == 0 && inputTransform.deleteLeft > 0) {
-      predictions.forEach((p) => p.prediction.sample.transform.deleteLeft += inputTransform.deleteLeft);
-    }
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
