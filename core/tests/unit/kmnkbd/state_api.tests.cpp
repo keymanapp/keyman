@@ -287,8 +287,8 @@ int main(int argc, char * argv[])
 
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr,
-               * test_clone = nullptr,
-               * test_clone_2 = nullptr;
+                * test_clone = nullptr,
+                * test_clone_2 = nullptr;
   test_kb = (km_core_keyboard *)new km::core::mock_processor(km::core::path("dummy.mock"));
 
   // Simple sanity tests.

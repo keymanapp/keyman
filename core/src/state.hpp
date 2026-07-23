@@ -37,8 +37,8 @@ public:
   template<typename... Args>
   actions(Args&&... args);
   actions(actions const &other);
-  // If the operator is needed in the future, it shall be implemented
-  // in like the deep copy constructor. Blocking accidental use of it.
+  // If the operator is needed in the future, it shall be implemented.
+  // Currently blocking accidental use of it for now.
   actions &operator=(actions const &) = delete;
 
   void push_character(km_core_usv usv);

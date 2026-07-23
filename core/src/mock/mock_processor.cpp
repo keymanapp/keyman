@@ -125,7 +125,7 @@ namespace km {
     {
       assert(state);
       assert(action_item);
-      if ((!state) || (!action_item)){
+      if ((!state) || (!action_item)) {
         return false;
       }
       // For this mock processor we only support queuing PERSIST_OPT action items.
