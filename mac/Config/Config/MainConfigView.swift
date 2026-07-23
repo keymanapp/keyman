@@ -15,7 +15,8 @@ struct MainConfigView: View {
   @EnvironmentObject var settings: SettingsContainer
   @State private var isShowingSheet = false
   @State private var isShowingDeleteAlert = false
-  @State private var selectedPackage: KeymanPackage?
+  @State private var selectedPackage: KeymanPackage? = nil
+  @State private var expandedPackageID: UUID? = nil
    
   /**
    * Sets isShowingDeleteAlert to true and assigns the state variable selectedPackage the KeymanPackage argument
@@ -44,21 +45,39 @@ struct MainConfigView: View {
     
     List(settings.singleKeyboardPackages, id: \.id) { package in
       ForEach(package.keyboards) { keyboard in
-        DisclosureGroup {
+        DisclosureGroup(isExpanded: Binding(
+          get: { self.expandedPackageID == package.id },
+          // handles when the chevron arrow is clicked by the user
+          // doesn't require if statement because the disclosure group has a state to toggle which is passed into the setter
+          // $0 = true when disclosure group is open and $0 = false when disclosure group is closed
+          set: { self.expandedPackageID = $0 ? package.id : nil }
+        )) {
           KeyboardInfoView(for: package)
         } label: {
           HStack {
             
             Text(keyboard.name)
               .font(.title)
-
+            
             Spacer()
-
+            
             // see keyboard help button
             IconButtonView(action: { print("See help") }, label: "See help", systemImage: "questionmark.circle", helpText: "See help", font: .title2)
-
+            
             // delete keyboard button
             IconButtonView(action: { showDeleteAlert(for: package) }, label: "Delete keyboard", systemImage: "trash", helpText: "Delete keyboard", font: .title2)
+          }
+          .contentShape(Rectangle())
+          // handles when the HStack is clicked by the user
+          .onTapGesture {
+            withAnimation {
+              // requires if statement because the HStack doesn't have a state to toggle and so the package id property must be manually checked
+              if self.expandedPackageID == package.id {
+                self.expandedPackageID = nil
+              } else {
+                self.expandedPackageID = package.id
+              }
+            }
           }
         }
       }
