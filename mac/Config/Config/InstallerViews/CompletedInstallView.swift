@@ -9,7 +9,6 @@ import SwiftUI
 
 struct CompletedInstallView: View {
   @EnvironmentObject var installation: InstallationContainer
-  @Environment(\.dismiss) private var dismiss
   let namespace: Namespace.ID
   
   var versionText: String {
@@ -39,10 +38,9 @@ struct CompletedInstallView: View {
       HStack {
         Text("Installation complete")
           .font(.title2)
-
           .frame(maxWidth: .infinity, alignment: .leading)
         
-        ContinueButton()
+        NavigationButton(action: .advance)
       }
     }
   }
