@@ -12,8 +12,7 @@ import KeymanSettings
 // String raw value for each task type is used as key for Dictionary
 // when storing the task state in the UserDefaults
 public enum InstallationTaskType: String {
-  case verifyInputMethod = "verifyInputMethod"  // verify the new input method was installed
-  case migrateData = "migrateData"              // only called for new install
+  case prepareNewInstall = "prepareNewInstall"  // only called for new install
   case enableInputMethod = "enableInputMethod"  // triggers register and enable
   case requestAccess = "requestAccess"          // causes prompt to user to grant Accessibility
   case restartMac = "restartMac"                // prompts user to restart machine

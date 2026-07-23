@@ -12,6 +12,7 @@ import KeymanSettings
 
 // in-app notifications sent
 public extension Notification.Name {
+  static let installationStateEvaluated = Notification.Name("installation.state.evaluated")
   static let inputMethodMissing = Notification.Name("input.method.missing")
   static let inputMethodOutdated = Notification.Name("input.method.outdated")
   static let newInstallation = Notification.Name("new.installation")
@@ -22,13 +23,6 @@ public extension Notification.Name {
 
 @MainActor // run on the main actor since data is published directly to the UI
 public class InstallationContainer : ObservableObject {
-  // if the installer was run, then installed and current should be true
-  public let isInputMethodInstalled : Bool
-  public let isInputMethodCurrent : Bool
-  // for convenience, combination of Installed and Current
-  public var isCurrentInputMethodInstalled : Bool {
-    isInputMethodInstalled && isInputMethodCurrent
-  }
   public var installationPhase: InstallationPhase {
     return self.installationCheck.installationPhase
   }
@@ -60,20 +54,25 @@ public class InstallationContainer : ObservableObject {
       fatalError("Unable to access group container path for InputMethodUtil: \(error.localizedDescription).")
     }
     
-    self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
-    self.isInputMethodInstalled = self.installationCheck.isInputMethodInstalled
-    self.isInputMethodCurrent = self.installationCheck.isInputMethodCurrent
-    self.installationState = self.installationCheck.installationState
-    
-    self.registerObservers()
-  }
+    self.installationState = nil
 
+    self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
+    self.registerObservers()
+    
+    self.installationCheck.startInstallationEvaluation()
+  }
   
   /**
-   * register the observer to listen for a notification from the InstallationCheck to
-   * repair the current installation
+   * register observers to learn of results of InstallationState evaluation
    */
   func registerObservers() {
+    print("InstallationContainer registerObservers")
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(self.handleInstallationEvaluated(_:)),
+      name: NSNotification.Name.installationStateEvaluated,
+      object: nil // Observe notifications from any sender
+    )
     print("InstallationContainer registerObservers")
     NotificationCenter.default.addObserver(
       self,
@@ -82,6 +81,25 @@ public class InstallationContainer : ObservableObject {
       object: nil // Observe notifications from any sender
     )
   }
+
+  /**
+   * called when `NSNotification.Name.installationStateEvaluated` is received
+   */
+  @objc func handleInstallationEvaluated(_ notification: Notification) {
+    // now that the installation has been evaluated
+    // we can set the installationState
+    
+    if let newState = notification.object as? InstallationState {
+      self.installationState = newState
+      
+      // the evaluation is done
+      self.installationCheck.isEvaluatingInstallation = false
+      print("handleInstallationEvaluated, new installationState: \(newState)")
+    } else {
+      print("handleInstallationEvaluated received but did not include new InstallationState")
+    }
+  }
+
 
   /**
    * called when `NSNotification.Name.installationRepairEvaluated` is received
@@ -128,9 +146,7 @@ public class InstallationContainer : ObservableObject {
 
     let incompleteTasks = state.tasks.filter { !$0.isComplete }
     
-    if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .verifyInputMethod }) {
-      return incompleteTask
-    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .migrateData }) {
+    if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .prepareNewInstall }) {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .enableInputMethod }) {
       return incompleteTask
@@ -152,9 +168,7 @@ public class InstallationContainer : ObservableObject {
     var completedTask = false
     
     switch task.taskType {
-    case .verifyInputMethod:
-      completedTask = self.verifyInputMethod()
-    case .migrateData:
+    case .prepareNewInstall:
       completedTask = self.migrateData()
     case .enableInputMethod:
       completedTask = self.enableKeymanInputMethod()
