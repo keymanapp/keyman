@@ -42,9 +42,9 @@ public struct KeyboardInfoView: View {
         // the package version
         GridRow {
           Text("Package Version:").bold()
-            .gridColumnAlignment(.trailing)
+            .gridColumnAlignment(.trailing) // all elements underneath inherit the .trailing alignment
           Text(package.packageVersion)
-            .gridColumnAlignment(.leading)
+            .gridColumnAlignment(.leading) // all elements underneath inherit the .leading alignment
         }
         // the fonts
         GridRow {
