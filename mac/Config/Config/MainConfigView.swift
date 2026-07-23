@@ -5,6 +5,7 @@
  *
  * Main view used for configuring Keyman
  * FEAT/MAC/CONFIG-WINDOW TODO: Finish writing file summary
+ * FEAT/MAC/CONFIG-WINDOW TODO: Set minimim width and height for window
  */
 
 import SwiftUI
@@ -13,14 +14,14 @@ import KeymanSettings
 struct MainConfigView: View {
   @EnvironmentObject var settings: SettingsContainer
   @State private var isShowingSheet = false
-  @State private var isShowingAlert = false
+  @State private var isShowingDeleteAlert = false
   @State private var selectedPackage: KeymanPackage?
    
   /**
-   * Sets isShowingAlert to true and assigns the state variable selectedPackage the KeymanPackage passed in as a parameter
+   * Sets isShowingDeleteAlert to true and assigns the state variable selectedPackage the KeymanPackage argument
    */
-  private func showAlert(for package: KeymanPackage) -> Void {
-    isShowingAlert = true
+  private func showDeleteAlert(for package: KeymanPackage) -> Void {
+    isShowingDeleteAlert = true
     selectedPackage = package
   }
   
@@ -29,6 +30,7 @@ struct MainConfigView: View {
       isShowingSheet = true
     } label: {
       Label("Add Keyboard", systemImage: "plus")
+        .font(.title2)
     }
     .buttonStyle(.bordered)
     .clipShape(Capsule())
@@ -48,21 +50,21 @@ struct MainConfigView: View {
           HStack {
             
             Text(keyboard.name)
-              .font(.title2)
+              .font(.title)
 
             Spacer()
 
             // see keyboard help button
-            IconButtonView(action: { print("See help") }, label: "See help", systemImage: "questionmark.circle", helpText: "See help")
+            IconButtonView(action: { print("See help") }, label: "See help", systemImage: "questionmark.circle", helpText: "See help", font: .title2)
 
             // delete keyboard button
-            IconButtonView(action: { showAlert(for: package) }, label: "Delete keyboard", systemImage: "trash", helpText: "Delete keyboard")
+            IconButtonView(action: { showDeleteAlert(for: package) }, label: "Delete keyboard", systemImage: "trash", helpText: "Delete keyboard", font: .title2)
           }
         }
       }
     }
     .alert("Are you sure you want to delete the keyboard \"\(selectedPackage?.packageName ?? "")\"?",
-             isPresented: $isShowingAlert,
+             isPresented: $isShowingDeleteAlert,
              presenting: selectedPackage) { package in
         
         Button("Cancel", role: .cancel) { }

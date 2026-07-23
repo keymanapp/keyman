@@ -17,38 +17,98 @@ public struct KeyboardInfoView: View {
     self.package = package
   }
   
+  /**
+   * Copies the text argument to the system clipboard
+   */
+  private func copyTextToClipboard (text: String) -> Void {
+    let pasteboard = NSPasteboard.general
+    pasteboard.clearContents()
+    pasteboard.setString(text, forType: .string)
+  }
+
   public var body: some View {
+    
     HStack {
+      
       // the custom package image
       if let packageImage = package.graphicImage {
         Image(nsImage: packageImage)
           .resizable()
-          .frame(width: 140, height: 250)
-          .border(Color.red, width: 1)
+          .frame(width: 87.92, height: 157) // Corresponds to max height of package properties presented as text and maintains width:height ratio of 140:250
       }
+      
       // the package properties presented as text
-      VStack (alignment: .leading, spacing: 10) {
-        Text("Keyboard Version: \(package.packageVersion)")
-        Text("Fonts:")
-        ForEach(package.fonts, id: \.self) { font in
-          Text(font)
+      Grid(horizontalSpacing: 10, verticalSpacing: 5) {
+        // the package version
+        GridRow {
+          Text("Package Version:").bold()
+            .gridColumnAlignment(.trailing)
+          Text(package.packageVersion)
+            .gridColumnAlignment(.leading)
         }
-        Text("Author: \(package.author ?? "")")
-        Text("Copyright: \(package.copyright ?? "")")
-        // FEAT/MAC/CONFIG-WINDOW TODO: Change text to link with Author's Website
-        Text("Author's Website")
+        // the fonts
+        GridRow {
+          Text("Fonts:").bold()
+          HStack{
+            ForEach(package.fonts, id: \.self) { font in
+              Text(font)
+            }
+          }
+        }
+        // the copyright
+        GridRow {
+          Text("Copyright:").bold()
+          Text(package.copyright ?? "")
+        }
+        // the author
+        GridRow {
+          Text("Author:").bold()
+          Text(package.author ?? "")
+        }
+        // the website
+        GridRow {
+          Text("Website:").bold()
+          if let websiteUrl = package.websiteUrl {
+            Link(destination: websiteUrl) {
+              Text(websiteUrl.absoluteString)
+                .underline()
+                .multilineTextAlignment(.leading)
+            }
+          }
+        }
       }
-      .border(Color.blue, width: 1)
-      // the package QR Code
+        .frame(minWidth: 350, minHeight: 125)
+        .padding()
+      
+      Spacer()
+      
+      // the package QR Code and link to share the package online
       // FEAT?MAC?CONFIG-WINDOW TODO: Make size variable
-      if let qrCode = package.generateSharePackageQRCode(size: 200) {
-        Image(nsImage: qrCode)
-          .interpolation(.none) // important: ensures the edges of the QR Code remain sharp
-          .resizable()
-          .frame(width: 200, height: 200)
-          .background(Color.white) // ensures good contrast for scanning
-          .border(Color.green, width: 1)
+      VStack {
+        
+        if let qrCode = package.generateSharePackageQRCode(size: 113) {
+          Image(nsImage: qrCode)
+            .interpolation(.none) // important: ensures the edges of the QR Code remain sharp
+            .resizable()
+            .frame(width: 113, height: 113)
+            .background(Color.white) // ensures good contrast for scanning
+        }
+        
+        if let sharePackageUrl = package.sharePackageUrl {
+          
+          HStack {
+            
+            Link(destination: sharePackageUrl) {
+              Text("Share Keyboard")
+                .underline()
+            }
+            IconButtonView(action: { copyTextToClipboard(text: sharePackageUrl.absoluteString) }, label: "Copy link", systemImage: "doc.on.doc", helpText: "Copy link", font: .body)
+          }
+        }
       }
+      .padding(5)
+      .border(Color.black, width: 1)
+      //.padding([.top, .bottom])
     }
   }
 }
