@@ -14,6 +14,7 @@ public struct IconButtonView: View {
   let label: String
   let systemImage: String
   let helpText: String
+  let font: Font
   
   public var body: some View {
     
@@ -22,7 +23,7 @@ public struct IconButtonView: View {
     } label: {
       Label(label, systemImage: systemImage)
         .labelStyle(.iconOnly)
-        .font(.title2)
+        .font(font)
     }
     .buttonStyle(.bordered)
     .clipShape(.circle)
