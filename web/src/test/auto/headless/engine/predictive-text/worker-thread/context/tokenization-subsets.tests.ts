@@ -21,6 +21,7 @@ import {
   ContextToken,
   ContextTokenization,
   generateSubsetId,
+  legacySubsetKeyer,
   models,
   precomputationSubsetKeyer,
   TokenizationTransitionEdits,
@@ -31,7 +32,7 @@ import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
-var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
+const plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker});
 
 function toToken(text: string) {
@@ -40,6 +41,54 @@ function toToken(text: string) {
   token.isWhitespace = isWhitespace;
   return token;
 }
+
+describe('legacySubsetKeyer', () => {
+  it('does not map backspace inputs to same result as standard key inputs', () => {
+    const appleToken = ContextToken.fromRawText(plainModel, 'apple', true);
+
+    const bksp = { insert: '', deleteLeft: 1, deleteRight: 0, id: 3 };
+    const bkspKey = legacySubsetKeyer({
+      alignment: {
+        merges: [],
+        splits: [],
+        unmappedEdits: [],
+        edgeWindow: {
+          ...buildEdgeWindow([appleToken], bksp, false),
+          retokenization: ['appl'],
+          retokenizationText: 'appl'
+        },
+        removedTokenCount: 0
+      },
+      tokenizedTransform: (() => {
+        const map: Map<number, Transform> = new Map();
+        map.set(0, bksp);
+        return map;
+      })()
+    });
+
+    const input = { insert: 's', deleteLeft: 0, deleteRight: 0, id: bksp.id };
+    const inputKey = legacySubsetKeyer({
+      alignment: {
+        merges: [],
+        splits: [],
+        unmappedEdits: [],
+        edgeWindow: {
+          ...buildEdgeWindow([appleToken], input, false),
+          retokenization: ['apples'],
+          retokenizationText: 'apples'
+        },
+        removedTokenCount: 0
+      },
+      tokenizedTransform: (() => {
+        const map: Map<number, Transform> = new Map();
+        map.set(0, input);
+        return map;
+      })()
+    });
+
+    assert.notEqual(bkspKey, inputKey);
+  });
+});
 
 describe('precomputationSubsetKeyer', function() {
   it("safely generates keys for empty transition + empty contexts", () => {

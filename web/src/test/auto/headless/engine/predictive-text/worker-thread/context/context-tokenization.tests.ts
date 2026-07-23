@@ -397,6 +397,43 @@ describe('ContextTokenization', function() {
       );
     });
 
+    it('handles simple case - deletion of final context content via backspace', () => {
+      const baseTokens = ['a'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+      const targetTokens = [''].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: '', deleteLeft: 1, deleteRight: 0, id: 42 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: '', deleteLeft: 1, id: 42 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.evaluateTransition({
+        alignment: {
+          merges: [],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow: {
+            ...edgeWindow,
+            // The range within the window constructed by the prior call for its parameterization.
+            // Any adjustments on the boundary token itself are included here.
+            retokenization: [...targetTokens.slice(edgeWindow.sliceIndex).map(t => t.text)]
+          },
+          removedTokenCount: 1
+        },
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
+      },
+        inputTransform.id,
+        1
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+    });
+
     it('handles simple case - new character added to last token', () => {
       const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'da'];
       const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));

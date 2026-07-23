@@ -13,7 +13,6 @@ import { ContextTransition } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import { ModelCompositor } from './model-compositor.js';
 import { getBestTokenMatches } from './correction/distance-modeler.js';
-import { TokenResultMapping } from './correction/token-result-mapping.js';
 
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
@@ -459,7 +458,8 @@ export function determineSuggestionRange(
 export function buildAndMapPredictions(
   transition: ContextTransition,
   tokenization: ContextTokenization,
-  match: Readonly<TokenResultMapping>,
+  // Originally, Readonly<TokenResultMapping> - but we only need these two components here.
+  match: Readonly<{matchString: string, totalCost: number}>,
   costFactor: number
 ): CorrectionPredictionTuple[] {
   const model = transition.final.model;
@@ -492,6 +492,13 @@ export function buildAndMapPredictions(
     // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
     // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
   });
+
+  // Backspaces that shorten a multi-codepoint whitespace token are not handled well by default.
+  // As a new empty token is placed at the end for such cases, we can detect and handle such cases.
+  const inputTransform = transition.inputDistribution?.[0].sample ?? { insert: '', deleteLeft: 0 };
+  if(tokenization.tokens.length > 1 && tokenization.tail.searchModule.codepointLength == 0 && inputTransform.deleteLeft > 0) {
+    predictions.forEach((p) => p.prediction.sample.transform.deleteLeft += inputTransform.deleteLeft);
+  }
 
   return predictions;
 }
@@ -577,11 +584,6 @@ export async function correctAndEnumerate(
   for await(const match of getBestTokenMatches(searchModules, timer)) {
     // Corrections obtained:  now to predict from them!
     const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
-
-    // If our 'match' results in fully deleting the new token, reject it and try again.
-    if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
-      continue;
-    }
 
     // If our 'match' fully replaces the token, reject it and try again.
     if(match.matchSequence.length != 0 && match.matchSequence.length == match.knownCost) {
@@ -1076,6 +1078,9 @@ export function finalizeSuggestions(
       // root; we need to remove that preserved delete-left here.
       if(presDL > 0) {
         mergedTransform.deleteLeft -= presDL;
+      }
+      if(prediction.sample.transform.id !== undefined) {
+        mergedTransform.id = prediction.sample.transform.id;
       }
 
       // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
