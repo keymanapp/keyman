@@ -1,20 +1,20 @@
 //
-//  AllowSecurityPermissionView.swift
+//  RestartComputerView.swift
 //  Config
 //
-//  Created by Eli Schantz on 7/3/26.
+//  Created by Eli Schantz on 7/21/26.
 //
 
 import SwiftUI
 
-struct AllowSecurityPermissionView: View {
+struct RestartComputerView: View {
   @EnvironmentObject var installation: InstallationContainer
   let namespace: Namespace.ID
   
   var body: some View {
     VStack {
       
-      Text("Allow Security Permission")
+      Text("Restart Computer")
         .font(.title)
         .bold()
         .frame(maxWidth: .infinity, alignment: .center)
@@ -25,40 +25,49 @@ struct AllowSecurityPermissionView: View {
       Spacer()
       
       
-      Image("SecurityPermission")
-        .interpolation(.high)
-        .resizable()
-        .scaledToFit()
-        .frame(height: 130)
-        .padding(.bottom, 8)
+      Image(systemName: "restart.circle.fill")
+        .font(.system(size: 88))
+        .padding(8)
       
-      Text("Toggle Keyman.app to provide it with necessary control in System Settings > Privacy & Security > Accessibility.")
+      Text("A restart is required for the previous installation steps to take effect.")
         .multilineTextAlignment(.center)
       
       Spacer()
       
       HStack {
         
-        Text("Toggle accessibility control")
+        Text("Finish installation")
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
         
         
+        
         Button {
-            withAnimation(.smooth(duration: 0.5)) {
-              _ = installation.requestAccessibility()
-            }
+          restart()
+          
         } label: {
-            Text("Allow")
+            Text("Restart Now")
                 .padding(.horizontal, 16)
                 .padding(.vertical, 4)
         }
         .buttonStyle(.borderedProminent)
         .tint(.blue)
         .clipShape(Capsule())
-
-        ContinueButton()
+        .matchedGeometryEffect(id: "actionButton", in: namespace)
+        
+        NavigationButton(action: .dismiss)
       }
     }
   }
+}
+
+
+func restart() {
+    let script = """
+    tell application "System Events"
+        restart
+    end tell
+    """
+
+    NSAppleScript(source: script)?.executeAndReturnError(nil)
 }

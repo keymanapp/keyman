@@ -8,6 +8,8 @@ import SwiftUI
 
 struct GradientDivider: View {
   let namespace: Namespace.ID
+  var id: String = "divider"
+  
   
   var body: some View {
     Rectangle()
@@ -21,8 +23,7 @@ struct GradientDivider: View {
         endPoint: .trailing
       ))
       .frame(height: 1)
-      .padding(.horizontal, -16)
       .opacity(0.5)
-      .matchedGeometryEffect(id: "divider", in: namespace)
+      .matchedGeometryEffect(id: id, in: namespace)
   }
 }

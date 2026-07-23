@@ -13,7 +13,6 @@ struct InitialView: View {
   
   @EnvironmentObject var installation: InstallationContainer
   @Environment(\.dismiss) private var dismiss
-  @Binding var notifiedViews: [InstallPage]
   let namespace: Namespace.ID
   
   var versionText: String {
@@ -46,7 +45,7 @@ struct InitialView: View {
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
         
-        ContinueButton()
+        NavigationButton(action: .advance)
       }
     }
   }
