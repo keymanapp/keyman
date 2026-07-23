@@ -140,7 +140,7 @@ keyboards, but should not be used in any new keyboards or user interfaces.
 
 [`ShowHelp` or `showHelp` Function (Deprecated)](ShowHelp)
 :   Use [`keyman.osk.setPos()`](../osk/setPos)
-    Use [`keyman.osk.show()`](../osk/show)
+:   Use [`keyman.osk.show()`](../osk/show)
 
 [`ShowPinnedHelp` or `showPinnedHelp` Function (Deprecated)](ShowPinnedHelp)
 :   Use [`keyman.osk.setRect()`](../osk/setRect)
