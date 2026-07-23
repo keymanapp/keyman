@@ -39,6 +39,14 @@ public class InstallationState {
     return !isRepair && tasks.allSatisfy{ !$0.isComplete }
   }
 
+  /**
+   * The installation has at least one task complete and at least one remaining to complete.
+   * It does not matter if this is a repair or not.
+   */
+  public var isInProgress: Bool {
+    return tasks.contains(where: { !$0.isComplete }) && tasks.contains(where: { $0.isComplete})
+  }
+
   init(version: String, dateRestartRequested: Date? = nil, isRepair: Bool = false, tasks: Set<InstallationTask>) {
     self.keymanVersion = version
     self.dateRestartRequested = dateRestartRequested
@@ -56,11 +64,8 @@ public class InstallationState {
     var installationTasks = Set<InstallationTask>()
     
     // for every task flag found in dictionary, insert a task in the tasks array
-    if let taskFlag = dictionary[InstallationTaskType.verifyInputMethod.rawValue] as? Bool {
-      installationTasks.insert(InstallationTask(task: .verifyInputMethod, completed: taskFlag))
-    }
-    if let taskFlag = dictionary[InstallationTaskType.migrateData.rawValue] as? Bool {
-      installationTasks.insert(InstallationTask(task: .migrateData, completed: taskFlag))
+    if let taskFlag = dictionary[InstallationTaskType.prepareNewInstall.rawValue] as? Bool {
+      installationTasks.insert(InstallationTask(task: .prepareNewInstall, completed: taskFlag))
     }
     if let taskFlag = dictionary[InstallationTaskType.enableInputMethod.rawValue] as? Bool {
       installationTasks.insert(InstallationTask(task: .enableInputMethod, completed: taskFlag))
