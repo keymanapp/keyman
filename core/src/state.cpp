@@ -36,6 +36,23 @@ void actions::push_capslock(bool turnOn) {
   emplace_back(std::move(ai));
 }
 
+actions::actions(actions const &other)
+: std::vector<action>(other)
+, _option_items_stack(other._option_items_stack)
+{
+  // Update all option pointers to point to the new stack.
+  size_t opt_index = 0;
+  for (auto &item : *this) {
+    if (item.type == KM_CORE_IT_PERSIST_OPT) {
+      if (opt_index < _option_items_stack.size()) {
+        item.option = &_option_items_stack[opt_index++];
+      } else {
+        // no matching item in the stack; clear pointer.
+        item.option = nullptr;
+      }
+    }
+  }
+}
 
 state::state(km::core::abstract_processor & ap, km_core_option_item const *env)
   : _processor(ap)
