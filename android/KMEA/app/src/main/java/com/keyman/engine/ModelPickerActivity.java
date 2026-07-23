@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.os.BundleCompat;
 
 import com.keyman.engine.cloud.CloudApiTypes;
 import com.keyman.engine.cloud.CloudDownloadMgr;
@@ -69,14 +70,15 @@ public final class ModelPickerActivity extends BaseActivity {
     TextView textView = (TextView) findViewById(R.id.bar_title);
 
     Bundle bundle = getIntent().getExtras();
-    String newLanguageID = bundle.getString(KMManager.KMKey_LanguageID);
-    String newCustomHelpLink = bundle.getString(KMManager.KMKey_CustomHelpLink, "");
+    HashMap<String, String> lmInfo = BundleCompat.getSerializable(bundle, KMManager.KMKey_LexicalModel, HashMap.class);
+    final String newLanguageID = lmInfo != null ? lmInfo.get(KMManager.KMKey_LanguageID) : bundle.getString(KMManager.KMKey_LanguageID, "");
+    final String newCustomHelpLink = lmInfo != null ? lmInfo.get(KMManager.KMKey_CustomHelpLink) : bundle.getString(KMManager.KMKey_CustomHelpLink, "");
+    final String languageName = lmInfo != null ? lmInfo.get(KMManager.KMKey_LanguageName) : bundle.getString(KMManager.KMKey_LanguageName, "");
 
     // Sometimes we need to re-initialize the list of models that are displayed in the ListView
     languageID = newLanguageID;
     customHelpLink = newCustomHelpLink;
 
-    final String languageName = bundle.getString(KMManager.KMKey_LanguageName);
     textView.setText(String.format(getString(R.string.model_picker_header), languageName));
 
     listView = (ListView) findViewById(R.id.listView);
