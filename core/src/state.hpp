@@ -10,6 +10,7 @@
 
 #include <cassert>
 #include <vector>
+#include <deque>
 
 #include "keyman_core.h"
 
@@ -27,7 +28,7 @@ using action = km_core_action_item;
 
 class actions : public std::vector<action>
 {
-  std::vector<option> _option_items_stack;
+  std::deque<option> _option_items_stack;
 
   template<km_core_action_type V>
   void _push_vkey(km_core_virtual_key);
