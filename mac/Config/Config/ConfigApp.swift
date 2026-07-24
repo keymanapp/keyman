@@ -25,6 +25,10 @@ struct ConfigApp: App {
           }
         }
     }
+      Window("Main Configuration", id: "main_config") {
+        MainConfigView()
+          .environmentObject(settings)
+      }
     Window("Installation", id: "install") {
       InstallView()
         .environmentObject(installation)
