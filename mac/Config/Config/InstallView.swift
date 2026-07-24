@@ -17,8 +17,8 @@ struct InstallView: View {
         Image(systemName: "gear")
           .imageScale(.large)
           .foregroundColor(.accentColor)
-        if let nextTask = installation.nextTask() {
-          Text("Next task = \(nextTask.taskType.rawValue)")
+        if let installTask = installation.currentTask() {
+          Text("Current task = \(installTask.taskType.rawValue)")
         }
       }
       HStack {
