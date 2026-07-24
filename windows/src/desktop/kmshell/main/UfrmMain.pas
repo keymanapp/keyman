@@ -661,6 +661,8 @@ end;
 
 procedure TfrmMain.Options_BaseKeyboard;   // I4169
 begin
+  // TODO change this dialog to run as current user and elevate on "ok" button:wq
+
   WaitForElevatedConfiguration(Handle, '-basekeyboard');
   // Refresh will be triggered by elevated process
 end;
