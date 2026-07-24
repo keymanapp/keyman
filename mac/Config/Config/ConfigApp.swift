@@ -16,12 +16,15 @@ struct ConfigApp: App {
   @Environment(\.openWindow) private var openWindow
   
   var body: some Scene {
+    
+    
     Window("Configuration", id: "config") {
       ConfigView()
         .environmentObject(settings)
         .task {
           if !installation.isInstallationComplete() {
             openWindow(id: "install")
+            openWindow(id: "new install")
           }
         }
     }
@@ -29,5 +32,14 @@ struct ConfigApp: App {
       InstallView()
         .environmentObject(installation)
     }
+    
+    
+    Window("New Installation", id: "new install") {
+      ParentInstallView()
+        .environmentObject(installation)
+    }
+    .defaultSize(width: 500, height: 400)
+    .windowResizability(.contentSize)
+  
   }
 }
