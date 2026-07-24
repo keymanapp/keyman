@@ -101,11 +101,7 @@ public class PackageDownload {
    * Send a notification that an attempt to downgrade a package has been detected
    */
   func sendNotificationToConfirmPackageDowngrade() {
-    NotificationCenter.default.post(
-      name: .packageDowngradeRequested,
-      object: nil,
-      userInfo: nil
-    )
+    NotificationCenter.default.post(name: .packageDowngradeRequested, object: nil)
   }
   
   /**
@@ -115,11 +111,7 @@ public class PackageDownload {
     try self.movePackageFromTemporaryToInstalled()
     try self.deleteDownloadedKmpFile()
     
-    NotificationCenter.default.post(
-      name: .newPackageInstalled,
-      object: nil,
-      userInfo: nil
-    )
+    NotificationCenter.default.post(name: .newPackageInstalled, object: nil)
   }
   
   /**
@@ -130,11 +122,7 @@ public class PackageDownload {
     try self.deleteDownloadedKmpFile()
     try self.movePackageFromTemporaryToInstalled()
     
-    NotificationCenter.default.post(
-      name: .packageReplaced,
-      object: nil,
-      userInfo: nil
-    )
+    NotificationCenter.default.post(name: .packageReplaced, object: nil)
   }
   
   /**
