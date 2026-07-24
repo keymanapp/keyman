@@ -12,13 +12,9 @@ import KeymanSettings
 
 // in-app notifications sent
 public extension Notification.Name {
-  static let installationStateEvaluated = Notification.Name("installation.state.evaluated")
-  static let inputMethodMissing = Notification.Name("input.method.missing")
-  static let inputMethodOutdated = Notification.Name("input.method.outdated")
-  static let newInstallation = Notification.Name("new.installation")
-  static let activeInstallation = Notification.Name("active.installation")
-  static let installationRepairEvaluated = Notification.Name("installation.repair.evaluated")
-  static let installationRepairNeeded = Notification.Name("installation.repair.needed")
+  static let startNewInstallation = Notification.Name("start.new.installation")
+  static let startInstallationRepair = Notification.Name("start.installation.repair")
+  static let installationRepairStarted = Notification.Name("installation.repair.started")
 }
 
 @MainActor // run on the main actor since data is published directly to the UI
@@ -69,23 +65,22 @@ public class InstallationContainer : ObservableObject {
     print("InstallationContainer registerObservers")
     NotificationCenter.default.addObserver(
       self,
-      selector: #selector(self.handleInstallationEvaluated(_:)),
-      name: NSNotification.Name.installationStateEvaluated,
+      selector: #selector(self.handleStartNewInstallation(_:)),
+      name: NSNotification.Name.startNewInstallation,
       object: nil // Observe notifications from any sender
     )
-    print("InstallationContainer registerObservers")
     NotificationCenter.default.addObserver(
       self,
-      selector: #selector(self.handleRepairDetermined(_:)),
-      name: NSNotification.Name.installationRepairEvaluated,
+      selector: #selector(self.handleStartInstallationRepair(_:)),
+      name: NSNotification.Name.startInstallationRepair,
       object: nil // Observe notifications from any sender
     )
   }
 
   /**
-   * called when `NSNotification.Name.installationStateEvaluated` is received
+   * called when `NSNotification.Name.startNewInstallation` is received
    */
-  @objc func handleInstallationEvaluated(_ notification: Notification) {
+  @objc func handleStartNewInstallation(_ notification: Notification) {
     // now that the installation has been evaluated
     // we can set the installationState
     
@@ -94,18 +89,17 @@ public class InstallationContainer : ObservableObject {
       
       // the evaluation is done
       self.installationCheck.isEvaluatingInstallation = false
-      print("handleInstallationEvaluated, new installationState: \(newState)")
+      print("handleStartNewInstallation, new state provided")
     } else {
-      print("handleInstallationEvaluated received but did not include new InstallationState")
+      print("handleStartNewInstallation received but did not include new InstallationState")
     }
   }
 
-
   /**
-   * called when `NSNotification.Name.installationRepairEvaluated` is received
+   * called when `NSNotification.Name.startInstallationRepair` is received
    */
-  @objc func handleRepairDetermined(_ notification: Notification) {
-    print("handleRepairDetermined")
+  @objc func handleStartInstallationRepair(_ notification: Notification) {
+    print("handleStartInstallationRepair")
     // Extract message from the notification if available
     if let newState = notification.object as? InstallationState {
       self.installationState = newState
@@ -113,9 +107,9 @@ public class InstallationContainer : ObservableObject {
       // now that the repair has been determined, we can notify that a repair is needed
       // so that the repair UI can presented to the user
       
-      NotificationCenter.default.post(name: .installationRepairNeeded, object: nil, userInfo: nil)
+      NotificationCenter.default.post(name: .installationRepairStarted, object: nil, userInfo: nil)
     } else {
-      print("handleRepairNeeded received but did not include new InstallationState")
+      print("handleStartInstallationRepair received but did not include new InstallationState")
     }
   }
 
@@ -359,38 +353,19 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
-   * first kill the Keyman input method if it is running
-   * second, call Keyman as a separate process with an argument that checks whether accessibility has been granted by the user
-   * and listen for message from Keyman to indicate the result
+   * call Keyman as a separate process with an argument that checks whether accessibility has been granted by the user
    */
   public func checkAccessibilityPermissionGranted() {
-    if (inputMethodUtil.isKeymanInputMethodRunning()) {
-      let killed = self.inputMethodUtil.killKeymanInputMethod()
-      print("checkAccessibilityPermission, Keyman input method killed: \(killed)")
-    } else {
-      print("checkAccessibilityPermission, Keyman input method not running")
-    }
- 
     self.inputMethodUtil.doAsyncAccessibilityCheck()
   }
   
   /**
-   * First kill the Keyman input method if it is running.
-   * Second, call Keyman as a separate process with an argument that requests the system to prompt the user to grant accessibility.
-   * The Keyman input method cannot send a message to indicate success, because it does not know itself when the user has
-   * finished making the change in Settings.
-   * To learn the result, we must poll with `isAccessibilityGranted()`
+   * Call Keyman as a separate process with an argument that requests the system to prompt the user to grant accessibility.
+   * To learn the result, we must poll with `checkAccessibilityPermissionGranted()`
    */
   public func requestAccessibility() -> Bool {
     var requested = false
-    
-    if (inputMethodUtil.isKeymanInputMethodRunning()) {
-      let killed = self.inputMethodUtil.killKeymanInputMethod()
-      print("requestAccessibility, Keyman input method killed: \(killed)")
-    } else {
-      print("requestAccessibility, Keyman input method not running")
-    }
-
+  
     requested = self.inputMethodUtil.invokeKeymanInputMethodRequestAccess()
     print("requestAccessibility called, requested: \(requested)")
     

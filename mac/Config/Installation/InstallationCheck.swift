@@ -135,45 +135,35 @@ public class InstallationCheck {
     DistributedNotificationCenter.default().addObserver(
       self,
       selector: #selector(self.handleAccessibilityResponse(_:)),
-      name: NSNotification.Name.accessibilityQueryResponse,
+      name: NSNotification.Name.accessibilityStateResponse,
       object: nil // Observe notifications from any sender
     )
     // MAC-CONFIG_TODO: add timeout?
   }
-  
+    
   /**
-   * If the installation is incomplete, send notifications so that the UI
-   * can present the user with the necessary steps to complete the installation.
-   */
-  func sendIncompleteNotificationsIfNecessary() {
-    if !self.isInputMethodInstalled {
-      NotificationCenter.default.post(name: .inputMethodMissing, object: nil)
-    } else if !self.isInputMethodCurrent {
-      NotificationCenter.default.post(name: .inputMethodOutdated, object: nil)
-    } else {
-      if let state = self.installationState {
-        if state.isNew {
-          if !state.isComplete {
-            NotificationCenter.default.post(name: .newInstallation, object: nil)
-          }
-        } else if !state.isComplete {
-          NotificationCenter.default.post(name: .activeInstallation, object: nil)
-        }
-      }
-    }
-  }
-  
-  /**
-   * called when `NSNotification.Name.accessibilityQueryResponse` is received
+   * called when `NSNotification.Name.accessibilityStateResponse` is received
    */
   @objc func handleAccessibilityResponse(_ notification: Notification) {
+    var installCompleted = false
+    
     print("handleAccessibilityResponse")
     // Extract message from the notification if available
     if let message = notification.object as? String {
       let permissionGranted = self.processAccessibilityResponse(with: message)
-      self.completeEvaluation(accessibilityPermissionGranted: permissionGranted)
+      
+      if let state = self.installationState {
+        installCompleted = state.isComplete
+      }
+      
+      // if this is a completed install, check whether repairs are needed
+      if installCompleted {
+        self.checkForRepair(accessibilityPermissionGranted: permissionGranted)
+      } else {
+        self.completeEvaluation(accessibilityPermissionGranted: permissionGranted)
+      }
     } else {
-      print("accessibilityQueryResponse received but did not include message")
+      print("accessibilityStateResponse received but did not include message")
     }
   }
   
@@ -193,21 +183,21 @@ public class InstallationCheck {
   }
 
   /**
-   * Save the new InstallationState and notify observers
+   * Save the new InstallationState and notify observers to start new installation
    */
   func applyNewInstallationState(state: InstallationState) {
     self.defaultsRepository.writeInstallationState(state.toUserDefaultsDictionary())
     self.installationState = state
-    NotificationCenter.default.post(name: .installationStateEvaluated, object: state)
+    NotificationCenter.default.post(name: .startNewInstallation, object: state)
   }
 
   /**
    * Save the new InstallationState for handling repairs and notify observers
    */
-  func prepareToRepair(newState: InstallationState) {
-    self.defaultsRepository.writeInstallationState(newState.toUserDefaultsDictionary())
-    self.installationState = newState
-    NotificationCenter.default.post(name: .installationRepairEvaluated, object: newState)
+  func applyRepairedInstallationState(state: InstallationState) {
+    self.defaultsRepository.writeInstallationState(state.toUserDefaultsDictionary())
+    self.installationState = state
+    NotificationCenter.default.post(name: .startInstallationRepair, object: state)
   }
 
   /**
@@ -303,21 +293,6 @@ public class InstallationCheck {
   }
   
   /**
-   * Creates a InstallationState object for an installation that is already in progress
-   * Mark existing tasks as complete if
-   */
-  func createInProgressInstallationState(with neededTasks: Set<InstallationTask>,
-                                         and existingTasks: Set<InstallationTask>) -> InstallationState {
-    var fullTaskList = neededTasks
-    
-    // add restartMac InstallationTask
-    fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .restartMac))
-    let installationState = InstallationState(version: self.inputMethodVersion, tasks: fullTaskList)
-    
-    return installationState
-  }
-
-  /**
    * Creates a InstallationState object describing a new installation
    */
   func createNewInstallationState(with neededTasks: Set<InstallationTask>) -> InstallationState {
@@ -331,19 +306,19 @@ public class InstallationCheck {
     return installationState
   }
 
-  // old repair-only version
   /**
    * Determine whether the completed installation has been altered in some way and needs repair.
-   * If repair is needed, then call `prepareToRepair` with the new `InstallationState`
+   * If repair is needed, then call `applyRepairedInstallationState` with the new `InstallationState`
    */
-//  func completeValidation(accessibilityPermissionGranted: Bool) {
-//    // check whether the installation requires repair
-//    if let newInstallationState = self.createRepairInstallationState(accessibilityPermissionGranted: accessibilityPermissionGranted) {
-//      self.prepareToRepair(newState: newInstallationState)
-//    } else {
-//      print("completeEvaluation: no repair needed")
-//    }
-//  }
+  func checkForRepair(accessibilityPermissionGranted: Bool) {
+    // check whether the installation requires repair
+    if let state = self.createRepairInstallationState(accessibilityPermissionGranted: accessibilityPermissionGranted) {
+      print("checkForRepair completed: repair is required")
+      self.applyRepairedInstallationState(state: state)
+    } else {
+      print("checkForRepair completed: no repair needed")
+    }
+  }
 
   /**
    * Read the currently saved installation state as an object
@@ -381,7 +356,7 @@ public class InstallationCheck {
   
   
   /**
-   * The provided parameter `accessibilityPermissionGranted` was already returned asynchronously from the input method.
+   * The provided parameter `accessibilityPermissionGranted` was returned asynchronously from the input method.
    * Use it and other info to see what tasks are needed to complete installation.
    */
   func determineInstallationTasksNeeded(for accessibilityPermissionGranted: Bool) -> Set<InstallationTask> {
@@ -399,34 +374,18 @@ public class InstallationCheck {
       // prompt user to restart after enabling the input method
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .restartMac))
     }
-//    
-//    if !newTasks.isEmpty {
-//      newInstallationState = InstallationState(version: self.inputMethodVersion, isRepair: true, tasks: newTasks)
-//    }
     
     return newTasks
   }
 
   /**
+   * The provided parameter `accessibilityPermissionGranted` was returned asynchronously from the input method.
    * Check the installation to see of it is valid -- something may have been tampered with after installation was completed.
-   * The provided parameter `accessibilityPermissionGranted` was already returned asynchronously from the input method.
    * If the installation needs repair, create the info needed for repairing the installation.
    */
   func createRepairInstallationState(accessibilityPermissionGranted: Bool) -> InstallationState? {
     var repairInstallationState: InstallationState? = nil
-    var repairTasks = Set<InstallationTask>()
-    
-    if !accessibilityPermissionGranted {
-      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .requestAccess))
-    }
-    
-    if !self.inputMethodUtil.isKeymanInputMethodEnabled() {
-      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .enableInputMethod))
-      
-      // also need to restart after enabling the input method
-      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .restartMac))
-    }
-    
+    var repairTasks = self.determineInstallationTasksNeeded(for: accessibilityPermissionGranted)
     
     if !repairTasks.isEmpty {
       repairInstallationState = InstallationState(version: self.inputMethodVersion, isRepair: true, tasks: repairTasks)
