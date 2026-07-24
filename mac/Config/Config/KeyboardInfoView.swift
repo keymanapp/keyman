@@ -25,7 +25,7 @@ public struct KeyboardInfoView: View {
     pasteboard.clearContents()
     pasteboard.setString(text, forType: .string)
   }
-
+  
   public var body: some View {
     
     HStack {
@@ -77,8 +77,8 @@ public struct KeyboardInfoView: View {
           }
         }
       }
-        .frame(minWidth: 350, minHeight: 125)
-        .padding()
+      .frame(minWidth: 350, minHeight: 125)
+      .padding()
       
       Spacer()
       
@@ -102,7 +102,7 @@ public struct KeyboardInfoView: View {
               Text("Share Keyboard")
                 .underline()
             }
-            IconButtonView(action: { copyTextToClipboard(text: sharePackageUrl.absoluteString) }, label: "Copy link", systemImage: "doc.on.doc", helpText: "Copy link", font: .body)
+            IconButtonView(action: { copyTextToClipboard(text: sharePackageUrl.absoluteString) }, systemImage: "doc.on.doc", font: .body , helpText: "Copy link")
           }
         }
       }
