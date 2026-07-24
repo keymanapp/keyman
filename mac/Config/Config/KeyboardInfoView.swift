@@ -3,6 +3,8 @@
  *
  * Created by Gabriel Schantz on 2026-07-20
  *
+ * The view used for keyboard info
+ * The view relies on the automatically synthesized memberwise intializer
  *
  * FEAT/MAC/CONFIG-WINDOW TODO: Finish writing file summary
  */
@@ -12,10 +14,6 @@ import KeymanSettings
 
 public struct KeyboardInfoView: View {
   let package: KeymanPackage
-  
-  public init(for package: KeymanPackage) {
-    self.package = package
-  }
   
   /**
    * Copies the text argument to the system clipboard
@@ -28,16 +26,16 @@ public struct KeyboardInfoView: View {
   
   public var body: some View {
     
-    HStack {
+    HStack (alignment: .top) {
       
       // the custom package image
       if let packageImage = package.graphicImage {
         Image(nsImage: packageImage)
           .resizable()
-          .frame(width: 87.92, height: 157) // Corresponds to max height of package properties presented as text and maintains width:height ratio of 140:250
+          .frame(maxWidth: 84, maxHeight: 150)
       }
       
-      // the package properties presented as text
+      // the text-based package properties presented in a grid
       Grid(horizontalSpacing: 10, verticalSpacing: 5) {
         // the package version
         GridRow {
@@ -46,25 +44,29 @@ public struct KeyboardInfoView: View {
           Text(package.packageVersion)
             .gridColumnAlignment(.leading) // all elements underneath inherit the .leading alignment
         }
+        
         // the fonts
         GridRow {
           Text("Fonts:").bold()
-          HStack{
+          HStack {
             ForEach(package.fonts, id: \.self) { font in
               Text(font)
             }
           }
         }
+        
         // the copyright
         GridRow {
           Text("Copyright:").bold()
           Text(package.copyright ?? "")
         }
+        
         // the author
         GridRow {
           Text("Author:").bold()
           Text(package.author ?? "")
         }
+        
         // the website
         GridRow {
           Text("Website:").bold()
@@ -77,20 +79,20 @@ public struct KeyboardInfoView: View {
           }
         }
       }
-      .frame(minWidth: 350, minHeight: 125)
-      .padding()
+      .padding(5)
       
       Spacer()
       
       // the package QR Code and link to share the package online
-      // FEAT?MAC?CONFIG-WINDOW TODO: Make size variable
       VStack {
-        
-        if let qrCode = package.generateSharePackageQRCode(size: 113) {
+        let size: CGFloat = 106
+        if let qrCode = package.generateSharePackageQRCode(size: size) {
+          
+          // the package QR Code
           Image(nsImage: qrCode)
             .interpolation(.none) // important: ensures the edges of the QR Code remain sharp
             .resizable()
-            .frame(width: 113, height: 113)
+            .frame(width: size, height: size)
             .background(Color.white) // ensures good contrast for scanning
         }
         
@@ -98,17 +100,20 @@ public struct KeyboardInfoView: View {
           
           HStack {
             
+            // the link to share the package online
             Link(destination: sharePackageUrl) {
               Text("Share Keyboard")
                 .underline()
             }
+            
+            // the button to copy the link to share the package online
             IconButtonView(action: { copyTextToClipboard(text: sharePackageUrl.absoluteString) }, systemImage: "doc.on.doc", font: .body , helpText: "Copy link")
           }
         }
       }
       .padding(5)
       .border(Color.black, width: 1)
-      //.padding([.top, .bottom])
     }
+    .frame(height: 150)
   }
 }
