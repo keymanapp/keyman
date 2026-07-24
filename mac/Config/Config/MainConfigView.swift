@@ -17,7 +17,7 @@ struct MainConfigView: View {
   @State private var isShowingDeleteAlert = false
   @State private var selectedPackage: KeymanPackage? = nil
   @State private var expandedPackageID: UUID? = nil
-   
+  
   /**
    * Sets isShowingDeleteAlert to true and assigns the state variable selectedPackage the KeymanPackage argument
    */
@@ -36,7 +36,7 @@ struct MainConfigView: View {
     .buttonStyle(.bordered)
     .clipShape(Capsule())
     .padding()
-    // Binds the visibility state to the sheet builder
+    // binds the visibility state to the sheet builder
     .sheet(isPresented: $isShowingSheet) {
       InstallKeyboardView()
         .frame(width: 960, height: 390)
@@ -47,7 +47,7 @@ struct MainConfigView: View {
       ForEach(package.keyboards) { keyboard in
         DisclosureGroup(isExpanded: Binding(
           get: { self.expandedPackageID == package.id },
-          // handles when the chevron arrow is clicked by the user
+          // setter handles when the chevron arrow is clicked by the user
           // doesn't require if statement because the disclosure group has a state to toggle which is passed into the setter
           // $0 = true when disclosure group is open and $0 = false when disclosure group is closed
           set: { self.expandedPackageID = $0 ? package.id : nil }
@@ -62,10 +62,10 @@ struct MainConfigView: View {
             Spacer()
             
             // see keyboard help button
-            IconButtonView(action: { print("See help") }, label: "See help", systemImage: "questionmark.circle", helpText: "See help", font: .title2)
+            IconButtonView(action: { print("See help") }, systemImage: "questionmark.circle", font: .title2, helpText: "See help")
             
             // delete keyboard button
-            IconButtonView(action: { showDeleteAlert(for: package) }, label: "Delete keyboard", systemImage: "trash", helpText: "Delete keyboard", font: .title2)
+            IconButtonView(action: { showDeleteAlert(for: package) }, systemImage: "trash", font: .title2, helpText: "Delete keyboard")
           }
           .contentShape(Rectangle())
           // handles when the HStack is clicked by the user
@@ -82,18 +82,19 @@ struct MainConfigView: View {
         }
       }
     }
+    // binds the visibilty state to the alert builder
     .alert("Are you sure you want to delete the keyboard \"\(selectedPackage?.packageName ?? "")\"?",
-             isPresented: $isShowingDeleteAlert,
-             presenting: selectedPackage) { package in
-        
-        Button("Cancel", role: .cancel) { }
-        
-        Button("Delete", role: .destructive) {
-          settings.removeInstalledPackage(with: package.id)
-        }
-      } message: { package in
-        Text("You can't undo this action.")
+           isPresented: $isShowingDeleteAlert,
+           presenting: selectedPackage) { package in
+      
+      Button("Cancel", role: .cancel) { }
+      
+      Button("Delete", role: .destructive) {
+        settings.removeInstalledPackage(with: package.id)
       }
+    } message: { package in
+      Text("You can't undo this action.")
+    }
     .padding()
   }
 }
