@@ -50,9 +50,18 @@ public class InstallationContainer : ObservableObject {
       fatalError("Unable to access group container path for InputMethodUtil: \(error.localizedDescription).")
     }
     
-    self.installationState = nil
 
     self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
+    
+    // if installation is still being evaluated, set the installation state later when it is done
+    // otherwise, set it immediately
+    if self.installationCheck.isEvaluatingInstallation {
+      self.installationState = nil
+    } else {
+      self.installationState = self.installationCheck.installationState
+      print("installation phase = \(self.installationCheck.installationPhase), hasTasks = \(self.installationCheck.installationPhase.hasTasks)")
+    }
+    
     self.registerObservers()
     
     self.installationCheck.startInstallationEvaluation()
@@ -132,11 +141,15 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
-   * Returns the next incompleted installation task, if there is one remaining.
+   * Returns the current incompleted installation task, if there is one.
    * Note that this function determines the order in which the tasks are executed as they are stored in an unsorted Set.
    */
-  public func nextTask() -> InstallationTask? {
+  public func currentTask() -> InstallationTask? {
     guard let state = self.installationState else { return nil }
+    guard self.installationPhase.hasTasks else {
+      print("the installation phase \(self.installationPhase) has no tasks");
+      return nil
+    }
 
     let incompleteTasks = state.tasks.filter { !$0.isComplete }
     
@@ -158,6 +171,10 @@ public class InstallationContainer : ObservableObject {
    */
   func executeTask(_ task: InstallationTask) {
     guard let state = self.installationState else { return }
+    guard self.installationPhase.hasTasks else {
+      print("the installation phase \(self.installationPhase) has no tasks");
+      return
+    }
 
     var completedTask = false
     
@@ -183,8 +200,8 @@ public class InstallationContainer : ObservableObject {
    * Executes the next installation task which is incomplete, if there is one remaining.
    */
   public func executeNextInstallationTask() {
-    if let nextTask = self.nextTask() {
-      self.executeTask(nextTask)
+    if let installTask = self.currentTask() {
+      self.executeTask(installTask)
     }
   }
   

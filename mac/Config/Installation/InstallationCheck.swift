@@ -16,13 +16,24 @@ import Foundation
 import KeymanSettings
 
 public enum InstallationPhase {
-  case inputMethodMissing
-  case inputMethodOutdated
-  case evaluatingInstallation
-  case newInstallation
-  case installationInProgress
-  case installationComplete
-  case installationRepairNeeded
+    case inputMethodMissing
+    case inputMethodOutdated
+    case evaluatingInstallation
+    case newInstallation
+    case installationInProgress
+    case installationComplete
+    case installationRepairNeeded
+
+    public var hasTasks: Bool {
+        switch self {
+        case .newInstallation,
+            .installationInProgress,
+            .installationRepairNeeded:
+            return true
+        default:
+          return false
+        }
+    }
 }
 
 @MainActor
@@ -92,12 +103,14 @@ public class InstallationCheck {
       if installState.keymanVersion != self.inputMethodVersion {
         print("removing stale installation state \(installState.keymanVersion) because the current version is \(self.inputMethodVersion)")
         self.clearInstallationState()
+        // this is a new installation
+        self.isEvaluatingInstallation = true
       } else if installState.isNew {
         // for a new installation, do not create the installationState until the evaluation is complete
         self.isEvaluatingInstallation = true
       } else {
         // If we're already in progress or completed or doing a repair, pick up where we left off
-        // Note that a completed installtion will need to be checked for repairs
+        // Note that a completed installation will need to be checked for repairs
         self.installationState = installState
         self.isEvaluatingInstallation = false
       }
@@ -117,7 +130,9 @@ public class InstallationCheck {
    */
   public func startInstallationEvaluation() {
     // call the input method to check whether Accessibility permission has been granted
-    self.inputMethodUtil.doAsyncAccessibilityCheck()
+    if self.isEvaluatingInstallation || self.installationState?.isComplete == true {
+      self.inputMethodUtil.doAsyncAccessibilityCheck()
+    }
   }
   
   static func isVersionCurrent(inputMethodVersion: String, configurationVersion: String) -> Bool {
