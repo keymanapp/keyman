@@ -10,6 +10,7 @@ import SwiftUI
 struct EnableInputMethodView: View {
   @EnvironmentObject var installation: InstallationContainer
   let namespace: Namespace.ID
+  let onContinue: () -> Void
   
   var body: some View {
     
@@ -59,7 +60,7 @@ struct EnableInputMethodView: View {
         .clipShape(Capsule())
         .matchedGeometryEffect(id: "actionButton", in: namespace)
 
-        NavigationButton(action: .advance)
+        NavigationButton(action: .advance, onContinue: onContinue)
       }
     }
   }

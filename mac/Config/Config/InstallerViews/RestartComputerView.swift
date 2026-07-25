@@ -43,7 +43,6 @@ struct RestartComputerView: View {
         
         
         Button {
-          restart()
           
         } label: {
             Text("Restart Now")
@@ -59,15 +58,4 @@ struct RestartComputerView: View {
       }
     }
   }
-}
-
-
-func restart() {
-    let script = """
-    tell application "System Events"
-        restart
-    end tell
-    """
-
-    NSAppleScript(source: script)?.executeAndReturnError(nil)
 }

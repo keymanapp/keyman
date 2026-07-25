@@ -18,6 +18,7 @@ func openAccessibilitySettings() {
 struct CheckAccessibiltyPermissionView: View {
   @EnvironmentObject var installation: InstallationContainer
   let namespace: Namespace.ID
+  let onContinue: () -> Void
   
   var body: some View {
     VStack {
@@ -54,6 +55,7 @@ struct CheckAccessibiltyPermissionView: View {
         
         Button {
             _ = installation.requestAccessibility()
+            openAccessibilitySettings()
           
         } label: {
           Text("Open Settings")
@@ -65,7 +67,7 @@ struct CheckAccessibiltyPermissionView: View {
         .clipShape(Capsule())
         .matchedGeometryEffect(id: "actionButton", in: namespace)
 
-        NavigationButton(action: .advance)
+        NavigationButton(action: .advance, onContinue: onContinue)
       }
     }
   }

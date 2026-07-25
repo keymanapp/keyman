@@ -16,7 +16,8 @@ enum ButtonAction {
 struct NavigationButton: View {
   @Environment(\.dismiss) private var dismiss
   @EnvironmentObject var installation: InstallationContainer
-  var action: ButtonAction
+  var action: ButtonAction = .advance
+  var onContinue: () -> Void = {}
   
     var body: some View {
       
@@ -24,7 +25,8 @@ struct NavigationButton: View {
           
           switch action {
           case .advance:
-            NotificationCenter.default.post(name: Notification.Name("advancePage"), object: nil)
+            installation.executeNextInstallationTask()
+            onContinue()
           case .dismiss:
             dismiss()
           }
@@ -48,8 +50,4 @@ struct NavigationButton: View {
         }
         .clipShape(Capsule())
     }
-}
-
-extension Notification.Name {
-    static let advancePage = Notification.Name("advancePage")
 }
