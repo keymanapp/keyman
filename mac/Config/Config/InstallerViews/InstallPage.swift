@@ -6,6 +6,7 @@
 //
 
 enum InstallPage: String, CaseIterable {
+  case loading
   case initial
   case completed
   case enableInputMethod

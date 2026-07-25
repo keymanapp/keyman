@@ -40,7 +40,7 @@ struct CompletedInstallView: View {
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
         
-        NavigationButton(action: .advance)
+        NavigationButton(action: .dismiss)
       }
     }
   }

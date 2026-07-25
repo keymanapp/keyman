@@ -14,6 +14,7 @@ struct InitialView: View {
   @EnvironmentObject var installation: InstallationContainer
   @Environment(\.dismiss) private var dismiss
   let namespace: Namespace.ID
+  let onContinue: () -> Void
   
   var versionText: String {
     if let version = installation.installationState?.keymanVersion {
@@ -45,7 +46,7 @@ struct InitialView: View {
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
         
-        NavigationButton(action: .advance)
+        NavigationButton(action: .advance, onContinue: onContinue)
       }
     }
   }
