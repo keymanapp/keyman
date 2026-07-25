@@ -45,7 +45,7 @@ struct ConfigApp: App {
         Button {
           AboutPanelPresenter.showAboutPanel()
         } label: {
-          Label("About Keyman", systemImage: "info.circle")
+          Label("About Keyman Configuration", systemImage: "info.circle")
         }
       }
     }
