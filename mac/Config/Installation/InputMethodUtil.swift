@@ -177,6 +177,11 @@ public class InputMethodUtil {
     var success = false
     do {
       print("invokeKeymanInputMethodRequestAccess()")
+
+      // because we are launching Keyman with a specific command line argument
+      // for this request, we must kill it first
+      _ = self.killKeymanInputMethod()
+      
       try self.launchKeymanInputMethodAsSeparateProcess(argument: kAccessCommand)
       success = true
     } catch {
@@ -187,14 +192,19 @@ public class InputMethodUtil {
   }
   
   /**
-   * Calls Keyman input to check whether it has accessibility permission granted.
+   * Calls Keyman input method to check whether it has accessibility permission granted.
    * The actual result is not returned from Keyman when called as a separate process.
-   * After this function is called, listen to the `NotificationCenter` for the notification named
-   * `com.keyman.accessibility.state`
+   * After this function is called, listen to the `DistributedNotificationCenter` for the notification named
+   * `accessibilityStateResponse`
    * It contains a message with a value of `granted` or `not-granted`
    */
   func invokeKeymanInputMethodCheckAccess() throws {
     print("invokeKeymanInputMethodCheckAccess()")
+    
+    // because we are launching Keyman with a specific command line argument
+    // for this request, we must kill it first
+    _ = self.killKeymanInputMethod()
+    
     try self.launchKeymanInputMethodAsSeparateProcess(argument: kCheckCommand)
   }
   
@@ -250,11 +260,8 @@ public class InputMethodUtil {
   }
   
   /**
-   * Special care is needed with this code because `processAccessCheckResult(with:)` is bound to the Main Actor,
-   * but it is called from a closure which may not run on the Main Actor.
-   * DistributedNotificationCenter is not fully updated for concurrency, so specifying `.main` for the `OperationQueue`
-   * does not ensure that the closure is running on the main actor.
-   * To ensure this, a Task is defined around the call to  `processAccessCheckResult`.
+   * Calls Keyman input method to check whether it has accessibility permission granted.
+   * Receives response as distributed notification named `accessibilityStateResponse`
    */
   func doAsyncAccessibilityCheck() {
     do {

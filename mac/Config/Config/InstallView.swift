@@ -17,8 +17,8 @@ struct InstallView: View {
         Image(systemName: "gear")
           .imageScale(.large)
           .foregroundColor(.accentColor)
-        if let nextTask = installation.nextTask() {
-          Text("Next task = \(nextTask.taskType.rawValue)")
+        if let installTask = installation.currentTask() {
+          Text("Current task = \(installTask.taskType.rawValue)")
         }
       }
       HStack {
@@ -65,9 +65,6 @@ struct InstallView: View {
         }
         Button("Uninstall") {
           installation.uninstall()
-        }
-        Button("Force Reset Installation") {
-          installation.forceResetInstallation()
         }
         Button("Force Validate Installation") {
           installation.forceValidateInstallation()

@@ -12,43 +12,52 @@ struct ParentInstallView: View {
   @Namespace var animation
   @State public var currentPage: InstallPage = .initial
   
+  func chooseCurrentPage() -> Void {
+    if installation.installationPhase.hasTasks {
+      switch installation.currentTask()?.taskType {
+      case .prepareNewInstall: currentPage = .initial
+      case .enableInputMethod:
+        currentPage = .enableInputMethod
+      case .requestAccess: currentPage =
+          .allowSecurityPermission
+      case .restartMac: currentPage = .restartComputer
+      default: currentPage = .completed
+      }
+    } else {
+      switch installation.installationPhase {
+      case .evaluatingInstallation: currentPage = .loading
+      case .inputMethodMissing, .inputMethodOutdated: currentPage = .rerunInstaller
+      case .installationComplete: currentPage = .completed
+      default: currentPage = .completed
+      }
+    }
+  }
+  
   var body: some View {
-    
-    
     
     ZStack {
       switch currentPage {
-      case .initial: InitialView(namespace: animation, )
+      case .loading: KeymanLogo(namespace: animation)
+      case .initial: InitialView(namespace: animation,onContinue: chooseCurrentPage)
       case .completed: CompletedInstallView(namespace: animation)
-      case .enableInputMethod: EnableInputMethodView(namespace: animation)
-      case .allowSecurityPermission: CheckAccessibiltyPermissionView(namespace: animation)
-      case .rerunInstaller:
-        RerunInstallerView(namespace: animation)
-        
-      case .restartComputer:
-        RestartComputerView(namespace: animation)
+      case .enableInputMethod: EnableInputMethodView(namespace: animation, onContinue: chooseCurrentPage)
+      case .allowSecurityPermission: CheckAccessibiltyPermissionView(namespace: animation, onContinue: chooseCurrentPage)
+      case .rerunInstaller: RerunInstallerView(namespace: animation)
+      case .restartComputer: RestartComputerView(namespace: animation)
       }
-      
-      
     }
-    .onReceive(NotificationCenter.default.publisher(for: .advancePage)) { notification in
-          withAnimation(.smooth(duration: 0.5)) {
-          }
-        }
     .onAppear {
       switch installation.installationPhase {
       case .evaluatingInstallation:
         currentPage = .initial
       default:
-        currentPage = .completed
+        chooseCurrentPage()
       }
     }
-    
     .padding()
     .frame(width: 600)
     .frame(height: 400)
   }
-  
 }
 
 #Preview {

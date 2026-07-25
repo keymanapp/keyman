@@ -12,13 +12,13 @@ import KeymanSettings
 
 // in-app notifications sent
 public extension Notification.Name {
-  static let installationStateEvaluated = Notification.Name("installation.state.evaluated")
-  static let inputMethodMissing = Notification.Name("input.method.missing")
-  static let inputMethodOutdated = Notification.Name("input.method.outdated")
-  static let newInstallation = Notification.Name("new.installation")
-  static let activeInstallation = Notification.Name("active.installation")
-  static let installationRepairEvaluated = Notification.Name("installation.repair.evaluated")
-  static let installationRepairNeeded = Notification.Name("installation.repair.needed")
+  static let startNewInstallation = Notification.Name("start.new.installation")
+  static let startInstallationRepair = Notification.Name("start.installation.repair")
+  static let installationRepairStarted = Notification.Name("installation.repair.started")
+  static let accessibilityGranted = Notification.Name("installation.accessibility.granted")
+  static let accessibilityNotGranted = Notification.Name("installation.accessibility.not.granted")
+  static let checkAccessibilitySuccess = Notification.Name("accessibility.success")
+  static let checkAccessibilityFailure = Notification.Name("accessibility.failure")
 }
 
 @MainActor // run on the main actor since data is published directly to the UI
@@ -54,9 +54,18 @@ public class InstallationContainer : ObservableObject {
       fatalError("Unable to access group container path for InputMethodUtil: \(error.localizedDescription).")
     }
     
-    self.installationState = nil
 
     self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
+    
+    // if installation is still being evaluated, set the installation state later when it is done
+    // otherwise, set it immediately
+    if self.installationCheck.isEvaluatingInstallation {
+      self.installationState = nil
+    } else {
+      self.installationState = self.installationCheck.installationState
+      print("installation phase = \(self.installationCheck.installationPhase), hasTasks = \(self.installationCheck.installationPhase.hasTasks)")
+    }
+    
     self.registerObservers()
     
     self.installationCheck.startInstallationEvaluation()
@@ -69,23 +78,34 @@ public class InstallationContainer : ObservableObject {
     print("InstallationContainer registerObservers")
     NotificationCenter.default.addObserver(
       self,
-      selector: #selector(self.handleInstallationEvaluated(_:)),
-      name: NSNotification.Name.installationStateEvaluated,
+      selector: #selector(self.handleStartNewInstallation(_:)),
+      name: NSNotification.Name.startNewInstallation,
       object: nil // Observe notifications from any sender
     )
-    print("InstallationContainer registerObservers")
     NotificationCenter.default.addObserver(
       self,
-      selector: #selector(self.handleRepairDetermined(_:)),
-      name: NSNotification.Name.installationRepairEvaluated,
+      selector: #selector(self.handleStartInstallationRepair(_:)),
+      name: NSNotification.Name.startInstallationRepair,
+      object: nil // Observe notifications from any sender
+    )
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(self.handleAccessibilityGranted(_:)),
+      name: NSNotification.Name.accessibilityGranted,
+      object: nil // Observe notifications from any sender
+    )
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(self.handleAccessibilityNotGranted(_:)),
+      name: NSNotification.Name.accessibilityNotGranted,
       object: nil // Observe notifications from any sender
     )
   }
 
   /**
-   * called when `NSNotification.Name.installationStateEvaluated` is received
+   * called when `NSNotification.Name.startNewInstallation` is received
    */
-  @objc func handleInstallationEvaluated(_ notification: Notification) {
+  @objc func handleStartNewInstallation(_ notification: Notification) {
     // now that the installation has been evaluated
     // we can set the installationState
     
@@ -94,18 +114,17 @@ public class InstallationContainer : ObservableObject {
       
       // the evaluation is done
       self.installationCheck.isEvaluatingInstallation = false
-      print("handleInstallationEvaluated, new installationState: \(newState)")
+      print("handleStartNewInstallation, new state provided")
     } else {
-      print("handleInstallationEvaluated received but did not include new InstallationState")
+      print("handleStartNewInstallation received but did not include new InstallationState")
     }
   }
 
-
   /**
-   * called when `NSNotification.Name.installationRepairEvaluated` is received
+   * called when `NSNotification.Name.startInstallationRepair` is received
    */
-  @objc func handleRepairDetermined(_ notification: Notification) {
-    print("handleRepairDetermined")
+  @objc func handleStartInstallationRepair(_ notification: Notification) {
+    print("handleStartInstallationRepair")
     // Extract message from the notification if available
     if let newState = notification.object as? InstallationState {
       self.installationState = newState
@@ -113,12 +132,31 @@ public class InstallationContainer : ObservableObject {
       // now that the repair has been determined, we can notify that a repair is needed
       // so that the repair UI can presented to the user
       
-      NotificationCenter.default.post(name: .installationRepairNeeded, object: nil, userInfo: nil)
+      NotificationCenter.default.post(name: .installationRepairStarted, object: nil, userInfo: nil)
     } else {
-      print("handleRepairNeeded received but did not include new InstallationState")
+      print("handleStartInstallationRepair received but did not include new InstallationState")
     }
   }
 
+  /**
+   * called when `NSNotification.Name.accessibilityGranted` is received
+   */
+  @objc func handleAccessibilityGranted(_ notification: Notification) {
+    guard let state = self.installationState else { return }
+    
+    // the confirmAccess task can now be marked as completed
+    self.updateTaskAsCompleted(taskType: .confirmAccess, for: state)
+    
+    NotificationCenter.default.post(name: .checkAccessibilitySuccess, object: nil, userInfo: nil)
+  }
+  
+  /**
+   * called when `NSNotification.Name.accessibilityNotGranted` is received
+   */
+  @objc func handleAccessibilityNotGranted(_ notification: Notification) {
+    NotificationCenter.default.post(name: .checkAccessibilityFailure, object: nil, userInfo: nil)
+  }
+  
   /**
    * Returns true if the Accessibility permission has been granted by the user for the Keyman input method.
    * This is an optional return value because it is only set in response to a call to `checkAccessibilityPermissionGranted`
@@ -138,11 +176,15 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
-   * Returns the next incompleted installation task, if there is one remaining.
+   * Returns the current incompleted installation task, if there is one.
    * Note that this function determines the order in which the tasks are executed as they are stored in an unsorted Set.
    */
-  public func nextTask() -> InstallationTask? {
+  public func currentTask() -> InstallationTask? {
     guard let state = self.installationState else { return nil }
+    guard self.installationPhase.hasTasks else {
+      print("the installation phase \(self.installationPhase) has no tasks");
+      return nil
+    }
 
     let incompleteTasks = state.tasks.filter { !$0.isComplete }
     
@@ -151,6 +193,8 @@ public class InstallationContainer : ObservableObject {
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .enableInputMethod }) {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .requestAccess }) {
+      return incompleteTask
+    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .confirmAccess }) {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .restartMac }) {
       return incompleteTask
@@ -164,6 +208,10 @@ public class InstallationContainer : ObservableObject {
    */
   func executeTask(_ task: InstallationTask) {
     guard let state = self.installationState else { return }
+    guard self.installationPhase.hasTasks else {
+      print("the installation phase \(self.installationPhase) has no tasks");
+      return
+    }
 
     var completedTask = false
     
@@ -174,23 +222,34 @@ public class InstallationContainer : ObservableObject {
       completedTask = self.enableKeymanInputMethod()
     case .requestAccess:
       completedTask = self.requestAccessibility()
+    case .confirmAccess:
+      self.checkAccessibilityPermissionGranted()
+      // this task is completed asynchronously when the response is returned from the input method
+      completedTask = false
     case .restartMac:
       completedTask = self.notifyUserPromptedToRestart()
     }
     
     if completedTask {
-      print("executeTask: \(task.taskType.rawValue) completed")
-      state.updateTaskAsCompleted(task: task.taskType)
-      self.writeInstallationState()
+      self.updateTaskAsCompleted(taskType: task.taskType, for: state)
     }
   }
-  
+
+  /**
+   * Executes the next installation task which is incomplete, if there is one remaining.
+   */
+  public func updateTaskAsCompleted(taskType: InstallationTaskType, for state: InstallationState) {
+    print("executeTask: \(taskType.rawValue) completed")
+    state.updateTaskAsCompleted(task: taskType)
+    self.writeInstallationState()
+  }
+
   /**
    * Executes the next installation task which is incomplete, if there is one remaining.
    */
   public func executeNextInstallationTask() {
-    if let nextTask = self.nextTask() {
-      self.executeTask(nextTask)
+    if let installTask = self.currentTask() {
+      self.executeTask(installTask)
     }
   }
   
@@ -256,14 +315,6 @@ public class InstallationContainer : ObservableObject {
     }
     print("validateRestarted: \(hasRestarted)")
     return hasRestarted
-  }
-  
-  // MAC-CONFIG-TODO: delete test code
-  /**
-   * for testing purposes, replace the InstallationState with a new object set for a new installation
-   */
-  func forceResetInstallation() {
-      self.installationState = InstallationCheck(defaultsRepo: self.defaultsRepository, inputMethodUtil: self.inputMethodUtil).createInstallationStateForNewInstallation()
   }
   
   /**
@@ -359,38 +410,19 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
-   * first kill the Keyman input method if it is running
-   * second, call Keyman as a separate process with an argument that checks whether accessibility has been granted by the user
-   * and listen for message from Keyman to indicate the result
+   * call Keyman as a separate process with an argument that checks whether accessibility has been granted by the user
    */
   public func checkAccessibilityPermissionGranted() {
-    if (inputMethodUtil.isKeymanInputMethodRunning()) {
-      let killed = self.inputMethodUtil.killKeymanInputMethod()
-      print("checkAccessibilityPermission, Keyman input method killed: \(killed)")
-    } else {
-      print("checkAccessibilityPermission, Keyman input method not running")
-    }
- 
     self.inputMethodUtil.doAsyncAccessibilityCheck()
   }
   
   /**
-   * First kill the Keyman input method if it is running.
-   * Second, call Keyman as a separate process with an argument that requests the system to prompt the user to grant accessibility.
-   * The Keyman input method cannot send a message to indicate success, because it does not know itself when the user has
-   * finished making the change in Settings.
-   * To learn the result, we must poll with `isAccessibilityGranted()`
+   * Call Keyman as a separate process with an argument that requests the system to prompt the user to grant accessibility.
+   * To learn the result, we must poll with `checkAccessibilityPermissionGranted()`
    */
   public func requestAccessibility() -> Bool {
     var requested = false
-    
-    if (inputMethodUtil.isKeymanInputMethodRunning()) {
-      let killed = self.inputMethodUtil.killKeymanInputMethod()
-      print("requestAccessibility, Keyman input method killed: \(killed)")
-    } else {
-      print("requestAccessibility, Keyman input method not running")
-    }
-
+  
     requested = self.inputMethodUtil.invokeKeymanInputMethodRequestAccess()
     print("requestAccessibility called, requested: \(requested)")
     

@@ -10,8 +10,8 @@ import AppKit
 internal import UniformTypeIdentifiers
 
 struct RerunInstallerView: View {
-  @EnvironmentObject var installation: InstallationContainer
   let namespace: Namespace.ID
+  @EnvironmentObject var installation: InstallationContainer
   
   var body: some View {
     VStack {
@@ -59,6 +59,8 @@ struct RerunInstallerView: View {
         .tint(.blue)
         .clipShape(Capsule())
         .matchedGeometryEffect(id: "actionButton", in: namespace)
+        
+        NavigationButton(action: .dismiss)
       }
     }
   }
