@@ -84,53 +84,61 @@ public class InstallationCheck {
     self.defaultsRepository = defaultsRepo
     self.inputMethodUtil = inputMethodUtil
     self.isEvaluatingInstallation = false
+    self.configurationVersion = ConfigAppUtil.configAppVersion()
     
-    if inputMethodUtil.keymanInputMethodExists() {
-      self.isInputMethodInstalled = true
-      self.inputMethodVersion = (try? inputMethodUtil.getKeymanInputMethodVersion()) ?? "unknown"
-    } else {
-      self.isInputMethodInstalled = false
-      self.inputMethodVersion = "unknown"
+    var keymanIsCurrent = false
+    var keymanVersion: String = "unknown"
+    
+    let keymanExists = inputMethodUtil.keymanInputMethodExists()
+    if keymanExists {
+      keymanVersion = (try? inputMethodUtil.getKeymanInputMethodVersion()) ?? "unknown"
+      keymanIsCurrent = InstallationCheck.isVersionCurrent(inputMethodVersion: keymanVersion, configurationVersion: self.configurationVersion)
     }
     
-    self.configurationVersion = ConfigAppUtil.configAppVersion()
-    self.isInputMethodCurrent = InstallationCheck.isVersionCurrent(inputMethodVersion: self.inputMethodVersion, configurationVersion: self.configurationVersion)
-    
-    self.installationState = nil
-    
-    if let installState = self.loadState() {
-      // if the installationState remains from a different version, then delete it
-      if installState.keymanVersion != self.inputMethodVersion {
-        print("removing stale installation state \(installState.keymanVersion) because the current version is \(self.inputMethodVersion)")
-        self.clearInstallationState()
-        // this is a new installation
-        self.isEvaluatingInstallation = true
-      } else if installState.isNew {
-        // for a new installation, do not create the installationState until the evaluation is complete
-        self.isEvaluatingInstallation = true
+    self.isInputMethodInstalled = keymanExists
+    self.isInputMethodCurrent = keymanIsCurrent
+    self.inputMethodVersion = keymanVersion
+
+    // MAC-CONFIG_TODO: break this out as a separate method
+    if (self.isInputMethodInstalled && self.isInputMethodCurrent) {
+      // if we have a valid input method, look at the installation state
+      
+      if let installState = self.loadState() {
+        // if a stale installationState remains from a different version, then delete it
+        if installState.keymanVersion != self.inputMethodVersion {
+          print("removing stale installation state \(installState.keymanVersion) because the current version is \(self.inputMethodVersion)")
+          self.clearInstallationState()
+          // this is a new installation
+          self.isEvaluatingInstallation = true
+        } else if installState.isNew {
+          // for a new installation, do not create the installationState until the evaluation is complete
+          self.isEvaluatingInstallation = true
+        } else {
+          // If we're already in progress or completed or doing a repair, pick up where we left off
+          // Note that a completed installation will be checked for repairs
+          self.installationState = installState
+          self.isEvaluatingInstallation = false
+        }
       } else {
-        // If we're already in progress or completed or doing a repair, pick up where we left off
-        // Note that a completed installation will need to be checked for repairs
-        self.installationState = installState
-        self.isEvaluatingInstallation = false
+        // if the installationState does not exist, then this is a new installation
+        // do not create the installationState until the evaluation is complete
+        self.isEvaluatingInstallation = true
       }
-    } else {
-      // if the installationState does not exist, then this is a new installation
-      // do not create the installationState until the evaluation is complete
-      self.isEvaluatingInstallation = true
     }
     
     self.registerObservers()
   }
 
   /**
-   * Should be called immediately after init to evaluate what is needed for installation.
+   * Should be called immediately after init to evaluate what is needed for installation
+   * or, if the installation is complete, whether it needs repairs.
    * When the notification from the input method is received and the evaluation is done,
    * the installation can move out of the `evaluatingInstallation` phase
    */
   public func startInstallationEvaluation() {
     // call the input method to check whether Accessibility permission has been granted
-    if self.isEvaluatingInstallation || self.installationState?.isComplete == true {
+    if (self.isInputMethodInstalled && self.isInputMethodCurrent) &&
+        (self.isEvaluatingInstallation || self.installationState?.isComplete == true) {
       self.inputMethodUtil.doAsyncAccessibilityCheck()
     }
   }
@@ -171,11 +179,20 @@ public class InstallationCheck {
         installCompleted = state.isComplete
       }
       
-      // if this is a completed install, check whether repairs are needed
-      if installCompleted {
+      if self.isEvaluatingInstallation {
+        // if evaluating the current state for a new installation,
+        // complete the evaluation using the results of the permission check
+       self.completeEvaluation(accessibilityPermissionGranted: permissionGranted)
+      } else if installCompleted {
+        // if this is a completed install, check whether repairs are needed
         self.checkForRepair(accessibilityPermissionGranted: permissionGranted)
       } else {
-        self.completeEvaluation(accessibilityPermissionGranted: permissionGranted)
+        // otherwise, this is for an install step, post results
+        if permissionGranted {
+          NotificationCenter.default.post(name: .accessibilityGranted, object: nil)
+        } else {
+          NotificationCenter.default.post(name: .accessibilityNotGranted, object: nil)
+        }
       }
     } else {
       print("accessibilityStateResponse received but did not include message")
@@ -346,30 +363,6 @@ public class InstallationCheck {
     return InstallationState(from: installationMap)
   }
   
-  
-  /**
-   * Creates a InstallationState object describing a new installation
-   */
-  func createInstallationStateForNewInstallation() -> InstallationState {
-    let installationState = InstallationState(version: self.inputMethodVersion, tasks: self.createNewInstallationTasks())
-    self.defaultsRepository.writeInstallationState(installationState.toUserDefaultsDictionary())
-    
-    return installationState
-  }
-  
-  /**
-   * Creates a the set of tasks required for a new installation
-   */
-  func createNewInstallationTasks() -> Set<InstallationTask> {
-    var taskList = Set<InstallationTask>()
-    taskList.insert(InstallationTask(task: .prepareNewInstall, completed: false))
-    taskList.insert(InstallationTask(task: .enableInputMethod, completed: false))
-    taskList.insert(InstallationTask(task: .requestAccess, completed: false))
-    taskList.insert(InstallationTask(task: .restartMac, completed: false))
-    return taskList
-  }
-  
-  
   /**
    * The provided parameter `accessibilityPermissionGranted` was returned asynchronously from the input method.
    * Use it and other info to see what tasks are needed to complete installation.
@@ -380,6 +373,7 @@ public class InstallationCheck {
     // add task to request Accessibility permission if needed
     if !accessibilityPermissionGranted {
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestAccess))
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmAccess))
     }
     
     // add enable input method and restart mac tasks if needed
@@ -400,7 +394,7 @@ public class InstallationCheck {
    */
   func createRepairInstallationState(accessibilityPermissionGranted: Bool) -> InstallationState? {
     var repairInstallationState: InstallationState? = nil
-    var repairTasks = self.determineInstallationTasksNeeded(for: accessibilityPermissionGranted)
+    let repairTasks = self.determineInstallationTasksNeeded(for: accessibilityPermissionGranted)
     
     if !repairTasks.isEmpty {
       repairInstallationState = InstallationState(version: self.inputMethodVersion, isRepair: true, tasks: repairTasks)

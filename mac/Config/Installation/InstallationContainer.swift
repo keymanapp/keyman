@@ -15,6 +15,10 @@ public extension Notification.Name {
   static let startNewInstallation = Notification.Name("start.new.installation")
   static let startInstallationRepair = Notification.Name("start.installation.repair")
   static let installationRepairStarted = Notification.Name("installation.repair.started")
+  static let accessibilityGranted = Notification.Name("installation.accessibility.granted")
+  static let accessibilityNotGranted = Notification.Name("installation.accessibility.not.granted")
+  static let checkAccessibilitySuccess = Notification.Name("accessibility.success")
+  static let checkAccessibilityFailure = Notification.Name("accessibility.failure")
 }
 
 @MainActor // run on the main actor since data is published directly to the UI
@@ -84,6 +88,18 @@ public class InstallationContainer : ObservableObject {
       name: NSNotification.Name.startInstallationRepair,
       object: nil // Observe notifications from any sender
     )
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(self.handleAccessibilityGranted(_:)),
+      name: NSNotification.Name.accessibilityGranted,
+      object: nil // Observe notifications from any sender
+    )
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(self.handleAccessibilityNotGranted(_:)),
+      name: NSNotification.Name.accessibilityNotGranted,
+      object: nil // Observe notifications from any sender
+    )
   }
 
   /**
@@ -123,6 +139,25 @@ public class InstallationContainer : ObservableObject {
   }
 
   /**
+   * called when `NSNotification.Name.accessibilityGranted` is received
+   */
+  @objc func handleAccessibilityGranted(_ notification: Notification) {
+    guard let state = self.installationState else { return }
+    
+    // the confirmAccess task can now be marked as completed
+    self.updateTaskAsCompleted(taskType: .confirmAccess, for: state)
+    
+    NotificationCenter.default.post(name: .checkAccessibilitySuccess, object: nil, userInfo: nil)
+  }
+  
+  /**
+   * called when `NSNotification.Name.accessibilityNotGranted` is received
+   */
+  @objc func handleAccessibilityNotGranted(_ notification: Notification) {
+    NotificationCenter.default.post(name: .checkAccessibilityFailure, object: nil, userInfo: nil)
+  }
+  
+  /**
    * Returns true if the Accessibility permission has been granted by the user for the Keyman input method.
    * This is an optional return value because it is only set in response to a call to `checkAccessibilityPermissionGranted`
    * and is not populated until an asynchronous message is received in response.
@@ -159,6 +194,8 @@ public class InstallationContainer : ObservableObject {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .requestAccess }) {
       return incompleteTask
+    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .confirmAccess }) {
+      return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .restartMac }) {
       return incompleteTask
     }
@@ -185,17 +222,28 @@ public class InstallationContainer : ObservableObject {
       completedTask = self.enableKeymanInputMethod()
     case .requestAccess:
       completedTask = self.requestAccessibility()
+    case .confirmAccess:
+      self.checkAccessibilityPermissionGranted()
+      // this task is completed asynchronously when the response is returned from the input method
+      completedTask = false
     case .restartMac:
       completedTask = self.notifyUserPromptedToRestart()
     }
     
     if completedTask {
-      print("executeTask: \(task.taskType.rawValue) completed")
-      state.updateTaskAsCompleted(task: task.taskType)
-      self.writeInstallationState()
+      self.updateTaskAsCompleted(taskType: task.taskType, for: state)
     }
   }
-  
+
+  /**
+   * Executes the next installation task which is incomplete, if there is one remaining.
+   */
+  public func updateTaskAsCompleted(taskType: InstallationTaskType, for state: InstallationState) {
+    print("executeTask: \(taskType.rawValue) completed")
+    state.updateTaskAsCompleted(task: taskType)
+    self.writeInstallationState()
+  }
+
   /**
    * Executes the next installation task which is incomplete, if there is one remaining.
    */
@@ -267,14 +315,6 @@ public class InstallationContainer : ObservableObject {
     }
     print("validateRestarted: \(hasRestarted)")
     return hasRestarted
-  }
-  
-  // MAC-CONFIG-TODO: delete test code
-  /**
-   * for testing purposes, replace the InstallationState with a new object set for a new installation
-   */
-  func forceResetInstallation() {
-      self.installationState = InstallationCheck(defaultsRepo: self.defaultsRepository, inputMethodUtil: self.inputMethodUtil).createInstallationStateForNewInstallation()
   }
   
   /**
