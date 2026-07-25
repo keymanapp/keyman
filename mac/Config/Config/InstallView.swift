@@ -66,9 +66,6 @@ struct InstallView: View {
         Button("Uninstall") {
           installation.uninstall()
         }
-        Button("Force Reset Installation") {
-          installation.forceResetInstallation()
-        }
         Button("Force Validate Installation") {
           installation.forceValidateInstallation()
         }

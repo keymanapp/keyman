@@ -15,6 +15,7 @@ public enum InstallationTaskType: String {
   case prepareNewInstall = "prepareNewInstall"  // only called for new install
   case enableInputMethod = "enableInputMethod"  // triggers register and enable
   case requestAccess = "requestAccess"          // causes prompt to user to grant Accessibility
+  case confirmAccess = "confirmAccess"          // confirms that Accessibility was granted
   case restartMac = "restartMac"                // prompts user to restart machine
 }
 

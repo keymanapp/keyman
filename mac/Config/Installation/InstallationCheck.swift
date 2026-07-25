@@ -99,6 +99,7 @@ public class InstallationCheck {
     self.isInputMethodCurrent = keymanIsCurrent
     self.inputMethodVersion = keymanVersion
 
+    // MAC-CONFIG_TODO: break this out as a separate method
     if (self.isInputMethodInstalled && self.isInputMethodCurrent) {
       // if we have a valid input method, look at the installation state
       
@@ -178,11 +179,20 @@ public class InstallationCheck {
         installCompleted = state.isComplete
       }
       
-      // if this is a completed install, check whether repairs are needed
-      if installCompleted {
+      if self.isEvaluatingInstallation {
+        // if evaluating the current state for a new installation,
+        // complete the evaluation using the results of the permission check
+       self.completeEvaluation(accessibilityPermissionGranted: permissionGranted)
+      } else if installCompleted {
+        // if this is a completed install, check whether repairs are needed
         self.checkForRepair(accessibilityPermissionGranted: permissionGranted)
       } else {
-        self.completeEvaluation(accessibilityPermissionGranted: permissionGranted)
+        // otherwise, this is for an install step, post results
+        if permissionGranted {
+          NotificationCenter.default.post(name: .accessibilityGranted, object: nil)
+        } else {
+          NotificationCenter.default.post(name: .accessibilityNotGranted, object: nil)
+        }
       }
     } else {
       print("accessibilityStateResponse received but did not include message")
@@ -353,30 +363,6 @@ public class InstallationCheck {
     return InstallationState(from: installationMap)
   }
   
-  
-  /**
-   * Creates a InstallationState object describing a new installation
-   */
-  func createInstallationStateForNewInstallation() -> InstallationState {
-    let installationState = InstallationState(version: self.inputMethodVersion, tasks: self.createNewInstallationTasks())
-    self.defaultsRepository.writeInstallationState(installationState.toUserDefaultsDictionary())
-    
-    return installationState
-  }
-  
-  /**
-   * Creates a the set of tasks required for a new installation
-   */
-  func createNewInstallationTasks() -> Set<InstallationTask> {
-    var taskList = Set<InstallationTask>()
-    taskList.insert(InstallationTask(task: .prepareNewInstall, completed: false))
-    taskList.insert(InstallationTask(task: .enableInputMethod, completed: false))
-    taskList.insert(InstallationTask(task: .requestAccess, completed: false))
-    taskList.insert(InstallationTask(task: .restartMac, completed: false))
-    return taskList
-  }
-  
-  
   /**
    * The provided parameter `accessibilityPermissionGranted` was returned asynchronously from the input method.
    * Use it and other info to see what tasks are needed to complete installation.
@@ -387,6 +373,7 @@ public class InstallationCheck {
     // add task to request Accessibility permission if needed
     if !accessibilityPermissionGranted {
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestAccess))
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmAccess))
     }
     
     // add enable input method and restart mac tasks if needed

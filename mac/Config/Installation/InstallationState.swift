@@ -73,6 +73,9 @@ public class InstallationState {
     if let taskFlag = dictionary[InstallationTaskType.requestAccess.rawValue] as? Bool {
       installationTasks.insert(InstallationTask(task: .requestAccess, completed: taskFlag))
     }
+    if let taskFlag = dictionary[InstallationTaskType.confirmAccess.rawValue] as? Bool {
+      installationTasks.insert(InstallationTask(task: .confirmAccess, completed: taskFlag))
+    }
     if let taskFlag = dictionary[InstallationTaskType.restartMac.rawValue] as? Bool {
       installationTasks.insert(InstallationTask(task: .restartMac, completed: taskFlag))
     }
