@@ -9,7 +9,7 @@ import { ContextTokenization } from './correction/context-tokenization.js';
 import { ContextTracker } from './correction/context-tracker.js';
 import { ContextToken } from './correction/context-token.js';
 import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
-import { ContextTransition } from './correction/context-transition.js';
+import { ContextTransition, TransitionReversionView } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import { ModelCompositor } from './model-compositor.js';
 import { getBestTokenMatches } from './correction/distance-modeler.js';
@@ -1196,4 +1196,35 @@ export function toAnnotatedSuggestion(
   }
 
   return result;
+}
+
+/**
+ * For applicable scenarios, this mutates the passed-in suggestion array by
+ * prepending a predictive-text reversion that restores the context to a prior
+ * state.  Otherwise, it leaves the suggestion array unaltered.
+ * @param suggestions
+ * @param transitionToRevert
+ * @returns
+ */
+export function prependReversion(suggestions: Suggestion[], transitionToRevert: TransitionReversionView) {
+  if(transitionToRevert) {
+    const reversion = transitionToRevert.reversion;
+    if(reversion) {
+      if(suggestions[0]?.tag == 'keep') {
+        const appliedId = -reversion.id;
+        const appliedSuggestion = transitionToRevert.final.suggestions.find((s) => s.id == appliedId);
+        // If the selected suggestion was itself a `keep`, we don't need a
+        // reversion.  They'd do the same thing.
+        if(appliedSuggestion.tag != 'keep') {
+          const keep = suggestions.shift();
+          suggestions.unshift(reversion);
+          suggestions.unshift(keep);
+        }
+      } else {
+        suggestions.unshift(reversion);
+      }
+    }
+  }
+
+  return suggestions;
 }

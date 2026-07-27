@@ -2,7 +2,7 @@ import * as models from '@keymanapp/models-templates';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { TransformUtils } from './transformUtils.js';
-import { applySuggestionCasing, correctAndEnumerate, createDefaultKeep, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
+import { applySuggestionCasing, correctAndEnumerate, createDefaultKeep, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, prependReversion, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
 import { ContextTracker } from './correction/context-tracker.js';
@@ -206,18 +206,8 @@ export class ModelCompositor {
       this.SUGGESTION_ID_SEED++;
     });
 
-    if(revertableTransitionId) {
-      const reversion = this.contextTracker.peek(revertableTransitionId)?.reversion;
-      if(reversion) {
-        if(suggestions[0]?.tag == 'keep') {
-          const keep = suggestions.shift();
-          suggestions.unshift(reversion);
-          suggestions.unshift(keep);
-        } else {
-          suggestions.unshift(reversion)
-        }
-      }
-    }
+    const transitionToRevert = this.contextTracker?.peek(revertableTransitionId);
+    prependReversion(suggestions, transitionToRevert);
 
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
@@ -239,8 +229,8 @@ export class ModelCompositor {
     // Step 1:  re-use the original input Transform as the reversion's Transform.
     // The Web engine will restore the original state of the context before accepting
     // and before reverting; all we need to do is put the original keystroke back in place.
-    let reversionTransform: Transform = originalInput 
-      ? { ...originalInput } 
+    let reversionTransform: Transform = originalInput
+      ? { ...originalInput }
       : { insert: '', deleteLeft: 0, id: suggestion.transform.id };
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
