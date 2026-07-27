@@ -54,8 +54,19 @@ public class InstallationState {
     self.keymanVersion = version
     self.dateRestartRequested = dateRestartRequested
     self.isRepair = isRepair
-    self.hasDisplayedInstallComplete = false
+    self.hasDisplayedInstallComplete = hasDisplayedInstallComplete
     self.tasks = tasks
+  }
+  
+  /**
+   * create a new InstallationState with an existing InstallationState and a task to mark as completed
+   */
+  public static func createCopyWithCompletedTask (from state: InstallationState, with completedTask: InstallationTaskType) -> InstallationState {
+    var newTaskList = state.tasks
+    let completedTask = InstallationTask(task: completedTask, completed: true)
+    newTaskList.update(with: completedTask)
+    
+    return InstallationState(version: state.keymanVersion, dateRestartRequested: state.dateRestartRequested, isRepair: state.isRepair, hasDisplayedInstallComplete: state.hasDisplayedInstallComplete, tasks: newTaskList)
   }
   
   /**
@@ -110,12 +121,12 @@ public class InstallationState {
     
     return dictionary
   }
-  
-  /**
-   * update the task of the specified type as completed
-   */
-  public func updateTaskAsCompleted(task: InstallationTaskType) {
-    let completedTask = InstallationTask(task: task, completed: true)
-    self.tasks.update(with: completedTask)
-  }
+//  
+//  /**
+//   * update the task of the specified type as completed
+//   */
+//  public func updateTaskAsCompleted(task: InstallationTaskType) {
+//    let completedTask = InstallationTask(task: task, completed: true)
+//    self.tasks.update(with: completedTask)
+//  }
 }

@@ -39,9 +39,9 @@ public enum InstallationPhase {
 @MainActor
 public class InstallationCheck {
   public var installationState: InstallationState?
-  // with isEvaluatingInstallation==true, we are awaiting
+  // with isEvaluatingNewInstallation==true, we are awaiting
   // message from input method to determine what tasks are needed
-  public var isEvaluatingInstallation: Bool
+  public var isEvaluatingNewInstallation: Bool
   fileprivate let isInputMethodInstalled: Bool
   fileprivate let isInputMethodCurrent: Bool
   fileprivate let inputMethodVersion: String
@@ -56,7 +56,7 @@ public class InstallationCheck {
       return .inputMethodMissing
     } else if !self.isInputMethodCurrent {
       return .inputMethodOutdated
-    } else if self.isEvaluatingInstallation {
+    } else if self.isEvaluatingNewInstallation {
       return .evaluatingInstallation
     }
     
@@ -83,7 +83,7 @@ public class InstallationCheck {
   public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil) {
     self.defaultsRepository = defaultsRepo
     self.inputMethodUtil = inputMethodUtil
-    self.isEvaluatingInstallation = false
+    self.isEvaluatingNewInstallation = false
     self.configurationVersion = ConfigAppUtil.configAppVersion()
     
     var keymanIsCurrent = false
@@ -109,20 +109,20 @@ public class InstallationCheck {
           print("removing stale installation state \(installState.keymanVersion) because the current version is \(self.inputMethodVersion)")
           self.clearInstallationState()
           // this is a new installation
-          self.isEvaluatingInstallation = true
+          self.isEvaluatingNewInstallation = true
         } else if installState.isNew {
           // for a new installation, do not create the installationState until the evaluation is complete
-          self.isEvaluatingInstallation = true
+          self.isEvaluatingNewInstallation = true
         } else {
           // If we're already in progress or completed or doing a repair, pick up where we left off
           // Note that a completed installation will be checked for repairs
           self.installationState = installState
-          self.isEvaluatingInstallation = false
+          self.isEvaluatingNewInstallation = false
         }
       } else {
         // if the installationState does not exist, then this is a new installation
         // do not create the installationState until the evaluation is complete
-        self.isEvaluatingInstallation = true
+        self.isEvaluatingNewInstallation = true
       }
     }
     
@@ -138,7 +138,7 @@ public class InstallationCheck {
   public func startInstallationEvaluation() {
     // call the input method to check whether Accessibility permission has been granted
     if (self.isInputMethodInstalled && self.isInputMethodCurrent) &&
-        (self.isEvaluatingInstallation || self.installationState?.isComplete == true) {
+        (self.isEvaluatingNewInstallation || self.installationState?.isComplete == true) {
       self.inputMethodUtil.doAsyncAccessibilityCheck()
     }
   }
@@ -179,10 +179,10 @@ public class InstallationCheck {
         installCompleted = state.isComplete
       }
       
-      if self.isEvaluatingInstallation {
+      if self.isEvaluatingNewInstallation {
         // if evaluating the current state for a new installation,
         // complete the evaluation using the results of the permission check
-       self.completeEvaluation(accessibilityPermissionGranted: permissionGranted)
+       self.completeNewInstallationEvaluation(accessibilityPermissionGranted: permissionGranted)
       } else if installCompleted {
         // if this is a completed install, check whether repairs are needed
         self.checkForRepair(accessibilityPermissionGranted: permissionGranted)
@@ -286,48 +286,20 @@ public class InstallationCheck {
   
   /**
    * Using the accessibility state returned from the input method, build the new task list
-   * and determine what is actually required to complete installation
+   * and determine what is actually required for the new installation.
    */
-  func completeEvaluation(accessibilityPermissionGranted: Bool) {
+  func completeNewInstallationEvaluation(accessibilityPermissionGranted: Bool) {
     // see what tasks remain based on the evaluation
     let neededTasks = determineInstallationTasksNeeded(for: accessibilityPermissionGranted)
-    var newState: InstallationState? = nil
-    let noIncompleteTasksDetected = neededTasks.isEmpty
-    
-    // read the current state, if we have one
-    if let currentState = self.loadState() {
-      if currentState.isComplete {
-        if noIncompleteTasksDetected {
-          print("installation is complete and no repair needed")
-        } else {
-          // MAC-CONFIG_TODO: handle repair scenario
-          print("installation needs repair")
-        }
-      } else {
-        if currentState.isNew {
-          // looks like a new installation, but can be recreated with neededTasks
-          newState = self.createNewInstallationState(with: neededTasks)
-        }
-      }
-    } else {
-      // no installation state exists, must be a new installation
-      newState = self.createNewInstallationState(with: neededTasks)
-    }
-    
-    if let newState = newState {
-      print("completeEvaluation: created new installation state")
-      self.installationState = newState
-      self.defaultsRepository.writeInstallationState(newState.toUserDefaultsDictionary())
-      self.applyNewInstallationState(state: newState)
-    } else {
-      print("completeEvaluation: no new installation state applied")
-    }
+    let newState = self.createNewInstallationState(with: neededTasks)
+    self.applyNewInstallationState(state: newState)
   }
   
   /**
    * Creates a InstallationState object describing a new installation
    */
   func createNewInstallationState(with neededTasks: Set<InstallationTask>) -> InstallationState {
+    print("completeNewInstallationEvaluation: created new installation state")
     var fullTaskList = neededTasks
     
     // add prepareNewInstall, requestRestart and confirmRestart InstallationTask

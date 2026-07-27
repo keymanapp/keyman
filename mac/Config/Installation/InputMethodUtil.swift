@@ -280,7 +280,7 @@ public class InputMethodUtil {
   
   /**
    * Kill the application with the specified bundle Id
-   * This is only permitted when running oustide sandbox
+   * This is only permitted when running outside sandbox
    */
   func killApplication(bundleId: String) -> Bool {
     let runningApps = NSRunningApplication.runningApplications(withBundleIdentifier: bundleId)

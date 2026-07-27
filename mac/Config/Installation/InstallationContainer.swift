@@ -58,7 +58,7 @@ public class InstallationContainer : ObservableObject {
     
     // if installation is still being evaluated, set the installation state later when it is done
     // otherwise, set it immediately
-    if self.installationCheck.isEvaluatingInstallation {
+    if self.installationCheck.isEvaluatingNewInstallation {
       self.installationState = nil
     } else {
       self.installationState = self.installationCheck.installationState
@@ -116,7 +116,7 @@ public class InstallationContainer : ObservableObject {
       self.installationState = newState
       
       // the evaluation is done
-      self.installationCheck.isEvaluatingInstallation = false
+      self.installationCheck.isEvaluatingNewInstallation = false
       print("handleStartNewInstallation, new state provided")
     } else {
       print("handleStartNewInstallation received but did not include new InstallationState")
@@ -145,10 +145,10 @@ public class InstallationContainer : ObservableObject {
    * called when `NSNotification.Name.accessibilityGranted` is received
    */
   @objc func handleAccessibilityGranted(_ notification: Notification) {
-    guard let state = self.installationState else { return }
+    guard self.installationState != nil else { return }
     
     // the confirmAccess task can now be marked as completed
-    self.updateTaskAsCompleted(taskType: .confirmAccess, for: state)
+    self.updateTaskAsCompleted(taskType: .confirmAccess)
     
     NotificationCenter.default.post(name: .checkAccessibilitySuccess, object: nil, userInfo: nil)
   }
@@ -165,11 +165,11 @@ public class InstallationContainer : ObservableObject {
    */
   func validateConfirmRestart() -> Bool {
     guard let task = self.currentTask() else { return false }
-    guard let state = self.installationState else { return false }
+    guard self.installationState != nil else { return false }
     
     if task.taskType == .confirmRestart &&  self.validateUserHasRestarted() {
       // the confirmAccess task can now be marked as completed
-      self.updateTaskAsCompleted(taskType: .confirmRestart, for: state)
+      self.updateTaskAsCompleted(taskType: .confirmRestart)
       return true
     } else {
       return false
@@ -228,7 +228,7 @@ public class InstallationContainer : ObservableObject {
    * Executes the specified installation task.
    */
   func executeTask(_ task: InstallationTask) {
-    guard let state = self.installationState else { return }
+    guard self.installationState != nil else { return }
     guard self.installationPhase.hasTasks else {
       print("the installation phase \(self.installationPhase) has no tasks");
       return
@@ -254,17 +254,24 @@ public class InstallationContainer : ObservableObject {
     }
     
     if completedTask {
-      self.updateTaskAsCompleted(taskType: task.taskType, for: state)
+      self.updateTaskAsCompleted(taskType: task.taskType)
     }
   }
 
   /**
-   * Executes the next installation task which is incomplete, if there is one remaining.
+   * Marks the specified task as completed and saves it to the UserDefaults.
+   * Note that this actually creates a copy of the InstallationState object and updates the property here
+   * and in InstallationCheck with the new reference. The new object is necessary because
+   * the property is published, and we want SwiftUI to notify observers.
    */
-  public func updateTaskAsCompleted(taskType: InstallationTaskType, for state: InstallationState) {
+  public func updateTaskAsCompleted(taskType: InstallationTaskType) {
     print("executeTask: \(taskType.rawValue) completed")
-    state.updateTaskAsCompleted(task: taskType)
-    self.writeInstallationState()
+    if let existingState = self.installationState {
+      let updatedState = InstallationState.createCopyWithCompletedTask(from: existingState, with: taskType)
+      self.installationState = updatedState
+      self.installationCheck.installationState = updatedState
+      self.writeInstallationState()
+    }
   }
 
   /**
