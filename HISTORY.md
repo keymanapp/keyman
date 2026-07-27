@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.260 alpha 2026-07-27
+
+* fix(web): ignore exception trying to access cookie (#16283)
+* chore(web): update help links to use latest version (#16285)
+
 ## 19.0.259 alpha 2026-07-20
 
 * docs(web): fix typos following #16170 (#16225)
