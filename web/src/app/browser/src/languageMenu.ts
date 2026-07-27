@@ -422,7 +422,7 @@ export class LanguageMenu {
   }
 
   /**
-   * Add a keyboard entry to the language menu *
+   * Add a keyboard entry to the language menu
    *
    * @param   {Object}    kbd     keyboard object
    * @param   {Object}    kb      element being added and styled
@@ -558,7 +558,6 @@ export class LanguageMenu {
 
         languageMenu.lgList.style.display='none'; //still allows blank menu momentarily on selection
         languageMenu.keyman.contextManager.activateKeyboard(entry.kn, entry.kc,true);
-        languageMenu.keyman.contextManager.restoreLastActiveTextStore();
         languageMenu.hide();
       }
 

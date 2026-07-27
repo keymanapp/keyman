@@ -292,7 +292,10 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * @param       {string|null=}  languageCode  A BCP47 language code which was used when
    *                                            registering the keyboard stub.
    */
-  public setKeyboardForControl(elem: HTMLElement, keyboard?: string, languageCode?: string): void {
+  public setKeyboardForControl(elem: HTMLElement, keyboard?: string | null, languageCode?: string | null): void {
+    if (!elem.ownerDocument.defaultView) {
+      return;
+    }
     if(elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
@@ -311,7 +314,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       }
     }
 
-    this.contextManager.setKeyboardForTextStore(elem._kmwAttachment.textStore, keyboard, languageCode);
+    this.contextManager.setKeyboardForTextStore(elem._kmwAttachment.textStore, keyboard ?? null, languageCode ?? null);
   }
 
   /**
@@ -320,13 +323,20 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboardForControl
    *
-   * @param       {Element}    Pelem    Control element
+   * @param       {Element}      elem   Control element
    * @return      {string|null}         The independently-managed keyboard for the control,
    *                                    or null if it is following the global keyboard setting.
    */
-  public getKeyboardForControl(Pelem: HTMLElement): string | null{
-    const textStore = textStoreForElement(Pelem);
-    return this.contextManager.getKeyboardStubForTextStore(textStore).id;
+  public getKeyboardForControl(elem: HTMLElement): string | null{
+    if(!elem || !this.contextManager.isElementInIndependentMode(elem)) {
+      return null;
+    }
+    const keyboard = elem._kmwAttachment.keyboard;
+    if(keyboard === '') {
+      return '';
+    }
+    const stub = this.keyboardRequisitioner.cache.getStub(keyboard, elem._kmwAttachment.languageCode);
+    return stub?.KI ?? keyboard;
   }
 
   // Is not currently published API... but it exists.
@@ -335,13 +345,15 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * for this control. If it is currently following the global keyboard setting,
    * returns null instead.
    *
-   * @param       {Element}    Pelem    Control element
-   * @return      {string|null}         The independently-managed keyboard for the control,
-   *                                    or null if it is following the global keyboard setting.
+   * @param       {Element}      elem  Control element
+   * @return      {string|null}        The independently-managed keyboard for the control,
+   *                                   or null if it is following the global keyboard setting.
    */
-  public getLanguageForControl(Pelem: HTMLElement): string | null {
-    const textStore = textStoreForElement(Pelem);
-    return this.contextManager.getKeyboardStubForTextStore(textStore).langId;
+  public getLanguageForControl(elem: HTMLElement): string | null {
+    if(!elem || !this.contextManager.isElementInIndependentMode(elem)) {
+      return null;
+    }
+    return elem._kmwAttachment.languageCode;
   }
 
   public isAttached(x: HTMLElement): boolean {
