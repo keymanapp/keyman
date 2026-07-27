@@ -235,9 +235,8 @@ public class InstallationContainer : ObservableObject {
 
   /**
    * Marks the specified task as completed and saves it to the UserDefaults.
-   * Note that this actually creates a copy of the InstallationState object and updates the property here
-   * and in InstallationCheck with the new reference. The new object is necessary because
-   * the property is published, and we want SwiftUI to notify observers.
+   * Note that this actually creates a copy of the InstallationState object and updates
+   * the property in InstallationCheck with the new reference.
    */
   public func updateTaskAsCompleted(taskType: InstallationTaskType) {
     print("executeTask: \(taskType.rawValue) completed")
