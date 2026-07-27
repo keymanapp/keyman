@@ -360,14 +360,13 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
    *
    * This is based on the current `.activeTextStore` and its related attachment metadata.
    */
-  protected currentKeyboardSrcTextStore(): AbstractElementTextStore<any> {
+  protected currentKeyboardSrcTextStore(): AbstractElementTextStore<any> | null {
     const textStore = this.currentTextStore || this.mostRecentTextStore;
 
     if(this.isTextStoreKeyboardIndependent(textStore)) {
       return textStore;
-    } else {
-      return null;
     }
+    return null;
   }
 
   private isTextStoreKeyboardIndependent(textStore: AbstractElementTextStore<any>): boolean {
