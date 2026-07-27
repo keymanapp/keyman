@@ -53,14 +53,6 @@ public class InputMethodUtil {
   }
   
   /**
-   * true if the Keyman input method of the correct version exists in the correct location
-   */
-  public func isKeymanInputMethodCurrent()  -> Bool {
-    // MAC-CONFIG-TODO: implement with version check
-    return true
-  }
-  
-  /**
    * Returns version number string of Keyman input method
    */
   public func getKeymanInputMethodVersion() throws -> String {

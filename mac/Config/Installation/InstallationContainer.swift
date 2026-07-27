@@ -405,7 +405,6 @@ public class InstallationContainer : ObservableObject {
 
     print("Keyman status, version: \(version), enabled: \(enabled), running: \(running), permissionGranted: \(permissionString)")
   }
-  
 
   /**
    * register may need to happen before enabling
@@ -425,15 +424,6 @@ public class InstallationContainer : ObservableObject {
     print("selectKeymanInputMethod suceeded: \(success)")
     
     return success
-  }
-  
-  /**
-   * Verify that the input method has been correctly installed.
-   * This may be superflous as we are verifying this before creating the installation tasks
-   */
-  public func verifyInputMethod()  -> Bool {
-    // MAC-CONFIG-TODO: currently does nothing, already verified when InstallationCheck is created
-    return true
   }
   
   /**
