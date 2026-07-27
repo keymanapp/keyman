@@ -4,7 +4,6 @@
  * Created by Gabriel Schantz on 2026-07-20
  *
  * The view used for keyboard info
- * The view relies on the automatically synthesized memberwise intializer
  *
  * FEAT/MAC/CONFIG-WINDOW TODO: Finish writing file summary
  */
@@ -87,7 +86,7 @@ public struct KeyboardInfoView: View {
       VStack {
         let size: CGFloat = 106
         if let qrCode = package.generateSharePackageQRCode(size: size) {
-          
+
           // the package QR Code
           Image(nsImage: qrCode)
             .interpolation(.none) // important: ensures the edges of the QR Code remain sharp
@@ -97,7 +96,6 @@ public struct KeyboardInfoView: View {
         }
         
         if let sharePackageUrl = package.sharePackageUrl {
-          
           HStack {
             
             // the link to share the package online
