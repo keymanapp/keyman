@@ -13,9 +13,13 @@ import KeymanSettings
 
 struct MainConfigView: View {
   @EnvironmentObject var settings: SettingsContainer
+  // visibilty state for the add package sheet
   @State private var isShowingSheet = false
+  // visibilty state for the delete package alert
   @State private var isShowingDeleteAlert = false
+  // used to identify the selected KeymanPackage for the delete package alert
   @State private var selectedPackage: KeymanPackage? = nil
+  // used to identify the expanded KeymanPackage id
   @State private var expandedPackageID: UUID? = nil
   
   /**
@@ -28,30 +32,20 @@ struct MainConfigView: View {
   
   var body: some View {
     VStack(spacing: 0) {
-      Button {
-        isShowingSheet = true
-      } label: {
-        Label("Add Keyboard", systemImage: "plus")
-          .font(.title2)
-      }
-      .buttonStyle(.bordered)
-      .clipShape(Capsule())
-      .padding([.top, .leading, .trailing])
+      // the add keyboard button
+      LabelButtonView(action: { isShowingSheet = true }, label: "Add Keyboard", systemImage: "plus", font: .title2 )
+        .clipShape(.capsule)
+        .padding([.top, .leading, .trailing])
       // binds the visibility state to the sheet builder
-      .sheet(isPresented: $isShowingSheet) {
-        InstallKeyboardView()
-          .frame(width: 960, height: 390)
-        // FEAT/MAC/CONFIG-WINDOW TODO: Make width and height percentages
-      }
+        .sheet(isPresented: $isShowingSheet) {
+          InstallKeyboardView()
+            .frame(width: 960, height: 390)
+          // FEAT/MAC/CONFIG-WINDOW TODO: Make width and height percentages
+        }
       
       List(settings.singleKeyboardPackages, id: \.id) { package in
         ForEach(package.keyboards) { keyboard in
-          DisclosureGroup(isExpanded: Binding(
-            get: { self.expandedPackageID == package.id },
-            // setter handles when the chevron arrow is clicked by the user
-            // $0 = true when disclosure group is open and $0 = false when disclosure group is closed
-            set: { self.expandedPackageID = $0 ? package.id : nil }
-          )) {
+          DisclosureGroup(isExpanded: isExpanded(package: package)) {
             KeyboardInfoView(package: package)
           } label: {
             HStack {
@@ -97,6 +91,34 @@ struct MainConfigView: View {
       .padding([.leading, .trailing, .bottom])
     }
   }
+  
+  // the view for buttons with a label
+  public struct LabelButtonView: View {
+    let action: () -> Void
+    let label: String
+    let systemImage: String
+    let font: Font
+    
+    public var body: some View {
+      Button(action: action) {
+        Label(label, systemImage: systemImage)
+          .font(font)
+          .buttonStyle(.bordered)
+      }
+    }
+  }
+  
+  // the helper method to generate the custom binding for whether a package's disclosure group is expanded or not
+  func isExpanded(package: KeymanPackage) -> Binding<Bool> {
+    Binding(
+      // the getter handles the position of the disclosure group to be rendered
+      get: { self.expandedPackageID == package.id },
+      // setter handles when the chevron arrow is clicked by the user
+      // $0 = true when disclosure group is open and $0 = false when disclosure group is closed
+      set: { self.expandedPackageID = $0 ? package.id : nil }
+    )
+  }
+  
 }
 
 #Preview {
