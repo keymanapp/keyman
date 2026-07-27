@@ -161,13 +161,16 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
   protected abstract activateKeyboardForTextStore(kbd: KeyboardInfoPair, textStore: TextStore): void;
 
   /**
-   * Checks the pending keyboard-activation array for an entry corresponding to the specified
-   * TextStore.  If found, also removes the entry for bookkeeping purposes.
-   * @param textStore  The specific TextStore affected by the pending Keyboard activation.
-   *                May be `null`, which corresponds to the global default Keyboard.
-   * @returns `true` if pending activation is still valid, `false` otherwise.
+   * Checks the pending keyboard-activation array for an entry
+   * corresponding to the specified TextStore.  If found, also removes
+   * the entry for bookkeeping purposes.
+   * @param textStore  The specific TextStore affected by the pending
+   *                   Keyboard activation. May be `null`, which
+   *                   corresponds to the global default Keyboard.
+   * @returns the pending activation for the specified TextStore, or
+   * `null` if no such activation exists.
    */
-  private findAndPopActivation(textStore: TextStore): PendingActivation {
+  protected findAndPopActivation(textStore: TextStore): PendingActivation {
     // Array.findIndex requires Chrome 45+. :(
     let activationIndex;
     for(activationIndex = 0; activationIndex < this.pendingActivations.length; activationIndex++) {
