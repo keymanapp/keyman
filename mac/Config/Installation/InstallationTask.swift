@@ -16,7 +16,8 @@ public enum InstallationTaskType: String {
   case enableInputMethod = "enableInputMethod"  // triggers register and enable
   case requestAccess = "requestAccess"          // causes prompt to user to grant Accessibility
   case confirmAccess = "confirmAccess"          // confirms that Accessibility was granted
-  case restartMac = "restartMac"                // prompts user to restart machine
+  case requestRestart = "requestRestart"        // prompts user to restart machine
+  case confirmRestart = "confirmRestart"        // confirms that the machine was restarted
 }
 
 public struct InstallationTask: Hashable, Equatable {

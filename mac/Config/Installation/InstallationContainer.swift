@@ -53,7 +53,6 @@ public class InstallationContainer : ObservableObject {
     } catch {
       fatalError("Unable to access group container path for InputMethodUtil: \(error.localizedDescription).")
     }
-    
 
     self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
     
@@ -66,9 +65,13 @@ public class InstallationContainer : ObservableObject {
       print("installation phase = \(self.installationCheck.installationPhase), hasTasks = \(self.installationCheck.installationPhase.hasTasks)")
     }
     
-    self.registerObservers()
-    
-    self.installationCheck.startInstallationEvaluation()
+    // If we can now confirm that the user restarted (the final task), then the installation
+    // will be complete and there is no need to evaluate the state.
+    // Otherwise, evaluate the installation to prepare for a new installation or check for repairs.
+    if !self.validateConfirmRestart() {
+      self.registerObservers()
+      self.installationCheck.startInstallationEvaluation()
+    }
   }
   
   /**
@@ -158,6 +161,22 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
+   * If the current task is confirmRestart, mark it as complete if the user has restarted.
+   */
+  func validateConfirmRestart() -> Bool {
+    guard let task = self.currentTask() else { return false }
+    guard let state = self.installationState else { return false }
+    
+    if task.taskType == .confirmRestart &&  self.validateUserHasRestarted() {
+      // the confirmAccess task can now be marked as completed
+      self.updateTaskAsCompleted(taskType: .confirmRestart, for: state)
+      return true
+    } else {
+      return false
+    }
+  }
+  
+  /**
    * Returns true if the Accessibility permission has been granted by the user for the Keyman input method.
    * This is an optional return value because it is only set in response to a call to `checkAccessibilityPermissionGranted`
    * and is not populated until an asynchronous message is received in response.
@@ -196,7 +215,9 @@ public class InstallationContainer : ObservableObject {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .confirmAccess }) {
       return incompleteTask
-    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .restartMac }) {
+    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .requestRestart }) {
+      return incompleteTask
+    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .confirmRestart }) {
       return incompleteTask
     }
     
@@ -226,8 +247,10 @@ public class InstallationContainer : ObservableObject {
       self.checkAccessibilityPermissionGranted()
       // this task is completed asynchronously when the response is returned from the input method
       completedTask = false
-    case .restartMac:
+    case .requestRestart:
       completedTask = self.notifyUserPromptedToRestart()
+    case .confirmRestart:
+      completedTask = self.validateUserHasRestarted()
     }
     
     if completedTask {
@@ -271,17 +294,35 @@ public class InstallationContainer : ObservableObject {
 
     self.defaultsRepository.writeInstallationState(state.toUserDefaultsDictionary())
   }
-  
- /**
-   * Write the time that the user was requested to restart their machine
-   */
-  func writeRestartRequestTime() {
-    guard let state = self.installationState else { return }
 
-    state.dateRestartRequested = Date()
-    self.writeInstallationState()
+  public func setHasDisplayedInstallationComplete() {
+    guard let state = self.installationState else { return }
+    
+    if !state.hasDisplayedInstallComplete {
+      state.hasDisplayedInstallComplete = true
+      self.writeInstallationState()
+    }
   }
   
+  /**
+    * Write the time that the user was requested to restart their machine
+    */
+   func getHasDisplayedInstallationComplete() -> Bool {
+     guard let state = self.installationState else { return false }
+
+     return state.hasDisplayedInstallComplete
+   }
+
+  /**
+    * Write the time that the user was requested to restart their machine
+    */
+   func writeRestartRequestTime() {
+     guard let state = self.installationState else { return }
+
+     state.dateRestartRequested = Date()
+     self.writeInstallationState()
+   }
+
   /**
    * Read the time that the user was requested to restart their machine
    */

@@ -15,11 +15,14 @@ public class InstallationState {
   let kVersionKey = "version"
   let kDateRestartRequestedKey = "dateRestartRequested"
   let kRepairKey = "isRepair"
-  
+  let kDisplayedInstallComplete = "displayedInstallComplete"
+
   public let keymanVersion: String
   public var dateRestartRequested: Date?
   // indicates whether we are repairing a previous installation or doing a full installation
   public let isRepair: Bool
+  // indicates whether the installation complete message has been displayed to the user
+  public var hasDisplayedInstallComplete: Bool
   // this list of tasks that make up this installation
   public var tasks: Set<InstallationTask>
   
@@ -47,10 +50,11 @@ public class InstallationState {
     return tasks.contains(where: { !$0.isComplete }) && tasks.contains(where: { $0.isComplete})
   }
 
-  init(version: String, dateRestartRequested: Date? = nil, isRepair: Bool = false, tasks: Set<InstallationTask>) {
+  init(version: String, dateRestartRequested: Date? = nil, isRepair: Bool = false, hasDisplayedInstallComplete: Bool = false, tasks: Set<InstallationTask>) {
     self.keymanVersion = version
     self.dateRestartRequested = dateRestartRequested
     self.isRepair = isRepair
+    self.hasDisplayedInstallComplete = false
     self.tasks = tasks
   }
   
@@ -61,6 +65,7 @@ public class InstallationState {
     self.keymanVersion = dictionary[kVersionKey] as? String ?? ""
     self.dateRestartRequested = dictionary[kDateRestartRequestedKey] as? Date
     self.isRepair = dictionary[kRepairKey] as? Bool ?? false
+    self.hasDisplayedInstallComplete = dictionary[kDisplayedInstallComplete] as? Bool ?? false
     var installationTasks = Set<InstallationTask>()
     
     // for every task flag found in dictionary, insert a task in the tasks array
@@ -76,10 +81,13 @@ public class InstallationState {
     if let taskFlag = dictionary[InstallationTaskType.confirmAccess.rawValue] as? Bool {
       installationTasks.insert(InstallationTask(task: .confirmAccess, completed: taskFlag))
     }
-    if let taskFlag = dictionary[InstallationTaskType.restartMac.rawValue] as? Bool {
-      installationTasks.insert(InstallationTask(task: .restartMac, completed: taskFlag))
+    if let taskFlag = dictionary[InstallationTaskType.requestRestart.rawValue] as? Bool {
+      installationTasks.insert(InstallationTask(task: .requestRestart, completed: taskFlag))
     }
-    
+    if let taskFlag = dictionary[InstallationTaskType.confirmRestart.rawValue] as? Bool {
+      installationTasks.insert(InstallationTask(task: .confirmRestart, completed: taskFlag))
+    }
+
     self.tasks = installationTasks
   }
   
@@ -94,7 +102,8 @@ public class InstallationState {
       dictionary[kDateRestartRequestedKey] = dateRestartRequested
     }
     dictionary[kRepairKey] = self.isRepair
-    
+    dictionary[kDisplayedInstallComplete] = self.hasDisplayedInstallComplete
+
     for task in self.tasks {
       dictionary[task.taskType.rawValue] = task.isComplete
     }

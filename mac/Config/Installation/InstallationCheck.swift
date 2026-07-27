@@ -330,9 +330,10 @@ public class InstallationCheck {
   func createNewInstallationState(with neededTasks: Set<InstallationTask>) -> InstallationState {
     var fullTaskList = neededTasks
     
-    // add prepareNewInstall and restartMac InstallationTask
+    // add prepareNewInstall, requestRestart and confirmRestart InstallationTask
     fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .prepareNewInstall))
-    fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .restartMac))
+    fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
+    fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
     let installationState = InstallationState(version: self.inputMethodVersion, tasks: fullTaskList)
     
     return installationState
@@ -381,7 +382,8 @@ public class InstallationCheck {
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .enableInputMethod))
       
       // prompt user to restart after enabling the input method
-      newTasks.insert(InstallationTask.createNewInstallationTask(type: .restartMac))
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
     }
     
     return newTasks

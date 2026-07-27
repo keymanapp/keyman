@@ -54,6 +54,12 @@ struct InstallView: View {
         Button("Check Restart") {
           _ = installation.validateUserHasRestarted()
         }
+        Button("Set Displayed Complete") {
+          let beforeDisplayed = installation.getHasDisplayedInstallationComplete()
+          installation.setHasDisplayedInstallationComplete()
+          let afterDisplayed = installation.getHasDisplayedInstallationComplete()
+          print("hasDisplayedInstallComplete = \(beforeDisplayed) -> \(afterDisplayed)")
+        }
         Button("debug") {
           installation.debug()
         }
