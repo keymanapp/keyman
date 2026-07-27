@@ -135,9 +135,6 @@ namespace km {
                         action_item->option->value));
         return true;
       }
-      else {
-        return false;
-      }
       return false;
     }
 
