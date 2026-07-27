@@ -408,7 +408,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
    * context.
    *
    * This is the core method that backs
-   * https://help.keyman.com/developer/engine/web/15.0/reference/core/setKeyboardForControl.
+   * https://help.keyman.com/developer/engine/web/current-version/reference/core/setKeyboardForControl.
    * @param textStore
    * @param kbdId
    * @param langId
