@@ -12,9 +12,10 @@ import handleIncPackagesJson from './handlers/inc/packages-json.js';
 import apiPackageRegister from './handlers/api/package/register.js';
 import handleIncKeyboardsCss from './handlers/inc/keyboards-css.js';
 import { Environment } from './version-data.js';
-import { configuration } from './config.js';
+import { standardPaths } from './standardPaths.js';
 import chalk from 'chalk';
 import { shutdown } from './shutdown.js';
+import { getOption } from './options.js';
 
 export default function setupRoutes(app: express.Express, upload: multer.Multer, wsServer: ws.WebSocketServer, environment: Environment ) {
 
@@ -163,7 +164,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
   /* ngrok data */
 
   app.get('/api/status', (_req,res,next) => {
-    const response = { ngrokEnabled: configuration.useNgrok, ngrokEndpoint: configuration.ngrokEndpoint };
+    const response = { ngrokEnabled: getOption("server use ngrok"), ngrokEndpoint: standardPaths.ngrokEndpoint };
     res.send(response);
     next();
   });

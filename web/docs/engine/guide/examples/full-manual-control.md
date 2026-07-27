@@ -28,15 +28,15 @@ Include the following script in the HEAD of your page:
     }
     document.f.multilingual.focus();
 
-    keyman.setActiveKeyboard('', '');
+    await keyman.setActiveKeyboard('', '');
   });
 
   /* KWControlChange: Called when user selects an item in the KWControl SELECT */
-  function KWControlChange() {
+  async function KWControlChange() {
     /* Select the keyboard in KeymanWeb */
     var name = KWControl.value.substr(0, KWControl.value.indexOf("$$"));
-    var languageCode = KWControl.value.substr(KWControl.value.indexOf("$$"+2));
-    keyman.setActiveKeyboard(name, languageCode);
+    var languageCode = KWControl.value.substr(KWControl.value.indexOf("$$") + 2);
+    await keyman.setActiveKeyboard(name, languageCode);
     /* Focus onto the multilingual field in the form */
     document.f.multilingual.focus();
   }
