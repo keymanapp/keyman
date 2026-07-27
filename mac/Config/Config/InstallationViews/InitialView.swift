@@ -1,9 +1,10 @@
-//
-//  InitialView.swift
-//  Config
-//
-//  Created by Eli Schantz on 7/1/26.
-//
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Eli Schantz on 2026-07-01
+ *
+ * View used for providing an opening screen after the installation package has been run
+ */
 
 import SwiftUI
 import Foundation
@@ -15,7 +16,6 @@ struct InitialView: View {
   @Environment(\.dismiss) private var dismiss
   let namespace: Namespace.ID
   let onContinue: () -> Void
-  
   var versionText: String {
     if let version = installation.installationState?.keymanVersion {
       return "Version: \(version)              "
@@ -44,6 +44,7 @@ struct InitialView: View {
       HStack {
         Text("Proceed to continue with installation")
           .font(.title2)
+          .multilineTextAlignment(.center)
           .frame(maxWidth: .infinity, alignment: .leading)
         
         NavigationButton(action: .advance, onContinue: onContinue)

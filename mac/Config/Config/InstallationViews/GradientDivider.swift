@@ -1,15 +1,16 @@
-//
-//  GradientDivider.swift
-//  Config
-//
-//  Created by Eli Schantz on 7/1/26.
-//
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Eli Schantz on 2026-07-01
+ *
+ * View used for creating a thin divider with a Keyman color gradient.
+ */
+
 import SwiftUI
 
 struct GradientDivider: View {
   let namespace: Namespace.ID
   var id: String = "divider"
-  
   
   var body: some View {
     Rectangle()

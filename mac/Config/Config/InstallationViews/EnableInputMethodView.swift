@@ -1,9 +1,10 @@
-//
-//  EnableInputMethodView.swift
-//  Config
-//
-//  Created by Eli Schantz on 7/1/26.
-//
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Eli Schantz on 2026-07-01
+ *
+ * View used for directing the user to enable the Keyman input method.
+ */
 
 import SwiftUI
 
@@ -11,17 +12,15 @@ struct EnableInputMethodView: View {
   @EnvironmentObject var installation: InstallationContainer
   let namespace: Namespace.ID
   let onContinue: () -> Void
+  @State var enableButtonPressed : Bool = false
   
   var body: some View {
-    
     VStack {
-      
       Text("Enable Keyman")
         .font(.title)
         .bold()
         .frame(maxWidth: .infinity, alignment: .center)
         .matchedGeometryEffect(id: "title", in: namespace)
-      
       GradientDivider(namespace: namespace)
       
       Spacer()
@@ -33,34 +32,29 @@ struct EnableInputMethodView: View {
         .frame(height: 150)
         .padding(.horizontal, 100)
         .padding(.bottom, 8)
-      
       Text("To use Keyman, enable the Keyman input method in System Settings.")
         .multilineTextAlignment(.center)
-      
       
       Spacer()
       
       HStack {
-        
         Text("Enable input method")
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
-        
-        
         Button {
-              _ = installation.enableKeymanInputMethod()
-          
+          enableButtonPressed = true
+          installation.executeNextInstallationTask()
         } label: {
-            Text("Enable")
-                .padding(.horizontal, 16)
-                .padding(.vertical, 4)
+          Text("Enable")
+            .padding(.horizontal, 16)
+            .padding(.vertical, 4)
         }
         .buttonStyle(.borderedProminent)
         .tint(.blue)
         .clipShape(Capsule())
         .matchedGeometryEffect(id: "actionButton", in: namespace)
-
         NavigationButton(action: .advance, onContinue: onContinue)
+          .disabled(!enableButtonPressed)
       }
     }
   }

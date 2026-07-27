@@ -1,9 +1,10 @@
-//
-//  CompletedInstallView.swift
-//  Config
-//
-//  Created by Eli Schantz on 7/1/26.
-//
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Eli Schantz on 2026-07-01
+ *
+ * View used for notifying the user that installation is complete.
+ */
 
 import SwiftUI
 
@@ -12,11 +13,11 @@ struct CompletedInstallView: View {
   let namespace: Namespace.ID
   
   var versionText: String {
-      if let version = installation.installationState?.keymanVersion {
-          return "Version: \(version)              "
-      } else {
-          return "No version to display"
-      }
+    if let version = installation.installationState?.keymanVersion {
+      return "Version: \(version)              "
+    } else {
+      return "No version to display"
+    }
   }
   
   var body: some View {
@@ -26,7 +27,6 @@ struct CompletedInstallView: View {
       Spacer()
       
       KeymanLogo(namespace: namespace)
-      
       Text(versionText)
         .foregroundStyle(.secondary)
       
@@ -34,12 +34,10 @@ struct CompletedInstallView: View {
       
       GradientDivider(namespace: namespace)
         .padding(.bottom, 8)
-      
       HStack {
         Text("Installation complete")
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
-        
         NavigationButton(action: .dismiss)
       }
     }
