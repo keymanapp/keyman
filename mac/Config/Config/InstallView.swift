@@ -72,9 +72,6 @@ struct InstallView: View {
         Button("Uninstall") {
           installation.uninstall()
         }
-        Button("Force Validate Installation") {
-          installation.forceValidateInstallation()
-        }
         Spacer()
       }
       .padding()

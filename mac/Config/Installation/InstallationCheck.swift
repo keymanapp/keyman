@@ -261,29 +261,7 @@ public class InstallationCheck {
   func clearInstallationState() {
     self.defaultsRepository.deleteInstallationState()
   }
-  /**
-   * Determine whether validation is needed.
-   */
-  func isValidationNeeded() -> Bool {
-    // no need to validate if the input method is not current
-    guard (self.isInputMethodInstalled &&  self.isInputMethodCurrent) else { return false }
 
-    // or if the current state is not saved (should never encounter this)
-    guard let currentInstallationState = self.installationState else { return false }
-    
-    // only need to validate if this installation has been completed
-    return currentInstallationState.isComplete
-  }
-
-  /**
-   * Determine whether the completed installation has been altered in some way and needs repair.
-   * If repair is needed, then a new InstallationState object will be returned.
-   */
-  func startValidation() {
-    // call the input method to check whether Accessibility permission has been granted
-    self.inputMethodUtil.doAsyncAccessibilityCheck()
-  }
-  
   /**
    * Using the accessibility state returned from the input method, build the new task list
    * and determine what is actually required for the new installation.

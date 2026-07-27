@@ -302,17 +302,21 @@ public class InstallationContainer : ObservableObject {
     self.defaultsRepository.writeInstallationState(state.toUserDefaultsDictionary())
   }
 
+  /**
+    * Record that the installation complete view has been shown to the user
+    */
   public func setHasDisplayedInstallationComplete() {
-    guard let state = self.installationState else { return }
-    
-    if !state.hasDisplayedInstallComplete {
-      state.hasDisplayedInstallComplete = true
+    if let existingState = self.installationState {
+      let updatedState = InstallationState.createCopy(from: existingState)
+      updatedState.hasDisplayedInstallComplete = true
+      self.installationState = updatedState
+      self.installationCheck.installationState = updatedState
       self.writeInstallationState()
     }
   }
   
   /**
-    * Write the time that the user was requested to restart their machine
+    * Return whether the installation complete view has been shown to the user
     */
    func getHasDisplayedInstallationComplete() -> Bool {
      guard let state = self.installationState else { return false }
@@ -324,10 +328,13 @@ public class InstallationContainer : ObservableObject {
     * Write the time that the user was requested to restart their machine
     */
    func writeRestartRequestTime() {
-     guard let state = self.installationState else { return }
-
-     state.dateRestartRequested = Date()
-     self.writeInstallationState()
+     if let existingState = self.installationState {
+       let updatedState = InstallationState.createCopy(from: existingState)
+       updatedState.dateRestartRequested = Date()
+       self.installationState = updatedState
+       self.installationCheck.installationState = updatedState
+       self.writeInstallationState()
+     }
    }
 
   /**
@@ -365,13 +372,6 @@ public class InstallationContainer : ObservableObject {
     return hasRestarted
   }
   
-  /**
-   * for testing purposes, validate the installation
-   */
-  func forceValidateInstallation() {
-    self.installationCheck.startValidation()
-  }
-
   /**
    * return the last time the system was booted
    */
