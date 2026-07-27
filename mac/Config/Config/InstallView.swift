@@ -10,20 +10,27 @@ import SwiftUI
 
 struct InstallView: View {
   @EnvironmentObject var installation: InstallationContainer
-  
+  @State private var taskText: String = "[task]"
+
   var body: some View {
     VStack {
       HStack {
         Image(systemName: "gear")
           .imageScale(.large)
           .foregroundColor(.accentColor)
-        if let installTask = installation.currentTask() {
-          Text("Current task = \(installTask.taskType.rawValue)")
-        }
+        Text("Current task = \(taskText)")
+          .onAppear() {
+            if let installTask = installation.currentTask() {
+              taskText = installTask.taskType.rawValue
+            }
+          }
       }
       HStack {
         Button("Next...") {
           installation.executeNextInstallationTask()
+          if let installTask = installation.currentTask() {
+            taskText = installTask.taskType.rawValue
+          }
         }
         .disabled(installation.isInstallationComplete())
         Button("Migrate Data") {

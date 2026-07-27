@@ -27,8 +27,9 @@ public class InstallationContainer : ObservableObject {
     return self.installationCheck.installationPhase
   }
   
-  // installationState describes the remaining tasks to complete the installation
-  @Published public var installationState: InstallationState?
+  var installationState: InstallationState? {
+    self.installationCheck.installationState
+  }
 
   fileprivate let installationCheck: InstallationCheck
   fileprivate let defaultsRepository: DefaultsRepo
@@ -55,15 +56,6 @@ public class InstallationContainer : ObservableObject {
     }
 
     self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
-    
-    // if installation is still being evaluated, set the installation state later when it is done
-    // otherwise, set it immediately
-    if self.installationCheck.isEvaluatingNewInstallation {
-      self.installationState = nil
-    } else {
-      self.installationState = self.installationCheck.installationState
-      print("installation phase = \(self.installationCheck.installationPhase), hasTasks = \(self.installationCheck.installationPhase.hasTasks)")
-    }
     
     // If we can now confirm that the user restarted (the final task), then the installation
     // will be complete and there is no need to evaluate the state.
@@ -109,36 +101,19 @@ public class InstallationContainer : ObservableObject {
    * called when `NSNotification.Name.startNewInstallation` is received
    */
   @objc func handleStartNewInstallation(_ notification: Notification) {
-    // now that the installation has been evaluated
-    // we can set the installationState
-    
-    if let newState = notification.object as? InstallationState {
-      self.installationState = newState
-      
-      // the evaluation is done
-      self.installationCheck.isEvaluatingNewInstallation = false
-      print("handleStartNewInstallation, new state provided")
-    } else {
-      print("handleStartNewInstallation received but did not include new InstallationState")
-    }
+    print("handleStartNewInstallation received")
+    // the evaluation is done
+    self.installationCheck.isEvaluatingNewInstallation = false
   }
 
   /**
    * called when `NSNotification.Name.startInstallationRepair` is received
    */
   @objc func handleStartInstallationRepair(_ notification: Notification) {
-    print("handleStartInstallationRepair")
-    // Extract message from the notification if available
-    if let newState = notification.object as? InstallationState {
-      self.installationState = newState
-      
-      // now that the repair has been determined, we can notify that a repair is needed
-      // so that the repair UI can presented to the user
-      
-      NotificationCenter.default.post(name: .installationRepairStarted, object: nil, userInfo: nil)
-    } else {
-      print("handleStartInstallationRepair received but did not include new InstallationState")
-    }
+    print("handleStartInstallationRepair received")
+    
+    // notify observers
+    NotificationCenter.default.post(name: .installationRepairStarted, object: nil, userInfo: nil)
   }
 
   /**
@@ -268,7 +243,6 @@ public class InstallationContainer : ObservableObject {
     print("executeTask: \(taskType.rawValue) completed")
     if let existingState = self.installationState {
       let updatedState = InstallationState.createCopyWithCompletedTask(from: existingState, with: taskType)
-      self.installationState = updatedState
       self.installationCheck.installationState = updatedState
       self.writeInstallationState()
     }
@@ -309,7 +283,6 @@ public class InstallationContainer : ObservableObject {
     if let existingState = self.installationState {
       let updatedState = InstallationState.createCopy(from: existingState)
       updatedState.hasDisplayedInstallComplete = true
-      self.installationState = updatedState
       self.installationCheck.installationState = updatedState
       self.writeInstallationState()
     }
@@ -331,7 +304,6 @@ public class InstallationContainer : ObservableObject {
      if let existingState = self.installationState {
        let updatedState = InstallationState.createCopy(from: existingState)
        updatedState.dateRestartRequested = Date()
-       self.installationState = updatedState
        self.installationCheck.installationState = updatedState
        self.writeInstallationState()
      }
