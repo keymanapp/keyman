@@ -16,24 +16,31 @@ import Foundation
 import KeymanSettings
 
 public enum InstallationPhase {
-    case inputMethodMissing
-    case inputMethodOutdated
-    case evaluatingInstallation
-    case newInstallation
-    case installationInProgress
-    case installationComplete
-    case installationRepairNeeded
-
-    public var hasTasks: Bool {
-        switch self {
-        case .newInstallation,
-            .installationInProgress,
-            .installationRepairNeeded:
-            return true
-        default:
-          return false
-        }
+  case inputMethodMissing
+  case inputMethodOutdated
+  case evaluatingInstallation
+  case newInstallation
+  case installationInProgress
+  case installationComplete
+  case installationRepairNeeded
+  
+  // indicates whether the installation contains tasks to complete installation
+  public var hasTasks: Bool {
+    switch self {
+    case .newInstallation,
+        .installationInProgress,
+        .installationRepairNeeded:
+      return true
+    default:
+      return false
     }
+  }
+}
+
+enum InstallationStateCondition {
+  case stale
+  case new
+  case inProgress
 }
 
 @MainActor
@@ -49,7 +56,7 @@ public class InstallationCheck {
   fileprivate let defaultsRepository: DefaultsRepo
   fileprivate let inputMethodUtil: InputMethodUtil
 
-  // a simple representation of the install state
+  // a classification of the install state
   // provided so UI knows what to present to the user
   public var installationPhase: InstallationPhase {
     if !self.isInputMethodInstalled {
@@ -88,7 +95,7 @@ public class InstallationCheck {
     
     var keymanIsCurrent = false
     var keymanVersion: String = "unknown"
-    
+
     let keymanExists = inputMethodUtil.keymanInputMethodExists()
     if keymanExists {
       keymanVersion = (try? inputMethodUtil.getKeymanInputMethodVersion()) ?? "unknown"
@@ -99,36 +106,61 @@ public class InstallationCheck {
     self.isInputMethodCurrent = keymanIsCurrent
     self.inputMethodVersion = keymanVersion
 
-    // MAC-CONFIG_TODO: break this out as a separate method
-    if (self.isInputMethodInstalled && self.isInputMethodCurrent) {
-      // if we have a valid input method, look at the installation state
+    let installState = InstallationCheck.readInstallationState(from: defaultsRepo)
+
+    if (keymanExists && keymanIsCurrent) {
+      // the input method is valid, examine the installation state recorded on disk
+      //
+      let installationStateCondition = InstallationCheck.evaluateInstallationState(state: installState, for: keymanVersion);
+      print("installationStateCondition: \(installationStateCondition)")
       
-      if let installState = self.loadState() {
-        // if a stale installationState remains from a different version, then delete it
-        if installState.keymanVersion != self.inputMethodVersion {
-          print("removing stale installation state \(installState.keymanVersion) because the current version is \(self.inputMethodVersion)")
-          self.clearInstallationState()
-          // this is a new installation
-          self.isEvaluatingNewInstallation = true
-        } else if installState.isNew {
-          // for a new installation, do not create the installationState until the evaluation is complete
-          self.isEvaluatingNewInstallation = true
-        } else {
-          // If we're already in progress or completed or doing a repair, pick up where we left off
-          // Note that a completed installation will be checked for repairs
-          self.installationState = installState
-          self.isEvaluatingNewInstallation = false
-        }
-      } else {
-        // if the installationState does not exist, then this is a new installation
-        // do not create the installationState until the evaluation is complete
-        self.isEvaluatingNewInstallation = true
+      switch installationStateCondition {
+      case .inProgress:
+        self.installationState = installState     // resume with the existing installation
+      case .new:
+        self.isEvaluatingNewInstallation = true   // evaluate before creating a new InstallationState
+      case .stale:
+        self.clearInstallationState()             // delete the existing installation state from the UserDefaults
+        self.isEvaluatingNewInstallation = true   // evaluate before creating a new InstallationState
       }
     }
     
     self.registerObservers()
   }
 
+  /**
+   * Check the condition of the InstallationState as recorded in the UserDefaults.
+   * Determine whether it is `stale` and should be deleted
+   * (which then is treated as a new installation) or
+   * is `inProgress` and should be loaded and used, or
+   * is `new`. All new installations are re-evaluated to determine
+   * what tasks must be executed to complete the installation.
+   */
+  static func evaluateInstallationState(state: InstallationState?, for version: String) -> InstallationStateCondition {
+ 
+    // If the installationState does not exist, then this is a new installation.
+    // The installationState will be created when evaluation is complete.
+    guard state != nil else { return .new }
+    
+    var condition = InstallationStateCondition.inProgress
+    
+    if let installState = state {
+      // If the installationState remains from a different install, mark it as stale.
+      // It will be deleted and we will evaluate for a new installation.
+      if installState.keymanVersion != version {
+        condition = .stale
+      } else if installState.isNew {
+        condition = .new
+      } else {
+        // If we're already in progress or completed or doing a repair, pick up where we left off
+        // Note that a completed installation will be checked for repairs
+        condition = .inProgress
+      }
+    }
+
+    return condition
+  }
+  
   /**
    * Should be called immediately after init to evaluate what is needed for installation
    * or, if the installation is complete, whether it needs repairs.
@@ -143,10 +175,14 @@ public class InstallationCheck {
     }
   }
   
+  /**
+   * Check whether the input method and configuration app are the same version.
+   * Because the version of the config app will not be sent when build locally, this can be overridden,
+   * for testing purposes, by specifying `kTestConfigVersion` in config app's standard UserDefaults
+   */
   static func isVersionCurrent(inputMethodVersion: String, configurationVersion: String) -> Bool {
-    //    return inputMethodVersion == configurationVersion
-    // MAC-CONFIG_TODO: temporarily hard-coded to true for testing with local config app builds
-    return true
+    print("isVersionCurrent, comparing input method version: \(inputMethodVersion) and config app version: \(configurationVersion)")
+    return inputMethodVersion == configurationVersion
   }
   
   /**
@@ -303,17 +339,24 @@ public class InstallationCheck {
     }
   }
 
-  /**
-   * Read the currently saved installation state as an object
-   */
-  func readInstallationState() -> InstallationState? {
-    guard let installationMap = self.defaultsRepository.readInstallationState() else {
-      return nil
-    }
-    
-    return InstallationState(from: installationMap)
+/**
+ * Read the currently saved installation state as an object
+ */
+func readInstallationState() -> InstallationState? {
+  return InstallationCheck.readInstallationState(from: self.defaultsRepository)
+}
+
+/**
+ * Read the currently saved installation state as an object
+ */
+static func readInstallationState(from repo: DefaultsRepo) -> InstallationState? {
+  guard let installationMap = repo.readInstallationState() else {
+    return nil
   }
   
+  return InstallationState(from: installationMap)
+}
+
   /**
    * The provided parameter `accessibilityPermissionGranted` was returned asynchronously from the input method.
    * Use it and other info to see what tasks are needed to complete installation.

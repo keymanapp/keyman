@@ -252,9 +252,9 @@ public class InstallationContainer : ObservableObject {
   }
 
   /**
-   * Executes the next installation task which is incomplete, if there is one remaining.
+   * Executes the current incomplete installation task, if one remains.
    */
-  public func executeNextInstallationTask() {
+  public func executeCurrentInstallationTask() {
     if let installTask = self.currentTask() {
       self.executeTask(installTask)
     }

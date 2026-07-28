@@ -27,7 +27,7 @@ struct InstallView: View {
       }
       HStack {
         Button("Next...") {
-          installation.executeNextInstallationTask()
+          installation.executeCurrentInstallationTask()
           if let installTask = installation.currentTask() {
             taskText = installTask.taskType.rawValue
           }
