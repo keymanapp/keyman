@@ -36,4 +36,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="inst-cpp.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>
