@@ -346,9 +346,11 @@ public class InstallationCheck {
    */
   func createRepairInstallationState(accessibilityPermissionGranted: Bool) -> InstallationState? {
     var repairInstallationState: InstallationState? = nil
-    let repairTasks = self.determineInstallationTasksNeeded(for: accessibilityPermissionGranted)
     
+    var repairTasks = self.determineInstallationTasksNeeded(for: accessibilityPermissionGranted)
     if !repairTasks.isEmpty {
+      // add prepareNewRepair
+      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .prepareNewRepair))
       repairInstallationState = InstallationState(version: self.inputMethodVersion, isRepair: true, tasks: repairTasks)
     }
     

@@ -184,6 +184,8 @@ public class InstallationContainer : ObservableObject {
     
     if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .prepareNewInstall }) {
       return incompleteTask
+    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .prepareNewRepair }) {
+      return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .enableInputMethod }) {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .requestAccess }) {
@@ -214,6 +216,8 @@ public class InstallationContainer : ObservableObject {
     switch task.taskType {
     case .prepareNewInstall:
       completedTask = self.migrateData()
+    case .prepareNewRepair:
+      completedTask = true
     case .enableInputMethod:
       completedTask = self.enableKeymanInputMethod()
     case .requestAccess:
