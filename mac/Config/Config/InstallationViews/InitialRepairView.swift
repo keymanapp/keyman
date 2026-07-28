@@ -1,0 +1,63 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Eli Schantz on 2026-07-27
+ *
+ * View used for providing an opening screen for the repair phase.
+ */
+
+import SwiftUI
+
+import SwiftUI
+import AppKit
+internal import UniformTypeIdentifiers
+
+struct InitialRepairView: View {
+  @EnvironmentObject var installation: InstallationContainer
+  let namespace: Namespace.ID
+  
+  var body: some View {
+    VStack {
+      Label("Repairs Required", systemImage: "hand.raised.fill")
+        .font(.title)
+        .bold()
+        .frame(maxWidth: .infinity, alignment: .center)
+        .matchedGeometryEffect(id: "title", in: namespace)
+      GradientDivider(namespace: namespace)
+      
+      Spacer()
+      
+      Image(systemName: "hammer.circle.fill")
+        .font(.system(size: 100))
+        .padding(.bottom, 16)
+      Text("One or more Keyman components or permissions require your attention. Complete the following steps to restore your Keyman installation.")
+        .multilineTextAlignment(.center)
+      
+      Spacer()
+      
+      HStack {
+        Text("Resolve Issues")
+          .font(.title2)
+          .frame(maxWidth: .infinity, alignment: .leading)
+          .buttonStyle(.borderedProminent)
+          .tint(.blue)
+          .clipShape(Capsule())
+        NavigationButton(action: .advance)
+      }
+    }
+  }
+}
+
+private struct InitialRepairViewPreview: View {
+  @Namespace private var namespace
+  private let installation = InstallationContainer()
+  
+  var body: some View {
+    InitialRepairView(namespace: namespace)
+      .environmentObject(installation)
+  }
+}
+
+#Preview {
+  InitialRepairViewPreview()
+}

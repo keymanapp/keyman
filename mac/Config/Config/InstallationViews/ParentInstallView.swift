@@ -17,19 +17,21 @@ struct ParentInstallView: View {
     if installation.installationPhase.hasTasks {
       switch installation.currentTask()?.taskType {
       case .prepareNewInstall: currentPage = .initial
-      case .enableInputMethod:
-        currentPage = .enableInputMethod
-      case .requestAccess: currentPage =
-          .allowSecurityPermission
+      case .enableInputMethod: currentPage = .enableInputMethod
+      case .requestAccess: currentPage = .allowSecurityPermission
       case .confirmAccess: print("Access granted")
-      case .restartMac: currentPage = .restartComputer
+      case .requestRestart: currentPage = .restartComputer
       default: currentPage = .completed
       }
     } else {
       switch installation.installationPhase {
       case .evaluatingInstallation: currentPage = .loading
       case .inputMethodMissing, .inputMethodOutdated: currentPage = .rerunInstaller
-      case .installationComplete: currentPage = .completed
+      case .installationComplete:
+        if installation.getHasDisplayedInstallationComplete() {
+          currentPage = .completed
+          installation.setHasDisplayedInstallationComplete()
+        }
       default: currentPage = .completed
       }
     }
@@ -40,7 +42,7 @@ struct ParentInstallView: View {
     ZStack {
       switch currentPage {
       case .loading: ProgressView()
-      case .initial: InitialView(namespace: animation,onContinue: {
+      case .initial: NewInstallView(namespace: animation,onContinue: {
         installation.executeNextInstallationTask()
         chooseCurrentPage()
       })
@@ -56,7 +58,7 @@ struct ParentInstallView: View {
         currentPage = .loading
         Task {
           while installation.installationPhase == .evaluatingInstallation {
-            try? await Task.sleep(for: .milliseconds(200))
+            try? await Task.sleep(for: .milliseconds(100))
           }
           await MainActor.run {
             withAnimation(.smooth) {
@@ -67,6 +69,8 @@ struct ParentInstallView: View {
       } else {
         chooseCurrentPage()
       }
+    }
+    .onReceive( NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in
     }
     .padding()
     .frame(minWidth: 600)

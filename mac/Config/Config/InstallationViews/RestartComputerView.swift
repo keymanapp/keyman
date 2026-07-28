@@ -40,5 +40,8 @@ struct RestartComputerView: View {
         NavigationButton(action: .dismiss)
       }
     }
+    .onAppear {
+      installation.executeNextInstallationTask()
+    }
   }
 }

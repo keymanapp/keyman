@@ -10,7 +10,7 @@ import SwiftUI
 import Foundation
 
 
-struct InitialView: View {
+struct NewInstallView: View {
   
   @EnvironmentObject var installation: InstallationContainer
   @Environment(\.dismiss) private var dismiss
@@ -46,7 +46,6 @@ struct InitialView: View {
           .font(.title2)
           .multilineTextAlignment(.center)
           .frame(maxWidth: .infinity, alignment: .leading)
-        
         NavigationButton(action: .advance, onContinue: onContinue)
       }
     }

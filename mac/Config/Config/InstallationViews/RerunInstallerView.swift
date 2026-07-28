@@ -41,9 +41,6 @@ struct RerunInstallerView: View {
         Text("Run Keyman installer")
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
-          .buttonStyle(.borderedProminent)
-          .tint(.blue)
-          .clipShape(Capsule())
         Button {
           installation.executeNextInstallationTask()
         } label: {
