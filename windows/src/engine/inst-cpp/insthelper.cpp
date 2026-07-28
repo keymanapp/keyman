@@ -31,17 +31,19 @@ HandleError(const MSIHANDLE& hInstall, const std::wstring& messagePrefix) {
   MsiSetProperty(hInstall, TEXT("EnginePostInstall_Error"), error.c_str());
   return errorCode;
 }
-#include <fstream>
+
 extern "C" __declspec(dllexport) UINT WINAPI EnginePostInstall(MSIHANDLE hInstall)
 {
   HANDLE hFile;
 
   // Find %appdata% path
-  PWSTR path = new wchar_t[MAX_PATH];
+  wchar_t path[MAX_PATH]={0};
+  PWSTR ppath = nullptr;
 
-  if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramData, 0, NULL, &path))) {
+  if (!SUCCEEDED(SHGetKnownFolderPath(FOLDERID_ProgramData, 0, NULL, &ppath))) {
     HandleError(hInstall, L"Keyman Engine failed to get known folder path");
   } else {
+    wcscat_s(path, MAX_PATH, ppath);
     wcscat_s(path, MAX_PATH, SFolderKeymanRoot);
 
     // Create directory if it does not exist
@@ -56,18 +58,26 @@ extern "C" __declspec(dllexport) UINT WINAPI EnginePostInstall(MSIHANDLE hInstal
     if (hFile == INVALID_HANDLE_VALUE) {
       return HandleError(hInstall, L"Keyman Engine failed to set permissions on shared data in CreateFile: ");
     }
-
+    // Create an SID for the WinBuiltinAnyPackageSid group on the local computer.
+    BYTE sidBuffer[SECURITY_MAX_SID_SIZE] ;
+    PSID pSid = sidBuffer ;
+    DWORD sidSize = sizeof( sidBuffer ) ;
+    if ( !CreateWellKnownSid( WinBuiltinAnyPackageSid, nullptr, sidBuffer, &sidSize ) ) {
+      CloseHandle(hFile);
+      return HandleError(hInstall, L"Keyman Engine failed to create SID for the WinBuiltinAnyPackageSid group on the local computer: ");
+    }
     // Set permission on shared data
     EXPLICIT_ACCESS ea      = {0};
     ea.grfAccessPermissions = GENERIC_READ | GENERIC_EXECUTE;
     ea.grfAccessMode        = SET_ACCESS;
     ea.grfInheritance       = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
     ea.Trustee.TrusteeForm  = TRUSTEE_IS_SID;
-    ea.Trustee.ptstrName    = (LPWCH)L"ALL APPLICATION PACKAGES";
+    ea.Trustee.TrusteeType  = TRUSTEE_IS_WELL_KNOWN_GROUP;
+    ea.Trustee.ptstrName    = (LPWSTR)pSid ;
 
     // Get a pointer to the existing DACL
-    PACL pOldDACL = NULL;
-    PACL pNewDACL = NULL;
+    PACL pOldDACL = nullptr;
+    PACL pNewDACL = nullptr;
     SE_OBJECT_TYPE objectType = SE_FILE_OBJECT;
 
     DWORD dwRes = GetSecurityInfo(hFile, objectType, DACL_SECURITY_INFORMATION, nullptr, nullptr, &pOldDACL, nullptr, nullptr);
@@ -101,7 +111,7 @@ extern "C" __declspec(dllexport) UINT WINAPI EnginePostInstall(MSIHANDLE hInstal
     CloseHandle(hFile);
   }
 
-  delete[] path;
+  CoTaskMemFree( ppath );
   return ERROR_SUCCESS;
 }
 
@@ -196,7 +206,7 @@ void UnregisterTIPAndItsProfiles(const CLSID& AClsid) {
   pInputProcessorProfiles->Unregister(AClsid);
 }
 
-extern "C" __declspec(dllexport) UINT PreUninstall( MSIHANDLE hInstall ) {
+extern "C" __declspec(dllexport) UINT WINAPI PreUninstall( MSIHANDLE hInstall ) {
   // Initialize COM
   HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
   if (SUCCEEDED(hr)) {
