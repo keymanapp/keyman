@@ -860,6 +860,198 @@ describe('ContextTokenization', function() {
       assert.equal(preTail.exampleInput, '\'');
       assert.equal(tail.exampleInput, '.');
     });
+
+    describe('properly handles previously-applied transition IDs', () => {
+      it('does not preserve applied transition IDs on edited tokens', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can'];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+        const REVERTABLE_TRANSITION_ID = 31415;
+        baseTokenization.tail.appliedTransitionId = REVERTABLE_TRANSITION_ID;
+        const NEW_TRANSITION_ID = REVERTABLE_TRANSITION_ID + 1;
+
+        const dist = [
+          {
+            sample: { insert: 't', deleteLeft: 0, deleteRight: 0, id: NEW_TRANSITION_ID },
+            p: 1
+          }
+        ];
+
+        const resultTokenization = baseTokenization.evaluateTransition(
+          {
+            alignment: {
+              merges: [],
+              splits: [],
+              unmappedEdits: [],
+              edgeWindow: {
+                ...buildEdgeWindow(baseTokenization.tokens, dist[0].sample, false),
+                retokenization: baseTokenization.tokens.map((t) => t.exampleInput),
+                retokenizationText: baseTokenization.tokens.map((t) => t.exampleInput).reduce((accum, curr) => accum + curr, '')
+              },
+              removedTokenCount: 0
+            },
+            inputs: (() => {
+              const map: Map<number, Transform> = new Map();
+              map.set(0, dist[0].sample);
+
+              return [
+                {sample: map, p: 1}
+              ];
+            })(),
+            inputSubsetId: 0
+          },
+          NEW_TRANSITION_ID,
+          1
+        )
+
+        resultTokenization.tokens.forEach((t) => {
+          assert.isUndefined(t.appliedTransitionId);
+        });
+      });
+
+      it('preserves applied transition IDs on applicable tokens', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can'];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+        const REVERTABLE_TRANSITION_ID = 31415;
+        baseTokenization.tail.appliedTransitionId = REVERTABLE_TRANSITION_ID;
+        const NEW_TRANSITION_ID = REVERTABLE_TRANSITION_ID + 1;
+
+
+        const dist = [
+          {
+            sample: { insert: ' ', deleteLeft: 0, deleteRight: 0, id: NEW_TRANSITION_ID },
+            p: 1
+          }
+        ];
+
+        const resultTokenization = baseTokenization.evaluateTransition(
+          {
+            alignment: {
+              merges: [],
+              splits: [],
+              unmappedEdits: [],
+              edgeWindow: {
+                ...buildEdgeWindow(baseTokenization.tokens, dist[0].sample, false),
+                retokenization: baseTokenization.tokens.map((t) => t.exampleInput),
+                retokenizationText: baseTokenization.tokens.map((t) => t.exampleInput).reduce((accum, curr) => accum + curr, '')
+              },
+              removedTokenCount: 0
+            },
+            inputs: (() => {
+              const map: Map<number, Transform> = new Map();
+              map.set(1, dist[0].sample);
+
+              return [
+                {sample: map, p: 1}
+              ];
+            })(),
+            inputSubsetId: 0
+          },
+          NEW_TRANSITION_ID,
+          1
+        )
+
+        const resultTokenLength = resultTokenization.tokens.length;
+
+        resultTokenization.tokens.forEach((t, i) => {
+          // The space will add TWO tokens.
+          if(i == resultTokenLength - 3) {
+            assert.equal(t.appliedTransitionId, REVERTABLE_TRANSITION_ID);
+          } else {
+            assert.isUndefined(t.appliedTransitionId);
+          }
+        });
+      });
+
+      // Performs the two above in sequence in a manner that could cause cross-effects
+      // if implemented incorrectly.
+      it('does not conflate effects between different tokenization transitions', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can'];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+        const REVERTABLE_TRANSITION_ID = 31415;
+        baseTokenization.tail.appliedTransitionId = REVERTABLE_TRANSITION_ID;
+        const NEW_TRANSITION_ID = REVERTABLE_TRANSITION_ID + 1;
+
+        const dist = [
+          {
+            sample: { insert: ' ', deleteLeft: 0, deleteRight: 0, id: NEW_TRANSITION_ID },
+            p: .8
+          }, {
+            sample: { insert: ' ', deleteLeft: 0, deleteRight: 0, id: NEW_TRANSITION_ID },
+            p: .2
+          }
+        ];
+
+        const baseTransitionEdge: TransitionEdge =  {
+          alignment: {
+            merges: [],
+            splits: [],
+            unmappedEdits: [],
+            edgeWindow: {
+              ...buildEdgeWindow(baseTokenization.tokens, dist[0].sample, false),
+              retokenization: baseTokenization.tokens.map((t) => t.exampleInput),
+              retokenizationText: baseTokenization.tokens.map((t) => t.exampleInput).reduce((accum, curr) => accum + curr, '')
+            },
+            removedTokenCount: 0
+          },
+          inputs: (() => {
+            const map: Map<number, Transform> = new Map();
+            map.set(1, dist[0].sample);
+
+            return [
+              {sample: map, p: dist[0].p}
+            ];
+          })(),
+          inputSubsetId: 0
+        };
+
+        // We don't care about the results here.  What we care about is that
+        // this call doesn't remove the appliedTransitionId from the source
+        // token, preventing it from being marked on later tokenization
+        // transitions.
+        baseTokenization.evaluateTransition(
+          {
+            alignment: {
+              ...baseTransitionEdge.alignment,
+              edgeWindow: {
+                ...baseTransitionEdge.alignment.edgeWindow,
+                ...buildEdgeWindow(baseTokenization.tokens, dist[1].sample, false)
+              }
+            },
+            inputs: (() => {
+              const map: Map<number, Transform> = new Map();
+              map.set(0, dist[1].sample);
+
+              return [
+                {sample: map, p: dist[1].p}
+              ];
+            })(),
+            inputSubsetId: 0
+          },
+          NEW_TRANSITION_ID,
+          dist[1].p
+        )
+
+        const resultTokenization = baseTokenization.evaluateTransition(
+          baseTransitionEdge,
+          NEW_TRANSITION_ID,
+          dist[0].p
+        );
+
+        const resultTokenLength = resultTokenization.tokens.length;
+
+        resultTokenization.tokens.forEach((t, i) => {
+          // The space will add TWO tokens.
+          if(i == resultTokenLength - 3) {
+            assert.equal(t.appliedTransitionId, REVERTABLE_TRANSITION_ID);
+          } else {
+            assert.isUndefined(t.appliedTransitionId);
+          }
+        });
+      });
+    });
   });
 
   describe('buildEdgeWindow', () => {
