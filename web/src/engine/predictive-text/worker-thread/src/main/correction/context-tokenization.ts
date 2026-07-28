@@ -673,9 +673,6 @@ export class ContextTokenization {
         tailTokenization.splice(tokenIndex, 1, affectedToken);
       }
 
-      affectedToken.isPartial = true;
-      delete affectedToken.appliedTransitionId;
-
       // If we are completely replacing a token via delete left, erase the deleteLeft;
       // that part applied to a _previous_ token that no longer exists.
       // We start at index 0 in the insert string for the "new" token.
@@ -698,6 +695,11 @@ export class ContextTokenization {
 
       affectedToken = new ContextToken(affectedToken);
       affectedToken.addInput(inputSource, distribution);
+
+      // Do not adjust the original token, as it may be used by other transitions.
+      // Only adjust the new, extended token.
+      affectedToken.isPartial = true;
+      delete affectedToken.appliedTransitionId;
 
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;
