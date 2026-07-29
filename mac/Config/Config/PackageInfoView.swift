@@ -11,7 +11,7 @@
 import SwiftUI
 import KeymanSettings
 
-public struct KeyboardInfoView: View {
+public struct PackageInfoView: View {
   let package: KeymanPackage
   
   /**
@@ -34,52 +34,54 @@ public struct KeyboardInfoView: View {
           .frame(maxWidth: 84, maxHeight: 150)
       }
       
-      // the text-based package properties presented in a grid
-      Grid(horizontalSpacing: 10, verticalSpacing: 5) {
-        // the package version
-        GridRow {
-          Text("Package Version:").bold()
-            .gridColumnAlignment(.trailing) // all elements underneath inherit the .trailing alignment
-          Text(package.packageVersion)
-            .gridColumnAlignment(.leading) // all elements underneath inherit the .leading alignment
-        }
-        
-        // the fonts
-        GridRow {
-          Text("Fonts:").bold()
-          HStack {
-            ForEach(package.fonts, id: \.self) { font in
-              Text(font)
+      VStack {
+        // the text-based package properties presented in a grid
+        Grid(horizontalSpacing: 10, verticalSpacing: 5) {
+          // the package version
+          GridRow {
+            Text("Package Version:").bold()
+              .gridColumnAlignment(.trailing) // all elements underneath inherit the .trailing alignment
+            Text(package.packageVersion)
+              .gridColumnAlignment(.leading) // all elements underneath inherit the .leading alignment
+          }
+          
+          // the fonts
+          GridRow {
+            Text("Fonts:").bold()
+            HStack {
+              ForEach(package.fonts, id: \.self) { font in
+                Text(font)
+              }
+            }
+          }
+          
+          // the copyright
+          GridRow {
+            Text("Copyright:").bold()
+            Text(package.copyright ?? "")
+          }
+          
+          // the author
+          GridRow {
+            Text("Author:").bold()
+            Text(package.author ?? "")
+          }
+          
+          // the website
+          GridRow {
+            Text("Website:").bold()
+            if let websiteUrl = package.websiteUrl {
+              Link(destination: websiteUrl) {
+                Text(websiteUrl.absoluteString)
+                  .underline()
+                  .multilineTextAlignment(.leading)
+              }
             }
           }
         }
-        
-        // the copyright
-        GridRow {
-          Text("Copyright:").bold()
-          Text(package.copyright ?? "")
-        }
-        
-        // the author
-        GridRow {
-          Text("Author:").bold()
-          Text(package.author ?? "")
-        }
-        
-        // the website
-        GridRow {
-          Text("Website:").bold()
-          if let websiteUrl = package.websiteUrl {
-            Link(destination: websiteUrl) {
-              Text(websiteUrl.absoluteString)
-                .underline()
-                .multilineTextAlignment(.leading)
-            }
-          }
-        }
+        .padding(5)
       }
-      .padding(5)
-      
+        
       Spacer()
       
       // the package QR Code and link to share the package online
