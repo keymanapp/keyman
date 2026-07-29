@@ -27,7 +27,7 @@ uses
 
 type
   TKPRecompileMnemonicKeyboard = class(TKPBase)
-    procedure Execute(const FileName: string; const PackageName: string);
+    procedure Execute(const FileName: string; const PackageName: string; BaseKeyboardID: Cardinal);
   end;
 
 implementation
@@ -42,10 +42,8 @@ uses
   Winapi.Windows,
 
   errorcontrolledregistry,
-  keymancontext,
   keymanerrorcodes,
   KeymanPaths,
-  keymanapi_TLB,
   RegistryKeys,
   utilexecute,
   utilkeyman,
@@ -67,7 +65,7 @@ begin
   Result := '';
 end;
 
-procedure TKPRecompileMnemonicKeyboard.Execute(const FileName,PackageName: string);
+procedure TKPRecompileMnemonicKeyboard.Execute(const FileName,PackageName: string; BaseKeyboardID: Cardinal);
 var
   FDestPath, FDestFileName: string;
   FBaseKeyboardIDHex: string;
@@ -76,16 +74,12 @@ var
   FExitCode: Integer;
   FMCompilePath: string;
   FBaseKeyboardFileName: string;
-  BaseKeyboardID: Cardinal;
   FDestDeadkeyFileName: string;
   FCommand: string;
 begin
   if PackageName <> ''
     then FDestPath := GetPackageInstallPath(PackageName)   // I3581
     else FDestPath := GetKeyboardInstallPath(FileName);   // I3581
-
-  with Context as TKeymanContext do
-    BaseKeyboardID := (Options as IKeymanOptions).Items['koBaseLayout'].Value;
 
   FBaseKeyboardIDHex := IntToHex(BaseKeyboardID, 8);
   FBaseFileName := FDestPath + '\' + ExtractFileName(FileName);   // I3581

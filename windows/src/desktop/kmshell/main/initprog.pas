@@ -90,6 +90,7 @@ type
                     fmKeyboardWelcome,  // I2569
                     fmKeyboardPrint,  // I2329
                     fmBaseKeyboard,   // I4169
+                    fmMCompile,
                     fmUpgradeMnemonicLayout,    // I4553
                     fmRepair,
                     fmKeepInTouch,
@@ -262,6 +263,13 @@ begin
       else if s = '-bd' then FMode := fmBackgroundDownload
       else if s = '-an' then FMode := fmApplyInstallNow
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
+      else if s = '-mcompile' then
+      begin
+        FMode := fmMCompile;
+        Inc(i);
+        if i > ParamCount then Exit;
+        FQuery := ParamStr(i);
+      end
       else if s = '-nowelcome'   then FNoWelcome := True
       else if s = '-kw' then FMode := fmKeyboardWelcome  // I2569
       else if s = '-kp' then FMode := fmKeyboardPrint  // I2329
@@ -393,6 +401,7 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
+  BaseKeyboardID: Integer;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -540,7 +549,12 @@ begin
       end;
 
     fmBaseKeyboard:   // I4169
-      if ConfigureBaseKeyboard
+      if ConfigureBaseKeyboard(BaseKeyboardID) and SetBaseKeyboard(0, BaseKeyboardID)
+        then ExitCode := 0
+        else ExitCode := 1;
+
+    fmMCompile:
+      if MCompileBaseKeyboard(FQuery)
         then ExitCode := 0
         else ExitCode := 1;
 

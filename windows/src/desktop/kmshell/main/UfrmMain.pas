@@ -197,6 +197,7 @@ uses
   Keyman.Configuration.UI.UfrmStartInstall,
   RegistryKeys,
   SupportXMLRenderer,
+  UfrmBaseKeyboard,
   UfrmChangeHotkey,
   UfrmHTML,
   UfrmInstallKeyboardFromWeb,
@@ -660,11 +661,15 @@ end;
  ------------------------------------------------------------------------------}
 
 procedure TfrmMain.Options_BaseKeyboard;   // I4169
+var
+  BaseKeyboardID: Integer;
 begin
-  // TODO change this dialog to run as current user and elevate on "ok" button:wq
+  if ConfigureBaseKeyboard(BaseKeyboardID) then
+  begin
+    SetBaseKeyboard(Handle, BaseKeyboardID)
+    // Refresh will be triggered by elevated process
+  end;
 
-  WaitForElevatedConfiguration(Handle, '-basekeyboard');
-  // Refresh will be triggered by elevated process
 end;
 
 procedure TfrmMain.Options_SettingsManager;
