@@ -22,10 +22,25 @@ public struct IconButtonView: View {
       Image(systemName: systemImage)
         .font(font)
     }
-    .buttonStyle(.bordered)
-    .clipShape(.circle)
+    .buttonStyle(.plain)
     .accessibilityLabel(helpText)
     .help(helpText)
     
+  }
+}
+
+// the view for buttons with a label
+public struct LabelButtonView: View {
+  let action: () -> Void
+  let label: String
+  let systemImage: String
+  let font: Font
+  
+  public var body: some View {
+    Button(action: action) {
+      Label(label, systemImage: systemImage)
+        .font(font)
+        .buttonStyle(.bordered)
+    }
   }
 }
