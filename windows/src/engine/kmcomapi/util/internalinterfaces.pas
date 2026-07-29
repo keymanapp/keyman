@@ -67,7 +67,7 @@ type
     ['{4876E6DF-C557-46E2-84F4-787BE5F55DDA}']
     function RegKeyboard: TRegKeyboard;
     procedure ClearVisualKeyboard;
-    procedure UpdateBaseLayout(BaseKeyboardID: Cardinal);   // I4169
+    procedure UpdateBaseLayout;   // I4169
     procedure RefreshInstallation;
   end;
 

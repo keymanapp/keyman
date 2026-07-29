@@ -109,7 +109,7 @@ type
     { IIntKeymanKeyboardInstalled }
     function RegKeyboard: TRegKeyboard;
     procedure ClearVisualKeyboard;
-    procedure UpdateBaseLayout(BaseKeyboardID: Integer);   // I4169
+    procedure UpdateBaseLayout;   // I4169
     procedure RefreshInstallation;
 
   public
@@ -151,15 +151,20 @@ begin
   end;
 end;
 
-procedure TKeymanKeyboardInstalled.UpdateBaseLayout(BaseKeyboardID: Integer);   // I4169
+procedure TKeymanKeyboardInstalled.UpdateBaseLayout;   // I4169
+var
+  BaseKeyboardID: Integer;
 begin
   if FRegKeyboard.MnemonicLayout and FileExists(FRegKeyboard.KeymanFile) then   // I4615
+  begin
+    BaseKeyboardID := (Context.Options as IKeymanOptions).Items['koBaseLayout'].Value;
     with TKPRecompileMnemonicKeyboard.Create(Context) do
     try
       Execute(FRegKeyboard.KeymanFile, FRegKeyboard.PackageName, BaseKeyboardID);
     finally
       Free;
     end;
+  end;
 end;
 
 function TKeymanKeyboardInstalled.Get_Copyright: WideString;

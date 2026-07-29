@@ -136,7 +136,7 @@ begin
   FNewBaseLayout := Get_Items('koBaseLayout').Value;
   if IsAdministrator and (FOldBaseLayout <> FNewBaseLayout) then
     for I := 0 to Context.Keyboards.Count - 1 do   // I4169
-      (Context.Keyboards.Items[I] as IIntKeymanKeyboardInstalled).UpdateBaseLayout(FNewBaseLayout);
+      (Context.Keyboards.Items[I] as IIntKeymanKeyboardInstalled).UpdateBaseLayout;
 
   Context.Control.AutoApplyKeyman;
 end;
