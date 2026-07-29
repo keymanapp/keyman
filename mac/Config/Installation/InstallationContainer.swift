@@ -123,7 +123,11 @@ public class InstallationContainer : ObservableObject {
     guard self.installationState != nil else { return }
     
     // the confirmAccess task can now be marked as completed
-    self.updateTaskAsCompleted(taskType: .confirmAccess)
+    if let task = self.currentTask() {
+      if task.taskType == .confirmAccess {
+        self.updateTaskAsCompleted(taskType: .confirmAccess)
+      }
+    }
     
     NotificationCenter.default.post(name: .checkAccessibilitySuccess, object: nil, userInfo: nil)
   }

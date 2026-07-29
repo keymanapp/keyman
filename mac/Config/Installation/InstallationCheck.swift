@@ -318,6 +318,8 @@ public class InstallationCheck {
     
     // add prepareNewInstall, requestRestart and confirmRestart InstallationTask
     fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .prepareNewInstall))
+    
+    // MAC-CONFIG_TODO: should we always restart for a new install or only when enabling input method?
     fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
     fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
     let installationState = InstallationState(version: self.inputMethodVersion, tasks: fullTaskList)
