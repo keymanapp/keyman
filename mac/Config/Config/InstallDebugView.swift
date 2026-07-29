@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct InstallView: View {
+struct InstallDebugView: View {
   @EnvironmentObject var installation: InstallationContainer
   @State private var taskText: String = "[task]"
 
@@ -90,6 +90,6 @@ struct InstallView: View {
 
 #Preview {
   let installation = InstallationContainer()
-  InstallView()
+  InstallDebugView()
     .environmentObject(installation)
 }

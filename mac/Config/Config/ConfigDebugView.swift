@@ -3,13 +3,13 @@
  *
  * Created by Shawn Schantz on 2026-02-26
  *
- * Main view used for configuring Keyman
+ * View for debugging Keyman configuration
  */
 
 import SwiftUI
 import KeymanSettings
 
-struct ConfigView: View {
+struct ConfigDebugView: View {
   @EnvironmentObject var settings: SettingsContainer
   @State private var isShowingSheet = false
 
@@ -80,7 +80,7 @@ struct ConfigView: View {
                 .labelStyle(.iconOnly)
                 .buttonStyle(.borderless)
               }
-              KeyboardListView(packageId: package.id, keyboards: package.keyboards)
+              KeyboardListDebugView(packageId: package.id, keyboards: package.keyboards)
             }
           }
         }
@@ -93,6 +93,6 @@ struct ConfigView: View {
 
 #Preview {
   let settings = SettingsContainer()
-  ConfigView()
+  ConfigDebugView()
     .environmentObject(settings)
 }

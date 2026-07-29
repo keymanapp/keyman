@@ -16,17 +16,12 @@ struct ConfigApp: App {
   @Environment(\.openWindow) private var openWindow
   
   var body: some Scene {
-    Window("Configuration", id: "config") {
-      ConfigView()
+    Window("Config Test", id: "config-debug") {
+      ConfigDebugView()
         .environmentObject(settings)
-        .task {
-          if !installation.isInstallationComplete() {
-            openWindow(id: "install")
-          }
-        }
     }
-    Window("Installation", id: "install") {
-      InstallView()
+    Window("Install Test", id: "install-debug") {
+      InstallDebugView()
         .environmentObject(installation)
     }
   }
