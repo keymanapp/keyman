@@ -46,12 +46,16 @@ export function precomputeTransitions(
    * context edited by the user.
    */
   keyMatchingUserContext: string
-  } {
+} {
   keyer ??= legacySubsetKeyer;
 
   let keyMatchingUserContext: string;
   const trueInput = transformDistribution[0].sample;
   const lexicalModel = startTokenizations[0]?.tail.searchModule.model;
+
+  if(trueInput.insert == '' && trueInput.deleteLeft == 0) {
+    transformDistribution = [transformDistribution[0]];
+  }
 
   const subsetBuilder = new TokenizationSubsetBuilder(keyer);
 
@@ -138,6 +142,18 @@ export function transitionTokenizations(
       const lastTokenIndex = tokens.length - 1;
       if(tokens[lastTokenIndex].isEmptyToken && tokens[lastTokenIndex-1]) {
         tokens[lastTokenIndex].appliedTransitionId ??= tokens[lastTokenIndex-1].appliedTransitionId
+      }
+
+      if(precomp[1].isBksp) {
+        const appliedEdge = precomp[1];
+        const affectedTokenCount = appliedEdge.inputs[0].sample.size;
+
+        for(let i = 0; i < affectedTokenCount; i++)  {
+          const index = tokens.length - affectedTokenCount + i;
+          const token = tokens[index];
+
+          remadeTokenization.tokens[index] = ContextToken.fromRawText(token.searchModule.model, token.exampleInput, token.isPartial, trueInput.id);
+        }
       }
 
       return remadeTokenization;

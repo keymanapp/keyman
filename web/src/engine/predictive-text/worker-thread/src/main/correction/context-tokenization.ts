@@ -154,6 +154,11 @@ export interface TokenizationTransitionEdits {
    * the end of the original context's tail token.
    */
   tokenizedTransform: Map<number, Transform>;
+
+  /**
+   * Indicates that this tokenization-transition handles a backspace transform.
+   */
+  isBksp?: boolean;
 }
 
 /**
@@ -560,6 +565,7 @@ export class ContextTokenization {
         removedTokenCount
       },
       tokenizedTransform: transformMap,
+      isBksp: transform.insert == '' && transform.deleteLeft == 1
     };
   }
 

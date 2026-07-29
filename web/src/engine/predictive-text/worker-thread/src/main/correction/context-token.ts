@@ -97,7 +97,7 @@ export class ContextToken {
    * @param model
    * @param rawText
    */
-  static fromRawText(model: LexicalModel, rawText: string, isPartial?: boolean) {
+  static fromRawText(model: LexicalModel, rawText: string, isPartial?: boolean, transitionId?: number) {
     rawText ||= '';
 
     // Supports the old pathway for: updateWithBackspace(tokenText: string, transitionId: number)
@@ -108,7 +108,7 @@ export class ContextToken {
       let inputMetadata: PathInputProperties = {
         segment: {
           start: 0,
-          transitionId: undefined
+          transitionId: transitionId
         },
         bestProbFromSet: BASE_PROBABILITY,
         subsetId: generateSubsetId()
