@@ -11,11 +11,11 @@ import Foundation
 
 
 struct NewInstallView: View {
-  
   @EnvironmentObject var installation: InstallationContainer
-  @Environment(\.dismiss) private var dismiss
+  
   let namespace: Namespace.ID
   let onContinue: () -> Void
+  
   var versionText: String {
     if let version = installation.installationState?.keymanVersion {
       return "Version: \(version)              "

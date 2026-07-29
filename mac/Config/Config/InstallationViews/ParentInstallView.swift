@@ -16,10 +16,12 @@ struct ParentInstallView: View {
   func chooseCurrentPage() {
     if installation.installationPhase.hasTasks {
       switch installation.currentTask()?.taskType {
-      case .prepareNewInstall: currentPage = .initial
+      case .prepareNewInstall: currentPage = .initialInstall
+      case .prepareNewRepair: currentPage = .initialRepair
       case .enableInputMethod: currentPage = .enableInputMethod
       case .requestAccess: currentPage = .allowSecurityPermission
-      case .confirmAccess: print("Access granted")
+      case .confirmAccess: currentPage = .allowSecurityPermission
+      case .confirmRestart: currentPage = .restartComputer
       case .requestRestart: currentPage = .restartComputer
       default: currentPage = .completed
       }
@@ -28,21 +30,26 @@ struct ParentInstallView: View {
       case .evaluatingInstallation: currentPage = .loading
       case .inputMethodMissing, .inputMethodOutdated: currentPage = .rerunInstaller
       case .installationComplete:
-        if installation.getHasDisplayedInstallationComplete() {
-          currentPage = .completed
+        currentPage = .completed
+        if !installation.getHasDisplayedInstallationComplete() {
           installation.setHasDisplayedInstallationComplete()
         }
-      default: currentPage = .completed
+      default:
+        currentPage = .completed
       }
     }
-    print("currentPage is now \(currentPage)")
+   
   }
   
   var body: some View {
     ZStack {
       switch currentPage {
       case .loading: ProgressView()
-      case .initial: NewInstallView(namespace: animation,onContinue: {
+      case .initialInstall: NewInstallView(namespace: animation,onContinue: {
+        installation.executeNextInstallationTask()
+        chooseCurrentPage()
+      })
+      case .initialRepair: NewRepairView(namespace: animation,onContinue: {
         installation.executeNextInstallationTask()
         chooseCurrentPage()
       })
@@ -54,23 +61,25 @@ struct ParentInstallView: View {
       }
     }
     .onAppear {
+      print("LOL ", installation.installationPhase)
+      print("LOL ", installation.currentTask()?.taskType ?? "no task available")
       if installation.installationPhase == .evaluatingInstallation {
         currentPage = .loading
         Task {
           while installation.installationPhase == .evaluatingInstallation {
-            try? await Task.sleep(for: .milliseconds(100))
+            try? await Task.sleep(for: .milliseconds(200))
           }
           await MainActor.run {
             withAnimation(.smooth) {
               chooseCurrentPage()
+              print("LOOL ", installation.installationPhase)
+
             }
           }
         }
       } else {
         chooseCurrentPage()
       }
-    }
-    .onReceive( NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in
     }
     .padding()
     .frame(minWidth: 600)

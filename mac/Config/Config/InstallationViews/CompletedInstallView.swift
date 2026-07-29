@@ -21,7 +21,6 @@ struct CompletedInstallView: View {
   }
   
   var body: some View {
-    
     VStack {
       
       Spacer()
@@ -43,4 +42,3 @@ struct CompletedInstallView: View {
     }
   }
 }
-

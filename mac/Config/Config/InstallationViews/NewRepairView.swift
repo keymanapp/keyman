@@ -12,9 +12,12 @@ import SwiftUI
 import AppKit
 internal import UniformTypeIdentifiers
 
-struct InitialRepairView: View {
+struct NewRepairView: View {
+  
   @EnvironmentObject var installation: InstallationContainer
+  
   let namespace: Namespace.ID
+  let onContinue: () -> Void
   
   var body: some View {
     VStack {
@@ -42,22 +45,8 @@ struct InitialRepairView: View {
           .buttonStyle(.borderedProminent)
           .tint(.blue)
           .clipShape(Capsule())
-        NavigationButton(action: .advance)
+        NavigationButton(action: .advance, onContinue: onContinue)
       }
     }
   }
-}
-
-private struct InitialRepairViewPreview: View {
-  @Namespace private var namespace
-  private let installation = InstallationContainer()
-  
-  var body: some View {
-    InitialRepairView(namespace: namespace)
-      .environmentObject(installation)
-  }
-}
-
-#Preview {
-  InitialRepairViewPreview()
 }

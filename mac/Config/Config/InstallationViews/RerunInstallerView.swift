@@ -11,6 +11,20 @@ import SwiftUI
 import AppKit
 internal import UniformTypeIdentifiers
 
+private func chooseAndOpenKeymanInstaller() {
+  let panel = NSOpenPanel()
+  panel.message = "Open the Keyman .pkg file."
+  panel.allowedContentTypes = [UTType(filenameExtension: "pkg")!]
+  panel.directoryURL = FileManager.default.urls(
+      for: .downloadsDirectory,
+      in: .userDomainMask
+  ).first
+
+  if panel.runModal() == .OK, let url = panel.url {
+      NSWorkspace.shared.open(url)
+  }
+}
+
 struct RerunInstallerView: View {
   @EnvironmentObject var installation: InstallationContainer
   let namespace: Namespace.ID
@@ -42,7 +56,7 @@ struct RerunInstallerView: View {
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
         Button {
-          installation.executeNextInstallationTask()
+          chooseAndOpenKeymanInstaller()
         } label: {
           Text("Open Installer")
             .padding(.horizontal, 16)

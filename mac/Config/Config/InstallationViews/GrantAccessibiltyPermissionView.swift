@@ -50,7 +50,7 @@ struct GrantAccessibiltyPermissionView: View {
           .padding(7)
           .background {
             Capsule()
-              .fill(.quaternary.opacity(0.6))
+              .fill(.quaternary.opacity(0.5))
           }
       }
       
@@ -68,16 +68,16 @@ struct GrantAccessibiltyPermissionView: View {
       Spacer()
       
       HStack {
-        
         Text("Grant accessibility control")
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
         Button {
           if installation.currentTask()?.taskType == .requestAccess {
-            openSettingsButtonPressed = true
             installation.executeNextInstallationTask()
+            openSettingsButtonPressed = true
           } else {
             openAccessibilitySettings()
+            openSettingsButtonPressed = true
           }
         } label: {
           Text("Open Settings")
@@ -91,7 +91,6 @@ struct GrantAccessibiltyPermissionView: View {
         Button {
           checkingPermission = true
           installation.executeNextInstallationTask()
-          
         } label: {
           Text("Continue")
             .padding(.horizontal, 16)
@@ -113,21 +112,5 @@ struct GrantAccessibiltyPermissionView: View {
         advancementRequestedAndPermissionNotGranted = true
       }
     }
-  }
-}
-
-struct GrantAccessibiltyPermissionView_Previews: PreviewProvider {
-  struct PreviewHost: View {
-    @Namespace private var namespace
-    private let installation = InstallationContainer()
-    
-    var body: some View {
-      GrantAccessibiltyPermissionView(namespace: namespace, onContinue: {})
-        .environmentObject(installation)
-    }
-  }
-  
-  static var previews: some View {
-    PreviewHost()
   }
 }

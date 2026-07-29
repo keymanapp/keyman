@@ -9,7 +9,8 @@
 
 enum InstallPage: String, CaseIterable {
   case loading
-  case initial
+  case initialInstall
+  case initialRepair
   case completed
   case enableInputMethod
   case allowSecurityPermission
