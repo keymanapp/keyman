@@ -237,9 +237,30 @@ export class KeylayoutToKmnConverter {
            }));
            return null;*/
 
-          }
-          else if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] !== undefined) {
+            for (let l = 0; l < dataUkelele.modifiers[i].length; l++) {
 
+              ruleObj = new Rule(
+                  /*   ruleType */                "C0",
+
+                  /*   modifierPrevDeadkey*/      "",
+                  /*   prevDeadkey */             "",
+                  /*   idPrevDeadkey */           0,
+                  /*   unique A */                0,
+
+                  /*   modifierDeadkey */         "",
+                  /*   deadkey */                 "",
+                  /*   dk for C2*/                0,
+                  /*   unique B */                0,
+
+                  /*   modifierKey*/             this.createKmnModifier(String(dataUkelele.modifiers[i][l]), isCapsused),
+                  /*   key */                    this.mapUkeleleKeycodeToVK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code'])),
+                  /*   output */                 new TextEncoder().encode(''),
+              );
+              rules.push(ruleObj);
+            }
+          }
+
+          else if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] !== undefined) {
 
             // loop modifiers
             for (let l = 0; l < dataUkelele.modifiers[i].length; l++) {
