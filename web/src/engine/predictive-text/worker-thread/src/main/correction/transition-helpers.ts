@@ -13,6 +13,7 @@ import { ContextToken } from './context-token.js';
 import { ContextTokenization } from './context-tokenization.js';
 import { SearchQuotientCluster } from './search-quotient-cluster.js';
 import { legacySubsetKeyer, TokenizationSubset, TokenizationSubsetBuilder } from './tokenization-subsets.js';
+import { TransformUtils } from '#./transformUtils.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
@@ -53,7 +54,7 @@ export function precomputeTransitions(
   const trueInput = transformDistribution[0].sample;
   const lexicalModel = startTokenizations[0]?.tail.searchModule.model;
 
-  if(trueInput.insert == '' && trueInput.deleteLeft == 0) {
+  if(TransformUtils.isBackspace(trueInput)) {
     transformDistribution = [transformDistribution[0]];
   }
 
@@ -139,21 +140,24 @@ export function transitionTokenizations(
       // If the last token is empty and has no flag for a revertable transition,
       // attempt to copy the previous token's revertable transition flag.
       const tokens = remadeTokenization.tokens;
-      const lastTokenIndex = tokens.length - 1;
-      if(tokens[lastTokenIndex].isEmptyToken && tokens[lastTokenIndex-1]) {
-        tokens[lastTokenIndex].appliedTransitionId ??= tokens[lastTokenIndex-1].appliedTransitionId
-      }
 
+      // If we have a pure backspace operation, we should forget fat-finger data
+      // and reconstruct the token without corrective data.
       if(precomp[1].isBksp) {
         const appliedEdge = precomp[1];
-        const affectedTokenCount = appliedEdge.inputs[0].sample.size;
+        const affectedTokenCount = appliedEdge.inputs[0].sample.size - appliedEdge.alignment.removedTokenCount;
 
         for(let i = 0; i < affectedTokenCount; i++)  {
           const index = tokens.length - affectedTokenCount + i;
           const token = tokens[index];
 
-          remadeTokenization.tokens[index] = ContextToken.fromRawText(token.searchModule.model, token.exampleInput, token.isPartial, trueInput.id);
+          tokens[index] = ContextToken.fromRawText(token.searchModule.model, token.exampleInput, token.isPartial, trueInput.id);
         }
+      }
+
+      const lastTokenIndex = tokens.length - 1;
+      if(tokens[lastTokenIndex].isEmptyToken && tokens[lastTokenIndex-1]) {
+        tokens[lastTokenIndex].appliedTransitionId ??= tokens[lastTokenIndex-1].appliedTransitionId
       }
 
       return remadeTokenization;

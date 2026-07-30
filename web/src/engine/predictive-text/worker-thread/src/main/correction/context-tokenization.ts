@@ -13,6 +13,7 @@ import { KMWString } from 'keyman/common/web-utils';
 import { ContextToken } from './context-token.js';
 import { TransformUtils } from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
+import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
 import { PathInputProperties } from './search-quotient-node.js';
@@ -20,7 +21,6 @@ import { TransitionEdge } from './tokenization-subsets.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
-import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 
 // May be able to "get away" with 2 & 5 or so, but having extra will likely help
 // with edit path stability.
@@ -565,7 +565,7 @@ export class ContextTokenization {
         removedTokenCount
       },
       tokenizedTransform: transformMap,
-      isBksp: transform.insert == '' && transform.deleteLeft == 1
+      isBksp: TransformUtils.isBackspace(transform)
     };
   }
 
