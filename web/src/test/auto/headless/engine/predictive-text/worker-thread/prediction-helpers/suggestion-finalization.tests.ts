@@ -5,7 +5,7 @@ import { deepCopy } from 'keyman/common/web-utils';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { IntermediateCompositedPrediction, finalizeSuggestions, models } from "@keymanapp/lm-worker/test-index";
+import { CompositedIntermediatePrediction, finalizeSuggestions, models } from "@keymanapp/lm-worker/test-index";
 
 import DummyModel = models.DummyModel;
 import Outcome = LexicalModelTypes.Outcome;
@@ -48,7 +48,7 @@ const testModelWithoutSpacing = new DummyModel({
  */
 const build_its_is_set = (verbose?: string) => {
   const verboseFlag = (verbose == 'verbose' ? true : false);
-  const its: IntermediateCompositedPrediction = {
+  const its: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {
@@ -70,7 +70,7 @@ const build_its_is_set = (verbose?: string) => {
     }
   };
 
-  const it_is: IntermediateCompositedPrediction = {
+  const it_is: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {
@@ -91,7 +91,7 @@ const build_its_is_set = (verbose?: string) => {
     }
   };
 
-  const is: IntermediateCompositedPrediction = {
+  const is: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {
@@ -112,7 +112,7 @@ const build_its_is_set = (verbose?: string) => {
     }
   };
 
-  const is_not: IntermediateCompositedPrediction = {
+  const is_not: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {

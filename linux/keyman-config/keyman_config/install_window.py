@@ -167,13 +167,14 @@ class InstallKmpWindow(Gtk.Dialog):
     def _add_buttons(self):
         hbox = Gtk.Box(spacing=6)
 
-        button = Gtk.Button.new_with_mnemonic(_("_Install"))
-        button.connect("clicked", self.on_install_clicked)
-        hbox.pack_start(button, False, False, 0)
-
         button = Gtk.Button.new_with_mnemonic(_("_Cancel"))
         button.connect("clicked", self.on_cancel_clicked)
+        hbox.pack_start(button, False, False, 0)
+
+        button = Gtk.Button.new_with_mnemonic(_("_Install"))
+        button.connect("clicked", self.on_install_clicked)
         hbox.pack_end(button, False, False, 0)
+
         bind_accelerator(self.accelerators, button, '<Control>w')
         return hbox
 

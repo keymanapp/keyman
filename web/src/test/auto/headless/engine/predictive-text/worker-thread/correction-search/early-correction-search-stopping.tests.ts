@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { CORRECTION_SEARCH_THRESHOLDS, IntermediateTokenizedPrediction, ModelCompositor, shouldStopSearchingEarly } from "@keymanapp/lm-worker/test-index";
+import { CORRECTION_SEARCH_THRESHOLDS, TokenizedIntermediatePrediction, ModelCompositor, shouldStopSearchingEarly } from "@keymanapp/lm-worker/test-index";
 
 function mockTokenizedPrediction(value: number) {
   return {
@@ -9,7 +9,7 @@ function mockTokenizedPrediction(value: number) {
         total: value
       }
     }
-  } as IntermediateTokenizedPrediction
+  } as TokenizedIntermediatePrediction
 }
 
 describe('correction-search: shouldStopSearchingEarly', () => {

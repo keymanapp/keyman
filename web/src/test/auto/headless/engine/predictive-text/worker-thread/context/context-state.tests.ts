@@ -98,14 +98,6 @@ describe('ContextState', () => {
       let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
-
-      // // Phrased this way to facilitate TS type-inference; assert.isTrue() does
-      // // NOT do this for us!
-      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
-      //   assert.fail("context alignment failed");
-      // }
-      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     it("properly matches and aligns when no context changes occur (after whitespace)", function() {
@@ -125,14 +117,6 @@ describe('ContextState', () => {
       let newContextMatch = baseState.analyzeTransition(newContext, toWrapperDistribution(transform));
       assert.isNotNull(newContextMatch?.final);
       assert.deepEqual(newContextMatch.final.displayTokenization.tokens.map(token => token.exampleInput), rawTokens);
-
-      // // Phrased this way to facilitate TS type-inference; assert.isTrue() does
-      // // NOT do this for us!
-      // if(!newContextMatch.final.tokenization.alignment.canAlign) {
-      //   assert.fail("context alignment failed");
-      // }
-      // assert.equal(newContextMatch.final.tokenization.alignment.leadTokenShift, 0);
-      // assert.equal(newContextMatch.final.tokenization.alignment.tailTokenShift, 0);
     });
 
     it("properly matches and aligns when lead token is removed (end of word)", function() {
@@ -426,7 +410,7 @@ describe('ContextState', () => {
   });
 });
 
-describe('determineContextSlideDeltas', () => {
+describe('determineContextSlideTransform', () => {
   it('finds prefixed text for backward sliding context window', () => {
     const before: Context = {
       left: 'ples and bananas',

@@ -326,5 +326,5 @@ export class BatchRenderer {
   // BatchRenderer's internal state stuff is static on the class and is not exposed with
   // the line below.
   // @ts-ignore
-  window['kmw_renderer'] = new BatchRenderer();
+  window['keyman_renderer'] = new BatchRenderer();
 })();

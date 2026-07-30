@@ -304,7 +304,7 @@ export class AnalyzeOskCharacterUse {
    *
    * - .json: returns the final aggregated data as an array of strings, which
    *   can be joined to form a JSON blob of an object with a single member,
-   *   `map`, which is an array of {@link Osk.StringResult} objects.
+   *   `map`, which is an array of {@link @keymanapp/kmc-kmn#Osk.StringResult} objects.
    *
    * @param    format - file format to return - can be '.txt', '.md', or '.json'
    * @returns  an array of strings, formatted according to the `format`
@@ -324,7 +324,7 @@ export class AnalyzeOskCharacterUse {
 
   /**
    * Load a JSON-format result file to merge from
-   * @param filename
+   * @param filename - the full path to the JSON result file to load
    * @returns
    */
   private loadPreviousMap(filename: string): Osk.StringResult[] {

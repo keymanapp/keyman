@@ -4,7 +4,7 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { deepCopy } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { IntermediateCompositedPrediction, dedupeSuggestions, models } from "@keymanapp/lm-worker/test-index";
+import { CompositedIntermediatePrediction, dedupeSuggestions, models } from "@keymanapp/lm-worker/test-index";
 
 import Context = LexicalModelTypes.Context;
 import DummyModel = models.DummyModel;
@@ -24,7 +24,7 @@ const testModel = new DummyModel({
  * @returns
  */
 const build_its_is_set = () => {
-  const its: IntermediateCompositedPrediction = {
+  const its: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {
@@ -46,7 +46,7 @@ const build_its_is_set = () => {
     }
   };
 
-  const it_is: IntermediateCompositedPrediction = {
+  const it_is: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {
@@ -67,7 +67,7 @@ const build_its_is_set = () => {
     }
   };
 
-  const is: IntermediateCompositedPrediction = {
+  const is: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {
@@ -88,7 +88,7 @@ const build_its_is_set = () => {
     }
   };
 
-  const is_not: IntermediateCompositedPrediction = {
+  const is_not: CompositedIntermediatePrediction = {
     components: {
       prediction: {
         transform: {

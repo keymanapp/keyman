@@ -182,9 +182,9 @@ export class KeyboardStub extends KeyboardProperties {
     }
   }
 
-  public validateForCustomKeyboard(): Error {
-    if(super.validateForCustomKeyboard() || !this.KF || !this.KR) {
-      return new Error('To use a custom keyboard, you must specify file name, keyboard id, keyboard name, language, language code, and region.');
+  public validateForCustomKeyboard(): Error|null {
+    if(super.validateForCustomKeyboard() || !this.KF) {
+      return new Error('To use a custom keyboard, you must specify file name, keyboard id, keyboard name, language and language code.');
     } else {
       return null;
     }

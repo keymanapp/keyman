@@ -8,13 +8,13 @@ Registers the keyboard stub or returns true if already registered.
 
 ## Syntax
 
-```c
+```js
 keyman.interface.registerStub(Pstub);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KRS(Pstub); // Shorthand
 ```
 

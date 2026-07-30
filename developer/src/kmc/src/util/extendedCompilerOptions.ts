@@ -10,6 +10,12 @@ export interface ExtendedCompilerOptions extends CompilerOptions {
    */
   forPublishing?: boolean;
   /**
+   * Do not build components, just do the publish phase for the project. This is
+   * used mostly by Keyman Developer IDE, which will run the .keyboard_info /
+   * .package_info validation and compilation step if skipMetadataFiles is true.
+   */
+  publishOnly?: boolean;
+  /**
    * Overrides for message reporting
    */
   messageOverrides?: CompilerMessageOverrideMap;
@@ -198,6 +204,7 @@ export function commanderOptionsToCompilerOptions(options: any, callbacks: Compi
     warnDeprecatedCode: options.warnDeprecatedCode,
     // ExtendedOptions
     forPublishing: options.forPublishing,
+    publishOnly: options.publishOnly,
     messageOverrides: overrides,
   }
 }
