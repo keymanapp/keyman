@@ -19,6 +19,15 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 
+export interface TransitionReversionView extends Pick<ContextTransition, 'reversion'> {
+  /**
+   * Gets the context state resulting from the context transition event,
+   * including any generated suggestions and data regarding potential
+   * application thereof.
+   */
+  final: Pick<ContextState, 'suggestions'>
+}
+
 /**
  * Represents the transition between two context states as triggered
  * by input keystrokes or applied suggestions.
@@ -36,7 +45,7 @@ export class ContextTransition {
    */
   inputDistribution?: Distribution<Transform>;
 
-  // The transform ID in play.
+  // The transition ID in play.
   private _transitionId?: number;
 
   /**
@@ -177,7 +186,7 @@ export class ContextTransition {
       // We won't try to partially revert a multi-word suggestion; reversions
       // are only supported at the end of the last word of the main suggestion
       // body and after any appended whitespace.
-      resultingTokenization.tail.appliedTransitionId = suggestion.transformId;
+      resultingTokenization.tail.appliedTransitionId = suggestion.transform.id;
 
       const resultingState = new ContextState(
         applyTransform(transformToApply, baseState.context),
@@ -189,12 +198,12 @@ export class ContextTransition {
       resultingState.appliedSuggestionId = suggestion.id;
       resultingState.suggestions = this.final.suggestions;
 
-      // Use the transform's ID for the transition.  Note that when applying the
+      // Use the transition ID tracked on the Transform.  Note that when applying the
       // `appendedTransform` component of a suggestion, this will differ from
-      // suggestion.transformId.
+      // suggestion.transitionId.
       const resultingTransition = new ContextTransition(baseState, transformToApply.id);
       resultingTransition.finalize(resultingState, inputDistribution);
-      resultingTransition.revertableTransitionId = suggestion.transformId;
+      resultingTransition.revertableTransitionId = suggestion.transform.id;
       // .finalize unsets _.transitionId; re-assign it.
       resultingTransition._transitionId = transformToApply.id;
 
@@ -236,7 +245,7 @@ export class ContextTransition {
     const baseTokenizationLength = results.transition.final.displayTokenization.tokens.length;
     const appliedTokenization = appendingTransition.final.displayTokenization;
     for(let i = baseTokenizationLength; i < appliedTokenization.tokens.length; i++) {
-      appliedTokenization.tokens[i].appliedTransitionId = suggestion.transformId;
+      appliedTokenization.tokens[i].appliedTransitionId = suggestion.transform.id;
     }
 
     return {

@@ -1,7 +1,19 @@
 import * as models from '@keymanapp/models-templates';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { applySuggestionCasing, composeIntermediatePredictions, correctAndEnumerate, createDefaultKeep, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
+import {
+  applySuggestionCasing,
+  composeIntermediatePredictions,
+  correctAndEnumerate,
+  createDefaultKeep,
+  dedupeSuggestions,
+  finalizeSuggestions,
+  predictionAutoSelect,
+  prependReversion,
+  processSimilarity,
+  toAnnotatedSuggestion,
+  tupleDisplayOrderSort
+} from './predict-helpers.js';
 import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
 import { ContextTracker } from './correction/context-tracker.js';
@@ -79,12 +91,12 @@ export class ModelCompositor {
     this.configuration = config;
   }
 
-  initContextTracker(context: Context, transformId: number) {
+  initContextTracker(context: Context, transitionId: number) {
     if(this.contextTracker || !this.lexicalModel.traverseFromRoot) {
       return;
     }
 
-    this._contextTracker = new ContextTracker(this.lexicalModel, context, transformId, this.configuration);
+    this._contextTracker = new ContextTracker(this.lexicalModel, context, transitionId, this.configuration);
   }
 
   async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Outcome<Suggestion|Keep>[]> {
@@ -120,8 +132,8 @@ export class ModelCompositor {
     // Only allow new-word suggestions if space was the most likely keypress.
     // const allowSpace = TransformUtils.isWhitespace(inputTransform);
     const inputTransform = transformDistribution[0].sample;
-    const transformId = inputTransform.id;
-    this.initContextTracker(context, transformId);
+    const transitionId = inputTransform.id;
+    this.initContextTracker(context, transitionId);
 
     // Section 1:  determine 'prediction roots' - enumerate corrections from most to least likely,
     // searching for results that yield viable predictions from the model.
@@ -190,18 +202,8 @@ export class ModelCompositor {
       this.SUGGESTION_ID_SEED++;
     });
 
-    if(revertableTransitionId) {
-      const reversion = this.contextTracker.peek(revertableTransitionId)?.reversion;
-      if(reversion) {
-        if(suggestions[0]?.tag == 'keep') {
-          const keep = suggestions.shift();
-          suggestions.unshift(reversion);
-          suggestions.unshift(keep);
-        } else {
-          suggestions.unshift(reversion)
-        }
-      }
-    }
+    const transitionToRevert = this.contextTracker?.peek(revertableTransitionId);
+    prependReversion(suggestions, transitionToRevert);
 
     if(suggestions.filter((s) => s.tag == 'keep').length > 1) {
       throw new Error(`Unexpected state:  multiple keep suggestions exist: ${JSON.stringify(suggestions.filter((s) => s.tag == 'keep'))}`);
@@ -229,7 +231,9 @@ export class ModelCompositor {
     // Step 1:  re-use the original input Transform as the reversion's Transform.
     // The Web engine will restore the original state of the context before accepting
     // and before reverting; all we need to do is put the original keystroke back in place.
-    let reversionTransform: Transform = originalInput ?? { insert: '', deleteLeft: 0 };
+    let reversionTransform: Transform = originalInput
+      ? { ...originalInput }
+      : { insert: '', deleteLeft: 0, id: suggestion.transform.id };
 
     // Step 2:  building the proper 'displayAs' string for the Reversion
     const postContext = originalInput ? models.applyTransform(originalInput, context) : context;
@@ -253,9 +257,6 @@ export class ModelCompositor {
     // Since we're outside of the standard `predict` control path, we'll need to
     // set the Reversion's ID directly.
     let reversion = toAnnotatedSuggestion(this.lexicalModel, firstConversion, 'revert');
-    if(suggestion.transformId != null) {
-      reversion.transformId = -suggestion.transformId;
-    }
     if(suggestion.id != null) {
       // Since a reversion inverts its source suggestion, we set its ID to be the
       // additive inverse of the source suggestion's ID.  Makes easy mapping /
@@ -277,11 +278,11 @@ export class ModelCompositor {
       }
     } else {
       let originalTransition = this.contextTracker.latest;
-      if(originalTransition.transitionId != suggestion.transformId) {
-        originalTransition = this.contextTracker.findAndRevert(suggestion.transformId);
+      if(originalTransition.transitionId != suggestion.transform.id) {
+        originalTransition = this.contextTracker.findAndRevert(suggestion.transform.id);
       }
       if(!originalTransition) {
-        this.contextTracker.reset(context, suggestion.transformId);
+        this.contextTracker.reset(context, suggestion.transform.id);
         originalTransition = this.contextTracker.latest;
       }
 
@@ -319,11 +320,8 @@ export class ModelCompositor {
     let compositor = this;
     let suggestions: Promise<Suggestion[]>;
     let fallbackSuggestions = async function() {
-      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, context);
+      const suggestions = await compositor.predict({insert: '', deleteLeft: 0, id: reversion.transform.id}, context);
       suggestions.forEach(function(suggestion) {
-        // A reversion's transform ID is the additive inverse of its original suggestion;
-        // we revert to the state of said original suggestion.
-        suggestion.transformId = -reversion.transformId;
         // Prevent auto-selection of any suggestion immediately after a reversion.
         // It's fine after at least one keystroke, but not before.
         suggestion.autoAccept = false;
@@ -337,18 +335,19 @@ export class ModelCompositor {
     }
 
     // When the context is tracked, we prefer the tracked information.
-    // Note that the base reversion's .transformId will predate the appendedTransform id
+    // Note that the base reversion's .transform.id will predate the appendedTransform id
     // used to add whitespace (if one existed), so reverting to the base ID's associated
     // context also reverts the appendedTransform.
-    let originalTransition = this.contextTracker.findAndRevert(-reversion.transformId);
+    const baseTransitionId = reversion.transform.id;
+    let originalTransition = this.contextTracker.findAndRevert(baseTransitionId);
 
     if(appendedOnly) {
       this.contextTracker.latest = originalTransition;
       return Promise.resolve([]);
     }
 
-    if(!originalTransition) {
-      this.contextTracker.reset(context, -reversion.transformId);
+    if(!originalTransition || originalTransition.transitionId != baseTransitionId) {
+      this.contextTracker.reset(context, baseTransitionId);
       originalTransition = this.contextTracker.latest;
 
       suggestions = fallbackSuggestions();

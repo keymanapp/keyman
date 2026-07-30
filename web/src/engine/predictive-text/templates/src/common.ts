@@ -132,10 +132,6 @@ export function transformToSuggestion(transform: Transform, p?: number): Outcome
     displayAs: transform.insert
   };
 
-  if(transform.id !== undefined) {
-    suggestion.transformId = transform.id;
-  }
-
   if(p === 0 || p) {
     suggestion.p = p;
   }

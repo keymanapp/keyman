@@ -137,7 +137,6 @@ describe('predictFromCorrectionSequence', () => {
 
       assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components[0].prediction), dummied_suggestions.map((s) => {
         delete s.p;
-        s.transformId = transitionID;
         s.transform.id = transitionID;
         return s;
       }));
@@ -205,14 +204,13 @@ describe('predictFromCorrectionSequence', () => {
       assert.sameOrderedMembers(predictions.map((entry) => entry.components[0].prediction.displayAs), ["it's", "its"]);
       assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components[0].prediction), dummied_suggestions.map((entry) => {
         entry = deepCopy(entry);
-        entry.transformId = transitionID;
         entry.transform.id = transitionID;
         return entry;
       }));
 
       assert.approximately(predictions[0].metadata.probabilities.total, 0.18 * 0.6, 0.00001);
       assert.approximately(predictions[1].metadata.probabilities.total, 0.02 * 0.6, 0.00001);
-      predictions.forEach((prediction) => assert.equal(prediction.components[0].prediction.transformId, transitionID));
+      predictions.forEach((prediction) => assert.equal(prediction.components[0].prediction.transform.id, transitionID));
     });
 
     it('constructs suggestions without input (as if after a context reset)', () => {
@@ -266,7 +264,6 @@ describe('predictFromCorrectionSequence', () => {
 
       assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.map((c) => c.prediction)), [dummied_suggestions.map((s) => {
         delete s.p;
-        s.transformId = transitionID;
         s.transform.id = transitionID;
         return s;
       })]);
@@ -355,24 +352,21 @@ describe('predictFromCorrectionSequence', () => {
             deleteLeft: 0,
             id: transitionID
           },
-          displayAs: 'g',
-          transformId: transitionID,
+          displayAs: 'g'
         }, {
           transform: {
             insert: ' ',
             deleteLeft: 0,
             id: transitionID
           },
-          displayAs: ' ',
-          transformId: transitionID
+          displayAs: ' '
         }, {
           transform: {
             insert: 'apple',
             deleteLeft: 0,
             id: transitionID
           },
-          displayAs: 'apple',
-          transformId: transitionID
+          displayAs: 'apple'
         }
       ];
 
@@ -565,24 +559,21 @@ describe('predictFromCorrectionSequence', () => {
             deleteLeft: 0,
             id: transitionID
           },
-          displayAs: 'g',
-          transformId: transitionID
+          displayAs: 'g'
         }, {
           transform: {
             insert: ' ',
             deleteLeft: 0,
             id: transitionID
           },
-          displayAs: ' ',
-          transformId: transitionID
+          displayAs: ' '
         }, {
           transform: {
             insert: 'apple',
             deleteLeft: 0,
             id: transitionID
           },
-          displayAs: 'apple',
-          transformId: transitionID
+          displayAs: 'apple'
         }
       ];
 
@@ -710,16 +701,14 @@ describe('predictFromCorrectionSequence', () => {
             deleteLeft: 0,
             id: transitionID
           },
-          displayAs: 'golden',
-          transformId: transitionID
+          displayAs: 'golden'
         }, {
           transform: {
             insert: ' ',
             deleteLeft: 0,
             id: transitionID
           },
-          displayAs: ' ',
-          transformId: transitionID
+          displayAs: ' '
         }
       ];
 
