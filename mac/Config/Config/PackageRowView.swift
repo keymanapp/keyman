@@ -43,7 +43,10 @@ public struct PackageRowView: View {
       ForEach(isSingleKeyboardPackage ? package.keyboards : package.keyboards.onlyFirst) { keyboard in
         DisclosureGroup(isExpanded: isExpanded(package: package)) {
           // the package info view is shown inside each disclosure group
-          PackageInfoView(package: package)
+          if expandedPackageID == package.id {
+            PackageInfoView(package: package)
+              .transition(.move(edge: .top))
+          }
         } label: {
           // a VStack is shown as the label for each disclosure group
           VStack (alignment: .leading, spacing: 0) {
@@ -139,7 +142,10 @@ public struct PackageRowView: View {
       get: { expandedPackageID == package.id },
       // setter handles when the chevron arrow is clicked by the user
       // $0 = true when disclosure group is open and $0 = false when disclosure group is closed
-      set: { expandedPackageID = $0 ? package.id : nil }
+      set: { isExpanded in
+        withAnimation {
+        expandedPackageID = isExpanded ? package.id : nil }
+      }
     )
   }
   
