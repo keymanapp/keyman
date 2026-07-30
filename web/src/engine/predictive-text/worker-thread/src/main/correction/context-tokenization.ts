@@ -673,9 +673,6 @@ export class ContextTokenization {
         tailTokenization.splice(tokenIndex, 1, affectedToken);
       }
 
-      affectedToken.isPartial = true;
-      delete affectedToken.appliedTransitionId;
-
       // If we are completely replacing a token via delete left, erase the deleteLeft;
       // that part applied to a _previous_ token that no longer exists.
       // We start at index 0 in the insert string for the "new" token.
@@ -699,6 +696,11 @@ export class ContextTokenization {
       affectedToken = new ContextToken(affectedToken);
       affectedToken.addInput(inputSource, distribution);
 
+      // Do not adjust the original token, as it may be used by other transitions.
+      // Only adjust the new, extended token.
+      affectedToken.isPartial = true;
+      delete affectedToken.appliedTransitionId;
+
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;
       // Do not re-use the previous token; the mutation may have unexpected
@@ -708,8 +710,19 @@ export class ContextTokenization {
       affectedToken = null;
     }
 
+    // Backspace handling - emptying context via backspace or erasing _part_ of
+    // a whitespace token can erase the tokenization-final empty token usually
+    // used for word-initial suggestions.
+    //
+    // We re-add it here so that suggestions can be presented to the user as
+    // normal.
+    const tokenSequence = this.tokens.slice(0, sliceIndex).concat(tailTokenization);
+    if(tokenSequence.length == 0 || tokenSequence[tokenSequence.length - 1]?.isWhitespace) {
+      tokenSequence.push(new ContextToken(new LegacyQuotientRoot(lexicalModel)));
+    }
+
     return new ContextTokenization(
-      this.tokens.slice(0, sliceIndex).concat(tailTokenization),
+      tokenSequence,
       null,
       determineTaillessTrueKeystroke(transitionEdge)
     );

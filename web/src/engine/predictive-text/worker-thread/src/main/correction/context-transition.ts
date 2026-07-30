@@ -19,6 +19,15 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
 
+export interface TransitionReversionView extends Pick<ContextTransition, 'reversion'> {
+  /**
+   * Gets the context state resulting from the context transition event,
+   * including any generated suggestions and data regarding potential
+   * application thereof.
+   */
+  final: Pick<ContextState, 'suggestions'>
+}
+
 /**
  * Represents the transition between two context states as triggered
  * by input keystrokes or applied suggestions.
