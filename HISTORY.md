@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.261 alpha 2026-07-30
+
+* fix(core): clone state actions deep copy (#15961)
+* maint(android): update Android Target API to 36 (#16280)
+* refactor(web): adjust function visibility and variable names (#16286)
+
 ## 19.0.260 alpha 2026-07-27
 
 * fix(web): ignore exception trying to access cookie (#16283)
