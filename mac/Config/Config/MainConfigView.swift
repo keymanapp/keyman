@@ -16,9 +16,12 @@ struct MainConfigView: View {
   @EnvironmentObject var settings: SettingsContainer
   // visibilty state for the add package sheet
   @State private var isShowingSheet = false
+  // used to identify the expanded KeymanPackage id
+  // both single and multi package views share the same state variable so only single disclosure group is expanded at once
+  @State private var expandedPackageID: UUID? = nil
   
   var body: some View {
-    VStack{
+    VStack {
       // the add keyboard button
       LabelButtonView(
         action: { isShowingSheet = true },
@@ -34,17 +37,20 @@ struct MainConfigView: View {
           .frame(width: 960, height: 390)
         // FEAT/MAC/CONFIG-WINDOW TODO: Make width and height percentages
       }
-      
-      List {
-        Section {
+      ScrollView {
+        VStack {
           // the view  for single keyboard packages
-          PackageRowView(packages: settings.singleKeyboardPackages, isSingleKeyboardPackage: true)
-        }
-        
-        Section {
+          PackageRowView(packages: settings.singleKeyboardPackages, isSingleKeyboardPackage: true, expandedPackageID: $expandedPackageID)
+          
           // the view  for multi keyboard packages
-          PackageRowView(packages: settings.multiKeyboardPackages, isSingleKeyboardPackage: false)
+          PackageRowView(packages: settings.multiKeyboardPackages, isSingleKeyboardPackage: false, expandedPackageID: $expandedPackageID)
         }
+        .padding()
+        .background(.quaternary)
+        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        
+        // the Spacer pushes the contents of the VStack to the top of the VStack
+        Spacer()
       }
     }
     .padding([.leading, .trailing, .bottom])
