@@ -12,8 +12,10 @@ import SwiftUI
 import KeymanSettings
 
 public struct PackageInfoView: View {
-  let package: KeymanPackage
   
+  let package: KeymanPackage
+  // closure passed from the parent view
+  let showAlertFunction: (KeymanPackage) -> Void
   /**
    * Copies the text argument to the system clipboard
    */
@@ -34,7 +36,7 @@ public struct PackageInfoView: View {
           .frame(maxWidth: 84, maxHeight: 150)
       }
       
-      VStack {
+      VStack (alignment: .leading) {
         // the text-based package properties presented in a grid
         Grid(horizontalSpacing: 10, verticalSpacing: 5) {
           // the package version
@@ -80,6 +82,14 @@ public struct PackageInfoView: View {
           }
         }
         .padding(5)
+        
+        // uninstall button
+        Button {
+          showAlertFunction(package)
+        } label: {
+          Text("Remove Package")
+        }
+        .padding(.horizontal)
       }
         
       Spacer()

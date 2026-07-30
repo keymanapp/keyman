@@ -46,7 +46,7 @@ struct MainConfigView: View {
           PackageRowView(packages: settings.multiKeyboardPackages, isSingleKeyboardPackage: false, expandedPackageID: $expandedPackageID)
         }
         .padding()
-        .background(.quaternary)
+        .background(.quinary)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         
         // the Spacer pushes the contents of the VStack to the top of the VStack
