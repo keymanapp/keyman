@@ -33,7 +33,7 @@ public struct PackageRowView: View {
   /**
    * Sets isShowingDeleteAlert to true and assigns the state variable selectedPackage the KeymanPackage argument
    */
-  private func showDeleteAlert(for package: KeymanPackage) {
+  public func showDeleteAlert(for package: KeymanPackage) {
     isShowingDeleteAlert = true
     selectedPackage = package
   }
@@ -44,7 +44,9 @@ public struct PackageRowView: View {
         DisclosureGroup(isExpanded: isExpanded(package: package)) {
           // the package info view is shown inside each disclosure group
           if expandedPackageID == package.id {
-            PackageInfoView(package: package)
+            PackageInfoView(package: package, showAlertFunction: { package in
+              showDeleteAlert(for: package)
+            })
               .transition(.move(edge: .top))
           }
         } label: {
@@ -74,14 +76,6 @@ public struct PackageRowView: View {
                 font: .title2,
                 helpText: "Show keyboard help"
               )
-              
-              // delete keyboard button
-              IconButtonView(
-                action: { showDeleteAlert(for: package) },
-                systemImage: "trash",
-                font: .title2,
-                helpText: "Delete keyboard"
-              )
             }
             
             // if the package contains multiple keyboards shows an HStack with the keyboard name and toggle button for each keyboard in the package
@@ -109,7 +103,7 @@ public struct PackageRowView: View {
           .contentShape(Rectangle())
           // handles when the HStack is clicked by the user
           .onTapGesture {
-            withAnimation {
+            withAnimation () {
               if self.expandedPackageID == package.id {
                 self.expandedPackageID = nil
               } else {
