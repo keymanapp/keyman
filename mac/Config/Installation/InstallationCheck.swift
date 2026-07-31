@@ -63,37 +63,37 @@ public class InstallationCheck {
     print("InstallationCheck registerObservers")
     DistributedNotificationCenter.default().addObserver(
       self,
-      selector: #selector(self.handlePermissionNotification(_:)),
-      name: NSNotification.Name.accessCheck,
+      selector: #selector(self.handleAccessibilityResponse(_:)),
+      name: NSNotification.Name.accessibilityQueryResponse,
       object: nil // Observe notifications from any sender
     )
     // MAC-CONFIG_TODO: add timeout?
   }
   
   /**
-   * called when `NSNotification.Name.accessCheck` is received
+   * called when `NSNotification.Name.accessibilityQueryResponse` is received
    */
-  @objc func handlePermissionNotification(_ notification: Notification) {
-    print("handlePermissionNotification")
+  @objc func handleAccessibilityResponse(_ notification: Notification) {
+    print("handleAccessibilityResponse")
     // Extract message from the notification if available
     if let message = notification.object as? String {
-      let permissionGranted = self.processInputMethodResponse(with: message)
+      let permissionGranted = self.processAccessibilityResponse(with: message)
       self.completeValidation(accessibilityPermissionGranted: permissionGranted)
     } else {
-      print("accessCheckResponse received but did not include message")
+      print("accessibilityQueryResponse received but did not include message")
     }
   }
   
   /**
    * Process the distributed notification message that we received from the Keyman input method.
    */
-  func processInputMethodResponse(with message: String) -> Bool {
+  func processAccessibilityResponse(with message: String) -> Bool {
     let timeStyle = Date.FormatStyle()
       .hour(.twoDigits(amPM: Date.FormatStyle.Symbol.Hour.AMPMStyle.abbreviated))
       .minute(.twoDigits)
       .second(.twoDigits)
       .secondFraction(.fractional(3))
-    print("processAccessibilityCheckResponse received message: \(message), time: \(Date().formatted(timeStyle))")
+    print("processAccessibilityResponse received message: \(message), time: \(Date().formatted(timeStyle))")
     
     // if the message indicates that access was granted, then return true
     return !message.isEmpty && message == kAccessibilityPermissionGrantedMessage

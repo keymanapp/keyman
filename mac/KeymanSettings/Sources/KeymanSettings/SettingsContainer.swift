@@ -25,13 +25,17 @@ import Foundation
 import Combine
 import ZIPFoundation
 
+// distributed notifications
 public extension Notification.Name {
-  static let accessCheck = Notification.Name("com.keyman.accessibility.state")
+  static let accessibilityQueryResponse = Notification.Name("com.keyman.accessibility.state")
+  static let keyboardsChanged = Notification.Name("com.keyman.keyboards.changed")
+}
+
+// in-app notifications
+public extension Notification.Name {
   static let newPackageInstalled = Notification.Name("com.keyman.package.installed")
   static let packageReplaced = Notification.Name("com.keyman.package.replaced")
   static let packageDowngradeRequested = Notification.Name("com.keyman.package.downgrade.requested")
-  static let packageLoadRequired = Notification.Name("com.keyman.package.load.required")
-  static let packageUpdateRequired = Notification.Name("com.keyman.package.update.required")
 }
 
 public enum SettingsError: Error {
@@ -43,6 +47,7 @@ public class SettingsContainer : ObservableObject {
   // installed packages are loaded from disk, each package may contain one or more keyboard
   fileprivate var installedPackages: [KeymanPackage] {
     didSet {
+      // whenever this array is modified, update the arrays that are derived from it
       self.updatePackageArrays()
     }
   }
@@ -135,7 +140,7 @@ public class SettingsContainer : ObservableObject {
         name: .packageReplaced, object: nil
     )
   }
-
+  
   /**
    * called for `newPackageInstalled` notification
    */
