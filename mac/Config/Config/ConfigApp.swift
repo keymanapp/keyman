@@ -24,5 +24,9 @@ struct ConfigApp: App {
       InstallDebugView()
         .environmentObject(installation)
     }
+    Window("Main Configuration", id: "main_config") {
+      MainConfigView()
+        .environmentObject(settings)
+    }
   }
 }
