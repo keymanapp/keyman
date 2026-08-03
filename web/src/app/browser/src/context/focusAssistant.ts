@@ -149,7 +149,7 @@ export class FocusAssistant extends EventEmitter<EventMap> {
    * @param       {(boolean|number)}  state  Activate (true,false)
    */
   setMaintainingFocus(state: boolean) {
-    this.maintainingFocus = state ? true : false;
+    this.maintainingFocus = !!state;
   }
 
   setFocusTimer(): void {

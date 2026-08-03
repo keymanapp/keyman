@@ -10,9 +10,9 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { PathInputProperties, SearchQuotientNode } from "./search-quotient-node.js";
-import { TokenSplitMap } from "./context-tokenization.js";
 import { SearchQuotientCluster } from './search-quotient-cluster.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
+import { TokenSplitMapping } from "./context-tokenization.js";
 import { LegacyQuotientSpur } from "./legacy-quotient-spur.js";
 import { LegacyQuotientRoot } from "./legacy-quotient-root.js";
 import { generateSubsetId } from './tokenization-subsets.js';
@@ -28,18 +28,18 @@ import Transform = LexicalModelTypes.Transform;
  * any prior cached data or for rewriting its probabilities after
  * receiving backspace input.
  * @param text
- * @param transformId
+ * @param transitionId
  * @returns
  */
-function textToCharTransforms(text: string, transformId?: number): Transform[] {
-  return transformId ?
-    [...text].map(insert => ({insert, deleteLeft: 0, id: transformId})) :
+function textToCharTransforms(text: string, transitionId?: number): Transform[] {
+  return transitionId ?
+    [...text].map(insert => ({insert, deleteLeft: 0, id: transitionId})) :
     [...text].map(insert => ({insert, deleteLeft: 0}));
 }
 
 
 /**
- * Implements an interface similar to ContextToken that is useful for handling
+ * Defines an interface compatible with ContextToken that is useful for handling
  * cases that should not be considered correctable.
  */
 export interface ContextTokenLike {
@@ -136,7 +136,7 @@ export class ContextToken implements ContextTokenLike {
   static fromRawText(model: LexicalModel, rawText: string, isPartial?: boolean) {
     rawText ||= '';
 
-    // Supports the old pathway for: updateWithBackspace(tokenText: string, transformId: number)
+    // Supports the old pathway for: updateWithBackspace(tokenText: string, transitionId: number)
     // Build a token that represents the current text with no ambiguity - probability at max (1.0)
     let searchModule: SearchQuotientNode = new LegacyQuotientRoot(model);
     const BASE_PROBABILITY = 1;
@@ -243,7 +243,7 @@ export class ContextToken implements ContextTokenLike {
    * @param lexicalModel
    * @returns
    */
-  split(split: TokenSplitMap): ContextToken[] {
+  split(split: TokenSplitMapping): ContextToken[] {
     // Split from tail to head - leave as much 'head' intact as possible at each
     // step, rather than needing to reconstruct the tail multiple times.
     const splitSpecs = split.matches.slice();

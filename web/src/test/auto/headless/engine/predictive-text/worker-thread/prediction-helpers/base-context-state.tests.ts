@@ -168,7 +168,6 @@ describe('matchBaseContextState', () => {
     const suggestion: Suggestion= {
       transform: { insert: 'dramatically', deleteLeft: 0, id: 3 },
       displayAs: 'dramatically',
-      transformId: 3,
       id: 5
     }
 
@@ -234,7 +233,6 @@ describe('matchBaseContextState', () => {
     const suggestion: Suggestion= {
       transform: { insert: '', deleteLeft: 'dramatically'.length, id: 3 },
       displayAs: '""',
-      transformId: 3,
       id: 5
     }
 

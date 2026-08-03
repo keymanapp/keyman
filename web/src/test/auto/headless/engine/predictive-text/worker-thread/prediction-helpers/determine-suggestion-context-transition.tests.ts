@@ -140,7 +140,6 @@ describe('determineContextTransition', () => {
         insert: ' ',
         deleteLeft: 0
       },
-      transformId: 0,
       displayAs: 'testing'
     };
     baseTransition.final.suggestions = [pred_testing];
@@ -154,7 +153,7 @@ describe('determineContextTransition', () => {
       }
     };
 
-    compositor.acceptSuggestion(applied_testing, baseContext, { insert: '', deleteLeft: 0 });
+    compositor.acceptSuggestion(applied_testing, baseContext, { insert: '', deleteLeft: 0, id: applied_testing.transform.id });
     const acceptingTransition = tracker.latest;
 
     const inputDistribution: Distribution<Transform> = [{sample: applied_testing.appendedTransform, p: 1}];
@@ -195,7 +194,7 @@ describe('determineContextTransition', () => {
       transform: {
         insert: 'testing',
         deleteLeft: 4,
-        id: 1
+        id: 0
       },
       appendedTransform: {
         insert: ' ',
@@ -203,12 +202,11 @@ describe('determineContextTransition', () => {
         id: 2
       },
       id: 4,
-      transformId: 0,
       displayAs: 'testing'
     };
     baseTransition.final.suggestions = [pred_testing];
 
-    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0 });
+    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0, id: pred_testing.transform.id });
 
     const inputDistribution: Distribution<Transform> = [{sample: { insert: 'a', deleteLeft: 0, id: 5 }, p: 1}];
 
@@ -234,8 +232,8 @@ describe('determineContextTransition', () => {
         t => t.tail.searchModule instanceof SubstitutionQuotientSpur).length,
         1
       );
-      assert.equal(extendingTransition.final.displayTokenization.tokens[6].appliedTransitionId, pred_testing.transformId);
-      assert.equal(extendingTransition.final.displayTokenization.tokens[7].appliedTransitionId, pred_testing.transformId);
+      assert.equal(extendingTransition.final.displayTokenization.tokens[6].appliedTransitionId, pred_testing.transform.id);
+      assert.equal(extendingTransition.final.displayTokenization.tokens[7].appliedTransitionId, pred_testing.transform.id);
 
       // We start a new token here, rather than continue (and/or replace) an old one;
       // this shouldn't be set here yet.
@@ -261,19 +259,18 @@ describe('determineContextTransition', () => {
       transform: {
         insert: 'testing',
         deleteLeft: 4,
-        id: 1
+        id: 0
       },
       appendedTransform: {
         insert: ' ',
         deleteLeft: 0,
         id: 2
       },
-      transformId: 0,
       displayAs: 'testing'
     };
     baseTransition.final.suggestions = [pred_testing];
 
-    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0 });
+    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0, id: pred_testing.transform.id });
 
     const inputDistribution: Distribution<Transform> = [{sample: { insert: 'a', deleteLeft: 0, id: 5 }, p: 1}];
 
@@ -301,7 +298,7 @@ describe('determineContextTransition', () => {
         [{sample: { insert: '', deleteLeft: 1 }, p: 1}]
       );
 
-      assert.equal(extensionDeletingTransition.revertableTransitionId, pred_testing.transformId);
+      assert.equal(extensionDeletingTransition.revertableTransitionId, pred_testing.transform.id);
     } finally {
       warningEmitterSpy.restore();
     }
@@ -323,19 +320,18 @@ describe('determineContextTransition', () => {
       transform: {
         insert: 'testing',
         deleteLeft: 4,
-        id: 1
+        id: 0
       },
       appendedTransform: {
         insert: ' ',
         deleteLeft: 0,
         id: 2
       },
-      transformId: 0,
       displayAs: 'testing'
     };
     baseTransition.final.suggestions = [pred_testing];
 
-    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0 });
+    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0, id: pred_testing.transform.id });
 
     const inputDistribution: Distribution<Transform> = [{sample: { insert: 'a', deleteLeft: 0, id: 5 }, p: 1}];
 
@@ -375,7 +371,7 @@ describe('determineContextTransition', () => {
         [{sample: { insert: '', deleteLeft: 1 }, p: 1}]
       );
 
-      assert.equal(appendDeletingTransition.revertableTransitionId, pred_testing.transformId);
+      assert.equal(appendDeletingTransition.revertableTransitionId, pred_testing.transform.id);
     } finally {
       warningEmitterSpy.restore();
     }
@@ -397,19 +393,18 @@ describe('determineContextTransition', () => {
       transform: {
         insert: 'testing',
         deleteLeft: 4,
-        id: 1
+        id: 0
       },
       appendedTransform: {
         insert: ' ',
         deleteLeft: 0,
         id: 2
       },
-      transformId: 0,
       displayAs: 'testing'
     };
     baseTransition.final.suggestions = [pred_testing];
 
-    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0 });
+    compositor.acceptSuggestion(pred_testing, baseContext, { insert: '', deleteLeft: 0, id: pred_testing.transform.id });
 
     const inputDistribution: Distribution<Transform> = [{sample: { insert: 'a', deleteLeft: 0, id: 5 }, p: 1}];
 

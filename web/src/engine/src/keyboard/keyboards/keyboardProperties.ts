@@ -255,7 +255,7 @@ export class KeyboardProperties implements KeyboardInternalPropertySpec {
     return null;
   }
 
-  public validateForCustomKeyboard(): Error {
+  public validateForCustomKeyboard(): Error|null {
     if(!this.KI || !this.KN || !this.KL || !this.KLC) {
       return new Error("To use a custom keyboard, you must specify keyboard id, keyboard name, language and language code.");
     } else {

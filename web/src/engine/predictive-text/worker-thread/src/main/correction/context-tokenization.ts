@@ -30,19 +30,78 @@ import Transform = LexicalModelTypes.Transform;
 const MIN_TOKENS_TO_RECONSIDER_FOR_TOKENIZATION = 3;
 const MIN_CHARS_TO_RECONSIDER_FOR_TOKENIZATION = 8;
 
-interface EditTokenMap {
+/**
+ * This type is used to indicate properties of tokens affected by merges and
+ * splits during a context transition.
+ */
+interface EditTokenMappingHalf {
+  /**
+   * The index of the affected token.
+   */
   index: number,
+  /**
+   * The token's most likely represented text.
+   */
   text: string
 };
 
-interface TokenMergeMap {
-  inputs: EditTokenMap[],
-  match: EditTokenMap
+/**
+ * This type is used to indicate properties of tokens affected by splits during
+ * a context transition.
+ */
+interface SplitTokenMappingHalf extends EditTokenMappingHalf {
+  /**
+   * The codepoint index within the original token at which the split-off token
+   * begins.
+   */
+  textOffset: number
 };
 
-export interface TokenSplitMap {
-  input: EditTokenMap,
-  matches: (EditTokenMap & { textOffset: number })[]
+/**
+ * This type represents mappings for tokens affected by merge edit operations.
+ */
+interface TokenMergeMapping {
+  /**
+   * Entries here represent source-context tokens that are combined as part of
+   * the merge edit operation.
+   *
+   * Entries will appear in the same ordering as the codepoints they represent
+   * appear in the underlying context.
+   */
+  inputs: EditTokenMappingHalf[],
+
+  /**
+   * This entry represents the post-transition context token produced from the
+   * merge edit operation.
+   *
+   * Note that it is possible for extra codepoints to exist here that were not
+   * represented in the original source-context tokens.
+   */
+  match: EditTokenMappingHalf
+};
+
+
+/**
+ * This type represents mappings for tokens affected by split edit operations.
+ */
+export interface TokenSplitMapping {
+  /**
+   * This entry represents the source-context token that was split as part of
+   * the split edit operation.
+   *
+   * Note that it is possible for codepoints to exist here but not be
+   * represented in the post-transition context tokens resulting from the split.
+   */
+  input: EditTokenMappingHalf,
+
+  /**
+   * Entries here represent post-transition tokens that represent pieces of the
+   * original source-context token affected by the split edit operation.
+   *
+   * Entries will appear in the same ordering as the codepoints they represent
+   * appear in the underlying context.
+   */
+  matches: SplitTokenMappingHalf[]
 };
 
 /**
@@ -55,11 +114,11 @@ export interface TransitionEdgeAlignment {
   /**
    * Denotes any token merge edits needed after applying the Transform.
    */
-  merges: TokenMergeMap[];
+  merges: TokenMergeMapping[];
   /**
    * Denotes any token split edits needed after applying the Transform.
    */
-  splits: TokenSplitMap[];
+  splits: TokenSplitMapping[];
   /**
    * Denotes any further token edits needed that cannot be attributed to
    * 'merge's, 'split's, or edits from the input `Transform`.
@@ -389,8 +448,8 @@ export class ContextTokenization {
    * @param transitionEdge Batched results from one or more
    * `precomputeTokenizationAfterInput` calls on this instance, all with the
    * same alignment values.
-   * @param transitionId The id of the Transform associated with the keystroke
-   * triggering the transition.
+   * @param transitionId The id of the context transition associated with the
+   * Transition
    * @param bestProbFromSet The probability of the single most likely input
    * transform in the overall transformDistribution associated with the
    * keystroke triggering the transition.  It need not be represented by the
@@ -449,9 +508,6 @@ export class ContextTokenization {
         tailTokenization.splice(tokenIndex, 1, affectedToken);
       }
 
-      affectedToken.isPartial = true;
-      delete affectedToken.appliedTransitionId;
-
       // If we are completely replacing a token via delete left, erase the deleteLeft;
       // that part applied to a _previous_ token that no longer exists.
       // We start at index 0 in the insert string for the "new" token.
@@ -477,6 +533,11 @@ export class ContextTokenization {
         : new SubstitutionQuotientSpur(affectedToken.searchModule, distribution, inputSource); // the token generally holds the current SearchSpace... at present.
       affectedToken = new ContextToken(searchPath, i == inputTransformKeys.length - 1);
 
+      // Do not adjust the original token, as it may be used by other transitions.
+      // Only adjust the new, extended token.
+      affectedToken.isPartial = true;
+      delete affectedToken.appliedTransitionId;
+
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;
 
@@ -487,7 +548,18 @@ export class ContextTokenization {
       affectedToken = null;
     }
 
-    return new ContextTokenization(this.tokens.slice(0, sliceIndex). /*map((t) => new ContextToken(t.searchModule, false)).*/ concat(tailTokenization));
+    // Backspace handling - emptying context via backspace or erasing _part_ of
+    // a whitespace token can erase the tokenization-final empty token usually
+    // used for word-initial suggestions.
+    //
+    // We re-add it here so that suggestions can be presented to the user as
+    // normal.
+    const tokenSequence = this.tokens.slice(0, sliceIndex).concat(tailTokenization);
+    if(tokenSequence.length == 0 || tokenSequence[tokenSequence.length - 1]?.isWhitespace) {
+      tokenSequence.push(new ContextToken(new SearchQuotientRoot(lexicalModel)));
+    }
+
+    return new ContextTokenization(tokenSequence);
   }
 
   get clusteringKey(): string {
@@ -987,8 +1059,8 @@ export function traceInsertEdits(tokens: string[], transform: Transform): {
  * Given context tokenizations before and after applying an incoming transform,
  * this method analyzes the tokenizations in order to make adjustments for any
  * 'merge' or 'split' edits needed for the transition.
- * @param priorTokenization
- * @param resultTokenization
+ * @param priorTokenization The raw-text form of the pre-transition context tokenization
+ * @param resultTokenization The raw-text form of the post-transition context tokenization
  * @returns
  */
 export function analyzePathMergesAndSplits(priorTokenization: string[], resultTokenization: string[]): {
@@ -1020,13 +1092,13 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
    * generality, if two separate groups of tokens are merged, two groups will be
    * defined - one for each token resulting from a merge.
    */
-  merges: TokenMergeMap[],
+  merges: TokenMergeMapping[],
   /**
    * Indicates groupings of directly related splits.  Without loss of
    * generality, if two separate tokens are split, two groups will be defined -
    * one for each source token split.
    */
-  splits: TokenSplitMap[]
+  splits: TokenSplitMapping[]
 } {
   // We've found the root token to which changes may apply.
   // We've found the last post-application token to which transform changes contributed.
@@ -1064,8 +1136,8 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
   const mappedPath: EditTuple<EditOperation>[] = [];
   let mergeOffset = 0;
   let splitOffset = 0;
-  const merges: TokenMergeMap[] = [];
-  const splits: TokenSplitMap[] = [];
+  const merges: TokenMergeMapping[] = [];
+  const splits: TokenSplitMapping[] = [];
   while(queueIndex < editPath.length) {
     const edit = editPath[queueIndex];
     const { input, match } = edit;
@@ -1075,7 +1147,7 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
     let matchOffset: number = 0;
     if(op == 'merge') {
       const mergeTarget = resultTokenization[match];
-      const merge: TokenMergeMap = {
+      const merge: TokenMergeMapping = {
         match: {
           index: match,
           text: mergeTarget
@@ -1106,7 +1178,7 @@ export function analyzePathMergesAndSplits(priorTokenization: string[], resultTo
       merges.push(merge);
     } else if(op == 'split') {
       const splitTarget = preTokenization[input];
-      const split: TokenSplitMap = {
+      const split: TokenSplitMapping = {
         input: {
           index: input,
           text: splitTarget

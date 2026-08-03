@@ -12,7 +12,7 @@ import { assert } from 'chai';
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
-import { IntermediateCompositedPrediction, createDefaultKeep, models, SuggestionSimilarity } from "@keymanapp/lm-worker/test-index";
+import { CompositedIntermediatePrediction, createDefaultKeep, models, SuggestionSimilarity } from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -102,7 +102,7 @@ describe('createDefaultKeep', () => {
       endOfBuffer: true
     };
 
-    const expectedKeep: IntermediateCompositedPrediction = {
+    const expectedKeep: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {
@@ -110,7 +110,6 @@ describe('createDefaultKeep', () => {
             deleteLeft: 4,
             id: transformId
           },
-          transformId,
           displayAs: '<appl>',
           matchesModel: false,
           tag: 'keep'
@@ -148,7 +147,7 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: IntermediateCompositedPrediction = {
+    const expectedKeep: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {
@@ -192,7 +191,7 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: IntermediateCompositedPrediction = {
+    const expectedKeep: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {
@@ -236,7 +235,7 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: IntermediateCompositedPrediction = {
+    const expectedKeep: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {
@@ -280,7 +279,7 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: IntermediateCompositedPrediction = {
+    const expectedKeep: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {
@@ -324,7 +323,7 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: IntermediateCompositedPrediction = {
+    const expectedKeep: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {
@@ -368,7 +367,7 @@ describe('createDefaultKeep', () => {
       p: 1
     };
 
-    const expectedKeep: IntermediateCompositedPrediction = {
+    const expectedKeep: CompositedIntermediatePrediction = {
       components: {
         prediction: {
           transform: {

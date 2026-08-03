@@ -28,7 +28,8 @@ import {
   models,
   SearchQuotientSpur,
   traceInsertEdits,
-  LegacyQuotientSpur
+  LegacyQuotientSpur,
+  TransitionEdge
 } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
@@ -45,8 +46,8 @@ function toToken(text: string) {
 }
 
 let TOKEN_TRANSFORM_SEED = 0;
-function toTransformToken(text: string, transformId?: number) {
-  let idSeed = transformId === undefined ? TOKEN_TRANSFORM_SEED++ : transformId;
+function toTransitionToken(text: string, transitionId?: number) {
+  let idSeed = transitionId === undefined ? TOKEN_TRANSFORM_SEED++ : transitionId;
   let isWhitespace = text == ' ';
   let token = ContextToken.fromRawText(plainModel, '');
   const textAsTransform = { insert: text, deleteLeft: 0, id: idSeed };
@@ -105,7 +106,7 @@ describe('ContextTokenization', function() {
 
     it("constructs from a token array + alignment data", () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      const tokens = rawTextTokens.map((text => toTransformToken(text)));
+      const tokens = rawTextTokens.map((text => toTransitionToken(text)));
 
       let tokenization = new ContextTokenization(tokens);
 
@@ -117,7 +118,8 @@ describe('ContextTokenization', function() {
 
     it('clones', () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      const tokens = rawTextTokens.map((text => toTransformToken(text)));
+      const tokens = rawTextTokens.map((text => toTransitionToken(text)));
+
       let baseTokenization = new ContextTokenization(tokens);
       let cloned = new ContextTokenization(baseTokenization);
 
@@ -321,6 +323,38 @@ describe('ContextTokenization', function() {
             ...edgeWindow
           },
           removedTokenCount: 2
+        },
+        inputs: [{ sample: inputTransformMap, p: 1 }],
+        inputSubsetId: generateSubsetId()
+      },
+        inputTransform.id,
+        1
+      );
+
+      assert.isOk(tokenization);
+      assert.equal(tokenization.tokens.length, targetTokens.length);
+      assert.deepEqual(tokenization.tokens.map((t) => ({text: t.exampleInput, isWhitespace: t.isWhitespace})),
+        targetTokens
+      );
+    });
+
+    it('handles simple case - deletion of final context content via backspace', () => {
+      const baseTokens = ['a'];
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+      const targetTokens = [''].map((t) => ({text: t, isWhitespace: t == ' '}));
+      const inputTransform = { insert: '', deleteLeft: 1, deleteRight: 0, id: 42 };
+      const inputTransformMap: Map<number, Transform> = new Map();
+      inputTransformMap.set(0, { insert: '', deleteLeft: 1, id: 42 });
+
+      const edgeWindow = buildEdgeWindow(baseTokenization.tokens, inputTransform, false, testEdgeWindowSpec);
+      const tokenization = baseTokenization.evaluateTransition({
+        alignment: {
+          merges: [],
+          splits: [],
+          unmappedEdits: [],
+          edgeWindow,
+          removedTokenCount: 1
         },
         inputs: [{ sample: inputTransformMap, p: 1 }],
         inputSubsetId: generateSubsetId()
@@ -745,6 +779,195 @@ describe('ContextTokenization', function() {
       assert.equal(preTail.exampleInput, '\'');
       assert.equal(tail.exampleInput, '.');
     });
+
+    describe('properly handles previously-applied transition IDs', () => {
+      it('does not preserve applied transition IDs on edited tokens', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can'];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+        const REVERTABLE_TRANSITION_ID = 31415;
+        baseTokenization.tail.appliedTransitionId = REVERTABLE_TRANSITION_ID;
+        const NEW_TRANSITION_ID = REVERTABLE_TRANSITION_ID + 1;
+
+        const dist = [
+          {
+            sample: { insert: 't', deleteLeft: 0, deleteRight: 0, id: NEW_TRANSITION_ID },
+            p: 1
+          }
+        ];
+
+        const resultTokenization = baseTokenization.evaluateTransition(
+          {
+            alignment: {
+              merges: [],
+              splits: [],
+              unmappedEdits: [],
+              edgeWindow: {
+                ...buildEdgeWindow(baseTokenization.tokens, dist[0].sample, false),
+                retokenizationText: baseTokenization.tokens.map((t) => t.exampleInput).reduce((accum, curr) => accum + curr, '')
+              },
+              removedTokenCount: 0
+            },
+            inputs: (() => {
+              const map: Map<number, Transform> = new Map();
+              map.set(0, dist[0].sample);
+
+              return [
+                {sample: map, p: 1}
+              ];
+            })(),
+            inputSubsetId: 0
+          },
+          NEW_TRANSITION_ID,
+          1
+        )
+
+        resultTokenization.tokens.forEach((t) => {
+          assert.isUndefined(t.appliedTransitionId);
+        });
+      });
+
+      it('preserves applied transition IDs on applicable tokens', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can'];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+        const REVERTABLE_TRANSITION_ID = 31415;
+        baseTokenization.tail.appliedTransitionId = REVERTABLE_TRANSITION_ID;
+        const NEW_TRANSITION_ID = REVERTABLE_TRANSITION_ID + 1;
+
+
+        const dist = [
+          {
+            sample: { insert: ' ', deleteLeft: 0, deleteRight: 0, id: NEW_TRANSITION_ID },
+            p: 1
+          }
+        ];
+
+        const resultTokenization = baseTokenization.evaluateTransition(
+          {
+            alignment: {
+              merges: [],
+              splits: [],
+              unmappedEdits: [],
+              edgeWindow: {
+                ...buildEdgeWindow(baseTokenization.tokens, dist[0].sample, false),
+                retokenizationText: baseTokenization.tokens.map((t) => t.exampleInput).reduce((accum, curr) => accum + curr, '')
+              },
+              removedTokenCount: 0
+            },
+            inputs: (() => {
+              const map: Map<number, Transform> = new Map();
+              map.set(1, dist[0].sample);
+
+              return [
+                {sample: map, p: 1}
+              ];
+            })(),
+            inputSubsetId: 0
+          },
+          NEW_TRANSITION_ID,
+          1
+        )
+
+        const resultTokenLength = resultTokenization.tokens.length;
+
+        resultTokenization.tokens.forEach((t, i) => {
+          // The space will add TWO tokens.
+          if(i == resultTokenLength - 3) {
+            assert.equal(t.appliedTransitionId, REVERTABLE_TRANSITION_ID);
+          } else {
+            assert.isUndefined(t.appliedTransitionId);
+          }
+        });
+      });
+
+      // Performs the two above in sequence in a manner that could cause cross-effects
+      // if implemented incorrectly.
+      it('does not conflate effects between different tokenization transitions', () => {
+        const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', 'can'];
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toToken(t)));
+
+        const REVERTABLE_TRANSITION_ID = 31415;
+        baseTokenization.tail.appliedTransitionId = REVERTABLE_TRANSITION_ID;
+        const NEW_TRANSITION_ID = REVERTABLE_TRANSITION_ID + 1;
+
+        const dist = [
+          {
+            sample: { insert: ' ', deleteLeft: 0, deleteRight: 0, id: NEW_TRANSITION_ID },
+            p: .8
+          }, {
+            sample: { insert: ' ', deleteLeft: 0, deleteRight: 0, id: NEW_TRANSITION_ID },
+            p: .2
+          }
+        ];
+
+        const baseTransitionEdge: TransitionEdge =  {
+          alignment: {
+            merges: [],
+            splits: [],
+            unmappedEdits: [],
+            edgeWindow: {
+              ...buildEdgeWindow(baseTokenization.tokens, dist[0].sample, false),
+              retokenizationText: baseTokenization.tokens.map((t) => t.exampleInput).reduce((accum, curr) => accum + curr, '')
+            },
+            removedTokenCount: 0
+          },
+          inputs: (() => {
+            const map: Map<number, Transform> = new Map();
+            map.set(1, dist[0].sample);
+
+            return [
+              {sample: map, p: dist[0].p}
+            ];
+          })(),
+          inputSubsetId: 0
+        };
+
+        // We don't care about the results here.  What we care about is that
+        // this call doesn't remove the appliedTransitionId from the source
+        // token, preventing it from being marked on later tokenization
+        // transitions.
+        baseTokenization.evaluateTransition(
+          {
+            alignment: {
+              ...baseTransitionEdge.alignment,
+              edgeWindow: {
+                ...baseTransitionEdge.alignment.edgeWindow,
+                ...buildEdgeWindow(baseTokenization.tokens, dist[1].sample, false)
+              }
+            },
+            inputs: (() => {
+              const map: Map<number, Transform> = new Map();
+              map.set(0, dist[1].sample);
+
+              return [
+                {sample: map, p: dist[1].p}
+              ];
+            })(),
+            inputSubsetId: 0
+          },
+          NEW_TRANSITION_ID,
+          dist[1].p
+        )
+
+        const resultTokenization = baseTokenization.evaluateTransition(
+          baseTransitionEdge,
+          NEW_TRANSITION_ID,
+          dist[0].p
+        );
+
+        const resultTokenLength = resultTokenization.tokens.length;
+
+        resultTokenization.tokens.forEach((t, i) => {
+          // The space will add TWO tokens.
+          if(i == resultTokenLength - 3) {
+            assert.equal(t.appliedTransitionId, REVERTABLE_TRANSITION_ID);
+          } else {
+            assert.isUndefined(t.appliedTransitionId);
+          }
+        });
+      });
+    });
   });
 
   describe('buildEdgeWindow', () => {
@@ -752,7 +975,7 @@ describe('ContextTokenization', function() {
       it('handles empty contexts', () => {
         const baseTokens = [''];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
@@ -772,7 +995,7 @@ describe('ContextTokenization', function() {
       it('handles empty contexts and invalid Transforms', () => {
         const baseTokens = [''];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
@@ -792,7 +1015,7 @@ describe('ContextTokenization', function() {
       it('builds edge windows for the start of context with no edits', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
@@ -832,7 +1055,7 @@ describe('ContextTokenization', function() {
       it('builds edge windows for the start of context with deletion edits (1)', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 2 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
@@ -872,7 +1095,7 @@ describe('ContextTokenization', function() {
       it('builds edge windows for the start of context with deletion edits (2)', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 4 }, true, testEdgeWindowSpec);
         assert.deepEqual(results, {
@@ -892,7 +1115,7 @@ describe('ContextTokenization', function() {
       it('builds edge windows for the end of context with no edits', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
         baseTokenization.tail.isPartial = true;
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, testEdgeWindowSpec);
@@ -913,7 +1136,7 @@ describe('ContextTokenization', function() {
       it('builds edge windows for the end of context with no edits, trailing whitespace', () => {
         const baseTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day', ' ', ''];
         const idSeed = TOKEN_TRANSFORM_SEED;
-        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+        const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
 
         const results = buildEdgeWindow(baseTokenization.tokens, { insert: '', deleteLeft: 0, deleteRight: 0 }, false, testEdgeWindowSpec);
         assert.deepEqual(results, {
@@ -1698,7 +1921,7 @@ describe('ContextTokenization', function() {
     it('returns the standard edge window for empty transform inputs', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
       const idSeed = TOKEN_TRANSFORM_SEED;
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
 
       const editTransform = {
         insert: '',
@@ -1731,7 +1954,7 @@ describe('ContextTokenization', function() {
     it('returns the standard edge window for empty transforms with context-final whitespace', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox', ' '];
       const idSeed = TOKEN_TRANSFORM_SEED;
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
 
       const editTransform = {
         insert: '',
@@ -1765,7 +1988,7 @@ describe('ContextTokenization', function() {
     it('returns the standard edge window for pure transform w insert inputs', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
         const idSeed = TOKEN_TRANSFORM_SEED;
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
 
       const editTransform = {
         insert: ' jumped',
@@ -1798,7 +2021,7 @@ describe('ContextTokenization', function() {
     it('returns the proper edge window for transforms w deleteLeft inputs (1)', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
       const idSeed = TOKEN_TRANSFORM_SEED;
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
 
       const editTransform = {
         insert: 'rog',
@@ -1832,7 +2055,7 @@ describe('ContextTokenization', function() {
     it('returns the proper edge window for transforms w deleteLeft inputs (2)', () => {
       const baseTokens = ['quick', ' ', 'brown', ' ', 'fox'];
       const idSeed = TOKEN_TRANSFORM_SEED;
-      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransformToken(t)));
+      const baseTokenization = new ContextTokenization(baseTokens.map(t => toTransitionToken(t)));
 
       const editTransform = {
         insert: 'fox and brown fox',  // => quick fox and brown fox
