@@ -266,14 +266,14 @@ export class PredictionContext extends EventEmitter<PredictionContextEventMap> {
         this._revertSuggestion = s as Reversion;
       }
 
-      if (this.langProcessor.mayAutoCorrect && s.autoAccept && !this.selected) {
+      if (this.langProcessor.mayAutoCorrect && s.autoAccept && !this.selected && s.tag != 'keep') {
         this.selected = s;
       }
     }
 
     // Verify that the transition IDs are still valid and remove special entries.
     this._currentSuggestions = suggestions.filter(s => {
-      return this.langProcessor.hasState(Math.abs(s.transformId)) &&
+      return this.langProcessor.hasState(Math.abs(s.transform.id)) &&
       s != this._keepSuggestion &&
       s != this._revertSuggestion
     });
