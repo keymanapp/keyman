@@ -98,12 +98,11 @@ export class DummyModel implements LexicalModel {
   predict(transform: Transform, context: Context, injectedSuggestions?: Outcome<Suggestion>[]): Distribution<Suggestion> {
     let makeUniformDistribution = function(suggestions: Outcome<Suggestion>[]): Distribution<Suggestion> {
       let distribution: Distribution<Suggestion> = [];
+      const transitionId = transform.id;
 
       for(let s of suggestions) {
-        const transitionId = transform.id;
         if(transitionId !== undefined) {
           // Set the transform ID to match the incoming transform ID if one exists.
-          s.transformId = transitionId;
           if(s.transform) {
             s.transform.id = transitionId;
           }

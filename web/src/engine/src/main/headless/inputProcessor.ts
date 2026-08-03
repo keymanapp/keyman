@@ -386,7 +386,7 @@ export class InputProcessor {
       // If so, since it behaves the same in either case, and it's a known word-breaking mark,
       // let's apply the selected suggestion automatically.
       if(postApplyTransform.insert == ruleTransform.insert && transformMatchesPattern(postApplyTransform, breakingMarks)) {
-        const baseTransition = this.contextCache.get(predictionContext.selected.transformId);
+        const baseTransition = this.contextCache.get(predictionContext.selected.transform.id);
 
         // Somehow, the base state is out of context - abort!
         if(!baseTransition) {

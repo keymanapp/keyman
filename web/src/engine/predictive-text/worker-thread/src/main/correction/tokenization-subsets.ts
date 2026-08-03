@@ -135,7 +135,8 @@ export function legacySubsetKeyer(tokenizationEdits: TokenizationTransitionEdits
   // Now, based on the transform tokenization. We want to force uniqueness for
   // all variations of result length on each tokenized transform resulting from
   // the precomputation's represented keystroke.
-  for(const {0: relativeIndex} of tokenizedTransform.entries()) {
+  for(const {0: relativeIndex, 1: transform} of tokenizedTransform.entries()) {
+    const insertLen = KMWString.length(transform.insert);
     if(relativeIndex > 0) {
       // The true boundary lie before the insert if the value is non-zero;
       // don't differentiate here!
@@ -148,10 +149,10 @@ export function legacySubsetKeyer(tokenizationEdits: TokenizationTransitionEdits
       //
       // IMPORTANT:  update unit tests manually if the BI marker here changes
       // or the use of SENTINEL_CODE_UNIT as a key component separator changes.
-      components.push(`BI@${relativeIndex}`);
+      components.push(`BI@${relativeIndex}-${boundaryTextLen + insertLen}`);
       boundaryTextLen = 0;
     } else {
-      components.push(`I@${relativeIndex}`);
+      components.push(`I@${relativeIndex}-${boundaryTextLen + insertLen}`);
     }
   }
 
