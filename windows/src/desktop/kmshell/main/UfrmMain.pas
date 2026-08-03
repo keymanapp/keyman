@@ -666,8 +666,8 @@ var
 begin
   if ConfigureBaseKeyboard(BaseKeyboardID) then
   begin
-    SetBaseKeyboard(Handle, BaseKeyboardID)
-    // Refresh will be triggered by elevated process
+    SetBaseKeyboard(Handle, BaseKeyboardID);
+    DoRefresh;
   end;
 
 end;
