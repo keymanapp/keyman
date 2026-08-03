@@ -13,7 +13,7 @@ import { ContextToken } from './context-token.js';
 import { ContextTokenization } from './context-tokenization.js';
 import { SearchQuotientCluster } from './search-quotient-cluster.js';
 import { legacySubsetKeyer, TokenizationSubset, TokenizationSubsetBuilder } from './tokenization-subsets.js';
-import { TransformUtils } from '#./transformUtils.js';
+import { TransformUtils } from '../transformUtils.js';
 
 import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
