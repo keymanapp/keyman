@@ -20,14 +20,18 @@ public struct PackageRowView: View {
   
   // settings.singleKeyboardPackages or settings.multiKeyboardPackages
   let packages: [KeymanPackage]
+  // a boolean for weather or not a package contains multiple keyboards
   let isSingleKeyboardPackage: Bool
   // binded to the shared state variable in the parent view
   @Binding var expandedPackageID: UUID?
+  // closure passed from the parent view
+  let showHelpTab: (URL) -> Void
   
-  init(packages: [KeymanPackage], isSingleKeyboardPackage: Bool, expandedPackageID: Binding<UUID?>) {
+  init(packages: [KeymanPackage], isSingleKeyboardPackage: Bool, expandedPackageID: Binding<UUID?>, showHelpTab: @escaping (URL) -> Void) {
     self.packages = packages
     self.isSingleKeyboardPackage = isSingleKeyboardPackage
     self._expandedPackageID = expandedPackageID
+    self.showHelpTab = showHelpTab
   }
   
   /**
@@ -57,6 +61,16 @@ public struct PackageRowView: View {
               Text(isSingleKeyboardPackage ? keyboard.name: package.packageName)
                 .font(.title)
               
+              // see keyboard help button
+              if let url = package.helpFileUrl {
+                IconButtonView(
+                  action: { showHelpTab(url) },
+                  systemImage: "questionmark.circle",
+                  font: .title2,
+                  helpText: "Show keyboard help"
+                )
+              }
+              
               // the Spacer pushes the contents of the HStack to the either edge
               Spacer()
               
@@ -69,13 +83,7 @@ public struct PackageRowView: View {
                   .gridColumnAlignment(.leading)
               }
               
-              // see keyboard help button
-              IconButtonView(
-                action: { print("Show keyboard help") },
-                systemImage: "questionmark.circle",
-                font: .title2,
-                helpText: "Show keyboard help"
-              )
+              
             }
             
             // if the package contains multiple keyboards shows an HStack with the keyboard name and toggle button for each keyboard in the package

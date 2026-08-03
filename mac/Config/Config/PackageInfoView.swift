@@ -39,6 +39,7 @@ public struct PackageInfoView: View {
       VStack (alignment: .leading) {
         // the text-based package properties presented in a grid
         Grid(horizontalSpacing: 10, verticalSpacing: 5) {
+          
           // the package version
           GridRow {
             Text("Package Version:").bold()
