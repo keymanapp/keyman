@@ -9,7 +9,7 @@ import { ContextTokenLike } from './correction/context-token.js';
 import { ContextTokenization } from './correction/context-tokenization.js';
 import { ContextTracker } from './correction/context-tracker.js';
 import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
-import { ContextTransition } from './correction/context-transition.js';
+import { ContextTransition, TransitionReversionView } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import { ModelCompositor } from './model-compositor.js';
 import { EDIT_DISTANCE_COST_SCALE, getBestTokenMatches } from './correction/distance-modeler.js';
@@ -690,11 +690,6 @@ export async function correctAndEnumerate(
     // Corrections obtained:  now to predict from them!
     const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
 
-    // If our 'match' results in fully deleting the new token, reject it and try again.
-    if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
-      continue;
-    }
-
     // If our 'match' fully replaces the token, reject it and try again.
     if(match.matchSequence.length != 0 && match.matchSequence.length == match.knownCost) {
       continue;
@@ -822,7 +817,6 @@ export function predictFromCorrectionSequence(
 
       entry.sample.transform.deleteLeft = correctionTransform.deleteLeft;
       if(transitionId !== undefined) {
-        entry.sample.transformId = transitionId;
         entry.sample.transform.id = transitionId;
       }
     });
@@ -946,7 +940,7 @@ export function composeIntermediatePredictions(predictions: TokenizedIntermediat
       insert: '',
       deleteLeft: 0
     }
-    const transformId = predictionData.components[0].prediction.transformId;
+    const transformId = predictionData.components[0].prediction.transform.id;
     if(transformId !== undefined) {
       reduceBaseTransform.id = transformId;
     }
@@ -1140,7 +1134,6 @@ export function createDefaultKeep(
 
   let keepOption = toAnnotatedSuggestion(lexicalModel, keepSuggestion, 'keep');
   if(inputTransform.id !== undefined) {
-    keepOption.transformId = inputTransform.id;
     keepOption.transform.id = inputTransform.id;
   }
   keepOption.matchesModel = false;
@@ -1199,9 +1192,11 @@ export function predictionAutoSelect(suggestionDistribution: CompositedIntermedi
 
   const keepOption = suggestionDistribution[0].components.prediction as Outcome<Keep>;
   if(keepOption.tag == 'keep' && keepOption.matchesModel) {
-    // Auto-select it for auto-acceptance; we don't correct away from perfectly-valid
-    // lexical entries, even if they are comparatively low-frequency.
-    keepOption.autoAccept = true;
+    // Do not auto-select 'keep' suggestions'; there's no need to apply them.
+    //
+    // Do, however, block auto-selection of any other suggestions if we would
+    // have auto-selected the 'keep'; even if it is comparatively unlikely /
+    // low-frequency, we 'keep' the current context.
     return;
   } else if(suggestionDistribution.length == 1) {
     return;
@@ -1296,12 +1291,6 @@ export function finalizeSuggestions(
 
   const suggestions = deduplicatedSuggestionTuples.map((tuple) => {
     const prediction = tuple.components.prediction;
-
-    // Is sometimes not set during unit tests.
-    if(prediction.transformId !== undefined) {
-      prediction.transform.id = prediction.transformId;
-    }
-
     const probs = tuple.metadata.probabilities;
 
     if(!verbose) {
@@ -1404,9 +1393,40 @@ export function toAnnotatedSuggestion(
     result.appendedTransform = suggestion.appendedTransform;
   }
 
-  if(suggestion.transformId !== undefined) {
-    result.transformId = suggestion.transformId;
+  if(suggestion.transform.id !== undefined) {
+    result.transform.id = suggestion.transform.id;
   }
 
   return result;
+}
+
+/**
+ * For applicable scenarios, this mutates the passed-in suggestion array by
+ * prepending a predictive-text reversion that restores the context to a prior
+ * state.  Otherwise, it leaves the suggestion array unaltered.
+ * @param suggestions
+ * @param transitionToRevert
+ * @returns
+ */
+export function prependReversion(suggestions: Suggestion[], transitionToRevert: TransitionReversionView) {
+  if(transitionToRevert) {
+    const reversion = transitionToRevert.reversion;
+    if(reversion) {
+      if(suggestions[0]?.tag == 'keep') {
+        const appliedId = -reversion.id;
+        const appliedSuggestion = transitionToRevert.final.suggestions.find((s) => s.id == appliedId);
+        // If the selected suggestion was itself a `keep`, we don't need a
+        // reversion.  They'd do the same thing.
+        if(appliedSuggestion.tag != 'keep') {
+          const keep = suggestions.shift();
+          suggestions.unshift(reversion);
+          suggestions.unshift(keep);
+        }
+      } else {
+        suggestions.unshift(reversion);
+      }
+    }
+  }
+
+  return suggestions;
 }

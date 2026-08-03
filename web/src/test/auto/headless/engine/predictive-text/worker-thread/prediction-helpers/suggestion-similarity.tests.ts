@@ -296,7 +296,6 @@ describe('processSimilarity', () => {
               deleteLeft: 4,
               id: transformId
             },
-            transformId,
             displayAs: 'apple'
           },
           correction: 'appl'

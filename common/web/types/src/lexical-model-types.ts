@@ -253,9 +253,14 @@ export interface LexicalModel {
  */
 export interface Transform {
   /**
-   * Facilitates use of unique identifiers for tracking the Transform and
-   * any related data from its original source, as the reference cannot be
-   * preserved across WebWorker boundaries.
+   * Facilitates use of unique identifiers for tracking data about the context
+   * transition to which the Transform belongs.  More than one Transform may
+   * hold the same `id` if they are alternate interpretations of the same
+   * transition event - say, the resulting effects of neighbor keys that may
+   * have been missed due to "fat fingering".
+   *
+   * Also note that the Transform reference cannot be preserved across WebWorker
+   * boundaries, but this ID may.
    *
    * This is *separate* from any LMLayer-internal identification values.
    */
@@ -287,13 +292,6 @@ export interface Transform {
  * A concrete suggestion
  */
 export interface Suggestion {
-  /**
-   * Indicates the externally-supplied id of the Transform that prompted
-   * the Suggestion.  Automatically handled by the LMLayer; models should
-   * not handle this field.
-   */
-  transformId?: number;
-
   /**
    * A unique identifier for the Suggestion itself, not shared with any others -
    * even for Suggestions sourced from the same Transform.

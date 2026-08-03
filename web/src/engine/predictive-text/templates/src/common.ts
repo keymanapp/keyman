@@ -60,7 +60,7 @@ export function buildMergedTransform(first: Transform, second: Transform): Trans
     deleteLeft: first.deleteLeft + mergedSecondDelete
   }
 
-  if(first.id && first.id == second.id) {
+  if(first.id !== undefined && first.id == second.id) {
     returnedObj.id = first.id;
   }
 
@@ -131,10 +131,6 @@ export function transformToSuggestion(transform: Transform, p?: number): Outcome
     transform: transform,
     displayAs: transform.insert
   };
-
-  if(transform.id !== undefined) {
-    suggestion.transformId = transform.id;
-  }
 
   if(p === 0 || p) {
     suggestion.p = p;

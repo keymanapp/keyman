@@ -110,7 +110,6 @@ describe('createDefaultKeep', () => {
             deleteLeft: 4,
             id: transformId
           },
-          transformId,
           displayAs: '<appl>',
           matchesModel: false,
           tag: 'keep'
