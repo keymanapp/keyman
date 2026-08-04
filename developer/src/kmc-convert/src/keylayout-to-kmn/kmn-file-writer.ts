@@ -68,7 +68,7 @@ export class UnicodeCharacterConversion {
   public static re_dec = /^&#([0-9]{1,7});$/;
 
   // &#x followed by 1.-6. hex digits or &# followed by 1.-7. decimal digits
-  private static re_hexdec = /^&#x?([0-9a-f]{1,7};)/ig;
+  private static re_hexdec = /^&#x?([0-9a-f]{1,7};)/i;
 
   // & followed by gt, lt, quot, amp, apos and ; (&gt;)
   private static re_nam = /&(gt|lt|quot|amp|apos);/i;
@@ -155,7 +155,6 @@ export class UnicodeCharacterConversion {
     inputString.input = this.unescape_string(inputString.input) ?? '';
 
     const re_hexdec = UnicodeCharacterConversion.re_hexdec.exec(inputString.input);
-    UnicodeCharacterConversion.re_hexdec.lastIndex = 0;
 
     // if the (remaining) input string starts with a hex or dec html entity ( &#x...; or &#...;) we need to convert this part to a character
     if (re_hexdec) {
