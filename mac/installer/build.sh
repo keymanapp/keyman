@@ -110,8 +110,15 @@ function build_distribution_xml(){
 cat <<EOF > "${OUTPUT__DISTRIBUTION_XML}"
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="2">
-    <title>Keyman for Mac</title>
-    <welcome file="welcome.html" />
+    <title>Keyman for macOS</title>
+    <welcome file="welcome.rtf" />
+    <license file="license.rtf" mime-type="text/rtf"/>
+    <!-- Light Mode Background -->
+    <background file="keyman-x20-y36-144.png" mime-type="image/png" alignment="center" scaling="none"/>
+    <!-- Dark Mode Background -->
+    <background-darkAqua file="keyman-x20-y36-144.png" mime-type="image/png" alignment="center" scaling="none"/>
+
+    <conclusion file="conclusion.rtf" mime-type="text/rtf"/>
 
     <!-- Restrict to macOS 13 Ventura or newer -->
     <allowed-os-versions>
