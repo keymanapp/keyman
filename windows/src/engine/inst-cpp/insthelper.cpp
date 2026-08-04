@@ -16,7 +16,8 @@
 #include <initguid.h>
 #include <comdef.h>
 #include <msctf.h>
-#include <atlbase.h>
+#include <wrl/client.h>
+// #include <atlbase.h>
 #include<sstream>
 #include<iomanip>
 #include "kmtip_guids.h"
@@ -167,43 +168,51 @@ InstallLayoutOrTip(const wchar_t* FLayoutInstallString, DWORD Flags) {
   return result ? true : false;
 }
 // Unregister the TIP
-void UnregisterTIPAndItsProfiles(const CLSID& AClsid) {
-  HRESULT hr;
-  CComPtr<ITfInputProcessorProfiles> pInputProcessorProfiles;
-  CComPtr<ITfInputProcessorProfileMgr> pInputProcessorProfileMgr;
-  CComPtr<IEnumTfInputProcessorProfiles> ippEnum;
-  ULONG pcFetch;
-  TF_INPUTPROCESSORPROFILE profile;
-  std::wstring FLayoutInstallString;
+using Microsoft::WRL::ComPtr;
 
-  // Create an instance of ITF Input Processor Profiles
-  hr = CoCreateInstance(
-      CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER, IID_ITfInputProcessorProfiles,
-      (void**)&pInputProcessorProfiles);
-  if (FAILED(hr))
-    throw _com_error(hr);
+void UnregisterTIPAndItsProfiles(const CLSID& AClsid)
+{
+    HRESULT hr;
+    ComPtr<ITfInputProcessorProfiles> pInputProcessorProfiles;
+    ComPtr<ITfInputProcessorProfileMgr> pInputProcessorProfileMgr;
+    ComPtr<IEnumTfInputProcessorProfiles> ippEnum;
 
-  // Query for ITfInputProcessorProfileMgr interface
-  hr = pInputProcessorProfiles->QueryInterface(IID_ITfInputProcessorProfileMgr, (void**)&pInputProcessorProfileMgr);
-  if (FAILED(hr))
-    throw _com_error(hr);
+    ULONG pcFetch;
+    TF_INPUTPROCESSORPROFILE profile;
+    std::wstring FLayoutInstallString;
 
-  // Enumerate the profiles
-  hr = pInputProcessorProfileMgr->EnumProfiles(0, &ippEnum);
-  if (FAILED(hr))
-    throw _com_error(hr);
+    hr = CoCreateInstance(
+        CLSID_TF_InputProcessorProfiles,
+        nullptr,
+        CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(pInputProcessorProfiles.GetAddressOf()));
+    if (FAILED(hr))
+        throw _com_error(hr);
 
-  // Unregister the input profiles installed through Keyman
-  while (ippEnum->Next(1, &profile, &pcFetch) == S_OK) {
-    if (profile.dwProfileType == TF_PROFILETYPE_INPUTPROCESSOR && IsEqualGUID(profile.clsid, AClsid)) {
-      FLayoutInstallString = GetLayoutInstallString(profile.langid, profile.guidProfile);
-      InstallLayoutOrTip(FLayoutInstallString.c_str(), ILOT_UNINSTALL);
-      pInputProcessorProfileMgr->UnregisterProfile(AClsid, profile.langid, profile.guidProfile, 0);
+    hr = pInputProcessorProfiles->QueryInterface(
+        IID_PPV_ARGS(pInputProcessorProfileMgr.GetAddressOf()));
+    if (FAILED(hr))
+        throw _com_error(hr);
+
+    hr = pInputProcessorProfileMgr->EnumProfiles(
+        0,
+        ippEnum.GetAddressOf());
+    if (FAILED(hr))
+        throw _com_error(hr);
+
+    while (ippEnum->Next(1, &profile, &pcFetch) == S_OK)
+    {
+        if (profile.dwProfileType == TF_PROFILETYPE_INPUTPROCESSOR &&
+            IsEqualGUID(profile.clsid, AClsid))
+        {
+            FLayoutInstallString = GetLayoutInstallString(profile.langid, profile.guidProfile);
+            InstallLayoutOrTip(FLayoutInstallString.c_str(), ILOT_UNINSTALL);
+            pInputProcessorProfileMgr->UnregisterProfile(
+                AClsid, profile.langid, profile.guidProfile, 0);
+        }
     }
-  }
 
-  // Unregister the entire input processor
-  pInputProcessorProfiles->Unregister(AClsid);
+    pInputProcessorProfiles->Unregister(AClsid);
 }
 
 extern "C" __declspec(dllexport) UINT WINAPI PreUninstall( MSIHANDLE hInstall ) {
