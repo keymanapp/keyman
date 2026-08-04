@@ -28,6 +28,7 @@ import {
   SearchQuotientCluster,
   TokenizationSubset,
   TokenizationTransitionEdits,
+  TransformUtils,
   TransitionEdge,
   transitionTokenizations
 } from '@keymanapp/lm-worker/test-index';
@@ -52,7 +53,8 @@ const plainModel = new TrieModel(
 function buildOutboundTransitionEdge (
   baseTokenization: ContextTokenization,
   inputs: Distribution<Required<Transform>>,
-  tokenizedInputs: Distribution<Map<number, Transform>>
+  tokenizedInputs: Distribution<Map<number, Transform>>,
+  isBksp: boolean
 ): TransitionEdge {
   const primaryTokenizedInput = tokenizedInputs[0].sample;
   const relativeTailIndex = [...primaryTokenizedInput.keys()][0];
@@ -77,7 +79,8 @@ function buildOutboundTransitionEdge (
       removedTokenCount: 0
     },
     inputs: tokenizedInputs,
-    inputSubsetId: generateSubsetId()
+    inputSubsetId: generateSubsetId(),
+    isBksp
   };
 }
 
@@ -132,14 +135,16 @@ function generateFixtureForTokenizationOutboundTransition (
   inputPropBase: PathInputProperties
 ) {
   return dists.map((dist) => {
+    const isBksp = TransformUtils.isBackspace(dist.raw[0].sample);
     const primaryTokenizedInput = dist.tokenized[0].sample;
-    const tokenizationEdge = buildOutboundTransitionEdge(srcTokenization, dist.raw, dist.tokenized);
+    const tokenizationEdge = buildOutboundTransitionEdge(srcTokenization, dist.raw, dist.tokenized, isBksp);
 
     // Is only built for use in constructing the subset keys.  We only need data
     // from one of the inputs here.
     const keyable: TokenizationTransitionEdits = {
       tokenizedTransform: primaryTokenizedInput,
-      alignment: tokenizationEdge.alignment
+      alignment: tokenizationEdge.alignment,
+      isBksp
     };
 
     const key = precomputationSubsetKeyer(keyable);
