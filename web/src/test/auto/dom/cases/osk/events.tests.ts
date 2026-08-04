@@ -2,7 +2,7 @@ import * as KeymanOSK from 'keyman/engine/osk';
 import { DeviceDetector } from 'keyman/engine/main';
 
 import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
-import { timedPromise } from '@keymanapp/web-utils';
+import { timedPromise } from 'keyman/common/web-utils';
 
 import sinon from 'sinon';
 
@@ -17,7 +17,7 @@ const TestResources = {
     isEmbedded: false,
     pathConfig: {
       fonts: '',
-      resources: '/web/build/publish/debug'
+      resources: '/web/build/publish/debug/'
     },
     hostDevice: device.coreSpec,
     allowHideAnimations: false // shortens timings.

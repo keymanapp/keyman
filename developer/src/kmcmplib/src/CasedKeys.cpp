@@ -2,7 +2,7 @@
 #include "pch.h"
 
 #include "km_u16.h"
-#include "../../../../common/windows/cpp/include/vkeys.h"
+#include "../../../../common/include/vkeys.h"
 
 #include "compfile.h"
 #include "kmn_compiler_errors.h"

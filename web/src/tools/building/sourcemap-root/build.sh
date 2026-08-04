@@ -14,7 +14,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 builder_describe "Builds the sourcemap-sanitizing script used for Keyman Engine for Web builds" \
-  "@/common/tools/sourcemap-path-remapper" \
+  "@/common/tools/sourcemap-path-remapper   build" \
   "clean" \
   "configure" \
   "build" \

@@ -4,7 +4,7 @@ import {
   OSKInputEventSpec,
   PhysicalInputEventSpec
 } from "@keymanapp/recorder-core";
-import { ManagedPromise, timedPromise } from "@keymanapp/web-utils";
+import { ManagedPromise, timedPromise } from "keyman/common/web-utils";
 
 import { type KeymanEngine } from 'keyman/app/browser';
 

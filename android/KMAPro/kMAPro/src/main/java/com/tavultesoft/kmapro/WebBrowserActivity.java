@@ -1,9 +1,10 @@
-/**
- * Copyright (C) 2017 SIL International. All rights reserved.
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
  */
 
 package com.tavultesoft.kmapro;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -386,7 +387,7 @@ public class WebBrowserActivity extends BaseActivity {
     super.onResume();
     if (webView != null) {
       if (didFinishLoading) {
-        String fontFilename = KMManager.getKeyboardTextFontFilename();
+        String fontFilename = getKeyboardTextFontFilenameOnly();
         if (!loadedFont.equals(fontFilename)) {
           webView.reload();
         }
@@ -432,8 +433,19 @@ public class WebBrowserActivity extends BaseActivity {
     }
   }
 
+  /**
+   * Returns the filename without path of the display font of the current keyboard.
+   */
+  private String getKeyboardTextFontFilenameOnly() {
+    String fontPath = KMManager.getKeyboardTextFontFilename();
+    if (fontPath == null || fontPath.isEmpty()) {
+      return "";
+    }
+    return new File(fontPath).getName();
+  }
+
   private void loadFont() {
-    String font = KMManager.getKeyboardTextFontFilename();
+    String font = getKeyboardTextFontFilenameOnly();
     if (!font.isEmpty()) {
       loadedFont = font;
       String fontUrl = String.format("%s%s", fontBaseUri, font);

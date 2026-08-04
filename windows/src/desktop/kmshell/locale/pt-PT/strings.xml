@@ -542,7 +542,7 @@
   <!-- Context: Base Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.445.0 -->
-  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">Selecione o teclado latino básico 
+  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">Selecione o teclado latino básico
   que utiliza no Windows. O teclado Keyman irá se adaptar automaticamente ao seu layout preferido.</string>
   <!-- Context: Hotkey Dialog -->
   <!-- String Type: FormatString -->
@@ -714,10 +714,6 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKLanguageCode" comment="The language code for the current translation">por-PT</string>
-  <!-- Context: _LanguageInfo -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDefaultLanguageCode" comment="The default language code for this product.  This should be the language that the product is created in. For Keyman this must stay 'en', for all translations.">por-PT</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->

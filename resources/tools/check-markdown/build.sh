@@ -16,7 +16,7 @@ builder_describe "Check markdown internal links" \
   "build"
 
 builder_describe_outputs \
-  configure          "${THIS_SCRIPT_PATH}/node_modules" \
+  configure          /node_modules \
   build              build/index.js
 
 builder_parse "$@"

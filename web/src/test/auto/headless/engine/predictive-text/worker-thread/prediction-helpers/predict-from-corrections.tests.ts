@@ -1,7 +1,7 @@
 
 import { assert } from 'chai';
 
-import { deepCopy } from "@keymanapp/web-utils";
+import { deepCopy } from "keyman/common/web-utils";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { models, predictFromCorrections, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";

@@ -22,7 +22,7 @@ To run a single test you pass the testname (as found in
 `common/test/keyboards/baseline`). Multiple tests should be separated by space.
 
 ```bash
-scripts/run-tests.sh -- k_000___null_keyboard k_005___nul_with_initial_context
+scripts/run-tests.sh -- k_0000___null_keyboard k_0002___nul_with_initial_context
 ```
 
 ## Debugging tests
@@ -39,7 +39,7 @@ For example:
 
 ```bash
 linux/ibus-keyman/tests/scripts/run-tests.sh --remote-debug \
-  --no-surrounding-text --no-wayland -- k_001___basic_input_unicodei
+  --no-surrounding-text --no-wayland -- k_0100___basic_input_unicodei
 ```
 
 On the host, you can then attach to the VM. See the

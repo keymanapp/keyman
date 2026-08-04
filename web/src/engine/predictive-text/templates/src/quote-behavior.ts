@@ -36,5 +36,3 @@ export namespace QuoteBehavior {
     }
   }
 }
-
-export default QuoteBehavior;

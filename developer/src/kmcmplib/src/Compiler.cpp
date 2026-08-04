@@ -70,7 +70,6 @@
 
 #include "compfile.h"
 #include <kmn_compiler_errors.h>
-#include "../../../../common/windows/cpp/include/vkeys.h"
 #include <cuchar>
 #include "versioning.h"
 #include "kmcmplib.h"
@@ -78,11 +77,10 @@
 #include "cp1252.h"
 #include "virtualcharkeys.h"
 
-// TODO: These three should be under common/cpp/include -- not windows specific
-#include "../../../../common/windows/cpp/include/keymanversion.h"
-#include "../../../../common/windows/cpp/include/crc32.h"
-#include "../../../../common/windows/cpp/include/ConvertUTF.h"
+#include "../../../../common/include/vkeys.h"
+#include "../../../../common/include/keymanversion.h"
 
+#include "crc32.h"
 #include "debugstore.h"
 #include "NamedCodeConstants.h"
 

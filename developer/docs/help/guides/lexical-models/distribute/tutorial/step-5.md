@@ -21,7 +21,7 @@ documentation is accessible to the end user.
 
 Once you have tested the package to your satisfaction, it is time to
 distribute it. We recommend submitting your lexical model package to the
-[Keyman Lexical Models Repository](https://github.com/keymanapp/lexical-models)
+[Keyman Lexical Models Repository](/developer/lexical-models)
 
 ## Distributing a package on your own website
 

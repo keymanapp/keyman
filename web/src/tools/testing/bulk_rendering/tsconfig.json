@@ -2,10 +2,9 @@
   "extends": "../../../tsconfig.dom.json",
 
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "../../../../build/tools/testing/bulk_rendering/obj/",
     "tsBuildInfoFile": "../../../../build/tools/testing/bulk_rendering/obj/tsconfig.tsbuildinfo",
-    "rootDir": "."
+    "rootDir": ".",
   },
 
   "files": [
@@ -13,7 +12,8 @@
   ],
 
 	"references": [
+    { "path": "../../../common/web-utils" },
     { "path": "../../../app/browser" },
-    { "path": "../../../engine/main" }
+    { "path": "../../../engine" }
 	]
 }

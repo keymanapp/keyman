@@ -20,7 +20,7 @@
       "name": "Launch kmx unit tests",
       "target": "build/arch/debug/tests/unit/kmx/kmx",
       "cwd": "${workspaceRoot}/core/",
-      "arguments": "tests/unit/kmx/k_033___caps_always_off.km{n,x}",
+      "arguments": "tests/unit/kmx/k_0702___caps_always_off.km{n,x}",
       "valuesFormatting": "parseText"
     },
     {
@@ -40,7 +40,7 @@
       "valuesFormatting": "parseText"
     },
     {
-      // start: linux/ibus-keyman/tests/scripts/run-tests.sh --remote-debug --no-surrounding-text --no-wayland -- k_001___basic_input_unicodei
+      // start: linux/ibus-keyman/tests/scripts/run-tests.sh --remote-debug --no-surrounding-text --no-wayland -- k_0100___basic_input_unicodei
       // then attach debugger in vscode
       "type": "gdb",
       "request": "attach",
@@ -58,7 +58,7 @@
       }
     },
     {
-      // - Run Docker container with `resources/docker-images/run.sh --remote-debug :linux -- linux/ibus-keyman/tests/scripts/run-tests.sh --no-x11 --remote-debug -- --directory /home/build/.local/share/keyman/test_kmx k_001___basic_input_unicodei`
+      // - Run Docker container with `resources/docker-images/run.sh --remote-debug :linux -- linux/ibus-keyman/tests/scripts/run-tests.sh --no-x11 --remote-debug -- --directory /home/build/.local/share/keyman/test_kmx k_0100___basic_input_unicodei`
       // - then attach debugger in vscode
       "type": "gdb",
       "request": "attach",

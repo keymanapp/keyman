@@ -2,7 +2,7 @@ import { assert } from 'chai';
 
 import { QuoteBehavior } from "@keymanapp/models-templates";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
-import { deepCopy } from '@keymanapp/web-utils';
+import { deepCopy } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { CorrectionPredictionTuple, models, processSimilarity, SuggestionSimilarity, toAnnotatedSuggestion } from "@keymanapp/lm-worker/test-index";

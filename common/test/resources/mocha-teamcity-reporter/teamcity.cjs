@@ -135,6 +135,8 @@ function Teamcity(runner, options) {
 	const ignoredTests = {};
 	const testState = { pending: 0 };
 
+	log('Initializing Mocha TeamCity Reporter');
+
 	runner.on(EVENT_SUITE_BEGIN, function (suite) {
 		handleFlow(true, hasParentFlowId);
 		if (suite.root) {

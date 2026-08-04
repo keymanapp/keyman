@@ -109,7 +109,7 @@ const TestData values[] = {
   //--------------------------------------------------------------------
   // KMN
   // Key with rule
-  {"KMN_VKey_A", "kmx/k_005___nul_with_initial_context.kmx", KM_CORE_VKEY_A, 0, u"x", true,
+  {"KMN_VKey_A", "kmx/k_0002___nul_with_initial_context.kmx", KM_CORE_VKEY_A, 0, u"x", true,
     { // KeyDown
       {KM_CORE_IT_CHAR, { 0, }, {'d'}},
       {KM_CORE_IT_END}
@@ -119,7 +119,7 @@ const TestData values[] = {
       {KM_CORE_IT_END}
     }
   },
-  {"KMN_Ctrl_VKey_A", "kmx/k_005___nul_with_initial_context.kmx", KM_CORE_VKEY_A, KM_CORE_MODIFIER_LCTRL, u"x", true,
+  {"KMN_Ctrl_VKey_A", "kmx/k_0002___nul_with_initial_context.kmx", KM_CORE_VKEY_A, KM_CORE_MODIFIER_LCTRL, u"x", true,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -131,7 +131,7 @@ const TestData values[] = {
     }
   },
   // Key without rule
-  {"KMN_VKey_X", "kmx/k_005___nul_with_initial_context.kmx", KM_CORE_VKEY_X, 0, u"x", true,
+  {"KMN_VKey_X", "kmx/k_0002___nul_with_initial_context.kmx", KM_CORE_VKEY_X, 0, u"x", true,
     { // KeyDown
       {KM_CORE_IT_CHAR, { 0, }, {'x'}},
       {KM_CORE_IT_END}
@@ -141,7 +141,7 @@ const TestData values[] = {
       {KM_CORE_IT_END}
     }
   },
-  {"KMN_Ctrl_VKey_X", "kmx/k_005___nul_with_initial_context.kmx", KM_CORE_VKEY_X, KM_CORE_MODIFIER_LCTRL, u"x", true,
+  {"KMN_Ctrl_VKey_X", "kmx/k_0002___nul_with_initial_context.kmx", KM_CORE_VKEY_X, KM_CORE_MODIFIER_LCTRL, u"x", true,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -153,7 +153,7 @@ const TestData values[] = {
     }
   },
   // Frame key without rule
-  {"KMN_VKey_Enter", "kmx/k_000___null_keyboard.kmx", KM_CORE_VKEY_ENTER, 0, u"x", false,
+  {"KMN_VKey_Enter", "kmx/k_0000___null_keyboard.kmx", KM_CORE_VKEY_ENTER, 0, u"x", false,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -178,7 +178,7 @@ const TestData values[] = {
   //   }
   // },
   // Backspace (without context)
-  {"KMN_VKey_Backspace_NoCtxt", "kmx/k_000___null_keyboard.kmx", KM_CORE_VKEY_BKSP, 0, NULL, false,
+  {"KMN_VKey_Backspace_NoCtxt", "kmx/k_0000___null_keyboard.kmx", KM_CORE_VKEY_BKSP, 0, NULL, false,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -190,7 +190,7 @@ const TestData values[] = {
     }
   },
   // Ctrl+Backspace (with context)
-  {"KMN_Ctrl_VKey_Backspace_Ctxt", "kmx/k_000___null_keyboard.kmx", KM_CORE_VKEY_BKSP, KM_CORE_MODIFIER_LCTRL, u"x", true,
+  {"KMN_Ctrl_VKey_Backspace_Ctxt", "kmx/k_0000___null_keyboard.kmx", KM_CORE_VKEY_BKSP, KM_CORE_MODIFIER_LCTRL, u"x", true,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -202,7 +202,7 @@ const TestData values[] = {
     }
   },
   // Ctrl+Backspace (no context)
-  {"KMN_Ctrl_VKey_Backspace_NoCtxt", "kmx/k_000___null_keyboard.kmx", KM_CORE_VKEY_BKSP, KM_CORE_MODIFIER_LCTRL, NULL, false,
+  {"KMN_Ctrl_VKey_Backspace_NoCtxt", "kmx/k_0000___null_keyboard.kmx", KM_CORE_VKEY_BKSP, KM_CORE_MODIFIER_LCTRL, NULL, false,
     { // KeyDown
       {KM_CORE_IT_INVALIDATE_CONTEXT, { 0, }, {0}},
       {KM_CORE_IT_EMIT_KEYSTROKE, { 0, }, {0}},
@@ -214,7 +214,7 @@ const TestData values[] = {
     }
   },
   // Modifier frame key
-  {"KMN_VKey_Shift", "kmx/k_000___null_keyboard.kmx", KM_CORE_VKEY_SHIFT, 0, u"x", false,
+  {"KMN_VKey_Shift", "kmx/k_0000___null_keyboard.kmx", KM_CORE_VKEY_SHIFT, 0, u"x", false,
     { // KeyDown
       {KM_CORE_IT_END}
     },

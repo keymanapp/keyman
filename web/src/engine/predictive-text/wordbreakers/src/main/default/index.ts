@@ -38,7 +38,7 @@ export interface DefaultWordBreakerOptions {
  * @see http://unicode.org/reports/tr29/#Word_Boundaries
  * @see https://github.com/eddieantonio/unicode-default-word-boundary/tree/v12.0.0
  */
-export default function default_(text: string, options?: DefaultWordBreakerOptions): LexicalModelTypes.Span[] {
+export function default_(text: string, options?: DefaultWordBreakerOptions): LexicalModelTypes.Span[] {
   let boundaries = findBoundaries(text, options);
   if (boundaries.length == 0) {
     return [];

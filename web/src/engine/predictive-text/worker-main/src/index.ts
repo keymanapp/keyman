@@ -1,6 +1,6 @@
-export { default as LMLayer } from './lmlayer.js';
-export { default as NodeWorker } from './node/worker.js';
-export { default as WebWorker } from './web/worker.js';
+export { LMLayer } from './lmlayer.js';
+export { NodeWorker } from './node/node-worker.js';
+export { WebWorker } from './web/web-worker.js';
 
 export interface WorkerFactory {
   constructInstance(): Worker

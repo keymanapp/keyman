@@ -2,7 +2,7 @@
 //
 
 #include "pch.h"
-#include "../../../common/windows/cpp/include/keymanversion.h"
+#include "../../../common/include/keymanversion.h"
 #include <iostream>
 #include <vector>
 #include <codecvt>
@@ -364,7 +364,7 @@ std::string unicode_escape(std::wstring s) {
   return r;
 }
 
-#include "../../../common/windows/cpp/include/vkeys.h"
+#include "../../../common/include/vkeys.h"
 
 std::wstring GetKeyName(UINT key) {
   WCHAR buf[64];

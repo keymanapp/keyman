@@ -186,7 +186,7 @@ initialization
   Assert(sizeof(km_core_context_item) = 8);
   Assert(sizeof(km_core_action_item) = 12);
   Assert(sizeof(km_core_option_item) = 12);
-  Assert(sizeof(km_core_keyboard_attrs) = 16);
+  Assert(sizeof(km_core_keyboard_attrs) = 12);
   Assert(sizeof(km_core_attr) = 16);
 
   //keyman_core_api_debug.h:

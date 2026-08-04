@@ -1,5 +1,161 @@
 # Keyman Version History
 
+## 19.0.261 alpha 2026-07-30
+
+* fix(core): clone state actions deep copy (#15961)
+* maint(android): update Android Target API to 36 (#16280)
+* refactor(web): adjust function visibility and variable names (#16286)
+
+## 19.0.260 alpha 2026-07-27
+
+* fix(web): ignore exception trying to access cookie (#16283)
+* chore(web): update help links to use latest version (#16285)
+
+## 19.0.259 alpha 2026-07-20
+
+* docs(web): fix typos following #16170 (#16225)
+
+## 19.0.258 alpha 2026-07-15
+
+* chore(android): remove doc for non-existing deprecated functions (#16244)
+
+## 19.0.257 alpha 2026-07-14
+
+* chore(linux): remove questing, add stonking (#16236)
+* chore(android): cleanup Android build scripts and artifact filenames (#16234)
+* chore(web): declare scope for stubAndKeyboardCache members (#16221)
+* fix(android): improve clarity of keyboard script error popup (#16228)
+* chore(android): log legacy cloud keyboards (#16237)
+* chore(android): cleanup font variable names, remove obsolete code (#16211)
+
+## 19.0.256 alpha 2026-07-13
+
+* fix(android): add permissions for Sentry and set default keyboard (#16216)
+* maint(resources): add extra debug reporting for builder (#16230)
+
+## 19.0.255 alpha 2026-07-11
+
+* maint(android): use KEYMAN_TIER instead of TIER.md (#16219)
+* feat(ios): add keyman-version to package-version check (#16138)
+* docs(web): cleanup of index pages and page titles (#16171)
+* feat(android): add keyman-version to package-version check (#16139)
+
+## 19.0.254 alpha 2026-07-10
+
+* fix(android): handle blank keyboard tap properly (#16217)
+* fix(web): define IME interfaces in `KeyboardInterfaceBase` (#16170)
+
+## 19.0.253 alpha 2026-07-09
+
+* fix(web): resync model in `set osk()` (as used by Server) (#16127)
+* chore(developer): consolidate api-extractor usage in Developer (#16135)
+
+## 19.0.252 alpha 2026-07-08
+
+* chore(linux): reorder buttons on kmp install window (#16210)
+* refactor(web): rename `keymanweb` to `keyman` in UI modules (#16174)
+* chore: remove deprecated "X-UA-Compatible" and "apple-mobile-web-app-capable" metas (#16176)
+* fix(android): refactor `KMLog` - simplification and added resilience (#16152)
+* fix(android): differentiate between fontPath and fontUrl in Keyman Engine for Android (#16188)
+* fix(web): fixes cookie unit-tests and path for OSK resources during testing (#16209)
+
+## 19.0.251 alpha 2026-07-02
+
+* fix(android): skip test on Windows that triggers androidx WebKit bug (#16184)
+
+## 19.0.250 alpha 2026-07-01
+
+* fix(android): use `WebViewAssetLoader` for loading assets on Android (address regression in 19.0.242) (#16146)
+* fix(ios): bundle in KMW's globe-hint.css (#16142)
+* fix(ios): load host page, keyboards through a consistent WKURLSchemeHandler (#16136)
+
+## 19.0.249 alpha 2026-06-30
+
+* fix(windows): add update property to remote check (#16126)
+* chore(android): allow to build FV app in docker container (#16163)
+* fix(developer): warn only on race when destroying TAppSourceHttpResponder (#16140)
+* fix(developer): map shift key nextlayer property when importing OSK (#16110)
+
+## 19.0.248 alpha 2026-06-29
+
+* chore: add missing line to history (#16154)
+* maint(resources): DRY out `PRInformation` interface (#16158)
+* fix(developer): prevent clone of legacy keyboards with no source (#16111)
+* fix(developer): consolidate user options in TypeScript code (#16134)
+* fix(developer): fixup references to layer after deleting in Touch Layout Editor (#16129)
+* fix(web): revert regression in setting `activeKeyboard` in `set osk` (#16156)
+* test(web): add e2e tests for examples from guide (#16108)
+* maint(linux): show output of API check also in log file (#16153)
+
+## 19.0.247 alpha 2026-06-16
+
+* chore: update multi-labeler to 5.0.0 (#16100)
+
+## 19.0.246 alpha 2026-06-15
+
+* feat(developer): run project validation from IDE (#16076)
+* fix(core): use meson subsystem and needs_exe_wrapper for cross builds on Windows (#16088)
+* docs(windows): add context documentation for additional Advanced options (#16089)
+
+## 19.0.245 alpha 2026-06-10
+
+* chore(web): hide KMX keyboard test page (#16083)
+* docs(web): remove unnecessary mentioning of Keyman 17 from docs (#16085)
+* chore(web): remove outdated `*_load.js` files (#16086)
+* fix(web): fix `KeyboardStub.validateForCustomKeyboard` (#16067)
+
+## 19.0.244 alpha 2026-06-09
+
+* refactor(web): extract function, rename variables (#16063)
+* refactor(web): reformatting of files (#16066)
+* chore(web): improve the KeymanWeb integration documentation (#16064)
+* chore(web): more improvements to documentation (#16070)
+
+## 19.0.243 alpha 2026-06-08
+
+* fix(developer): reduce km_core_keyboard_attrs size to 12 (#16075)
+* chore(deps): bump minimatch in /core/tests/unit/wasm (#16045)
+* chore(deps): bump glob from 10.4.5 to 10.5.0 in /core/tests/unit/wasm (#16046)
+* chore(deps-dev): bump js-yaml from 4.1.0 to 4.2.0 in /core/tests/unit/wasm (#16047)
+* chore(deps-dev): bump picomatch from 2.3.1 to 2.3.2 in /core/tests/unit/wasm (#16048)
+* chore(deps): bump qs and express (#16009)
+
+## 19.0.242 alpha 2026-06-03
+
+* fix(web): fix displaying of keyboard menu (#16061)
+
+## 19.0.241 alpha 2026-06-02
+
+* chore: web-core preflight (#16015)
+* chore(web): web-core preflight - strip core references (#16040)
+* docs: add note on how to use composer on dockerized websites (#16029)
+* fix(web): fix race displaying active keyboard in menu (#16042)
+
+## 19.0.240 alpha 2026-05-28
+
+* chore(web): add filename to link text of manual web tests (#16019)
+* docs(web): reformat and small fixes (#16021)
+
+## 19.0.239 alpha 2026-05-27
+
+* chore(web): remove obsolete file (#16013)
+
+## 19.0.238 alpha 2026-05-26
+
+* maint(linux): Don't block merge if source verification check fails (#16010)
+* maint(linux): fix Linux source tarball (#16011)
+
+## 19.0.237 alpha 2026-05-22
+
+* fix(windows): Ensure default locale always appears in list of locales (#15984)
+* chore(ios): update First Voices distribution certificate (#15993)
+
+## 19.0.236 alpha 2026-05-21
+
+* docs(developer): write up basic internal docs on kmc modules (#15982)
+* chore(common): move common cpp files and remove unused files (#15981)
+* docs(developer): update links to lexical model distribution (#15974)
+
 ## 19.0.235 alpha 2026-05-20
 
 * fix(linux): fix source tarball verification (#15975)

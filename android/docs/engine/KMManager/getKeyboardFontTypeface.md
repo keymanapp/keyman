@@ -28,6 +28,8 @@ exists, `null` otherwise.
 Use this method to create a new typeface from the selected keyboard's
 font if it has any.
 
+Deprecated. Use `getKeyboardTextFontFilename()` instead.
+
 ## Examples
 
 ### Example: Using `getKeyboardFontTypeface()`
@@ -44,3 +46,4 @@ The following script illustrate the use of `getKeyboardFontTypeface()`:
 
 -   [`getFontTypeface()`](getFontTypeface)
 -   [`getKeyboardFontFilename()` (Deprecated)](getKeyboardFontFilename)
+-   [`getKeyboardTextFontFilename()`](getKeyboardTextFontFilename)

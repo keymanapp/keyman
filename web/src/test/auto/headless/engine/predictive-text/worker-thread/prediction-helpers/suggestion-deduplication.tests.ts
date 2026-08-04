@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
-import { deepCopy } from '@keymanapp/web-utils';
+import { deepCopy } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { CorrectionPredictionTuple, dedupeSuggestions, models } from "@keymanapp/lm-worker/test-index";

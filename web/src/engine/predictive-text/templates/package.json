@@ -57,7 +57,6 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@keymanapp/keyman-version": "*",
     "@keymanapp/common-types": "*",
     "@keymanapp/models-wordbreakers": "*",
     "@keymanapp/resources-gosh": "*"

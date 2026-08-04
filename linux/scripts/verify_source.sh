@@ -36,10 +36,6 @@ create_source_tarball() {
   ./scripts/reconf.sh
   PKG_CONFIG_PATH="${KEYMAN_ROOT}/core/build/arch/release/meson-private" ./scripts/dist.sh
   mv "dist/keyman-${KEYMAN_VERSION}.tar.xz" "${target_dir}"
-
-  builder_echo heading "Make source for packaging"
-  PKG_CONFIG_PATH="${KEYMAN_ROOT}/core/build/arch/release/meson-private" ./scripts/dist.sh origdist
-  mv "dist/keyman_${KEYMAN_VERSION}.orig.tar.xz" "${target_dir}/keyman_${KEYMAN_VERSION}.pkg.tar.xz"
 }
 
 extract_source_tarball() {
@@ -49,15 +45,6 @@ extract_source_tarball() {
   cd "${target_dir}"
   rm -rf "keyman"
   tar -xvf "keyman-${KEYMAN_VERSION}.tar.xz"
-}
-
-extract_packaging_source_tarball() {
-  local target_dir="$1"
-
-  builder_echo heading "Extract packaging source tarball"
-  cd "${target_dir}"
-  rm -rf "keyman-${KEYMAN_VERSION}"
-  tar -xvf "keyman_${KEYMAN_VERSION}.pkg.tar.xz"
 }
 
 verify_can_build() {
@@ -81,7 +68,7 @@ create_source_package() {
   cd launchpad
   cp -r "../keyman-${KEYMAN_VERSION}" .
   cp -r "${KEYMAN_ROOT}/linux/debian" "keyman-${KEYMAN_VERSION}"
-  cp "${target_dir}/keyman_${KEYMAN_VERSION}.pkg.tar.xz" "keyman_${KEYMAN_VERSION}.orig.tar.xz"
+  cp "${target_dir}/keyman-${KEYMAN_VERSION}.tar.xz" "keyman_${KEYMAN_VERSION}.orig.tar.xz"
   "keyman-${KEYMAN_VERSION}/linux/scripts/launchpad.sh" --no-download \
     --dist "$(lsb_release -c -s)" --outputdir "${target_dir}/launchpad" --no-lintian --no-sign
 }
@@ -124,7 +111,8 @@ fi
 
 if ! builder_has_option --source-only; then
   builder_echo start lintian "Verifying Launchpad source package"
-  extract_packaging_source_tarball "${TARGET_DIR}"
+  extract_source_tarball "${TARGET_DIR}"
+  mv "${TARGET_DIR}/keyman" "${TARGET_DIR}/keyman-${KEYMAN_VERSION}"
   create_source_package "${TARGET_DIR}"
   verify_lintian
   rm -rf "${TARGET_DIR}/keyman-${KEYMAN_VERSION}"
