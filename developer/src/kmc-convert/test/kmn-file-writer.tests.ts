@@ -12,8 +12,9 @@ import { assert } from 'chai';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
-import { KmnFileWriter } from '../src/keylayout-to-kmn/kmn-file-writer.js';
+import { KmnFileWriter, UnicodeCharacterConversion, ReplacedOutputString } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
+
 describe('KmnFileWriter', function () {
 
   before(function () {
@@ -65,7 +66,6 @@ describe('KmnFileWriter', function () {
       assert.equal(writtenCorrectName, (outExpectedFirst + converted.keylayoutFilename + outExpectedLast));
     });
   });
-
 
   describe('reviewRules messages', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
@@ -404,6 +404,158 @@ describe('KmnFileWriter', function () {
         };
         const result1 = sutW.writeDataRules(data);
         assert.isTrue(result1 === values[1][0]);
+      });
+    });
+  });
+
+  describe('UnicodeCharacterConversion readXmlOutput', function () {
+    [
+      ["", ''],
+      [undefined, undefined],
+      [null, undefined],
+
+      ['<', '<'],
+      ['a', 'a'],
+      ['ሴ', 'ሴ'],
+      ['W̊', 'W̊'],
+      ['😎', '😎'],
+      ['ab', 'ab'],
+      ['ሴЖ', 'ሴЖ'],
+      ['ẘẈ', 'ẘẈ'],
+      ['😎😆', '😎😆'],
+      ['aሴẘ😆', 'aሴẘ😆'],
+      ['U+0061', 'U+0061'],
+      ['&#x61;', 'a'],
+      ['&#x1E98;', 'ẘ'],
+      ['&#x0002;', '\u0002'],
+      ['&#4660;', 'ሴ'],
+      ['&#128518;', '😆'],
+      ['&#0003;', '\u0003'],
+      ['&lt;', '<'],
+      ['&quot;', '"'],
+      ['&apos;', "'"],
+      ['␤', '␤'],
+      ['␕', '␕'],
+      ['', ''],
+      ['U+', 'U+'],
+
+      ['&gt;', '>'],
+      ['&amp;gt', '&gt'],
+      [' &amp;gt', ' &gt'],
+      ['y&amp;gt', 'y&gt'],
+      ['&amp;', '&'],
+      ['&amp;amp;', '&'],
+      ['&amp;amp;amp;', '&'],
+      ['&amp;#x1234;', 'ሴ'],
+      ['&amp;#x1234;&amp;', 'ሴ&'],
+      ['&amp;#x&amp;#x;', '&#x&#x;'],
+      ['a&gt;b', 'a>b'],
+      ['a &gt; b', 'a > b'],
+
+      ['&', '&'],
+      ['&#x;', '&#x;'],
+      ['&#;', '&#;'],
+      ['&##;', '&##;'],
+
+      ['&a', '&a'],
+      ['a&b', 'a&b'],
+      ['a&bcd&defg', 'a&bcd&defg'],
+      ['a&gt', 'a&gt'],
+      ['&&', '&&'],
+      ['&&;', '&&;'],
+      ['&#&#', '&#&#'],
+      ['&#x&#x', '&#x&#x'],
+      ['&#', '&#'],
+      ['&#x', '&#x'],
+      ['&##', '&##'],
+
+      ['&#x10FFFF;', undefined],
+      ['&#1114111;', undefined],
+      ['&#x110000;', undefined],
+      ['&#x0026;gt;', '>'],
+      ['&#x1000000;', '&#x1000000;'],
+      ['&#x2000000;', '&#x2000000;'],
+      ['aሴ&#x1F60F;bẘ&gt;😆z<y&amp;&#97;😎-&#128547&#x1F60F;', 'aሴ😏bẘ>😆z<y&a😎-&#128547😏'],
+      ['aሴ&#x1F60F;bẘ&gt;😆z<y&amp;&#97;😎-&#128547;&#x1F60F;', 'aሴ😏bẘ>😆z<y&a😎-😣😏'],
+
+      ['&#1234;56', 'Ӓ56'],
+      ['&#&#1234;56', '&#Ӓ56'],
+      ['a&#&#1234;56', 'a&#Ӓ56'],
+      ['&#x0026;gt', '&gt'],
+
+      ['&#x1F60F;', '😏'],
+      ['&#x1234;', 'ሴ'],
+      ['&#97;', 'a'],
+      ['&#7835;', 'ẛ'],
+      ['&#x1F606;', '😆'],
+      ['&#1000000;', '󴉀'],
+      ['&gt', '&gt'],
+
+      ['&amp;#x1234;', 'ሴ'],
+      ['&#x0026;amp;#x1234;', 'ሴ'],
+      ['&commat;', '&commat;'],
+      ['&amp;lt;', '<'],
+      ['x&amp;lt;', 'x<'],
+      [' &amp;lt;', ' <'],
+
+      ['typing a &gt;', 'typing a >'],
+      ['typing a &amp;gt;', 'typing a >'],
+      ['typing a amp;gt;', 'typing a amp;gt;'],
+      ['typing a "&gt;"', 'typing a ">"'],
+      ['typing a &amp;gt', 'typing a &gt'],
+
+    ].forEach(function (values) {
+      it(('readXmlOutput should convert "' + values[0] + '"').padEnd(30, " ") + 'to "' + values[1] + '"', async function () {
+        const out: ReplacedOutputString = {
+          input: values[0] as string,
+          replaced_character: '',
+          replaced_string: '',
+          rest_string: values[0] as string,
+          carryOver: '',
+        };
+        const result = UnicodeCharacterConversion.processXmlValue(out);
+        assert.equal(result.replaced_string, values[1]);
+      });
+    });
+  });
+
+  describe('unescape_string', function () {
+    [
+      ["", ''],
+      [undefined, undefined],
+      [null, undefined],
+      ["&amp;", '&'],
+      ["&amp;amp;", '&'],
+      ["&amp;amp;amp;", '&'],
+      ["&amp;gt;", '>'],
+      ["&apos;", "'"],
+      ["&gt;", '>'],
+      ["&lt;", '<'],
+      ["&amp;#x1234;", '&#x1234;'],
+      ["&amp;#x1234;&amp;", '&#x1234;&'],
+      ['aሴ&#x1F60F;bẘ&gt;😆z<y&amp;&#97;😎-&#128547;&#x1F60F;', 'aሴ&#x1F60F;bẘ>😆z<y&&#97;😎-&#128547;&#x1F60F;'],
+      ["a&gt;", 'a>'],
+      ["a&gt;b", 'a>b'],
+      ["a &gt; b", 'a > b'],
+      ["typing a '&gt;'", "typing a \'>\'"],
+      ["typing a &gt;", 'typing a >'],
+      ["typing a &amp;gt", 'typing a &gt'],
+      ["a&bcd", "a&bcd"],
+      ['&', '&'],
+      ["&#;", "&#;"],
+      ["&#x;", "&#x;"],
+      ['&##;', "&##;"],
+      ["&#x110000;", '&#x110000;'],
+      ["&#x2000000;", '&#x2000000;'],
+      ['&#1234;56', '&#1234;56'],
+      ['&#&#1234;56', '&#&#1234;56'],
+      ['a&#&#1234;56', 'a&#&#1234;56'],
+      ["&#x0026;gt;", '&#x0026;gt;'],
+      ["&#x0026;gt", "&#x0026;gt"],
+    ].forEach(function (values) {
+      it(('unescape_string should unescape "' + values[0] + '"').padEnd(30, " ") + 'to "' + values[1] + '"', async function () {
+        const result = UnicodeCharacterConversion.unescape_string(values[0] as string);
+        assert.equal(result, values[1]);
       });
     });
   });
