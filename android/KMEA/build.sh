@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
+#
 # Build Keyman Engine for Android using Keyman Web artifacts
 #
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -7,19 +9,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 # ################################ Main script ################################
-
-# Definition of global compile constants
-
-KEYMAN_ANDROID_ROOT="$KEYMAN_ROOT/android"
-KEYMAN_WEB_ROOT="$KEYMAN_ROOT/web"
-ENGINE_ASSETS="$KEYMAN_ANDROID_ROOT/KMEA/app/src/main/assets"
-CONFIG="release"
-BUILD_FLAGS="aR -x lint -x test"           # Gradle build w/o test
-TEST_FLAGS="-x aR lintRelease testRelease" # Gradle test w/o build
-JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
 
 builder_describe "Builds Keyman Engine for Android." \
   "@/web/src/app/webview" \
@@ -30,78 +21,64 @@ builder_describe "Builds Keyman Engine for Android." \
   "test             Runs lint and unit tests." \
   ":engine          Builds Engine"
 
-# parse before describe_outputs to check debug flags
 builder_parse "$@"
 
+# Definition of global compile constants
+
 if builder_is_debug_build; then
-  builder_heading "### Debug config ####"
-  CONFIG="debug"
   BUILD_FLAGS="assembleDebug -x lintDebug -x testDebug"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
   JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
+else
+  BUILD_FLAGS="assembleRelease -x lint -x test"           # Gradle build w/o test
+  TEST_FLAGS="-x assembleRelease lintRelease testRelease" # Gradle test w/o build
+  JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
+fi
+
+if builder_is_ci_build; then
+  GRADLE_DAEMON=--no-daemon
+else
+  GRADLE_DAEMON=
 fi
 
 builder_describe_outputs \
-  build:engine     /android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar
-
-#### Build
-
-
-# Parse args
-
-DAEMON_FLAG=
-if builder_is_ci_build; then
-  DAEMON_FLAG=--no-daemon
-fi
+  build:engine     /android/KMEA/app/build/outputs/aar/keyman-engine-${BUILDER_CONFIGURATION}.aar
 
 #### Build action definitions ####
 
-# Check about cleaning artifact paths
-if builder_start_action clean:engine; then
-  rm -rf "$KEYMAN_ROOT/android/KMEA/app/build/outputs"
-  builder_finish_action success clean:engine
-fi
-
-if builder_start_action configure:engine; then
-
-  builder_finish_action success configure:engine
-fi
-
-# Destinations that will need the keymanweb artifacts
-
-
-if builder_start_action build:engine; then
+do_build() {
+  local ENGINE_ASSETS="$KEYMAN_ROOT/android/KMEA/app/src/main/assets"
 
   # Copy KeymanWeb artifacts
-  echo "Copying Keyman Web artifacts"
-  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.js" "$ENGINE_ASSETS/keymanweb-webview.js"
-  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.js.map" "$ENGINE_ASSETS/keymanweb-webview.js.map"
-  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/map-polyfill.js" "$ENGINE_ASSETS/map-polyfill.js"
-  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
-  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
-  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
-  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
+  builder_echo "Copying Keyman Web artifacts"
+  cp "$KEYMAN_ROOT/web/build/app/webview/$BUILDER_CONFIGURATION/keymanweb-webview.js" "$ENGINE_ASSETS/"
+  cp "$KEYMAN_ROOT/web/build/app/webview/$BUILDER_CONFIGURATION/keymanweb-webview.js.map" "$ENGINE_ASSETS/"
+  cp "$KEYMAN_ROOT/web/build/app/webview/$BUILDER_CONFIGURATION/map-polyfill.js" "$ENGINE_ASSETS/"
+  cp "$KEYMAN_ROOT/web/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/"
+  cp "$KEYMAN_ROOT/web/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/"
+  cp "$KEYMAN_ROOT/web/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/"
+  cp "$KEYMAN_ROOT/web/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/"
   cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
 
-  echo "Copying es6-shim polyfill"
-  cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$ENGINE_ASSETS/es6-shim.min.js"
+  builder_echo "Copying es6-shim polyfill"
+  cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$ENGINE_ASSETS/"
 
-  echo "BUILD_FLAGS $BUILD_FLAGS"
+  builder_echo "BUILD_FLAGS $BUILD_FLAGS"
+
   # Build without test
-  ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
+  ./gradlew $GRADLE_DAEMON $BUILD_FLAGS
+}
 
-  builder_finish_action success build:engine
-fi
-
-if builder_start_action test:engine; then
-
+do_test() {
   if builder_is_ci_build; then
     # Report JUnit test results to CI
     echo "$JUNIT_RESULTS"
   fi
 
-  echo "TEST_FLAGS: $TEST_FLAGS"
-  ./gradlew $DAEMON_FLAG $TEST_FLAGS
+  builder_echo "TEST_FLAGS: $TEST_FLAGS"
+  ./gradlew $GRADLE_DAEMON $TEST_FLAGS
+}
 
-  builder_finish_action success test:engine
-fi
+builder_run_action clean:engine    rm -rf build app/build
+builder_run_action build:engine    do_build
+builder_run_action test:engine     do_test
