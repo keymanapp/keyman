@@ -43,7 +43,11 @@
     <keyMapSet id="ANSI">
         <keyMap index="0">
             <key code="5" output="G"/>
-            <key code="5" output="G"/>
+            <key code="9" output="U+0047"/>
+            <key code="11" output="&#x0026;gt"/>
+            <key code="12" output="&#0001;"/>
+            <key code="13" output=""/>
+            <key code="14" output="&#x0009;"/>
         </keyMap>
         <keyMap index="1">
             <key code="5" output="&#x0007;"/>
@@ -52,7 +56,7 @@
             <key code="25" action="a0"/>
             <key code="6" output="Z"/>
             <key code="7" output="X"/>
-            <key code="7" output="ẍ"/>
+            <key code="8" output="ẍ"/>
         </keyMap>
         <keyMap index="3">
             <key code="5" output="∞"/>
