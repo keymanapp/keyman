@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Start Using Banne</title>
+  <style type="text/css">
+    body { margin-left: 2.5%;}
+    p { font: 10pt Tahoma; }
+    h1 { font: bold 16pt Tahoma; color: #4444cc; margin-bottom: 2px }
+    h2 { font: bold 12pt Tahoma; color: #4444cc; }
+    h3 { font: bold 11pt Tahoma; color: #4444cc; }
+
+    .coldiv { display: flex; flex-direction: row; gap: 5%;}
+    table, tr, th, td { font: 10pt Arial; border-collapse: collapse; border: solid 1px; padding: 5px 5px; text-align: center;}
+    th { font-weight: bold;}
+    .combo { font-family: Courier, monospace; padding: 0px 10px;}
+    .empty { background-color: lightgray;}
+  </style>
+</head>
+<body>
+
+<h1>Start Using Banne</h1>
+
+<p>
+Keyboard with a script error in `gs()`, taken originally from release/b/banne. The .js and .kmp files in modified_build/ have been manually tweaked to throw an error.
+</p>
+
+<h1>Keyboard Layout</h1>
+<h2>Keystrokes</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Base</th>
+        <th class="combo">+</th>
+        <th>Modifier</th>
+        <th class="combo">=</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><kbd>s</kbd></td>
+        <td class="combo"><kbd>+</kbd></td>
+        <td><kbd>'</kbd></td>
+        <td class="combo">=</td>
+        <td>š</td>
+      </tr>
+      <tr>
+        <td><kbd>S</kbd></td>
+        <td class="combo">+</td>
+        <td><kbd>'</kbd></td>
+        <td class="combo">=</td>
+        <td>Š</td>
+      </tr>
+    </tbody>
+  </table>
+<h3>Punctuation</h3>
+<p>
+  The <kbd>'</kbd> key has been modified to cycle between <kbd>‹</kbd> (U+2039) and <kbd>›</kbd> (U+203A) from the second keypress onwards.
+  <br>
+  The first keypress will produce the <kbd>'</kbd> (U+0027) character as expected, and pressing it again will turn the <kbd>'</kbd> into a <kbd>‹</kbd>. Pressing the <kbd>'</kbd> key one more time will produce a <kbd>›</kbd>.
+</p>
+<p>
+  The <kbd>"</kbd> key has been modified to automatically type the character <kbd>«</kbd> (U+00AB). To cancel this, pressing the <kbd>;</kbd> key before typing a <kbd>"</kbd> will produce a normal <kbd>"</kbd>.
+  <br>
+  Pressing the <kbd>"</kbd> key repeatedly will cycle between the <kbd>»</kbd> (U+00BB) and <kbd>«</kbd> characters.
+</p>
+
+<div class="coldiv">
+  <table>
+    <thead>
+      <tr>
+        <th>Base</th>
+        <th class="combo">+</th>
+        <th>Modifier</th>
+        <th class="combo">=</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><kbd>'</kbd></td>
+        <td class="combo"><kbd>+</kbd></td>
+        <td><kbd>'</kbd></td>
+        <td class="combo">=</td>
+        <td>‹</td>
+      </tr>
+      <tr>
+        <td><kbd><</kbd></td>
+        <td class="combo">+</td>
+        <td><kbd>'</kbd></td>
+        <td class="combo">=</td>
+        <td>‹</td>
+      </tr>
+      <tr>
+        <td><kbd>></kbd></td>
+        <td class="combo">+</td>
+        <td><kbd>'</kbd></td>
+        <td class="combo">=</td>
+        <td>›</td>
+      </tr>
+      <tr>
+        <td><kbd>"</kbd></td>
+        <td class="empty"> </td>
+        <td class="empty"> </td>
+        <td class="combo">=</td>
+        <td>«</td>
+      </tr>
+      <tr>
+        <td><kbd><</kbd></td>
+        <td class="combo">+</td>
+        <td><kbd><</kbd></kbd></td>
+        <td class="combo">=</td>
+        <td>«</td>
+      </tr>
+      <tr>
+        <td><kbd>></kbd></td>
+        <td class="combo">+</td>
+        <td><kbd>></kbd></td>
+        <td class="combo">=</td>
+        <td>»</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Base</th>
+        <th class="combo">+</th>
+        <th>Modifier</th>
+        <th class="combo">=</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>‹</td>
+        <td class="combo">+</td>
+        <td><kbd>'</kbd></td>
+        <td class="combo">=</td>
+        <td>›</td>
+      </tr>
+      <tr>
+        <td>›</td>
+        <td class="combo">+</td>
+        <td><kbd>'</kbd></td>
+        <td class="combo">=</td>
+        <td>‹</td>
+      </tr>
+      <tr>
+        <td>«</td>
+        <td class="combo">+</td>
+        <td><kbd>"</kbd></td>
+        <td class="combo">=</td>
+        <td>»</td>
+      </tr>
+      <tr>
+        <td>»</td>
+        <td class="combo">+</td>
+        <td><kbd>"</kbd></td>
+        <td class="combo">=</td>
+        <td>«</td>
+      </tr>
+      <tr>
+        <td>;</td>
+        <td class="combo">+</td>
+        <td><kbd>"</kbd></td>
+        <td class="combo">=</td>
+        <td>"</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

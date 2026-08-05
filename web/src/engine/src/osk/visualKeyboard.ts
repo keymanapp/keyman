@@ -40,7 +40,7 @@ import { KeyTip } from './keytip.interface.js';
 import { OSKKey } from './keyboard-layout/oskKey.js';
 import { OSKLayer, LayerLayoutParams } from './keyboard-layout/oskLayer.js';
 import { OSKLayerGroup } from './keyboard-layout/oskLayerGroup.js';
-import { OSKView } from './views/oskView.js';
+import { getResourcePath, OSKView } from './views/oskView.js';
 import { ParsedLengthStyle } from './lengthStyle.js';
 import { defaultFontSize } from './fontSizeUtils.js';
 import { PhoneKeyTip } from './input/gestures/browser/phoneKeytip.js';
@@ -1372,7 +1372,8 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
       device: {
         formFactor?: DeviceSpec.FormFactor,
         OS?: DeviceSpec.OperatingSystem,
-        touchable?: boolean
+        touchable?: boolean,
+        browser?: DeviceSpec.Browser
       } = {};
 
     // Device emulation for target documentation.
@@ -1380,9 +1381,11 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
     if (formFactor != 'desktop') {
       device.OS = DeviceSpec.OperatingSystem.iOS;
       device.touchable = true;
+      device.browser = DeviceSpec.Browser.Safari;
     } else {
       device.OS = DeviceSpec.OperatingSystem.Windows;
       device.touchable = false;
+      device.browser = DeviceSpec.Browser.Chrome;
     }
 
     const layout = PKbd.layout(formFactor);
@@ -1398,7 +1401,11 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
       styleSheetManager: null,
       specialFont: {
         family: 'SpecialOSK',
-        files: [`${pathConfig.resources}/osk/keymanweb-osk.ttf`],
+        files: [`${getResourcePath({
+          // Not actually leveraged.
+          hostDevice: device as DeviceSpec,
+          pathConfig
+        })}keymanweb-osk.ttf`],
         path: '' // Not actually used.
       }
     });

@@ -46,20 +46,22 @@ class ProjectBuilder {
 
     // Give a hint if the project is v1.0
     if(this.project.options.version != '2.0') {
-      if(getOption("prompt to upgrade projects", true)) {
+      if(getOption("prompt to upgrade projects")) {
         this.callbacks.reportMessage(InfrastructureMessages.Hint_ProjectIsVersion10());
       }
     }
 
-    // Go through the various file types and build them
-    for(const builder of buildActivities) {
-      if(builder.sourceExtension == KeymanFileTypes.Source.Project) {
-        // We don't support nested projects
-        continue;
-      }
+    if(!this.options.publishOnly) {
+      // Go through the various file types and build them
+      for(const builder of buildActivities) {
+        if(builder.sourceExtension == KeymanFileTypes.Source.Project) {
+          // We don't support nested projects
+          continue;
+        }
 
-      if(!await this.buildProjectTargets(builder)) {
-        return false;
+        if(!await this.buildProjectTargets(builder)) {
+          return false;
+        }
       }
     }
 
@@ -113,7 +115,11 @@ class ProjectBuilder {
 
     const buildFilename = path.relative(process.cwd(), infile).replace(/\\/g, '/');
     const callbacks = new CompilerFileCallbacks(buildFilename, options, this.callbacks);
-    callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile, relativeFilename:buildFilename}));
+    if(activity.sourceExtension == KeymanFileTypes.Source.Project) {
+      callbacks.reportMessage(InfrastructureMessages.Info_ValidatingProject({filename: infile, relativeFilename:buildFilename}));
+    } else {
+      callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename: infile, relativeFilename:buildFilename}));
+    }
 
     fs.mkdirSync(path.dirname(outfile), {recursive:true});
 
@@ -123,12 +129,19 @@ class ProjectBuilder {
     // note: command line option here, if set, overrides project setting
     result = result && !callbacks.hasFailureMessage(this.options.compilerWarningsAsErrors ?? this.project.options.compilerWarningsAsErrors);
 
-    if(result) {
-      callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: infile, relativeFilename:buildFilename}));
+    if(activity.sourceExtension == KeymanFileTypes.Source.Project) {
+      if(result) {
+        callbacks.reportMessage(InfrastructureMessages.Info_ProjectValidatedSuccessfully({filename: infile, relativeFilename:buildFilename}));
+      } else {
+        callbacks.reportMessage(InfrastructureMessages.Info_ProjectNotValidatedSuccessfully({filename: infile, relativeFilename:buildFilename}));
+      }
     } else {
-      callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename: infile, relativeFilename: buildFilename}));
+      if(result) {
+        callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: infile, relativeFilename:buildFilename}));
+      } else {
+        callbacks.reportMessage(InfrastructureMessages.Info_FileNotBuiltSuccessfully({filename: infile, relativeFilename: buildFilename}));
+      }
     }
-
     return result;
   }
 
