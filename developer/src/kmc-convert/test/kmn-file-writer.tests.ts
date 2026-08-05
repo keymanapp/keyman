@@ -505,7 +505,7 @@ describe('KmnFileWriter', function () {
       ['typing a &amp;gt', 'typing a &gt'],
 
     ].forEach(function (values) {
-      it(('readXmlOutput should convert "' + values[0] + '"').padEnd(30, " ") + 'to "' + values[1] + '"', async function () {
+      it(('readXmlOutput should convert ' + values[0] + "'").padEnd(30, " ") + " to '" + values[1] + "'", async function () {
         const out: ReplacedOutputString = {
           input: values[0] as string,
           replaced_character: '',
@@ -521,39 +521,42 @@ describe('KmnFileWriter', function () {
 
   describe('unescape_string', function () {
     [
-      ["", ''],
+      ['', ''],
       [undefined, undefined],
       [null, undefined],
-      ["&amp;", '&'],
-      ["&amp;amp;", '&'],
-      ["&amp;amp;amp;", '&'],
-      ["&amp;gt;", '>'],
-      ["&apos;", "'"],
-      ["&gt;", '>'],
-      ["&lt;", '<'],
-      ["&amp;#x1234;", '&#x1234;'],
-      ["&amp;#x1234;&amp;", '&#x1234;&'],
+      ['&amp;', '&'],
+      ['&amp;amp;', '&'],
+      ['&amp;amp;amp;', '&'],
+      ['&amp;gt;', '>'],
+      ['&apos;', "'"],
+      ['&gt;', '>'],
+      ['&GT;', '&GT;'],
+      ['&Gt;', '&Gt;'],
+      ['&gT;', '&gT;'],
+      ['&lt;', '<'],
+      ['&amp;#x1234;', '&#x1234;'],
+      ['&amp;#x1234;&amp;', '&#x1234;&'],
       ['aሴ&#x1F60F;bẘ&gt;😆z<y&amp;&#97;😎-&#128547;&#x1F60F;', 'aሴ&#x1F60F;bẘ>😆z<y&&#97;😎-&#128547;&#x1F60F;'],
-      ["a&gt;", 'a>'],
-      ["a&gt;b", 'a>b'],
-      ["a &gt; b", 'a > b'],
-      ["typing a '&gt;'", "typing a \'>\'"],
-      ["typing a &gt;", 'typing a >'],
-      ["typing a &amp;gt", 'typing a &gt'],
-      ["a&bcd", "a&bcd"],
+      ['a&gt;', 'a>'],
+      ['a&gt;b', 'a>b'],
+      ['a &gt; b', 'a > b'],
+      ["typing a '&gt;'", "typing a '>'"],
+      ['typing a &gt;', 'typing a >'],
+      ['typing a &amp;gt', 'typing a &gt'],
+      ['a&bcd', 'a&bcd'],
       ['&', '&'],
-      ["&#;", "&#;"],
-      ["&#x;", "&#x;"],
-      ['&##;', "&##;"],
-      ["&#x110000;", '&#x110000;'],
-      ["&#x2000000;", '&#x2000000;'],
+      ['&#;', '&#;'],
+      ['&#x;', '&#x;'],
+      ['&##;', '&##;'],
+      ['&#x110000;', '&#x110000;'],
+      ['&#x2000000;', '&#x2000000;'],
       ['&#1234;56', '&#1234;56'],
       ['&#&#1234;56', '&#&#1234;56'],
       ['a&#&#1234;56', 'a&#&#1234;56'],
-      ["&#x0026;gt;", '&#x0026;gt;'],
-      ["&#x0026;gt", "&#x0026;gt"],
+      ['&#x0026;gt;', '&#x0026;gt;'],
+      ['&#x0026;gt', '&#x0026;gt'],
     ].forEach(function (values) {
-      it(('unescape_string should unescape "' + values[0] + '"').padEnd(30, " ") + 'to "' + values[1] + '"', async function () {
+      it(('unescape_string should unescape ' + values[0] + "'").padEnd(30, ' ') + " to '" + values[1] + "'", async function () {
         const result = UnicodeCharacterConversion.unescape_string(values[0] as string);
         assert.equal(result, values[1]);
       });
