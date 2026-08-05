@@ -730,7 +730,7 @@ export class ContextTokenization {
     return new ContextTokenization(
       tokenSequence,
       null,
-      determineTaillessTrueKeystroke(transitionEdge)
+      determineTaillessTrueKeystroke(transitionEdge.inputs[0].sample)
     );
   }
 }
@@ -1244,20 +1244,19 @@ export function assembleTransforms(stackedInserts: string[], stackedDeletes: num
  * Used to construct and represent the part of the incoming transform that does
  * not land as part of the final token in the resulting context.  This component
  * should be preserved by any suggestions that get applied.
- * @param tokenizationAnalysis Precomputed metadata about a potential transition
- * from a pre-transition context tokenization to a post-transition context
- * tokenization
+ * @param tokenizedInputs The precomputed tokenization for incoming inputs
+ * involved in a pre-transition context tokenization to a post-transition
+ * context tokenization.
  * @returns
  */
-export function determineTaillessTrueKeystroke(tokenizationAnalysis: TransitionEdge) {
+export function determineTaillessTrueKeystroke(tokenizedInput: Map<number, Transform>) {
   // undefined by default; we haven't yet determined if we're still affecting
   // the same token that was the tail in the previous tokenization state.
   let taillessTrueKeystroke: Transform;
 
   // If tokens were inserted, emit an empty transform; this prevents
   // suggestions from replacing the "current" token.
-  const bestTokenizedInput = tokenizationAnalysis.inputs[0].sample;
-  if(bestTokenizedInput.has(1)) {
+  if(tokenizedInput.has(1)) {
     // Sets a default transform that will be returned even if the main
     // transform body lies entirely within a new token.
     taillessTrueKeystroke = { insert: '', deleteLeft: 0 };
@@ -1266,26 +1265,43 @@ export function determineTaillessTrueKeystroke(tokenizationAnalysis: TransitionE
     // by the loop that follows, without fail.
   }
 
-  const transformKeys = [...tokenizationAnalysis.inputs[0].sample.keys()];
+  const transformKeys = [...tokenizedInput.keys()];
+  do {
+    const penultimateKey = transformKeys[transformKeys.length - 2];
+    const tailKey = transformKeys[transformKeys.length - 1];
+
+    const penultimateTransform = tokenizedInput.get(penultimateKey);
+    const tailTransform = tokenizedInput.get(tailKey);
+
+    // Do not treat pure-backspace transforms at the tail end of context as the
+    // transform applied to the suggestion if the input was tokenized; this
+    // scenario implies that a prior token is being edited instead.
+    if(TransformUtils.isBackspace(tailTransform) && transformKeys.length > 1) {
+      transformKeys.pop();
+      continue;
+    } else if(!penultimateTransform) {
+      break;
+      // Erasing a single-char whitespace requires deletion of two tokens, the
+      // last of which is empty.  Check for this case and handle it accordingly
+      // as well.
+    } else if(TransformUtils.isEmpty(tailTransform) && TransformUtils.isBackspace(penultimateTransform)) {
+      transformKeys.pop();
+      continue;
+    } else {
+      break;
+    }
+  } while(true);
+
+  // Ignore the transform that applies to the suggestion-root token - it should
+  // contribute to the suggestion, rather than be a fixed, universally-applied
+  // constant.
   transformKeys.pop();
 
+  // If no inputs remain, that's fine - that means an empty transform applies to
+  // whatever token exists to the token indexed before the first input-key
+  // entry.
   for(let i of transformKeys) {
-    /*
-      * Thinking ahead to multitokenization:
-      *
-      * If what we have is not on the "true" tokenization, then... we need to
-      * do multitoken effects, right?  We're basing new suggestions based on a
-      * state that does not currently exist!  We'd need to enforce THAT state,
-      * *then* do the suggestion!
-      * - Which gets fun if we auto-apply such a case, as the new "true" tokenization
-      *   no longer results directly from the true input.
-      *
-      * If we give tokens unique IDs on first creation, we could backtrace to
-      * find the most recent common ancestor.
-      * - simple cases (same 'token', but different input transform lengths/effects)
-      *   will have the same prior token ID
-      */
-    const primaryInput = tokenizationAnalysis.inputs[0].sample.get(i);
+    const primaryInput = tokenizedInput.get(i);
     if(!taillessTrueKeystroke) {
       taillessTrueKeystroke = {...primaryInput};
     } else {
