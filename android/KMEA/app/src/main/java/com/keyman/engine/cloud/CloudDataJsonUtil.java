@@ -225,10 +225,6 @@ public class CloudDataJsonUtil {
                   KeyboardPickerActivity.addLexicalModel(aContext, lmInfo);
                   lm.setUpdateKMP(link);
                   updateKMP = link;
-                  LexicalModel cached = CloudRepository.shared.getLexicalModel(aContext, languageID, lexicalModelID);
-                  if (cached != null) {
-                    cached.setUpdateKMP(link);
-                  }
                 }
 
                 if (updateKMP != null && !updateKMP.isEmpty()) {

@@ -159,23 +159,10 @@ public class CloudRepository {
    * @return LexicalModel of an associated lexical model. Null if no match found
    */
   public LexicalModel getAssociatedLexicalModel(@NonNull Context context, String languageID) {
-    return getLexicalModel(context, languageID, null);
-  }
-
-  /**
-   * Get the lexical model with modelID associated with the given language ID. If
-   * modelID is null, return the first model associated with languageID. Available
-   * models are from the cloud catalog and locally installed models.
-   * @param context Context
-   * @param languageID String of the language ID to search
-   * @param modelID    String of the lexical model ID.
-   * @return LexicalModel of an associated lexical model. Null if no match found.
-   */
-  public LexicalModel getLexicalModel(@NonNull Context context, String languageID, String modelID) {
     if (memCachedDataset != null) {
       for (int i=0; i < memCachedDataset.lexicalModels.getCount(); i++) {
         LexicalModel lm = memCachedDataset.lexicalModels.getItem(i);
-        if (BCP47.languageEquals(lm.getLanguageID(), languageID) && (modelID == null || modelID.equals(lm.getLexicalModelID()))) {
+        if (BCP47.languageEquals(lm.getLanguageID(), languageID)) {
           return lm;
         }
       }
