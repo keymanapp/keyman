@@ -23,7 +23,7 @@ import TrieModel = models.TrieModel;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
 
-describe.only('prepareTokenizationSearch', () => {
+describe('prepareTokenizationSearch', () => {
   it('handles simple-case, single tokenization transitions well', () => {
     const baseContext: Context = {
       left: '',
@@ -312,18 +312,18 @@ describe.only('prepareTokenizationSearch', () => {
       const tokenization = nextState.tokenizations.find((t) => corrector.tokenization == t);
       assert.isOk(tokenization);
 
-      assert.deepEqual(corrector.orderedTokens, tokenization.tokens.slice(1), `Error for variant at index ${index}`);
+      assert.deepEqual(corrector.orderedTokens, tokenization.tokens.slice(1), `Error for variant's ordered tokens at index ${index}`);
       const correctables = tokenization.tokens.slice(variationStartIndex.get(tokenization), -1)
-      assert.deepEqual(corrector.correctableTokens, correctables, `Error for variant at index ${index}`);
-      assert.deepEqual(corrector.uncorrectableTokens, tokenization.tokens.slice(1, variationStartIndex.get(tokenization)), `Error for variant at index ${index}`);
-      assert.deepEqual(corrector.predictableToken, tokenization.tail, `Error for variant at index ${index}`);
+      assert.deepEqual(corrector.correctableTokens, correctables, `Error for variant's correctable tokens at index ${index}`);
+      assert.deepEqual(corrector.uncorrectableTokens, tokenization.tokens.slice(1, variationStartIndex.get(tokenization)), `Error for variant's uncorrectable tokens at index ${index}`);
+      assert.deepEqual(corrector.predictableToken, tokenization.tail, `Error for variant's predictable token at index ${index}`);
 
       assert.equal(
         corrector.correctableCodepoints,
         correctables.reduce((accum, curr) => accum + curr.codepointLength, 0) + tokenization.tail.codepointLength,
-        `Error for variant at index ${index}`
+        `Error for variant's correctable-codepoint count at index ${index}`
       );
-      assert.isTrue(corrector.modelsCorrectables, `Error for variant at index ${index}`);
+      assert.isTrue(corrector.modelsCorrectables, `Error for variant's 'models correctables' flag at index ${index}`);
     });
   });
 });
