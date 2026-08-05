@@ -686,7 +686,7 @@ export class KmnFileWriter {
           + "]  >  dk(A"
           + rule[index].idPrevDeadkey
           + ") ) ";
-        warningText[2] = "unavailable superior rules ( ["
+        warningText[2] = "unavailable superior rule ( ["
           + rule[index].modifierPrevDeadkey + " "
           + rule[index].prevDeadkey
           + "]  >  dk(A"
