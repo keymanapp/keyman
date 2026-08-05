@@ -636,6 +636,10 @@ export function prepareTokenizationSearch(
     correctableValidator?: (token: ContextToken) => boolean
   }
 ) {
+  // Create duplicate of config parameter in order to prevent unwanted
+  // side-effects across multiple calls.
+  configuration = {...configuration};
+
   // Goal - determine what parts of each tokenization are searchable & prep them for correcion-search.
   const tokenizationAnalyses = tokenizations.map((tokenization) => {
     return {
@@ -644,6 +648,15 @@ export function prepareTokenizationSearch(
     };
   });
 
+  // The token "removal" from each analysis is always based upon the
+  // base-state's tokenization - the same set of tokens.
+  //
+  // It is a consistent base from which all target tokenization variants are
+  // derived, first by removing the specified token count, then by adding on the
+  // edits + new additions.
+
+  // Thus, the first step:  what's the largest count removed by ANY transition
+  // variant?
   const biggestCommonRemoval = tokenizationAnalyses.reduce(
     (biggest, current) => biggest.length > current.analysis.tokensToRemove.length ? biggest : current.analysis.tokensToRemove,
     [] as ContextTokenLike[]
@@ -655,13 +668,21 @@ export function prepareTokenizationSearch(
 
   configuration.correctableValidator ??= (token) => (token.codepointLength == 0 || correctionValidForAutoSelect(token.exampleInput));
   const tokenizationSetup = tokenizationAnalyses.map((tuple) => {
-    // These tokens are unaffected by the input whatsoever, though their
-    // probability may affect thresholding for the non-locked tokens.
+    // While removed by at least one variant, this number of tokens was left in
+    // place, untouched, during the transition to the variant under
+    // consideration. These tokens are thus unaffected by the input whatsoever,
+    // though their probability may affect thresholding for the non-locked
+    // tokens.
     const unaffectedTokenCount = biggestCommonRemoval.length - tuple.analysis.tokensToRemove.length;
-    // Unaffected tokens should still be part of the correction range; they'll just
-    // be marked noncorrectable.
+    // Unaffected tokens should still be part of the correction range; they'll
+    // just be marked noncorrectable.  The edited + appended tokens (for actual
+    // correction and prediction), of course, are also part of that range.
     const mutatedLength = tuple.analysis.tokensToPredict.length + unaffectedTokenCount;
 
+    // Redefined here to capture this loop's value for `mutatedLength`.
+
+    // If the token falls past the unaffected range...
+    // and, *for now*, is actually the tail token, then it may be corrected.
     configuration.rangeValidator = rangeValidator ?? ((index, rangeStart) => {
       return index >= rangeStart        // is a modified token
         && index == mutatedLength - 1   // TEMP: adjacent to the caret (TO BE REMOVED)
