@@ -21,24 +21,12 @@ export class PathConfiguration implements OSKResourcePathConfiguration {
   private _fonts: string;
   readonly protocol: string;
 
-  /*
-   * Pre-modularization code corresponding to `sourcePath`:
-  ```
-   // Determine path and protocol of executing script, setting them as
-   // construction defaults.
-   //
-   // This can only be done during load when the active script will be the
-   // last script loaded.  Otherwise the script must be identified by name.
-
-   var scripts = document.getElementsByTagName('script');
-   var ss = scripts[scripts.length-1].src;
-   var sPath = ss.substr(0,ss.lastIndexOf('/')+1);
-   ```
-   */
   constructor(pathSpec: Required<PathOptionSpec>, sourcePath: string) {
+    const sourceURL = new URL(sourcePath);
+
     sourcePath = addDelimiter(sourcePath);
     this.sourcePath = sourcePath;
-    this.protocol = sourcePath.replace(/(.{3,5}:)(.*)/,'$1');
+    this.protocol = sourceURL.protocol;
 
     this.updateFromOptions(pathSpec);
   }
@@ -75,8 +63,16 @@ export class PathConfiguration implements OSKResourcePathConfiguration {
 
     p = addDelimiter(p);
 
-    // Absolute
-    if((p.replace(/^(http)s?:.*/,'$1') == 'http') || (p.replace(/^(file):.*/,'$1') == 'file')) {
+    // Absolute - with protocol specified
+    const protocolList = [
+      'http:',
+      'https:',
+      'file:',
+      // If using a custom origin (say, hosted in an iOS WebView via WKURLSchemeHandler)
+      this.protocol
+    ];
+
+    if(protocolList.find((protocol) => p.startsWith(protocol))) {
       return p;
     }
 

@@ -105,7 +105,7 @@ if (env_keys_json_file != null && file(env_keys_json_file).exists()) {
 
         // Deactivate lower conflicting version APKs
         resolutionStrategy.set(com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE)
-        String tier = new File('../../../TIER.md').getText('UTF-8').trim();
+        String tier = System.getenv("KEYMAN_TIER");
         switch (tier) {
             case 'beta':
                 track.set("beta")
@@ -137,6 +137,7 @@ dependencies {
     implementation files('libs/keyman-engine.aar')
     implementation 'io.sentry:sentry-android:8.19.1'
     implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.webkit:webkit:1.14.0'
 }
 
 apply plugin: 'com.android.application'

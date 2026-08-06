@@ -177,19 +177,34 @@ function _builder_basic_print_build_number_for_teamcity() {
 }
 
 function _builder_basic_print_version_utils_debug() {
-    echo "KEYMAN_ROOT:                    $KEYMAN_ROOT"
-    echo "KEYMAN_VERSION:                 $KEYMAN_VERSION"
-    echo "KEYMAN_VERSION_WIN:             $KEYMAN_VERSION_WIN"
-    echo "KEYMAN_VERSION_RELEASE:         $KEYMAN_VERSION_RELEASE"
-    echo "KEYMAN_VERSION_MAJOR:           $KEYMAN_VERSION_MAJOR"
-    echo "KEYMAN_VERSION_MINOR:           $KEYMAN_VERSION_MINOR"
-    echo "KEYMAN_VERSION_PATCH:           $KEYMAN_VERSION_PATCH"
-    echo "KEYMAN_TIER:                    $KEYMAN_TIER"
-    echo "KEYMAN_VERSION_TAG:             $KEYMAN_VERSION_TAG"
-    echo "KEYMAN_VERSION_WITH_TAG:        $KEYMAN_VERSION_WITH_TAG"
-    echo "KEYMAN_VERSION_GIT_TAG:         $KEYMAN_VERSION_GIT_TAG"
-    echo "KEYMAN_VERSION_ENVIRONMENT:     $KEYMAN_VERSION_ENVIRONMENT"
-    echo "KEYMAN_VERSION_FOR_FILENAME:    $KEYMAN_VERSION_FOR_FILENAME"
+    if ! builder_is_debug_internal && ! builder_is_ci_build; then
+        return
+    fi
+
+    if [[ ${_builder_basic_environment_printed:-false} == true ]]; then
+        # report this only once per build
+        return
+    fi
+
+    builder_echo start builder_basic_debug "Builder internal environment variables"
+
+    echo "  KEYMAN_ROOT:                    $KEYMAN_ROOT"
+    echo "  KEYMAN_VERSION:                 $KEYMAN_VERSION"
+    echo "  KEYMAN_VERSION_WIN:             $KEYMAN_VERSION_WIN"
+    echo "  KEYMAN_VERSION_RELEASE:         $KEYMAN_VERSION_RELEASE"
+    echo "  KEYMAN_VERSION_MAJOR:           $KEYMAN_VERSION_MAJOR"
+    echo "  KEYMAN_VERSION_MINOR:           $KEYMAN_VERSION_MINOR"
+    echo "  KEYMAN_VERSION_PATCH:           $KEYMAN_VERSION_PATCH"
+    echo "  KEYMAN_TIER:                    $KEYMAN_TIER"
+    echo "  KEYMAN_VERSION_TAG:             $KEYMAN_VERSION_TAG"
+    echo "  KEYMAN_VERSION_WITH_TAG:        $KEYMAN_VERSION_WITH_TAG"
+    echo "  KEYMAN_VERSION_GIT_TAG:         $KEYMAN_VERSION_GIT_TAG"
+    echo "  KEYMAN_VERSION_ENVIRONMENT:     $KEYMAN_VERSION_ENVIRONMENT"
+    echo "  KEYMAN_VERSION_FOR_FILENAME:    $KEYMAN_VERSION_FOR_FILENAME"
+
+    export _builder_basic_environment_printed=true
+
+    builder_echo end builder_basic_debug success "Builder internal environment variables"
 }
 
 # TODO: consolidate with buildLevel, see #14285
@@ -284,8 +299,8 @@ _builder_basic_find_keyman_root
 _builder_basic_find_tier
 _builder_basic_find_version
 
-# _builder_basic_print_version_utils_debug
 _builder_basic_print_build_number_for_teamcity
+_builder_basic_print_version_utils_debug
 
 _builder_basic_find_should_sentry_release
 

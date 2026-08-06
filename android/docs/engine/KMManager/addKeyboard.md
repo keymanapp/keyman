@@ -32,39 +32,6 @@ can be selected from the keyboards menu. If the keyboard with same
 keyboard ID and language ID exists, it updates the existing keyboard
 info.
 
-  
-
-------------------------------------------------------------------------
-
-## Syntax (Deprecated)
-
-``` javascript
-KMManager.addKeyboard(Context context, HashMap<String, String> keyboardInfo)
-```
-
-### Parameters
-
-`context`
-:   The context.
-
-`keyboardInfo`
-:   A dictionary of keyboard information with keys and values defined as
-    `HashMap<String key, String value>`.
-
-### Returns
-
-Returns `true` if the keyboard was added successfully, `false`
-otherwise.
-
-## Description
-
-Use this method to include a keyboard in the keyboards list so that it
-can be selected from the keyboards menu. If the keyboard with same
-keyboard ID and language ID exists, it updates the existing keyboard
-info.
-
-  
-
 ------------------------------------------------------------------------
 
 ## Examples
