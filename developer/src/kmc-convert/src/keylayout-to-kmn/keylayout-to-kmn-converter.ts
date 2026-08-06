@@ -140,7 +140,7 @@ export class KeylayoutToKmnConverter {
     const outputKmn = kmnFileWriter.write(processedData);
     const result: ConverterToKmnResult = {
       artifacts: {
-        kmn: { data: outputKmn, filename: processedData?.kmnFilename ?? 'noFileName' }
+        kmn: { data: outputKmn, filename: processedData?.kmnFilename ?? '' }
       }
     };
     return result;

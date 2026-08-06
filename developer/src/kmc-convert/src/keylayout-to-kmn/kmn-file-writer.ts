@@ -68,7 +68,7 @@ export class UnicodeCharacterConversion {
   public static re_dec = /^&#([0-9]{1,7});$/;
 
   // &#x followed by 1.-6. hex digits or &# followed by 1.-7. decimal digits
-  private static re_hexdec = /^&#(?:x[0-9a-f]{1,6}|[0-9]{1,7});/i
+  private static re_hexdec = /^&#(?:x[0-9a-f]{1,6}|[0-9]{1,7});/i;
 
   /**
     * @brief  function to convert a (character or) numeric html character reference to a character
@@ -168,11 +168,11 @@ export class UnicodeCharacterConversion {
         inputString.replaced_character = returnChar;
 
         // create a string; if if one character of the string converts to 'undefined' we set the whole string to 'undefined'
-        if (inputString.replaced_character) {
-          inputString.replaced_string = inputString.replaced_string + inputString.replaced_character;
-        }
-        else {
+        if (inputString.replaced_character === undefined) {
           inputString.replaced_string = undefined;
+        }
+        else if (inputString.replaced_string !== undefined) {
+          inputString.replaced_string = inputString.replaced_string + inputString.replaced_character;
         }
       }
       // use the rest of the string after the replaced portion and use carryOver if available
