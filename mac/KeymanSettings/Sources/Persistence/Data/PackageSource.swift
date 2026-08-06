@@ -41,6 +41,13 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
       return nil
     }
   }
+  var helpFilename: String? {
+    if let filename = options?.welcomeFile {
+      return filename
+    } else {
+      return nil
+    }
+  }
   var graphicFilename: String? {
     if let filename = options?.graphicFile {
       return filename
@@ -144,10 +151,14 @@ struct SystemInfo: Decodable {
 struct Options: Decodable {
   let readmeFile: String?
   let graphicFile: String?
-  
+  let licenseFile: String?
+  let welcomeFile: String?
+
   enum CodingKeys: String, CodingKey {
     case readmeFile
     case graphicFile
+    case licenseFile
+    case welcomeFile
   }
 }
 

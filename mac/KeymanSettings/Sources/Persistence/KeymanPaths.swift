@@ -40,6 +40,10 @@ public struct KeymanPaths {
   static public let configBundleId = "com.keyman.config"
   static public let groupId = "group.com.keyman"
   
+  static public let keymanDomain = "keyman.com"
+  static public let keymanHelpDomain = "help.keyman.com"
+  static public let keymanApiDomain = "api.keyman.com"
+
     // keyman file extensions
   static public let keymanPackageFileExtension: String = "kmp"
 
@@ -132,6 +136,9 @@ public struct KeymanPaths {
     }
   }
   
+  /**
+   * build the URL to the executable inside the specified Input Method app
+   */
   public func buildInputMethodExecutableUrl(fileName:String) -> URL? {
     if let inputMethodUrl = self.buildInputMethodPathUrl(fileName: fileName) {
       let executableName = inputMethodUrl.deletingPathExtension().lastPathComponent

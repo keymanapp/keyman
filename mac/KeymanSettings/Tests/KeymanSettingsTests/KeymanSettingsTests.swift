@@ -22,11 +22,12 @@ import Foundation
     let packageRepo = PackageRepoStub()
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
     
-    #expect(settingsContainer.installedPackages.isEmpty)
-    
+    #expect(settingsContainer.multiKeyboardPackages.isEmpty)
+    #expect(settingsContainer.singleKeyboardPackages.isEmpty)
+
     settingsContainer.loadPackages()
     
-    #expect(settingsContainer.findPackage(with: packageRepo.testPackageId) != nil)
+    #expect(settingsContainer.findInstalledPackage(with: packageRepo.testPackageId) != nil)
     #expect(defaultsRepo.readEnabledKeyboards().contains(moabiteKeyboardKey))
   }
   
@@ -37,8 +38,8 @@ import Foundation
     settingsContainer.loadPackages()
     
     // verify that we can find that test package and cannot find the null package
-    #expect(settingsContainer.findPackage(with: packageRepo.testPackageId) != nil)
-    #expect(settingsContainer.findPackage(with: packageRepo.nullPackageId) == nil)
+    #expect(settingsContainer.findInstalledPackage(with: packageRepo.testPackageId) != nil)
+    #expect(settingsContainer.findInstalledPackage(with: packageRepo.nullPackageId) == nil)
   }
   
   @Test("Check remove package") @MainActor func testRemovePackage() async throws {
@@ -48,9 +49,9 @@ import Foundation
     settingsContainer.loadPackages()
     
     // verify that we cannot find the test package after removing it
-    #expect(settingsContainer.findPackage(with: packageRepo.testPackageId) != nil)
-    settingsContainer.removePackage(at: 0)
-    #expect(settingsContainer.findPackage(with: packageRepo.testPackageId) == nil)
+    #expect(settingsContainer.findInstalledPackage(with: packageRepo.testPackageId) != nil)
+    settingsContainer.removeMultipleKeyboardPackage(at: 0)
+    #expect(settingsContainer.findInstalledPackage(with: packageRepo.testPackageId) == nil)
   }
   
   /**
@@ -78,7 +79,7 @@ import Foundation
     let settingsContainer = SettingsContainer(defaultsRepo: defaultsRepo, packageRepo: packageRepo)
     
     settingsContainer.loadPackages()
-    let package = try #require(settingsContainer.findPackage(with: packageRepo.testPackageId))
+    let package = try #require(settingsContainer.findInstalledPackage(with: packageRepo.testPackageId))
     
     // the hittite keyboard is initialized as disabled
     #expect(!package.isKeyboardEnabled(keyboardKey: hittiteKeyboardKey))
@@ -171,13 +172,13 @@ import Foundation
   
   @Test("Check Keyman 19 container data directory") func testKeyman19ContainerDataDirectory() async throws {
     #expect(true)
-    let containerDirectory = try #require(KeymanPaths().keyman19ContainerDirectory)
+    let containerDirectory = try KeymanPaths().keyman19ContainerDirectory
     #expect(containerDirectory.absoluteString.hasSuffix("Group%20Containers/group.com.keyman/"))
   }
   
   @Test("Check Keyman 19 packages directory") func testKeyman19KeyboardsDirectory() async throws {
     #expect(true)
-    let keyboardsDirectory = try #require(KeymanPaths().keyman19PackagesDirectory)
+    let keyboardsDirectory = try KeymanPaths().keyman19PackagesDirectory
     #expect(keyboardsDirectory.absoluteString.hasSuffix("Group%20Containers/group.com.keyman/Library/Application%20Support/Keyman-Packages/"))
   }
 }

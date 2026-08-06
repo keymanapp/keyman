@@ -19,7 +19,8 @@ struct ConfigView: View {
         Image(systemName: "keyboard")
           .imageScale(.large)
           .foregroundColor(.accentColor)
-        Text("keyboard count = \(settings.installedPackages.count)")
+        Text("multiple keyboard package count = \(settings.multiKeyboardPackages.count)")
+        Text("single keyboard package count = \(settings.singleKeyboardPackages.count)")
         Button("debug") {
           settings.debug()
         }
@@ -46,17 +47,39 @@ struct ConfigView: View {
       
       ScrollView {
         VStack(alignment: .leading, spacing: 6) {
-          ForEach(Array(settings.installedPackages.enumerated()), id: \.offset) { index, package in
+          ForEach(Array(settings.singleKeyboardPackages.enumerated()), id: \.offset) { index, package in
             VStack {
               HStack(alignment: .center, spacing: 10) {
+                VStack(spacing: 16) {
+                    Text("Scan to visit website:")
+                        .font(.headline)
+                    
+                  if let qrImage = package.generateSharePackageQRCode(size: 200) {
+                        Image(nsImage: qrImage)
+                            .interpolation(.none) // important: keeps the QR edges sharp
+                            .resizable()
+                            .frame(width: 200, height: 200)
+                            .background(Color.white) // ensures good scanning contrast
+                    } else {
+                        Text("Failed to generate QR Code")
+                            .foregroundColor(.red)
+                    }
+                }
+                .padding()
                 Text(package.packageName)
                   .font(.headline)
                 Text(package.packageVersion)
                   .font(.subheadline)
                 // Example of Icon-Only Button
                 Spacer()
+                if let nsImage = package.graphicImage {
+                  Image(nsImage: nsImage)
+                    .resizable() // Allows resizing
+                    .scaledToFit() // Maintains original aspect ratio
+                    .frame(maxWidth: 140, maxHeight: 250) // Controls the bounds
+                }
                 Button(action: {
-                  settings.removePackage(at: index)
+                  settings.removeInstalledPackage(with: package.id)
                 }) {
                   Label("remove", systemImage: "trash.fill")
                 }

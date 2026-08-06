@@ -28,6 +28,10 @@ NSString *processorType = @"Intel";
 NSString *processorType = @"Unknown";
 #endif
 
+// distributed notifications
+NSString *const kKeyboardsChanged = @"com.keyman.keyboards.changed";
+
+// in-app notifications
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
 @implementation NSString (VersionNumbers)
@@ -125,8 +129,20 @@ id _lastServerWithOSKShowing = nil;
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodDeactivated:) name:kInputMethodDeactivatedNotification object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodChangedClient:) name:kInputMethodClientChangeNotification object:nil];
 
+  // register to receive notifications generated from Keyman Configuration App
+  [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardsChanged:) name:kKeyboardsChanged object:nil];
+
   // start Input Method lifecycle
   [KMInputMethodLifecycle.shared startLifecycle];
+}
+
+
+/**
+ * When packages have been installed, removed, enabled or disabled -- notification from the Keyman Configuration app
+ */
+- (void)handleKeyboardsChanged:(NSNotification *)notification {
+  os_log_debug([KMLogs configLog], "***KMInputMethodAppDelegate handleKeyboardsChanged");
+  [self reloadEnabledKeyboards];
 }
 
 /**
@@ -675,6 +691,24 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   }
 
   return _enabledKeyboards;
+}
+
+/**
+ * Called when the enabled keyboards have been changed by the Keyman Config app.
+ * Reload the enabled keyboards from the UserDefaults
+ * Then update the Keyman menu
+ */
+- (void)reloadEnabledKeyboards {
+  os_log_debug([KMLogs configLog], "reloadEnabledKeyboards");
+  
+  // read the enabled keyboards from UserDefaults
+  _enabledKeyboards = [[KMSettingsRepository.shared readEnabledKeyboards] mutableCopy];
+  
+  // set Sentry tag for how many keyboards are enabled
+  [KMSentryHelper addEnabledKeyboardCountTag:_enabledKeyboards.count];
+  
+  // update the keyboard menu to reflect the updated list of enabled keyboards
+  [self updateKeyboardMenuItems];
 }
 
 - (void)saveEnabledKeyboards {

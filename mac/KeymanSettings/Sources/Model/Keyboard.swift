@@ -16,6 +16,8 @@ public class Keyboard: Identifiable, Hashable, Equatable {
   public var id = UUID()
   public var enabled: Bool
   public var name: String
+  public let oskFont: String?
+  public let displayFont: String?
   public var keyboardId: String
   // the directory we are reading the keyboard from
   public var keyboardDirectoryUrl: URL
@@ -30,19 +32,21 @@ public class Keyboard: Identifiable, Hashable, Equatable {
   public init(keyboardSource: KeyboardSource, directoryUrl: URL) {
     self.enabled = true
     self.name = keyboardSource.name
+    self.oskFont = keyboardSource.oskFont
+    self.displayFont = keyboardSource.displayFont
     self.keyboardId = keyboardSource.id
     self.keyboardDirectoryUrl = directoryUrl
     self.kmxFileUrl = Keyboard.deriveKmxFileUrl(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
     self.keyboardKey = Keyboard.deriveKeyboardSettingsKey(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
-    
-//    print("keyboard created for: \(keyboardSource.id) \r   with kmxFileUrl: \(self.kmxFileUrl) \r   and settingsKey: \(self.keyboardKey)")
   }
   
   /**
    * initializer that does not rely on package source -- provided to create unit test data
    */
-  public init(name: String, keyboardId: String, keyboardDirectoryUrl: URL, enabled: Bool) {
+  public init(name: String, oskFont: String? = nil, displayFont: String? = nil, keyboardId: String, keyboardDirectoryUrl: URL, enabled: Bool) {
     self.name = name
+    self.oskFont = oskFont
+    self.displayFont = displayFont
     self.keyboardId = keyboardId
     self.keyboardDirectoryUrl = keyboardDirectoryUrl
     self.kmxFileUrl = Keyboard.deriveKmxFileUrl(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
