@@ -6,6 +6,7 @@ title: Keyman Developer - kmc-convert - keylayout -> kmn
 A minimal example of a keylayout might look like this:
 
 ![image](structure_keylayout.png)
+
  _structure of a .keylayout file_
 
  - A **modifierMap** defines a set of (multiple) behaviours (keyMapSelect)
@@ -28,6 +29,7 @@ A .keylayout file may specify a sequence of up to 3 modifiers and keys.
  - We could also use a **third** modifier, key and output following a **second** modifier and key following a **first** modifier and key (purple+green+blue:C3)
 
 ![image](mod_key_combination.png)
+
 _3 modifier/key combinations of a rule_
 
 
@@ -50,18 +52,28 @@ _3 modifier/key combinations of a rule_
 
 ![image](minimal_c0_kl.png)
 ![image](minimal_c0_ru.png)
+
 _minimal example C0_
+
 
 ![image](minimal_c1_kl.png)
 ![image](minimal_c1_ru.png)
+
 _minimal example C1_
 
+
 ![image](minimal_c2_kl.png)
-_minimal example C2_
-![image](rule_c2_keylayout_how_to_read.png)
+
 _minimal example C2_
 
+
+![image](rule_c2_keylayout_how_to_read.png)
+
+_minimal example C2_
+
+
 ![image](minimal_c3.png)
+
  _minimal example C3_
 
 ***
@@ -77,6 +89,7 @@ As a start we first focus on a conversion where data is stored in an array inste
 ### Data is read from a .keylayout file using KeymanXmlReader
 
 ![image](kmc_convert_present_architecture.png)
+
 _architecture of kmc-convert_
 
 ***
@@ -87,11 +100,13 @@ After reading data and finding all possible modifier-key combinations specified 
 If a second or first modifier/key combination is not used the appropriate elements will not contain data
 
 ![image](rule.png)
+
 _rule object containing data for all rules_
 
 In Rule[ ] each “Rule” is an Object and represents a case C0-C3. This 'Data' might look like that:
 
 ![image](rule_table.png)
+
 _rule object containing data for all rules_
 
 Since multiple modifier-key combinations might lead to the same output, several elements might have the same output. 
@@ -160,6 +175,7 @@ If we find duplicate or ambiguous rules or if we discover an unsupported modifie
 
 
 ![image](parts_of_a_rule.png)
+
 _a rule is made of up to 3 parts_
 
 
@@ -170,6 +186,7 @@ If a rule contains parts which have been defined before, they will be omitted wi
 
 
 ![image](warning_duplicate.png)
+
 _handling of duplicate rules_
 
 ##### Simply printing each element of the array of Rule would not work since duplicate lines are not allowed in .kmn files:
@@ -213,6 +230,7 @@ In cases where rules are ambiguous, a warning is displayed before the rule so th
 In ambiguous rules where only part3 is specified (C0, C1 rules) **we print out the first occurrence** of the ambiguous rule pair (e.g.+ [CAPS K_X]  >  'X' ) and comment out further ambiguous occurrence(s)  (e.g. + [CAPS K_X]  >  'Y' ) since the first occurrence seems to be used more frequently for a keyboard.
 
 ![image](warning_c0c1.png)
+
 _warning for ambiguous C0/C1 rules_
 
 
@@ -222,6 +240,7 @@ _warning for ambiguous C0/C1 rules_
 If a rule has more than part3 specified (= C2 or C3 rule) and part 1 or part 2 of this rule is ambiguous with respect to part3 of a C0/C1 rule, **we use the later occurrence of the ambiguous rule pair** (e.g.  [CAPS K_A]  >  dk(A1)) and comment out the earlier occurrence in the C0/C1 rule ( e.g. + [CAPS K_A]  >  'A' ). 
 
 ![image](warningc2c3.png)
+
 _warning for ambiguous C2/C3 rules_
 
 This is necessary because it would be pointless to comment out the earlier parts (part 1 or part 2) if part 3 depends on part 1 or part 2. In that case all parts dependent on earlier parts of a rule would be obsolete if the earlier part of that rule would not be available.
