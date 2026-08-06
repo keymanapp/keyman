@@ -1281,10 +1281,12 @@ export function determineTaillessTrueKeystroke(tokenizedInput: Map<number, Trans
       continue;
     } else if(!penultimateTransform) {
       break;
+    } else if(
       // Erasing a single-char whitespace requires deletion of two tokens, the
       // last of which is empty.  Check for this case and handle it accordingly
       // as well.
-    } else if(TransformUtils.isEmpty(tailTransform) && TransformUtils.isBackspace(penultimateTransform)) {
+      TransformUtils.isEmpty(tailTransform) && TransformUtils.isBackspace(penultimateTransform)
+    ) {
       transformKeys.pop();
       continue;
     } else {
