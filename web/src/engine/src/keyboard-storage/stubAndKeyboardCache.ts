@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { Keyboard, JSKeyboard, KeyboardLoaderBase as KeyboardLoader } from "keyman/engine/keyboard";
 import { EventEmitter } from "eventemitter3";
 
@@ -48,14 +51,14 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
     this.keyboardLoader = keyboardLoader;
   }
 
-  shutdown(): void {
+  public shutdown(): void {
   }
 
-  getKeyboardForStub(stub: KeyboardStub): Keyboard {
+  public getKeyboardForStub(stub: KeyboardStub): Keyboard {
     return stub ? this.getKeyboard(stub.KI) : null;
   }
 
-  getKeyboard(keyboardID: string): Keyboard {
+  public getKeyboard(keyboardID: string): Keyboard {
     if(!keyboardID) {
       return null;
     }
@@ -68,7 +71,7 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
     return entry instanceof Promise ? null : entry;
   }
 
-  get defaultStub(): KeyboardStub {
+  public get defaultStub(): KeyboardStub {
     /* See the following two StackOverflow links:
      * - https://stackoverflow.com/a/23202095
      * - https://stackoverflow.com/a/5525820
@@ -111,18 +114,14 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
     }
   }
 
-  addKeyboard(keyboard: Keyboard) {
+  public addKeyboard(keyboard: Keyboard): void {
     const keyboardID = toPrefixedKeyboardId(keyboard.id);
     this.keyboardTable[keyboardID] = keyboard;
 
     this.emit('keyboardadded', keyboard);
   }
 
-  fetchKeyboardForStub(stub: KeyboardStub) : Promise<Keyboard> {
-    return this.fetchKeyboard(stub.KI);
-  }
-
-  isFetchingKeyboard(keyboardID: string): boolean {
+  public isFetchingKeyboard(keyboardID: string): boolean {
     if(!keyboardID) {
       throw new Error("Keyboard ID must be specified");
     }
@@ -133,7 +132,7 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
     return cachedEntry instanceof Promise;
   }
 
-  fetchKeyboard(keyboardID: string): Promise<Keyboard> {
+  public fetchKeyboard(keyboardID: string): Promise<Keyboard> {
     if(!keyboardID) {
       throw new Error("Keyboard ID must be specified");
     }
@@ -178,7 +177,7 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
     return promise;
   }
 
-  addStub(stub: KeyboardStub) {
+  public addStub(stub: KeyboardStub): void {
     const keyboardID = toPrefixedKeyboardId(stub.KI);
     const stubTable = this.stubSetTable[keyboardID] = this.stubSetTable[keyboardID] ?? {};
     stubTable[stub.KLC] = stub;
@@ -186,13 +185,13 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
     this.emit('stubadded', stub);
   }
 
-  findMatchingStub(stub: KeyboardStub) {
+  public findMatchingStub(stub: KeyboardStub) {
     return this.getStub(stub.KI, stub.KLC);
   }
 
-  getStub(keyboardID: string, languageID: string): KeyboardStub;
-  getStub(keyboard: Keyboard, languageID?: string): KeyboardStub;
-  getStub(arg0: string | Keyboard, arg1?: string): KeyboardStub {
+  public getStub(keyboardID: string, languageID: string): KeyboardStub;
+  public getStub(keyboard: Keyboard, languageID?: string): KeyboardStub;
+  public getStub(arg0: string | Keyboard, arg1?: string): KeyboardStub {
     let keyboardID: string;
     const languageID = arg1 || '---';
 
@@ -227,7 +226,7 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
    * @param purge If `true`, will also purge the `Keyboard` instance itself from the cache.
    *              If `false`, only forgets the metadata (stubs).
    */
-  forgetKeyboard(keyboard: string | Keyboard, purge: boolean = false) {
+  public forgetKeyboard(keyboard: string | Keyboard, purge: boolean = false): void {
     const id: string = (keyboard instanceof JSKeyboard) ? keyboard.id : toPrefixedKeyboardId(keyboard as string);
 
     if(this.stubSetTable[id]) {
@@ -239,7 +238,7 @@ export class StubAndKeyboardCache extends EventEmitter<EventMap> {
     }
   }
 
-  getStubList(): KeyboardStub[] {
+  public getStubList(): KeyboardStub[] {
     const arr: KeyboardStub[] = [];
 
     const kbdIds = Object.keys(this.stubSetTable);
