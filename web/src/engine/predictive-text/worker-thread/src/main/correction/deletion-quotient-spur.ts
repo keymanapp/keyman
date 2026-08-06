@@ -9,7 +9,7 @@
 
 import { LexicalModelTypes } from "@keymanapp/common-types";
 
-import { SearchNode } from "./distance-modeler.js";
+import { EDIT_DISTANCE_COST_SCALE, SearchNode } from "./distance-modeler.js";
 import { PathInputProperties, SearchQuotientNode } from "./search-quotient-node.js";
 import { SearchQuotientSpur } from "./search-quotient-spur.js";
 import { TokenResultMapping } from "./token-result-mapping.js";
@@ -50,6 +50,9 @@ export class DeletionQuotientSpur extends SearchQuotientSpur {
 
   get bestExample() {
     // As deletion spurs add no new input, we can just re-use the parent node's version.
-    return this.parentNode.bestExample;
+    const rootExample = this.parentNode.bestExample;
+    rootExample.p *= Math.exp(-EDIT_DISTANCE_COST_SCALE);
+
+    return rootExample;
   }
 }

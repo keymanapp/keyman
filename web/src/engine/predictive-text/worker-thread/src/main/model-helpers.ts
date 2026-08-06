@@ -79,9 +79,6 @@ export function determineModelTokenizer(model: LexicalModel) {
 
 export function detectCurrentCasing(lexicalModel: LexicalModel, context: Context): CasingForm {
   let model = lexicalModel;
-  const wordbreak = determineModelWordbreaker(lexicalModel);
-
-  let text = wordbreak(context);
 
   if(!model.languageUsesCasing) {
     throw "Invalid attempt to detect casing: languageUsesCasing is set to false";
@@ -92,6 +89,16 @@ export function detectCurrentCasing(lexicalModel: LexicalModel, context: Context
     // function isn't defined explicitly as part of the model.
     throw "Invalid LMLayer state:  languageUsesCasing is set to true, but no applyCasing function exists";
   }
+
+  const wordbreak = determineModelWordbreaker(lexicalModel);
+
+  // The sentinel character doesn't case properly and isn't expected by model casing functions!
+  // It may appear in base-context text when insertion or deletion edits are present.
+  context = {
+    ...context,
+    left: context.left.replace(models.SENTINEL_CODE_UNIT, '')
+  };
+  let text = wordbreak(context);
 
   // If the user has selected Shift or Caps layer, that overrides our
   // text analysis

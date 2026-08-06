@@ -4,6 +4,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { detectCurrentCasing, ModelCompositor, models } from '@keymanapp/lm-worker/test-index';
 
 import DummyModel = models.DummyModel;
+import SENTINEL_CODE_UNIT = models.SENTINEL_CODE_UNIT;
 
 const defaultCasingModel = new DummyModel({
   languageUsesCasing: true,
@@ -82,6 +83,8 @@ const emptyContext = {
   startOfBuffer: true,
   endOfBuffer: true
 }
+
+// Edits here!  Add SENTINEL-ignoring cases!
 
 describe('detectCasing', () => {
   // precondition - `context` is defined.  Will fail if `null` or `undefined`.
@@ -190,6 +193,111 @@ describe('detectCasing', () => {
       assert.equal(detectCurrentCasing(defaultCasingModel, {
         ...emptyContext,
         left: 'aPpLe',
+        casingForm: 'upper'
+      }), 'upper');
+    });
+  });
+
+  describe('ignores SENTINEL chars in text', () => {
+    it('returns expected case for context without preferred case specified', () => {
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `app${SENTINEL_CODE_UNIT}e`
+      }), 'lower');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `App${SENTINEL_CODE_UNIT}e`
+      }), 'initial');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `APP${SENTINEL_CODE_UNIT}E`
+      }), 'upper');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `aPp${SENTINEL_CODE_UNIT}e`
+      }), null);
+    });
+
+    // When set to 'lower', it's just treated as a default, rather than an override.
+    it('returns expected case for context with preferred case set to lower', () => {
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `app${SENTINEL_CODE_UNIT}e`,
+        casingForm: 'lower'
+      }), 'lower');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `App${SENTINEL_CODE_UNIT}e`,
+        casingForm: 'lower'
+      }), 'initial');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `APP${SENTINEL_CODE_UNIT}E`,
+        casingForm: 'lower'
+      }), 'upper');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `aPp${SENTINEL_CODE_UNIT}e`,
+        casingForm: 'lower'
+      }), 'lower');
+    });
+
+    // When set to 'initial', it's treated as an override.
+    it('returns expected case for context with preferred case set to initial', () => {
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `app${SENTINEL_CODE_UNIT}e`,
+        casingForm: 'initial'
+      }), 'initial');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `App${SENTINEL_CODE_UNIT}e`,
+        casingForm: 'initial'
+      }), 'initial');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `APP${SENTINEL_CODE_UNIT}E`,
+        casingForm: 'initial'
+      }), 'initial');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `aPp${SENTINEL_CODE_UNIT}e`,
+        casingForm: 'initial'
+      }), 'initial');
+    });
+
+    // When set to 'upper', it's treated as an override.
+    it('returns expected case for context with preferred case set to upper', () => {
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `app${SENTINEL_CODE_UNIT}e`,
+        casingForm: 'upper'
+      }), 'upper');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `App${SENTINEL_CODE_UNIT}e`,
+        casingForm: 'upper'
+      }), 'upper');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `APP${SENTINEL_CODE_UNIT}E`,
+        casingForm: 'upper'
+      }), 'upper');
+
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: `aPp${SENTINEL_CODE_UNIT}e`,
         casingForm: 'upper'
       }), 'upper');
     });

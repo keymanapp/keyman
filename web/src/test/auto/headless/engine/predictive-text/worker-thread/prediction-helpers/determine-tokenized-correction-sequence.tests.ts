@@ -54,7 +54,7 @@ describe('determineTokenizedCorrectionSequence', () => {
     };
 
     const state = new ContextState(context, testModel);
-    const transition = state.analyzeTransition(context, [trueInput]);
+    const transition = state.analyzeTransition(context, [trueInput], true);
 
 
     const results = determineTokenizedCorrectionSequence(
@@ -109,7 +109,7 @@ describe('determineTokenizedCorrectionSequence', () => {
     };
 
     const state = new ContextState(context, testModel);
-    const transition = state.analyzeTransition(context, [trueInput]);
+    const transition = state.analyzeTransition(context, [trueInput], true);
 
 
     const results = determineTokenizedCorrectionSequence(
@@ -165,7 +165,7 @@ describe('determineTokenizedCorrectionSequence', () => {
     };
 
     const state = new ContextState(context, testModel);
-    const transition = state.analyzeTransition(context, [trueInput]);
+    const transition = state.analyzeTransition(context, [trueInput], true);
 
 
     const results = determineTokenizedCorrectionSequence(
@@ -223,13 +223,14 @@ describe('determineTokenizedCorrectionSequence', () => {
 
     const constructingState = new ContextState(context, testModel);
     const tokens = constructingState.displayTokenization.tokens;
+    tokens.pop(); // remove the default empty token from the end!
     tokens.push(ContextToken.fromRawText(testModel, 'can'));
     tokens.push(ContextToken.fromRawText(testModel, '\''));
 
     context = models.applyTransform({insert: 'can\'', deleteLeft: 0}, context);
 
     const state = new ContextState(context, testModel, new ContextTokenization(tokens));
-    const transition = state.analyzeTransition(context, [trueInput]);
+    const transition = state.analyzeTransition(context, [trueInput], true);
 
     const results = determineTokenizedCorrectionSequence(
       transition,
@@ -283,7 +284,7 @@ describe('determineTokenizedCorrectionSequence', () => {
 
     const state = new ContextState(context, testModel);
     assert.equal(state.displayTokenization.tail.exampleInput, 'can\'');
-    const transition = state.analyzeTransition(context, [trueInput]);
+    const transition = state.analyzeTransition(context, [trueInput], true);
 
     const results = determineTokenizedCorrectionSequence(
       transition,
@@ -339,7 +340,7 @@ describe('determineTokenizedCorrectionSequence', () => {
     };
 
     const state = new ContextState(context, testModel);
-    const transition = state.analyzeTransition(context, [trueInput]);
+    const transition = state.analyzeTransition(context, [trueInput], true);
 
     const results = determineTokenizedCorrectionSequence(
       transition,

@@ -76,6 +76,7 @@ describe('ContextTracker', function() {
       assert.equal(postContextMatch.final.appliedSuggestionId, baseSuggestion.id);
 
       // Penultimate token corresponds to whitespace, which does not have a 'raw' representation.
+      assert.equal(postContextMatch.final.tokenizations.length, 1);
       assert.equal(postContextMatch.final.displayTokenization.tokens[postContextMatch.final.displayTokenization.tokens.length - 2].exampleInput, ' ');
 
       // Final token is empty (follows a wordbreak)

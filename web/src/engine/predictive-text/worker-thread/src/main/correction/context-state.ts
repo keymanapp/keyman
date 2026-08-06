@@ -16,10 +16,10 @@ import { KMWString } from 'keyman/common/web-utils';
 import { ContextToken } from './context-token.js';
 import { ContextTokenization } from './context-tokenization.js';
 import { ContextTransition } from './context-transition.js';
-import { precomputeTransitions, transitionTokenizations } from './transition-helpers.js';
 
 import { determineModelTokenizer } from '../model-helpers.js';
 import { TransformUtils } from '../transformUtils.js';
+import { precomputeTransitions, transitionTokenizations } from './transition-helpers.js';
 
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
@@ -239,20 +239,31 @@ export class ContextState {
    */
   analyzeTransition(
     context: Context,
-    transformDistribution: Distribution<Transform>
+    transformDistribution: Distribution<Transform>,
+    mayCorrect: boolean
   ): ContextTransition {
     const lexicalModel = this.model;
-
     const trueInput = transformDistribution[0].sample;
+
+    // Determine the best probability from among ALL available inputs, before they're split
+    // into subsets.
     const transition = new ContextTransition(this, this.appliedInput?.id);
 
     // From here on, we work toward the common-case - re-using old info when
     // context (and its tokenization) is changed by an input Transform.
-
     const slideUpdateTransform = determineContextSlideTransform(this.context, context);
 
-    const startTokenizations = this.tokenizations.map((t) => {
-      return t.applyContextSlide(lexicalModel, slideUpdateTransform);
+    // Goal:  allow multiple base tokenizations.
+    const slidTokenizations: Map<string, ContextTokenization> = new Map();
+    let slidDisplayKey: string;
+    this.tokenizations.forEach(t => {
+      const slidTokenization = t.applyContextSlide(lexicalModel, slideUpdateTransform);
+      slidTokenizations.set(t.clusteringKey, slidTokenization);
+
+      // This is the base-state displayTokenization identifier needed for `transitionTokenizations` below.
+      if(t == this._displayTokenization) {
+        slidDisplayKey = slidTokenization.clusteringKey;
+      }
     });
 
     // Easy case - no net change to the tokenizations whatsoever; the actual request
@@ -263,15 +274,15 @@ export class ContextState {
       // If the tokenizations match, clone the ContextState; we want to preserve a post-application
       // context separately from pre-application contexts for predictions based on empty roots.
       const state = new ContextState(this);
-      state._tokenizations = [...startTokenizations.values()];
-      state._displayTokenization = this._displayTokenization.applyContextSlide(lexicalModel, slideUpdateTransform);
+      state._tokenizations = [...slidTokenizations.values()];
+      state._displayTokenization = slidTokenizations.get(this.displayTokenization.clusteringKey);
       transition.finalize(state, transformDistribution);
       return transition;
     }
 
-    const { subsets, keyMatchingUserContext: trueInputSubsetKey } = precomputeTransitions(startTokenizations, transformDistribution);
-    const possibleTokenizations = transitionTokenizations(subsets, transformDistribution);
-    const resultTokenization = possibleTokenizations.get(trueInputSubsetKey);
+    const {subsets, keyMatchingUserContext} = precomputeTransitions([...slidTokenizations.values()], transformDistribution, slidDisplayKey, mayCorrect);
+    const finalTokenizations = transitionTokenizations(subsets, transformDistribution);
+
     // ------------
 
     // So, if we have a suggestion transition ID at the end and didn't just apply...
@@ -282,11 +293,26 @@ export class ContextState {
     // 'any'.)
 
     const state = new ContextState(applyTransform(trueInput, context), lexicalModel);
-    state._tokenizations = [resultTokenization]; // TODO:  [...possibleTokenizations.values()];
-    state._displayTokenization = resultTokenization;
+    // Set tokenizations from above.
+    // TODO:
+    // - sort by most .tail.searchSpace.bestExample.p?
+    // - threshold to the N most likely tokenizations?
+    state._tokenizations = [...finalTokenizations.values()];
+    state._displayTokenization = finalTokenizations.get(keyMatchingUserContext);
     state.appliedInput = transformDistribution?.[0].sample;
     transition.finalize(state, transformDistribution);
-    transition.revertableTransitionId = state._displayTokenization.tail.appliedTransitionId;
+
+    // Maybe sort the tokenizations in some manner, first?
+    // Also, avoid retaining a transition ID invalidly...
+    transition.revertableTransitionId = state.tokenizations.map((tokenization) => {
+      const tokens = tokenization.tokens;
+      const lastIndex = tokens.length - 1;
+      // Ignore a context-final empty '' token; the interesting one is what comes before.
+      const nonEmptyTail = !tokens[lastIndex].isEmptyToken ? tokens[lastIndex] : tokens[lastIndex - 1];
+      return nonEmptyTail?.appliedTransitionId;
+    }).find((transitionId) => {
+      return transitionId !== undefined;
+    });
     return transition;
   }
 }

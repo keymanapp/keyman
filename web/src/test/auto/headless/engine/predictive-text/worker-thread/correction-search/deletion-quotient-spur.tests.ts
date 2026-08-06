@@ -12,6 +12,7 @@ import { assert } from 'chai';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import {
   DeletionQuotientSpur,
+  EDIT_DISTANCE_COST_SCALE,
   models,
   SearchQuotientRoot,
   SubstitutionQuotientSpur
@@ -43,7 +44,7 @@ describe('DeletionQuotientSpur', () => {
       assert.equal(extendedPath.codepointLength, 0);
       assert.isNumber(extendedPath.spaceId);
       assert.notEqual(extendedPath.spaceId, rootPath.spaceId);
-      assert.deepEqual(extendedPath.bestExample, { text: '', p: 1 } );
+      assert.deepEqual(extendedPath.bestExample, { text: '', p: Math.exp(-EDIT_DISTANCE_COST_SCALE) } );
 
       assert.deepEqual(extendedPath.parents, [rootPath]);
       assert.deepEqual(extendedPath.inputs, leadEdgeDistribution);
@@ -91,7 +92,8 @@ describe('DeletionQuotientSpur', () => {
       assert.equal(length2Path.codepointLength, 1);
       assert.isNumber(length2Path.spaceId);
       assert.notEqual(length2Path.spaceId, length1Path.spaceId);
-      assert.deepEqual(length2Path.bestExample, length1Path.bestExample);
+      assert.equal(length2Path.bestExample.text, length1Path.bestExample.text);
+      assert.equal(length2Path.bestExample.p, length1Path.bestExample.p * Math.exp(-EDIT_DISTANCE_COST_SCALE));
       assert.deepEqual(length2Path.parents, [length1Path]);
       assert.deepEqual(length2Path.inputs, tailEdgeDistribution);
       assert.deepEqual(length2Path.inputSegments, [

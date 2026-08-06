@@ -8,6 +8,7 @@
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
 import { KMWString } from 'keyman/common/web-utils';
 
 import { ContextToken, ContextTokenLike } from './context-token.js';
@@ -15,10 +16,11 @@ import { TransformUtils } from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
 import { determineModelTokenizer } from '../model-helpers.js';
 import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
-import { LegacyQuotientRoot } from './legacy-quotient-root.js';
-import { LegacyQuotientSpur } from './legacy-quotient-spur.js';
 import { PathInputProperties } from './search-quotient-node.js';
 import { TransitionEdge } from './tokenization-subsets.js';
+import { SubstitutionQuotientSpur } from './substitution-quotient-spur.js';
+import { SearchQuotientRoot } from './search-quotient-root.js';
+import { DeletionQuotientSpur } from './deletion-quotient-spur.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
 import Transform = LexicalModelTypes.Transform;
@@ -127,7 +129,7 @@ export interface TransitionEdgeAlignment {
    * The edge window defining the potential range of tokenization adjustments
    * needed after applying the Transform
    */
-  edgeWindow: RetokenizedEdgeWindow;
+  edgeWindow: EdgeWindow;
 
   /**
    * The number of tokens deleted from the end, without being erased.
@@ -153,6 +155,10 @@ export interface TokenizationTransitionEdits {
   /**
    * The tokenized form of the input Transform, indexed by position relative to
    * the end of the original context's tail token.
+   *
+   * When set to `null`, indicates that the transition matches a `delete` edit
+   * paradigm - the actual input is ignored but the keystroke is considered
+   * processed.
    */
   tokenizedTransform: Map<number, Transform>;
 }
@@ -169,7 +175,6 @@ export class ContextTokenization {
 
   constructor(priorToClone: ContextTokenization);
   constructor(tokens: ContextToken[]);
-  constructor(tokens: ContextToken[], alignment: TransitionEdge);
   constructor(
     param1: ContextToken[] | ContextTokenization
   ) {
@@ -429,7 +434,7 @@ export class ContextTokenization {
       }
 
       const token = new ContextToken(baseTokenization[i]);
-      token.isPartial = false;
+      token.isPartial = baseTokenization[i].isPartial;
       tokenization.push(token);
     }
 
@@ -458,6 +463,7 @@ export class ContextTokenization {
     bestProbFromSet: number
   ): ContextTokenization {
     const { alignment, inputs } = transitionEdge;
+    const viaDeletion = (inputs.length == 0);
     const sliceIndex = alignment.edgeWindow.sliceIndex;
     const lexicalModel = this.tail.searchModule.model;
 
@@ -466,9 +472,13 @@ export class ContextTokenization {
     const tailTokenization = this.tokens.slice(sliceIndex);
 
     // Assumption:  inputs.length > 0.  (There is at least one input transform.)
-    const inputTransformKeys = [...inputs[0].sample.keys()];
+    const inputTransformKeys = [...inputs[0]?.sample.keys() ?? [0]];
     const baseTailIndex = (tailTokenization.length - 1);
     let removedTokenCount = alignment.removedTokenCount;
+    if(alignment.removedTokenCount && viaDeletion) {
+      throw new Error("Deletion edits should not alter the token count!");
+    }
+
     while(removedTokenCount-- > 0) {
       inputTransformKeys.pop();
       tailTokenization.pop();
@@ -478,15 +488,22 @@ export class ContextTokenization {
     for(let i = 0; i < inputTransformKeys.length; i++) {
       const tailRelativeIndex = inputTransformKeys[i];
       let distribution = inputs.map((i) => ({sample: i.sample.get(tailRelativeIndex), p: i.p}));
+      // For deletions, accumulate all values into a single deletion transform
+      // representing deletion of anything in the original distribution.
+      if(viaDeletion) {
+        distribution = [{sample: { insert: '', deleteLeft: 0 }, p: distribution.reduce((accum, curr) => accum + curr.p, 0)}]
+      }
+
+      const exemplarTransform = distribution[0].sample;
       const tokenIndex = baseTailIndex + tailRelativeIndex;
 
       affectedToken = tailTokenization[tokenIndex];
       if(!affectedToken) {
-        affectedToken = new ContextToken(new LegacyQuotientRoot(lexicalModel));
+        affectedToken = new ContextToken(new SearchQuotientRoot(lexicalModel));
         tailTokenization.push(affectedToken);
-      } else if(KMWString.length(affectedToken.exampleInput) == distribution[0].sample.deleteLeft) {
+      } else if(!viaDeletion && KMWString.length(affectedToken.exampleInput) == exemplarTransform.deleteLeft) {
         // If the entire token will be replaced, throw out the old one and start anew.
-        affectedToken = new ContextToken(new LegacyQuotientRoot(lexicalModel));
+        affectedToken = new ContextToken(new SearchQuotientRoot(lexicalModel));
         // Replace the token at the affected index with a brand-new token.
         tailTokenization.splice(tokenIndex, 1, affectedToken);
       }
@@ -494,7 +511,7 @@ export class ContextTokenization {
       // If we are completely replacing a token via delete left, erase the deleteLeft;
       // that part applied to a _previous_ token that no longer exists.
       // We start at index 0 in the insert string for the "new" token.
-      if(affectedToken.inputCount == 0 && distribution[0].sample.deleteLeft != 0) {
+      if(affectedToken.inputCount == 0 && exemplarTransform.deleteLeft != 0) {
         distribution = distribution.map((mass) => ({sample: { ...mass.sample, deleteLeft: 0 }, p: mass.p }));
       }
 
@@ -506,15 +523,15 @@ export class ContextTokenization {
         bestProbFromSet: bestProbFromSet,
         subsetId: transitionEdge.inputSubsetId
       };
-      appliedLength += KMWString.length(distribution[0].sample.insert);
+      appliedLength += KMWString.length(exemplarTransform.insert);
       if(i + 1 < inputTransformKeys.length) {
         inputSource.segment.end = appliedLength;
       }
 
-      affectedToken = new ContextToken(
-        new LegacyQuotientSpur(affectedToken.searchModule, distribution, inputSource),
-        affectedToken.isPartial
-      );
+      const searchPath = viaDeletion
+        ? new DeletionQuotientSpur(affectedToken.searchModule, distribution, inputSource)
+        : new SubstitutionQuotientSpur(affectedToken.searchModule, distribution, inputSource); // the token generally holds the current SearchSpace... at present.
+      affectedToken = new ContextToken(searchPath, i == inputTransformKeys.length - 1);
 
       // Do not adjust the original token, as it may be used by other transitions.
       // Only adjust the new, extended token.
@@ -523,6 +540,7 @@ export class ContextTokenization {
 
       const tokenize = determineModelTokenizer(lexicalModel);
       affectedToken.isWhitespace = tokenize({left: affectedToken.exampleInput, startOfBuffer: false, endOfBuffer: false}).left[0]?.isWhitespace ?? false;
+
       // Do not re-use the previous token; the mutation may have unexpected
       // results (say, in unit-testing)
       tailTokenization[tokenIndex] = affectedToken;
@@ -538,14 +556,20 @@ export class ContextTokenization {
     // normal.
     const tokenSequence = this.tokens.slice(0, sliceIndex).concat(tailTokenization);
     if(tokenSequence.length == 0 || tokenSequence[tokenSequence.length - 1]?.isWhitespace) {
-      tokenSequence.push(new ContextToken(new LegacyQuotientRoot(lexicalModel)));
+      tokenSequence.push(new ContextToken(new SearchQuotientRoot(lexicalModel)));
     }
 
-    return new ContextTokenization(
-      tokenSequence,
-      null
-    );
+    return new ContextTokenization(tokenSequence);
   }
+
+  get clusteringKey(): string {
+    return determineClusteringKey(this.tokens);
+  }
+}
+
+export function determineClusteringKey(tokens: ContextToken[]) {
+  // Note:  SENTINEL_CODE_UNIT is not leveraged by SearchPath.sourceRangeKey.
+  return tokens.map(t => `${t.sourceRangeKey}L${t.searchModule.codepointLength}`).join(SENTINEL_CODE_UNIT);
 }
 
 const appendText = (full: string, current: string) => full + current;
@@ -640,18 +664,6 @@ interface EdgeWindow {
 }
 
 /**
- * Represents the context edge to which an incoming `Transform` will be applied
- * and how it is retokenized given the `Transform` as input.
- */
-interface RetokenizedEdgeWindow extends EdgeWindow {
-  /**
-   * The new tokenization (and its implied boundaries) for the edge window's
-   * represented text.
-   */
-  retokenization: string[];
-}
-
-/**
  * Given an existing tokenization and an incoming input `Transform`, this
  * method precomputes how both the current, pre-application tokenization will
  * be altered and how the incoming Transform will be tokenized.
@@ -691,7 +703,7 @@ export function mapWhitespacedTokenization(
   // Do not mutate the original transform; it can cause unexpected assertion
   // effects in unit tests.
   const edgeTransform = {...transform, deleteRight: transform.deleteRight || 0};
-  const edgeWindow = buildEdgeWindow(tokens, edgeTransform, false, edgeOptions);
+  const edgeWindow = buildEdgeWindow(tokens, edgeTransform, false, edgeOptions); // does not do tokenization of its own.
   const {
     retokenizationText,
     editBoundary,
@@ -701,24 +713,22 @@ export function mapWhitespacedTokenization(
   const stackedDeletes = edgeWindow.deleteLengths.slice();
 
   const tokenize = determineModelTokenizer(lexicalModel);
+
+  // Do SENTINEL chars like deadkey chars in base JS-keyboard KMW.
+  // Reinsert them after the 'retokenization' seen here, attaching them as well as possible.
+  // (They are needed within construction of edit-effected transform.insert values)
   const postTokenization = tokenize({left: retokenizationText + transform.insert, startOfBuffer: true, endOfBuffer: true}).left.map(t => t.text);
+
+  // TODO:  hmm, how to tokenize with Insert spur placeholders...
+  // especially if some are at a word's RHS and some at the next word's LHS.
+  // \uffe is wordbroken as its own char!  Yikes!
+  // ... could do "deadkey-like' marking if needed?
+  //
+  // ... do we actually NEED the SENTINEL markers here?
   if(postTokenization.length == 0) {
     postTokenization.push('');
   }
   const { stackedInserts, firstInsertPostIndex } = traceInsertEdits(postTokenization, transform);
-
-  // What does the edge's retokenization look like when we remove the inserted portions?
-  const retokenizedEdge = postTokenization.slice(0, firstInsertPostIndex);
-  const insertBoundaryToken = postTokenization[firstInsertPostIndex];
-
-  // Note:  requires that helpers have not mutated `stackedInserts`.
-  const uninsertedBoundaryToken = KMWString.substring(insertBoundaryToken, 0, KMWString.lastIndexOf(insertBoundaryToken, stackedInserts[0]));
-
-  // Do not preserve empty tokens here, even if tokenization normally would produce one.
-  // It's redundant and replaceable for tokenization batching efforts.
-  if(uninsertedBoundaryToken != '') {
-    retokenizedEdge.push(uninsertedBoundaryToken);
-  }
 
   // We've found the root token within the root context state to which deletes (and inserts)
   // may be applied.
@@ -797,7 +807,7 @@ export function mapWhitespacedTokenization(
   // dropped some tokens outright.
   const removedTokenCount = baseRemovedTokenCount + (droppedFinalTransform ? 1 : 0);
 
-  // Final step:  check for any unexpected boundary shifts not mappable to 'merge' / 'split'
+  // Penultimate step:  check for any unexpected boundary shifts not mappable to 'merge' / 'split'
   // and not caused by transforms.  All transforms always apply in sequence at the end.
   const unmappedEdits: EditTuple<EditOperation>[] = [];
   for(let i = 0; i < editPath.length - transformMap.size; i++) {
@@ -817,9 +827,33 @@ export function mapWhitespacedTokenization(
     }
   }
 
+  // Final step:  was the boundary token involved in a merge or split operation?
+  // If so, ensure the boundary reflects this!
+  for(let m of merges) {
+    if(m.inputs.find((entry) => entry.index == editBoundary.tokenIndex + mergeOffset + splitOffset)) {
+      // Reflect the merged edit-boundary.
+      editBoundary.text = m.match.text;
+      editBoundary.tokenIndex = m.inputs[0].index;
+    }
+  }
+
+  for(let s of splits) {
+    // Assumption:  the split is always on the boundary token.
+    if(s.input.index == editBoundary.tokenIndex + splitOffset + mergeOffset) {
+      const firstTransformKey = transformMap.keys().next().value as number;
+      const isLastOfSplit = firstTransformKey >= s.matches.length - 1;
+      editBoundary.text = s.matches[firstTransformKey].text;
+      editBoundary.tokenIndex = s.matches[firstTransformKey].index;
+      editBoundary.isPartial = isLastOfSplit;
+      editBoundary.omitsEmptyToken &&= isLastOfSplit;
+
+      // NOTE:  cannot reasonably overwrite .sourceRangeKey here!
+    }
+  }
+
   return {
     alignment: {
-      edgeWindow: {...edgeWindow, retokenization: retokenizedEdge},
+      edgeWindow,
       merges,
       splits,
       unmappedEdits,
