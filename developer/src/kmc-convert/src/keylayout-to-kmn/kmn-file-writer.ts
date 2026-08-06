@@ -825,7 +825,7 @@ export class KmnFileWriter {
             + " "
             + amb_4_1[0].prevDeadkey
             + "]  >  dk(C"
-            + amb_2_1[0].idDeadkey
+            + amb_4_1[0].idDeadkey
             + ") ");
 
         resultWarnings.type = 'RuleReview';
