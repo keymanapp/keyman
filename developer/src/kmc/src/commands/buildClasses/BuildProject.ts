@@ -46,7 +46,7 @@ class ProjectBuilder {
 
     // Give a hint if the project is v1.0
     if(this.project.options.version != '2.0') {
-      if(getOption("prompt to upgrade projects", true)) {
+      if(getOption("prompt to upgrade projects")) {
         this.callbacks.reportMessage(InfrastructureMessages.Hint_ProjectIsVersion10());
       }
     }

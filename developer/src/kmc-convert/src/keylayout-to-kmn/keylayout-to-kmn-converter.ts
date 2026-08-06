@@ -140,7 +140,7 @@ export class KeylayoutToKmnConverter {
     const outputKmn = kmnFileWriter.write(processedData);
     const result: ConverterToKmnResult = {
       artifacts: {
-        kmn: { data: outputKmn, filename: processedData?.kmnFilename ?? 'noFileName' }
+        kmn: { data: outputKmn, filename: processedData?.kmnFilename ?? '' }
       }
     };
     return result;
@@ -538,11 +538,14 @@ export class KeylayoutToKmnConverter {
     // check for duplicate C2 and C3 rules in rules (e.g. [NCAPS RALT K_8]  >  dk(C12) ): create a separate array of unique rules,
     // then compare to rules and mark first occurrence  of a rule in rules
 
-    let uniqueCountDkB = 0;
-    const uniqueTextRules: string[][] = [];
-
     const rules: Rule[] = dataUkelele.rules;
 
+    if (rules.length === 0) {
+      return dataUkelele;
+    }
+
+    let uniqueCountDkB = 0;
+    const uniqueTextRules: string[][] = [];
     //------------------------------------ C2: dk ----------------------------------
     // first rule is always unique
     rules[0].uniqueDeadkey = uniqueCountDkB;

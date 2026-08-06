@@ -168,11 +168,11 @@ export class UnicodeCharacterConversion {
         inputString.replaced_character = returnChar;
 
         // create a string; if if one character of the string converts to 'undefined' we set the whole string to 'undefined'
-        if (inputString.replaced_character) {
-          inputString.replaced_string = inputString.replaced_string + inputString.replaced_character;
-        }
-        else {
+        if (inputString.replaced_character === undefined) {
           inputString.replaced_string = undefined;
+        }
+        else if (inputString.replaced_string !== undefined) {
+          inputString.replaced_string = inputString.replaced_string + inputString.replaced_character;
         }
       }
       // use the rest of the string after the replaced portion and use carryOver if available
@@ -326,6 +326,7 @@ export class KmnFileWriter {
         // we always print out the Unicode Character  (A, W̊, 😎, ... ).
         // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
         // and add a warning about the use of control characters
+        
         const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
@@ -334,9 +335,9 @@ export class KmnFileWriter {
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          const versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        const versionOutputCharacter = characterMessage.character;
+        warnText[2] = characterMessage.message;
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -397,9 +398,9 @@ export class KmnFileWriter {
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          const versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        const versionOutputCharacter = characterMessage.character;
+        warnText[2] = characterMessage.message;
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -471,18 +472,20 @@ export class KmnFileWriter {
 
     for (let k = 0; k < uniqueDataRules.length; k++) {
       if (uniqueDataRules[k].ruleType === "C3") {
+        
         // use of Unicode Character vs Unicode Codepoint;
         // we always print out the Unicode Character  (A, W̊, 😎, ... ).
         // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
-        // and add a warning about the use of control characters
+
+        // and add a warning about the use of control characters  
+        // TODO-KMC-CONVERT: remove
+        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class  
         const warnText = this.reviewRules(uniqueDataRules, k);
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-
-        // TODO-KMC-CONVERT: remove
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          const versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        const versionOutputCharacter = characterMessage.character;
+        warnText[2] = characterMessage.message;
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -831,7 +834,7 @@ export class KmnFileWriter {
           + " "
           + amb_4_1[0].prevDeadkey
           + "]  >  dk(C"
-          + amb_2_1[0].idDeadkey
+          + amb_4_1[0].idDeadkey
           + ") ");
       }
 
