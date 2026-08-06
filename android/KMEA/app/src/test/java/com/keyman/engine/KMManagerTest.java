@@ -1,5 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 package com.keyman.engine;
 
+import android.content.Context;
 import android.util.Log;
 import androidx.test.core.app.ApplicationProvider;
 
@@ -32,7 +36,11 @@ public class KMManagerTest {
   // For some keyboard list tests, load an existing keyboard list.
   // Can't use @Before because context is null before running tests.
   public void loadOldKeyboardsList() {
-    KMManager.initialize(ApplicationProvider.getApplicationContext(), KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
+    Context context = ApplicationProvider.getApplicationContext();
+    // Create appData directory accessed in KMKeyboardWebViewClient
+    File dataDir = context.getDir("data", Context.MODE_PRIVATE);
+    dataDir.mkdirs();
+    KMManager.initialize(context, KMManager.KeyboardType.KEYBOARD_TYPE_INAPP);
 
     File keyboards_dat = new File(TEST_RESOURCE_ROOT, OLD_KEYBOARDS_LIST);
     if (keyboards_dat == null || !keyboards_dat.exists()) {
@@ -111,6 +119,11 @@ public class KMManagerTest {
   */
   @Test
   public void create_newKeyboardsList() {
+    if(File.separatorChar != '/') {
+      Log.w(TAG, "create_newKeyboardsList skipped due to #16183");
+      return;
+    }
+
     loadOldKeyboardsList();
     dat_list = new ArrayList<HashMap<String, String>>();
 
@@ -182,6 +195,12 @@ public class KMManagerTest {
 
   @Test
   public void test_updateOldKeyboardsList() {
+    // #16183
+    if(File.separatorChar != '/') {
+      Log.w(TAG, "test_updateOldKeyboardsList skipped due to #16183");
+      return;
+    }
+
     loadOldKeyboardsList();
     Assert.assertNotNull(dat_list);
 

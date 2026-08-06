@@ -543,7 +543,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getLastActiveElement
    */
   public getLastActiveElement(): HTMLElement | null {
-    return this.contextManager.lastActiveTextStore?.getElement();
+    return this.contextManager.lastActiveTextStore?.getElement() ?? null;
   }
 
   /**
