@@ -39,21 +39,7 @@ interface RuleReview {
   output: string;
 
 };
-//interface UnavailableModifier /*extends RuleReview*/ {
-/*interface UnavailableModifier {
-  type: 'UnavailableModifier';
-  isEarlier: boolean;
-  isused: boolean;
-  context: string;
-  prevDK_modifier: string;
-  prevDK_key: string;
-  DK_modifier: string;
-  DK_key: string;
-  modifier: string;
-  key: string;
-  output: string;
-  warningMessage: string[];
-};*/
+
 interface RuleReview {
   type: 'RuleReview';
   isEarlier: boolean;
