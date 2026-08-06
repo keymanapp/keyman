@@ -165,7 +165,7 @@ describe('StubAndKeyboardCache', function () {
     cache.addStub(bad_stub);
 
     try {
-      cache.fetchKeyboardForStub(bad_stub);
+      cache.fetchKeyboard(bad_stub.KI);
       assert.fail();
     } catch(err) {
       assert.isTrue(err instanceof Error);
