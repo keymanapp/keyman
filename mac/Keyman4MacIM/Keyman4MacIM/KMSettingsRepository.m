@@ -89,51 +89,51 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   return self;
 }
 
-// MAC-CONFIG-TODO: add support for migration from Keyman 18 and earlier to Keyman 19
-
 /**
- * Determines whether the keyboard data needs to be moved from pre-Keyman-18 location to the Keyman 18 location
- * This is true if
- * 1) the UserDefaults exist (indicating that this is not a new installation of Keyman) and
- * 2) the value for kVersionStoreDataInLibraryDirectory is < 1,
+ * Determines the current state of the Keyman settings (UserDefaults), indicating
+ * whether migration is needed to a new format and/or location or whether this is
+ * a first-time install and settings must be created.
  */
-- (BOOL)keyman18DataMigrationNeeded {
-  BOOL keymanSettingsExist = [self settingsExist];
-  os_log([KMLogs dataLog], "keyman settings exist: %{public}@", keymanSettingsExist ? @"YES" : @"NO" );
+- (SettingsState)determineSettingsState {
+  SettingsState state = KeymanSettingsVersionCurrent;
   
-  BOOL keyboardsStoredInLibrary = [self dataModelWithKeyboardsInLibrary];
-  os_log([KMLogs dataLog], "settings indicate that keyboards are stored in ~/Library: %{public}@", keyboardsStoredInLibrary ? @"YES" : @"NO" );
+  // settings were moved to share app group beginning in Keyman 19
+  if ([self settingsExistForAppGroup]) {
+    os_log([KMLogs dataLog], "keyman shared settings exist, version is current");
+    SettingsState state = KeymanSettingsVersionCurrent;
+  } else if ([self settingsExistForInputMethod]) {
+    // In Keyman 18, KMDataModelVersion was added to settings and set to value of 1
+    if ([self version18SettingsExistForInputMethod]) {
+      os_log([KMLogs dataLog], "keyman app (unshared) settings version indicates Keyman 18, packages stored in ~/Library");
+      state = KeymanSettingsVersion18;
+    } else {
+      // no KMDataModelVersion key is found in the app UserDefaults
+     os_log([KMLogs dataLog], "lack of keyman settings version indicates Keyman 17 or earlier, packages stored in ~/Documents");
+      state = KeymanSettingsVersion17;
+    }
+  } else {
+    // settings do not exist, must be a new install
+    os_log([KMLogs dataLog], "keyman settings do not exist, must be created for new install");
+    state = KeymanSettingsNotFound;
+  }
   
-  BOOL migrationNeeded = keymanSettingsExist && !keyboardsStoredInLibrary;
-  os_log([KMLogs dataLog], "keyman18DataMigrationNeeded: %{public}@", migrationNeeded ? @"YES" : @"NO" );
-
-  return migrationNeeded;
+  return state;
 }
 
-/**
- * Determines whether the keyboard data needs to be moved from the Keyman 18 location to the Keyman 19 location
- * This is true if the UserDefaults exist in the old location for the input method
- */
-- (BOOL)keyman19SettingsMigrationNeeded {
-  BOOL keymanSettingsExistForInputMethod = [self inputMethodUserDefaultsExist];
-  os_log([KMLogs dataLog], "keyman input method settings exist (for 18 and earlier): %{public}@", keymanSettingsExistForInputMethod ? @"YES" : @"NO" );
-  
-  BOOL keyboardsStoredInLibrary = [self dataModelWithKeyboardsInLibrary];
-  os_log([KMLogs dataLog], "settings indicate that keyboards are stored in ~/Library: %{public}@", keyboardsStoredInLibrary ? @"YES" : @"NO" );
-  
-  BOOL migrationNeeded = keymanSettingsExistForInputMethod;
-  os_log([KMLogs dataLog], "keyman19SettingsMigrationNeeded: %{public}@", migrationNeeded ? @"YES" : @"NO" );
-
-  return migrationNeeded;
-}
+// MAC-CONFIG-TODO: add support for migration from Keyman 17 and earlier to Keyman 19
 
 - (void)migrateSettingsForKeyman19 {
   [self migrateInputMethodSettingsToAppGroup];
 
-  // set kDataModelVersion to indicate that we are using the group container
-  [self.groupDefaults setInteger:kVersionStoreDataInGroupContainer forKey:kDataModelVersion];
-  
+  // set kDataModelVersion for the current format
+  [self.setDataModelVersionIfNecessary];
+
   [self removeMigratedInputMethodSettings];
+}
+
+- (void)createKeyman19SharedSettingsIfNecessary {
+  // set kDataModelVersion for the current format
+  [self.setDataModelVersionIfNecessary];
 }
 
 /**
@@ -194,28 +194,37 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
 
 - (void)setDataModelVersionIfNecessary {
   if (![self dataModelWithKeyboardsInLibrary]) {
-    [self.groupDefaults setInteger:kVersionStoreDataInLibraryDirectory forKey:kDataModelVersion];
+    [self.groupDefaults setInteger:kVersionStoreDataInGroupContainer forKey:kDataModelVersion];
   }
 }
 
-// MAC-CONFIG-TODO: remove if obsolete
 /**
- * If the selectedKeyboard has not been set, then the settings have not been saved in the UserDefaults.
+ * The dataModelVersion field will always exists for Keyman 18 and later, and starting
+ * with Keyman 19, it will be located in the UserDefaults for the app group.
  * If this method is called after applicationDidFinishLaunching, then it will always return true.
  * If called from awakeFromNib, then it will return false when running for the first time.
  */
-- (BOOL)settingsExist
+- (BOOL)settingsExistForAppGroup
+{
+  return ([self.groupDefaults objectForKey:kDataModelVersion] != nil);
+}
+
+/**
+ * If the selectedKeyboard has not been set, then the settings have not been saved in the UserDefaults.
+ * For old versions of Keyman, 17 and earlier, there was no`KMDataModelVersion` to check.
+ */
+- (BOOL)settingsExistForInputMethod
 {
   return ([self.appDefaults objectForKey:kSelectedKeyboardKey] != nil);
 }
 
 /**
- * Returns true for Keyman 18 and earlier when settings were stored exclusively for the input method rather than for the app group.
- * If the selectedKeyboard has not been set, then the settings are not saved in the input method's UserDefaults.
+ * The dataModelVersion field will always exists for Keyman 18 and later, but it will be located
+ * in the app UserDefaults -- for the input method only -- instead of the app group UserDefaults
  */
-- (BOOL)inputMethodUserDefaultsExist
+- (BOOL)version18SettingsExistForInputMethod
 {
-  return ([self.appDefaults objectForKey:kSelectedKeyboardKey] != nil);
+  return ([self.appDefaults objectForKey:kDataModelVersion] != nil);
 }
 
 - (void)writeOptionForSelectedKeyboard:(NSString *)key withValue:(NSString*)value {
@@ -263,7 +272,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   // [NSUserDefaults integerForKey] returns zero if the key does not exist
   NSInteger dataModelVersion = [self.groupDefaults integerForKey:kDataModelVersion];
   
-  return dataModelVersion >= kVersionStoreDataInLibraryDirectory;
+  return dataModelVersion == kVersionStoreDataInLibraryDirectory;
 }
 
 - (NSString *)readSelectedKeyboard {

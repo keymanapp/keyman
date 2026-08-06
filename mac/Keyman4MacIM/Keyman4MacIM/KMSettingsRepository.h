@@ -12,13 +12,22 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// for classifying the state of the settings (UserDefaults) and data
+// used for determining whether migration is needed of the UserDefaults and Keyman packages
+// to a new format and/or location
+typedef NS_ENUM(NSInteger, SettingsState) {
+  KeymanSettingsNotFound = 0,
+  KeymanSettingsVersion17 = 17,
+  KeymanSettingsVersion18 = 18,
+  KeymanSettingsVersionCurrent = 19
+};
+
 @interface KMSettingsRepository : NSObject
 + (KMSettingsRepository *)shared;
 - (instancetype)init;
-- (BOOL)keyman18DataMigrationNeeded;
-- (BOOL)keyman19SettingsMigrationNeeded;
+- (SettingsState)determineSettingsState;
+- (void)createKeyman19SharedSettingsIfNecessary;
 - (void)migrateSettingsForKeyman18;
-- (void)setDataModelVersionIfNecessary;
 - (void)migrateSettingsForKeyman19;
 - (BOOL)migrateInputMethodSettingsToAppGroup;
 - (NSString *)readSelectedKeyboard;

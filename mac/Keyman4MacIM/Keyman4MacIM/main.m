@@ -43,11 +43,26 @@ void runAsInputMethod(void) {
  */
 int doMigration(void) {
   os_log_info([KMLogs startupLog], "doMigration executed");
-  // if necessary, migrate settings and keyboard data for compatibility with Keyman 19
-  if ([KMSettingsRepository.shared keyman19SettingsMigrationNeeded]) {
-    [KMDataRepository.shared migrateDataForKeyman19];
-    [KMSettingsRepository.shared migrateSettingsForKeyman19];
+  
+  SettingsState state = [KMSettingsRepository.shared determineSettingsState];
+
+  switch (state) {
+    case KeymanSettingsVersion17:
+      os_log_info([KMLogs startupLog], "doMigration executed for Keyman 17 to current");
+      break;
+    case KeymanSettingsVersion18:
+      os_log_info([KMLogs startupLog], "doMigration executed for Keyman 18 to current");
+      [KMDataRepository.shared migrateDataForKeyman19];
+      [KMSettingsRepository.shared migrateSettingsForKeyman19];
+      break;
+    case KeymanSettingsNotFound:
+      os_log_info([KMLogs startupLog], "doMigration: no migration needed, settings not found");
+      break;
+    case KeymanSettingsVersionCurrent:
+      os_log_info([KMLogs startupLog], "doMigration: no migration needed, settings are current");
+      break;
   }
+
   return 0;
 }
 
