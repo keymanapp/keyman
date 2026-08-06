@@ -178,19 +178,15 @@ export class KmnFileWriter {
 
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        let versionOutputCharacter;
-        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
+        const warnText = this.reviewRules(uniqueDataRules, k);
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-
-        if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
-        }
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        const versionOutputCharacter = characterMessage.character;
+        warnText[2] = characterMessage.message;
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -243,18 +239,15 @@ export class KmnFileWriter {
 
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        let versionOutputCharacter;
-        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
+        const warnText = this.reviewRules(uniqueDataRules, k);
+
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-
-        if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
-        }
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        const versionOutputCharacter = characterMessage.character;
+        warnText[2] = characterMessage.message;
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -329,17 +322,13 @@ export class KmnFileWriter {
 
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        let versionOutputCharacter;
 
         const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
-
-        if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
-        }
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        const versionOutputCharacter = characterMessage.character;
+        warnText[2] = characterMessage.message;
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -708,6 +697,7 @@ export class KmnFileWriter {
         ambiguousWarnings.prevDk_modifier = amb_4_1[0].modifierPrevDeadkey;
         ambiguousWarnings.prevDk_key = amb_4_1[0].prevDeadkey;
         ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 2);
+
       }
 
       if (amb_2_1.length > 0) {

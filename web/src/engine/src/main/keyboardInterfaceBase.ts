@@ -8,6 +8,7 @@ import { ContextManagerBase } from './contextManagerBase.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
 import { KeymanEngineBase } from "./keymanEngineBase.js";
 import { EngineConfiguration } from "./engineConfiguration.js";
+import { type TextStore } from 'keyman/engine/keyboard';
 
 export class KeyboardInterfaceBase<ContextManagerType extends ContextManagerBase<any>> extends JSKeyboardInterface {
   protected readonly engine: KeymanEngineBase<EngineConfiguration, ContextManagerType, any>;
@@ -118,6 +119,92 @@ export class KeyboardInterfaceBase<ContextManagerType extends ContextManagerBase
 
   // Short-hand name: necessary to do it this way due to assignment style.
   KT = this.insertText;
+
+  /**
+   * Get the currently or most recently focused text store. This is for use by
+   * IME keyboards, to allow for more complex focus interactions when clicking
+   * IME elements.
+   *
+   * @returns the last active text store, or null
+   *
+   * See also {@link focusLastActiveTextStore}
+   */
+  getLastActiveTextStore(): TextStore {
+    return this.engine.contextManager.activeTextStore;
+  }
+
+  /**
+   * Set focus to the currently-focused or most recently focused text store.
+   * This is for use, for example, by IME keyboards to return the focus to the
+   * text store after the user clicks on an IME element, without resetting
+   * context.
+   *
+   * See also {@link getLastActiveTextStore}
+   */
+  focusLastActiveTextStore(): void {
+    // no op in base
+  }
+
+  /**
+   * Warning: this function returns a `TextStore`, not a `HTMLElement`. Instead,
+   * use {@link getLastActiveTextStore}
+   * @deprecated see {@link getLastActiveTextStore}
+   */
+  readonly getLastActiveElement = this.getLastActiveTextStore;
+
+  /**
+   * @deprecated see {@link focusLastActiveTextStore}
+   */
+  readonly focusLastActiveElement = this.focusLastActiveTextStore;
+
+  /**
+   * @deprecated
+   */
+  hideHelp(): void {
+    // no op in base
+  }
+
+  /**
+   * @deprecated
+   */
+  showHelp(Px: number, Py: number): void {
+    // no op in base
+  }
+
+  /**
+   * @deprecated
+   */
+  showPinnedHelp(): void {
+    // no op in base
+  }
+
+  /**
+   * Warning: this function returns a `TextStore`, not a `HTMLElement`. Instead,
+   * use {@link getLastActiveTextStore}
+   * @deprecated see {@link getLastActiveTextStore}
+   */
+  readonly GetLastActiveElement = this.getLastActiveTextStore;
+
+  /**
+   * @deprecated see {@link focusLastActiveTextStore}
+   */
+  readonly FocusLastActiveElement = this.focusLastActiveTextStore;
+
+  // Also needed for some legacy CJK keyboards.
+  /**
+   * @deprecated
+   */
+  readonly HideHelp = this.hideHelp;
+
+  /**
+   * @deprecated
+   */
+  readonly ShowHelp = this.showHelp;
+
+  /**
+   * @deprecated
+   */
+  readonly ShowPinnedHelp = this.showPinnedHelp;
 }
 
 (function() {

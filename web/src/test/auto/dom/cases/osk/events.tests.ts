@@ -17,7 +17,7 @@ const TestResources = {
     isEmbedded: false,
     pathConfig: {
       fonts: '',
-      resources: '/web/build/publish/debug'
+      resources: '/web/build/publish/debug/'
     },
     hostDevice: device.coreSpec,
     allowHideAnimations: false // shortens timings.
