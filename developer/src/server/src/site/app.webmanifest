@@ -1,0 +1,9 @@
+{
+  "name": "Keyman Developer Server",
+  "display": "standalone",
+  "id": "com.keyman.developer.server.self-hosted",
+  "icons": [{
+    "src": "keyman-developer.svg",
+    "sizes": "any"
+  }]
+}
