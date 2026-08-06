@@ -1629,6 +1629,16 @@ public final class KMManager {
    */
   public static Typeface getFontTypeface(Context context, String fontFilename) {
     try {
+      if (fontFilename == null || fontFilename.isEmpty()) {
+        return null;
+      }
+      if (fontFilename.startsWith("http://") || fontFilename.startsWith("https://")
+        || fontFilename.startsWith("file://")) {
+        // Font file is not local, so cannot load Typeface
+        KMLog.LogError(TAG, "Font file is not local: " + fontFilename);
+        return null;
+      }
+
       if ((fontFilename != null) && FileUtils.hasFontExtension(fontFilename)) {
         // Ignore .woff files if Android 7.0 / 7.1 (Issue #4896)
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) &&

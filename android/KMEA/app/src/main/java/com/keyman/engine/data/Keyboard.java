@@ -49,6 +49,7 @@ public class Keyboard extends LanguageResource implements Serializable {
    */
   public Keyboard(JSONObject installedObj) {
     this.fromJSON(installedObj);
+    logIfLegacyKeyboard();
   }
 
   /**
@@ -79,6 +80,8 @@ public class Keyboard extends LanguageResource implements Serializable {
 
       this.helpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink,
         KMString.format(HELP_URL_FORMATSTR, HELP_URL_HOST, this.resourceID, this.version));
+
+      logIfLegacyKeyboard();
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Keyboard exception parsing JSON: ", e);
     }
@@ -96,6 +99,8 @@ public class Keyboard extends LanguageResource implements Serializable {
     this.isNewKeyboard = isNewKeyboard;
     this.font = (font != null) ? font : "";
     this.oskFont = (oskFont != null) ? oskFont : "";
+
+    logIfLegacyKeyboard();
   }
 
   public Keyboard(Keyboard k) {
@@ -106,6 +111,12 @@ public class Keyboard extends LanguageResource implements Serializable {
     this.font = k.getFont();
     this.oskFont = k.getOSKFont();
     this.displayName = k.getDisplayName();
+  }
+
+  private void logIfLegacyKeyboard() {
+    if (this.packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      KMLog.LogInfo(TAG, "Constructing legacy keyboard: " + this.resourceID);
+    }
   }
 
   public String getKeyboardID() { return getResourceID(); }

@@ -50,7 +50,7 @@ import Foundation
     
     // verify that we cannot find the test package after removing it
     #expect(settingsContainer.findInstalledPackage(with: packageRepo.testPackageId) != nil)
-    settingsContainer.removeInstalledPackage(at: 0)
+    settingsContainer.removeMultipleKeyboardPackage(at: 0)
     #expect(settingsContainer.findInstalledPackage(with: packageRepo.testPackageId) == nil)
   }
   
