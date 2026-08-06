@@ -32,48 +32,49 @@ struct GrantAccessibiltyPermissionView: View {
         .frame(maxWidth: .infinity, alignment: .center)
         .matchedGeometryEffect(id: "title", in: namespace)
       GradientDivider(namespace: namespace)
-        .padding(.bottom, 8)
-      if checkingPermission {
-        HStack {
-          ProgressView()
-            .controlSize(.small)
-          
-          Text("Checking...")
+      
+      Color.clear
+        .frame(height: 50)
+        .hidden()
+      
+      Form {
+        Section {
+          Image("AccessibilityPermission")
+            .interpolation(.high)
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .padding(.bottom, 8)
+          Text("Ensure Keyman.app is toggled to provide it with necessary control in System Settings > Privacy & Security > Accessibility.")
+            .lineSpacing(6)
+            .foregroundStyle(.secondary)
         }
       }
-      
-      Spacer()
-      
-      if advancementRequestedAndPermissionNotGranted == true {
-        Text("Access has not been granted.")
-          .foregroundStyle(Color.red)
-          .padding(7)
-          .background {
-            Capsule()
-              .fill(.quaternary.opacity(0.5))
-          }
-      }
-      
-      Spacer()
-      
-      Image("AccessibilityPermission")
-        .interpolation(.high)
-        .resizable()
-        .scaledToFit()
-        .frame(height: 130)
-        .padding(.bottom, 8)
-      Text("Ensure Keyman.app is toggled to provide it with necessary control in System Settings > Privacy & Security > Accessibility.")
-        .multilineTextAlignment(.center)
-      
-      Spacer()
+      .formStyle(.grouped)
+      .frame(maxHeight: .infinity, alignment: .center)
       
       HStack {
-        Text("Grant accessibility control")
-          .font(.title2)
-          .frame(maxWidth: .infinity, alignment: .leading)
+        
+        Spacer()
+        
+        if checkingPermission {
+          HStack {
+            ProgressView()
+              .controlSize(.small)
+            
+            Text("Checking...")
+          }
+        } else if advancementRequestedAndPermissionNotGranted {
+          Text("Access has not been granted.")
+            .foregroundStyle(Color.red)
+            .padding(7)
+            .background(.thinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+
+        
         Button {
           if installation.currentTask()?.taskType == .requestAccess {
-            installation.executeNextInstallationTask()
+            installation.executeCurrentInstallationTask()
             openSettingsButtonPressed = true
           } else {
             openAccessibilitySettings()
@@ -90,7 +91,7 @@ struct GrantAccessibiltyPermissionView: View {
         .matchedGeometryEffect(id: "actionButton", in: namespace)
         Button {
           checkingPermission = true
-          installation.executeNextInstallationTask()
+          installation.executeCurrentInstallationTask()
         } label: {
           Text("Continue")
             .padding(.horizontal, 16)

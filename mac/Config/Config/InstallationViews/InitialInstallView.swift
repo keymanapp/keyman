@@ -10,7 +10,7 @@ import SwiftUI
 import Foundation
 
 
-struct NewInstallView: View {
+struct InitialInstallView: View {
   @EnvironmentObject var installation: InstallationContainer
   
   let namespace: Namespace.ID
@@ -49,5 +49,17 @@ struct NewInstallView: View {
         NavigationButton(action: .advance, onContinue: onContinue)
       }
     }
+  }
+}
+
+struct InitialInstallView_Previews: PreviewProvider {
+  @Namespace static var namespace
+  
+  static var previews: some View {
+    InitialInstallView(
+      namespace: namespace,
+      onContinue: { }
+    )
+    .environmentObject(InstallationContainer())
   }
 }

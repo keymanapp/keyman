@@ -12,7 +12,7 @@ import SwiftUI
 import AppKit
 internal import UniformTypeIdentifiers
 
-struct NewRepairView: View {
+struct InitialRepairView: View {
   
   @EnvironmentObject var installation: InstallationContainer
   
@@ -28,15 +28,21 @@ struct NewRepairView: View {
         .matchedGeometryEffect(id: "title", in: namespace)
       GradientDivider(namespace: namespace)
       
-      Spacer()
+      Color.clear
+        .frame(height: 50)
       
-      Image(systemName: "hammer.circle.fill")
-        .font(.system(size: 100))
-        .padding(.bottom, 16)
-      Text("One or more Keyman components or permissions require your attention. Complete the following steps to restore your Keyman installation.")
-        .multilineTextAlignment(.center)
-      
-      Spacer()
+      Form {
+        HStack {
+          Spacer()
+          Image(systemName: "hammer.circle.fill")
+            .font(.system(size: 100))
+            .padding(.bottom, 16)
+          Spacer()
+        }
+        Text("One or more Keyman components or permissions require your attention. Complete the following steps to restore your Keyman installation.")
+          .multilineTextAlignment(.center)
+      }
+      .formStyle(.grouped)
       
       HStack {
         Text("Resolve Issues")

@@ -38,18 +38,22 @@ struct RerunInstallerView: View {
         .matchedGeometryEffect(id: "title", in: namespace)
       GradientDivider(namespace: namespace)
       
-      Spacer()
-      
-      Image("InstallerIcon")
-        .interpolation(.high)
-        .resizable()
-        .scaledToFit()
-        .frame(height: 130)
-        .padding(.bottom, 8)
-      Text("Your Keyman input method is either missing or outdated. Run the Keyman installer to install a new version.")
-        .multilineTextAlignment(.center)
-      
-      Spacer()
+      Form {
+        HStack {
+          Spacer()
+          Image("InstallerIcon")
+            .interpolation(.high)
+            .resizable()
+            .scaledToFit()
+            .frame(height: 130)
+            .padding(.bottom, 8)
+          Spacer()
+        }
+        Text("Your Keyman input method is either missing or outdated. Run the Keyman installer to install a new version.")
+          .multilineTextAlignment(.center)
+          .foregroundStyle(.secondary)
+      }
+      .formStyle(.grouped)
       
       HStack {
         Text("Run Keyman installer")

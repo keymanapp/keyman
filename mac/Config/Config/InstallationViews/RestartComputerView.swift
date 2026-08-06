@@ -41,7 +41,7 @@ struct RestartComputerView: View {
       }
     }
     .onAppear {
-      installation.executeNextInstallationTask()
+      installation.executeCurrentInstallationTask()
     }
   }
 }

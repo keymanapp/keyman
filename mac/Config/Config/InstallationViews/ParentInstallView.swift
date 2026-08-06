@@ -21,8 +21,6 @@ struct ParentInstallView: View {
       case .enableInputMethod: currentPage = .enableInputMethod
       case .requestAccess: currentPage = .allowSecurityPermission
       case .confirmAccess: currentPage = .allowSecurityPermission
-      case .confirmRestart: currentPage = .restartComputer
-      case .requestRestart: currentPage = .restartComputer
       default: currentPage = .completed
       }
     } else {
@@ -45,24 +43,24 @@ struct ParentInstallView: View {
     ZStack {
       switch currentPage {
       case .loading: ProgressView()
-      case .initialInstall: NewInstallView(namespace: animation,onContinue: {
-        installation.executeNextInstallationTask()
+      case .initialInstall: InitialInstallView(namespace: animation,onContinue: {
+        installation.executeCurrentInstallationTask()
         chooseCurrentPage()
       })
-      case .initialRepair: NewRepairView(namespace: animation,onContinue: {
-        installation.executeNextInstallationTask()
+      case .initialRepair: InitialRepairView(namespace: animation,onContinue: {
+        installation.executeCurrentInstallationTask()
         chooseCurrentPage()
       })
       case .completed: CompletedInstallView(namespace: animation)
       case .enableInputMethod: EnableInputMethodView(namespace: animation, onContinue: chooseCurrentPage)
       case .allowSecurityPermission: GrantAccessibiltyPermissionView(namespace: animation, onContinue: chooseCurrentPage)
       case .rerunInstaller: RerunInstallerView(namespace: animation)
-      case .restartComputer: RestartComputerView(namespace: animation)
       }
     }
     .onAppear {
       print("LOL ", installation.installationPhase)
       print("LOL ", installation.currentTask()?.taskType ?? "no task available")
+      
       if installation.installationPhase == .evaluatingInstallation {
         currentPage = .loading
         Task {
@@ -82,13 +80,9 @@ struct ParentInstallView: View {
       }
     }
     .padding()
-    .frame(minWidth: 600)
-    .frame(minHeight: 400)
+    .frame(
+      minWidth: 600, idealWidth: 600, maxWidth: 600,
+      minHeight: 500, idealHeight: 500, maxHeight: 500
+  )
   }
-}
-
-#Preview {
-  let installation = InstallationContainer()
-  ParentInstallView()
-    .environmentObject(installation)
 }

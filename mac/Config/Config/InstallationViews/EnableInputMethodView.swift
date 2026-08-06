@@ -23,27 +23,34 @@ struct EnableInputMethodView: View {
         .matchedGeometryEffect(id: "title", in: namespace)
       GradientDivider(namespace: namespace)
       
-      Spacer()
+      Color.clear
+        .frame(height: 25)
       
-      Image("EnableKeyman")
-        .interpolation(.high)
-        .resizable()
-        .scaledToFit()
-        .frame(height: 150)
-        .padding(.horizontal, 100)
-        .padding(.bottom, 8)
-      Text("To use Keyman, enable the Keyman input method in System Settings.")
-        .multilineTextAlignment(.center)
-      
-      Spacer()
-      
+      Form {
+        Section {
+          HStack {
+            Spacer()
+            Image("EnableKeyman")
+              .interpolation(.high)
+              .resizable()
+              .scaledToFit()
+              .frame(maxHeight: 200)
+            Spacer()
+          }
+          Text("To use Keyman, enable the Keyman input method in System Settings.")
+            .lineSpacing(6)
+            .foregroundStyle(.secondary)
+        }
+      }
+      .formStyle(.grouped)
+            
       HStack {
-        Text("Enable input method")
-          .font(.title2)
-          .frame(maxWidth: .infinity, alignment: .leading)
+        
+        Spacer()
+        
         Button {
           enableButtonPressed = true
-          installation.executeNextInstallationTask()
+          installation.executeCurrentInstallationTask()
         } label: {
           Text("Enable")
             .padding(.horizontal, 16)

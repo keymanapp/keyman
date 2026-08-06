@@ -15,5 +15,4 @@ enum InstallPage: String, CaseIterable {
   case enableInputMethod
   case allowSecurityPermission
   case rerunInstaller
-  case restartComputer
 }
