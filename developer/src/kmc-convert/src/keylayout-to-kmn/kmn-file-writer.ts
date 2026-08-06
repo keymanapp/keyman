@@ -177,18 +177,18 @@ export class KmnFileWriter {
 
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        const warnText = this.reviewRules(uniqueDataRules, k);
+        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-       
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          if (characterMessage !== null) {
-           const versionOutputCharacter = characterMessage.character;
-            warnText[2] = characterMessage.message;
-          }
+        let versionOutputCharacter;
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        if (characterMessage !== null) {
+          versionOutputCharacter = characterMessage.character;
+          warnText[2] = characterMessage.message;
+        }
 
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -242,18 +242,19 @@ export class KmnFileWriter {
 
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        const warnText = this.reviewRules(uniqueDataRules, k);
+        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
 
+        let versionOutputCharacter;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          if (characterMessage !== null) {
-            const versionOutputCharacter = characterMessage.character;
-            warnText[2] = characterMessage.message;
-          }
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        if (characterMessage !== null) {
+          versionOutputCharacter = characterMessage.character;
+          warnText[2] = characterMessage.message;
+        }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -332,12 +333,12 @@ export class KmnFileWriter {
         const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
-
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-          if (characterMessage !== null) {
-            const versionOutputCharacter = characterMessage.character;
-            warnText[2] = characterMessage.message;
-          }
+        let versionOutputCharacter;
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        if (characterMessage !== null) {
+          versionOutputCharacter = characterMessage.character;
+          warnText[2] = characterMessage.message;
+        }
 
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -1089,14 +1090,14 @@ export class KmnFileWriter {
     return resultWarningTextSet;
   }
 
-/**
-  * @brief  member function to write a character as Unicode Character or Unicode Codepoint depending on the character that is to be written
-  * @param  ctr : string - the character to be written
-  * @return a string containing the Unicode representation of the control character.
-  *         A control character will be written as unicode (U+0004),
-  *         a non-control character will be written as itself ( 'A', '1', '፩', '😎')
-  *         null in case of an empty string or null or undefined input
-  */
+  /**
+    * @brief  member function to write a character as Unicode Character or Unicode Codepoint depending on the character that is to be written
+    * @param  ctr : string - the character to be written
+    * @return a string containing the Unicode representation of the control character.
+    *         A control character will be written as unicode (U+0004),
+    *         a non-control character will be written as itself ( 'A', '1', '፩', '😎')
+    *         null in case of an empty string or null or undefined input
+    */
   public writeCharacterOrUnicode(ctr: string, msg: string = ""): MessageCharacter | null {
 
     if ((ctr === null) || (ctr === undefined)) {
