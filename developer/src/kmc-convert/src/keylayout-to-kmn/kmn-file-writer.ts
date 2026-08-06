@@ -178,7 +178,7 @@ export class KmnFileWriter {
 
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        const warnText = this.reviewRules(uniqueDataRules, k);
+        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
@@ -239,7 +239,7 @@ export class KmnFileWriter {
 
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        const warnText = this.reviewRules(uniqueDataRules, k);
+        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
