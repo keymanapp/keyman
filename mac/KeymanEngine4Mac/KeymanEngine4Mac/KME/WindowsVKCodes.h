@@ -6,7 +6,7 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
-/*#ifndef WindowsVKCodes_h
+#ifndef WindowsVKCodes_h
 #define WindowsVKCodes_h
 
 #define VK_BACKSPACE        0x08
@@ -83,4 +83,4 @@
 
 #define VK_OEM_102          0xE2
 
-#endif*/ /* WindowsVKCodes_h */
+#endif /* WindowsVKCodes_h */
