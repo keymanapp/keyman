@@ -1,5 +1,5 @@
 ---
-title: Utility Module
+title: `keyman.util` - Utility Module
 ---
 
 The KeymanWeb Utility Function module is exposed to the developer as `window.keyman.util`.
