@@ -49,14 +49,18 @@ int doMigration(void) {
   switch (state) {
     case KeymanSettingsVersion17:
       os_log_info([KMLogs startupLog], "doMigration executed for Keyman 17 to current");
+      [KMDataRepository.shared migrateDataFromKeyman17];
+      [KMSettingsRepository.shared migrateSettingsFromKeyman17];
       break;
     case KeymanSettingsVersion18:
       os_log_info([KMLogs startupLog], "doMigration executed for Keyman 18 to current");
-      [KMDataRepository.shared migrateDataForKeyman19];
-      [KMSettingsRepository.shared migrateSettingsForKeyman19];
+      [KMDataRepository.shared migrateDataFromKeyman18];
+      [KMSettingsRepository.shared migrateSettingsFromKeyman18];
       break;
     case KeymanSettingsNotFound:
-      os_log_info([KMLogs startupLog], "doMigration: no migration needed, settings not found");
+      os_log_info([KMLogs startupLog], "doMigration: no settings found, creating settings and directories");
+      [KMSettingsRepository.shared createSharedSettingsIfNecessary];
+      [KMDataRepository.shared createSharedDirectoriesIfNecessary];
       break;
     case KeymanSettingsVersionCurrent:
       os_log_info([KMLogs startupLog], "doMigration: no migration needed, settings are current");

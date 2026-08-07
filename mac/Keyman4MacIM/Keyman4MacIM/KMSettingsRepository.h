@@ -26,10 +26,9 @@ typedef NS_ENUM(NSInteger, SettingsState) {
 + (KMSettingsRepository *)shared;
 - (instancetype)init;
 - (SettingsState)determineSettingsState;
-- (void)createKeyman19SharedSettingsIfNecessary;
-- (void)migrateSettingsForKeyman18;
-- (void)migrateSettingsForKeyman19;
-- (BOOL)migrateInputMethodSettingsToAppGroup;
+- (void)createSharedSettingsIfNecessary; // introduced with Keyman 19
+- (void)migrateSettingsFromKeyman17;
+- (void)migrateSettingsFromKeyman18;
 - (NSString *)readSelectedKeyboard;
 - (void)writeSelectedKeyboard:(NSString *)selectedKeyboard;
 - (NSArray *)readEnabledKeyboards;

@@ -23,9 +23,9 @@ extern NSString *const kKeymanGroupId;
 @property (readonly) NSURL *keyman19KeyboardsDirectory;
 
 + (KMDataRepository *)shared;
-- (void)createKeyman19SharedDirectoriesIfNecessary;
-- (BOOL)migrateDataForKeyman18;
-- (BOOL)migrateDataForKeyman19;
+- (void)createSharedDirectoriesIfNecessary;
+- (BOOL)migrateDataFromKeyman17;
+- (BOOL)migrateDataFromKeyman18;
 - (NSString*)buildFullPath:(NSString *)fromPartialPath;
 - (NSString*)trimToPartialPath:(NSString *)fromFullPath;
 - (NSString *)buildPartialPathFrom:(NSString *)keyboardSubdirectory keyboardFile:(NSString *)kmxFilename;
