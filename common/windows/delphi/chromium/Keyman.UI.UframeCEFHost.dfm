@@ -39,9 +39,9 @@ object frameCEFHost: TframeCEFHost
     Top = 208
   end
   object cef: TChromium
-    OnWidgetCompMsg = cefWidgetCompMsg
     OnLoadEnd = cefLoadEnd
     OnLoadingStateChange = cefLoadingStateChange
+    OnGotFocus = cefGotFocus
     OnSetFocus = cefSetFocus
     OnRunContextMenu = cefRunContextMenu
     OnPreKeyEvent = cefPreKeyEvent

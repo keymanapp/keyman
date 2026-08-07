@@ -284,6 +284,7 @@ begin
     begin
       TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
         'Failed to open registry key: "' + SRegKey_KeymanEngine_CU + '"');
+      KL.Log('Failed to open registry key: "' + SRegKey_KeymanEngine_CU + '"');
       Exit;
     end;
 
@@ -418,6 +419,7 @@ begin
       begin
         TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
           'Failed to read registry: ' + E.Message);
+        KL.Log('Failed to read registry: "'+ E.Message + '"');
         Result := False;
       end;
     end;
@@ -434,6 +436,7 @@ begin
   begin
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
       'Error CurrentState was uninitiallised');
+    KL.Log('Error CurrentState was uninitiallised');
     Result := nil;
   end;
 end;
@@ -454,7 +457,8 @@ begin
   else
   begin
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-      'Set CurrentState was failed');
+      'Set CurrentState failed');
+    KL.Log('Set CurrentState failed');
   end;
 
 end;
@@ -482,6 +486,7 @@ begin
     Result := usIdle;
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
       'Unknown State Machine class');
+    KL.Log('Unknown State Machine class');
   end;
 end;
 
@@ -493,6 +498,7 @@ begin
   begin
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
       'Error CurrentState was uninitiallised');
+    KL.Log('Error CurrentState was uninitiallised');
     Result := False;
   end;
 end;
@@ -606,6 +612,8 @@ begin
   // during the first run.
   TKeymanSentryClient.Breadcrumb('info',
     'TState.HandleFirstRun first run called in state:"' + Self.ClassName + '"', 'update');
+  // For debugging
+  KL.Log('TState.HandleFirstRun first run called in state:"' + Self.ClassName + '"');
   bucStateContext.RemoveCachedFiles;
   ChangeState(IdleState);
 end;
@@ -701,6 +709,7 @@ begin
   if not IsOnline then
   begin
     TKeymanSentryClient.Breadcrumb('default', 'Not Online, cant execute download process.', 'update');
+    KL.Log('Not Online, cant execute download process.');
     Exit;
   end;
   // call separate process
@@ -711,6 +720,7 @@ begin
   begin
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
       'Executing kmshell process to download updated Failed');
+    KL.Log('Executing kmshell process to download updated Failed');
     ChangeState(IdleState);
   end;
 end;
@@ -796,6 +806,7 @@ begin
     if not FMutex.TakeOwnership then
     begin
       TKeymanSentryClient.Breadcrumb('default', 'DownloadingState.EnterState: Unable to get Mutex download process exists', 'update');
+      KL.Log('DownloadingState.EnterState: Unable to get Mutex download process exists');
       Exit;
     end;
     // verify there is an update available
@@ -819,6 +830,7 @@ begin
     // IdleState to wait 'CheckPeriod' before trying again
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
     'Error Updates not downloaded');
+    KL.Log('Error Updates not downloaded');
     bucStateContext.RemoveCachedFiles;
     ChangeState(IdleState);
   end
@@ -1130,6 +1142,7 @@ begin
     begin
       TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
       'Installing Package failed"' + PackageFullPath + '"');
+      KL.Log('Installing Package failed "' + PackageFullPath + '"');
     end;
   end;
   Result := True;

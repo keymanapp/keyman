@@ -3,7 +3,7 @@ CEF4Delphi is an open source project created by Salvador Díaz Fau to embed Chro
 
 CEF4Delphi is based on DCEF3 and fpCEF3. The original license of those projects still applies to CEF4Delphi. Read the license terms in the LICENSE.md file.
 
-CEF4Delphi uses CEF 146.0.12 which includes Chromium 146.0.7680.179. 
+CEF4Delphi uses CEF 146.0.12 which includes Chromium 146.0.7680.179.
 
 The CEF binaries used by CEF4Delphi are available for download at Spotify :
 * [Windows   32 bits](https://cef-builds.spotifycdn.com/cef_binary_146.0.12%2Bg6214c8e%2Bchromium-146.0.7680.179_windows32.tar.bz2)
@@ -22,7 +22,7 @@ CEF4Delphi demos have been tested in Windows 10, Windows 11, Linux Mint 22.3 and
 * [Developer Forums](https://www.briskbard.com/forum)
 * The Windows components need Windows 10, 11 or newer to run. If you need Windows XP and Vista support use [OldCEF4Delphi](https://github.com/salvadordf/OldCEF4Delphi). If you need Windows 7, 8/8.1 support use [this CEF4Delphi release](https://github.com/salvadordf/CEF4Delphi/releases/tag/109.0.5414.120).
 
-## Stable releases 
+## Stable releases
 This is the development branch and it may have issues. Use the [latest release](https://github.com/salvadordf/CEF4Delphi/releases/latest) if you need a stable component.
 
 ## Support
@@ -47,7 +47,7 @@ Delphinus-Support
 * [WebUI4CSharp](https://github.com/salvadordf/WebUI4CSharp)
 * [Tesseract4Delphi](https://github.com/salvadordf/Tesseract4Delphi)
 * [VirtualTouchKeyboard4Delphi](https://github.com/salvadordf/VirtualTouchKeyboard4Delphi)
-* [DCEF3](https://github.com/hgourvest/dcef3) 
+* [DCEF3](https://github.com/hgourvest/dcef3)
 * [fpCEF3](https://github.com/dliw/fpCEF3)
 * [CEF](https://bitbucket.org/chromiumembedded/cef/)
 * [DCPcrypt](https://sourceforge.net/projects/lazarus-ccr/files/DCPcrypt/)
@@ -76,4 +76,4 @@ Delphinus-Support
 ## Attribution
 * [Fugue & Diagona icons](http://yusukekamiyamane.com/)
 * [FatCow Farm-Fresh Web Icons](https://github.com/gammasoft/fatcow)
-* [Material Design Icons](https://github.com/google/material-design-icons) 
+* [Material Design Icons](https://github.com/google/material-design-icons)

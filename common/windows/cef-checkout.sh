@@ -10,6 +10,12 @@ set -e
 # Terminate script if an unset variable is used
 set -u
 
+### REMOVE THIS LINE IT IS JUST FOR TESTING updating the CEF version we don't want to
+### wipe out the CEF binaries.
+
+exit 0
+
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"

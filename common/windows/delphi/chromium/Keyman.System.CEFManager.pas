@@ -103,8 +103,9 @@ begin
   GlobalCEFApp.ResourcesDirPath     := GlobalCEFApp.FrameworkDirPath;
   GlobalCEFApp.LocalesDirPath       := GlobalCEFApp.FrameworkDirPath + '\locales';
   GlobalCEFApp.EnableGPU            := True;      // Enable hardware acceleration
+  GlobalCEFApp.DoNotDeElevate       := True;
   GlobalCEFApp.cache                := TKeymanPaths.CEFDataPath('cache');
-  GlobalCEFApp.UserDataPath         := TKeymanPaths.CEFDataPath('userdata');
+  GlobalCEFApp.RootCache         := TKeymanPaths.CEFDataPath('userdata');
   GlobalCEFApp.UserAgent            := 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36 (Keyman/'+SKeymanVersion+')';
 
   // We no longer attempt to cleanup before shutdown, and rely on the child cef
