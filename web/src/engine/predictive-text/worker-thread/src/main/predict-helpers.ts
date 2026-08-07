@@ -336,10 +336,13 @@ export function determineSuggestionAlignment(
    */
   predictionContext: Context,
   /**
-   * The total number of characters to delete for generated suggestions
-   * in order to replace the prediction root token entirely.
+   * The total number of characters to delete from the token to be corrected.
    */
-  deleteLeft: number
+  correctionDeleteLeft: number
+  /**
+   * The number of characters deleted from tokens aside from the one being corrected.
+   */
+  committedDeleteLeft: number
 } {
   const transitionEdits = tokenization.transitionEdits;
   const context = transition.base.context;
@@ -361,10 +364,11 @@ export function determineSuggestionAlignment(
       // As the word/token being corrected/predicted didn't originally exist,
       // there's no part of it to 'replace'.  (Suggestions are applied to the
       // pre-transform state.)
-      deleteLeft: 0
+      correctionDeleteLeft: 0,
+      committedDeleteLeft: 0
     };
     // If the tokenized context length is shorter... sounds like a backspace (or similar).
-  } else if (transitionEdits?.removedOldTokens) {
+  } else if (transitionEdits?.removedOldTokens || TransformUtils.isBackspace(inputTransform)) {
     /* Ooh, we've dropped context here.  Almost certainly from a backspace or
      * similar effect.  Even if we drop multiple tokens... well, we know exactly
      * how many chars were actually deleted - `inputTransform.deleteLeft`. Since
@@ -372,7 +376,12 @@ export function determineSuggestionAlignment(
      * remaining context's tail token in addition to however far was deleted to
      * reach that state.
      */
-    deleteLeft = KMWString.length(wordbreak(postContext)) + inputTransform.deleteLeft;
+    return {
+      predictionContext: models.applyTransform({...inputTransform, insert: ''}, context),
+      // Pre-apply delete-lefts, but do not include any inserted portion.
+      correctionDeleteLeft: KMWString.length(wordbreak(postContext)) - KMWString.length(inputTransform.insert),
+      committedDeleteLeft: inputTransform.deleteLeft
+    };
   } else {
     // Suggestions are applied to the pre-input context, so get the token's original length.
     // We're on the same token, so just delete its text for the replacement op.
@@ -385,7 +394,11 @@ export function determineSuggestionAlignment(
     deleteLeft = 0;
   }
 
-  return { predictionContext: context, deleteLeft };
+  return {
+    predictionContext: context,
+    correctionDeleteLeft: deleteLeft,
+    committedDeleteLeft: 0
+  };
 }
 
 /**
@@ -467,7 +480,7 @@ export function buildAndMapPredictions(
   // No matter the prediction, once we know the root of the prediction, we'll
   // always 'replace' the same amount of text.  We can handle this before the
   // big 'prediction root' loop.
-  const { predictionContext, deleteLeft } = determineSuggestionAlignment(transition, tokenization, model);
+  const { predictionContext, correctionDeleteLeft, committedDeleteLeft } = determineSuggestionAlignment(transition, tokenization, model);
 
   let correction = match.matchString;
   let rootCost = match.totalCost;
@@ -475,7 +488,7 @@ export function buildAndMapPredictions(
   // Replace the existing context with the correction.
   const correctionTransform: Transform = {
     insert: correction,  // insert correction string
-    deleteLeft: deleteLeft,
+    deleteLeft: correctionDeleteLeft,
     id: transition.transitionId // The correction should always be based on the most recent external transform/transcription ID.
   }
 
@@ -489,16 +502,8 @@ export function buildAndMapPredictions(
   let predictions = predictFromCorrections(model, [predictionRoot], predictionContext);
   predictions.forEach((entry) => {
     entry.preservationTransform = tokenization.taillessTrueKeystroke;
-    // // Will need an extra lookup layer if the suggestion is generated from within a cluster.
-    // entry.baseTokenization = transition.final.tokenizationSourceMap.get(tokenization);
+    entry.prediction.sample.transform.deleteLeft += committedDeleteLeft;
   });
-
-  // Backspaces that shorten a multi-codepoint whitespace token are not handled well by default.
-  // As a new empty token is placed at the end for such cases, we can detect and handle such cases.
-  const inputTransform = transition.inputDistribution?.[0].sample ?? { insert: '', deleteLeft: 0 };
-  if(tokenization.tokens.length > 1 && tokenization.tail.searchModule.codepointLength == 0 && inputTransform.deleteLeft > 0) {
-    predictions.forEach((p) => p.prediction.sample.transform.deleteLeft += inputTransform.deleteLeft);
-  }
 
   return predictions;
 }

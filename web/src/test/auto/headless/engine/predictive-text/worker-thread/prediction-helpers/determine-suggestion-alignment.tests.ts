@@ -51,7 +51,8 @@ describe('determineSuggestionAlignment', () => {
     const results = determineSuggestionAlignment(transition, transition.final.tokenization, plainCasedModel);
 
     assert.deepEqual(results.predictionContext, context);
-    assert.equal(results.deleteLeft, "techn".length);
+    assert.equal(results.correctionDeleteLeft, "techn".length /* does not include the deleted whitespace */);
+    assert.equal(results.committedDeleteLeft, 0);
   });
 
   it('handles extension of prior token after backspace', () => {
@@ -67,8 +68,14 @@ describe('determineSuggestionAlignment', () => {
     // transition, model
     const results = determineSuggestionAlignment(transition, transition.final.tokenization, plainCasedModel);
 
-    assert.deepEqual(results.predictionContext, context);
-    assert.equal(results.deleteLeft, "tech".length + 1 /* for the deleted whitespace */);
+    assert.deepEqual(results.predictionContext, {
+      ...context,
+      left: context.left.substring(0, context.left.length - 1),
+      right: '',
+      casingForm: undefined
+    });
+    assert.equal(results.correctionDeleteLeft, "tech".length /* does not include the deleted whitespace */);
+    assert.equal(results.committedDeleteLeft, 1 /* for the deleted whitespace */);
   });
 
   it('handles extension of prior token after complex input with delete-left', () => {
@@ -84,7 +91,13 @@ describe('determineSuggestionAlignment', () => {
     // transition, model
     const results = determineSuggestionAlignment(transition, transition.final.tokenization, plainCasedModel);
 
-    assert.deepEqual(results.predictionContext, context);
-    assert.equal(results.deleteLeft, "techn".length + 1 /* for the deleted whitespace */);
+    assert.deepEqual(results.predictionContext, {
+      ...context,
+      left: context.left.substring(0, context.left.length - 1),
+      right: '',
+      casingForm: undefined
+    });
+    assert.equal(results.correctionDeleteLeft, "tech".length /* does not include the deleted whitespace */);
+    assert.equal(results.committedDeleteLeft, 1 /* for the deleted whitespace */);
   });
 });
