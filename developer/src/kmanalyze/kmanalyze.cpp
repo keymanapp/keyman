@@ -7,7 +7,7 @@
 #include <vector>
 #include <codecvt>
 #include <locale>
-#include "../../../common/include/km_vkey.h"
+#include "km_vkey.h"
 
 using namespace km::vkey;
 
