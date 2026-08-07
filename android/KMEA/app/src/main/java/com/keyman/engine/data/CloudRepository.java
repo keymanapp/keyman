@@ -154,8 +154,10 @@ public class CloudRepository {
   /**
    * Search the available lexical models list and see there's an associated model for a
    * given language ID. Available models are from the cloud catalog and locally installed models.
-   * @param context Context
-   * @param languageID String of the language ID to search
+   * If more than one model are installed for a given language, the first one found will be
+   * returned.
+   * @param context     Context
+   * @param languageID  String of the language ID to search
    * @return LexicalModel of an associated lexical model. Null if no match found
    */
   public LexicalModel getAssociatedLexicalModel(@NonNull Context context, String languageID) {
