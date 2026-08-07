@@ -1647,9 +1647,12 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
     // that the user actually touched.  Even if it's not the most likely key.
     const keyDistribution = keyEvent.keyDistribution;
     if(keyDistribution && keyDistribution.length > 1) {
-      const matchIndex = keyDistribution.findIndex(keySample => keySample.keySpec == keySpec);
+      // While the references should match, it appears something disrupts this
+      // within the iOS WebView.  Fortunately, we can still check against the unique
+      // element ID, fortunately.
+      const matchIndex = keyDistribution.findIndex(keySample => keySample.keySpec.elementID == keySpec.elementID);
       if(matchIndex < 0 && correctionKeyFilter(keySpec)) {
-        console.error("Could not find and prioritize output key in its fat-finger distribution");
+        console.error(`Could not find and prioritize output key in its fat-finger distribution`);
       } else if(matchIndex > 0) {
         // Possibly not ideal for easy reading during inspection, but it's
         // low-cost to just swap the entry with the most likely entry and call
