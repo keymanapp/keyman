@@ -18,8 +18,7 @@
 #import "CoreAction.h"
 #import "keyman_core_api.h"
 #import "MacVKCodes.h"
-#import "km_vkey.h"
-//#import "WindowsVKCodes.h"
+#import "WindowsVKCodes.h"
 #import "KMELogs.h"
 
 const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;

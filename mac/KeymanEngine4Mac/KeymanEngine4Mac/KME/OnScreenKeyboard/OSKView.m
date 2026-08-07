@@ -10,8 +10,7 @@
 #import "OSKKey.h"
 #import "KeyView.h"
 #import "MacVKCodes.h"
-//#import "WindowsVKCodes.h"
-#import "km_vkey.h"
+#import "WindowsVKCodes.h"
 #import "NKey.h"
 #import "CoreHelper.h"
 
