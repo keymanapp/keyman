@@ -6,7 +6,7 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
-#define VK_BACKSPACE        0x08
+/*#define VK_BACKSPACE        0x08
 #define VK_TAB              0x09
 #define VK_ENTER            0x0D
 #define VK_SPACE            0x20
@@ -76,4 +76,4 @@
 #define VK_LEFT_BRACKET     0xDB
 #define VK_BACKSLASH        0xDC
 #define VK_RIGHT_BRACKET	0xDD
-#define VK_QUOTE            0xDE
+#define VK_QUOTE            0xDE*/
