@@ -77,7 +77,7 @@
 #include "cp1252.h"
 #include "virtualcharkeys.h"
 
-#include "../../../../common/include/km_vkey.h"
+#include "km_vkey.h"
 #include "../../../../common/include/vkeys.h"
 #include "../../../../common/include/keymanversion.h"
 

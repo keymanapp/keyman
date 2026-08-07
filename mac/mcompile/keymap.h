@@ -8,9 +8,7 @@
 #include <vector>
 
 #include "../../common/include/km_u16.h"
-
-#include "../../common/include/km_vkey.h"
-//#include "../../../../common/include/km_vkey.h"
+#include "km_vkey.h"
 enum ShiftState {
   Base         = 0,                   // 0
   Shft         = 1,                   // 1
