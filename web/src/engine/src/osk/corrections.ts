@@ -1,6 +1,13 @@
 import { ActiveKeyBase, KeyDistribution } from "keyman/engine/keyboard";
 import { CorrectionLayout } from "./correctionLayout.js";
 
+export type CorrectionDistanceMap = Map<
+  string, {
+    keySpec: ActiveKeyBase,
+    dist: number
+  }
+>;
+
 /**
  * Computes a squared 'pseudo-distance' for the touch from each key.  (Not a proper metric.)
  * Intended for use in generating a probability distribution over the keys based on the touch input.
@@ -10,8 +17,8 @@ import { CorrectionLayout } from "./correctionLayout.js";
  *                          by a correction algorithm, also within <0, 0> to <1, 1>.
  * @returns A mapping of key IDs to the 'squared pseudo-distance' of the touchpoint to each key.
  */
-export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiveLayout: CorrectionLayout): Map<ActiveKeyBase, number> {
-  const keyDists: Map<ActiveKeyBase, number> = new Map<ActiveKeyBase, number>();
+export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiveLayout: CorrectionLayout): CorrectionDistanceMap {
+  const keyDists: Map<string, {keySpec: ActiveKeyBase, dist: number}> = new Map();
 
   // This loop computes a pseudo-distance for the touch from each key. Quite useful for
   // generating a probability distribution.
@@ -55,7 +62,7 @@ export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiv
     distY += dy * entry.height;
 
     const distance = distX * distX + distY * distY;
-    keyDists.set(entry.keySpec, distance);
+    keyDists.set(entry.keySpec.elementID, {keySpec: entry.keySpec, dist: distance});
   });
 
   return keyDists;
@@ -66,8 +73,8 @@ export function keyTouchDistances(touchCoords: {x: number, y: number}, correctiv
  * consideration.
  * @returns
  */
-export function distributionFromDistanceMaps(squaredDistMaps: Map<ActiveKeyBase, number> | Map<ActiveKeyBase, number>[]): KeyDistribution {
-  const keyProbs = new Map<ActiveKeyBase, number>();
+export function distributionFromDistanceMaps(squaredDistMaps: CorrectionDistanceMap | CorrectionDistanceMap[]): KeyDistribution {
+  const keyProbs: CorrectionDistanceMap = new Map();
   let totalMass = 0;
 
   if(!Array.isArray(squaredDistMaps)) {
@@ -77,7 +84,7 @@ export function distributionFromDistanceMaps(squaredDistMaps: Map<ActiveKeyBase,
   for(const squaredDistMap of squaredDistMaps) {
     // Should we wish to allow multiple different transforms for distance -> probability, use a function parameter in place
     // of the formula in the loop below.
-    for(const key of squaredDistMap.keys()) {
+    for(const [key, distTuple] of squaredDistMap.entries()) {
       // We've found that in practice, dist^-4 seems to work pretty well.  (Our input has dist^2.)
       // (Note:  our rule of thumb here has only been tested for layout-based distances.)
       //
@@ -85,18 +92,19 @@ export function distributionFromDistanceMaps(squaredDistMaps: Map<ActiveKeyBase,
       // 1. Prevent div-by-0 errors
       // 2. Ensures that the main key's probability doesn't get SO high that we don't
       //    consider correcting to immediate neighbors, even if perfectly accurate.
-      const entry = 1 / (Math.pow(squaredDistMap.get(key), 2) + 3e-5);
+      const entry = 1 / (Math.pow(distTuple.dist, 2) + 3e-5);
       totalMass += entry;
 
       // In case of duplicate key IDs; this can occur if multiple sets are specified.
-      keyProbs.set(key, keyProbs.get(key) ?? 0 + entry);
+      const probTuple = keyProbs.get(key);
+      keyProbs.set(key, {keySpec: distTuple.keySpec, dist: (probTuple?.dist ?? 0) + entry});
     }
   }
 
-  const list: {keySpec: ActiveKeyBase, p: number}[] = [];
+  const list: KeyDistribution = [];
 
-  for(const key of keyProbs.keys()) {
-    list.push({keySpec: key, p: keyProbs.get(key) / totalMass});
+  for(const [key, tuple] of keyProbs.entries()) {
+    list.push({elementID: key, keySpec: tuple.keySpec, p: tuple.dist / totalMass});
   }
 
   return list.sort(function(a, b) {
