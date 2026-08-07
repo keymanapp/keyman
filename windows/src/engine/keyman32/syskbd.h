@@ -22,7 +22,10 @@
 #ifndef __SYSKBD_H
 #define __SYSKBD_H
 
-#define VK_COLON	0xBA
+#include "../../../../common/include/km_vkey.h"
+
+
+/*#define VK_COLON	0xBA
 #define VK_EQUAL	0xBB
 #define VK_COMMA	0xBC
 #define VK_HYPHEN	0xBD
@@ -33,7 +36,7 @@
 #define VK_BKSLASH	0xDC
 #define VK_RBRKT	0xDD
 #define VK_QUOTE	0xDE
-#define VK_xDF		0xDF
+#define VK_xDF		0xDF*/
 
 WCHAR CharFromVK(WORD *VKey, UINT ShiftFlags);   // I4582
 WORD USVKToScanCodeToLayoutVK(WORD VKey);   // I3762
