@@ -28,7 +28,7 @@ NSString *const kKeymanGroupId = @"group.com.keyman";
  * Three directory trees are represented by the following properties, one in active use
  * and two that are obsolete.
  * The actively used directories, introduced in Keyman 19, are shared via the app group `group.com.keyman`:
- *  'Group Containers/group.com.keyman/Library/Application Support/Keyman-Packages/
+ *  '~/Library/Group Containers/group.com.keyman/Library/Application Support/Keyman-Packages/'
  * The obsolete directories from Keyman 18 are:
  *    applicationSupportSubDirectory: '~/Library/Application Support'
  *      keyman18DataDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman'

@@ -53,7 +53,6 @@ NSString *const kAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 NSString *const kUseVerboseLogging = @"KMUseVerboseLogging";
 
 NSString *const kObsoletePathComponent = @"/Documents/Keyman-Keyboards";
-NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputmethod.Keyman/";
 
 /**
  * Store the version number of the data model in the UserDefaults with this key.
@@ -293,7 +292,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
 // MARK: Settings Migration
 
 - (void)migrateSettingsFromKeyman17 {
-  os_log_debug([KMLogs dataLog], "converting settings in UserDefaults for migration");
+  os_log_debug([KMLogs dataLog], "migrating settings in UserDefaults from Keyman 17 ");
   
   [self migrateSettingsFromKeyman17ToAppGroup];
 
@@ -431,6 +430,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
 }
 
 - (void)migrateSettingsFromKeyman18 {
+  os_log_debug([KMLogs dataLog], "migrating settings in UserDefaults from Keyman 178");
   [self migrateSettingsFromKeyman18ToAppGroup];
 
   // set kDataModelVersion for the current format
