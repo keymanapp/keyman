@@ -384,32 +384,32 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
 - (void)convertOptionsPathsFromKeyman17 {
   NSDictionary * optionsMap = [self readFullOptionsMapFromAppDefaults];
   NSMutableDictionary *mutableOptionsMap = nil;
-  BOOL optionsChanged = NO;
 
   if (optionsMap != nil) {
     os_log_info([KMLogs configLog], "optionsMap != nil");
     mutableOptionsMap = [[NSMutableDictionary alloc] initWithCapacity:0];
-    for(id key in optionsMap) {
+    for (id key in optionsMap) {
       os_log_info([KMLogs configLog], "persisted options found in UserDefaults with key = %{public}@", key);
     }
-    for (NSString *key in optionsMap) {
-      NSString *newPathString = [self trimObsoleteKeyboardPath:key];
-      NSDictionary *optionsValue = [optionsMap objectForKey:key];
+    for (NSString *keyboardPath in optionsMap) {
+      os_log_info([KMLogs configLog], "persisted options keybaord path = %{public}@", keyboardPath);
+      NSDictionary *keyboardOptions = [optionsMap objectForKey:keyboardPath];
+      
+      NSString *newPathString = [self trimObsoleteKeyboardPath:keyboardPath];
+      os_log_info([KMLogs configLog], "persisted options converted key = %{public}@", newPathString);
 
-      if ([key isNotEqualTo:newPathString]) {
-        optionsChanged = YES;
-        
+      if ([keyboardPath isNotEqualTo:newPathString]) {
         // insert options into new map with newly converted path as key
-        [mutableOptionsMap setObject:optionsValue forKey:newPathString];
-        os_log_debug([KMLogs dataLog], "converted option key from '%{public}@' to '%{public}@'", key, newPathString);
+        [mutableOptionsMap setObject:keyboardOptions forKey:newPathString];
+        os_log_debug([KMLogs dataLog], "converted option key from '%{public}@' to '%{public}@'", keyboardPath, newPathString);
       } else {
         // retain options that did not need converting
-        [mutableOptionsMap setObject:optionsValue forKey:key];
+        [mutableOptionsMap setObject:keyboardOptions forKey:keyboardPath];
+        os_log_debug([KMLogs dataLog], "no conversion needed, adding options for '%{public}@'", keyboardPath);
       }
     }
-    if (optionsChanged) {
-      [self writeFullOptionsMap:mutableOptionsMap];
-    }
+    // write the full option map for all keyboards to the group UserDefaults
+    [self writeFullOptionsMap:mutableOptionsMap];
   }
 }
 

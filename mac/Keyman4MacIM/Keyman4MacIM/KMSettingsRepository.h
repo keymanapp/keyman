@@ -12,9 +12,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// for classifying the state of the settings (UserDefaults) and data
-// used for determining whether migration is needed of the UserDefaults and Keyman packages
-// to a new format and/or location
+// For classifying the state of the settings (UserDefaults) and data.
+// Used to determine whether migration is needed of the UserDefaults and Keyman packages
+// to a new format and/or location.
 typedef NS_ENUM(NSInteger, SettingsState) {
   KeymanSettingsNotFound = 0,
   KeymanSettingsVersion17 = 17,
