@@ -17,3 +17,5 @@ const breakWords = wordBreakers['default'];
 console.log(breakWords('Hello, World!').map(span => span.text));
 // prints: [ 'Hello', ',', 'World', '!' ]
 ```
+
+## TODO: dict-breakers
