@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:KeymanSettings">
+   </FileRef>
+   <FileRef
+      location = "group:Config/Config.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:Keyman4MacIM/Pods/Pods.xcodeproj">
    </FileRef>
    <FileRef
@@ -12,5 +18,8 @@
    </FileRef>
    <FileRef
       location = "group:Keyman4Mac/Keyman4Mac.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:KeymanSettings/Tests/KeymanSettingsTests/KeymanSettingsTests.xctestplan">
    </FileRef>
 </Workspace>
