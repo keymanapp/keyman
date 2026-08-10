@@ -1,5 +1,5 @@
 ---
-title: Core Module
+title: `keyman` - Core Module
 ---
 
 The KeymanWeb core module is exposed to the developer as `window.keyman`.

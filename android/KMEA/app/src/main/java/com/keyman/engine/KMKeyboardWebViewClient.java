@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2023 SIL International. All rights reserved.
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
  */
 package com.keyman.engine;
 
@@ -9,9 +9,13 @@ import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.util.Log;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
+import androidx.webkit.WebViewAssetLoader;
+import androidx.webkit.WebViewAssetLoader.InternalStoragePathHandler;
 
 import com.keyman.engine.KeyboardEventHandler.EventType;
 import com.keyman.engine.KMManager;
@@ -19,6 +23,7 @@ import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMManager.SuggestionType;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.util.WebViewUtils;
 
 import org.json.JSONObject;
 
@@ -31,11 +36,16 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
   public Context context;
   private KeyboardType keyboardType;
   private boolean keyboardLoaded;
+  private WebViewAssetLoader assetLoader;
 
   KMKeyboardWebViewClient(Context context, KeyboardType keyboardType) {
     this.context = context;
     this.keyboardType = keyboardType;
     this.keyboardLoaded = false;
+    this.assetLoader = new WebViewAssetLoader.Builder()
+      .addPathHandler(WebViewUtils.ASSET_DATA_PATH,
+        new InternalStoragePathHandler(context, context.getDir("data", Context.MODE_PRIVATE)))
+      .build();
 
     if (keyboardType != KeyboardType.KEYBOARD_TYPE_INAPP && keyboardType != KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       KMLog.LogError(TAG, String.format("Cannot initialize: Invalid keyboard type: %s", keyboardType.toString()));
@@ -59,6 +69,11 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
   }
 
   @Override
+  public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+    return this.assetLoader.shouldInterceptRequest(request.getUrl());
+  }
+
+  @Override
   public void onPageFinished(WebView view, String url) {
     Log.d("KMEA", String.format("onPageFinished: [%s] %s", keyboardType.toString(), url));
     shouldOverrideUrlLoading(view, url);
@@ -74,46 +89,44 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
     kmKeyboard.keyboardSet = false;
     KMManager.currentLexicalModel = null;
 
-    if (url.startsWith("file")) { // TODO: is this test necessary?
-      this.keyboardLoaded = true;
+    this.keyboardLoaded = true;
 
-      SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-      int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-      if (index < 0) {
-        index = 0;
+    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
+    Keyboard keyboardInfo = null;
+    if (index >= 0) {
+      keyboardInfo = KMManager.getKeyboardInfo(context, index);
+    }
+    String langId = null;
+    if (keyboardInfo != null) {
+      langId = keyboardInfo.getLanguageID();
+      kmKeyboard.setKeyboard(keyboardInfo);
+    } else {
+      // Revert to default (index 0) or fallback keyboard
+      keyboardInfo = KMManager.getKeyboardInfo(context, 0);
+      if (keyboardInfo == null) {
+        // Don't log to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
+        keyboardInfo = KMManager.getDefaultKeyboard(context);
       }
-      Keyboard keyboardInfo = KMManager.getKeyboardInfo(context, index);
-      String langId = null;
       if (keyboardInfo != null) {
         langId = keyboardInfo.getLanguageID();
         kmKeyboard.setKeyboard(keyboardInfo);
-      } else {
-        // Revert to default (index 0) or fallback keyboard
-        keyboardInfo = KMManager.getKeyboardInfo(context, 0);
-        if (keyboardInfo == null) {
-          // Don't log to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
-          keyboardInfo = KMManager.getDefaultKeyboard(context);
-        }
-        if (keyboardInfo != null) {
-          langId = keyboardInfo.getLanguageID();
-          kmKeyboard.setKeyboard(keyboardInfo);
-        }
       }
+    }
 
-      KMManager.registerAssociatedLexicalModel(langId);
+    KMManager.registerAssociatedLexicalModel(langId);
 
-      kmKeyboard.showHelpBubbleAfterDelay(2000, true); // check if it should be shown at that time!
+    kmKeyboard.showHelpBubbleAfterDelay(2000, true); // check if it should be shown at that time!
 
-      kmKeyboard.callJavascriptAfterLoad();
-      kmKeyboard.setSpacebarText(KMManager.getSpacebarText());
+    kmKeyboard.callJavascriptAfterLoad();
+    kmKeyboard.setSpacebarText(KMManager.getSpacebarText());
 
-      KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, keyboardType, EventType.KEYBOARD_LOADED, null);
+    KeyboardEventHandler.notifyListeners(KMTextView.kbEventListeners, keyboardType, EventType.KEYBOARD_LOADED, null);
 
-      // Special handling for in-app TextView context keymanapp/keyman#3809
-      if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP &&
-          KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
-        KMTextView.updateTextContext();
-      }
+    // Special handling for in-app TextView context keymanapp/keyman#3809
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP &&
+        KMTextView.activeView != null && KMTextView.activeView.getClass() == KMTextView.class) {
+      KMTextView.updateTextContext();
     }
   }
 

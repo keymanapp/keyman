@@ -1,7 +1,7 @@
 ---
-title: Desktop User Interfaces
+title: `keyman.ui` - Desktop User Interfaces
 ---
-  
+
 Four different KeymanWeb user interfaces for desktop browsers are
 included, allowing users to select and enable keyboard mapping from a
 list of installed keyboards, and to control the visibility of the
