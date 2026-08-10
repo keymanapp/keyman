@@ -6,7 +6,6 @@
   History:      7 Oct 2018 - TSE - Refactored out of km_core_keyboard_api.cpp
 */
 #include "keyboard.hpp"
-#include "jsonpp.hpp"
 
 using namespace km::core;
 
@@ -47,15 +46,4 @@ keyboard_attributes::keyboard_attributes(keyboard_attributes &&rhs)
 keyboard_attributes & keyboard_attributes::operator = (keyboard_attributes &&rhs)
 {
   return *new (this) keyboard_attributes(std::move(rhs));
-}
-
-
-json & km::core::operator << (json & j, km::core::keyboard_attributes const & kb)
-{
-  j << json::object
-      << "id" << kb.id
-      << "version" << kb.version_string
-      << "rules" << json::array << json::close;
-
-  return j << json::close;
 }

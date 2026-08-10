@@ -7,9 +7,9 @@ import {assert} from 'chai';
 import { stripIndent } from 'common-tags';
 
 import { KMX, KvkFileWriter, VisualKeyboard } from '@keymanapp/common-types';
-import hextobin from '@keymanapp/hextobin';
+import { hextobinFromFile } from '@keymanapp/hextobin';
 
-import { checkMessages, compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
+import { checkMessages, compilerTestCallbacks, compilerTestOptions, makePathToCommonFixture, makePathToFixture } from './helpers/index.js';
 
 import { LdmlKeyboardVisualKeyboardCompiler } from '../src/compiler/visual-keyboard-compiler.js';
 import { LDMLKeyboardXMLSourceFileReader } from '@keymanapp/developer-utils';
@@ -22,7 +22,7 @@ describe('visual-keyboard-compiler', function() {
     // Let's build basic.xml
 
     // It should match basic.kvk (built from basic-kvk.txt)
-    const inputFilename = makePathToFixture('basic.xml');
+    const inputFilename = makePathToCommonFixture('keyboards', 'kmx-plus', 'basic.xml');
     const binaryFilename = makePathToFixture('basic-kvk.txt');
 
     // Compile the visual keyboard
@@ -57,7 +57,7 @@ describe('visual-keyboard-compiler', function() {
     assert.isNotNull(code);
 
     // Compare output
-    const expected = await hextobin(binaryFilename, undefined, {silent:true});
+    const expected = hextobinFromFile(binaryFilename, undefined, {silent:true});
 
     assert.deepEqual<Uint8Array>(code, expected);
   });

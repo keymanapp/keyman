@@ -5,9 +5,10 @@
  * to .kvk format. This is an interim solution until Keyman Core supports
  * interrogation of the KMX+ data for OSK.
  */
-import { ModifierKeyConstants, KMXPlus, VisualKeyboard } from "@keymanapp/common-types";
+import { KMXPlus, VisualKeyboard, translateLdmlModifiersToVisualKeyboardShift } from "@keymanapp/common-types";
 import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
+import { constants } from "@keymanapp/ldml-keyboard-constants";
 
 // This is a partial polyfill for findLast, so not polluting Array.prototype
 // https://medium.com/@stheodorejohn/findlast-method-polyfill-in-javascript-bridging-browser-gaps-c3baf6aabae1
@@ -25,16 +26,6 @@ function findLast(arr: any, callback: any) {
   }
   return undefined;
 }
-
-
-const LDML_MODIFIER_TO_KVK_MODIFIER = new Map<number, number>();
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.LCTRLFLAG,      VisualKeyboard.VisualKeyboardShiftState.KVKS_LCTRL);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.RCTRLFLAG,      VisualKeyboard.VisualKeyboardShiftState.KVKS_RCTRL);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.LALTFLAG,       VisualKeyboard.VisualKeyboardShiftState.KVKS_LALT);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.RALTFLAG,       VisualKeyboard.VisualKeyboardShiftState.KVKS_RALT);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_SHIFTFLAG,    VisualKeyboard.VisualKeyboardShiftState.KVKS_SHIFT);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_CTRLFLAG,     VisualKeyboard.VisualKeyboardShiftState.KVKS_CTRL);
-LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_ALTFLAG,      VisualKeyboard.VisualKeyboardShiftState.KVKS_ALT);
 
 export class LdmlKeyboardVisualKeyboardCompiler {
   public constructor(private callbacks: CompilerCallbacks) {
@@ -60,13 +51,13 @@ export class LdmlKeyboardVisualKeyboardCompiler {
 
     let hasVisualKeyboard = false;
 
-    for(const layersList of source.layr.lists) {
-      const formId = layersList.hardware.value;
+    for(const layersForm of source.layr.forms) {
+      const formId = layersForm.hardware.value;
       if(formId == 'touch') {
         continue;
       }
 
-      for(const layer of layersList.layers) {
+      for(const layer of layersForm.layers) {
         const res = this.compileHardwareLayer(source, result, layer, formId);
         if(res === false) {
           // failed to compile the layer
@@ -97,7 +88,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
 
     hardware = 'us'; // TODO-LDML: US Only. We need to clean this up for other hardware forms
 
-    const shift = this.translateLayerModifiersToVisualKeyboardShift(layer.mod);
+    const shift = translateLdmlModifiersToVisualKeyboardShift(layer.mod);
     if(shift === null) {
       // Caps (num, scroll) is not a supported shift state in .kvk
       return null;
@@ -136,33 +127,15 @@ export class LdmlKeyboardVisualKeyboardCompiler {
   }
 
   private getDisplayFromKey(keydef: KMXPlus.KeysKeys, source: KMXPlus.KMXPlusData) {
-    const display = source.disp?.disps?.find(d => d.id.value == keydef.id.value || d.to.value == keydef.to.value);
+    // if(source.disp.disps[0].toId)
+    const display = source.disp?.disps?.find(d =>
+      d.toId !== null
+      ? (d.toId.value == keydef.id.value && d.flags & constants.disp_item_flags_is_id) ||
+        (d.toId.value == keydef.to.value && !(d.flags & constants.disp_item_flags_is_id))
+      : d.id.value == keydef.id.value || d.to.value == keydef.to.value);
     const value = display?.display.value ?? keydef.to.value;
     // strip markers from the output (these are valid in keydef.to, but not in display.display, nor in kvk)
     return value.replaceAll(/\uffff\u0008./g, '');
   }
 
-  private translateLayerModifiersToVisualKeyboardShift(modifiers: number): VisualKeyboard.VisualKeyboardShiftState {
-
-    if(modifiers == 0) {
-      return VisualKeyboard.VisualKeyboardShiftState.KVKS_NORMAL;
-    }
-
-    if(modifiers &
-      (ModifierKeyConstants.CAPITALFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.SCROLLFLAG)
-    ) {
-      // Caps/Num/Scroll are not supported in .kvk, in combination or alone
-      return null;
-    }
-
-    let shift: VisualKeyboard.VisualKeyboardShiftState = 0;
-
-    for(const mod of LDML_MODIFIER_TO_KVK_MODIFIER.keys()) {
-      if(modifiers & mod) {
-        shift |= LDML_MODIFIER_TO_KVK_MODIFIER.get(mod);
-      }
-    }
-
-    return shift;
-  }
 }

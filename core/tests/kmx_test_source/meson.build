@@ -1,22 +1,16 @@
-
-# TODO -- why are these differing from the standard.meson.build flags?
-if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
-  warns = [
-     '-Wno-missing-field-initializers',
-     '-Wno-unused-parameter'
-  ]
-else
-  warns = []
-endif
-
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# Build kmx_test_source library (used by core, linux)
+#
 coretest_files = files(
     'kmx_test_source.cpp',
 )
 
 kmx_test_source_lib = static_library('keymancore-tests',
   coretest_files,
-  cpp_args: defns + warns + flags,
-  include_directories: [inc, libsrc],
+  cpp_args: defns + test_warns + flags,
+  include_directories: test_includes,
   link_args: links,
   objects: lib.extract_all_objects(recursive: false),
   pic: true,
