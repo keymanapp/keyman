@@ -1265,6 +1265,9 @@ export function determineTaillessTrueKeystroke(tokenizedInput: Map<number, Trans
     // by the loop that follows, without fail.
   }
 
+  // We first wish to find the transform that affects the final post-transition
+  // token.  Accordingly, skip past any transforms that deleted pre-transition
+  // tokens.
   const transformKeys = [...tokenizedInput.keys()];
   do {
     const penultimateKey = transformKeys[transformKeys.length - 2];
@@ -1299,9 +1302,9 @@ export function determineTaillessTrueKeystroke(tokenizedInput: Map<number, Trans
   // constant.
   transformKeys.pop();
 
-  // If no inputs remain, that's fine - that means an empty transform applies to
-  // whatever token exists to the token indexed before the first input-key
-  // entry.
+  // If no inputs remain, that's fine - that means of the remaining
+  // post-transition context tokens, only the final token is affected by the
+  // input.
   for(let i of transformKeys) {
     const primaryInput = tokenizedInput.get(i);
     if(!taillessTrueKeystroke) {
