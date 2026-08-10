@@ -468,7 +468,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       return true;
     } else if (item.getItemId() == R.id.action_update_keyboards) {
       KMManager.getUpdateTool().executeOpenUpdates();
-      // Dismiss icon
+      // Dismiss icon - we intentionally hide the icon, even if the user cancels the update
       updateUpdateCountIndicator(0);
       final MenuItem _keyboardupdate = menu.findItem(R.id.action_update_keyboards);
       if (_keyboardupdate != null && _keyboardupdate.isVisible()) {
