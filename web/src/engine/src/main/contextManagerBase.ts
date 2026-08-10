@@ -150,7 +150,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * attached elements within the app/browser textStore.  For `app/webview`, this should
    * always return a consistent value - likely, `null`.
    */
-  protected abstract currentKeyboardSrcTextStore(): TextStore;
+  protected abstract currentKeyboardSrcTextStore(): TextStore | null;
 
   /**
    * Ensures that newly activated keyboards are set correctly within managed context, possibly
