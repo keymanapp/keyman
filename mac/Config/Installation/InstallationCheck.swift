@@ -75,16 +75,16 @@ public class InstallationCheck {
           return .newInstallation
         } else if state.isRepair {
           return .installationRepairNeeded
-        } else {
-          return .installationInProgress
         }
+        
+        return .installationInProgress
       }
-    } else {
-      // in case that installationState (optional) == nil
-      // will never reach this case because if it is nil
-      // we return inputMethodMissing or inputMethodOutdated
-      return .newInstallation
     }
+    
+    // In case installationState (optional) == nil --
+    // though we will never reach this case because if it is nil
+    // we return inputMethodMissing or inputMethodOutdated
+    return .newInstallation
   }
   
   public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil) {
