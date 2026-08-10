@@ -40,6 +40,7 @@
             <key code="1" output="&#x1234;"/>
             <key code="2" output="&#2345;"/>
             <key code="3" output="&#x1F600;"/>
+            <!-- this is not technically valid XML but .keylayout files include C0 characters -->
             <key code="4" output="&#x0002;"/>
             <key code="5" output="&#x0004;"/>
             <key code="6" output="&amp;"/>

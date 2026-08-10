@@ -56,6 +56,7 @@
             <when state="1" output="â"/>
         </action>
         <action id="A7">
+            <!-- this is not technically valid XML but .keylayout files include C0 characters -->
             <when state="1" output="&#0007;"/>
         </action>
     </actions>

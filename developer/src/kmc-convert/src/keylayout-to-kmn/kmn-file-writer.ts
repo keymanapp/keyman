@@ -130,10 +130,16 @@ export class UnicodeCharacterConversion {
   }
 
   /**
-    * @brief  recursive function to read a string char by char and convert all occuring
-    * hex and dec html entities as well as some named entities to the corresponding character.
-    * @param  inputString the string that will be read and converted
-    * @return an ReplacedOutputString containing all processed data obtained
+    * @brief  recursive function to read a string 'step' by 'step' and return an object containing the 
+    * input string, replaced_character, replaced_string, rest_string and a carryOver.
+    * A 'step' is either a character or a hex, dec or named html entitiy.
+    * @param  inputString an object containing all data that will be read and converted:
+    *  - input the inputstring; replaced by rest_tring after each iteration until no characters/entities are left to convert
+    *  - replaced_character: the first character of the input string or the converted html entity
+    *  - replaced_string: a concatination of all replaced characters
+    *  - rest_string: the input string with the first character or html entity chopped off
+    *  - carryOver: a '&' in case a non html named specification of '&' is used in the input string ( e.g. '&#x0026;gt;' -> &gt; )    * 
+    * @return an ReplacedOutputString containing all data
     *         undefined if input is null or undefined
     */
   public static processXmlValue(inputString: ReplacedOutputString): ReplacedOutputString {

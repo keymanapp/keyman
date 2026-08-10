@@ -408,7 +408,7 @@ describe('KmnFileWriter', function () {
     });
   });
 
-  describe('UnicodeCharacterConversion readXmlOutput', function () {
+  describe('UnicodeCharacterConversion processXmlValue', function () {
     [
       ["", ''],
       [undefined, undefined],
@@ -505,7 +505,7 @@ describe('KmnFileWriter', function () {
       ['typing a &amp;gt', 'typing a &gt'],
 
     ].forEach(function (values) {
-      it(('readXmlOutput should convert ' + values[0] + "'").padEnd(30, " ") + " to '" + values[1] + "'", async function () {
+      it(('processXmlValue should convert ' + values[0] + "'").padEnd(30, " ") + " to '" + values[1] + "'", async function () {
         const out: ReplacedOutputString = {
           input: values[0] as string,
           replaced_character: '',
@@ -558,6 +558,109 @@ describe('KmnFileWriter', function () {
     ].forEach(function (values) {
       it(('unescape_string should unescape ' + values[0] + "'").padEnd(30, ' ') + " to '" + values[1] + "'", async function () {
         const result = UnicodeCharacterConversion.unescape_string(values[0] as string);
+        assert.equal(result, values[1]);
+      });
+    });
+  });
+
+  describe('convert_htmlToCharacter', function () {
+    [
+      ["", ''],
+      [undefined, undefined],
+      [null, undefined],
+
+      ['<', '<'],
+      ['a', 'a'],
+      ['ሴ', 'ሴ'],
+      ['W̊', 'W̊'],
+      ['😎', '😎'],
+      ['ab', 'ab'],
+      ['ሴЖ', 'ሴЖ'],
+      ['ẘẈ', 'ẘẈ'],
+      ['😎😆', '😎😆'],
+      ['aሴẘ😆', 'aሴẘ😆'],
+      ['U+0061', 'U+0061'],
+      ['&#x61;', 'a'],
+      ['&#x1E98;', 'ẘ'],
+      ['&#x0002;', '\u0002'],
+      ['&#4660;', 'ሴ'],
+      ['&#128518;', '😆'],
+      ['&#0003;', '\u0003'],
+      ['&lt;', '&lt;'],
+      ['&quot;', '&quot;'],
+      ['&apos;', '&apos;'],
+      ['␤', '␤'],
+      ['␕', '␕'],
+      ['', ''],
+      ['U+', 'U+'],
+
+      ['&gt;', '&gt;'],
+      ['&amp;gt', '&amp;gt'],
+      [' &amp;gt', ' &amp;gt',],
+      ['y&amp;gt', 'y&amp;gt'],
+      ['&amp;', '&amp;'],
+      ['&amp;amp;', '&amp;amp;'],
+      ['&amp;amp;amp;', '&amp;amp;amp;'],
+      ['&amp;#x1234;', '&amp;#x1234;'],
+      ['&amp;#x1234;&amp;', '&amp;#x1234;&amp;'],
+      ['&amp;#x&amp;#x;', '&amp;#x&amp;#x;'],
+      ['a&gt;b', 'a&gt;b'],
+      ['a &gt; b', 'a &gt; b'],
+
+      ['&', '&'],
+      ['&#x;', '&#x;'],
+      ['&#;', '&#;'],
+      ['&##;', '&##;'],
+
+      ['&a', '&a'],
+      ['a&b', 'a&b'],
+      ['a&bcd&defg', 'a&bcd&defg'],
+      ['a&gt', 'a&gt'],
+      ['&&', '&&'],
+      ['&&;', '&&;'],
+      ['&#&#', '&#&#'],
+      ['&#x&#x', '&#x&#x'],
+      ['&#', '&#'],
+      ['&#x', '&#x'],
+      ['&##', '&##'],
+
+      ['&#x10FFFF;', undefined],
+      ['&#1114111;', undefined],
+      ['&#x110000;', undefined],
+      ['&#x0026;gt;', '&#x0026;gt;'],
+      ['&#x1000000;', '&#x1000000;'],
+      ['&#x2000000;', '&#x2000000;'],
+      ['aሴ&#x1F60F;bẘ&gt;😆z<y&amp;&#97;😎-&#128547&#x1F60F;', 'aሴ&#x1F60F;bẘ&gt;😆z<y&amp;&#97;😎-&#128547&#x1F60F;'],
+      ['aሴ&#x1F60F;bẘ&gt;😆z<y&amp;&#97;😎-&#128547;&#x1F60F;', 'aሴ&#x1F60F;bẘ&gt;😆z<y&amp;&#97;😎-&#128547;&#x1F60F;'],
+
+      ['&#1234;56', '&#1234;56'],
+      ['&#&#1234;56', '&#&#1234;56'],
+      ['a&#&#1234;56', 'a&#&#1234;56'],
+      ['&#x0026;gt', '&#x0026;gt'],
+
+      ['&#x1F60F;', '😏'],
+      ['&#x1234;', 'ሴ'],
+      ['&#97;', 'a'],
+      ['&#7835;', 'ẛ'],
+      ['&#x1F606;', '😆'],
+      ['&#1000000;', '󴉀'],
+      ['&gt', '&gt'],
+
+      ['&amp;#x1234;', '&amp;#x1234;'],
+      ['&#x0026;amp;#x1234;', '&#x0026;amp;#x1234;'],
+      ['&commat;', '&commat;'],
+      ['&amp;lt;', '&amp;lt;'],
+      ['x&amp;lt;', 'x&amp;lt;'],
+      [' &amp;lt;', ' &amp;lt;'],
+
+      ['typing a &gt;', 'typing a &gt;'],
+      ['typing a &amp;gt;', 'typing a &amp;gt;'],
+      ['typing a amp;gt;', 'typing a amp;gt;'],
+      ['typing a "&gt;"', 'typing a "&gt;"'],
+      ['typing a &amp;gt', 'typing a &amp;gt'],
+    ].forEach(function (values) {
+      it(('convert_htmlToCharacter should convert ' + values[0] + "'").padEnd(30, ' ') + " to '" + values[1] + "'", async function () {
+        const result = UnicodeCharacterConversion.convert_htmlToCharacter(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
