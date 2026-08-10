@@ -17,7 +17,7 @@ java {
 }
 
 android {
-    compileSdk 35
+    compileSdk 36
     namespace="com.tavultesoft.kmapro"
 
     // Don't compress kmp files so they can be copied via AssetManager
@@ -32,7 +32,7 @@ android {
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
         minSdkVersion 21
-        targetSdkVersion 35
+        targetSdkVersion 36
 
         //println "===DUMPING PROPERTIES==="
         //dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration
