@@ -12,7 +12,7 @@ java {
 }
 
 android {
-    compileSdk 35
+    compileSdk 36
     namespace="com.keyman.kmsample2"
 
     // Don't compress kmp files so they can be copied via AssetManager
@@ -27,7 +27,7 @@ android {
     defaultConfig {
         applicationId "com.keyman.kmsample2"
         minSdkVersion 21
-        targetSdkVersion 35
+        targetSdkVersion 36
 
         // KEYMAN_VERSION_CODE, KEYMAN_VERSION_NAME, KEYMAN_VERSION_FOR_FILENAME from version.gradle
         versionCode KEYMAN_VERSION_CODE as Integer
