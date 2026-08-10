@@ -12,6 +12,7 @@ import KeymanSettings
 struct ConfigDebugView: View {
   @EnvironmentObject var settings: SettingsContainer
   @State private var isShowingSheet = false
+  @State private var isHovering = false
 
   var body: some View {
     VStack {
@@ -41,7 +42,31 @@ struct ConfigDebugView: View {
           .frame(width: 700, height: 500)
       }
 
-      
+      VStack {
+        Text(settings.dragStatusMessage)
+          .font(.system(.body, design: .monospaced))
+          .multilineTextAlignment(.center)
+          .padding()
+          .frame(width: 350, height: 180)
+          .background(Color(NSColor.controlBackgroundColor))
+          .cornerRadius(10)
+          .overlay(
+            RoundedRectangle(cornerRadius: 10)
+              .stroke(isHovering ? Color.accentColor : Color.gray, lineWidth: 2)
+          )
+        // Accept URL drops
+          .dropDestination(for: URL.self) { urls, _ in
+            guard let archiveURL = urls.first, urls.count == 1 else {
+              settings.dragStatusMessage = "Drop exactly one file."
+              return false
+            }
+            return settings.processDraggedKmpFile(from: archiveURL)
+          } isTargeted: { hovering in
+            isHovering = hovering
+          }
+      }
+      .padding()
+
       ScrollView {
         VStack(alignment: .leading, spacing: 6) {
           ForEach(Array(settings.singleKeyboardPackages.enumerated()), id: \.offset) { index, package in
