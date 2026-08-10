@@ -27,7 +27,9 @@ import ZIPFoundation
 
 // distributed notifications
 public extension Notification.Name {
-  static let accessibilityQueryResponse = Notification.Name("com.keyman.accessibility.state")
+  // sent from input method, received by InstallationCheck
+  static let accessibilityStateResponse = Notification.Name("com.keyman.accessibility.state")
+  // sent from config app (DefaultsRepository), received by input method
   static let keyboardsChanged = Notification.Name("com.keyman.keyboards.changed")
 }
 

@@ -10,7 +10,7 @@ import SwiftUI
 import KeymanSettings
 import Combine
 
-struct KeyboardListView: View {
+struct KeyboardListDebugView: View {
   @EnvironmentObject var settings: SettingsContainer
   @State var packageId: UUID
   @State var keyboards: [Keyboard]

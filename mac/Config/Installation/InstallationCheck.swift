@@ -15,44 +15,174 @@
 import Foundation
 import KeymanSettings
 
+public enum InstallationPhase {
+  case inputMethodMissing
+  case inputMethodOutdated
+  case evaluatingInstallation
+  case newInstallation
+  case installationInProgress
+  case installationComplete
+  case installationRepairNeeded
+  
+  // indicates whether the installation contains tasks to complete installation
+  public var hasTasks: Bool {
+    switch self {
+    case .newInstallation,
+        .installationInProgress,
+        .installationRepairNeeded:
+      return true
+    default:
+      return false
+    }
+  }
+}
+
+enum InstallationStateCondition {
+  case stale
+  case new
+  case inProgress
+}
+
 @MainActor
 public class InstallationCheck {
-  public let isInputMethodInstalled: Bool
-  public let isInputMethodCurrent: Bool
   public var installationState: InstallationState?
+  // with isEvaluatingNewInstallation==true, we are awaiting
+  // message from input method to determine what tasks are needed
+  public var isEvaluatingNewInstallation: Bool
+  fileprivate let isInputMethodInstalled: Bool
+  fileprivate let isInputMethodCurrent: Bool
   fileprivate let inputMethodVersion: String
   fileprivate let configurationVersion: String
   fileprivate let defaultsRepository: DefaultsRepo
   fileprivate let inputMethodUtil: InputMethodUtil
 
+  // a classification of the install state
+  // provided so UI knows what to present to the user
+  public var installationPhase: InstallationPhase {
+    if !self.isInputMethodInstalled {
+      return .inputMethodMissing
+    } else if !self.isInputMethodCurrent {
+      return .inputMethodOutdated
+    } else if self.isEvaluatingNewInstallation {
+      return .evaluatingInstallation
+    }
+    
+    if let state = self.installationState {
+      if state.isComplete {
+        return .installationComplete
+      } else {
+        if state.isNew {
+          return .newInstallation
+        } else if state.isRepair {
+          return .installationRepairNeeded
+        }
+        
+        return .installationInProgress
+      }
+    }
+    
+    // In case installationState (optional) == nil --
+    // though we will never reach this case because if it is nil
+    // we return inputMethodMissing or inputMethodOutdated
+    return .newInstallation
+  }
+  
   public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil) {
     self.defaultsRepository = defaultsRepo
     self.inputMethodUtil = inputMethodUtil
+    self.isEvaluatingNewInstallation = false
+    self.configurationVersion = ConfigAppUtil.configAppVersion()
     
-    if inputMethodUtil.keymanInputMethodExists() {
-      self.isInputMethodInstalled = true
-      self.inputMethodVersion = (try? inputMethodUtil.getKeymanInputMethodVersion()) ?? "unknown"
-    } else {
-      self.isInputMethodInstalled = false
-      self.inputMethodVersion = "unknown"
+    var keymanIsCurrent = false
+    var keymanVersion: String = "unknown"
+
+    let keymanExists = inputMethodUtil.keymanInputMethodExists()
+    if keymanExists {
+      keymanVersion = (try? inputMethodUtil.getKeymanInputMethodVersion()) ?? "unknown"
+      keymanIsCurrent = InstallationCheck.isVersionCurrent(inputMethodVersion: keymanVersion, configurationVersion: self.configurationVersion)
     }
     
-    self.configurationVersion = ConfigAppUtil.configAppVersion()
-    self.isInputMethodCurrent = InstallationCheck.isVersionCurrent(inputMethodVersion: self.inputMethodVersion, configurationVersion: self.configurationVersion)
-    
-    self.installationState = self.loadState()
+    self.isInputMethodInstalled = keymanExists
+    self.isInputMethodCurrent = keymanIsCurrent
+    self.inputMethodVersion = keymanVersion
+
+    let installState = InstallationCheck.readInstallationState(from: defaultsRepo)
+
+    if (keymanExists && keymanIsCurrent) {
+      // the input method is valid, examine the installation state recorded on disk
+      //
+      let installationStateCondition = InstallationCheck.evaluateInstallationState(state: installState, for: keymanVersion);
+      print("installationStateCondition: \(installationStateCondition)")
+      
+      switch installationStateCondition {
+      case .inProgress:
+        self.installationState = installState     // resume with the existing installation
+      case .new:
+        self.isEvaluatingNewInstallation = true   // evaluate before creating a new InstallationState
+      case .stale:
+        self.clearInstallationState()             // delete the existing installation state from the UserDefaults
+        self.isEvaluatingNewInstallation = true   // evaluate before creating a new InstallationState
+      }
+    }
     
     self.registerObservers()
-    
-    if self.isValidationNeeded() {
-      self.startValidation()
-    }
   }
 
+  /**
+   * Check the condition of the InstallationState as recorded in the UserDefaults.
+   * Determine whether it is `stale` and should be deleted
+   * (which then is treated as a new installation) or
+   * is `inProgress` and should be loaded and used, or
+   * is `new`. All new installations are re-evaluated to determine
+   * what tasks must be executed to complete the installation.
+   */
+  static func evaluateInstallationState(state: InstallationState?, for version: String) -> InstallationStateCondition {
+ 
+    // If the installationState does not exist, then this is a new installation.
+    // The installationState will be created when evaluation is complete.
+    guard state != nil else { return .new }
+    
+    var condition = InstallationStateCondition.inProgress
+    
+    if let installState = state {
+      // If the installationState remains from a different install, mark it as stale.
+      // It will be deleted and we will evaluate for a new installation.
+      if installState.keymanVersion != version {
+        condition = .stale
+      } else if installState.isNew {
+        condition = .new
+      } else {
+        // If we're already in progress or completed or doing a repair, pick up where we left off
+        // Note that a completed installation will be checked for repairs
+        condition = .inProgress
+      }
+    }
+
+    return condition
+  }
+  
+  /**
+   * Should be called immediately after init to evaluate what is needed for installation
+   * or, if the installation is complete, whether it needs repairs.
+   * When the notification from the input method is received and the evaluation is done,
+   * the installation can move out of the `evaluatingInstallation` phase
+   */
+  public func startInstallationEvaluation() {
+    // call the input method to check whether Accessibility permission has been granted
+    if (self.isInputMethodInstalled && self.isInputMethodCurrent) &&
+        (self.isEvaluatingNewInstallation || self.installationState?.isComplete == true) {
+      self.inputMethodUtil.doAsyncAccessibilityCheck()
+    }
+  }
+  
+  /**
+   * Check whether the input method and configuration app are the same version.
+   * Because the version of the config app will not be sent when build locally, this can be overridden,
+   * for testing purposes, by specifying `kTestConfigVersion` in config app's standard UserDefaults
+   */
   static func isVersionCurrent(inputMethodVersion: String, configurationVersion: String) -> Bool {
-    //    return inputMethodVersion == configurationVersion
-    // MAC-CONFIG_TODO: temporarily hard-coded to true for testing with local config app builds
-    return true
+    print("isVersionCurrent, comparing input method version: \(inputMethodVersion) and config app version: \(configurationVersion)")
+    return inputMethodVersion == configurationVersion
   }
   
   /**
@@ -64,23 +194,44 @@ public class InstallationCheck {
     DistributedNotificationCenter.default().addObserver(
       self,
       selector: #selector(self.handleAccessibilityResponse(_:)),
-      name: NSNotification.Name.accessibilityQueryResponse,
+      name: NSNotification.Name.accessibilityStateResponse,
       object: nil // Observe notifications from any sender
     )
     // MAC-CONFIG_TODO: add timeout?
   }
-  
+    
   /**
-   * called when `NSNotification.Name.accessibilityQueryResponse` is received
+   * called when `NSNotification.Name.accessibilityStateResponse` is received
    */
   @objc func handleAccessibilityResponse(_ notification: Notification) {
+    var installCompleted = false
+    
     print("handleAccessibilityResponse")
     // Extract message from the notification if available
     if let message = notification.object as? String {
       let permissionGranted = self.processAccessibilityResponse(with: message)
-      self.completeValidation(accessibilityPermissionGranted: permissionGranted)
+      
+      if let state = self.installationState {
+        installCompleted = state.isComplete
+      }
+      
+      if self.isEvaluatingNewInstallation {
+        // if evaluating the current state for a new installation,
+        // complete the evaluation using the results of the permission check
+       self.completeNewInstallationEvaluation(accessibilityPermissionGranted: permissionGranted)
+      } else if installCompleted {
+        // if this is a completed install, check whether repairs are needed
+        self.checkForRepair(accessibilityPermissionGranted: permissionGranted)
+      } else {
+        // otherwise, this is for an install step, post results
+        if permissionGranted {
+          NotificationCenter.default.post(name: .accessibilityGranted, object: nil)
+        } else {
+          NotificationCenter.default.post(name: .accessibilityNotGranted, object: nil)
+        }
+      }
     } else {
-      print("accessibilityQueryResponse received but did not include message")
+      print("accessibilityStateResponse received but did not include message")
     }
   }
   
@@ -100,12 +251,21 @@ public class InstallationCheck {
   }
 
   /**
+   * Save the new InstallationState and notify observers to start new installation
+   */
+  func applyNewInstallationState(state: InstallationState) {
+    self.defaultsRepository.writeInstallationState(state.toUserDefaultsDictionary())
+    self.installationState = state
+    NotificationCenter.default.post(name: .startNewInstallation, object: state)
+  }
+
+  /**
    * Save the new InstallationState for handling repairs and notify observers
    */
-  func prepareToRepair(newState: InstallationState) {
-    self.defaultsRepository.writeInstallationState(newState.toUserDefaultsDictionary())
-    self.installationState = newState
-    NotificationCenter.default.post(name: .installationRepairNeeded, object: newState)
+  func applyRepairedInstallationState(state: InstallationState) {
+    self.defaultsRepository.writeInstallationState(state.toUserDefaultsDictionary())
+    self.installationState = state
+    NotificationCenter.default.post(name: .startInstallationRepair, object: state)
   }
 
   /**
@@ -115,116 +275,127 @@ public class InstallationCheck {
    *  completed or
    *  in progress
    * 2. creating a new installation
+   * 
    */
   public func loadState() -> InstallationState? {
-    var installationState: InstallationState
+    var installationState: InstallationState? = nil
     
     guard self.isInputMethodInstalled && self.isInputMethodCurrent else {
       return nil
     }
     
     if let savedInstallationState = readInstallationState() {
-        installationState = savedInstallationState
-    } else {
-      // if installation could not be read, then
-      installationState = self.createInstallationStateForNewInstallation()
+      installationState = savedInstallationState
     }
     
     return installationState
   }
 
   /**
-   * Determine whether validation is needed.
+   * Clear the installation state from the UserDefaults
    */
-  func isValidationNeeded() -> Bool {
-    // no need to validate if the input method is not current
-    guard (self.isInputMethodInstalled &&  self.isInputMethodCurrent) else { return false }
-
-    // or if the current state is not saved (should never encounter this)
-    guard let currentInstallationState = self.installationState else { return false }
-    
-    // only need to validate if this installation has been completed
-    return currentInstallationState.isComplete
+  func clearInstallationState() {
+    self.defaultsRepository.deleteInstallationState()
   }
 
   /**
-   * Determine whether the completed installation has been altered in some way and needs repair.
-   * If repair is needed, then a new InstallationState object will be returned.
+   * Using the accessibility state returned from the input method, build the new task list
+   * and determine what is actually required for the new installation.
    */
-  func startValidation() {
-    // call the input method to check whether Accessibility permission has been granted
-    self.inputMethodUtil.doAsyncAccessibilityCheck()
+  func completeNewInstallationEvaluation(accessibilityPermissionGranted: Bool) {
+    // see what tasks remain based on the evaluation
+    let neededTasks = determineInstallationTasksNeeded(for: accessibilityPermissionGranted)
+    let newState = self.createNewInstallationState(with: neededTasks)
+    self.applyNewInstallationState(state: newState)
   }
-  
-  /**
-   * Determine whether the completed installation has been altered in some way and needs repair.
-   * If repair is needed, then call `prepareToRepair` with the new `InstallationState`
-   */
-  func completeValidation(accessibilityPermissionGranted: Bool) {
-    // check whether the installation requires repair
-    if let newInstallationState = self.createRepairInstallationState(accessibilityPermissionGranted: accessibilityPermissionGranted) {
-      self.prepareToRepair(newState: newInstallationState)
-    } else {
-      print("completeValidation: no repair needed")
-    }
-  }
-  
-  /**
-   * Read the currently saved installation state as an object
-   */
-  func readInstallationState() -> InstallationState? {
-    guard let installationMap = self.defaultsRepository.readInstallationState() else {
-      return nil
-    }
-    
-    return InstallationState(from: installationMap)
-  }
-  
   
   /**
    * Creates a InstallationState object describing a new installation
    */
-  func createInstallationStateForNewInstallation() -> InstallationState {
-    let installationState = InstallationState(version: self.inputMethodVersion, tasks: self.createNewInstallationTasks())
-    self.defaultsRepository.writeInstallationState(installationState.toUserDefaultsDictionary())
+  func createNewInstallationState(with neededTasks: Set<InstallationTask>) -> InstallationState {
+    print("completeNewInstallationEvaluation: created new installation state")
+    var fullTaskList = neededTasks
+    
+    // add prepareNewInstall, requestRestart and confirmRestart InstallationTask
+    fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .prepareNewInstall))
+    
+    // MAC-CONFIG_TODO: should we always restart for a new install or only when enabling input method?
+    fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
+    fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
+    let installationState = InstallationState(version: self.inputMethodVersion, tasks: fullTaskList)
     
     return installationState
   }
-  
+
   /**
-   * Creates a the set of tasks required for a new installation
+   * Determine whether the completed installation has been altered in some way and needs repair.
+   * If repair is needed, then call `applyRepairedInstallationState` with the new `InstallationState`
    */
-  func createNewInstallationTasks() -> Set<InstallationTask> {
-    var taskList = Set<InstallationTask>()
-    taskList.insert(InstallationTask(task: .migrateData, completed: false))
-    taskList.insert(InstallationTask(task: .enableInputMethod, completed: false))
-    taskList.insert(InstallationTask(task: .requestAccess, completed: false))
-    taskList.insert(InstallationTask(task: .restartMac, completed: false))
-    return taskList
+  func checkForRepair(accessibilityPermissionGranted: Bool) {
+    // check whether the installation requires repair
+    if let state = self.createRepairInstallationState(accessibilityPermissionGranted: accessibilityPermissionGranted) {
+      print("checkForRepair completed: repair is required")
+      self.applyRepairedInstallationState(state: state)
+    } else {
+      print("checkForRepair completed: no repair needed")
+    }
+  }
+
+/**
+ * Read the currently saved installation state as an object
+ */
+func readInstallationState() -> InstallationState? {
+  return InstallationCheck.readInstallationState(from: self.defaultsRepository)
+}
+
+/**
+ * Read the currently saved installation state as an object
+ */
+static func readInstallationState(from repo: DefaultsRepo) -> InstallationState? {
+  guard let installationMap = repo.readInstallationState() else {
+    return nil
   }
   
+  return InstallationState(from: installationMap)
+}
+
   /**
+   * The provided parameter `accessibilityPermissionGranted` was returned asynchronously from the input method.
+   * Use it and other info to see what tasks are needed to complete installation.
+   */
+  func determineInstallationTasksNeeded(for accessibilityPermissionGranted: Bool) -> Set<InstallationTask> {
+    var newTasks = Set<InstallationTask>()
+    
+    // add task to request Accessibility permission if needed
+    if !accessibilityPermissionGranted {
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestAccess))
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmAccess))
+    }
+    
+    // add enable input method and restart mac tasks if needed
+    if !self.inputMethodUtil.isKeymanInputMethodEnabled() {
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .enableInputMethod))
+      
+      // prompt user to restart after enabling the input method
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
+    }
+    
+    return newTasks
+  }
+
+  /**
+   * The provided parameter `accessibilityPermissionGranted` was returned asynchronously from the input method.
    * Check the installation to see of it is valid -- something may have been tampered with after installation was completed.
-   * The provided parameter `accessibilityPermissionGranted` was already returned asynchronously from the input method.
    * If the installation needs repair, create the info needed for repairing the installation.
    */
   func createRepairInstallationState(accessibilityPermissionGranted: Bool) -> InstallationState? {
     var repairInstallationState: InstallationState? = nil
-    var repairTasks = Set<InstallationTask>()
     
-    if !accessibilityPermissionGranted {
-      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .requestAccess))
-    }
-    
-    if !self.inputMethodUtil.isKeymanInputMethodEnabled() {
-      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .enableInputMethod))
-      
-      // also need to restart after enabling the input method
-      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .restartMac))
-    }
-    
-    
+    var repairTasks = self.determineInstallationTasksNeeded(for: accessibilityPermissionGranted)
     if !repairTasks.isEmpty {
+      // add prepareNewRepair
+      repairTasks.insert(InstallationTask.createNewInstallationTask(type: .prepareNewRepair))
       repairInstallationState = InstallationState(version: self.inputMethodVersion, isRepair: true, tasks: repairTasks)
     }
     

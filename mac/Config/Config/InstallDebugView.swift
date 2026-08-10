@@ -8,22 +8,29 @@
 
 import SwiftUI
 
-struct InstallView: View {
+struct InstallDebugView: View {
   @EnvironmentObject var installation: InstallationContainer
-  
+  @State private var taskText: String = "[task]"
+
   var body: some View {
     VStack {
       HStack {
         Image(systemName: "gear")
           .imageScale(.large)
           .foregroundColor(.accentColor)
-        if let nextTask = installation.nextTask() {
-          Text("Next task = \(nextTask.taskType.rawValue)")
-        }
+        Text("Current task = \(taskText)")
+          .onAppear() {
+            if let installTask = installation.currentTask() {
+              taskText = installTask.taskType.rawValue
+            }
+          }
       }
       HStack {
         Button("Next...") {
-          installation.executeNextInstallationTask()
+          installation.executeCurrentInstallationTask()
+          if let installTask = installation.currentTask() {
+            taskText = installTask.taskType.rawValue
+          }
         }
         .disabled(installation.isInstallationComplete())
         Button("Migrate Data") {
@@ -54,6 +61,12 @@ struct InstallView: View {
         Button("Check Restart") {
           _ = installation.validateUserHasRestarted()
         }
+        Button("Set Displayed Complete") {
+          let beforeDisplayed = installation.getHasDisplayedInstallationComplete()
+          installation.setHasDisplayedInstallationComplete()
+          let afterDisplayed = installation.getHasDisplayedInstallationComplete()
+          print("hasDisplayedInstallComplete = \(beforeDisplayed) -> \(afterDisplayed)")
+        }
         Button("debug") {
           installation.debug()
         }
@@ -66,22 +79,17 @@ struct InstallView: View {
         Button("Uninstall") {
           installation.uninstall()
         }
-        Button("Force Reset Installation") {
-          installation.forceResetInstallation()
-        }
-        Button("Force Validate Installation") {
-          installation.forceValidateInstallation()
-        }
         Spacer()
       }
       .padding()
     }
     .padding()
+//    .onReceive(NotificationCenter.default.publisher(for: .inputMethodMissing), perform: {_ in print("input method missing")})
   }
 }
 
 #Preview {
   let installation = InstallationContainer()
-  InstallView()
+  InstallDebugView()
     .environmentObject(installation)
 }
