@@ -1,5 +1,49 @@
 # Keyman Version History
 
+## 19.0.258 alpha 2026-07-15
+
+* chore(android): remove doc for non-existing deprecated functions (#16244)
+
+## 19.0.257 alpha 2026-07-14
+
+* chore(linux): remove questing, add stonking (#16236)
+* chore(android): cleanup Android build scripts and artifact filenames (#16234)
+* chore(web): declare scope for stubAndKeyboardCache members (#16221)
+* fix(android): improve clarity of keyboard script error popup (#16228)
+* chore(android): log legacy cloud keyboards (#16237)
+* chore(android): cleanup font variable names, remove obsolete code (#16211)
+
+## 19.0.256 alpha 2026-07-13
+
+* fix(android): add permissions for Sentry and set default keyboard (#16216)
+* maint(resources): add extra debug reporting for builder (#16230)
+
+## 19.0.255 alpha 2026-07-11
+
+* maint(android): use KEYMAN_TIER instead of TIER.md (#16219)
+* feat(ios): add keyman-version to package-version check (#16138)
+* docs(web): cleanup of index pages and page titles (#16171)
+* feat(android): add keyman-version to package-version check (#16139)
+
+## 19.0.254 alpha 2026-07-10
+
+* fix(android): handle blank keyboard tap properly (#16217)
+* fix(web): define IME interfaces in `KeyboardInterfaceBase` (#16170)
+
+## 19.0.253 alpha 2026-07-09
+
+* fix(web): resync model in `set osk()` (as used by Server) (#16127)
+* chore(developer): consolidate api-extractor usage in Developer (#16135)
+
+## 19.0.252 alpha 2026-07-08
+
+* chore(linux): reorder buttons on kmp install window (#16210)
+* refactor(web): rename `keymanweb` to `keyman` in UI modules (#16174)
+* chore: remove deprecated "X-UA-Compatible" and "apple-mobile-web-app-capable" metas (#16176)
+* fix(android): refactor `KMLog` - simplification and added resilience (#16152)
+* fix(android): differentiate between fontPath and fontUrl in Keyman Engine for Android (#16188)
+* fix(web): fixes cookie unit-tests and path for OSK resources during testing (#16209)
+
 ## 19.0.251 alpha 2026-07-02
 
 * fix(android): skip test on Windows that triggers androidx WebKit bug (#16184)

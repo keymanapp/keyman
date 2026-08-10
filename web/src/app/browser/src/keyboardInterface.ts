@@ -26,23 +26,27 @@ export class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
     this.engine.contextManager.focusAssistant._IgnoreNextSelChange = 1;
   }
 
-  /**
-   * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
-   */
-  getLastActiveElement(): AbstractElementTextStore<any> {
+  getLastActiveTextStore(): AbstractElementTextStore<any> {
     return this.engine.contextManager.lastActiveTextStore;
   }
 
-  focusLastActiveElement(): void {
+  focusLastActiveTextStore(): void {
     this.engine.contextManager.restoreLastActiveTextStore();
   }
 
   //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
+
+  /**
+   * @deprecated
+   */
   hideHelp(): void {
     const osk = this.engine.osk;
     osk.startHide(true);
   }
 
+  /**
+   * @deprecated
+   */
   showHelp(Px: number, Py: number): void {
     const osk = this.engine.osk;
 
@@ -53,6 +57,9 @@ export class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
     }
   }
 
+  /**
+   * @deprecated
+   */
   showPinnedHelp(): void {
     const osk = this.engine.osk;
 
@@ -74,13 +81,6 @@ export class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
     // pinned position.
     osk.present();
   }
-
-  // Also needed for some legacy CJK keyboards.
-  readonly GetLastActiveElement = this.getLastActiveElement;
-  readonly FocusLastActiveElement = this.focusLastActiveElement;
-  readonly HideHelp = this.hideHelp;
-  readonly ShowHelp = this.showHelp;
-  readonly ShowPinnedHelp = this.showPinnedHelp;
 }
 
 (function() {

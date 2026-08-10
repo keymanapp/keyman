@@ -1,15 +1,18 @@
 ---
-title: ShowHelp
+title: ShowHelp (deprecated)
 ---
-  
+
 ## Summary
 
 Shows the on-screen keyboard at the requested (x, y) coordinates.
 
 ## Syntax
 
-```
-keyman.ShowHelp(x, y);
+```js
+keyman.interface.ShowHelp(x, y);
+keyman.interface.showHelp(x, y);
+KeymanWeb.ShowHelp(x, y);
+KeymanWeb.showHelp(x, y);
 ```
 
 ### Parameters
@@ -27,6 +30,8 @@ keyman.ShowHelp(x, y);
 `undefined`
 
 ### Replaced by
+
+This function is deprecated; see instead:
 
 [`keyman.osk.setPos()`](../osk/setPos),
 [`keyman.osk.show()`](../osk/show)

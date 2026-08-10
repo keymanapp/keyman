@@ -389,6 +389,8 @@ export class KeymanEngineBase<
       if (this.contextManager.activeKeyboard) {
         value.activeKeyboard = this.contextManager.activeKeyboard;
       }
+      value.bannerController.selectBanner(this.core.languageProcessor.state);
+      value.refreshLayout();
       value.on('keyevent', this.keyEventListener);
       this.core.keyboardProcessor.layerStore.handler = value.layerChangeHandler;
     }

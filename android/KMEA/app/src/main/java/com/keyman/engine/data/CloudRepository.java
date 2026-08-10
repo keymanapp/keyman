@@ -45,7 +45,7 @@ public class CloudRepository {
   public static final String API_STAGING_HOST = "api.keyman.com"; // #7227 disabling: "api.keyman-staging.com";
 
   public static final String API_MODEL_LANGUAGE_FORMATSTR = "https://%s/model?q=bcp47:%s";
-  public static final String API_PACKAGE_VERSION_FORMATSTR = "https://%s/package-version?platform=android%s%s";
+  public static final String API_PACKAGE_VERSION_FORMATSTR = "https://%s/package-version?platform=android&keyman-version=%s%s%s";
 
   private Dataset memCachedDataset;
   private Calendar lastLoad; // To be used for Dataset caching.
@@ -205,7 +205,7 @@ public class CloudRepository {
       }
     }
 
-    String queryURL = String.format(API_PACKAGE_VERSION_FORMATSTR, getHost(), keyboardQuery, lexicalModelQuery);
+    String queryURL = String.format(API_PACKAGE_VERSION_FORMATSTR, getHost(), KMManager.getVersion(), keyboardQuery, lexicalModelQuery);
     return new CloudApiTypes.CloudApiParam(
       CloudApiTypes.ApiTarget.PackageVersion, queryURL).setType(CloudApiTypes.JSONType.Object);
   }

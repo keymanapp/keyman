@@ -10,14 +10,14 @@ declare global {
   }
 }
 
-const keymanweb=window.keyman;
+const keyman=window.keyman;
 
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
-if(!keymanweb) {
+if(!keyman) {
   throw new Error("`keyman` global is missing; Keyman Engine for Web script has not been loaded");
-} else if(!keymanweb.ui?.name) {
+} else if(!keyman.ui?.name) {
   /********************************/
   /*                              */
   /* Floating User Interface      */
@@ -36,7 +36,7 @@ if(!keymanweb) {
   try {
 
     // Declare KeymanWeb, OnScreen keyboard and Util objects
-    const util=keymanweb.util;
+    const util=keyman.util;
 
     // Disable UI for touch devices
     if(util.isTouchDevice()) {
@@ -86,8 +86,8 @@ if(!keymanweb) {
        * Display or hide the OSK from the OSK icon link
        */
       readonly toggleOSK = () => {
-        keymanweb.activatingUI(true);
-        const osk = keymanweb.osk;
+        keyman.activatingUI(true);
+        const osk = keyman.osk;
         if(osk && osk.show) {
           if(osk.isEnabled()) {
             osk.hide();
@@ -98,8 +98,8 @@ if(!keymanweb) {
         if(window.event) {
           window.event.returnValue=false;
         }
-        keymanweb.focusLastActiveElement();
-        keymanweb.activatingUI(false);
+        keyman.focusLastActiveElement();
+        keyman.activatingUI(false);
         return false;
       }
 
@@ -115,7 +115,7 @@ if(!keymanweb) {
         }
 
         // Must always initialize after keymanWeb itself, otherwise options are undefined
-        if(!keymanweb.initialized) {
+        if(!keyman.initialized) {
           this.initTimer = window.setTimeout(this.initialize, 50);
           return;
         }
@@ -238,7 +238,7 @@ if(!keymanweb) {
           }
 
           // Loop over installed keyboards and add to selection list
-          const Lkbds=keymanweb.getKeyboards();
+          const Lkbds=keyman.getKeyboards();
 
           for(let Ln=0; Ln<Lkbds.length; Ln++) {
             let Lopt = util.createElement('option');
@@ -261,21 +261,21 @@ if(!keymanweb) {
         this.updateList = false;
 
         // Set the menu selector to the last active keyboard
-        let activeKeyboard = keymanweb.getActiveKeyboard();
+        let activeKeyboard = keyman.getActiveKeyboard();
         let activeLanguage = '';
         if (activeKeyboard) {
-          activeLanguage = keymanweb.getActiveLanguage();
+          activeLanguage = keyman.getActiveLanguage();
         } else {
           // savedKeyboard is only correct if we use global keyboard settings,
           // otherwise it's set to the first keyboard in the list
-          const savedKeyboard = keymanweb.getSavedKeyboard().split(':');
+          const savedKeyboard = keyman.getSavedKeyboard().split(':');
           activeKeyboard = savedKeyboard[0];
           activeLanguage = savedKeyboard.length < 2 ? '' : savedKeyboard[1];
         }
         this.updateMenu(activeKeyboard, activeLanguage);
 
         // Redisplay the UI to correct width for any new language entries
-        if(keymanweb.getLastActiveElement()) {
+        if(keyman.getLastActiveElement()) {
           this.HideInterface();
           this.ShowInterface();
         }
@@ -354,7 +354,7 @@ if(!keymanweb) {
          * Set a timer to update the UI keyboard list on timeout after each keyboard is registered,
          * thus updating only once when only if multiple keyboards are registered together
          */
-        keymanweb.addEventListener('keyboardregistered', (p) => {
+        keyman.addEventListener('keyboardregistered', (p) => {
           this.updateList = true;
           if(this.updateTimer) {
             clearTimeout(this.updateTimer);
@@ -370,8 +370,8 @@ if(!keymanweb) {
          * Note: Cannot simply set it to the loaded keyboard,
          *       as more than one language may be supported by that keyboard.
          */
-        keymanweb.addEventListener('keyboardloaded', (p) => {
-          const sk = keymanweb.getSavedKeyboard().split(':');
+        keyman.addEventListener('keyboardloaded', (p) => {
+          const sk = keyman.getSavedKeyboard().split(':');
           if(sk.length > 1) {
             this.updateMenu(sk[0],sk[1]);
           }
@@ -382,7 +382,7 @@ if(!keymanweb) {
          *
          * Update menu selection and control OSK display appropriately
          */
-        keymanweb.addEventListener('keyboardchange', (p) => {
+        keyman.addEventListener('keyboardchange', (p) => {
           // Update the keyboard selector whenever a keyboard is loaded
           this.updateMenu(p.internalName, p.languageCode);
 
@@ -390,7 +390,7 @@ if(!keymanweb) {
           this.addButtonOSK();
         });
 
-        const osk = keymanweb.osk;
+        const osk = keyman.osk;
         if(!osk) {
           return;
         }
@@ -421,8 +421,8 @@ if(!keymanweb) {
        * Description  Set KMW UI activation state on mouse click
        */
       readonly _SelectorMouseDown = (e: MouseEvent) => {
-        if(keymanweb.activatingUI) {
-          keymanweb.activatingUI(1);
+        if(keyman.activatingUI) {
+          keyman.activatingUI(1);
         }
       }
 
@@ -433,8 +433,8 @@ if(!keymanweb) {
        * Description  Set KMW UI activation state on mouse over
        */
       readonly _SelectorMouseOver = (e: MouseEvent) => {
-        if(keymanweb.activatingUI) {
-          keymanweb.activatingUI(1);
+        if(keyman.activatingUI) {
+          keyman.activatingUI(1);
         }
       }
 
@@ -445,8 +445,8 @@ if(!keymanweb) {
        * Description Clear KMW UI activation state on mouse out
        */
       readonly _SelectorMouseOut = (e: MouseEvent) => {
-        if(keymanweb.activatingUI) {
-          keymanweb.activatingUI(0);
+        if(keyman.activatingUI) {
+          keyman.activatingUI(0);
         }
       }
 
@@ -457,19 +457,19 @@ if(!keymanweb) {
        * Description  Change active keyboard in response to user selection event
        */
       private readonly SelectKeyboardChange = async (e: Event): Promise<void> => {
-        keymanweb.activatingUI(true);
+        keyman.activatingUI(true);
 
         if(this.KeyboardSelector.value != '-') {
           const i=this.KeyboardSelector.selectedIndex;
           const t=this.KeyboardSelector.options[i].value.split(':');
-          await keymanweb.setActiveKeyboard(t[0],t[1]);
+          await keyman.setActiveKeyboard(t[0],t[1]);
         } else {
-          await keymanweb.setActiveKeyboard('');
+          await keyman.setActiveKeyboard('');
         }
 
         //if(osk['show']) osk['show'](osk['isEnabled']()); handled by keyboard change event???
-        keymanweb.focusLastActiveElement();
-        keymanweb.activatingUI(false);
+        keyman.focusLastActiveElement();
+        keyman.activatingUI(false);
         this.selecting = true;
       }
 
@@ -481,7 +481,7 @@ if(!keymanweb) {
        */
       readonly SelectBlur = (e: Event) => {
         if(!this.selecting) {
-          keymanweb.focusLastActiveElement();
+          keyman.focusLastActiveElement();
         }
         this.selecting = false;
       }
@@ -510,7 +510,7 @@ if(!keymanweb) {
         this.addButtonOSK();
 
         // Set the language selection to the currently active keyboard, if listed
-        this.updateMenu(keymanweb.getActiveKeyboard(), keymanweb.getActiveLanguage());
+        this.updateMenu(keyman.getActiveKeyboard(), keyman.getActiveLanguage());
       }
 
       /**
@@ -533,12 +533,12 @@ if(!keymanweb) {
        */
       readonly addButtonOSK = () => {
         if(this.oskButton != null) {
-          if(keymanweb.isCJK() || (this.KeyboardSelector.selectedIndex==0)) {
+          if(keyman.isCJK() || (this.KeyboardSelector.selectedIndex==0)) {
             this.oskButton.style.display = 'none';
             this.outerDiv.style.width = this.KeyboardSelector.offsetWidth+30+'px';
           } else {
             this.oskButton.style.display = 'block';
-            const osk = keymanweb.osk;
+            const osk = keyman.osk;
             if(osk) {
               this.oskButtonState(osk.isEnabled());
             } else {
@@ -558,7 +558,7 @@ if(!keymanweb) {
        */
       readonly _Resize = (e: Event) => {
         if(this.outerDiv.style.display =='block') {
-          const elem = keymanweb.getLastActiveElement();
+          const elem = keyman.getLastActiveElement();
           if(this.floatRight) {  // I1296
             this.ShowInterface(util.getAbsoluteX(elem) + elem.offsetWidth + 1, util.getAbsoluteY(elem) + 1);
           } else {
@@ -569,13 +569,13 @@ if(!keymanweb) {
       }
     }
 
-    const ui=keymanweb.ui = new UIFloat();
+    const ui=keyman.ui = new UIFloat();
 
     //TODO:  had to expose properties of params - what does that do? (focus event doesn't normally include these properties?)
-    keymanweb.addEventListener('controlfocused', (params) => {
+    keyman.addEventListener('controlfocused', (params) => {
       // ... this check shouldn't need to check _kmwAttachment directly.
       if(params.activeControl == null || params.activeControl['_kmwAttachment']) {
-        /*if(keymanweb.domManager._IsEditableIframe(Ltarg))
+        /*if(keyman.domManager._IsEditableIframe(Ltarg))
           Ltarg = Ltarg.defaultView.frameElement;*/
         if(ui.floatRight) {  // I1296
           ui.ShowInterface(util.getAbsoluteX(params.target) + params.target.offsetWidth + 1, util.getAbsoluteY(params.target) + 1);
@@ -587,7 +587,7 @@ if(!keymanweb) {
       return true;
     });
 
-    keymanweb.addEventListener('controlblurred', (params) => {
+    keyman.addEventListener('controlblurred', (params) => {
       if(!params.event) {
         return true;   // I2404 - Manage IE events in IFRAMEs
       }
@@ -607,7 +607,7 @@ if(!keymanweb) {
     ui.initialize();
 
     // is/was never actually raised.  Note that the `shutdown` method likely fulfills a similar role.
-    // keymanweb.addEventListener('unloaduserinterface', ui._UnloadUserInterface);
+    // keyman.addEventListener('unloaduserinterface', ui._UnloadUserInterface);
 
   } catch(err){}
 
