@@ -50,16 +50,20 @@ export class CookieSerializer<Type extends Record<keyof Type, DecodedCookieField
    */
   private _loadRawCookies(): Record<string, string> {
     const v: Record<string, string> = {};
-    if(typeof(document.cookie) != 'undefined' && document.cookie != '') {
-      const c = document.cookie.split(/;\s*/);
-      for(let i = 0; i < c.length; i++) {
-        const d = c[i].split('=');
-        if(d.length == 2) {
-          v[d[0]] = d[1];
+    try {
+      if(typeof(document.cookie) != 'undefined' && document.cookie != '') {
+        const c = document.cookie.split(/;\s*/);
+        for(let i = 0; i < c.length; i++) {
+          const d = c[i].split('=');
+          if(d.length == 2) {
+            v[d[0]] = d[1];
+          }
         }
       }
+    } catch (e) {
+      // Ignore exceptions, e.g. if third-party cookies are blocked in
+      // the browser (#r.keymanweb.com/9)
     }
-
     return v;
   }
 
@@ -110,6 +114,11 @@ export class CookieSerializer<Type extends Record<keyof Type, DecodedCookieField
 
     const d = new Date(new Date().valueOf() + 1000 * 60 * 60 * 24 * 30).toUTCString();
     const cookieConfig = ' path=/; expires=' + d;  //Fri, 31 Dec 2099 23:59:59 GMT;';
-    document.cookie = `${cookieName}=${encodeURIComponent(serialization)}; ${cookieConfig}`;
+    try {
+      document.cookie = `${cookieName}=${encodeURIComponent(serialization)}; ${cookieConfig}`;
+    } catch (e) {
+      // Ignore exceptions, e.g. if third-party cookies are blocked in
+      // the browser (#r.keymanweb.com/9)
+    }
   }
 }
