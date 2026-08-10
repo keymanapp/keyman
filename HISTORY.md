@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.262 alpha 2026-08-04
+
+* chore(web): fire `keyboardloaded` event only once per keyboard (#16297)
+
 ## 19.0.261 alpha 2026-07-30
 
 * fix(core): clone state actions deep copy (#15961)
