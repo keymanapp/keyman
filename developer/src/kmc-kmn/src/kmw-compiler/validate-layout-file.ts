@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { KMX, TouchLayout } from "@keymanapp/common-types";
 import { TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/developer-utils";
 import { callbacks, minimumKeymanVersion, verifyAndSetMinimumRequiredKeymanVersion15,
@@ -263,77 +266,10 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
     return null;
   }
 
-  let hasWarnedOfGestureUseDownlevel = false;
-  const warnGesturesIfNeeded = function(keyId: string) {
-    if(!hasWarnedOfGestureUseDownlevel && !verifyAndSetMinimumRequiredKeymanVersion17()) {
-      hasWarnedOfGestureUseDownlevel = true;
-      callbacks.reportMessage(KmwCompilerMessages.Hint_TouchLayoutUsesUnsupportedGesturesDownlevel({keyId}));
-    }
-  }
-
-  let result: boolean = true;
-  let FTouchLayoutFont = '';   // I4872
-  let pid: keyof TouchLayout.TouchLayoutFile;
-  for(pid in data) {
-    const platform = data[pid];
-
-    // Test that the font matches on all platforms   // I4872
-
-    if(FTouchLayoutFont == '') {
-      FTouchLayoutFont = platform.font?.toLowerCase() ?? '';
-    }
-    else if((platform.font?.toLowerCase() ?? '') != FTouchLayoutFont) {
-      callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutFontShouldBeSameForAllPlatforms());
-      // TODO: why support multiple font values if it has to be the same across all platforms?!
-    }
-
-    // Test that all required keys are present
-    for(const layer of platform.layer) {
-      const FRequiredKeys: TRequiredKey[] = [];
-      let rowIndex = 0;
-      for(const row of layer.row) {
-        rowIndex++;
-        let keyIndex = 0;
-        for(const key of row.key) {
-          keyIndex++;
-          result = CheckKey(pid, platform, layer, key.id, key.text, key.nextlayer, key.sp, FRequiredKeys, FDictionary, {rowIndex, keyIndex}) && result;   // I4119
-          if(key.sk) {
-            let subKeyIndex = 0;
-            for(const subkey of key.sk) {
-              subKeyIndex++;
-              result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
-                {rowIndex, keyIndex, subKeyIndex}) && result;
-            }
-          }
-          let direction: keyof TouchLayout.TouchLayoutFlick;
-          if(key.flick) {
-            for(direction in key.flick) {
-              warnGesturesIfNeeded(key.id);
-              result = CheckKey(pid, platform, layer, key.flick[direction].id, key.flick[direction].text,
-                key.flick[direction].nextlayer, key.flick[direction].sp, FRequiredKeys, FDictionary, {rowIndex, keyIndex, direction}) && result;
-            }
-          }
-
-          if(key.multitap) {
-            let multitapIndex = 0;
-            for(const subkey of key.multitap) {
-              multitapIndex++;
-              warnGesturesIfNeeded(key.id);
-              result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
-                {rowIndex, keyIndex, multitapIndex}) && result;
-            }
-          }
-        }
-      }
-
-      if(FRequiredKeys.length != CRequiredKeys.length) {
-        callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutMissingRequiredKeys({
-          layerId: layer.id,
-          platformName: pid,
-          missingKeys: CRequiredKeys.filter(x => !FRequiredKeys.includes(x)).join(', ')
-        }));
-      }
-    }
+  const result = validateLayoutFileContent(data, FDictionary);
+  if(result === null) {
+    // A structural error was encountered
+    return null;
   }
 
   // Transform the layout keys with displayMap
@@ -356,3 +292,115 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
     result
   }
 }
+
+/**
+ * Validate the structure and content of a touch layout file
+ * @param data
+ * @param FDictionary
+ * @returns  null if the file is structurally invalid; false if the file contains content errors, true otherwise
+ */
+function validateLayoutFileContent(data: TouchLayout.TouchLayoutFile, FDictionary: string[]): boolean | null {
+  let hasWarnedOfGestureUseDownlevel = false;
+  const warnGesturesIfNeeded = function(keyId: string) {
+    if(!hasWarnedOfGestureUseDownlevel && !verifyAndSetMinimumRequiredKeymanVersion17()) {
+      hasWarnedOfGestureUseDownlevel = true;
+      callbacks.reportMessage(KmwCompilerMessages.Hint_TouchLayoutUsesUnsupportedGesturesDownlevel({keyId}));
+    }
+  }
+
+  let result: boolean = true;
+  let FTouchLayoutFont = '';   // I4872
+  let pid: keyof TouchLayout.TouchLayoutFile;
+
+  for(pid in data) {
+    const platform = data[pid];
+
+    // Test that the font matches on all platforms   // I4872
+
+    if(FTouchLayoutFont == '') {
+      FTouchLayoutFont = platform.font?.toLowerCase() ?? '';
+    }
+    else if((platform.font?.toLowerCase() ?? '') != FTouchLayoutFont) {
+      callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutFontShouldBeSameForAllPlatforms());
+      // TODO: why support multiple font values if it has to be the same across all platforms?!
+    }
+
+    // Test that all required keys are present
+    if(!Array.isArray(platform.layer)) {
+      callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFileFormat({msg: 'platform.layer must be an array'}));
+      return null;
+    }
+    for(const layer of platform.layer) {
+      const FRequiredKeys: TRequiredKey[] = [];
+      let rowIndex = 0;
+      if(!Array.isArray(layer.row)) {
+        callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFileFormat({msg: 'layer.row must be an array'}));
+        return null;
+      }
+      for(const row of layer.row) {
+        rowIndex++;
+        let keyIndex = 0;
+        if(!Array.isArray(row.key)) {
+          callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFileFormat({msg: 'row.key must be an array'}));
+          return null;
+        }
+        for(const key of row.key) {
+          keyIndex++;
+          result = CheckKey(pid, platform, layer, key.id, key.text, key.nextlayer, key.sp, FRequiredKeys, FDictionary, {rowIndex, keyIndex}) && result;   // I4119
+          if(key.sk) {
+            let subKeyIndex = 0;
+            if(!Array.isArray(key.sk)) {
+              callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFileFormat({msg: 'key.sk must be an array'}));
+              return null;
+            }
+            for(const subkey of key.sk) {
+              subKeyIndex++;
+              result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
+                {rowIndex, keyIndex, subKeyIndex}) && result;
+            }
+          }
+          let direction: keyof TouchLayout.TouchLayoutFlick;
+          if(key.flick) {
+            if(typeof(key.flick) != "object") {
+              callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFileFormat({msg: 'platform.layer must be an array'}));
+              return null;
+            }
+            for(direction in key.flick) {
+              warnGesturesIfNeeded(key.id);
+              result = CheckKey(pid, platform, layer, key.flick[direction].id, key.flick[direction].text,
+                key.flick[direction].nextlayer, key.flick[direction].sp, FRequiredKeys, FDictionary, {rowIndex, keyIndex, direction}) && result;
+            }
+          }
+
+          if(key.multitap) {
+            let multitapIndex = 0;
+            if(!Array.isArray(key.multitap)) {
+              callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFileFormat({msg: 'key.multitap must be an array'}));
+              return null;
+            }
+            for(const subkey of key.multitap) {
+              multitapIndex++;
+              warnGesturesIfNeeded(key.id);
+              result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
+                {rowIndex, keyIndex, multitapIndex}) && result;
+            }
+          }
+        }
+      }
+
+      if(FRequiredKeys.length != CRequiredKeys.length) {
+        callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutMissingRequiredKeys({
+          layerId: layer.id,
+          platformName: pid,
+          missingKeys: CRequiredKeys.filter(x => !FRequiredKeys.includes(x)).join(', ')
+        }));
+      }
+    }
+  }
+
+  return result;
+}
+
+export const unitTestEndpoints = {
+  validateLayoutFileContent,
+};
