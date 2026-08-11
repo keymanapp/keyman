@@ -22,12 +22,6 @@
 #include <stdio.h>
 #include "imlib.h"
 
-// km_vkey.h is not used here because duplicate definitions of VK codes in km_vkey.h and <windows.h> might
-// produce macro redefinition warnings. (in case we  ever need VK_ESCAPE or VK_BACK on mac or linux the
-// corresponding values are: VK_ESCAPE =0x1B;  VK_BACK=0x08)
-// #include "../../../../common/include/km_vkey.h"
-// using namespace km::vkey;
-
 HWND hwnd;
 HWND hwndChild;
 HINSTANCE hinst;

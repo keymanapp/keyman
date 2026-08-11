@@ -17,7 +17,6 @@
 #include <cassert>
 #include "km_vkey.h"
 
-
 enum ShiftState {
   Base         = 0,                   // 0
   Shft         = 1,                   // 1
@@ -30,40 +29,6 @@ enum ShiftState {
   Xxxx         = 8,                   // 8
   ShftXxxx     = Shft | Xxxx,         // 9
 };
-
-/*#define VK_SPACE    0x20
-#define VK_COLON	  0xBA
-#define VK_EQUAL	  0xBB
-#define VK_COMMA	  0xBC
-#define VK_HYPHEN   0xBD
-#define VK_PERIOD	  0xBE
-#define	VK_SLASH	  0xBF
-#define VK_ACCENT	  0xC0
-#define VK_LBRKT	  0xDB
-#define VK_BKSLASH	0xDC
-#define VK_RBRKT	  0xDD
-#define VK_QUOTE	  0xDE
-#define VK_xDF		  0xDF
-#define VK_OEM_102  0xE2  //  "<>" or "\|" on RT 102-key kbd.
-
-#define VK_DIVIDE   0x6F
-#define VK_CANCEL   0x03
-//#define VK_DECIMAL  0x2E //_S2 probably wrong 0x2E (which is actually the Windows VK_DELETE value, not the standard VK_DECIMAL which is 0x6E for the numpad decimal key)
-#define VK_DECIMAL  0x6E
-
-#define VK_OEM_CLEAR      0xFE
-#define VK_LSHIFT         0xA0
-#define VK_RSHIFT         0xA1
-#define VK_LCONTROL       0xA2
-#define VK_RCONTROL       0xA3
-#define VK_LMENU          0xA4
-#define VK_RMENU          0xA5
-
-#define VK_SHIFT          0x10
-#define VK_CONTROL        0x11
-#define VK_MENU           0x12
-#define VK_PAUSE          0x13
-#define VK_CAPITAL        0x14*/
 
 typedef std::vector<std::string> vec_string_1D;
 typedef std::vector<KMX_DWORD> vec_dword_1D;

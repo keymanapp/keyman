@@ -34,6 +34,7 @@
 #include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "../../../common/include/vkeys.h"
 #include "../../../common/include/km_vkey.h"
+
 using namespace km::vkey;
 
 #define SSN__PREFIX		L"&"
