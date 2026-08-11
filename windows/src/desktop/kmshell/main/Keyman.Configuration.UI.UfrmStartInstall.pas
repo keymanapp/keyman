@@ -1,7 +1,5 @@
 {
   Keyman is copyright (C) SIL Global. MIT License.
-
-  // TODO: #12887 Localise all the labels and captions.
 }
 unit Keyman.Configuration.UI.UfrmStartInstall;
 interface
@@ -19,32 +17,66 @@ uses
   Winapi.Messages,
   Winapi.Windows,
   UfrmKeymanBase,
-  UserMessages, Vcl.Imaging.pngimage;
+  UserMessages,
+  Vcl.Imaging.pngimage;
 
 type
+  // The 6 valid installation form scenarios plus a None case for validation
+  TInstallCase = (
+    icNone, // Not a valid case, can be used as check before calling creating form
+    icDownloadRestartMetered,
+    icDownloadRestart,
+    icDownload,
+    icDownloadMetered,
+    icRestart,
+    icReadyToInstall // Metered warning never needed if ReadyToInstall
+  );
+
   TfrmStartInstall = class(TfrmKeymanBase)
     cmdInstall: TButton;
     cmdLater: TButton;
     lblUpdateMessage: TLabel;
+    lblDownloadRequired: TLabel;
     imgKeymanLogo: TImage;
+    lblMeteredWarning: TLabel;
+    imgCaution: TImage;
     procedure FormCreate(Sender: TObject);
   private
-    FRestartRequired: Boolean;
+    FScenario: TInstallCase;
+    procedure UpdateLayout;
   public
-  constructor Create(AOwner: TComponent; const RestartRequired: Boolean); reintroduce;
+    constructor Create(
+      AOwner: TComponent;
+      const AScenario: TInstallCase); reintroduce;
   end;
 
 implementation
+
 uses
   MessageIdentifiers,
   MessageIdentifierConsts;
 
 {$R *.dfm}
 
-constructor TfrmStartInstall.Create(AOwner: TComponent; const RestartRequired: Boolean);
+constructor TfrmStartInstall.Create(
+  AOwner: TComponent;
+  const AScenario: TInstallCase);
 begin
+  Assert(AScenario <> icNone, 'Invalid install case');
+  FScenario := AScenario;
   inherited Create(AOwner);
-  FRestartRequired := RestartRequired;
+end;
+
+procedure TfrmStartInstall.UpdateLayout;
+const
+  CompactClientHeight = 260;
+  ButtonBottomMargin = 13;
+begin
+  if not lblMeteredWarning.Visible then
+    ClientHeight := CompactClientHeight;
+
+  cmdInstall.Top := ClientHeight - cmdInstall.Height - ButtonBottomMargin;
+  cmdLater.Top := cmdInstall.Top;
 end;
 
 procedure TfrmStartInstall.FormCreate(Sender: TObject);
@@ -52,10 +84,62 @@ begin
   inherited;
   cmdInstall.Caption := MsgFromId(S_Update_Now);
   cmdLater.Caption := MsgFromId(S_Later);
-  if FRestartRequired then
-    lblUpdateMessage.Caption := MsgFromId(S_Update_Restart_Req)
-  else
-    lblUpdateMessage.Caption := MsgFromId(S_Ready_To_Install);
+
+  // Default UI configuration state - metered warnings hidden initially
+  lblUpdateMessage.Visible := False;
+  lblDownloadRequired.Visible := False;
+  lblMeteredWarning.Visible := False;
+  imgCaution.Visible := False;
+
+  case FScenario of
+    icDownloadRestartMetered:
+    begin
+      lblUpdateMessage.Caption := MsgFromId(S_Update_Restart_Req);
+      lblUpdateMessage.Visible := True;
+      lblDownloadRequired.Caption := MsgFromId(S_Update_Download_Required);
+      lblDownloadRequired.Visible := True;
+      lblMeteredWarning.Caption := MsgFromId(S_Metered_Warning);
+      lblMeteredWarning.Visible := True;
+      imgCaution.Visible := True;
+    end;
+
+    icDownloadRestart:
+    begin
+      lblUpdateMessage.Caption := MsgFromId(S_Update_Restart_Req);
+      lblUpdateMessage.Visible := True;
+      lblDownloadRequired.Caption := MsgFromId(S_Update_Download_Required);
+      lblDownloadRequired.Visible := True;
+    end;
+
+    icDownload:
+    begin
+      lblDownloadRequired.Caption := MsgFromId(S_Update_Download_Required);
+      lblDownloadRequired.Visible := True;
+    end;
+
+    icRestart:
+    begin
+      lblUpdateMessage.Caption := MsgFromId(S_Update_Restart_Req);
+      lblUpdateMessage.Visible := True;
+    end;
+
+    icReadyToInstall:
+    begin
+      lblUpdateMessage.Caption := MsgFromId(S_Ready_To_Install);
+      lblUpdateMessage.Visible := True;
+    end;
+
+    icDownloadMetered:
+    begin
+      lblDownloadRequired.Caption := MsgFromId(S_Update_Download_Required);
+      lblDownloadRequired.Visible := True;
+      lblMeteredWarning.Caption := MsgFromId(S_Metered_Warning);
+      lblMeteredWarning.Visible := True;
+      imgCaution.Visible := True;
+    end;
+  end;
+
+  UpdateLayout;
 end;
 
 end.
