@@ -3,7 +3,9 @@
  *
  * Created by Gabriel Schantz on 2026-07-27
  *
- * View for a package row
+ * Displays an array of Keyman Packages as disclosure groups
+ * If the argument isSingleKeyboardPackage is true, displays information in a format suited to a single keyboard,
+ * otherwise displays information in a format suited to a multi-keyboard package
  */
 
 import SwiftUI

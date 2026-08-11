@@ -3,9 +3,7 @@
  *
  * Created by Gabriel Schantz on 2026-07-20
  *
- * The view used for keyboard info
- *
- * FEAT/MAC/CONFIG-WINDOW TODO: Finish writing file summary
+ * The view used to display package info inside the disclosure group opened from PackageRowView
  */
 
 import SwiftUI
