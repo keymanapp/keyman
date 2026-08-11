@@ -33,6 +33,23 @@
 		D88F03DD2F50ED5100C02A31 /* ConfigUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConfigUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		375D21122FF2F21800FCD24A /* Exceptions for "Config" folder in "Config" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ConfigTests/ConfigTests.swift,
+			);
+			target = D88F03C52F50ED5000C02A31 /* Config */;
+		};
+		375D21132FF2F21800FCD24A /* Exceptions for "Config" folder in "ConfigTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ConfigTests/ConfigTests.swift,
+			);
+			target = D88F03D22F50ED5100C02A31 /* ConfigTests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D87D6F492FAF95400083A95E /* Installation */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -41,12 +58,11 @@
 		};
 		D88F03C82F50ED5000C02A31 /* Config */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				375D21122FF2F21800FCD24A /* Exceptions for "Config" folder in "Config" target */,
+				375D21132FF2F21800FCD24A /* Exceptions for "Config" folder in "ConfigTests" target */,
+			);
 			path = Config;
-			sourceTree = "<group>";
-		};
-		D88F03D62F50ED5100C02A31 /* ConfigTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ConfigTests;
 			sourceTree = "<group>";
 		};
 		D88F03E02F50ED5100C02A31 /* ConfigUITests */ = {
@@ -87,7 +103,6 @@
 			children = (
 				D87D6F492FAF95400083A95E /* Installation */,
 				D88F03C82F50ED5000C02A31 /* Config */,
-				D88F03D62F50ED5100C02A31 /* ConfigTests */,
 				D88F03E02F50ED5100C02A31 /* ConfigUITests */,
 				D88F04022F512FE800C02A31 /* Frameworks */,
 				D88F03C72F50ED5000C02A31 /* Products */,
@@ -150,9 +165,6 @@
 			);
 			dependencies = (
 				D88F03D52F50ED5100C02A31 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				D88F03D62F50ED5100C02A31 /* ConfigTests */,
 			);
 			name = ConfigTests;
 			packageProductDependencies = (
