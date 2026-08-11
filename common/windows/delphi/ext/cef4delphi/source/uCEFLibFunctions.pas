@@ -1,59 +1,17 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFLibFunctions;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
 uses
-  {$IFDEF DELPHI16_UP}
-    {$IFDEF MSWINDOWS}WinApi.Windows,{$ENDIF} System.Math,
-  {$ELSE}
-    {$IFDEF MSWINDOWS}Windows,{$ENDIF} Math,
-  {$ENDIF}
   {$IFDEF LINUX}
     {$IFDEF FPC}xlib,{$ENDIF}
     {$IFDEF FMX}uCEFLinuxTypes,{$ENDIF}
@@ -62,11 +20,21 @@ uses
 
 var
   // *********************************
-  // *********** API HASH ************
+  // ************ INCLUDE ************
   // *********************************
 
   // /include/cef_api_hash.h
-  cef_api_hash               : function(entry: integer): PAnsiChar; cdecl;
+  cef_api_hash               : function(version, entry: integer): PAnsiChar; cdecl;
+  cef_api_version            : function : integer; cdecl;
+
+  // /include/cef_version_info.h
+  cef_version_info           : function(entry: integer) : integer; cdecl;
+  cef_version_info_all       : procedure(info: PCefVersionInfoEx); cdecl;   {* CEF_API_ADDED(13800) *}
+
+  // /include/cef_id_mappers.h
+  cef_id_for_pack_resource_name : function(const name : PAnsiChar) : integer; cdecl;
+  cef_id_for_pack_string_name   : function(const name : PAnsiChar) : integer; cdecl;
+  cef_id_for_command_id_name    : function(const name : PAnsiChar) : integer; cdecl;
 
 
   // *********************************
@@ -74,22 +42,26 @@ var
   // *********************************
 
   // /include/capi/cef_app_capi.h
-  cef_initialize             : function(const args: PCefMainArgs; const settings: PCefSettings; application: PCefApp; windows_sandbox_info: Pointer): Integer; cdecl;
-  cef_shutdown               : procedure; cdecl;
-  cef_execute_process        : function(const args: PCefMainArgs; application: PCefApp; windows_sandbox_info: Pointer): Integer; cdecl;
-  cef_do_message_loop_work   : procedure; cdecl;
-  cef_run_message_loop       : procedure; cdecl;
-  cef_quit_message_loop      : procedure; cdecl;
-  cef_set_osmodal_loop       : procedure(osModalLoop: Integer); cdecl;
-  cef_enable_highdpi_support : procedure; cdecl;
+  cef_initialize                 : function(const args: PCefMainArgs; const settings: PCefSettings; application: PCefApp; windows_sandbox_info: Pointer): Integer; cdecl;
+  cef_get_exit_code              : function : integer; cdecl;
+  cef_shutdown                   : procedure; cdecl;
+  cef_execute_process            : function(const args: PCefMainArgs; application: PCefApp; windows_sandbox_info: Pointer): Integer; cdecl;
+  cef_do_message_loop_work       : procedure; cdecl;
+  cef_run_message_loop           : procedure; cdecl;
+  cef_quit_message_loop          : procedure; cdecl;
+  cef_set_nestable_tasks_allowed : procedure(allowed: integer); cdecl;
 
   // /include/capi/cef_browser_capi.h
-  cef_browser_host_create_browser      : function(const windowInfo: PCefWindowInfo; client: PCefClient; const url: PCefString; const settings: PCefBrowserSettings; extra_info: PCefDictionaryValue; request_context: PCefRequestContext): Integer; cdecl;
-  cef_browser_host_create_browser_sync : function(const windowInfo: PCefWindowInfo; client: PCefClient; const url: PCefString; const settings: PCefBrowserSettings; extra_info: PCefDictionaryValue; request_context: PCefRequestContext): PCefBrowser; cdecl;
+  cef_browser_host_create_browser            : function(const windowInfo: PCefWindowInfo; client: PCefClient; const url: PCefString; const settings: PCefBrowserSettings; extra_info: PCefDictionaryValue; request_context: PCefRequestContext): Integer; cdecl;
+  cef_browser_host_create_browser_sync       : function(const windowInfo: PCefWindowInfo; client: PCefClient; const url: PCefString; const settings: PCefBrowserSettings; extra_info: PCefDictionaryValue; request_context: PCefRequestContext): PCefBrowser; cdecl;
+  cef_browser_host_get_browser_by_identifier : function(browser_id: Integer): PCefBrowser; cdecl;
 
   // /include/capi/cef_command_line_capi.h
   cef_command_line_create     : function : PCefCommandLine; cdecl;
   cef_command_line_get_global : function : PCefCommandLine; cdecl;
+
+  // /include/capi/cef_component_updater_capi.h
+  cef_component_updater_get   : function : PCefComponentUpdater; cdecl;
 
   // /include/capi/cef_cookie_capi.h
   cef_cookie_manager_get_global_manager   : function(callback: PCefCompletionCallback): PCefCookieManager; cdecl;
@@ -111,11 +83,14 @@ var
   cef_zip_directory                      : function(const src_dir, dest_file : PCefString; include_hidden_files : integer): Integer; cdecl;
   cef_load_crlsets_file                  : procedure(const path : PCefString); cdecl;
 
+  // / include/capi/cef_i18n_util_capi.h
+  cef_is_rtl                             : function : Integer; cdecl;
+
   // /include/capi/cef_image_capi.h
   cef_image_create : function : PCefImage; cdecl;
 
   // /include/capi/cef_media_router_capi.h
-  cef_media_router_get_global : function : PCefMediaRouter; cdecl;
+  cef_media_router_get_global : function(callback: PCefCompletionCallback) : PCefMediaRouter; cdecl;
 
   // /include/capi/cef_menu_model_capi.h
   cef_menu_model_create : function(delegate: PCefMenuModelDelegate): PCefMenuModel; cdecl;
@@ -126,13 +101,14 @@ var
   cef_clear_cross_origin_whitelist        : function : Integer; cdecl;
 
   // /include/capi/cef_parser_capi.h
+  cef_resolve_url                     : function(const base_url, relative_url: PCefString; resolved_url: PCefString): Integer; cdecl;
   cef_parse_url                       : function(const url: PCefString; var parts: TCefUrlParts): Integer; cdecl;
   cef_create_url                      : function(const parts: PCefUrlParts; url: PCefString): Integer; cdecl;
   cef_format_url_for_security_display : function(const origin_url: PCefString): PCefStringUserFree; cdecl;
   cef_get_mime_type                   : function(const extension: PCefString): PCefStringUserFree; cdecl;
   cef_get_extensions_for_mime_type    : procedure(const mime_type: PCefString; extensions: TCefStringList); cdecl;
-  cef_base64encode                    : function(const data: Pointer; data_size: NativeUInt): PCefStringUserFree; cdecl;
-  cef_base64decode                    : function(const data: PCefString): PCefBinaryValue; cdecl;
+  cef_base64_encode                   : function(const data: Pointer; data_size: NativeUInt): PCefStringUserFree; cdecl;
+  cef_base64_decode                   : function(const data: PCefString): PCefBinaryValue; cdecl;
   cef_uriencode                       : function(const text: PCefString; use_plus: Integer): PCefStringUserFree; cdecl;
   cef_uridecode                       : function(const text: PCefString; convert_to_utf8: Integer; unescape_rule: TCefUriUnescapeRule): PCefStringUserFree; cdecl;
   cef_parse_json                      : function(const json_string: PCefString; options: TCefJsonParserOptions): PCefValue; cdecl;
@@ -142,6 +118,11 @@ var
 
   // /include/capi/cef_path_util_capi.h
   cef_get_path : function(key: TCefPathKey; path: PCefString): Integer; cdecl;
+
+  // /include/capi/cef_preference_capi.h
+  cef_preference_manager_get_global                          : function : PCefPreferenceManager; cdecl;
+  cef_preference_manager_get_chrome_variations_as_switches   : procedure(switches: TCefStringList); cdecl;  {* CEF_API_ADDED(13401) *}
+  cef_preference_manager_get_chrome_variations_as_strings    : procedure(strings: TCefStringList); cdecl;   {* CEF_API_ADDED(13401) *}
 
   // /include/capi/cef_print_settings_capi.h
   cef_print_settings_create : function : PCefPrintSettings; cdecl;
@@ -158,9 +139,9 @@ var
   cef_post_data_element_create : function : PCefPostDataElement; cdecl;
 
   // /include/capi/cef_request_context_capi.h
-  cef_request_context_get_global_context : function : PCefRequestContext; cdecl;
-  cef_request_context_create_context     : function(const settings: PCefRequestContextSettings; handler: PCefRequestContextHandler): PCefRequestContext; cdecl;
-  cef_create_context_shared              : function(other: PCefRequestContext; handler: PCefRequestContextHandler): PCefRequestContext; cdecl;
+  cef_request_context_get_global_context        : function : PCefRequestContext; cdecl;
+  cef_request_context_create_context            : function(const settings: PCefRequestContextSettings; handler: PCefRequestContextHandler): PCefRequestContext; cdecl;
+  cef_request_context_cef_create_context_shared : function(other: PCefRequestContext; handler: PCefRequestContextHandler): PCefRequestContext; cdecl;
 
   // /include/capi/cef_resource_bundle_capi.h
   cef_resource_bundle_get_global : function : PCefResourceBundle; cdecl;
@@ -174,6 +155,9 @@ var
 
   // /include/capi/cef_server_capi.h
   cef_server_create : procedure(const address: PCefString; port: uint16; backlog: Integer; handler: PCefServerHandler); cdecl;
+
+  // /include/capi/cef_shared_process_message_builder_capi.h
+  cef_shared_process_message_builder_create : function(const name: PCefString; byte_size: NativeUInt) : PCefSharedProcessMessageBuilder; cdecl;
 
   // /include/capi/cef_ssl_info_capi.h
   cef_is_cert_status_error       : function(status : TCefCertStatus) : integer; cdecl;
@@ -192,6 +176,9 @@ var
   cef_post_task                          : function(threadId: TCefThreadId; task: PCefTask): Integer; cdecl;
   cef_post_delayed_task                  : function(threadId: TCefThreadId; task: PCefTask; delay_ms: Int64): Integer; cdecl;
 
+  // /include/capi/cef_task_manager_capi.h
+  cef_task_manager_get                   : function : PCefTaskManager;
+
   // /include/capi/cef_thread_capi.h
   cef_thread_create : function(const display_name: PCefString; priority: TCefThreadPriority; message_loop_type: TCefMessageLoopType; stoppable: integer; com_init_mode: TCefCOMInitMode): PCefThread; cdecl;
 
@@ -204,23 +191,27 @@ var
   cef_urlrequest_create : function(request: PCefRequest; client: PCefUrlRequestClient; request_context: PCefRequestContext): PCefUrlRequest; cdecl;
 
   // /include/capi/cef_v8_capi.h
-  cef_v8context_get_current_context : function : PCefv8Context; cdecl;
-  cef_v8context_get_entered_context : function : PCefv8Context; cdecl;
-  cef_v8context_in_context          : function : Integer; cdecl;
-  cef_v8value_create_undefined      : function : PCefv8Value; cdecl;
-  cef_v8value_create_null           : function : PCefv8Value; cdecl;
-  cef_v8value_create_bool           : function(value: Integer): PCefv8Value; cdecl;
-  cef_v8value_create_int            : function(value: Integer): PCefv8Value; cdecl;
-  cef_v8value_create_uint           : function(value: Cardinal): PCefv8Value; cdecl;
-  cef_v8value_create_double         : function(value: Double): PCefv8Value; cdecl;
-  cef_v8value_create_date           : function(const value: PCefTime): PCefv8Value; cdecl;
-  cef_v8value_create_string         : function(const value: PCefString): PCefv8Value; cdecl;
-  cef_v8value_create_object         : function(accessor: PCefV8Accessor; interceptor: PCefV8Interceptor): PCefv8Value; cdecl;
-  cef_v8value_create_array          : function(length: Integer): PCefv8Value; cdecl;
-  cef_v8value_create_array_buffer   : function(buffer : Pointer; length: NativeUInt; release_callback : PCefv8ArrayBufferReleaseCallback): PCefv8Value; cdecl;
-  cef_v8value_create_function       : function(const name: PCefString; handler: PCefv8Handler): PCefv8Value; cdecl;
-  cef_v8stack_trace_get_current     : function(frame_limit: Integer): PCefV8StackTrace; cdecl;
-  cef_register_extension            : function(const extension_name, javascript_code: PCefString; handler: PCefv8Handler): Integer; cdecl;
+  cef_v8_context_get_current_context                  : function : PCefv8Context; cdecl;
+  cef_v8_context_get_entered_context                  : function : PCefv8Context; cdecl;
+  cef_v8_context_in_context                           : function : Integer; cdecl;
+  cef_v8_value_create_undefined                       : function : PCefv8Value; cdecl;
+  cef_v8_value_create_null                            : function : PCefv8Value; cdecl;
+  cef_v8_value_create_bool                            : function(value: Integer): PCefv8Value; cdecl;
+  cef_v8_value_create_int                             : function(value: Integer): PCefv8Value; cdecl;
+  cef_v8_value_create_uint                            : function(value: Cardinal): PCefv8Value; cdecl;
+  cef_v8_value_create_double                          : function(value: Double): PCefv8Value; cdecl;
+  cef_v8_value_create_date                            : function(value: TCefBaseTime): PCefv8Value; cdecl;
+  cef_v8_value_create_string                          : function(const value: PCefString): PCefv8Value; cdecl;
+  cef_v8_value_create_object                          : function(accessor: PCefV8Accessor; interceptor: PCefV8Interceptor): PCefv8Value; cdecl;
+  cef_v8_value_create_array                           : function(length: Integer): PCefv8Value; cdecl;
+  cef_v8_value_create_array_buffer                    : function(buffer: Pointer; length: NativeUInt; release_callback : PCefv8ArrayBufferReleaseCallback): PCefv8Value; cdecl;
+  cef_v8_value_create_array_buffer_with_copy          : function(buffer: Pointer; length: NativeUInt): PCefv8Value; cdecl;
+  cef_v8_value_create_array_buffer_from_backing_store : function(backing_store: PCefv8BackingStore): PCefv8Value; cdecl;
+  cef_v8_value_create_function                        : function(const name: PCefString; handler: PCefv8Handler): PCefv8Value; cdecl;
+  cef_v8_value_create_promise                         : function : PCefv8Value; cdecl;
+  cef_v8_stack_trace_get_current                      : function(frame_limit: Integer): PCefV8StackTrace; cdecl;
+  cef_register_extension                              : function(const extension_name, javascript_code: PCefString; handler: PCefv8Handler): Integer; cdecl;
+  cef_v8_backing_store_create                         : function(byte_length: NativeUInt): PCefv8BackingStore; cdecl;
 
   // /include/capi/cef_values_capi.h
   cef_value_create            : function : PCefValue; cdecl;
@@ -230,14 +221,6 @@ var
 
   // /include/capi/cef_waitable_event_capi.h
   cef_waitable_event_create : function(automatic_reset, initially_signaled : integer): PCefWaitableEvent; cdecl;
-
-  // /include/capi/cef_web_plugin_capi.h
-  cef_visit_web_plugin_info          : procedure(visitor: PCefWebPluginInfoVisitor); cdecl;
-  cef_refresh_web_plugins            : procedure; cdecl;
-  cef_unregister_internal_web_plugin : procedure(const path: PCefString); cdecl;
-  cef_register_web_plugin_crash      : procedure(const path: PCefString); cdecl;
-  cef_is_web_plugin_unstable         : procedure(const path: PCefString; callback: PCefWebPluginUnstableCallback); cdecl;
-  cef_register_widevine_cdm          : procedure(const path: PCefString; callback: PCefRegisterCDMCallback); cdecl;
 
   // /include/capi/cef_xml_reader_capi.h
   cef_xml_reader_create : function(stream: PCefStreamReader; encodingType: TCefXmlEncodingType; const URI: PCefString): PCefXmlReader; cdecl;
@@ -256,11 +239,15 @@ var
   cef_browser_view_get_for_browser : function(browser: PCefBrowser): PCefBrowserView; cdecl;
 
   // /include/capi/views/cef_display_capi.h
-  cef_display_get_primary         : function : PCefDisplay; cdecl;
-  cef_display_get_nearest_point   : function(const point: PCefPoint; input_pixel_coords: Integer): PCefDisplay; cdecl;
-  cef_display_get_matching_bounds : function(const bounds: PCefRect; input_pixel_coords: Integer): PCefDisplay; cdecl;
-  cef_display_get_count           : function : NativeUInt; cdecl;
-  cef_display_get_alls            : procedure(displaysCount: PNativeUInt; displays: PPCefDisplay); cdecl;
+  cef_display_get_primary                      : function : PCefDisplay; cdecl;
+  cef_display_get_nearest_point                : function(const point: PCefPoint; input_pixel_coords: Integer): PCefDisplay; cdecl;
+  cef_display_get_matching_bounds              : function(const bounds: PCefRect; input_pixel_coords: Integer): PCefDisplay; cdecl;
+  cef_display_get_count                        : function : NativeUInt; cdecl;
+  cef_display_get_alls                         : procedure(displaysCount: PNativeUInt; displays: PPCefDisplay); cdecl;
+  cef_display_convert_screen_point_to_pixels   : function(const point: PCefPoint): TCefPoint; cdecl;
+  cef_display_convert_screen_point_from_pixels : function(const point: PCefPoint): TCefPoint; cdecl;
+  cef_display_convert_screen_rect_to_pixels    : function(const rect: PCefRect): TCefRect; cdecl;
+  cef_display_convert_screen_rect_from_pixels  : function(const rect: PCefRect): TCefRect; cdecl;
 
   // /include/capi/views/cef_label_button_capi.h
   cef_label_button_create         : function(delegate: PCefButtonDelegate; const text: PCefString): PCefLabelButton; cdecl;
@@ -286,9 +273,15 @@ var
   // *********** INTERNAL ************
   // *********************************
 
+  // /include/internal/cef_app_win.h
+  cef_set_osmodal_loop       : procedure(osModalLoop: Integer); cdecl;
+
+  // /include/internal/cef_dump_without_crashing_internal.h
+  cef_dump_without_crashing  : function(mseconds_between_dumps: int64; const function_name, file_name: PAnsiChar; line_number: integer): Integer; cdecl;
+
   // /include/internal/cef_logging_internal.h
   cef_get_min_log_level : function : Integer; cdecl;
-  cef_get_vlog_level    : function(const file_start: PAnsiChar; N: NativeInt): Integer; cdecl;
+  cef_get_vlog_level    : function(const file_start: PAnsiChar; N: NativeUInt): Integer; cdecl;
   cef_log               : procedure(const file_: PAnsiChar; line, severity: Integer; const message_: PAnsiChar); cdecl;
 
   // /include/internal/cef_string_list.h
@@ -352,16 +345,27 @@ var
   cef_get_current_platform_thread_id     : function : TCefPlatformThreadId; cdecl;
   cef_get_current_platform_thread_handle : function : TCefPlatformThreadHandle; cdecl;
 
+  // /include/internal/cef_time.h
+  cef_time_to_timet         : function(const cef_time: PCefTime; out time_: Int64): integer; cdecl;
+  cef_time_from_timet       : function(time_: int64; out cef_time: TCefTime): integer; cdecl;
+  cef_time_to_doublet       : function(const cef_time: PCefTime; out time_: double): integer; cdecl;
+  cef_time_from_doublet     : function(time: double; out cef_time: TCefTime): integer; cdecl;
+  cef_time_now              : function(out cef_time: TCefTime): integer; cdecl;
+  cef_basetime_now          : function : TCefBaseTime; cdecl;
+  cef_time_delta            : function(const cef_time1, cef_time2: PCefTime; out delta: int64): integer; cdecl;
+  cef_time_to_basetime      : function(const from: PCefTime; to_: PCefBaseTime) : integer; cdecl;
+  cef_time_from_basetime    : function(const from: TCefBaseTime; to_: PCefTime) : integer; cdecl;
+
   // /include/internal/cef_trace_event_internal.h
-  cef_trace_event_instant         : procedure(const category, name, arg1_name: PAnsiChar; arg1_val: uint64; const arg2_name: PAnsiChar; arg2_val: UInt64; copy: Integer); cdecl;
-  cef_trace_event_begin           : procedure(const category, name, arg1_name: PAnsiChar; arg1_val: UInt64; const arg2_name: PAnsiChar; arg2_val: UInt64; copy: Integer); cdecl;
-  cef_trace_event_end             : procedure(const category, name, arg1_name: PAnsiChar; arg1_val: UInt64; const arg2_name: PAnsiChar; arg2_val: UInt64; copy: Integer); cdecl;
-  cef_trace_counter               : procedure(const category, name, value1_name: PAnsiChar; value1_val: UInt64; const value2_name: PAnsiChar; value2_val: UInt64; copy: Integer); cdecl;
-  cef_trace_counter_id            : procedure(const category, name: PAnsiChar; id: UInt64; const value1_name: PAnsiChar; value1_val: UInt64; const value2_name: PAnsiChar; value2_val: UInt64; copy: Integer); cdecl;
-  cef_trace_event_async_begin     : procedure(const category, name: PAnsiChar; id: UInt64; const arg1_name: PAnsiChar; arg1_val: UInt64; const arg2_name: PAnsiChar; arg2_val: UInt64; copy: Integer); cdecl;
-  cef_trace_event_async_step_into : procedure(const category, name: PAnsiChar; id, step: UInt64; const arg1_name: PAnsiChar; arg1_val: UInt64; copy: Integer); cdecl;
-  cef_trace_event_async_step_past : procedure(const category, name: PAnsiChar; id, step: UInt64; const arg1_name: PAnsiChar; arg1_val: UInt64; copy: Integer); cdecl;
-  cef_trace_event_async_end       : procedure(const category, name: PAnsiChar; id: UInt64; const arg1_name: PAnsiChar; arg1_val: UInt64; const arg2_name: PAnsiChar; arg2_val: UInt64; copy: Integer); cdecl;
+  cef_trace_event_instant         : procedure(const category, name, arg1_name: PAnsiChar; arg1_val: uint64; const arg2_name: PAnsiChar; arg2_val: UInt64); cdecl;
+  cef_trace_event_begin           : procedure(const category, name, arg1_name: PAnsiChar; arg1_val: UInt64; const arg2_name: PAnsiChar; arg2_val: UInt64); cdecl;
+  cef_trace_event_end             : procedure(const category, name, arg1_name: PAnsiChar; arg1_val: UInt64; const arg2_name: PAnsiChar; arg2_val: UInt64); cdecl;
+  cef_trace_counter               : procedure(const category, name, value1_name: PAnsiChar; value1_val: UInt64; const value2_name: PAnsiChar; value2_val: UInt64); cdecl;
+  cef_trace_counter_id            : procedure(const category, name: PAnsiChar; id: UInt64; const value1_name: PAnsiChar; value1_val: UInt64; const value2_name: PAnsiChar; value2_val: UInt64); cdecl;
+  cef_trace_event_async_begin     : procedure(const category, name: PAnsiChar; id: UInt64; const arg1_name: PAnsiChar; arg1_val: UInt64; const arg2_name: PAnsiChar; arg2_val: UInt64); cdecl;
+  cef_trace_event_async_step_into : procedure(const category, name: PAnsiChar; id, step: UInt64; const arg1_name: PAnsiChar; arg1_val: UInt64); cdecl;
+  cef_trace_event_async_step_past : procedure(const category, name: PAnsiChar; id, step: UInt64; const arg1_name: PAnsiChar; arg1_val: UInt64); cdecl;
+  cef_trace_event_async_end       : procedure(const category, name: PAnsiChar; id: UInt64; const arg1_name: PAnsiChar; arg1_val: UInt64; const arg2_name: PAnsiChar; arg2_val: UInt64); cdecl;
 
   {$IFDEF LINUX}
   // /include/internal/cef_types_linux.h
@@ -371,3 +375,4 @@ var
 implementation
 
 end.
+

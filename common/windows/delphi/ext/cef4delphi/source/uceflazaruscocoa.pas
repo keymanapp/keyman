@@ -1,22 +1,4 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// Unit Author: Jonas Maebe
-//
-
 unit uCEFLazarusCocoa;
-
 
 {$mode objfpc}{$H+}
 {$I cef.inc}
@@ -27,13 +9,11 @@ unit uCEFLazarusCocoa;
 
 interface
 
-uses
 {$IFDEF DARWIN}  // $IFDEF MACOSX
+uses
   CocoaAll, CocoaInt, Cocoa_Extra,
-{$ENDIF}
   Classes, SysUtils, ctypes;
 
-{$IFDEF DARWIN}  // $IFDEF MACOSX
 type
   CrAppProtocol = objcprotocol
     function isHandlingSendEvent: LCLObjCBoolean; message 'isHandlingSendEvent';
@@ -60,6 +40,10 @@ var   LastMacOsKeyDownCode: cushort;
 {$ENDIF}
 
 implementation
+
+//
+// Unit Author: Jonas Maebe
+//
 
 {$IFDEF DARWIN}  // $IFDEF MACOSX
 uses

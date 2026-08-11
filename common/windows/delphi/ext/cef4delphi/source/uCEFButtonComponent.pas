@@ -1,58 +1,21 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFButtonComponent;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
 uses
   {$IFDEF DELPHI16_UP}
-    {$IFDEF MSWINDOWS}WinApi.Windows,{$ENDIF} System.Classes,
+    System.Classes,
   {$ELSE}
-    {$IFDEF MSWINDOWS}Windows,{$ENDIF} Classes,
+    Classes,
     {$IFDEF FPC}
     LCLProc, LCLType, LCLIntf, LResources, InterfaceBase,
     {$ENDIF}
@@ -84,15 +47,37 @@ type
       procedure doOnButtonStateChanged(const button: ICefButton);
 
     public
+      /// <summary>
+      /// Sets the Button will use an ink drop effect for displaying state changes.
+      /// </summary>
       procedure SetInkDropEnabled(enabled_: boolean);
+      /// <summary>
+      /// Sets the tooltip text that will be displayed when the user hovers the
+      /// mouse cursor over the Button.
+      /// </summary>
       procedure SetTooltipText(const tooltip_text: ustring);
+      /// <summary>
+      /// Sets the accessible name that will be exposed to assistive technology
+      /// (AT).
+      /// </summary>
       procedure SetAccessibleName(const name_: ustring);
-
+      /// <summary>
+      /// Returns this Button as a LabelButton or NULL if this is not a LabelButton.
+      /// </summary>
       property AsLabelButton          : ICefLabelButton             read GetAsLabelButton;
+      /// <summary>
+      /// Returns the current display state of the Button.
+      /// </summary>
       property State                  : TCefButtonState             read GetState                  write SetState;
 
     published
+      /// <summary>
+      /// Called when |button| is pressed.
+      /// </summary>
       property OnButtonPressed        : TOnButtonPressedEvent       read FOnButtonPressed          write FOnButtonPressed;
+      /// <summary>
+      /// Called when the state of |button| changes.
+      /// </summary>
       property OnButtonStateChanged   : TOnButtonStateChangedEvent  read FOnButtonStateChanged     write FOnButtonStateChanged;
   end;
 
@@ -124,9 +109,6 @@ type
 // *********************************************************
 
 implementation
-
-uses
-  uCEFButtonDelegate;
 
 procedure TCEFButtonComponent.Initialize;
 begin

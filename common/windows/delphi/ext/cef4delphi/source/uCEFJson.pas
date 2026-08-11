@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFJson;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -59,24 +22,90 @@ uses
 type
   TCEFJson = class
     public
+      /// <summary>
+      /// Returns the ICefValue value at the specified key.
+      /// </summary>
       class function ReadValue(const aDictionary : ICefDictionaryValue; const aKey : string; var aValue : ICefValue) : boolean;
+      /// <summary>
+      /// Returns the boolean value at the specified key.
+      /// </summary>
       class function ReadBoolean(const aDictionary : ICefDictionaryValue; const aKey : string; var aValue : boolean) : boolean;
+      /// <summary>
+      /// Returns the integer value at the specified key.
+      /// </summary>
       class function ReadInteger(const aDictionary : ICefDictionaryValue; const aKey : string; var aValue : integer) : boolean;
+      /// <summary>
+      /// Returns the double value at the specified key.
+      /// </summary>
       class function ReadDouble(const aDictionary : ICefDictionaryValue; const aKey : string; var aValue : double) : boolean;
+      /// <summary>
+      /// Returns the ustring value at the specified key.
+      /// </summary>
       class function ReadString(const aDictionary : ICefDictionaryValue; const aKey : string; var aValue : ustring) : boolean;
+      /// <summary>
+      /// Returns the ICefBinaryValue value at the specified key.
+      /// </summary>
       class function ReadBinary(const aDictionary : ICefDictionaryValue; const aKey : string; var aValue : ICefBinaryValue) : boolean;
+      /// <summary>
+      /// Returns the ICefDictionaryValue value at the specified key.
+      /// </summary>
       class function ReadDictionary(const aDictionary : ICefDictionaryValue; const aKey : string; var aValue : ICefDictionaryValue) : boolean;
+      /// <summary>
+      /// Returns the ICefListValue value at the specified key.
+      /// </summary>
       class function ReadList(const aDictionary : ICefDictionaryValue; const aKey : string; var aValue : ICefListValue) : boolean;
-
+      /// <summary>
+      /// Parses the specified |json_string| and returns a dictionary or list
+      /// representation. If JSON parsing fails this function returns NULL.
+      /// </summary>
       class function Parse(const jsonString: ustring; options: TCefJsonParserOptions = JSON_PARSER_RFC): ICefValue; overload;
+      /// <summary>
+      /// Parses the specified UTF8-encoded |json| buffer of size |json_size| and
+      /// returns a dictionary or list representation. If JSON parsing fails this
+      /// function returns NULL.
+      /// </summary>
       class function Parse(const json: Pointer; json_size: NativeUInt; options: TCefJsonParserOptions = JSON_PARSER_RFC): ICefValue; overload;
+      /// <summary>
+      /// Parses the specified |json_string| and returns a dictionary or list
+      /// representation. If JSON parsing fails this function returns NULL and
+      /// populates |error_msg_out| with a formatted error message.
+      /// </summary>
       class function ParseAndReturnError(const jsonString: ustring; options: TCefJsonParserOptions; out errorMsgOut: ustring): ICefValue;
+      /// <summary>
+      /// Generates a JSON string from the specified root |node|.
+      /// Returns an NULL string on failure. This function
+      /// requires exclusive access to |node| including any underlying data.
+      /// </summary>
       class function Write(const node: ICefValue; options: TCefJsonWriterOptions = JSON_WRITER_DEFAULT): ustring; overload;
+      /// <summary>
+      /// Generates a JSON string from the specified root |node|.
+      /// Returns an NULL string on failure. This function
+      /// requires exclusive access to |node| including any underlying data.
+      /// </summary>
       class function Write(const node: ICefDictionaryValue; options: TCefJsonWriterOptions = JSON_WRITER_DEFAULT): ustring; overload;
+      /// <summary>
+      /// Generates a JSON string from the specified root |node|.
+      /// Returns an NULL string on failure. This function
+      /// requires exclusive access to |node| including any underlying data.
+      /// </summary>
       class function Write(const node: ICefValue; var aRsltStrings: TStringList): boolean; overload;
+      /// <summary>
+      /// Generates a JSON string from the specified root |node|.
+      /// Returns an NULL string on failure. This function
+      /// requires exclusive access to |node| including any underlying data.
+      /// </summary>
       class function Write(const node: ICefDictionaryValue; var aRsltStrings: TStringList): boolean; overload;
+      /// <summary>
+      /// Saves the JSON data in |node| to a file in aFileName.
+      /// </summary>
       class function SaveToFile(const node: ICefValue; const aFileName: ustring): boolean; overload;
+      /// <summary>
+      /// Saves the JSON data in |node| to a file in aFileName.
+      /// </summary>
       class function SaveToFile(const node: ICefDictionaryValue; const aFileName: ustring): boolean; overload;
+      /// <summary>
+      /// Loads the JSON data in |aFileName| using the |encoding| and returns an ICefValue node in |aRsltNode|.
+      /// </summary>
       class function LoadFromFile(const aFileName: ustring; var aRsltNode: ICefValue; {$IFDEF DELPHI12_UP}encoding: TEncoding = nil;{$ENDIF} options: TCefJsonParserOptions = JSON_PARSER_RFC): boolean;
   end;
 
@@ -92,7 +121,7 @@ begin
 
   if (aDictionary <> nil) then
     begin
-      aValue := aDictionary.GetValue(aKey);
+      aValue := aDictionary.GetValue({$IFDEF FPC}UTF8Decode({$ENDIF}aKey{$IFDEF FPC}){$ENDIF});
       Result := (aValue <> nil);
     end;
 end;
@@ -101,8 +130,9 @@ class function TCEFJson.ReadBoolean(const aDictionary : ICefDictionaryValue; con
 var
   TempValue : ICefValue;
 begin
-  Result := False;
-  aValue := False;
+  Result    := False;
+  aValue    := False;
+  TempValue := nil;
 
   if ReadValue(aDictionary, aKey, TempValue) and
      (TempValue.GetType = VTYPE_BOOL) then
@@ -116,8 +146,9 @@ class function TCEFJson.ReadInteger(const aDictionary : ICefDictionaryValue; con
 var
   TempValue : ICefValue;
 begin
-  Result := False;
-  aValue := 0;
+  Result    := False;
+  aValue    := 0;
+  TempValue := nil;
 
   if ReadValue(aDictionary, aKey, TempValue) and
      (TempValue.GetType = VTYPE_INT) then
@@ -131,8 +162,9 @@ class function TCEFJson.ReadDouble(const aDictionary : ICefDictionaryValue; cons
 var
   TempValue : ICefValue;
 begin
-  Result := False;
-  aValue := 0;
+  Result    := False;
+  aValue    := 0;
+  TempValue := nil;
 
   if ReadValue(aDictionary, aKey, TempValue) and
      (TempValue.GetType = VTYPE_DOUBLE) then
@@ -146,8 +178,9 @@ class function TCEFJson.ReadString(const aDictionary : ICefDictionaryValue; cons
 var
   TempValue : ICefValue;
 begin
-  Result := False;
-  aValue := '';
+  Result    := False;
+  aValue    := '';
+  TempValue := nil;
 
   if ReadValue(aDictionary, aKey, TempValue) and
      (TempValue.GetType = VTYPE_STRING) then
@@ -161,8 +194,9 @@ class function TCEFJson.ReadBinary(const aDictionary : ICefDictionaryValue; cons
 var
   TempValue : ICefValue;
 begin
-  Result := False;
-  aValue := nil;
+  Result    := False;
+  aValue    := nil;
+  TempValue := nil;
 
   if ReadValue(aDictionary, aKey, TempValue) and
      (TempValue.GetType = VTYPE_BINARY) then
@@ -176,8 +210,9 @@ class function TCEFJson.ReadDictionary(const aDictionary : ICefDictionaryValue; 
 var
   TempValue : ICefValue;
 begin
-  Result := False;
-  aValue := nil;
+  Result    := False;
+  aValue    := nil;
+  TempValue := nil;
 
   if ReadValue(aDictionary, aKey, TempValue) and
      (TempValue.GetType = VTYPE_DICTIONARY) then
@@ -191,8 +226,9 @@ class function TCEFJson.ReadList(const aDictionary : ICefDictionaryValue; const 
 var
   TempValue : ICefValue;
 begin
-  Result := False;
-  aValue := nil;
+  Result    := False;
+  aValue    := nil;
+  TempValue := nil;
 
   if ReadValue(aDictionary, aKey, TempValue) and
      (TempValue.GetType = VTYPE_LIST) then
@@ -318,7 +354,7 @@ begin
 
       if Write(node, TempJSON) then
         begin
-          TempJSON.SaveToFile(aFileName);
+          TempJSON.SaveToFile({$IFDEF FPC}UTF8Encode({$ENDIF}aFileName{$IFDEF FPC}){$ENDIF});
           Result := True;
         end;
     except
@@ -343,7 +379,7 @@ begin
 
       if Write(node, TempJSON) then
         begin
-          TempJSON.SaveToFile(aFileName);
+          TempJSON.SaveToFile({$IFDEF FPC}UTF8Encode({$ENDIF}aFileName{$IFDEF FPC}){$ENDIF});
           Result := True;
         end;
     except
@@ -367,8 +403,8 @@ begin
       if (length(aFileName) > 0) and FileExists(aFileName) then
         begin
           TempJSON  := TStringList.Create;
-          TempJSON.LoadFromFile(aFileName{$IFDEF DELPHI12_UP}, encoding{$ENDIF});
-          aRsltNode := Parse(TempJSON.Text, options);
+          TempJSON.LoadFromFile({$IFDEF FPC}UTF8Encode({$ENDIF}aFileName{$IFDEF FPC}){$ENDIF}{$IFDEF DELPHI12_UP}, encoding{$ENDIF});
+          aRsltNode := Parse({$IFDEF FPC}UTF8Decode({$ENDIF}TempJSON.Text{$IFDEF FPC}){$ENDIF}, options);
           Result    := True;
         end;
     except

@@ -1,66 +1,29 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFScrollViewComponent;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
 uses
   {$IFDEF DELPHI16_UP}
-    {$IFDEF MSWINDOWS}WinApi.Windows,{$ENDIF} System.Classes,
+    System.Classes,
   {$ELSE}
-    {$IFDEF MSWINDOWS}Windows,{$ENDIF} Classes,
+    Classes,
     {$IFDEF FPC}
     LCLProc, LCLType, LCLIntf, LResources, InterfaceBase,
     {$ENDIF}
   {$ENDIF}
-  uCEFTypes, uCEFInterfaces, uCEFViewsFrameworkEvents, uCEFViewComponent;
+  uCEFTypes, {$IFDEF DELPHI16_UP}uCEFConstants,{$ENDIF} uCEFInterfaces, uCEFViewComponent;
 
 type
-  {$IFNDEF FPC}{$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pidWin32 or pidWin64)]{$ENDIF}{$ENDIF}
+  {$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pfidWindows or pfidOSX or pfidLinux)]{$ENDIF}
   TCEFScrollViewComponent = class(TCEFViewComponent)
     protected
       FScrollView                  : ICefScrollView;
@@ -84,13 +47,34 @@ type
       procedure doCreateCustomView; override;
 
     public
+      /// <summary>
+      /// Create a new ScrollView.
+      /// </summary>
       procedure CreateScrollView;
-
+      /// <summary>
+      /// Get and set the content View. The content View must have a specified size (e.g.
+      /// via ICefView.SetBounds or ICefViewDelegate.GetPreferredSize).
+      /// </summary>
       property  ContentView               : ICefView      read GetContentView                 write SetContentView;
+      /// <summary>
+      /// Returns the visible region of the content View.
+      /// </summary>
       property  VisibleContentRect        : TCefRect      read GetVisibleContentRect;
+      /// <summary>
+      /// Returns the height of the horizontal scrollbar.
+      /// </summary>
       property  HorizontalScrollbarHeight : Integer       read GetHorizontalScrollbarHeight;
+      /// <summary>
+      /// Returns the width of the vertical scrollbar.
+      /// </summary>
       property  VerticalScrollbarWidth    : Integer       read GetVerticalScrollbarWidth;
+      /// <summary>
+      /// Returns true (1) if the horizontal scrollbar is currently showing.
+      /// </summary>
       property  HasHorizontalScrollbar    : boolean       read GetHasHorizontalScrollbar;
+      /// <summary>
+      /// Returns true (1) if the vertical scrollbar is currently showing.
+      /// </summary>
       property  HasVerticalScrollbar      : boolean       read GetHasVerticalScrollbar;
   end;
 
@@ -128,7 +112,7 @@ procedure Register;
 implementation
 
 uses
-  uCEFScrollView, uCEFMiscFunctions, uCEFViewDelegate;
+  uCEFScrollView, uCEFViewDelegate;
 
 procedure TCEFScrollViewComponent.CreateScrollView;
 begin

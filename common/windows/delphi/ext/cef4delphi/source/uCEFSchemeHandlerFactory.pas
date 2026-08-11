@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFSchemeHandlerFactory;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -52,20 +15,39 @@ uses
   uCEFBaseRefCounted, uCEFInterfaces, uCEFTypes, uCEFResourceHandler;
 
 type
+  /// <summary>
+  /// Class that creates ICefResourceHandler instances for handling scheme
+  /// requests.
+  /// </summary>
+  /// <remarks>
+  /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/cef_scheme_capi.h">CEF source file: /include/capi/cef_scheme_capi.h (cef_scheme_handler_factory_t)</see></para>
+  /// </remarks>
   TCefSchemeHandlerFactoryOwn = class(TCefBaseRefCountedOwn, ICefSchemeHandlerFactory)
     protected
       FClass : TCefResourceHandlerClass;
 
+      /// <summary>
+      /// Return a new resource handler instance to handle the request or an NULL
+      /// reference to allow default handling of the request. |browser| and |frame|
+      /// will be the browser window and frame respectively that originated the
+      /// request or NULL if the request did not originate from a browser window
+      /// (for example, if the request came from ICefUrlRequest). The |request|
+      /// object passed to this function cannot be modified.
+      /// </summary>
       function New(const browser: ICefBrowser; const frame: ICefFrame; const schemeName: ustring; const request: ICefRequest): ICefResourceHandler; virtual;
 
     public
+      /// <summary>
+      /// Constructor of the scheme handler factory.
+      /// </summary>
+      /// <param name="AClass">Class of the custom resource handler used to handle custom scheme requests.</param>
       constructor Create(const AClass: TCefResourceHandlerClass); virtual;
   end;
 
 implementation
 
 uses
-  uCEFMiscFunctions, uCEFLibFunctions, uCEFBrowser, uCEFFrame, uCEFRequest;
+  uCEFMiscFunctions, uCEFBrowser, uCEFFrame, uCEFRequest;
 
 function cef_scheme_handler_factory_create(      self        : PCefSchemeHandlerFactory;
                                                  browser     : PCefBrowser;

@@ -1,66 +1,29 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFLabelButtonComponent;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
 uses
   {$IFDEF DELPHI16_UP}
-    {$IFDEF MSWINDOWS}WinApi.Windows,{$ENDIF} System.Classes,
+    System.Classes,
   {$ELSE}
-    {$IFDEF MSWINDOWS}Windows,{$ENDIF} Classes,
+    Classes,
     {$IFDEF FPC}
     LCLProc, LCLType, LCLIntf, LResources, InterfaceBase,
     {$ENDIF}
   {$ENDIF}
-  uCEFTypes, uCEFInterfaces, uCEFViewsFrameworkEvents, uCEFButtonComponent;
+  uCEFTypes, {$IFDEF DELPHI16_UP}uCEFConstants,{$ENDIF} uCEFInterfaces, uCEFButtonComponent;
 
 type
-  {$IFNDEF FPC}{$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pidWin32 or pidWin64)]{$ENDIF}{$ENDIF}
+  {$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pfidWindows or pfidOSX or pfidLinux)]{$ENDIF}
   TCEFLabelButtonComponent = class(TCEFButtonComponent)
     protected
       FLabelButton     : ICefLabelButton;
@@ -84,16 +47,62 @@ type
       procedure doCreateCustomView; override;
 
     public
+      /// <summary>
+      /// Create a new LabelButton. |aText| will be shown on the LabelButton and used as the default
+      /// accessible name.
+      /// </summary>
       procedure CreateLabelButton(const aText : ustring);
+      /// <summary>
+      /// Sets the text color shown for the specified button |for_state| to |color|.
+      /// </summary>
       procedure SetTextColor(for_state: TCefButtonState; color: TCefColor);
+      /// <summary>
+      /// Sets the text colors shown for the non-disabled states to |color|.
+      /// </summary>
       procedure SetEnabledTextColors(color: TCefColor);
+      /// <summary>
+      /// <para>Sets the font list. The format is "<FONT_FAMILY_LIST>,[STYLES] <SIZE>",
+      /// where:</para>
+      /// <code>
+      /// - FONT_FAMILY_LIST is a comma-separated list of font family names,
+      /// - STYLES is an optional space-separated list of style names (case-sensitive
+      ///   "Bold" and "Italic" are supported), and
+      /// - SIZE is an integer font size in pixels with the suffix "px".
+      /// </code>
+      /// <para>Here are examples of valid font description strings:</para>
+      /// <code>
+      /// - "Arial, Helvetica, Bold Italic 14px"
+      /// - "Arial, 14px"
+      /// </code>
+      /// </summary>
       procedure SetFontList(const font_list: ustring);
+      /// <summary>
+      /// Sets the horizontal alignment; reversed in RTL. Default is
+      /// CEF_HORIZONTAL_ALIGNMENT_CENTER.
+      /// </summary>
       procedure SetHorizontalAlignment(alignment: TCefHorizontalAlignment);
+      /// <summary>
+      /// Reset the minimum size of this LabelButton to |size|.
+      /// </summary>
       procedure SetMinimumSize(const size_: TCefSize);
+      /// <summary>
+      /// Reset the maximum size of this LabelButton to |size|.
+      /// </summary>
       procedure SetMaximumSize(const size_: TCefSize);
-
+      /// <summary>
+      /// Gets and sets the text shown on the LabelButton. By default |text| will also be
+      /// used as the accessible name.
+      /// </summary>
       property  Text                                  : ustring         read GetText          write SetText;
+      /// <summary>
+      /// Returns the image shown for |button_state|. If no image exists for that
+      /// state then the image for CEF_BUTTON_STATE_NORMAL will be returned.
+      /// </summary>
       property  Image[button_state : TCefButtonState] : ICefImage       read GetImage         write SetImage;
+      /// <summary>
+      /// Returns this LabelButton as a MenuButton or NULL if this is not a
+      /// MenuButton.
+      /// </summary>
       property  AsMenuButton                          : ICefMenuButton  read GetAsMenuButton;
   end;
 
@@ -131,7 +140,7 @@ procedure Register;
 implementation
 
 uses
-  uCEFLabelButton, uCEFMiscFunctions, uCEFButtonDelegate;
+  uCEFLabelButton, uCEFButtonDelegate;
 
 procedure TCEFLabelButtonComponent.CreateLabelButton(const aText : ustring);
 begin

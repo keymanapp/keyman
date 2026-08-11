@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFCookieManager;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -59,8 +22,6 @@ uses
 type
   TCefCookieManagerRef = class(TCefBaseRefCountedRef, ICefCookieManager)
     protected
-      procedure SetSupportedSchemes(const schemes: TStrings; include_defaults: boolean; const callback: ICefCompletionCallback);
-      procedure SetSupportedSchemesProc(const schemes: TStrings; include_defaults: boolean; const callback: TCefCompletionCallbackProc);
       function  VisitAllCookies(const visitor: ICefCookieVisitor): Boolean;
       function  VisitAllCookiesProc(const visitor: TCefCookieVisitorProc): Boolean;
       function  VisitUrlCookies(const url: ustring; includeHttpOnly: Boolean; const visitor: ICefCookieVisitor): Boolean;
@@ -87,7 +48,7 @@ implementation
 
 uses
   uCEFMiscFunctions, uCEFLibFunctions, uCEFDeleteCookiesCallback,
-  uCEFSetCookieCallback, uCEFCookieVisitor, uCEFStringList;
+  uCEFSetCookieCallback, uCEFCookieVisitor;
 
 
 function TCefCookieManagerRef.DeleteCookies(const url        : ustring;
@@ -139,22 +100,23 @@ var
   TempCookie : TCefCookie;
 begin
   TempURL                := CefString(url);
+  TempCookie.size        := SizeOf(TempCookie);
   TempCookie.name        := CefString(name);
   TempCookie.value       := CefString(value);
   TempCookie.domain      := CefString(domain);
   TempCookie.path        := CefString(path);
   TempCookie.secure      := Ord(secure);
   TempCookie.httponly    := Ord(httponly);
-  TempCookie.creation    := DateTimeToCefTime(creation);
-  TempCookie.last_access := DateTimeToCefTime(lastAccess);
+  TempCookie.creation    := DateTimeToCefBaseTime(creation);
+  TempCookie.last_access := DateTimeToCefBaseTime(lastAccess);
   TempCookie.has_expires := Ord(hasExpires);
   TempCookie.same_site   := same_site;
   TempCookie.priority    := priority;
 
   if hasExpires then
-    TempCookie.expires := DateTimeToCefTime(expires)
+    TempCookie.expires := DateTimeToCefBaseTime(expires)
    else
-    FillChar(TempCookie.expires, SizeOf(TCefTime), 0);
+    TempCookie.expires := 0;
 
   Result := PCefCookieManager(FData)^.set_cookie(PCefCookieManager(FData), @TempURL, @TempCookie, CefGetData(callback)) <> 0;
 end;
@@ -171,39 +133,6 @@ begin
                       creation, lastAccess, expires,
                       same_site, priority,
                       TCefFastSetCookieCallback.Create(callback));
-end;
-
-procedure TCefCookieManagerRef.SetSupportedSchemes(const schemes          : TStrings;
-                                                         include_defaults : boolean;
-                                                   const callback         : ICefCompletionCallback);
-var
-  TempSL     : ICefStringList;
-  TempHandle : TCefStringList;
-begin
-  try
-    if (schemes <> nil) and (schemes.count > 0) then
-      begin
-        TempSL := TCefStringListOwn.Create;
-        TempSL.AddStrings(schemes);
-        TempHandle := TempSL.Handle;
-      end
-     else
-      TempHandle := nil;
-
-    PCefCookieManager(FData)^.set_supported_schemes(PCefCookieManager(FData),
-                                                    TempHandle,
-                                                    ord(include_defaults),
-                                                    CefGetData(callback));
-  finally
-    TempSL := nil;
-  end;
-end;
-
-procedure TCefCookieManagerRef.SetSupportedSchemesProc(const schemes          : TStrings;
-                                                             include_defaults : boolean;
-                                                       const callback         : TCefCompletionCallbackProc);
-begin
-  SetSupportedSchemes(schemes, include_defaults, TCefFastCompletionCallback.Create(callback));
 end;
 
 class function TCefCookieManagerRef.UnWrap(data: Pointer): ICefCookieManager;

@@ -1,40 +1,3 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFFMXBufferPanel;
 
 {$I cef.inc}
@@ -48,16 +11,20 @@ uses
   System.SyncObjs,
   {$ENDIF}
   System.Classes, System.UIConsts, System.Types, System.UITypes,
-  {$IFDEF DELPHI17_UP}
+  {$IFDEF DELPHI19_UP}
   FMX.Graphics,
   {$ENDIF}
   FMX.Types, FMX.Controls, FMX.Forms,
-  uCEFTypes;
+  uCEFTypes, uCEFConstants;
 
 type
   TDialogKeyEvent = procedure(Sender: TObject; var Key: Word; Shift: TShiftState) of object;
 
-  {$IFNDEF FPC}{$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pidWin32 or pidWin64)]{$ENDIF}{$ENDIF}
+  {$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pfidWindows or pfidOSX or pfidLinux)]{$ENDIF}
+  /// <summary>
+  /// TBufferPanel is used by FMX applications with browsers in OSR mode
+  /// to draw the browser contents. See the FMXExternalPumpBrowser demo for more details.
+  /// </summary>
   TFMXBufferPanel = class(TControl)
     protected
       {$IFDEF MSWINDOWS}
@@ -94,23 +61,76 @@ type
       constructor Create(AOwner: TComponent); override;
       destructor  Destroy; override;
       procedure   AfterConstruction; override;
+      /// <summary>
+      /// Save the visible web contents as a bitmap file.
+      /// </summary>
       function    SaveToFile(const aFilename : string) : boolean;
+      /// <summary>
+      /// Invalidate this panel.
+      /// </summary>
       procedure   InvalidatePanel;
+      /// <summary>
+      /// Acquires the synchronization object before drawing into the background bitmap.
+      /// </summary>
       function    BeginBufferDraw : boolean;
+      /// <summary>
+      /// Releases the synchronization object after drawing into the background bitmap.
+      /// </summary>
       procedure   EndBufferDraw;
+      /// <summary>
+      /// Draws a part of aBitmap into the background bitmap buffer at the specified rectangle.
+      /// </summary>
+      /// <param name="aBitmap">Bitmap that will be drawn into the background bitmap.</param>
+      /// <param name="aSrcRect">Rectangle that defines the area of aBitmap that will be drawn into the background bitmap.</param>
+      /// <param name="aDstRect">Rectangle that defines the area of the background bitmap where aBitmap will be drawn.</param>
       procedure   BufferDraw(const aBitmap : TBitmap; const aSrcRect, aDstRect : TRectF);
+      /// <summary>
+      /// Update the background bitmap size.
+      /// </summary>
       function    UpdateBufferDimensions(aWidth, aHeight : integer) : boolean;
+      /// <summary>
+      /// Check if the background image buffers have the same dimensions as this panel. Returns true if they have the same size.
+      /// </summary>
       function    BufferIsResized(aUseMutex : boolean = True) : boolean;
+      /// <summary>
+      /// Convert a point from the screen coordinate system to the client coordinate system.
+      /// </summary>
       function    ScreenToClient(aPoint : TPoint) : TPoint; overload;
+      /// <summary>
+      /// Convert a point from the screen coordinate system to the client coordinate system.
+      /// </summary>
       function    ScreenToClient(aPoint : TPointF) : TPointF; overload;
+      /// <summary>
+      /// Convert a point from the client coordinate system to the screen coordinate system.
+      /// </summary>
       function    ClientToScreen(aPoint : TPoint) : TPoint; overload;
+      /// <summary>
+      /// Convert a point from the client coordinate system to the screen coordinate system.
+      /// </summary>
       function    ClientToScreen(aPoint : TPointF) : TPointF; overload;
-
+      /// <summary>
+      /// Background bitmap.
+      /// </summary>
       property Buffer                    : TBitmap                   read FBuffer;
+      /// <summary>
+      /// Returns the scanline size.
+      /// </summary>
       property ScanlineSize              : integer                   read FScanlineSize;
+      /// <summary>
+      /// Image width.
+      /// </summary>
       property BufferWidth               : integer                   read GetBufferWidth;
+      /// <summary>
+      /// Image height.
+      /// </summary>
       property BufferHeight              : integer                   read GetBufferHeight;
+      /// <summary>
+      /// Returns the screen scale.
+      /// </summary>
       property ScreenScale               : single                    read GetScreenScale;
+      /// <summary>
+      /// Screen scale value used instead of the real one.
+      /// </summary>
       property ForcedDeviceScaleFactor   : single                    read FForcedDeviceScaleFactor   write FForcedDeviceScaleFactor;
 
     published
@@ -119,11 +139,16 @@ type
       property Visible;
       property Enabled;
       property TabOrder;
+      /// <summary>
+      /// Color used to clear the panel canvas in the Paint method.
+      /// </summary>
       property Color            : TAlphaColor        read FColor            write FColor            default claWhite;
+      /// <summary>
+      /// Set HighSpeedDrawing to True to draw the buffer to the canvas using a high speed interpolation mode.
+      /// </summary>
       property HighSpeedDrawing : boolean            read FHighSpeedDrawing write FHighSpeedDrawing default True;
 
       {$IFDEF DELPHI17_UP}
-      property TabStop;
       property CanFocus;
       property CanParentFocus;
       property Height;
@@ -135,7 +160,15 @@ type
       property RotationAngle;
       property RotationCenter;
       property Scale;
+      {$ENDIF}
+      {$IFDEF DELPHI18_UP}
+      property TabStop;
+      {$ENDIF}
+      {$IFDEF DELPHI21_UP}
       property Size;
+      {$ENDIF}
+      {$IFDEF DELPHI25_UP}
+      property OnResized;
       {$ENDIF}
       {$IFNDEF DELPHI23_UP}
       property Hint;
@@ -154,6 +187,9 @@ type
       property OnMouseWheel;
       property OnKeyUp;
       property OnKeyDown;
+      /// <summary>
+      /// Event triggered before the DialogKey.
+      /// </summary>
       property OnDialogKey    : TDialogKeyEvent    read FOnDialogKey      write FOnDialogKey;
   end;
 
@@ -161,8 +197,9 @@ implementation
 
 uses
   System.SysUtils, System.Math,
-  {$IFDEF MSWINDOWS}FMX.Helpers.Win,{$ENDIF}
-  FMX.Platform, uCEFMiscFunctions, uCEFApplicationCore;
+  {$IFDEF MSWINDOWS}{$IFDEF DELPHI24_UP}FMX.Helpers.Win,{$ENDIF}{$ENDIF}
+  FMX.Platform, {$IFDEF MACOS}FMX.Platform.Mac,{$ENDIF}
+  uCEFMiscFunctions, uCEFApplicationCore;
 
 constructor TFMXBufferPanel.Create(AOwner: TComponent);
 begin
@@ -390,18 +427,39 @@ var
   TempHandle : TCefWindowHandle;
 {$ENDIF}{$ENDIF}
 begin
-  Result       := False;
-  aResultScale := 1;
-
-  {$IFDEF DELPHI24_UP}{$IFDEF MSWINDOWS}
+  {$IFDEF MSWINDOWS}
+  {$IFDEF DELPHI24_UP}
   TempHandle := GetParentFormHandle;
 
   if (TempHandle <> 0) then
     begin
       Result       := True;
       aResultScale := GetWndScale(TempHandle);
+    end
+   else
+    begin
+      Result       := False;
+      aResultScale := 1;
     end;
-  {$ENDIF}{$ENDIF}
+  {$ELSE}
+  Result       := False;
+  aResultScale := 1;
+  {$ENDIF}
+  {$ENDIF}
+
+  {$IFDEF LINUX}
+  if (Screen.DisplayCount = 1) then
+    aResultScale := Screen.Displays[0].Scale
+   else
+    aResultScale := Screen.DisplayFromForm(GetParentForm).Scale;
+
+  Result := True;
+  {$ENDIF}
+
+  {$IFDEF MACOS}
+  Result       := True;
+  aResultScale := TMacWindowHandle(GetParentForm.Handle).Wnd.backingScaleFactor;
+  {$ENDIF}
 end;
 
 function TFMXBufferPanel.GetScreenScale : single;
@@ -448,21 +506,27 @@ begin
 end;
 
 function TFMXBufferPanel.UpdateBufferDimensions(aWidth, aHeight : integer) : boolean;
+{$IFDEF DELPHI18_UP}
 var
   TempScale : single;
+{$ENDIF}
 begin
   Result    := False;
+  {$IFDEF DELPHI18_UP}
   TempScale := ScreenScale;
+  {$ENDIF}
 
   if ((FBuffer             =  nil)       or
+      {$IFDEF DELPHI18_UP}
       (FBuffer.BitmapScale <> TempScale) or
+      {$ENDIF}
       (FBuffer.Width       <> aWidth)    or
       (FBuffer.Height      <> aHeight))  then
     begin
       if (FBuffer <> nil) then FreeAndNil(FBuffer);
 
       FBuffer             := TBitmap.Create(aWidth, aHeight);
-      {$IFDEF DELPHI17_UP}
+      {$IFDEF DELPHI18_UP}
       FBuffer.BitmapScale := TempScale;
       FScanlineSize       := FBuffer.BytesPerLine;
       {$ELSE}
@@ -486,7 +550,9 @@ begin
       TempHeight := round(Height * TempScale);
 
       Result := (FBuffer <> nil) and
+                {$IFDEF DELPHI18_UP}
                 (FBuffer.BitmapScale = TempScale) and
+                {$ENDIF}
                 (FBuffer.Width       = TempWidth) and
                 (FBuffer.Height      = TempHeight);
 

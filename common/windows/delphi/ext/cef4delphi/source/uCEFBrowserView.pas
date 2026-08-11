@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFBrowserView;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -57,14 +20,66 @@ uses
   uCEFBaseRefCounted, uCEFInterfaces, uCEFTypes, uCEFView;
 
 type
+  /// <summary>
+  /// A View hosting a ICefBrowser instance. Methods must be called on the
+  /// browser process UI thread unless otherwise indicated.
+  /// </summary>
+  /// <remarks>
+  /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/views/cef_browser_view_capi.h">CEF source file: /include/capi/views/cef_browser_view_capi.h (cef_browser_view_t)</see></para>
+  /// </remarks>
   TCefBrowserViewRef = class(TCefViewRef, ICefBrowserView)
     protected
+      /// <summary>
+      /// Returns the ICefBrowser hosted by this BrowserView. Will return NULL if
+      /// the browser has not yet been created or has already been destroyed.
+      /// </summary>
       function  GetBrowser : ICefBrowser;
+      /// <summary>
+      /// Returns the Chrome toolbar associated with this BrowserView. Only
+      /// supported when using Chrome style. The ICefBrowserViewDelegate.GetChromeToolbarType
+      /// function must return a value other than
+      /// CEF_CTT_NONE and the toolbar will not be available until after this
+      /// BrowserView is added to a ICefWindow and
+      /// ICefViewDelegate.OnWindowChanged() has been called.
+      /// </summary>
+      function  GetChromeToolbar : ICefView;
+      /// <summary>
+      /// Sets whether normal priority accelerators are first forwarded to the web
+      /// content (`keydown` event handler) or ICefKeyboardHandler. Normal priority
+      /// accelerators can be registered via ICefWindow.SetAccelerator (with
+      /// |high_priority|=false) or internally for standard accelerators supported
+      /// by Chrome style. If |prefer_accelerators| is true then the matching
+      /// accelerator will be triggered immediately (calling
+      /// ICefWindowDelegate.OnAccelerator or ICefCommandHandler.OnChromeCommand
+      /// respectively) and the event will not be forwarded to the web content or
+      /// ICefKeyboardHandler first. If |prefer_accelerators| is false then the
+      /// matching accelerator will only be triggered if the event is not handled by
+      /// web content (`keydown` event handler that calls `event.preventDefault()`)
+      /// or by ICefKeyboardHandler. The default value is false.
+      /// </summary>
       procedure SetPreferAccelerators(prefer_accelerators: boolean);
+      /// <summary>
+      /// Returns the runtime style for this BrowserView (ALLOY or CHROME). See
+      /// TCefRuntimeStyle documentation for details.
+      /// </summary>
+      function GetRuntimeStyle : TCefRuntimeStyle;
 
     public
+      /// <summary>
+      /// Returns a ICefBrowserView instance using a PCefBrowserView data pointer.
+      /// </summary>
       class function UnWrap(data: Pointer): ICefBrowserView;
+      /// <summary>
+      /// Create a new BrowserView. The underlying cef_browser_t will not be created
+      /// until this view is added to the views hierarchy. The optional |extra_info|
+      /// parameter provides an opportunity to specify extra information specific to
+      /// the created browser that will be passed to
+      /// cef_render_process_handler_t::on_browser_created() in the render process.
+      /// </summary>
       class function CreateBrowserView(const client: ICefClient; const url: ustring; const settings: TCefBrowserSettings; const extra_info: ICefDictionaryValue; const request_context: ICefRequestContext; const delegate: ICefBrowserViewDelegate): ICefBrowserView;
+      /// <summary>
+      /// Returns the BrowserView associated with |browser|.
+      /// </summary>
       class function GetForBrowser(const browser: ICefBrowser): ICefBrowserView;
   end;
 
@@ -78,10 +93,20 @@ begin
   Result := TCefBrowserRef.UnWrap(PCefBrowserView(FData)^.get_browser(PCefBrowserView(FData)));
 end;
 
+function TCefBrowserViewRef.GetChromeToolbar : ICefView;
+begin
+  Result := TCefViewRef.UnWrap(PCefBrowserView(FData)^.get_chrome_toolbar(PCefBrowserView(FData)));
+end;
+
 procedure TCefBrowserViewRef.SetPreferAccelerators(prefer_accelerators: boolean);
 begin
   PCefBrowserView(FData)^.set_prefer_accelerators(PCefBrowserView(FData),
                                                   ord(prefer_accelerators));
+end;
+
+function TCefBrowserViewRef.GetRuntimeStyle : TCefRuntimeStyle;
+begin
+  Result := PCefBrowserView(FData)^.get_runtime_style(PCefBrowserView(FData));
 end;
 
 class function TCefBrowserViewRef.UnWrap(data: Pointer): ICefBrowserView;

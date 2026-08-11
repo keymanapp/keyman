@@ -1,66 +1,29 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFPanelComponent;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
 uses
   {$IFDEF DELPHI16_UP}
-    {$IFDEF MSWINDOWS}WinApi.Windows,{$ENDIF} System.Classes,
+    System.Classes,
   {$ELSE}
-    {$IFDEF MSWINDOWS}Windows,{$ENDIF} Classes,
+    Classes,
     {$IFDEF FPC}
     LCLProc, LCLType, LCLIntf, LResources, InterfaceBase,
     {$ENDIF}
   {$ENDIF}
-  uCEFTypes, uCEFInterfaces, uCEFViewsFrameworkEvents, uCEFViewComponent;
+  uCEFTypes, {$IFDEF DELPHI16_UP}uCEFConstants,{$ENDIF} uCEFInterfaces, uCEFViewComponent;
 
 type
-  {$IFNDEF FPC}{$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pidWin32 or pidWin64)]{$ENDIF}{$ENDIF}
+  {$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pfidWindows or pfidOSX or pfidLinux)]{$ENDIF}
   TCEFPanelComponent = class(TCEFViewComponent, ICefPanelDelegateEvents)
     protected
       FPanel    : ICefPanel;
@@ -72,25 +35,68 @@ type
       function  GetAsView : ICefView; override;
       function  GetAsPanel : ICefPanel; override;
       function  GetAsWindow : ICefWindow; virtual;
+      function  GetChildViewCount : NativeUInt;
 
       // ICefViewDelegateEvents
       procedure doCreateCustomView; override;
 
     public
+      /// <summary>
+      /// Create a new Panel.
+      /// </summary>
       procedure CreatePanel;
+      /// <summary>
+      /// Set this Panel's Layout to FillLayout and return the FillLayout object.
+      /// </summary>
       function  SetToFillLayout : ICefFillLayout;
+      /// <summary>
+      /// Set this Panel's Layout to BoxLayout and return the BoxLayout object.
+      /// </summary>
       function  SetToBoxLayout(const settings: TCefBoxLayoutSettings): ICefBoxLayout;
+      /// <summary>
+      /// Get the Layout.
+      /// </summary>
       function  GetLayout : ICefLayout;
+      /// <summary>
+      /// Lay out the child Views (set their bounds based on sizing heuristics
+      /// specific to the current Layout).
+      /// </summary>
       procedure Layout;
+      /// <summary>
+      /// Add a child View.
+      /// </summary>
       procedure AddChildView(const view: ICefView);
+      /// <summary>
+      /// Add a child View at the specified |index|. If |index| matches the result
+      /// of GetChildCount() then the View will be added at the end.
+      /// </summary>
       procedure AddChildViewAt(const view: ICefView; index: Integer);
+      /// <summary>
+      /// Move the child View to the specified |index|. A negative value for |index|
+      /// will move the View to the end.
+      /// </summary>
       procedure ReorderChildView(const view: ICefView; index: Integer);
+      /// <summary>
+      /// Remove a child View. The View can then be added to another Panel.
+      /// </summary>
       procedure RemoveChildView(const view: ICefView);
+      /// <summary>
+      /// Remove all child Views. The removed Views will be deleted if the client
+      /// holds no references to them.
+      /// </summary>
       procedure RemoveAllChildViews;
-      function  GetChildViewCount : NativeUInt;
+      /// <summary>
+      /// Returns the child View at the specified |index|.
+      /// </summary>
       function  GetChildViewAt(index: Integer): ICefView;
-
-      property AsWindow : ICefWindow   read GetAsWindow;
+      /// <summary>
+      /// Returns this Panel as a Window or NULL if this is not a Window.
+      /// </summary>
+      property AsWindow       : ICefWindow   read GetAsWindow;
+      /// <summary>
+      /// Returns the number of child Views.
+      /// </summary>
+      property ChildViewCount : NativeUInt   read GetChildViewCount;
   end;
 
 {$IFDEF FPC}
@@ -127,7 +133,7 @@ procedure Register;
 implementation
 
 uses
-  uCEFPanelDelegate, uCEFPanel, uCEFMiscFunctions, uCEFTask;
+  uCEFPanelDelegate, uCEFPanel;
 
 procedure TCEFPanelComponent.CreatePanel;
 begin

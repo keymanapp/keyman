@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFButton;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -57,23 +20,54 @@ uses
   uCEFBaseRefCounted, uCEFInterfaces, uCEFTypes, uCEFView;
 
 type
+  /// <summary>
+  /// A View representing a button. Depending on the specific type, the button
+  /// could be implemented by a native control or custom rendered. Methods must be
+  /// called on the browser process UI thread unless otherwise indicated.
+  /// </summary>
+  /// <remarks>
+  /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/views/cef_button_capi.h">CEF source file: /include/capi/views/cef_button_capi.h (cef_button_t)</see></para>
+  /// </remarks>
   TCefButtonRef = class(TCefViewRef, ICefButton)
     protected
+      /// <summary>
+      /// Returns this Button as a LabelButton or NULL if this is not a LabelButton.
+      /// </summary>
       function  AsLabelButton : ICefLabelButton;
+      /// <summary>
+      /// Sets the current display state of the Button.
+      /// </summary>
       procedure SetState(state_: TCefButtonState);
+      /// <summary>
+      /// Returns the current display state of the Button.
+      /// </summary>
       function  GetState : TCefButtonState;
+      /// <summary>
+      /// Sets the Button will use an ink drop effect for displaying state changes.
+      /// </summary>
       procedure SetInkDropEnabled(enabled_: boolean);
+      /// <summary>
+      /// Sets the tooltip text that will be displayed when the user hovers the
+      /// mouse cursor over the Button.
+      /// </summary>
       procedure SetTooltipText(const tooltip_text: ustring);
+      /// <summary>
+      /// Sets the accessible name that will be exposed to assistive technology
+      /// (AT).
+      /// </summary>
       procedure SetAccessibleName(const name: ustring);
 
     public
+      /// <summary>
+      /// Returns a ICefButton instance using a PCefButton data pointer.
+      /// </summary>
       class function UnWrap(data: Pointer): ICefButton;
   end;
 
 implementation
 
 uses
-  uCEFLibFunctions, uCEFMiscFunctions, uCEFLabelButton;
+  uCEFMiscFunctions, uCEFLabelButton;
 
 function TCefButtonRef.AsLabelButton : ICefLabelButton;
 begin

@@ -1,58 +1,21 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFDomNode;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
 uses
   {$IFDEF DELPHI16_UP}
-    {$IFDEF MSWINDOWS}WinApi.Windows,{$ENDIF} System.Classes, System.SysUtils,
+    System.Classes, System.SysUtils,
   {$ELSE}
-    {$IFDEF MSWINDOWS}Windows,{$ENDIF} Classes, SysUtils,
+    Classes, SysUtils,
   {$ENDIF}
   uCEFBaseRefCounted, uCEFInterfaces, uCEFTypes;
 
@@ -64,7 +27,7 @@ type
       function  IsElement: Boolean;
       function  IsEditable: Boolean;
       function  IsFormControlElement: Boolean;
-      function  GetFormControlElementType: ustring;
+      function  GetFormControlElementType: TCefDomFormControlType;
       function  IsSame(const that: ICefDomNode): Boolean;
       function  GetName: ustring;
       function  GetValue: ustring;
@@ -143,13 +106,17 @@ begin
               TempValue := TempStrMap.Value[i];
 
               if (length(TempKey) > 0) and (length(TempValue) > 0) then
-                attrList.Add(TempKey + attrList.NameValueSeparator + TempValue)
+                {$IFDEF VER140}
+                attrList.Add(TempKey + '=' + TempValue)  // Only for Delphi 6
+                {$ELSE}
+                attrList.Add({$IFDEF FPC}UTF8Encode({$ENDIF}TempKey + {$IFDEF FPC}UTF8Decode({$ENDIF}attrList.NameValueSeparator{$IFDEF FPC}){$ENDIF} + TempValue{$IFDEF FPC}){$ENDIF})
+                {$ENDIF}
                else
                 if (length(TempKey) > 0) then
-                  attrList.Add(TempKey)
+                  attrList.Add({$IFDEF FPC}UTF8Encode({$ENDIF}TempKey{$IFDEF FPC}){$ENDIF})
                  else
                   if (length(TempValue) > 0) then
-                    attrList.Add(TempValue);
+                    attrList.Add({$IFDEF FPC}UTF8Encode({$ENDIF}TempValue{$IFDEF FPC}){$ENDIF});
 
               inc(i);
             end;
@@ -183,9 +150,9 @@ begin
   Result := TCefDomNodeRef.UnWrap(PCefDomNode(FData)^.get_first_child(PCefDomNode(FData)));
 end;
 
-function TCefDomNodeRef.GetFormControlElementType: ustring;
+function TCefDomNodeRef.GetFormControlElementType: TCefDomFormControlType;
 begin
-  Result := CefStringFreeAndGet(PCefDomNode(FData)^.get_form_control_element_type(PCefDomNode(FData)));
+  Result := PCefDomNode(FData)^.get_form_control_element_type(PCefDomNode(FData));
 end;
 
 function TCefDomNodeRef.GetLastChild: ICefDomNode;

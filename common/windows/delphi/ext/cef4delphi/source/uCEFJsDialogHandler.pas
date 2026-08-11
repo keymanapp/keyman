@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFJsDialogHandler;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -89,7 +52,7 @@ uses
   {$ELSE}
   SysUtils,
   {$ENDIF}
-  uCEFMiscFunctions, uCEFLibFunctions, uCEFBrowser, uCEFJsDialogCallback;
+  uCEFMiscFunctions, uCEFBrowser, uCEFJsDialogCallback;
 
 function cef_jsdialog_handler_on_jsdialog(      self                : PCefJsDialogHandler;
                                                 browser             : PCefBrowser;
@@ -100,23 +63,25 @@ function cef_jsdialog_handler_on_jsdialog(      self                : PCefJsDial
                                                 callback            : PCefJsDialogCallback;
                                                 suppress_message    : PInteger): Integer; stdcall;
 var
-  TempSuppress : Boolean;
+  TempSuppress : boolean;
   TempObject   : TObject;
+  TempResult   : boolean;
 begin
-  Result       := Ord(False);
+  TempResult   := False;
   TempSuppress := suppress_message^ <> 0;
   TempObject   := CefGetObject(self);
 
   if (TempObject <> nil) and (TempObject is TCefJsDialogHandlerOwn) then
-    Result := Ord(TCefJsDialogHandlerOwn(TempObject).OnJsdialog(TCefBrowserRef.UnWrap(browser),
+    TempResult := TCefJsDialogHandlerOwn(TempObject).OnJsdialog(TCefBrowserRef.UnWrap(browser),
                                                                 CefString(origin_url),
                                                                 dialog_type,
                                                                 CefString(message_text),
                                                                 CefString(default_prompt_text),
                                                                 TCefJsDialogCallbackRef.UnWrap(callback),
-                                                                TempSuppress));
+                                                                TempSuppress);
 
   suppress_message^ := Ord(TempSuppress);
+  Result            := Ord(TempResult);
 end;
 
 function cef_jsdialog_handler_on_before_unload_dialog(      self         : PCefJsDialogHandler;
@@ -126,15 +91,18 @@ function cef_jsdialog_handler_on_before_unload_dialog(      self         : PCefJ
                                                             callback     : PCefJsDialogCallback): Integer; stdcall;
 var
   TempObject : TObject;
+  TempResult : boolean;
 begin
-  Result     := Ord(False);
+  TempResult := False;
   TempObject := CefGetObject(self);
 
   if (TempObject <> nil) and (TempObject is TCefJsDialogHandlerOwn) then
-    Result := Ord(TCefJsDialogHandlerOwn(TempObject).OnBeforeUnloadDialog(TCefBrowserRef.UnWrap(browser),
+    TempResult := TCefJsDialogHandlerOwn(TempObject).OnBeforeUnloadDialog(TCefBrowserRef.UnWrap(browser),
                                                                           CefString(message_text),
                                                                           is_reload <> 0,
-                                                                          TCefJsDialogCallbackRef.UnWrap(callback)));
+                                                                          TCefJsDialogCallbackRef.UnWrap(callback));
+
+  Result := Ord(TempResult);
 end;
 
 procedure cef_jsdialog_handler_on_reset_dialog_state(self    : PCefJsDialogHandler;

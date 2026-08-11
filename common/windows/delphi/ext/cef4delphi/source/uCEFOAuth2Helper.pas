@@ -1,40 +1,3 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFOAuth2Helper;
 
 {$I cef.inc}
@@ -43,9 +6,9 @@ interface
 
 uses
   {$IFDEF DELPHI16_UP}
-    {$IFDEF MSWINDOWS}WinApi.Windows,{$ENDIF}System.Classes, System.UITypes, System.SysUtils,
+    System.Classes, System.UITypes, System.SysUtils,
   {$ELSE}
-    {$IFDEF MSWINDOWS}Windows,{$ENDIF} Classes, {$IFDEF FPC}dynlibs,{$ENDIF}SysUtils,
+    Classes, {$IFDEF FPC}dynlibs,{$ENDIF}SysUtils,
   {$ENDIF}
   uCEFInterfaces, uCEFTypes;
 
@@ -192,7 +155,7 @@ end;
 
 function TCEFOAuth2Helper.GetRedirectURI : ustring;
 begin
-  Result := 'http://' + FRedirectHost + ':' + inttostr(FRedirectPort);
+  Result := 'http://' + FRedirectHost + ':' + {$IFDEF FPC}UTF8Decode({$ENDIF}inttostr(FRedirectPort){$IFDEF FPC}){$ENDIF};
 end;
 
 function TCEFOAuth2Helper.GetAuthCodeURI : ustring;
@@ -237,7 +200,7 @@ end;
 
 function TCEFOAuth2Helper.GetValidState : boolean;
 begin
-  Result := (CompareStr(FState, FIncState) = 0);
+  Result := (CompareStr({$IFDEF FPC}UTF8Encode({$ENDIF}FState{$IFDEF FPC}){$ENDIF}, {$IFDEF FPC}UTF8Encode({$ENDIF}FIncState{$IFDEF FPC}){$ENDIF}) = 0);
 end;
 
 function TCEFOAuth2Helper.GenerateRandomString(aLength : cardinal) : ustring;
@@ -260,7 +223,7 @@ begin
 
   while (i < aLength) do
     begin
-      Result := Result + UnreservedCharValues[Random(UnreservedCharValuesLen)];
+      Result := Result + {$IFDEF FPC}UTF8Decode({$ENDIF}UnreservedCharValues[Random(UnreservedCharValuesLen)]{$IFDEF FPC}){$ENDIF};
       inc(i);
     end;
 end;
@@ -285,8 +248,8 @@ begin
             FCodeChallenge := CefBase64Encode(@TempHash[0], length(TempHash));
 
             // Converts base64 to base64url.
-            FCodeChallenge := StringReplace(FCodeChallenge, '+', '-', [rfReplaceAll]);
-            FCodeChallenge := StringReplace(FCodeChallenge, '/', '_', [rfReplaceAll]);
+            FCodeChallenge := {$IFDEF FPC}UTF8Decode({$ENDIF}StringReplace({$IFDEF FPC}UTF8Encode({$ENDIF}FCodeChallenge{$IFDEF FPC}){$ENDIF}, '+', '-', [rfReplaceAll]){$IFDEF FPC}){$ENDIF};
+            FCodeChallenge := {$IFDEF FPC}UTF8Decode({$ENDIF}StringReplace({$IFDEF FPC}UTF8Encode({$ENDIF}FCodeChallenge{$IFDEF FPC}){$ENDIF}, '/', '_', [rfReplaceAll]){$IFDEF FPC}){$ENDIF};
 
             // Strips padding.
             while (length(FCodeChallenge) > 0) and (FCodeChallenge[length(FCodeChallenge)] = '=') do
@@ -349,10 +312,11 @@ begin
 
   Randomize;
 
-  FState := IntToHex(Random(high(integer)), 8) +
+  FState := {$IFDEF FPC}UTF8Decode({$ENDIF}
             IntToHex(Random(high(integer)), 8) +
             IntToHex(Random(high(integer)), 8) +
-            IntToHex(Random(high(integer)), 8);
+            IntToHex(Random(high(integer)), 8) +
+            IntToHex(Random(high(integer)), 8){$IFDEF FPC}){$ENDIF};
 end;
 
 function TCEFOAuth2Helper.ReadJSONString(const aDictionary : ICefDictionaryValue; const aKey : ustring) : ustring;
@@ -473,10 +437,10 @@ begin
       TempKey   := copy(aPair, 1, pred(i));
       TempValue := copy(aPair, succ(i), length(aPair));
 
-      if      (CompareStr(TempKey, 'code')              = 0) then FAuthCode         := TempValue
-      else if (CompareStr(TempKey, 'state')             = 0) then FIncState         := TempValue
-      else if (CompareStr(TempKey, 'error')             = 0) then FError            := TempValue
-      else if (CompareStr(TempKey, 'error_description') = 0) then FErrorDescription := TempValue;
+      if      (CompareStr({$IFDEF FPC}UTF8Encode({$ENDIF}TempKey{$IFDEF FPC}){$ENDIF}, 'code')              = 0) then FAuthCode         := TempValue
+      else if (CompareStr({$IFDEF FPC}UTF8Encode({$ENDIF}TempKey{$IFDEF FPC}){$ENDIF}, 'state')             = 0) then FIncState         := TempValue
+      else if (CompareStr({$IFDEF FPC}UTF8Encode({$ENDIF}TempKey{$IFDEF FPC}){$ENDIF}, 'error')             = 0) then FError            := TempValue
+      else if (CompareStr({$IFDEF FPC}UTF8Encode({$ENDIF}TempKey{$IFDEF FPC}){$ENDIF}, 'error_description') = 0) then FErrorDescription := TempValue;
     end;
 end;
 

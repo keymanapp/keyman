@@ -1,50 +1,13 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFMenuButton;
 
 {$IFDEF FPC}
   {$MODE OBJFPC}{$H+}
 {$ENDIF}
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -57,13 +20,45 @@ uses
   uCEFBaseRefCounted, uCEFInterfaces, uCEFTypes, uCEFLabelButton;
 
 type
+  /// <summary>
+  /// MenuButton is a button with optional text, icon and/or menu marker that
+  /// shows a menu when clicked with the left mouse button. All size and position
+  /// values are in density independent pixels (DIP) unless otherwise indicated.
+  /// Methods must be called on the browser process UI thread unless otherwise
+  /// indicated.
+  /// </summary>
+  /// <remarks>
+  /// <para><see href="https://bitbucket.org/chromiumembedded/cef/src/master/include/capi/views/cef_menu_button_capi.h">CEF source file: /include/capi/views/cef_menu_button_capi.h (cef_menu_button_t)</see></para>
+  /// </remarks>
   TCefMenuButtonRef = class(TCefLabelButtonRef, ICefMenuButton)
     protected
+      /// <summary>
+      /// Show a menu with contents |menu_model|. |screen_point| specifies the menu
+      /// position in screen coordinates. |anchor_position| specifies how the menu
+      /// will be anchored relative to |screen_point|. This function should be
+      /// called from ICefMenuButtonDelegate.OnMenuButtonPressed().
+      /// </summary>
       procedure ShowMenu(const menu_model: ICefMenuModel; const screen_point: TCefPoint; anchor_position: TCefMenuAnchorPosition);
+      /// <summary>
+      /// Show the menu for this button. Results in a call to
+      /// ICefMenuButtonDelegate.OnMenuButtonPressed().
+      /// </summary>
       procedure TriggerMenu;
 
     public
+      /// <summary>
+      /// Returns a ICefMenuButton instance using a PCefMenuButton data pointer.
+      /// </summary>
       class function UnWrap(data: Pointer): ICefMenuButton;
+      /// <summary>
+      /// Create a new MenuButton. A |delegate| must be provided to call show_menu()
+      /// when the button is clicked. |text| will be shown on the MenuButton and used
+      /// as the default accessible name. If |with_frame| is true (1) the button will
+      /// have a visible frame at all times, center alignment, additional padding and
+      /// a default minimum size of 70x33 DIP. If |with_frame| is false (0) the button
+      /// will only have a visible frame on hover/press, left alignment, less padding
+      /// and no default minimum size.
+      /// </summary>
       class function CreateMenuButton(const delegate: ICefMenuButtonDelegate; const text: ustring): ICefMenuButton;
   end;
 

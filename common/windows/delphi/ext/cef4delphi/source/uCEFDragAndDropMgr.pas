@@ -1,40 +1,3 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFDragAndDropMgr;
 
 {$IFDEF FPC}
@@ -52,11 +15,12 @@ interface
 
 uses
   {$IFDEF DELPHI16_UP}
-  {$IFDEF MSWINDOWS}WinApi.Windows, WinApi.ActiveX, WinApi.ShlObj, WinApi.ShellApi,{$ENDIF}
-  System.Classes, System.SysUtils, System.Math, System.StrUtils, System.AnsiStrings,
+    {$IFDEF MSWINDOWS}WinApi.Windows, WinApi.ActiveX, WinApi.ShlObj, WinApi.ShellApi,{$ENDIF}
+    System.Classes, System.SysUtils, System.Math, System.StrUtils, System.AnsiStrings,
   {$ELSE}
-  {$IFDEF MSWINDOWS}Windows, ActiveX, ShlObj, Shellapi,{$ENDIF}
-  Classes, SysUtils, Math, StrUtils, {$IFDEF DELPHI12_UP}AnsiStrings,{$ENDIF}
+    {$IFDEF MSWINDOWS}Windows, ActiveX, Shellapi,{$ENDIF}
+    {$IFNDEF FPC}ShlObj,{$ENDIF} Classes, SysUtils, StrUtils,
+    {$IFDEF DELPHI12_UP}AnsiStrings,{$ENDIF}
   {$ENDIF}
   uCEFDragData, uCEFInterfaces, uCEFTypes, uCEFOLEDragAndDrop;
 
@@ -277,7 +241,7 @@ begin
           aFormat.cfFormat := FFileDescFormat;
 
           TempFileName     := TempFileName + #0;
-          Result           := GetStorageForFileDescriptor(aMedium, TempFileName);
+          Result           := GetStorageForFileDescriptor(aMedium, {$IFDEF FPC}UTF8Encode({$ENDIF}TempFileName{$IFDEF FPC}){$ENDIF});
         end;
     end;
 end;
@@ -288,7 +252,7 @@ function TCEFDragAndDropMgr.DragDataToDataObject_FileContents(const aDragData : 
 var
   TempHandler   : ICefWriteHandler;
   TempWriter    : ICefStreamWriter;
-  TempSize      : cardinal;
+  TempSize      : NativeUInt;
 begin
   Result := False;
 
@@ -309,7 +273,7 @@ begin
 
           aDragData.GetFileContents(TempWriter);
 
-          TempSize    := cardinal(TCefBytesWriteHandler(TempHandler).GetDataSize);
+          TempSize    := NativeUInt(TCefBytesWriteHandler(TempHandler).GetDataSize);
           Result      := GetStorageForBytes(aMedium, TCefBytesWriteHandler(TempHandler).GetData, TempSize);
         end;
     end;
@@ -411,7 +375,11 @@ begin
         {$IFDEF DELPHI12_UP}
         Result := UTF8ToString(TempString);
         {$ELSE}
-        Result := UTF8Decode(TempString);
+          {$IFDEF FPC}
+          Result := TempString;
+          {$ELSE}
+          Result := UTF8Decode(TempString);
+          {$ENDIF}
         {$ENDIF}
     end
    else
@@ -425,8 +393,6 @@ const
   CFHTML_ENDHTML   : AnsiString = 'EndHTML:';
   CFHTML_STARTFRAG : AnsiString = 'StartFragment:';
   CFHTML_ENDFRAG   : AnsiString = 'EndFragment:';
-  CFHTML_STARSEL   : AnsiString = 'StartSelection:';
-  CFHTML_ENDSEL    : AnsiString = 'EndSelection:';
   CFHTML_SOURCEURL : AnsiString = 'SourceURL:';
   FRAGMENT_START   : AnsiString = '<!--StartFragment';
   FRAGMENT_END     : AnsiString = '<!--EndFragment';
@@ -438,8 +404,14 @@ var
   TempFragStartPos, TempFragEndPos : integer;
   TempFragStartCommentPos, TempFragEndCommentPos : integer;
 begin
-  html     := '';
-  base_url := '';
+  html             := '';
+  base_url         := '';
+  TempVersionPos   := 0;
+  TempSourcePos    := 0;
+  TempHTMLStartPos := 0;
+  TempHTMLEndPos   := 0;
+  TempFragStartPos := 0;
+  TempFragEndPos   := 0;
 
   if (FindStringField(cf_html, CFHTML_VERSION, TempVersionPos) <> '0.9') then exit;
 
@@ -487,7 +459,11 @@ begin
           {$IFDEF DELPHI12_UP}
           html := UTF8ToString(copy(cf_html, TempFragStartCommentPos, TempFragEndCommentPos - TempFragStartCommentPos));
           {$ELSE}
-          html := UTF8Decode(copy(cf_html, TempFragStartCommentPos, TempFragEndCommentPos - TempFragStartCommentPos));
+            {$IFDEF FPC}
+            html := copy(cf_html, TempFragStartCommentPos, TempFragEndCommentPos - TempFragStartCommentPos);
+            {$ELSE}
+            html := UTF8Decode(copy(cf_html, TempFragStartCommentPos, TempFragEndCommentPos - TempFragStartCommentPos));
+            {$ENDIF}
           {$ENDIF}
 
           base_url := FindStringField(cf_html, CFHTML_SOURCEURL, TempSourcePos);
@@ -497,7 +473,7 @@ end;
 
 function TCEFDragAndDropMgr.DataObjectToDragData_Unicode(var aMedium : TStgMedium; var aDragData : ICefDragData) : boolean;
 var
-  TempText : string;
+  TempText : ustring;
   TempPointer : pointer;
 begin
   Result := False;
@@ -534,10 +510,14 @@ begin
           {$IFDEF DELPHI12_UP}
           TempText := UTF8ToString(PAnsiChar(TempPointer));
           {$ELSE}
-          TempText := UTF8Decode(PAnsiChar(TempPointer));
+            {$IFDEF FPC}
+            TempText := PAnsiChar(TempPointer);
+            {$ELSE}
+            TempText := UTF8Decode(PAnsiChar(TempPointer));
+            {$ENDIF}
           {$ENDIF}
 
-          aDragData.SetFragmentText(TempText);
+          aDragData.SetFragmentText({$IFDEF FPC}UTF8Decode({$ENDIF}TempText{$IFDEF FPC}){$ENDIF});
           GlobalUnlock(aMedium.hGlobal);
           Result   := True;
         end;
@@ -548,7 +528,7 @@ end;
 
 function TCEFDragAndDropMgr.DataObjectToDragData_URL(var aMedium : TStgMedium; var aDragData : ICefDragData) : boolean;
 var
-  TempText, TempURL, TempTitle : string;
+  TempText, TempURL, TempTitle : ustring;
   TempPos : integer;
   TempPointer : pointer;
 begin
@@ -561,8 +541,8 @@ begin
       if (TempPointer <> nil) then
         begin
           TempText := PWideChar(TempPointer);
-          TempPos  := LastDelimiter(#13, TempText);
-          if (TempPos <= 0) then TempPos := LastDelimiter(#10, TempText);
+          TempPos  := LastDelimiter(#13, {$IFDEF FPC}UTF8Encode({$ENDIF}TempText{$IFDEF FPC}){$ENDIF});
+          if (TempPos <= 0) then TempPos := LastDelimiter(#10, {$IFDEF FPC}UTF8Encode({$ENDIF}TempText{$IFDEF FPC}){$ENDIF});
 
           if (TempPos > 0) then
             begin
@@ -603,8 +583,8 @@ begin
 
           CFHtmlToHtml(TempAnsi, TempHTML, TempBaseURL);
 
-          aDragData.SetFragmentHtml(TempHTML);
-          aDragData.SetFragmentBaseURL(TempBaseURL);
+          aDragData.SetFragmentHtml({$IFDEF FPC}UTF8Decode({$ENDIF}TempHTML{$IFDEF FPC}){$ENDIF});
+          aDragData.SetFragmentBaseURL({$IFDEF FPC}UTF8Decode({$ENDIF}TempBaseURL{$IFDEF FPC}){$ENDIF});
           GlobalUnlock(aMedium.hGlobal);
           Result := True;
         end;
@@ -629,7 +609,9 @@ begin
 
       if (TempPointer <> nil) then
         begin
+          {$hints off}
           TempHdrop    := THandle(TempPointer);
+          {$hints on}
           TempNumFiles := DragQueryFile(TempHdrop, $FFFFFFFF, nil, 0);
           TempAdded    := False;
           i            := 0;
@@ -647,9 +629,9 @@ begin
                   TempAdded    := True;
 
                   if (length(TempFileName) > 0) then
-                    aDragData.AddFile(TempFilePath, TempFileName)
+                    aDragData.AddFile({$IFDEF FPC}UTF8Decode({$ENDIF}TempFilePath{$IFDEF FPC}){$ENDIF}, {$IFDEF FPC}UTF8Decode({$ENDIF}TempFileName{$IFDEF FPC}){$ENDIF})
                    else
-                    aDragData.AddFile(TempFilePath, TempFilePath);
+                    aDragData.AddFile({$IFDEF FPC}UTF8Decode({$ENDIF}TempFilePath{$IFDEF FPC}){$ENDIF}, {$IFDEF FPC}UTF8Decode({$ENDIF}TempFilePath{$IFDEF FPC}){$ENDIF});
                 end;
 
               inc(i);
@@ -719,6 +701,7 @@ var
   TempResult      : HRESULT;
   TempFormatArray : TOLEFormatArray;
   TempMediumArray : TOLEMediumArray;
+  TempDragOps     : TCefDragOperations;
   i               : integer;
 begin
   Result := DRAG_OPERATION_NONE;
@@ -742,13 +725,17 @@ begin
           {$IFNDEF FPC}
           TempResult     := DoDragDrop(TempDataObject, TempDropSource, FOLEEffect, TempResEffect);
           {$ELSE}
+          {$warnings off}
           TempResult     := DoDragDrop(TempDataObject, TempDropSource, DWORD(FOLEEffect), LPDWORD(TempResEffect));
+          {$warnings on}
           {$ENDIF}
 
           if (TempResult <> DRAGDROP_S_DROP) then TempResEffect := DROPEFFECT_NONE;
           FCurrentDragData := nil;
 
-          DropEffectToDragOperation(TempResEffect, Result);
+          TempDragOps := TCefDragOperations(Result);
+          DropEffectToDragOperation(TempResEffect, TempDragOps);
+          Result := TCefDragOperation(TempDragOps);
         end;
     end;
 end;

@@ -1,46 +1,9 @@
-// ************************************************************************
-// ***************************** CEF4Delphi *******************************
-// ************************************************************************
-//
-// CEF4Delphi is based on DCEF3 which uses CEF to embed a chromium-based
-// browser in Delphi applications.
-//
-// The original license of DCEF3 still applies to CEF4Delphi.
-//
-// For more information about CEF4Delphi visit :
-//         https://www.briskbard.com/index.php?lang=en&pageid=cef
-//
-//        Copyright © 2021 Salvador Diaz Fau. All rights reserved.
-//
-// ************************************************************************
-// ************ vvvv Original license and comments below vvvv *************
-// ************************************************************************
-(*
- *                       Delphi Chromium Embedded 3
- *
- * Usage allowed under the restrictions of the Lesser GNU General Public License
- * or alternatively the restrictions of the Mozilla Public License 1.1
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
- * the specific language governing rights and limitations under the License.
- *
- * Unit owner : Henri Gourvest <hgourvest@gmail.com>
- * Web site   : http://www.progdigy.com
- * Repository : http://code.google.com/p/delphichromiumembedded/
- * Group      : http://groups.google.com/group/delphichromiumembedded
- *
- * Embarcadero Technologies, Inc is not permitted to use or redistribute
- * this source code without explicit permission.
- *
- *)
-
 unit uCEFFMXChromium;
 
-{$IFNDEF CPUX64}{$ALIGN ON}{$ENDIF}
-{$MINENUMSIZE 4}
-
 {$I cef.inc}
+
+{$IFNDEF TARGET_64BITS}{$ALIGN ON}{$ENDIF}
+{$MINENUMSIZE 4}
 
 interface
 
@@ -49,11 +12,18 @@ uses
   {$IFDEF MSWINDOWS}
   WinApi.Windows, WinApi.Messages, FMX.Platform.Win,
   {$ENDIF}
-  FMX.Types, FMX.Platform, FMX.Forms, FMX.Controls, FMX.Graphics,
-  uCEFTypes, uCEFInterfaces, uCEFChromiumCore;
+  FMX.Types, FMX.Platform, FMX.Forms, FMX.Controls,
+  {$IFDEF DELPHI19_UP}
+  FMX.Graphics,
+  {$ENDIF}
+  uCEFTypes, uCEFInterfaces, uCEFConstants, uCEFChromiumCore;
 
 type
-  {$IFNDEF FPC}{$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pidWin32 or pidWin64)]{$ENDIF}{$ENDIF}
+  {$IFDEF DELPHI16_UP}[ComponentPlatformsAttribute(pfidWindows or pfidOSX or pfidLinux)]{$ENDIF}
+  /// <summary>
+  ///  FMX version of TChromiumCore that puts together all browser procedures, functions, properties and events in one place.
+  ///  It has all you need to create, modify and destroy a web browser.
+  /// </summary>
   TFMXChromium = class(TChromiumCore, IChromiumEvents)
     protected
       function  GetParentFormHandle : TCefWindowHandle; override;
@@ -62,20 +32,62 @@ type
       procedure InitializeDevToolsWindowInfo; virtual;
 
     public
+      /// <summary>
+      /// Open developer tools (DevTools) in its own browser. If inspectElementAt has a valid point
+      /// with coordinates different than low(integer) then the element at the specified location
+      /// will be inspected. If the DevTools browser is already open then it will be focused.
+      /// </summary>
       procedure ShowDevTools(inspectElementAt: TPoint);
+      /// <summary>
+      /// close the developer tools.
+      /// </summary>
       procedure CloseDevTools;
-
+      /// <summary>
+      /// Move the parent form to the x and y coordinates.
+      /// </summary>
       procedure MoveFormTo(const x, y: Integer);
+      /// <summary>
+      /// Move the parent form adding x and y to the coordinates.
+      /// </summary>
       procedure MoveFormBy(const x, y: Integer);
+      /// <summary>
+      /// Add x to the parent form width.
+      /// </summary>
       procedure ResizeFormWidthTo(const x : Integer);
+      /// <summary>
+      /// Add y to the parent form height.
+      /// </summary>
       procedure ResizeFormHeightTo(const y : Integer);
+      /// <summary>
+      /// Set the parent form left property to x.
+      /// </summary>
       procedure SetFormLeftTo(const x : Integer);
+      /// <summary>
+      /// Set the parent form top property to y.
+      /// </summary>
       procedure SetFormTopTo(const y : Integer);
-
+      /// <summary>
+      /// Used to create the browser after the global request context has been
+      /// initialized. You need to set all properties and events before calling
+      /// this function because it will only create the internal handlers needed
+      /// for those events and the property values will be used in the browser
+      /// initialization.
+      /// The browser will be fully initialized when the TChromiumCore.OnAfterCreated
+      /// event is triggered.
+      /// </summary>
       function  CreateBrowser(const aWindowName : ustring = ''; const aContext : ICefRequestContext = nil; const aExtraInfo : ICefDictionaryValue = nil) : boolean; overload; virtual;
-      function  SaveAsBitmapStream(var aStream : TStream; const aRect : System.Types.TRect) : boolean;
+      /// <summary>
+      /// Copy the DC to a bitmap stream. Only works on Windows with browsers without GPU acceleration.
+      /// It's recommended to use the "Page.captureScreenshot" DevTools method instead.
+      /// </summary>
+      function  SaveAsBitmapStream(const aStream : TStream; const aRect : System.Types.TRect) : boolean;
+      /// <summary>
+      /// Takes a snapshot into a TBitmap using the SaveAsBitmapStream function.
+      /// </summary>
       function  TakeSnapshot(var aBitmap : TBitmap; const aRect : System.Types.TRect) : boolean;
-
+      /// <summary>
+      /// Returns the screen scale of the monitor where the parent form is located.
+      /// </summary>
       property  ScreenScale    : single             read GetScreenScale;
   end;
 
@@ -109,7 +121,7 @@ type
 implementation
 
 uses
-  {$IFDEF MSWINDOWS}FMX.Helpers.Win,{$ENDIF}
+  {$IFDEF MSWINDOWS}{$IFDEF DELPHI24_UP}FMX.Helpers.Win,{$ENDIF}{$ENDIF}
   System.SysUtils, System.Math,
   uCEFApplicationCore;
 
@@ -144,7 +156,7 @@ begin
   if Initialized then
     begin
       InitializeDevToolsWindowInfo;
-      inherited ShowDevTools(inspectElementAt, @FDevWindowInfo);
+      inherited ShowDevTools(inspectElementAt, @FDevWindowInfo.WindowInfoRecord);
     end;
 end;
 
@@ -212,16 +224,16 @@ end;
 procedure TFMXChromium.MoveFormTo(const x, y: Integer);
 var
   TempForm : TCustomForm;
-  {$IFDEF DELPHI17_UP}
+  {$IFDEF DELPHI21_UP}
   TempRect : TRect;
   {$ENDIF}
 begin
   TempForm := GetParentForm;
-  {$IFDEF DELPHI17_UP}
+  {$IFDEF DELPHI21_UP}
   if (TempForm <> nil) then
     begin
-      TempRect.Left   := min(max(x, max(screen.DesktopLeft, 0)), screen.DesktopWidth  - TempForm.Width);
-      TempRect.Top    := min(max(y, max(screen.DesktopTop,  0)), screen.DesktopHeight - TempForm.Height);
+      TempRect.Left   := min(max(x, max(round(screen.DesktopLeft), 0)), round(screen.DesktopWidth)  - TempForm.Width);
+      TempRect.Top    := min(max(y, max(round(screen.DesktopTop),  0)), round(screen.DesktopHeight) - TempForm.Height);
       TempRect.Right  := TempRect.Left + TempForm.Width  - 1;
       TempRect.Bottom := TempRect.Top  + TempForm.Height - 1;
 
@@ -235,16 +247,16 @@ end;
 procedure TFMXChromium.MoveFormBy(const x, y: Integer);
 var
   TempForm : TCustomForm;
-  {$IFDEF DELPHI17_UP}
+  {$IFDEF DELPHI21_UP}
   TempRect : TRect;
   {$ENDIF}
 begin
   TempForm := GetParentForm;
-  {$IFDEF DELPHI17_UP}
+  {$IFDEF DELPHI21_UP}
   if (TempForm <> nil) then
     begin
-      TempRect.Left   := min(max(TempForm.Left + x, max(screen.DesktopLeft, 0)), screen.DesktopWidth  - TempForm.Width);
-      TempRect.Top    := min(max(TempForm.Top  + y, max(screen.DesktopTop,  0)), screen.DesktopHeight - TempForm.Height);
+      TempRect.Left   := min(max(TempForm.Left + x, max(round(screen.DesktopLeft), 0)), round(screen.DesktopWidth)  - TempForm.Width);
+      TempRect.Top    := min(max(TempForm.Top  + y, max(round(screen.DesktopTop),  0)), round(screen.DesktopHeight) - TempForm.Height);
       TempRect.Right  := TempRect.Left + TempForm.Width  - 1;
       TempRect.Bottom := TempRect.Top  + TempForm.Height - 1;
 
@@ -292,8 +304,8 @@ begin
   TempForm := GetParentForm;
 
   if (TempForm <> nil) then
-    {$IFDEF DELPHI17_UP}
-    TempForm.Left := min(max(x, max(screen.DesktopLeft, 0)), screen.DesktopWidth  - TempForm.Width);
+    {$IFDEF DELPHI21_UP}
+    TempForm.Left := min(max(x, max(round(screen.DesktopLeft), 0)), round(screen.DesktopWidth) - TempForm.Width);
     {$ELSE}
     TempForm.Left := x;
     {$ENDIF}
@@ -306,14 +318,14 @@ begin
   TempForm := GetParentForm;
 
   if (TempForm <> nil) then
-    {$IFDEF DELPHI17_UP}
-    TempForm.Top := min(max(y, max(screen.DesktopTop, 0)), screen.DesktopHeight - TempForm.Height);
+    {$IFDEF DELPHI21_UP}
+    TempForm.Top := min(max(y, max(round(screen.DesktopTop), 0)), round(screen.DesktopHeight) - TempForm.Height);
     {$ELSE}
     TempForm.Top := y;
     {$ENDIF}
 end;
 
-function TFMXChromium.SaveAsBitmapStream(var aStream : TStream; const aRect : System.Types.TRect) : boolean;
+function TFMXChromium.SaveAsBitmapStream(const aStream : TStream; const aRect : System.Types.TRect) : boolean;
 {$IFDEF MSWINDOWS}
 var
   TempDC   : HDC;
@@ -351,7 +363,7 @@ begin
   try
     TempStream := TMemoryStream.Create;
 
-    if SaveAsBitmapStream(TStream(TempStream), aRect) then
+    if SaveAsBitmapStream(TempStream, aRect) then
       begin
         aBitmap.LoadFromStream(TempStream);
         Result := True;

@@ -129,7 +129,7 @@ type
       source: TCefFocusSource; out Result: Boolean);
     procedure cefTitleChange(Sender: TObject; const browser: ICefBrowser;
       const title: ustring);
-    procedure cefWidgetCompMsg(Sender: TObject; var aMessage: TMessage; var aHandled: Boolean);
+    procedure cefGotFocus(Sender: TObject; const browser: ICefBrowser);
     procedure cefLoadingStateChange(Sender: TObject; const browser: ICefBrowser;
       isLoading, canGoBack, canGoForward: Boolean);
   private
@@ -325,12 +325,11 @@ begin
   FreeMem(p);
 end;
 
-procedure TframeCEFHost.cefWidgetCompMsg(Sender: TObject; var aMessage: TMessage;
-  var aHandled: Boolean);
+procedure TframeCEFHost.cefGotFocus(Sender: TObject;
+  const browser: ICefBrowser);
 begin
   AssertCefThread;
-  if aMessage.Msg = WM_SETFOCUS then
-    PostMessage(FCallbackWnd, CEF_SETFOCUS, 0, 0);
+  PostMessage(FCallbackWnd, CEF_SETFOCUS, 0, 0);
 end;
 
 procedure TframeCEFHost.CreateBrowser;
