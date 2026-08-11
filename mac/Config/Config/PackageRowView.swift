@@ -57,7 +57,7 @@ public struct PackageRowView: View {
           // a VStack is shown as the label for each disclosure group
           VStack (alignment: .leading, spacing: 0) {
             HStack {
-              // if the package contains one keyboard shows the keyboard name, otherwise show the package name
+              // if the package contains one keyboard, show the keyboard name, otherwise show the package name
               Text(isSingleKeyboardPackage ? keyboard.name: package.packageName)
                 .font(.title)
               
