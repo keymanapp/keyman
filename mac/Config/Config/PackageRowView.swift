@@ -20,7 +20,7 @@ public struct PackageRowView: View {
   
   // settings.singleKeyboardPackages or settings.multiKeyboardPackages
   let packages: [KeymanPackage]
-  // a boolean for weather or not a package contains multiple keyboards
+  // a boolean for whether or not a package contains multiple keyboards
   let isSingleKeyboardPackage: Bool
   // binded to the shared state variable in the parent view
   @Binding var expandedPackageID: UUID?
