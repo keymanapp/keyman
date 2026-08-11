@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 19.0.262 alpha 2026-08-04
+
+* chore(web): fire `keyboardloaded` event only once per keyboard (#16297)
+
+## 19.0.261 alpha 2026-07-30
+
+* fix(core): clone state actions deep copy (#15961)
+* maint(android): update Android Target API to 36 (#16280)
+* refactor(web): adjust function visibility and variable names (#16286)
+
+## 19.0.260 alpha 2026-07-27
+
+* fix(web): ignore exception trying to access cookie (#16283)
+* chore(web): update help links to use latest version (#16285)
+
+## 19.0.259 alpha 2026-07-20
+
+* docs(web): fix typos following #16170 (#16225)
+
 ## 19.0.258 alpha 2026-07-15
 
 * chore(android): remove doc for non-existing deprecated functions (#16244)

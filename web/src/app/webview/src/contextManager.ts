@@ -147,7 +147,7 @@ export class ContextManager extends ContextManagerBase<WebviewConfiguration> {
    * Reflects the active 'textStore' upon which any `set activeKeyboard` operation will take place.
    * For app/webview... there's only one textStore, thus only a "global default" matters.
    */
-  protected currentKeyboardSrcTextStore(): SyntheticTextStore {
+  protected currentKeyboardSrcTextStore(): SyntheticTextStore | null {
     return null;
   }
 

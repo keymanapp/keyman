@@ -2,7 +2,7 @@ import { EventEmitter } from "eventemitter3";
 
 /**
  * The return object documented for
- * https://help.keyman.com/developer/engine/web/16.0/reference/core/getUIState.
+ * https://help.keyman.com/developer/engine/web/current-version/reference/core/getUIState.
  *
  * As it has long been documented in this format, property names should not be adjusted!
  */
