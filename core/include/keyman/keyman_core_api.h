@@ -216,12 +216,15 @@ filename: changes.md
 title: Changes - Keyman Core API
 ---
 
-## Changes between 18.0 and 19.0
+## Changes between 19.0 and 20.0
 
-* Removed deprecated `km_core_keyboard_attrs.folder_path`
 * The JSON introspection APIs (which were not fully implemented),
   `km_core_state_options_to_json` and `km_core_state_to_json`, have been
   removed.
+
+## Changes between 18.0 and 19.0
+
+* Removed deprecated `km_core_keyboard_attrs.folder_path`
 
 ## Changes between 17.0 and 18.0
 
