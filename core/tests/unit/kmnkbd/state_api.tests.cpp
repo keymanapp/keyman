@@ -423,7 +423,13 @@ action_clone.option = &clone_persist_opt;
 if (test_clone_2->actions().back().type == KM_CORE_IT_END) {
       test_clone_2->actions().pop_back();
 }
-km_core_state_queue_action_items(test_clone_2, &action_clone);
+
+km_core_action_item action_clone_queue[] = {
+  action_clone,
+  {KM_CORE_IT_END}
+};
+
+km_core_state_queue_action_items(test_clone_2, action_clone_queue);
 test_clone_2->actions().commit();
 
   // Test debug dump
