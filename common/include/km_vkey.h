@@ -56,7 +56,7 @@ namespace vkey {
 #define VK_EXECUTE 0x2B
 #define VK_SNAPSHOT 0x2C
 #define VK_INSERT 0x2D
-#define VK_DECIMAL 0x6E
+#define VK_DELETE 0x2E
 
 #define VK_KEY_0 0x30
 #define VK_KEY_1 0x31
@@ -111,6 +111,7 @@ namespace vkey {
 
 #define VK_NUMPAD_SUBTRACT 0x6D
 #define VK_NUMPAD_DECIMAL 0x6E
+#define VK_DECIMAL 0x6E
 #define VK_NUMPAD_DIVIDE 0x6F
 #define VK_DIVIDE 0x6F
 
