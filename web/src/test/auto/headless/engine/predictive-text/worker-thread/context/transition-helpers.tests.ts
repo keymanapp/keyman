@@ -13,8 +13,11 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
+import { KMWString } from 'keyman/common/web-utils';
+
 import {
   buildEdgeWindow,
+  ContextState,
   ContextToken,
   ContextTokenization,
   generateSubsetId,
@@ -99,6 +102,9 @@ function buildTokenizationForSimpleInputs (
     // Only the 'insert' and 'deleteLeft' fields are set during transform
     // tokenization at this time.
     map.set(0, { insert: sample.insert, deleteLeft: sample.deleteLeft });
+    if(sample.id !== undefined) {
+      map.get(0).id = sample.id;
+    }
     return { sample: map, p };
   })
 };
@@ -500,5 +506,33 @@ describe('transitionTokenizations', () => {
 
       assertMatchingTokenization(actual, expected, msg);
     }
+  });
+
+  it('handles backspace transitions correctly for a recently reset context', () => {
+    const baseState = new ContextState({
+      left: 'an apple a',
+      startOfBuffer: true,
+      endOfBuffer: true
+    }, plainModel);
+
+    const dist: Distribution<Transform> = [{
+      sample: {
+        insert: '',
+        deleteLeft: 3
+      },
+      p: 1
+    }]
+    const precomputedTransition = precomputeTransitions([baseState.tokenization], dist);
+
+    const result = transitionTokenizations(precomputedTransition.subsets, dist);
+
+    const resultTokenization = result.get(precomputedTransition.keyMatchingUserContext);
+
+    assert.isOk(resultTokenization);
+    const resultTail = resultTokenization.tail;
+
+    assert.equal(resultTail.exampleInput, 'appl');
+    assert.equal(resultTail.inputCount, resultTail.searchModule.codepointLength);
+    assert.equal(resultTail.searchModule.codepointLength, KMWString.length(resultTail.exampleInput));
   });
 });

@@ -527,6 +527,9 @@ export class ContextTokenization {
     // Mutates stackedInserts, stackedDeletes.
     const baseRemovedTokenCount = Math.max(0, stackedDeletes.length - stackedInserts.length);
     const transformMap = assembleTransforms(stackedInserts, stackedDeletes, tailIndex);
+    if(transform.id !== undefined) {
+      [...transformMap.values()].forEach((v) => v.id = transform.id);
+    }
 
     // If there's an empty transform in the 0 position and we already know we're
     // dropping tokens - and only deleting - we're dropping an
