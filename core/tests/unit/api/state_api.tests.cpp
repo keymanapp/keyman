@@ -17,6 +17,7 @@
 #include "state.hpp"
 #include "mock/mock_processor.hpp"
 
+#include "../helpers/action_items.hpp"
 #include "../helpers/core_test_helpers.h"
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -42,6 +43,24 @@ namespace
 constexpr km_core_option_item const expected_persist_opt = {
   u"test_keyboard_option",
   u"F2 pressed test save.",
+  KM_CORE_OPT_KEYBOARD
+};
+
+constexpr km_core_option_item const clone_persist_opt = {
+  u"__test_clone",
+  u"Not in original",
+  KM_CORE_OPT_KEYBOARD
+};
+
+constexpr km_core_option_item const test_point_3_opt = {
+  u"__test_point_3",
+  u"F3 pressed test save 1.",
+  KM_CORE_OPT_KEYBOARD
+};
+
+constexpr km_core_option_item const test_point_4_opt = {
+  u"__test_point_4",
+  u"F3 pressed test save 2.",
   KM_CORE_OPT_KEYBOARD
 };
 
@@ -221,7 +240,8 @@ TEST(StateApiTests, TestStateApi) {
 
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr,
-               * test_clone = nullptr;
+                * test_clone = nullptr,
+                * test_clone_2 = nullptr;
   test_kb = (km_core_keyboard *)new km::core::mock_processor(km::core::path("dummy.mock"));
 
   // Simple sanity tests.
@@ -334,11 +354,32 @@ TEST(StateApiTests, TestStateApi) {
     clone_state_deleted_text
   ));
 
+  // Add two actions before cloning the state again
+  ASSERT_STATUS_OK(km_core_process_event(test_state, KM_CORE_VKEY_F3, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  ASSERT_STATUS_OK(km_core_state_clone(test_state, &test_clone_2));
+
+  // Now put an option in the test_clone_2 state only
+  km_core_action_item action_clone = {KM_CORE_IT_PERSIST_OPT, {0,}, };
+  action_clone.option = &clone_persist_opt;
+  if (test_clone_2->actions().back().type == KM_CORE_IT_END) {
+        test_clone_2->actions().pop_back();
+  }
+  km_core_state_queue_action_items(test_clone_2, &action_clone);
+  test_clone_2->actions().commit();
+
+  km_core_action_item action_tp3 = {KM_CORE_IT_PERSIST_OPT, {0,}, };
+  action_tp3.option = &test_point_3_opt;
+
+  km_core_action_item action_tp4 = {KM_CORE_IT_PERSIST_OPT, {0,}, };
+  action_tp4.option = &test_point_4_opt;
+
+  ASSERT_TRUE(km::tests::action_items(test_state, {action_tp3, action_tp4, {KM_CORE_IT_END}}));
+  // Check that test_clone_2 has the same persisted options plus the extra queued option.
+  ASSERT_TRUE(km::tests::action_items(test_clone_2, {action_tp3, action_tp4, action_clone, {KM_CORE_IT_END}}));
+
   // Destroy them
   km_core_state_dispose(test_state);
   km_core_state_dispose(test_clone);
+  km_core_state_dispose(test_clone_2);
   km_core_keyboard_dispose(test_kb);
 }
-
-
-

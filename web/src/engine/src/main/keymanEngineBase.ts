@@ -330,10 +330,6 @@ export class KeymanEngineBase<
         this.config.deferForInitialization.then(eventRaiser);
       }
     });
-
-    this.keyboardRequisitioner.cache.on('keyboardadded', (keyboard) => {
-      this.legacyAPIEvents.callEvent('keyboardloaded', { keyboardName: keyboard.id });
-    });
     //
     // #endregion
 
