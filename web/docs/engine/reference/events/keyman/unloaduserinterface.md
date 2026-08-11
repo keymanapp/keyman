@@ -8,7 +8,7 @@ Called when allow ui clean-up.
 
 ## Syntax
 
-```
+```javascript
 keyman.addEventListener('unloaduserinterface', function() {
   ...
 });
