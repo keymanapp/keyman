@@ -1,8 +1,18 @@
 <!-- Custom banner theme -->
-<div style="background: white; width: 100%; height: 100%; position: absolute; left: 0; top: 0; display: flex">
+<style>
+  .keyman-banner { background: white; }
+  .keyman-banner.dark { background: #1e1e1e; }
+
+  .keyman-banner .logo-dark { display: none; }
+  .keyman-banner.dark .logo-light { display: none; }
+  .keyman-banner.dark .logo-dark { display: block; }
+</style>
+
+<div class="keyman-banner" style="width: 100%; height: 100%; position: absolute; left: 0; top: 0; display: flex">
 
   <!-- svg path is relative to assets/ folder -->
-  <img src="banner/keyman_banner.svg" style="height:60%; background: white; display: block; margin: auto 2%;">
+  <img class="logo-light" src="banner/keyman_banner.svg" style="height:60%; margin: auto 2%;">
+  <img class="logo-dark" src="banner/keyman_banner_dark.png" style="height:60%; margin: auto 2%;">
 
   <!-- Tri-color line -->
   <div style='height: 7%; left: 0; position: absolute; bottom: 0; width: 56%; background: #F68924'></div>
