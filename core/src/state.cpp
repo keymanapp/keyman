@@ -49,7 +49,6 @@ actions::actions(actions const &other)
     }
   }
 }
-}
 
 state::state(km::core::abstract_processor & ap, km_core_option_item const *env)
   : _processor(ap)
