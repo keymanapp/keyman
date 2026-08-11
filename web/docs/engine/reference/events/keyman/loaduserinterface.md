@@ -8,7 +8,7 @@ Called to initiate the ui initialization process.
 
 ## Syntax
 
-```
+```javascript
 keyman.addEventListener('loaduserinterface', function() {
   ...
 });

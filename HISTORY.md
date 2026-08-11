@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 19.0.263 alpha 2026-08-10
+
+* chore(deps): bump tar from 7.5.11 to 7.5.22 in /developer/src/server/src/win32/trayicon/addon-src (#16282)
+* chore(deps): bump brace-expansion from 5.0.6 to 5.0.9 in /developer/src/server/src/win32/trayicon/addon-src (#16295)
+* refactor(web): improve naming of `_SetTargetDir` function (#16311)
+* docs(web): add language identifier to the code blocks of event docs (#16333)
+
+## 19.0.262 alpha 2026-08-04
+
+* chore(web): fire `keyboardloaded` event only once per keyboard (#16297)
+
 ## 19.0.261 alpha 2026-07-30
 
 * fix(core): clone state actions deep copy (#15961)
