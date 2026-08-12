@@ -19,6 +19,6 @@ public protocol PackageRepo {
   func loadSinglePackage(packageUrl: URL) throws -> KeymanPackage
   func getDownloadUrl(for kmpFilename: String) -> URL
   func getUnzipDestinationUrl(for packageName: String) -> URL
-  func getInstallationUrlForPackageName(packageName: String) -> URL
+  func buildInstallationUrlForPackageName(packageName: String) -> URL
   func cleanupTempDirectory()
 }

@@ -40,9 +40,25 @@ public extension Notification.Name {
   static let packageDowngradeRequested = Notification.Name("com.keyman.package.downgrade.requested")
 }
 
-public enum SettingsError: Error {
-  case unknownPackage
+// define LocalizedError so that UI can present a localizable message
+// when the attempt to install a KMP file using drag and drop fails
+public enum DropKmpError: LocalizedError {
+  case invalidFileType(String)
+  case alreadyInstalled(String)
+  case installFailed(String)
+  case tooManyFiles
+  
+  public var errorDescription: String? {
+    switch self {
+    case .invalidFileType(let fileName): return "The file \(fileName) is not a .KMP file."
+    case .alreadyInstalled(let fileName): return "The package \(fileName) is already installed."
+    case .installFailed(let fileName): return "The file \(fileName) could not be installed."
+    case .tooManyFiles: return "Only a single .KMP file can be installed at a time."
+    }
+  }
 }
+
+private let kmpFileExtension = ".kmp"
 
 @MainActor // run on the main actor since data is published directly to the UI
 public class SettingsContainer : ObservableObject {
@@ -61,7 +77,7 @@ public class SettingsContainer : ObservableObject {
   // (Consider installedPackages as the source of truth and these arrays for presentation purposes.)
   @Published public private(set) var singleKeyboardPackages: [KeymanPackage]
   @Published public private(set) var multiKeyboardPackages: [KeymanPackage]
-  @Published public var dragStatusMessage = "Drag a single .kmp archive here"
+  @Published public var dropStatusMessage = "Drag a single .kmp archive here"
 
   // when a new package is downloaded, it is tracked here
   public private(set) var packageDownload: PackageDownload? = nil
@@ -230,52 +246,6 @@ public class SettingsContainer : ObservableObject {
    return false
   }
 
-  public func processDraggedKmpFile(from fileLocation: URL) -> Bool {
-    // if the file does not end with .kmp, reject it
-    guard fileLocation.pathExtension.lowercased() == "kmp" else {
-      dragStatusMessage = "Rejected: file must have a .kmp extension."
-      return false
-    }
-    
-    // if we cannot get a URL to the install location, then reject it (should never happen)
-    guard let destinationURL = getInstalledPackageUrl(for: fileLocation) else {
-      dragStatusMessage = "Unable to find application data directory."
-        return false
-    }
-    
-    // if a package of the same name is installed, reject it
-    guard !FileManager.default.fileExists(atPath: destinationURL.path) else {
-      dragStatusMessage = "The package \(destinationURL.lastPathComponent) is already installed."
-        return false
-    }
-    
-    do {
-      try self.installDraggedPackage(from: fileLocation, to: destinationURL)
-      dragStatusMessage = "The package \(destinationURL.lastPathComponent) was installed successfully."
-      return true
-    } catch {
-      dragStatusMessage = "The package \(destinationURL.lastPathComponent) failed to install."
-      return false
-    }
-  }
-
-  func getInstalledPackageUrl(for draggedKmpFile: URL) -> URL? {
-    // package name is filename minus .kmp extension
-    let packageName = draggedKmpFile.lastPathComponent.replacingOccurrences(of: ".kmp", with: "")
-    return self.packageRepository.getInstallationUrlForPackageName(packageName: packageName)
-  }
-
-  func installDraggedPackage(from draggedFileUrl: URL, to installPackageLocation: URL) throws {
-    try self.packageRepository.unzipKmpFile(at: draggedFileUrl, to: installPackageLocation)
-    
-    // load the unzipped package and get a reference to it
-    let newPackage = try self.packageRepository.loadSinglePackage(packageUrl: installPackageLocation)
-    
-    // add the new package to the array and enable its keyboards
-    self.installedPackages.append(newPackage)
-    self.addEnabledKeyboards(for: newPackage)
-  }
-  
   /**
    * Called by the WebView Coordinator before initiating a package download.
    * Creates a PackageDownload instance to manage the state of the package being downloaded with the specified name.
@@ -283,7 +253,7 @@ public class SettingsContainer : ObservableObject {
    */
   public func preparePackageDownload(kmpFileName: String) -> URL? {
     // package name is filename minus .kmp extension
-    let packageName = kmpFileName.replacingOccurrences(of: ".kmp", with: "")
+    let packageName = kmpFileName.replacingOccurrences(of: kmpFileExtension, with: "")
     
     let packageDownload = PackageDownload(filename: kmpFileName, packageName: packageName, packageRepo: self.packageRepository, installedPackages: self.installedPackages)
 
@@ -515,6 +485,88 @@ public class SettingsContainer : ObservableObject {
       {
         $0.enabled = enabledKeyboards.contains($0.keyboardKey)
       }
+    }
+  }
+  
+  // MARK: Drag and drop Package Installation
+  
+  /**
+   * Attempt to install a package from a KMP file. Called when file is dropped on the Configuration view
+   */
+  public func processDroppedKmpFile(at fileLocation: URL) throws {
+    // get the location where the package will be installed
+    let destinationURL = try self.validateDropUrlForInstallation(from: fileLocation)
+    
+    // install it
+    try self.installDroppedKmpFile(from: fileLocation, to: destinationURL)
+  }
+
+  /**
+   * Validate the URL for the file we are dropping and return the installation location
+   * Throws errors if the URL does not end with .kmp or the same package is already installed
+   */
+  func validateDropUrlForInstallation(from fileLocation: URL) throws -> URL {
+    // if the file does not end with .kmp, reject it
+    guard fileLocation.pathExtension.lowercased() == "kmp" else {
+      dropStatusMessage = "Rejected: file must have a .kmp extension."
+      throw DropKmpError.invalidFileType(fileLocation.lastPathComponent)
+    }
+    
+    // if we cannot get a URL to the install location, then reject it (should never happen)
+    guard let destinationURL = buildInstalledPackageUrl(for: fileLocation) else {
+      dropStatusMessage = "Unable to find application data directory."
+      throw DropKmpError.installFailed(fileLocation.lastPathComponent)
+    }
+    
+    // if a package of the same name is installed, reject it
+    guard !FileManager.default.fileExists(atPath: destinationURL.path) else {
+      dropStatusMessage = "The package \(destinationURL.lastPathComponent) is already installed."
+      throw DropKmpError.alreadyInstalled(fileLocation.lastPathComponent)
+    }
+    
+    return destinationURL
+  }
+  
+  /**
+   * Build the URL where the package will be installed
+   */
+  func buildInstalledPackageUrl(for draggedKmpFile: URL) -> URL? {
+    // package name is filename minus .kmp extension
+    let packageName = draggedKmpFile.lastPathComponent.replacingOccurrences(of: kmpFileExtension, with: "")
+    return self.packageRepository.buildInstallationUrlForPackageName(packageName: packageName)
+  }
+
+  /**
+   * Install the package from the dropped kmp file
+   */
+  func installDroppedKmpFile(from droppedFileUrl: URL, to installPackageLocation: URL) throws {
+    var newPackage: KeymanPackage? = nil
+    
+    try self.packageRepository.unzipKmpFile(at: droppedFileUrl, to: installPackageLocation)
+    
+    do {
+      // load the unzipped package and get a reference to it
+      newPackage = try self.packageRepository.loadSinglePackage(packageUrl: installPackageLocation)
+    }
+    catch {
+      // the package could not be loaded, so delete it from disk
+      do {
+        if FileManager.default.fileExists(atPath: installPackageLocation.path) {
+          try FileManager.default.removeItem(at: installPackageLocation)
+          print("removed uninstalled dropped kmp file at: \(installPackageLocation)")
+        }
+      } catch {
+        print("could not remove uninstalled dropped kmp file: \(error.localizedDescription)")
+      }
+      
+      // re-throw error to notify user of reason installation failed
+      throw error
+    }
+    
+    if let installedPackage = newPackage {
+      // add the newly installed package to the array and enable its keyboards
+      self.installedPackages.append(installedPackage)
+      self.addEnabledKeyboards(for: installedPackage)
     }
   }
 }

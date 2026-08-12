@@ -26,7 +26,7 @@ public class PackageDownload {
     self.packageRepository = packageRepo
     self.temporaryKmpFileLocation = self.packageRepository.getDownloadUrl(for: filename)
     self.temporaryPackageLocation = self.packageRepository.getUnzipDestinationUrl(for: packageName)
-    self.installPackageLocation = self.packageRepository.getInstallationUrlForPackageName(packageName: packageName)
+    self.installPackageLocation = self.packageRepository.buildInstallationUrlForPackageName(packageName: packageName)
     self.installedPackages = installedPackages
     
     // cannot be initialized until after download when packageName of new package is known

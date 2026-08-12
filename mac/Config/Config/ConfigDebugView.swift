@@ -12,6 +12,9 @@ import KeymanSettings
 struct ConfigDebugView: View {
   @EnvironmentObject var settings: SettingsContainer
   @State private var isShowingSheet = false
+  @State private var dropError: DropKmpError?
+  @State private var isShowingDropKmpAlert = false
+  @State private var alertMessage = ""
   @State private var isHovering = false
 
   var body: some View {
@@ -43,7 +46,7 @@ struct ConfigDebugView: View {
       }
 
       VStack {
-        Text(settings.dragStatusMessage)
+        Text(settings.dropStatusMessage)
           .font(.system(.body, design: .monospaced))
           .multilineTextAlignment(.center)
           .padding()
@@ -56,16 +59,33 @@ struct ConfigDebugView: View {
           )
         // Accept URL drops
           .dropDestination(for: URL.self) { urls, _ in
-            guard let archiveURL = urls.first, urls.count == 1 else {
-              settings.dragStatusMessage = "Drop exactly one file."
-              return false
+            // reject drop if it is more than one file
+            guard let droppedFileUrl = urls.first, urls.count == 1 else {
+              let error = DropKmpError.tooManyFiles
+              self.alertMessage = error.localizedDescription
+              self.isShowingDropKmpAlert = true
+              return false // the drop failed
             }
-            return settings.processDraggedKmpFile(from: archiveURL)
+            do {
+              try settings.processDroppedKmpFile(at: droppedFileUrl)
+              return true // the drop was successful
+            } catch {
+              self.alertMessage = error.localizedDescription
+              self.isShowingDropKmpAlert = true
+              return false
+              
+            }
           } isTargeted: { hovering in
             isHovering = hovering
           }
       }
       .padding()
+      // alert riggers automatically when $dropError becomes non-nil
+      .alert("Package Installation Failed", isPresented: $isShowingDropKmpAlert) {
+          Button("OK", role: .cancel) { }
+      } message: {
+          Text(alertMessage)
+      }
 
       ScrollView {
         VStack(alignment: .leading, spacing: 6) {

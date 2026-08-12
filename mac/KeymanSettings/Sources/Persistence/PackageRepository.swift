@@ -10,7 +10,7 @@
 
 import Foundation
 
-enum LoadPackageError: Error {
+public enum LoadPackageError: LocalizedError {
   case containsNoFiles
   case containsNoKeyboards
   case kmpJsonFileUnreadable
@@ -19,33 +19,29 @@ enum LoadPackageError: Error {
   case missingKeyboardId
   case missingKeyboardVersion
   case missingKmxFile
+  
+  public var errorDescription: String? {
+    switch self {
+    case .containsNoFiles: return "The keyboard package contains no files."
+    case .containsNoKeyboards: return "The keyboard package contains no keyboards."
+    case .kmpJsonFileUnreadable: return "The package's kmp.json file could not be parsed."
+    case .kmpJsonFileNotFound: return "The package's kmp.json file was not found."
+    case .missingKeyboardName: return "A keyboard in the package has no name."
+    case .missingKeyboardId: return "A keyboard in the package has no ID."
+    case .missingKeyboardVersion: return "A keyboard in the package has no version."
+    case .missingKmxFile: return "A keyboard in the package has no corresponding KMX file."
+    }
+  }
 }
 
-enum InstallPackageError: Error {
+enum InstallPackageError: LocalizedError {
   case invalidUrl
   case unzipError
-}
-
-// Conform to LocalizedError to provide the description
-extension LoadPackageError: LocalizedError {
-  var errorDescription: String? {
+  
+  public var errorDescription: String? {
     switch self {
-    case .containsNoFiles:
-      return NSLocalizedString("The package contains no files.", comment: "")
-    case .containsNoKeyboards:
-      return NSLocalizedString("The package contains no keyboards", comment: "")
-    case .kmpJsonFileUnreadable:
-      return NSLocalizedString("The package's kmp.json file could not be parsed", comment: "")
-    case .kmpJsonFileNotFound:
-      return NSLocalizedString("The package's kmp.json file was not found", comment: "")
-    case .missingKeyboardName:
-      return NSLocalizedString("A keyboard in the package has no name", comment: "")
-    case .missingKeyboardId:
-      return NSLocalizedString("A keyboard in the package has no id", comment: "")
-    case .missingKeyboardVersion:
-      return NSLocalizedString("A keyboard in the package has no version", comment: "")
-    case .missingKmxFile:
-      return NSLocalizedString("A keyboard in the package has no corresponding KMX file", comment: "")
+    case .invalidUrl: return "The URL is not valid."
+    case .unzipError: return "The keyboard package could not be unzipped."
     }
   }
 }
@@ -171,9 +167,9 @@ public class PackageRepository: PackageRepo {
     return self.pathUtil.keyman19TempDirectory.appendingPathComponent(packageName)
   }
   /**
-   * get the url to where the specified package should be installed
+   * build the URL where the specified package will be installed
    */
-  public func getInstallationUrlForPackageName(packageName: String) -> URL {
+  public func buildInstallationUrlForPackageName(packageName: String) -> URL {
     return self.pathUtil.keyman19PackagesDirectory.appendingPathComponent(packageName)
   }
 
