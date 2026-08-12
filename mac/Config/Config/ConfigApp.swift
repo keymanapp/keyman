@@ -32,7 +32,7 @@ struct ConfigApp: App {
         .environmentObject(installation)
     }
     Window("Installation", id: "install") {
-      ParentInstallView()
+      MainInstallView()
         .environmentObject(installation)
     }
     .windowResizability(.contentSize)

@@ -13,9 +13,7 @@ import AppKit
 internal import UniformTypeIdentifiers
 
 struct InitialRepairView: View {
-  
   @EnvironmentObject var installation: InstallationContainer
-  
   let namespace: Namespace.ID
   let onContinue: () -> Void
   

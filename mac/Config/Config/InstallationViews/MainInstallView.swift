@@ -8,10 +8,32 @@
 
 import SwiftUI
 
-struct ParentInstallView: View {
+enum InstallPage: String, CaseIterable {
+  case loading
+  case initialInstall
+  case initialRepair
+  case completed
+  case enableInputMethod
+  case allowSecurityPermission
+  case rerunInstaller
+  case restartMac
+}
+
+struct MainInstallView: View {
   @EnvironmentObject var installation: InstallationContainer
+  /**
+   * A namespace is created here and passed to child views.
+   * Any subviews with the same string id and this namespace
+   * will animate smoothly when changing positions or states.
+   */
   @Namespace var animation
   @State public var currentPage: InstallPage = .loading
+  
+  /**
+   * chooseCurrentPage() will update the @State var currentPage according to the current task.
+   * If there is a task involved with the installationPhase, it will display the page associated with that task.
+   * If there is not a task involved with the installationPhase, it will display the page associated with that phase.
+   */
   
   func chooseCurrentPage() {
     if installation.installationPhase.hasTasks {
@@ -21,6 +43,7 @@ struct ParentInstallView: View {
       case .enableInputMethod: currentPage = .enableInputMethod
       case .requestAccess: currentPage = .allowSecurityPermission
       case .confirmAccess: currentPage = .allowSecurityPermission
+      case .requestRestart: currentPage = .restartMac
       default: currentPage = .completed
       }
     } else {
@@ -40,7 +63,9 @@ struct ParentInstallView: View {
   }
   
   var body: some View {
-    ZStack {
+    
+    VStack {
+      // The switch statement below updates the view this VStack contains whenever currentPage changes value
       switch currentPage {
       case .loading: ProgressView()
       case .initialInstall: InitialInstallView(namespace: animation,onContinue: {
@@ -55,11 +80,13 @@ struct ParentInstallView: View {
       case .enableInputMethod: EnableInputMethodView(namespace: animation, onContinue: chooseCurrentPage)
       case .allowSecurityPermission: GrantAccessibiltyPermissionView(namespace: animation, onContinue: chooseCurrentPage)
       case .rerunInstaller: RerunInstallerView(namespace: animation)
+      case .restartMac: RestartComputerView(namespace: animation)
       }
     }
+    // While the installer is evaluating the Keyman installation, the loading screen will be shown
     .onAppear {
-      print("LOL ", installation.installationPhase)
-      print("LOL ", installation.currentTask()?.taskType ?? "no task available")
+      print("From MainInstallView onAppear: ", installation.installationPhase)
+      print("From MainInstallView onAppear: ", installation.currentTask()?.taskType ?? "no task available")
       
       if installation.installationPhase == .evaluatingInstallation {
         currentPage = .loading
@@ -70,8 +97,6 @@ struct ParentInstallView: View {
           await MainActor.run {
             withAnimation(.smooth) {
               chooseCurrentPage()
-              print("LOOL ", installation.installationPhase)
-
             }
           }
         }

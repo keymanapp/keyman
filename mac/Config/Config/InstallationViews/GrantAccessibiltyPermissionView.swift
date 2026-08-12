@@ -20,9 +20,19 @@ struct GrantAccessibiltyPermissionView: View {
   let namespace: Namespace.ID
   let onContinue: () -> Void
   
+  /**
+   * The flow of this view depends on the following @State variables.
+   * Once the user presses "Open Settings" in order to toggle the security permission they will be allowed to continue.
+   * When they press "Continue," a loading symbol will run until the view receives a notification of whether the access is
+   * granted or not. If not granted, an error message will appear. If granted, the user will be moved to the next screen.
+   */
+  
+  // Tracks if the user clicked "Open Settings" (Enables the "Continue" button)
   @State var openSettingsButtonPressed: Bool = false
+  // Tracks if the app is currently running the background permission check
   @State var checkingPermission: Bool = false
-  @State var advancementRequestedAndPermissionNotGranted: Bool = false
+  // Tracks if the user clicked "Continue" but permission is still missing
+  @State var permissionNotGrantedAfterPrompt: Bool = false
   
   var body: some View {
     VStack {
@@ -58,12 +68,13 @@ struct GrantAccessibiltyPermissionView: View {
         
         if checkingPermission {
           HStack {
+            // Shows spinner AKA ProgressView()
             ProgressView()
               .controlSize(.small)
             
             Text("Checking...")
           }
-        } else if advancementRequestedAndPermissionNotGranted {
+        } else if permissionNotGrantedAfterPrompt {
           Text("Access has not been granted.")
             .foregroundStyle(Color.red)
             .padding(7)
@@ -89,7 +100,9 @@ struct GrantAccessibiltyPermissionView: View {
         .tint(.blue)
         .clipShape(Capsule())
         .matchedGeometryEffect(id: "actionButton", in: namespace)
+        
         Button {
+          // Trigger the system task to check for accessibility permission
           checkingPermission = true
           installation.executeCurrentInstallationTask()
         } label: {
@@ -101,16 +114,18 @@ struct GrantAccessibiltyPermissionView: View {
         .clipShape(Capsule())
       }
     }
+    // Triggered when the system confirms accessibility has been granted.
     .onReceive( NotificationCenter.default.publisher(for: .accessibilityGranted)) { notification in
       withAnimation(.smooth) {
-        advancementRequestedAndPermissionNotGranted = true
-        onContinue()
+        permissionNotGrantedAfterPrompt = false
+        onContinue() // Moves the user to the next screen
       }
     }
+    // Triggered when the system confirms accessibility has not been granted.
     .onReceive( NotificationCenter.default.publisher(for: .accessibilityNotGranted)) { notification in
       withAnimation(.smooth) {
-        checkingPermission = false
-        advancementRequestedAndPermissionNotGranted = true
+        checkingPermission = false // Stops showing the loading spinner
+        permissionNotGrantedAfterPrompt = true // Shows the red error text
       }
     }
   }
