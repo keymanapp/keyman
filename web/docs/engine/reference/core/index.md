@@ -85,6 +85,10 @@ The KeymanWeb core module is exposed to the developer as `window.keyman`.
 : Get the KeymanWeb user interface activation state.
 
 
+[`helpURL` Property](helpURL) (deprecated)
+: URL for keyboard help site.
+
+
 [`init` Function](init)
 : Sets license key, selects user interface, and other KeymanWeb Options.
 

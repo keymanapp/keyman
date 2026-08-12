@@ -48,8 +48,8 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
   public getOskWidth?: () => number = null;
 
   /**
-   * Provides a quick link to the base help page for Keyman keyboards.
-   *
+   * Public API: Provides a quick link to the base help page for Keyman keyboards. (deprecated)
+   * @deprecated
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/helpURL
    */
   public readonly helpURL = 'https://help.keyman.com/go';

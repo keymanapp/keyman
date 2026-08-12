@@ -8,7 +8,7 @@ Generates a KeymanWeb alert window.
 
 ## Syntax
 
-```c
+```js
 keyman.util.alert(msg, fn)
 ```
 
