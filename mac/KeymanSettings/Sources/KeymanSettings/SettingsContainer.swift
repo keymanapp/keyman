@@ -77,7 +77,7 @@ public class SettingsContainer : ObservableObject {
   // (Consider installedPackages as the source of truth and these arrays for presentation purposes.)
   @Published public private(set) var singleKeyboardPackages: [KeymanPackage]
   @Published public private(set) var multiKeyboardPackages: [KeymanPackage]
-  @Published public var dragStatusMessage = "Drag a single .kmp archive here"
+  @Published public var dropStatusMessage = "Drag a single .kmp archive here"
 
   // when a new package is downloaded, it is tracked here
   public private(set) var packageDownload: PackageDownload? = nil
@@ -246,52 +246,6 @@ public class SettingsContainer : ObservableObject {
    return false
   }
 
-  public func processDraggedKmpFile(from fileLocation: URL) -> Bool {
-    // if the file does not end with .kmp, reject it
-    guard fileLocation.pathExtension.lowercased() == "kmp" else {
-      dragStatusMessage = "Rejected: file must have a .kmp extension."
-      return false
-    }
-    
-    // if we cannot get a URL to the install location, then reject it (should never happen)
-    guard let destinationURL = getInstalledPackageUrl(for: fileLocation) else {
-      dragStatusMessage = "Unable to find application data directory."
-        return false
-    }
-    
-    // if a package of the same name is installed, reject it
-    guard !FileManager.default.fileExists(atPath: destinationURL.path) else {
-      dragStatusMessage = "The package \(destinationURL.lastPathComponent) is already installed."
-        return false
-    }
-    
-    do {
-      try self.installDraggedPackage(from: fileLocation, to: destinationURL)
-      dragStatusMessage = "The package \(destinationURL.lastPathComponent) was installed successfully."
-      return true
-    } catch {
-      dragStatusMessage = "The package \(destinationURL.lastPathComponent) failed to install."
-      return false
-    }
-  }
-
-  func getInstalledPackageUrl(for draggedKmpFile: URL) -> URL? {
-    // package name is filename minus .kmp extension
-    let packageName = draggedKmpFile.lastPathComponent.replacingOccurrences(of: ".kmp", with: "")
-    return self.packageRepository.getInstallationUrlForPackageName(packageName: packageName)
-  }
-
-  func installDraggedPackage(from draggedFileUrl: URL, to installPackageLocation: URL) throws {
-    try self.packageRepository.unzipKmpFile(at: draggedFileUrl, to: installPackageLocation)
-    
-    // load the unzipped package and get a reference to it
-    let newPackage = try self.packageRepository.loadSinglePackage(packageUrl: installPackageLocation)
-    
-    // add the new package to the array and enable its keyboards
-    self.installedPackages.append(newPackage)
-    self.addEnabledKeyboards(for: newPackage)
-  }
-  
   /**
    * Called by the WebView Coordinator before initiating a package download.
    * Creates a PackageDownload instance to manage the state of the package being downloaded with the specified name.
@@ -299,7 +253,7 @@ public class SettingsContainer : ObservableObject {
    */
   public func preparePackageDownload(kmpFileName: String) -> URL? {
     // package name is filename minus .kmp extension
-    let packageName = kmpFileName.replacingOccurrences(of: ".kmp", with: "")
+    let packageName = kmpFileName.replacingOccurrences(of: kmpFileExtension, with: "")
     
     let packageDownload = PackageDownload(filename: kmpFileName, packageName: packageName, packageRepo: self.packageRepository, installedPackages: self.installedPackages)
 
