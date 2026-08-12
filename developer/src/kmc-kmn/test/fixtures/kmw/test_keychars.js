@@ -22,10 +22,7 @@ function Keyboard_test_keychars()
   this.s_letter_6=" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
   this.KVS=[];
   this.gs=function(t,e) {
-    return this.g_Main_0(t,e);
-  };
-  this.gs=function(t,e) {
-    return this.g_Main_0(t,e);
+    return this.g_main_0(t,e);
   };
   this.g_Main_0=function(t,e) {
     var k=KeymanWeb,r=0,m=0;

@@ -18,9 +18,6 @@ function Keyboard_k_0806___modifier_keys_keep_context()
   this.gs=function(t,e) {
     return this.g_main_0(t,e);
   };
-  this.gs=function(t,e) {
-    return this.g_main_0(t,e);
-  };
   this.g_main_0=function(t,e) {
     var k=KeymanWeb,r=0,m=0;
     if(k.KKM(e, 0x4000, 0x41)) {

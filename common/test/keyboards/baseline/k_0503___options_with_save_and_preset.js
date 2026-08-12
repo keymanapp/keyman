@@ -27,10 +27,7 @@ function Keyboard_k_0503___options_with_save_and_preset()
   this.s11="0";
   this.KVS=['s_foo_4'];
   this.gs=function(t,e) {
-    return this.g_Main_0(t,e);
-  };
-  this.gs=function(t,e) {
-    return this.g_Main_0(t,e);
+    return this.g_main_0(t,e);
   };
   this.g_Main_0=function(t,e) {
     var k=KeymanWeb,r=0,m=0;

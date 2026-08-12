@@ -24,10 +24,7 @@ function Keyboard_k_0809___if_and_context()
   this.s8="1";
   this.KVS=['s_ifx_5'];
   this.gs=function(t,e) {
-    return this.g_Main_0(t,e);
-  };
-  this.gs=function(t,e) {
-    return this.g_Main_0(t,e);
+    return this.g_main_0(t,e);
   };
   this.g_Main_0=function(t,e) {
     var k=KeymanWeb,r=0,m=0;
