@@ -33,7 +33,7 @@ export interface GestureHandler {
    * simple-tap corrections, allowing gestures to utilize the values as a basis
    * for their own calculations as appropriate.
    *
-   * @param baseDistMap The distance map used for simple-tap corrections
+   * @param baseDistanceMap The distance map used for simple-tap corrections
    */
-  currentStageKeyDistribution(baseDistMap: CorrectionDistanceMap): KeyDistribution | null;
+  currentStageKeyDistribution(baseDistanceMap: CorrectionDistanceMap): KeyDistribution | null;
 }

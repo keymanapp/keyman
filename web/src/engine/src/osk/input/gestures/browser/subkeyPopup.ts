@@ -505,7 +505,7 @@ export class SubkeyPopup implements GestureHandler {
     mappedCoord.y = mappedCoord.y < 0 ? 0 : (mappedCoord.y > 1 ? 1: mappedCoord.y);
 
     const rawSqDistances = keyTouchDistances(mappedCoord, this.buildCorrectiveLayout());
-    const currentKeyDist = rawSqDistances.get(lastCoord.item.key.spec.elementID);
+    const currentKey = rawSqDistances.get(lastCoord.item.key.spec.elementID);
 
     /*
      * - how long has the subkey menu been visible?
@@ -533,7 +533,7 @@ export class SubkeyPopup implements GestureHandler {
     // We only want to add a single distance 'dimension' - we'll choose the one that affects
     // the interpreted distance the least.  (This matters for upflick-shortcutting in particular)
     const layerDistance = Math.min(timeDistance * timeDistance, pathDistance * pathDistance);
-    const baseKeyDistance = currentKeyDist.dist + layerDistance;
+    const baseKeyDistance = currentKey.distance + layerDistance;
 
     // Include the base key as a corrective option.
     const baseKeyMap: CorrectionDistanceMap = new Map();
@@ -541,7 +541,7 @@ export class SubkeyPopup implements GestureHandler {
 
     // Ensure the corrective distribution includes the base key, if applicable.
     const keySpecToMap = subkeyMatch ? subkeyMatch.key.spec : this.baseKey.key.spec;
-    baseKeyMap.set(keySpecToMap.elementID, {keySpec: keySpecToMap, dist: baseKeyDistance});
+    baseKeyMap.set(keySpecToMap.elementID, {keySpec: keySpecToMap, distance: baseKeyDistance});
 
     return distributionFromDistanceMaps([rawSqDistances, baseKeyMap]);
   }
