@@ -1990,9 +1990,6 @@ function Keyboard_gesture_prototyping()
   this.gpk=function(t,e) {
     return this.g_postKeystroke_1(t,e);
   };
-  this.gs=function(t,e) {
-    return this.g_main_0(t,e);
-  };
   this.g_main_0=function(t,e) {
     var k=KeymanWeb,r=0,m=0;
     if(k.KKM(e, modCodes.CAPS | modCodes.VIRTUAL_KEY /* 0x4100 */, keyCodes.K_A /* 0x41 */)) {
