@@ -527,11 +527,17 @@ export class ContextTokenization {
     // Mutates stackedInserts, stackedDeletes.
     const baseRemovedTokenCount = Math.max(0, stackedDeletes.length - stackedInserts.length);
     const transformMap = assembleTransforms(stackedInserts, stackedDeletes, tailIndex);
+    if(transform.id !== undefined) {
+      transformMap.forEach((v) => v.id = transform.id);
+    }
 
-    // If there's an empty transform in the 0 position and we already know we're
-    // dropping tokens - and only deleting - we're dropping an
-    // otherwise-untracked empty token - make sure it's included!
-    const droppedFinalTransform = baseRemovedTokenCount > 0 && transform.insert == '' && TransformUtils.isEmpty(transformMap.get(0));
+    // If there's an empty transform in the final token's position and we
+    // already know we're dropping tokens - and only deleting - we're dropping
+    // an otherwise-untracked empty token - make sure it's included!
+    const droppedFinalTransform = baseRemovedTokenCount > 0
+      && transform.insert == ''
+      && TransformUtils.isEmpty(transformMap.get(0))
+      && shiftDeletes;
     // Past that, if we have more delete entries than insert entries for our transforms, we
     // dropped some tokens outright.
     const removedTokenCount = baseRemovedTokenCount + (droppedFinalTransform ? 1 : 0);
@@ -1265,6 +1271,9 @@ export function determineTaillessTrueKeystroke(tokenizedInput: Map<number, Trans
     // by the loop that follows, without fail.
   }
 
+  // We first wish to find the transform that affects the final post-transition
+  // token.  Accordingly, skip past any transforms that deleted pre-transition
+  // tokens.
   const transformKeys = [...tokenizedInput.keys()];
   do {
     const penultimateKey = transformKeys[transformKeys.length - 2];
@@ -1299,9 +1308,9 @@ export function determineTaillessTrueKeystroke(tokenizedInput: Map<number, Trans
   // constant.
   transformKeys.pop();
 
-  // If no inputs remain, that's fine - that means an empty transform applies to
-  // whatever token exists to the token indexed before the first input-key
-  // entry.
+  // If no inputs remain, that's fine - that means of the remaining
+  // post-transition context tokens, only the final token is affected by the
+  // input.
   for(let i of transformKeys) {
     const primaryInput = tokenizedInput.get(i);
     if(!taillessTrueKeystroke) {

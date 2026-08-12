@@ -1648,7 +1648,7 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
     const keyDistribution = keyEvent.keyDistribution;
     if(keyDistribution && keyDistribution.length > 1) {
       // While the references should match, it appears something disrupts this
-      // within the iOS WebView.  Fortunately, we can still check against the unique
+      // within the iOS WebView (#16254).  Fortunately, we can still check against the unique
       // element ID, fortunately.
       const matchIndex = keyDistribution.findIndex(keySample => keySample.elementID == keySpec.elementID);
       if(matchIndex < 0 && correctionKeyFilter(keySpec)) {
