@@ -24,6 +24,9 @@
             <key code="1" output="U+1F603"/>
             <key code="2" output="&#128514;"/>
             <key code="3" output="😀"/>
+            <key code="3" output="U+0001"/>
+            <key code="4" output="&#x0004;"/><!--should give unexpected entity as fast xml parser reads it to ''   -->
+
         </keyMap>
     </keyMapSet>
     <actions>

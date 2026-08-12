@@ -63,7 +63,7 @@ describe('KmnFileWriter', function () {
 
     it(('writeKmnFileHeader should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
       const writtenCorrectName = sutW.writeKmnFileHeader(converted);
-      assert.equal(writtenCorrectName, (outExpectedFirst + converted.keylayoutFilename + outExpectedLast));
+      assert.equal(writtenCorrectName, (outExpectedFirst + (converted?.keylayoutFilename ?? "") + outExpectedLast));
     });
   });
 
@@ -442,5 +442,42 @@ describe('KmnFileWriter', function () {
       });
     });
   });
+describe('writeCharacterOrUnicode and return values', function () {
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    [
+      ["A", "A", "Msg "],
+      ["ሴ", "ሴ", "Msg "],
+      ["😀", "😀", "Msg "],
+      ["ẘ", "ẘ", "Msg "],
+      ["U+0001", "U+0001", "Msg Use of a control character "],
+      ["U+0061", "a", "Msg "],
+      ["&#x0002;", "U+0002", "Msg Use of a control character "],
+      ["&#x1234;", 'ሴ', "Msg "],
+      ["&#0003;", "U+0003", "Msg Use of a control character "],
+      ["&#4666;", "ሺ", "Msg "],
+      ["", "U+0006", "Msg Use of a control character "],
+      ['', '', 'Msg empty output or unsupported numerical html entity: '],
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg ");
+        assert.isNotNull(result);
+        assert.equal(result.character, values[1]);
+        assert.equal(result.message, values[2]);
+      });
+    });
+  });
 
+  describe('writeCharacterOrUnicode and return null for result.message and result.character', function () {
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    [
+      [null, null],
+      [undefined, null],
+
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sutW.writeCharacterOrUnicode(values[0], "");
+        assert.isNull(result);
+      });
+    });
+  });
 });

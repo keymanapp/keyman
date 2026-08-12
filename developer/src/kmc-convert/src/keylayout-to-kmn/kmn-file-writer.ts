@@ -9,7 +9,6 @@
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from './keylayout-to-kmn-converter.js';
-import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 interface MessageCharacter {
@@ -74,12 +73,7 @@ export class KmnFileWriter {
     if (dataRules)
       data += dataStores + dataRules;
 
-    try {
-      return new TextEncoder().encode(data);
-    } catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename: dataUkelele.kmnFilename, errorText: err }));
-      return null;
-    }
+    return new TextEncoder().encode(data);
   }
 
   /**
@@ -87,7 +81,10 @@ export class KmnFileWriter {
    * @param  dataUkelele an object containing all data read from a .keylayout file
    * @return string -  all stores to be printed
    */
-  public writeKmnFileHeader(dataUkelele: ProcessedData): string {
+  public writeKmnFileHeader(dataUkelele: ProcessedData | null): string {
+    if (!dataUkelele) {
+      return "";
+    }
 
     let data: string = "";
 
@@ -114,8 +111,10 @@ export class KmnFileWriter {
    * @param  dataUkelele an object containing all data read from a .keylayout file
    * @return string -  all rules to be printed
    */
-  public writeDataRules(dataUkelele: ProcessedData): string {
-
+  public writeDataRules(dataUkelele: ProcessedData | null): string {
+    if (!dataUkelele) {
+      return "";
+    }
     const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
     let data: string = "";
 
@@ -149,7 +148,7 @@ export class KmnFileWriter {
         unique.push(o);
       }
       return unique;
-    }, []);
+    }, [] as Rule[]);
 
     //................................................ C0 C1 ................................................................
 
@@ -184,9 +183,13 @@ export class KmnFileWriter {
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
+        let versionOutputCharacter;
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-        const versionOutputCharacter = characterMessage.character;
-        warnText[2] = characterMessage.message;
+        if (characterMessage !== null) {
+          versionOutputCharacter = characterMessage.character;
+          warnText[2] = characterMessage.message;
+        }
+
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -241,13 +244,17 @@ export class KmnFileWriter {
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
 
+        let versionOutputCharacter;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
+
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-        const versionOutputCharacter = characterMessage.character;
-        warnText[2] = characterMessage.message;
+        if (characterMessage !== null) {
+          versionOutputCharacter = characterMessage.character;
+          warnText[2] = characterMessage.message;
+        }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -326,9 +333,13 @@ export class KmnFileWriter {
         const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
+        let versionOutputCharacter;
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
-        const versionOutputCharacter = characterMessage.character;
-        warnText[2] = characterMessage.message;
+        if (characterMessage !== null) {
+          versionOutputCharacter = characterMessage.character;
+          warnText[2] = characterMessage.message;
+        }
+
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -566,21 +577,25 @@ export class KmnFileWriter {
     const unavailableModiWarnings = {
       type: 'UnavailableModifier',
       warningMessages: ['', '', ''],
+      output: '',
     } as UnavailableModifier;
 
     const unavailableSuperiWarnings = {
       type: 'UnavailableSuperiorRule',
       warningMessages: ['', '', ''],
+      output: '',
     } as UnavailableSuperiorRule;
 
     const duplicateWarnings = {
       type: 'DuplicateRule',
       warningMessages: ['', '', ''],
+      output: '',
     } as DuplicateRules;
 
     const ambiguousWarnings = {
       type: 'AmbiguousRule',
       warningMessages: ['', '', ''],
+      output: '',
     } as AmbiguousRules;
 
     const resultWarningTextSet = {
@@ -715,8 +730,12 @@ export class KmnFileWriter {
         ambiguousWarnings.isEarlier = true;
         ambiguousWarnings.modifier = amb_1_1[0].modifierKey;
         ambiguousWarnings.key = amb_1_1[0].key;
-        ambiguousWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output)).character;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output));
+        if (outputCharacter !== null) {
+          ambiguousWarnings.output = outputCharacter.character;
+        }
         ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 2);
+
       }
 
       if (dup_1_1.length > 0) {
@@ -724,7 +743,10 @@ export class KmnFileWriter {
         duplicateWarnings.isEarlier = true;
         duplicateWarnings.modifier = dup_1_1[0].modifierKey;
         duplicateWarnings.key = dup_1_1[0].key;
-        duplicateWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output)).character;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output));
+        if (outputCharacter !== null) {
+          duplicateWarnings.output = outputCharacter.character;
+        }
         duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 2);
       }
     }
@@ -806,8 +828,12 @@ export class KmnFileWriter {
         ambiguousWarnings.dk_id = [amb_3_3[0].idPrevDeadkey, amb_3_3[0].idDeadkey];
         ambiguousWarnings.modifier = amb_3_3[0].modifierKey;
         ambiguousWarnings.key = amb_3_3[0].key;
-        ambiguousWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output)).character;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output));
+        if (outputCharacter !== null) {
+          ambiguousWarnings.output = outputCharacter.character;
+        }
         ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 2);
+
       }
 
       if (dup_3_3.length > 0) {
@@ -817,7 +843,10 @@ export class KmnFileWriter {
         duplicateWarnings.dk_prefix = ['', 'A'];
         duplicateWarnings.modifier = dup_3_3[0].modifierKey;
         duplicateWarnings.key = dup_3_3[0].key;
-        duplicateWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output)).character;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output));
+        if (outputCharacter !== null) {
+          duplicateWarnings.output = outputCharacter.character;
+        }
         duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 2);
       }
 
@@ -941,7 +970,10 @@ export class KmnFileWriter {
         ambiguousWarnings.dk_id = [amb_6_3[0].idPrevDeadkey, amb_6_3[0].idDeadkey];
         ambiguousWarnings.modifier = amb_6_3[0].modifierKey;
         ambiguousWarnings.key = amb_6_3[0].key;
-        ambiguousWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output)).character;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output));
+        if (outputCharacter !== null) {
+          ambiguousWarnings.output = outputCharacter.character;
+        }
         ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 1);
       }
 
@@ -952,7 +984,10 @@ export class KmnFileWriter {
         duplicateWarnings.dk_id = [dup_6_3[0].idPrevDeadkey, dup_6_3[0].idDeadkey];
         duplicateWarnings.modifier = dup_6_3[0].modifierKey;
         duplicateWarnings.key = dup_6_3[0].key;
-        duplicateWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output)).character;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output));
+        if (outputCharacter !== null) {
+          duplicateWarnings.output = outputCharacter.character;
+        }
         duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 1);
       }
 
@@ -1003,7 +1038,10 @@ export class KmnFileWriter {
         ambiguousWarnings.dk_id = [amb_6_6[0].idPrevDeadkey, amb_6_6[0].idDeadkey];
         ambiguousWarnings.modifier = amb_6_6[0].modifierKey;
         ambiguousWarnings.key = amb_6_6[0].key;
-        ambiguousWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output)).character;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output));
+        if (outputCharacter !== null) {
+          ambiguousWarnings.output = outputCharacter.character;
+        }
         ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 2);
       }
 
@@ -1014,7 +1052,10 @@ export class KmnFileWriter {
         duplicateWarnings.dk_id = [dup_6_6[0].idPrevDeadkey, dup_6_6[0].idDeadkey];
         duplicateWarnings.modifier = dup_6_6[0].modifierKey;
         duplicateWarnings.key = dup_6_6[0].key;
-        duplicateWarnings.output = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output)).character;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output));
+        if (outputCharacter !== null) {
+          duplicateWarnings.output = outputCharacter.character;
+        }
         duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 2);
       }
     }
@@ -1050,14 +1091,14 @@ export class KmnFileWriter {
   }
 
   /**
-  * @brief  member function to write a character as Unicode Character or Unicode Codepoint depending on the character that is to be written
-  * @param  ctr : string - the character to be written
-  * @return a string containing the Unicode representation of the control character.
-  *         A control character will be written as unicode (U+0004),
-  *         a non-control character will be written as itself ( 'A', '1', '፩', '😎')
-  *         null in case of an empty string or null or undefined input
-  */
-  public writeCharacterOrUnicode(ctr: string, msg: string = ""): MessageCharacter {
+    * @brief  member function to write a character as Unicode Character or Unicode Codepoint depending on the character that is to be written
+    * @param  ctr : string - the character to be written
+    * @return a string containing the Unicode representation of the control character.
+    *         A control character will be written as unicode (U+0004),
+    *         a non-control character will be written as itself ( 'A', '1', '፩', '😎')
+    *         null in case of an empty string or null or undefined input
+    */
+  public writeCharacterOrUnicode(ctr: string, msg: string = ""): MessageCharacter | null {
 
     if ((ctr === null) || (ctr === undefined)) {
       return null;
@@ -1076,8 +1117,14 @@ export class KmnFileWriter {
     const m_dec = /^&#([0-9]{1,7});$/.exec(ctr);
 
     // find the value of output character which may be specified in unicode, html hex or html dec format ( e.g. U+1234 -> 1234; &#x1234; -> 1234; &#4660; -> 1234)
-    const ctr_val = ((m_uni || m_hex || m_dec) ?
-      m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : parseInt(m_dec[1], 10) : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
+    const ctr_val = (
+      m_uni
+        ? parseInt(m_uni[1], 16)
+        : m_hex
+          ? parseInt(m_hex[1], 16)
+          : m_dec
+            ? parseInt(m_dec[1], 10)
+            : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
     );
 
     if (ctr.length === 0) {
@@ -1101,7 +1148,7 @@ export class KmnFileWriter {
       msg_control = "Use of a control character ";
     }
     else {
-      out.character = this.convertToUnicodeCharacter(ctr);
+      out.character = this.convertToUnicodeCharacter(ctr) ?? "";
     }
 
     // add a warning message
@@ -1122,10 +1169,9 @@ export class KmnFileWriter {
    * @param  inputString the value that will converted
    * @return a unicode character like 'c', 'ሴ', '😎' or undefined if inputString is not recognized
    */
-  public convertToUnicodeCharacter(inputString: string): string {
+  public convertToUnicodeCharacter(inputString: string): string | undefined {
 
-
-    // null, undefined will later be refused for conversion
+    // null, undefined will later be treated as '' in conversion
     if (inputString == null || inputString == undefined) {
       return undefined;
     }
@@ -1214,6 +1260,7 @@ export class KmnFileWriter {
     }
     return undefined;
   }
+
   /** @internal */
   public unitTestEndpoints = {
     reviewRules: this.reviewRules.bind(this),
