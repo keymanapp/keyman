@@ -325,7 +325,6 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
 
   // only move data if there is something to move
   if (dataExistsInOldLocation) {
-    [KMDataRepository.shared createSharedDirectoriesIfNecessary];
     [KMDataRepository movePackages:[self keyman17KeyboardsDirectory] to:[self keyman19KeyboardsDirectory]];
 
     // delete the Keyman-Keyboards directory
@@ -334,7 +333,7 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
     if (error == nil) {
       os_log_debug([KMLogs dataLog], "deleted obsolete keyboards directory: '%{public}@'", [self keyman17KeyboardsDirectory]);
     } else {
-      os_log_error([KMLogs dataLog], "error attempting to delte obsolete keyboards directory: '%{public}@'", [error localizedDescription]);
+      os_log_error([KMLogs dataLog], "error attempting to delete obsolete keyboards directory: '%{public}@'", [error localizedDescription]);
     }
   }
 }
@@ -351,7 +350,6 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
 
   // only move data if there is something to move
   if (dataExistsInOldLocation) {
-    [KMDataRepository.shared createSharedDirectoriesIfNecessary];
     [KMDataRepository movePackages:[self keyman18KeyboardsDirectory] to:[self keyman19KeyboardsDirectory]];
 
     // delete the Keyman-Keyboards directory
@@ -361,7 +359,7 @@ NSString *const kContainerKeyboardsPartialPath = @"Library/Application Support/K
     if (error == nil) {
       os_log_debug([KMLogs dataLog], "deleted obsolete keyboards directory: '%{public}@'", [self keyman18KeyboardsDirectory]);
     } else {
-      os_log_error([KMLogs dataLog], "error attempting to delte obsolete keyboards directory: '%{public}@'", [error localizedDescription]);
+      os_log_error([KMLogs dataLog], "error attempting to delete obsolete keyboards directory: '%{public}@'", [error localizedDescription]);
     }
   }
 }

@@ -793,9 +793,13 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   switch (state) {
     case KeymanSettingsVersion17:
       os_log_info([KMLogs dataLog], "prepareStorage, migration needed for Keyman 17 to current");
+      [KMDataRepository.shared createSharedDirectoriesIfNecessary];
+      [KMDataRepository.shared migrateDataFromKeyman17];
+      [KMSettingsRepository.shared migrateSettingsFromKeyman17];
       break;
     case KeymanSettingsVersion18:
       os_log_info([KMLogs dataLog], "prepareStorage, migration needed for Keyman 18 to current");
+      [KMDataRepository.shared createSharedDirectoriesIfNecessary];
       [KMDataRepository.shared migrateDataFromKeyman18];
       [KMSettingsRepository.shared migrateSettingsFromKeyman18];
       break;
@@ -803,7 +807,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       os_log_info([KMLogs dataLog], "prepareStorage, settings not found, create them");
       [KMDataRepository.shared createSharedDirectoriesIfNecessary];
       [KMSettingsRepository.shared createSharedSettingsIfNecessary];
-      // MAC-CONFIG-TODO: are settings created for fresh install?
       break;
     case KeymanSettingsVersionCurrent:
       os_log_info([KMLogs dataLog], "prepareStorage: settings are current, no migration needed");

@@ -99,7 +99,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   // settings were moved to share app group beginning in Keyman 19
   if ([self settingsExistForAppGroup]) {
     os_log([KMLogs dataLog], "keyman shared settings exist, version is current");
-    SettingsState state = KeymanSettingsVersionCurrent;
+    state = KeymanSettingsVersionCurrent;
   } else if ([self settingsExistForInputMethod]) {
     // In Keyman 18, KMDataModelVersion was added to settings and set to value of 1
     // No need to check the value, if it exists in the app UserDefaults, then it needs to be migrated
@@ -108,7 +108,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
       state = KeymanSettingsVersion18;
     } else {
       // no KMDataModelVersion key is found in the app UserDefaults
-     os_log([KMLogs dataLog], "lack of keyman settings version indicates Keyman 17 or earlier, packages stored in ~/Documents");
+      os_log([KMLogs dataLog], "lack of keyman settings version indicates Keyman 17 or earlier, packages stored in ~/Documents");
       state = KeymanSettingsVersion17;
     }
   } else {
@@ -430,7 +430,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
 }
 
 - (void)migrateSettingsFromKeyman18 {
-  os_log_debug([KMLogs dataLog], "migrating settings in UserDefaults from Keyman 178");
+  os_log_debug([KMLogs dataLog], "migrating settings in UserDefaults from Keyman 18");
   [self migrateSettingsFromKeyman18ToAppGroup];
 
   // set kDataModelVersion for the current format
