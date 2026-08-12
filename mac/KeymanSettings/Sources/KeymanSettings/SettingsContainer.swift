@@ -77,7 +77,6 @@ public class SettingsContainer : ObservableObject {
   // (Consider installedPackages as the source of truth and these arrays for presentation purposes.)
   @Published public private(set) var singleKeyboardPackages: [KeymanPackage]
   @Published public private(set) var multiKeyboardPackages: [KeymanPackage]
-  @Published public var dropStatusMessage = "Drag a single .kmp archive here"
 
   // when a new package is downloaded, it is tracked here
   public private(set) var packageDownload: PackageDownload? = nil
@@ -236,64 +235,6 @@ public class SettingsContainer : ObservableObject {
    */
   public func clearUserDefaults() {
     self.defaultsRepository.clearDefaults()
-  }
-  
-  /**
-   * check whether a download is already in progress
-   */
-  public func isDownloadInProgress() -> Bool {
-    // MAC-CONFIG-TODO: add logic, this does not actually prevent downloads when hard-coded to true
-   return false
-  }
-
-  /**
-   * Called by the WebView Coordinator before initiating a package download.
-   * Creates a PackageDownload instance to manage the state of the package being downloaded with the specified name.
-   * Returns a URL to the temporary location where the package is to be downloaded as a .kmp file.
-   */
-  public func preparePackageDownload(kmpFileName: String) -> URL? {
-    // package name is filename minus .kmp extension
-    let packageName = kmpFileName.replacingOccurrences(of: kmpFileExtension, with: "")
-    
-    let packageDownload = PackageDownload(filename: kmpFileName, packageName: packageName, packageRepo: self.packageRepository, installedPackages: self.installedPackages)
-
-    self.packageDownload = packageDownload
-    return packageDownload.temporaryKmpFileLocation
-  }
-  
-  /**
-   * Called by the WebView Coordinator after the download is complete.
-   * Delegates to the PackageDownload instance to decide whether the package should be installed.
-   */
-  public func packageDownloadComplete(kmpFileUrl: URL) {
-    print ("packageDownloadComplete \(kmpFileUrl)")
-
-    self.packageDownload?.packageDownloadComplete(for: kmpFileUrl)
-  }
-
-  /**
-   * The package is approved for installation, so add it to the package list and update the UserDefaults for enabled keyboards
-   */
-  func addInstalledPackage() {
-    if let package = self.packageDownload?.packageToInstall {
-      self.installedPackages.append(package)
-      self.addEnabledKeyboards(for: package)
-    }
-  }
-  
-  /**
-   * The package is approved for installation, so replace the package of the same name in the package list.
-   * Also update the UserDefaults for enabled keyboards because the new package is enabled by default, and the existing may be disabled
-   */
-  func replaceInstalledPackage() {
-    if let package = self.packageDownload?.packageToInstall {
-      if let index = self.installedPackages.firstIndex(where: { $0.packageName == package.packageName }) {
-        self.installedPackages[index] = package
-        self.addEnabledKeyboards(for: package)
-      } else {
-        print("Error: package '\(package.packageName)' not found for replacement")
-      }
-    }
   }
   
   /**
