@@ -131,12 +131,14 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
   public set ui(module: UIModule) {
     if(this._ui) {
+      this.legacyAPIEvents.callEvent('unloaduserinterface', {});
       this._ui.shutdown();
     }
 
     this._ui = module;
-    if(this.config.deferForInitialization.isFulfilled) {
+    if(module && this.config.deferForInitialization.isFulfilled) {
       module.initialize();
+      this.legacyAPIEvents.callEvent('loaduserinterface', {});
     }
   }
 
@@ -716,8 +718,6 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     this.core.languageProcessor.shutdown();
     this.hardKeyboard.shutdown();
     this.util.shutdown(); // For tracked dom events, stylesheets.
-
-    this.legacyAPIEvents.callEvent('unloaduserinterface', {});
-    this.ui?.shutdown();
+    this.ui = undefined; // will shutdown and call event listeners
   }
 }
