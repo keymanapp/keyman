@@ -10,7 +10,6 @@
 
 using namespace km::core;
 using namespace kmx;
-using namespace km::vkey;
 
 const km_core_cu *km::core::kmx::u16chr(const km_core_cu *p, km_core_cu ch) {
   while (*p) {

@@ -11,7 +11,6 @@
 #include "utfcodec.hpp"
 
 using namespace km::core::kmx;
-using namespace km::vkey;
 
 TEST(KMXPlusTest, test_COMP_KMXPLUS_KEYS_KEY) {
   COMP_KMXPLUS_KEYS_KEY e[2] = {

@@ -18,7 +18,6 @@
 #include "../load_kmx_file.hpp"
 
 using namespace km::core::kmx;
-using namespace km::vkey;
 
 km_core_option_item test_env_opts[] =
 {

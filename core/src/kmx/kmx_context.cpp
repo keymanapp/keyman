@@ -6,7 +6,6 @@
 
 using namespace km::core;
 using namespace kmx;
-using namespace km::vkey;
 
 /* KMX_Context */
 

@@ -7,9 +7,6 @@
 
 #pragma once
 
-namespace km {
-namespace vkey {
-
 #define VK_LBUTTON 0x01
 #define VK_RBUTTON 0x02
 #define VK_CANCEL 0x03
@@ -156,6 +153,3 @@ namespace vkey {
 #define VK_OEM_8 0xDF
 #define VK_OEM_102 0xE2
 #define VK_OEM_CLEAR 0xFE
-
-}  // namespace vkey
-}  // namespace km

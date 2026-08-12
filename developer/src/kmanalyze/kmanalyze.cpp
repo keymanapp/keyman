@@ -9,8 +9,6 @@
 #include <locale>
 #include "../../../common/include/km_vkey.h"
 
-using namespace km::vkey;
-
 BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard);
 
 void Err(const char *p);

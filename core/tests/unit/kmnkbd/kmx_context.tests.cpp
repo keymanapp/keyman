@@ -16,7 +16,6 @@
 #include <test_assert.h>
 
 using namespace km::core::kmx;
-using namespace km::vkey;
 using namespace std;
 
 void

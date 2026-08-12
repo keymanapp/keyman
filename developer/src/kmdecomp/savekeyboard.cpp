@@ -35,8 +35,6 @@
 #include "../../../common/include/vkeys.h"
 #include "../../../common/include/km_vkey.h"
 
-using namespace km::vkey;
-
 #define SSN__PREFIX		L"&"
 
 const char *UTF16Sig = "\xFF\xFE";
