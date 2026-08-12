@@ -12,6 +12,8 @@ import KeymanSettings
 struct ConfigDebugView: View {
   @EnvironmentObject var settings: SettingsContainer
   @State private var isShowingSheet = false
+  
+  // for drag and drop package installation
   @State private var dropError: DropKmpError?
   @State private var isShowingDropKmpAlert = false
   @State private var alertMessage = ""
@@ -46,7 +48,7 @@ struct ConfigDebugView: View {
       }
 
       VStack {
-        Text(settings.dropStatusMessage)
+        Text("Drag a single .kmp archive here")
           .font(.system(.body, design: .monospaced))
           .multilineTextAlignment(.center)
           .padding()
