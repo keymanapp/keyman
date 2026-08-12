@@ -329,7 +329,7 @@ export class Flick implements GestureHandler {
     return distribution.sort((a, b) => b.p - a.p);
   }
 
-  currentStageKeyDistribution(baseDistMap: CorrectionDistanceMap): KeyDistribution {
+  currentStageKeyDistribution(baseDistanceMap: CorrectionDistanceMap): KeyDistribution {
     const baseSpec = this.baseSpec;
     const baseDistances = this.baseKeyDistances;
     const flickDistrib = this.computedFlickDistribution;

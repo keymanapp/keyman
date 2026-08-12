@@ -77,7 +77,7 @@ export class Modipress implements GestureHandler {
 
   readonly hasModalVisualization = false;
 
-  currentStageKeyDistribution(baseDistMap: CorrectionDistanceMap): KeyDistribution {
+  currentStageKeyDistribution(baseDistanceMap: CorrectionDistanceMap): KeyDistribution {
     return null;
   }
 }
