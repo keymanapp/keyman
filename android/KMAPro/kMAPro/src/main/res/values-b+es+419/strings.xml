@@ -129,9 +129,9 @@
   <!-- Context: Keyman Settings menu -->
   <string name="show_send_crash_report" comment="permission for sending crash reports">Informes de errores automáticos</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="show_send_crash_report_on" comment="Description when toggle is on">Allow error reports to be sent to Keyman team</string>
+  <string name="show_send_crash_report_on" comment="Description when toggle is on">Permitir que se envíen los informes de errores al equipo Keyman</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="show_send_crash_report_off" comment="Description when toggle is off">Error reports are not sent to Keyman team</string>
+  <string name="show_send_crash_report_off" comment="Description when toggle is off">Los informes de error no se envían al equipo Keyman</string>
   <!-- Context: Main drawer menu -->
   <string name="drawer_menu_help" comment="Help drawer item title">Guía de usuario</string>
   <string name="drawer_menu_update_keyboards" comment="Drawer action to update installed keyboards">Actualizar teclados</string>
