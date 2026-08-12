@@ -1250,6 +1250,10 @@ export function assembleTransforms(stackedInserts: string[], stackedDeletes: num
  * @returns
  */
 export function determineTaillessTrueKeystroke(tokenizedInput: Map<number, Transform>) {
+  if(!tokenizedInput || tokenizedInput.size == 0) {
+    throw new Error(`tokenizedInput must not be nullish or empty; even an empty transform should have an entry`);
+  }
+
   // undefined by default; we haven't yet determined if we're still affecting
   // the same token that was the tail in the previous tokenization state.
   let taillessTrueKeystroke: Transform;
