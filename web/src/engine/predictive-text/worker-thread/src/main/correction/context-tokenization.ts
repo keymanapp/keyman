@@ -531,10 +531,13 @@ export class ContextTokenization {
       transformMap.forEach((v) => v.id = transform.id);
     }
 
-    // If there's an empty transform in the 0 position and we already know we're
-    // dropping tokens - and only deleting - we're dropping an
-    // otherwise-untracked empty token - make sure it's included!
-    const droppedFinalTransform = baseRemovedTokenCount > 0 && transform.insert == '' && TransformUtils.isEmpty(transformMap.get(0));
+    // If there's an empty transform in the final token's position and we
+    // already know we're dropping tokens - and only deleting - we're dropping
+    // an otherwise-untracked empty token - make sure it's included!
+    const droppedFinalTransform = baseRemovedTokenCount > 0
+      && transform.insert == ''
+      && TransformUtils.isEmpty(transformMap.get(0))
+      && shiftDeletes;
     // Past that, if we have more delete entries than insert entries for our transforms, we
     // dropped some tokens outright.
     const removedTokenCount = baseRemovedTokenCount + (droppedFinalTransform ? 1 : 0);
