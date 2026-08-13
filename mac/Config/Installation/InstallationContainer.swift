@@ -28,7 +28,7 @@ public class InstallationContainer : ObservableObject {
   }
   
   var installationState: InstallationState? {
-    self.installationCheck.installationState
+    return self.installationCheck.installationState
   }
 
   fileprivate let installationCheck: InstallationCheck
@@ -284,8 +284,8 @@ public class InstallationContainer : ObservableObject {
   }
 
   /**
-    * Record that the installation complete view has been shown to the user
-    */
+   * Record that the installation complete view has been shown to the user
+   */
   public func setHasDisplayedInstallationComplete() {
     if let existingState = self.installationState {
       let updatedState = InstallationState.createCopy(from: existingState)
@@ -296,25 +296,25 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
-    * Return whether the installation complete view has been shown to the user
-    */
-   func getHasDisplayedInstallationComplete() -> Bool {
-     guard let state = self.installationState else { return false }
-
-     return state.hasDisplayedInstallComplete
-   }
-
+   * Return whether the installation complete view has been shown to the user
+   */
+  func getHasDisplayedInstallationComplete() -> Bool {
+    guard let state = self.installationState else { return false }
+    
+    return state.hasDisplayedInstallComplete
+  }
+  
   /**
-    * Write the time that the user was requested to restart their machine
-    */
-   func writeRestartRequestTime() {
-     if let existingState = self.installationState {
-       let updatedState = InstallationState.createCopy(from: existingState)
-       updatedState.dateRestartRequested = Date()
-       self.installationCheck.installationState = updatedState
-       self.writeInstallationState()
-     }
-   }
+   * Write the time that the user was requested to restart their machine
+   */
+  func writeRestartRequestTime() {
+    if let existingState = self.installationState {
+      let updatedState = InstallationState.createCopy(from: existingState)
+      updatedState.dateRestartRequested = Date()
+      self.installationCheck.installationState = updatedState
+      self.writeInstallationState()
+    }
+  }
 
   /**
    * Read the time that the user was requested to restart their machine

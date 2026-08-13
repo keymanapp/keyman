@@ -31,7 +31,7 @@ public class InstallationState {
    * Returns true if the tasks list is empty, but it should never be empty.
    */
   public var isComplete: Bool {
-    tasks.allSatisfy(\.isComplete)
+    return tasks.allSatisfy(\.isComplete)
   }
 
   /**

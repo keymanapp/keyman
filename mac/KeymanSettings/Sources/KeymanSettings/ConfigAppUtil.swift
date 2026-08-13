@@ -20,7 +20,7 @@ public struct ConfigAppUtil {
       // (not in the group container UserDefaults), then use it instead
       return configTestVersion
     } else {
-      // get the actual version number from the applicaiton bundle
+      // get the actual version number from the application bundle
       return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
     }
   }
