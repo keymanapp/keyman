@@ -9,7 +9,7 @@ keyboard).
 
 ## Syntax
 
-```javascript
+```js
 keyman.addEventListener('keyboardregistered', function(keyboardProperties) {
   ...
 });

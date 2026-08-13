@@ -8,13 +8,13 @@ title: ifStore (KIFS)
 
 ## Syntax
 
-```c
+```js
 keyman.interface.ifStore(systemId, strValue, Pelem);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KIFS(systemId, strValue, Pelem);
 ```
 
