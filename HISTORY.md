@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.266 alpha 2026-08-13
+
+* chore(deps-dev): bump esbuild from 0.25.0 to 0.28.1 (#16095)
+* feat(web): add `keyman.versionInfo` API (#16351)
+* chore(common): cleanup and merge Preprocessor constants (#14360)
+
 ## 19.0.265 alpha 2026-08-12
 
 * fix(core): make coherence check a debug assert (#16343)
