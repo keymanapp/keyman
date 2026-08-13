@@ -17,6 +17,7 @@ export interface LDMLKeyboardXMLSourceFile {
 export interface LKKeyboard {
   locale?: string;
   conformsTo?: string;
+  draft?: string;
 
   locales?: LKLocales;
   version?: LKVersion;
