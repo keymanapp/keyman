@@ -8,7 +8,7 @@ Get absolute position and size of OSK window.
 
 ## Syntax
 
-```c
+```js
 keyman.osk.getRect()
 ```
 

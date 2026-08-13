@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.265 alpha 2026-08-12
+
+* fix(core): make coherence check a debug assert (#16343)
+* feat(windows): honour Windows "metered connection" flag for downloading updates (#16099)
+
 ## 19.0.264 alpha 2026-08-11
 
 * docs(android): update keyboardharness readme (#16220)

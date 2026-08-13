@@ -8,7 +8,7 @@ Called when an input element loses focus.
 
 ## Syntax
 
-```javascript
+```js
 keyman.addEventListener('controlblurred', function(eventProperties) {
   ...
 });
