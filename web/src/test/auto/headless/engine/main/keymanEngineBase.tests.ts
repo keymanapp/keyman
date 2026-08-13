@@ -61,5 +61,9 @@ describe('KeymanEngineBase', function () {
 
     assert.match(keyman.versionInfo.version, /^\d+\.\d+\.\d+$/);
     assert.equal(keyman.versionInfo.version, KEYMAN_VERSION.VERSION);
+
+    // see builder-basic.inc.sh for details on how VERSION_WITH_TAG is constructed
+    assert.match(keyman.versionInfo.full, /^\d+\.\d+\.\d+(-(alpha|beta))?(-(local|(test(-.+)?)))?$/);
+    assert.equal(keyman.versionInfo.full, KEYMAN_VERSION.VERSION_WITH_TAG);
   });
 });
