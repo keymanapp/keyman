@@ -63,7 +63,7 @@ describe('KmnFileWriter', function () {
 
     it(('writeKmnFileHeader should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
       const writtenCorrectName = sutW.writeKmnFileHeader(converted);
-      assert.equal(writtenCorrectName, (outExpectedFirst + converted.keylayoutFilename + outExpectedLast));
+      assert.equal(writtenCorrectName, (outExpectedFirst + (converted?.keylayoutFilename ?? "") + outExpectedLast));
     });
   });
 
@@ -85,7 +85,7 @@ describe('KmnFileWriter', function () {
       [''],
       ['c WARNING: unavailable modifier ']],
 
-      [[new Rule("C2", '', '', 0, 0, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'UNAVAILABLE', 'K_C', new TextEncoder().encode('C'),)],
+      [[new Rule("C2", '', '', 1, 1, 'UNAVAILABLE_dk', 'K_EQUAL', 2, 2, 'UNAVAILABLE', 'K_C', new TextEncoder().encode('C'),)],
       [''],
       ['c WARNING: unavailable modifier '],
       ['c WARNING: unavailable modifier ']],
@@ -112,13 +112,14 @@ describe('KmnFileWriter', function () {
 
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('rule " ' + (values[0][0] as Rule).ruleType as string + ' "') + 'should create "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 0);
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 0).warningMessages;
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
       });
     });
   });
+
 
   describe('reviewRules messages duplicate and ambiguous', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
@@ -277,7 +278,7 @@ describe('KmnFileWriter', function () {
 
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 1);
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 1).warningMessages;
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -297,7 +298,7 @@ describe('KmnFileWriter', function () {
     ["c WARNING: ambiguous rule later: [RALT K_B]  >  dk(A0) ambiguous rule earlier: [RALT K_B]  >  'X' PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  "]],
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
-        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 2);
+        const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 2).warningMessages;
         assert.equal(result[0], values[1][0]);
         assert.equal(result[1], values[2][0]);
         assert.equal(result[2], values[3][0]);
@@ -407,7 +408,31 @@ describe('KmnFileWriter', function () {
       });
     });
   });
-
+describe('writeCharacterOrUnicode and return values', function () {
+    const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
+    [
+      ["A", "A", "Msg "],
+      ["ሴ", "ሴ", "Msg "],
+      ["😀", "😀", "Msg "],
+      ["ẘ", "ẘ", "Msg "],
+      ["U+0001", "U+0001", "Msg Use of a control character "],
+      ["U+0061", "a", "Msg "],
+      ["&#x0002;", "U+0002", "Msg Use of a control character "],
+      ["&#x1234;", 'ሴ', "Msg "],
+      ["&#0003;", "U+0003", "Msg Use of a control character "],
+      ["&#4666;", "ሺ", "Msg "],
+      ["", "U+0006", "Msg Use of a control character "],
+      ['', '', 'Msg empty output or unsupported numerical html entity: '],
+    ].forEach(function (values) {
+      it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
+        const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg ");
+        assert.isNotNull(result);
+        assert.equal(result.character, values[1]);
+        assert.equal(result.message, values[2]);
+      });
+    });
+  });
+     
   describe('UnicodeCharacterConversion processXmlValue', function () {
     [
       ["", ''],

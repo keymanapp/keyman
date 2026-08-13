@@ -28,6 +28,51 @@ describe('KeylayoutFileReader', function () {
       const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
       assert.isTrue(validated);
     });
+      // TODO-KMC-CONVERT; Do we need these 6 tests?
+    it('validate() should return false on inputfile with unknown tags', async function () {
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const inputFilename = makePathToFixture('../data/Test_unknownTags.keylayout');
+      const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      assert.isFalse(validated);
+    });
+
+    it('validate() should return false on inputfile with additional tags', async function () {
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const inputFilename = makePathToFixture('../data/Test_additionalTags.keylayout');
+      const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      assert.isFalse(validated);
+    });
+    it('validate() should return false on inputfile with missing tags', async function () {
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const inputFilename = makePathToFixture('../data/Test_missingTags.keylayout');
+      const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      assert.isFalse(validated);
+    });
+    it('validate() should return false on no entries in action-when', async function () {
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const inputFilename = makePathToFixture('../data/Test_noActionWhen.keylayout');
+      const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      assert.isFalse(validated);
+    });
+    it('validate() should return false on null as input', async function () {
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const inputFilename = makePathToFixture('../data/Test_noActionWhen.keylayout');
+      //const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+      const validated = sutR.validate(null, inputFilename);
+      assert.isFalse(validated);
+    });
+    it('validate() should return false on undefined as input', async function () {
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const inputFilename = makePathToFixture('../data/Test_noActionWhen.keylayout');
+      //const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+      const validated = sutR.validate(undefined, inputFilename);
+      assert.isFalse(validated);
+    });
+  });
 
     it('validate() should return false on inputfile with unknown tags', async function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
@@ -144,11 +189,12 @@ describe('KeylayoutFileReader', function () {
       });
     });
   });
-
+  // TODO-KMC-CONVERT: Do we need all tests here? 
   describe('checkForCorrespondingElements ', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     [
       ['../data/Test.keylayout', true],
+      ['../data/Test_sameKeyMapAndKeyMapselectAndJisERROR.keylayout', true],
       ['../data/Test_moreKeymapSelectThanKeymapERROR.keylayout', false],
       ['../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout', false],
       ['../data/Test_moreKeyMapThanKeyMapselectAndJisERROR.keylayout', false],
@@ -171,7 +217,7 @@ describe('KeylayoutFileReader', function () {
       const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(binaryData);
 
       assert.isNotNull(result);
-      assert.isTrue(result.keyboard !== null);
+      assert.notEqual(result.keyboard, null);
 
       for (let i = 0; i < result.keyboard.layouts.length; i++) {
         assert.isTrue(result.keyboard.layouts[i].layout.length > 0);
@@ -183,8 +229,8 @@ describe('KeylayoutFileReader', function () {
         for (let j = 0; j < result.keyboard.keyMapSet[i].keyMap.length; j++) {
           assert.isTrue(result.keyboard.keyMapSet[i].keyMap[j].key.length > 0);
           for (let k = 0; k < result.keyboard.keyMapSet[i].keyMap[j].key.length; k++) {
-            assert.isTrue(result.keyboard.keyMapSet[i].keyMap[j].key[k]['action'] !== null
-              || result.keyboard.keyMapSet[i].keyMap[j].key[k]['output'] !== null);
+            assert.isNotNull(result.keyboard.keyMapSet[i].keyMap[j].key[k]['action']);
+            assert.isNotNull(result.keyboard.keyMapSet[i].keyMap[j].key[k]['output']);
           }
         }
       }
@@ -199,8 +245,8 @@ describe('KeylayoutFileReader', function () {
       for (let i = 0; i < result.keyboard.modifierMap.length; i++) {
         assert.isTrue(result.keyboard.modifierMap[i].keyMapSelect.length > 0);
         for (let j = 0; j < result.keyboard.keyMapSet.length; j++) {
-          assert.isTrue(result.keyboard.keyMapSet[j].keyMap.length
-            === result.keyboard.modifierMap[i].keyMapSelect.length);
+          assert.equal(result.keyboard.keyMapSet[j].keyMap.length,
+            result.keyboard.modifierMap[i].keyMapSelect.length);
         }
       }
     });

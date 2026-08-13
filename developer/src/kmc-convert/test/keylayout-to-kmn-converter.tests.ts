@@ -97,7 +97,8 @@ describe('KeylayoutToKmnConverter', function () {
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         await sut.run(makePathToFixture(files[0]));
-        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.isTrue(compilerTestCallbacks.messages.length === 0);
+
       });
     });
   });
