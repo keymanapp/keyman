@@ -252,4 +252,3 @@ describe('KeylayoutFileReader', function () {
     });
 
   });
-});
