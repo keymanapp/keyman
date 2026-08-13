@@ -13,10 +13,10 @@ import { KMWString } from 'keyman/common/web-utils';
 import { ContextToken, ContextTokenLike } from './context-token.js';
 import { TransformUtils } from '../transformUtils.js';
 import { computeDistance, EditOperation, EditTuple } from './classical-calculation.js';
-import { determineModelTokenizer } from '../model-helpers.js';
-import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
 import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { LegacyQuotientSpur } from './legacy-quotient-spur.js';
+import { determineModelTokenizer } from '../model-helpers.js';
+import { ExtendedEditOperation, SegmentableDistanceCalculation } from './segmentable-calculation.js';
 import { PathInputProperties } from './search-quotient-node.js';
 import { TransitionEdge } from './tokenization-subsets.js';
 
@@ -155,6 +155,11 @@ export interface TokenizationTransitionEdits {
    * the end of the original context's tail token.
    */
   tokenizedTransform: Map<number, Transform>;
+
+  /**
+   * Indicates that this tokenization-transition handles a backspace transform.
+   */
+  isBksp?: boolean;
 }
 
 /**
@@ -826,6 +831,7 @@ export function mapWhitespacedTokenization(
       removedTokenCount
     },
     tokenizedTransform: transformMap,
+    isBksp: TransformUtils.isBackspace(transform)
   };
 }
 

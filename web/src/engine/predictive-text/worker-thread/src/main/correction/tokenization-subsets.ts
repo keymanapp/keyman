@@ -35,6 +35,11 @@ export interface TransitionEdge {
   inputs: Distribution<Map<number, Transform>>
 
   /**
+   * Indicates that the modeled transition handles a raw BKSP.
+   */
+  isBksp?: boolean;
+
+  /**
    * A unique identifier associated with this TransitionEdge and its
    * transforms within `SearchSpace`s.  This ID assists with detecting when
    * split transforms are re-merged during SearchSpace merges.  Only
@@ -103,6 +108,10 @@ export function editKeyer(precomputation: TokenizationTransitionEdits): string[]
     components.push('UE:' + unmappedEdits.map((edit) => {
       return `${edit.op}(${edit.input ?? ''}-${edit.match ?? ''}`;
     }).join(','));
+  }
+
+  if(precomputation.isBksp) {
+    components.push('ISBKSP');
   }
 
   return components;
@@ -243,7 +252,8 @@ export class TokenizationSubsetBuilder {
     const forTokenization: TransitionEdge = entry.transitionEdges.get(tokenization) ?? {
       alignment: precomputation.alignment,
       inputs: [],
-      inputSubsetId: generateSubsetId()
+      inputSubsetId: generateSubsetId(),
+      isBksp: precomputation.isBksp
     };
 
     // Adds the incoming tokenized transform data for the pairing...

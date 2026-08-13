@@ -26,6 +26,23 @@ describe('ModelCompositor', function() {
         {wordBreaker: wordBreakers.default}
       );
 
+      it('properly handles a context-reset sequence', async () => {
+        const compositor = new ModelCompositor(plainModel, true);
+
+        const context = {
+          left: 'appl',
+          startOfBuffer: true,
+          endOfBuffer: true
+        };
+        const resetTransitionID = 3;
+        compositor.resetContext(context, resetTransitionID);
+
+        const results = await compositor.predict([{sample: {insert: '', deleteLeft: 0, id: resetTransitionID}, p: 1}], context);
+
+        // returns a keep + "applied"
+        assert.isAbove(results.length, 0);
+      });
+
       it('does not correct when corrections are disabled', async function() {
         const compositor = new ModelCompositor(plainModel, true);
 
@@ -533,6 +550,71 @@ describe('ModelCompositor', function() {
   });
 
   describe('Prediction with legacy Models (12.0 / 13.0)', function() {
+    it('properly handles a context-reset sequence', async () => {
+      const dummiedModel = new models.DummyModel({
+        futureSuggestions: [
+          [{
+            transform: { insert: 'e', deleteLeft: 0 },
+            displayAs: "apple",
+            id: 1,
+            p: 0.7
+          }, {
+            transform: { insert: 'y', deleteLeft: 0 },
+            displayAs: "apply",
+            id: 2,
+            p: 0.3
+          }]
+        ]
+      });
+
+      const compositor = new ModelCompositor(dummiedModel, true);
+
+      const context = {
+        left: 'appl',
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+      const resetTransitionID = 3;
+      compositor.resetContext(context, resetTransitionID);
+
+      const results = await compositor.predict([{sample: {insert: '', deleteLeft: 0, id: resetTransitionID}, p: 1}], context);
+
+      assert.isAbove(results.length, 0);
+    });
+
+    it('annotates suggestions with the original suggestion ID', async function () {
+      var model = new models.DummyModel({
+        futureSuggestions: [
+          [], [{
+            transform: { insert: 'e', deleteLeft: 0 },
+            displayAs: "the",
+            id: 1,
+            p: 0.7
+          }], [{
+            transform: { insert: 'ree', deleteLeft: 0},
+            displayAs: "three",
+            id: 2,
+            p: 0.3
+          }]
+        ]
+      });
+      let compositor = new ModelCompositor(model, true);
+
+      // Initialize context
+      const EXPECTED_TRANSITION_ID = 0; // Even 0 should be handled correctly.
+      let context = {
+        left: 'th', startOfBuffer: false, endOfBuffer: true,
+      };
+      await compositor.predict({insert: '', deleteLeft: 0, id: EXPECTED_TRANSITION_ID-1}, context);
+
+      // Pretend to fat finger "the" as "thr"
+      const the = { sample: { insert: 'r', deleteLeft: 0, id: EXPECTED_TRANSITION_ID }, p: 0.45 };
+      const thr = { sample: { insert: 'e', deleteLeft: 0, id: EXPECTED_TRANSITION_ID }, p: 0.55 };
+      const suggestions = await compositor.predict([thr, the], context);
+
+      suggestions.forEach((s) => assert.equal(s.transform.id, EXPECTED_TRANSITION_ID));
+    });
+
     it('should compose suggestions from a fat-fingered keypress (no keying needed)', async function () {
       var model = new models.DummyModel({
         futureSuggestions: [

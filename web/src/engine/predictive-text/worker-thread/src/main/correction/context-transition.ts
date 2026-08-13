@@ -161,23 +161,30 @@ export class ContextTransition {
       transformToApply: Transform,
       inputDistribution: Distribution<Transform>
     ) => {
+      const appliesSuggestion = transformToApply == suggestion.transform;
+
       const appliedDistribution = [{sample: transformToApply, p: 1}];
-      const { subsets: applicationSubsets, keyMatchingUserContext } = precomputeTransitions(
+      const { subsets: transitionSubsets, keyMatchingUserContext } = precomputeTransitions(
         [rootTokenization], appliedDistribution
       );
 
       // Filter out insert and delete edges here!  ONLY the primary substitution
       // edge should be permitted!
-      const directSuggestionSubset: typeof applicationSubsets = new Map();
+      let applicationSubsets: typeof transitionSubsets = new Map();
 
-      // When applying suggestions, only consider the actual tokenization that would result.
-      directSuggestionSubset.set(keyMatchingUserContext, applicationSubsets.get(keyMatchingUserContext));
+      const currentContextSubset = transitionSubsets.get(keyMatchingUserContext);
+      if(appliesSuggestion) {
+        // When applying suggestions, only consider the actual tokenization that would result.
+        applicationSubsets.set(keyMatchingUserContext, currentContextSubset);
 
-      // TODO:  verify that 'insert' and 'delete' edit-spurs are ignored (once
-      // they're supported)
+        // TODO:  verify that 'insert' and 'delete' edit-spurs are ignored (once
+        // they're supported)
+      } else {
+        applicationSubsets = transitionSubsets;
+      }
 
       const resultingTokenization = transitionTokenizations(
-        directSuggestionSubset,
+        applicationSubsets,
         appliedDistribution
       ).get(keyMatchingUserContext);
 
