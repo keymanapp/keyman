@@ -262,8 +262,7 @@ public class PackageRepository: PackageRepo {
       throw LoadPackageError.kmpJsonFileNotFound
     }
     
-    // use try without do block
-    // if an error occurs, it will not be handled but propagated to caller
+    // if an error occurs, it will be propagated to caller
     if let source = try readPackage(packageDirectoryUrl: packageDirectoryUrl, kmpFileUrl: kmpJsonFileUrl) {
       packageSource = source
     }

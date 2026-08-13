@@ -46,6 +46,11 @@ public class PackageDownload {
       try self.unzipDownloadedPackage(for: kmpFileUrl)
       try self.handleNewPackage()
     } catch {
+      do {
+        try self.cleanupFailedInstallation()
+      } catch {
+        print("unzipDownloadedPackage failed and cleanup of download files failed")
+      }
       print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
       // MAC-CONFIG-TODO: handle error
       // send notification that installation failed?
@@ -59,7 +64,7 @@ public class PackageDownload {
     try self.packageRepository.unzipKmpFile(at: kmpFileUrl, to: self.temporaryPackageLocation)
     
     // load the unzipped package from the temporary location and save a reference to it
-    let newPackage = try self.packageRepository.loadSinglePackage(packageUrl: self.installPackageLocation)
+    let newPackage = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
     self.packageToInstall = newPackage
   }
   
@@ -127,7 +132,8 @@ public class PackageDownload {
   /**
    * Clean up the downloaded .kmp file and package folder
    */
-  func cancelInstallation() throws {
+  func cleanupFailedInstallation() throws {
+    print("cleanupFailedInstallation of: \(self.temporaryPackageLocation.lastPathComponent)")
     try self.deleteDownloadedKmpFile()
     try self.deleteDownloadedPackage()
   }

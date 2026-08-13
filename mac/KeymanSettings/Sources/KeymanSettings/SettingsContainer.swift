@@ -195,8 +195,9 @@ public class SettingsContainer : ObservableObject {
    */
   public func userCanceledPackageDowngrade() {
     if let download = self.packageDownload {
+      print("user cancelled package downgrade")
       do {
-        try download.cancelInstallation()
+        try download.cleanupFailedInstallation()
       } catch {
         print("downgrade cancelled but failed to cancel installation")
       }
