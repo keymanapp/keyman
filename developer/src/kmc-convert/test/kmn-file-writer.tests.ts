@@ -73,32 +73,32 @@ describe('KmnFileWriter', function () {
       [[new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'UNAVAILABLE', 'K_A', new TextEncoder().encode('A'))],
       [''],
       [''],
-      ['c WARNING: unavailable modifier : here: ']],
+      ['c WARNING: unavailable modifier ']],
 
       [[new Rule("C1", '', '', 0, 0, 'CAPS', 'K_EQUAL', 0, 0, 'UNAVAILABLE', 'K_B', new TextEncoder().encode('B'))],
       [''],
       [''],
-      ['c WARNING: unavailable modifier : here: ']],
+      ['c WARNING: unavailable modifier ']],
 
       [[new Rule("C2", '', '', 0, 0, 'CAPS', 'K_EQUAL', 0, 0, 'UNAVAILABLE', 'K_C', new TextEncoder().encode('C'),)],
       [''],
       [''],
-      ['c WARNING: unavailable modifier : here: ']],
+      ['c WARNING: unavailable modifier ']],
 
       [[new Rule("C2", '', '', 0, 0, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'UNAVAILABLE', 'K_C', new TextEncoder().encode('C'),)],
       [''],
-      ['c WARNING: unavailable modifier : here: '],
-      ['c WARNING: unavailable modifier : here: ']],
+      ['c WARNING: unavailable modifier '],
+      ['c WARNING: unavailable modifier ']],
 
       [[new Rule("C3", 'UNAVAILABLE_prev_dk', 'K_D', 0, 0, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
-      ['c WARNING: unavailable modifier : here: '],
-      ['c WARNING: unavailable modifier : here: '],
-      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) : here: ']],
+      ['c WARNING: unavailable modifier '],
+      ['c WARNING: unavailable modifier '],
+      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) ']],
 
       [[new Rule("C3", 'UNAVAILABLE_prev_dk', 'K_D', 0, 0, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'UNAVAIL', 'K_C', new TextEncoder().encode('D'),)],
-      ['c WARNING: unavailable modifier : here: '],
-      ['c WARNING: unavailable modifier : here: '],
-      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) : unavailable modifier : here: ']],
+      ['c WARNING: unavailable modifier '],
+      ['c WARNING: unavailable modifier '],
+      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) unavailable modifier ']],
 
       [[new Rule("C3", 'CAPS', 'K_D', 0, 0, 'RALT', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
       [''],
@@ -106,9 +106,9 @@ describe('KmnFileWriter', function () {
       ['']],
 
       [[new Rule("C3", 'X', 'K_X', 0, 0, 'Y', 'K_Y', 0, 0, 'SHIFT', 'K_Z', new TextEncoder().encode('D'),)],
-      ['c WARNING: unavailable modifier : here: '],
-      ['c WARNING: unavailable modifier : here: '],
-      ['c WARNING: unavailable superior rule ( [Y K_Y]  >  dk(B0) ) : here: ']],
+      ['c WARNING: unavailable modifier '],
+      ['c WARNING: unavailable modifier '],
+      ['c WARNING: unavailable superior rule ( [Y K_Y]  >  dk(B0) ) ']],
 
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('rule " ' + (values[0][0] as Rule).ruleType as string + ' "') + 'should create "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
@@ -127,9 +127,9 @@ describe('KmnFileWriter', function () {
       [[
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),],
-      ['c WARNING: duplicate rule: earlier: [LALT K_A]  >  dk(C0) here: '],
-      ["c WARNING: duplicate rule: earlier: dk(B0) + [SHIFT K_B]  >  dk(B0) here: "],
-      ["c WARNING: duplicate rule: earlier: dk(B0) + [CAPS K_C]  >  'X' here: "]],
+      ['c WARNING: duplicate rule earlier: [LALT K_A]  >  dk(C0) '],
+      ["c WARNING: duplicate rule earlier: dk(B0) + [SHIFT K_B]  >  dk(B0) "],
+      ["c WARNING: duplicate rule earlier: dk(B0) + [CAPS K_C]  >  'X' "]],
 
       //6-6 dup
       [[
@@ -137,7 +137,7 @@ describe('KmnFileWriter', function () {
         new Rule("C3", 'CTRL', 'K_D', 0, 0, 'NCAPS', 'K_E', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),],
       [''],
       [""],
-      ["c WARNING: duplicate rule: earlier: dk(B0) + [CAPS K_C]  >  'X' here: "]],
+      ["c WARNING: duplicate rule earlier: dk(B0) + [CAPS K_C]  >  'X' "]],
 
       //6-6 amb
       [[
@@ -145,29 +145,29 @@ describe('KmnFileWriter', function () {
         new Rule("C3", 'CTRL', 'K_D', 0, 0, 'NCAPS', 'K_E', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('Y')),],
       [''],
       [""],
-      ["c WARNING: ambiguous rule: earlier: dk(B0) + [CAPS K_C]  >  'X' here: "]],
+      ["c WARNING: ambiguous rule earlier: dk(B0) + [CAPS K_C]  >  'X' "]],
 
       // 5-5 amb
       [[
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 1, 'RALT', 'K_F', new TextEncoder().encode('X')),],
-      ['c WARNING: duplicate rule: earlier: [LALT K_A]  >  dk(C0) here: '],
-      ["c WARNING: ambiguous rule: earlier: dk(B0) + [NCAPS K_B]  >  dk(B0) here: "], [''],
+      ['c WARNING: duplicate rule earlier: [LALT K_A]  >  dk(C0) '],
+      ["c WARNING: ambiguous rule earlier: dk(B0) + [NCAPS K_B]  >  dk(B0) "], [''],
       ],
 
       // 5-5 dup
       [[
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 0, 'RALT', 'K_F', new TextEncoder().encode('X')),],
-      ['c WARNING: duplicate rule: earlier: [LALT K_A]  >  dk(C0) here: '],
-      ["c WARNING: duplicate rule: earlier: dk(B0) + [NCAPS K_B]  >  dk(B0) here: "],
+      ['c WARNING: duplicate rule earlier: [LALT K_A]  >  dk(C0) '],
+      ["c WARNING: duplicate rule earlier: dk(B0) + [NCAPS K_B]  >  dk(B0) "],
       ['']],
 
       // 4-2 amb
       [[
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C2", '', '', 0, 0, 'LALT', 'K_A', 0, 0, 'RALT', 'K_F', new TextEncoder().encode('X')),],
-      ['c WARNING: ambiguous rule: later: [LALT K_A]  >  dk(C0) here: '],
+      ['c WARNING: ambiguous rule later: [LALT K_A]  >  dk(C0) '],
       [''],
       ['']],
 
@@ -175,7 +175,7 @@ describe('KmnFileWriter', function () {
       [[
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'LALT', 'K_A', 1, 1, 'NCAPS', 'K_E', 0, 0, 'RALT', 'K_F', new TextEncoder().encode('Y')),],
-      ['c WARNING: ambiguous rule: earlier: [LALT K_A]  >  dk(C0) here: '],
+      ['c WARNING: ambiguous rule earlier: [LALT K_A]  >  dk(C0) '],
       [""],
       [''],],
 
@@ -183,7 +183,7 @@ describe('KmnFileWriter', function () {
       [[
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_E', 0, 0, 'RALT', 'K_F', new TextEncoder().encode('X')),],
-      ['c WARNING: duplicate rule: earlier: [LALT K_A]  >  dk(C0) here: '],
+      ['c WARNING: duplicate rule earlier: [LALT K_A]  >  dk(C0) '],
       [''],
       ['']],
 
@@ -191,7 +191,7 @@ describe('KmnFileWriter', function () {
       [[
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C2", '', '', 0, 0, 'LALT', 'K_A', 0, 0, 'RALT', 'K_F', new TextEncoder().encode('Y')),],
-      ['c WARNING: ambiguous rule: later: [LALT K_A]  >  dk(C0) here: '],
+      ['c WARNING: ambiguous rule later: [LALT K_A]  >  dk(C0) '],
       [''],
       ['']],
 
@@ -200,7 +200,7 @@ describe('KmnFileWriter', function () {
         new Rule("C2", '', '', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'CTRL', 'K_D', 0, 0, 'NCAPS', 'K_E', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),],
       [''],
-      ["c WARNING: duplicate rule: earlier: dk(C0) + [CAPS K_C]  >  'X' here: "],
+      ["c WARNING: duplicate rule earlier: dk(C0) + [CAPS K_C]  >  'X' "],
       [''],],
 
       // 6-3 amb
@@ -208,14 +208,14 @@ describe('KmnFileWriter', function () {
         new Rule("C2", '', '', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'CTRL', 'K_D', 0, 0, 'NCAPS', 'K_E', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('Y')),],
       [''],
-      ["c WARNING: ambiguous rule: earlier: dk(C0) + [CAPS K_C]  >  'X' here: "],
+      ["c WARNING: ambiguous rule earlier: dk(C0) + [CAPS K_C]  >  'X' "],
       [''],],
 
       // 2-4 amb
       [[
         new Rule("C2", '', '', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'SHIFT', 'K_B', 0, 0, 'NCAPS', 'K_E', 0, 0, 'RALT', 'K_F', new TextEncoder().encode('Y')),],
-      ['c WARNING: ambiguous rule: earlier: [SHIFT K_B]  >  dk(A0) here: '],
+      ['c WARNING: ambiguous rule earlier: [SHIFT K_B]  >  dk(A0) '],
       [''],
       ['']],
 
@@ -224,7 +224,7 @@ describe('KmnFileWriter', function () {
         new Rule("C2", '', '', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C2", '', '', 0, 0, 'SHIFT', 'K_B', 1, 1, 'RALT', 'K_F', new TextEncoder().encode('Y')),],
       [''],
-      ['c WARNING: ambiguous rule: earlier: [SHIFT K_B]  >  dk(C0) here: '],
+      ['c WARNING: ambiguous rule earlier: [SHIFT K_B]  >  dk(C0) '],
       ['']],
 
       // 2-2 dup
@@ -232,7 +232,7 @@ describe('KmnFileWriter', function () {
         new Rule("C2", '', '', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C2", '', '', 0, 0, 'SHIFT', 'K_B', 0, 0, 'RALT', 'K_F', new TextEncoder().encode('Y')),],
       [''],
-      ['c WARNING: duplicate rule: earlier: [SHIFT K_B]  >  dk(C0) here: '],
+      ['c WARNING: duplicate rule earlier: [SHIFT K_B]  >  dk(C0) '],
       ['']],
 
       // 3-3 dup
@@ -241,7 +241,7 @@ describe('KmnFileWriter', function () {
         new Rule("C2", '', '', 0, 0, 'NCAPS', 'K_E', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),],
       [''],
       [''],
-      ["c WARNING: duplicate rule: earlier: dk(A0) + [CAPS K_C]  >  'X' here: "]],
+      ["c WARNING: duplicate rule earlier: dk(A0) + [CAPS K_C]  >  'X' "]],
 
       // 3-3 amb
       [[
@@ -249,7 +249,7 @@ describe('KmnFileWriter', function () {
         new Rule("C2", '', '', 0, 0, 'NCAPS', 'K_E', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('Y')),],
       [''],
       [''],
-      ["c WARNING: ambiguous rule: earlier: dk(A0) + [CAPS K_C]  >  'X' here: "]],
+      ["c WARNING: ambiguous rule earlier: dk(A0) + [CAPS K_C]  >  'X' "]],
 
       // 2-1 amb
       [[
@@ -257,7 +257,7 @@ describe('KmnFileWriter', function () {
         new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'RALT', 'K_B', new TextEncoder().encode('Y'))],
       [''],
       [''],
-      ['c WARNING: ambiguous rule: later: [RALT K_B]  >  dk(A0) here: ']],
+      ['c WARNING: ambiguous rule later: [RALT K_B]  >  dk(A0) ']],
 
       // 1-1 amb
       [[
@@ -265,7 +265,7 @@ describe('KmnFileWriter', function () {
         new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('Y'))],
       [''],
       [''],
-      ["c WARNING: ambiguous rule: earlier: [CAPS K_C]  >  'X' here: "]],
+      ["c WARNING: ambiguous rule earlier: [CAPS K_C]  >  'X' "]],
 
       // 1-1 amb
       [[
@@ -273,7 +273,7 @@ describe('KmnFileWriter', function () {
         new Rule("C0", '', '', 0, 0, '', '', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X'))],
       [''],
       [''],
-      ["c WARNING: duplicate rule: earlier: [CAPS K_C]  >  'X' here: "]],
+      ["c WARNING: duplicate rule earlier: [CAPS K_C]  >  'X' "]],
 
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
@@ -294,7 +294,7 @@ describe('KmnFileWriter', function () {
     ],
     [''],
     [''],
-    ["c WARNING: ambiguous rule: later: [RALT K_B]  >  dk(A0) ambiguous rule: earlier: [RALT K_B]  >  'X' here: PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  "]],
+    ["c WARNING: ambiguous rule later: [RALT K_B]  >  dk(A0) ambiguous rule earlier: [RALT K_B]  >  'X' PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  "]],
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
         const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 2);
