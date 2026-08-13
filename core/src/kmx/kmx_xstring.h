@@ -25,12 +25,12 @@ const km_core_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
  * @brief True if a lead surrogate
  * \def Uni_IsSurrogate1
  */
-#define Uni_IsSurrogate1(ch) ((ch) >= km::core::kmx::Uni_LEAD_SURROGATE_START && (ch) <= km::core::kmx::Uni_LEAD_SURROGATE_END)
+#define Uni_IsSurrogate1(ch) ((km_core_usv)(ch) >= (km_core_usv)km::core::kmx::Uni_LEAD_SURROGATE_START && (km_core_usv)(ch) <= (km_core_usv)km::core::kmx::Uni_LEAD_SURROGATE_END)
 /**
  * @brief True if a trail surrogate
  * \def Uni_IsSurrogate2
  */
-#define Uni_IsSurrogate2(ch) ((ch) >= km::core::kmx::Uni_TRAIL_SURROGATE_START && (ch) <= km::core::kmx::Uni_TRAIL_SURROGATE_END)
+#define Uni_IsSurrogate2(ch) ((km_core_usv)(ch) >= (km_core_usv)km::core::kmx::Uni_TRAIL_SURROGATE_START && (km_core_usv)(ch) <= (km_core_usv)km::core::kmx::Uni_TRAIL_SURROGATE_END)
 
 /**
  * @brief True if any surrogate
@@ -42,7 +42,7 @@ const km_core_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
  * @brief Returns true if BMP (Plane 0)
  * \def Uni_IsBMP
  */
-#define Uni_IsBMP(ch) ((ch) <=  km::core::kmx::Uni_BMP_END)
+#define Uni_IsBMP(ch) ((km_core_usv)(ch) <= (km_core_usv)km::core::kmx::Uni_BMP_END)
 
 /**
  * @brief Convert two UTF-16 surrogates into one UTF-32 codepoint
@@ -50,7 +50,7 @@ const km_core_usv Uni_MAX_CODEPOINT       = 0x10FFFF;
  * @param cl trail surrogate - Uni_IsSurrogate2(cl) must == true
  * \def Uni_SurrogateToUTF
  */
-#define Uni_SurrogateToUTF32(ch, cl) (((ch) - km::core::kmx::Uni_LEAD_SURROGATE_START) * 0x400 + ((cl) - km::core::kmx::Uni_TRAIL_SURROGATE_START) + km::core::kmx::Uni_SMP_START)
+#define Uni_SurrogateToUTF32(ch, cl) (((km_core_usv)(ch) - (km_core_usv)km::core::kmx::Uni_LEAD_SURROGATE_START) * 0x400 + ((km_core_usv)(cl) - (km_core_usv)km::core::kmx::Uni_TRAIL_SURROGATE_START) + (km_core_usv)km::core::kmx::Uni_SMP_START)
 
 /**
  * @brief Convert UTF-32 BMP to UTF-16 BMP
@@ -189,7 +189,7 @@ u32string_to_u16string(const std::u32string &source) {
 }
 
 inline bool Uni_IsEndOfPlaneNonCharacter(km_core_usv ch) {
-  return (((ch) & Uni_FFFE_NONCHARACTER) == Uni_FFFE_NONCHARACTER); // matches FFFF or FFFE
+  return (((ch) & (km_core_usv)Uni_FFFE_NONCHARACTER) == (km_core_usv)Uni_FFFE_NONCHARACTER); // matches FFFF or FFFE
 }
 
 inline bool Uni_IsNoncharacter(km_core_usv ch) {
