@@ -4,7 +4,7 @@
  * Created by Gabriel Schantz on 2026-06-29
  *
  * Main view used for configuring Keyman
- * FEAT/MAC/CONFIG-WINDOW TODO: Set default width and height for window
+ * MAC-CONFIG-TODO: Set default width and height for window
  */
 
 import SwiftUI
@@ -45,7 +45,7 @@ struct MainConfigView: View {
         .sheet(isPresented: $isShowingSheet) {
           InstallKeyboardView()
             .frame(width: 960, height: 390)
-          // FEAT/MAC/CONFIG-WINDOW TODO: Make width and height percentages
+          // MAC-CONFIG-TODO: Make width and height percentages
         }
         
         Form {

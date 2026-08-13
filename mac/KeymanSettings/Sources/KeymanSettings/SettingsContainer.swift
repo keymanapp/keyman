@@ -205,15 +205,6 @@ public class SettingsContainer : ObservableObject {
     self.packageDownload = nil
   }
   
-  // MAC-CONFIG-TODO: delete test code
-  public func debug() {
-    self.installedPackages .forEach { package in
-      package.keyboards.forEach { keyboard in
-        print("\(keyboard.keyboardId) enabled: \(keyboard.enabled)")
-      }
-    }
-  }
-  
   /**
    * for debugging: prints UserDefaults values
    */

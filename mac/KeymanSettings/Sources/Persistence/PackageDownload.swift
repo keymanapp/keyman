@@ -32,7 +32,6 @@ public class PackageDownload {
     // cannot be initialized until after download when packageName of new package is known
     self.packageToReplace = nil
     
-    // MAC-CONFIG-TODO: should we resume a download if the app was quit or killed before completing a keyboard install?
     // if any packages are remaining from an earlier download, delete them
     self.packageRepository.cleanupTempDirectory()
   }
@@ -60,7 +59,7 @@ public class PackageDownload {
     try self.packageRepository.unzipKmpFile(at: kmpFileUrl, to: self.temporaryPackageLocation)
     
     // load the unzipped package from the temporary location and save a reference to it
-    let newPackage = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
+    let newPackage = try self.packageRepository.loadSinglePackage(packageUrl: self.installPackageLocation)
     self.packageToInstall = newPackage
   }
   

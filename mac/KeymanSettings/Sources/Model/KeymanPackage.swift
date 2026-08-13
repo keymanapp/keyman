@@ -48,6 +48,8 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   // the URL of the graphic file within the package
   public let graphicFileUrl: URL?
   public let graphicImage: NSImage?
+  // the qrCode image does not change size so a single cached image per package is sufficient
+  var qrCodeImageCache: (image: NSImage, size: CGFloat)? = nil
   
   /**
    * create a KeymanPackage object using the PackageSource object created from the kmp.json
@@ -226,13 +228,38 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   static func buildSharePackageUrl(packageUrl: URL) -> URL? {
     return URL(string: "https://\(KeymanPaths.keymanDomain)/go/keyboard/\(packageUrl.lastPathComponent)/share")
   }
-
-  // MAC-CONFIG-TODO: cache QR code image, but must be size specific
-
+  
   /**
-   * generate a QR code for sharing the Keyman Package URL
+   * get a QR code image of the specified size from the cache or generate a new one
    */
-  public func generateSharePackageQRCode(size: CGFloat = 300) -> NSImage? {
+  public func getSharePackageQRCode(for size: CGFloat) -> NSImage? {
+    var qrCodeImage: NSImage? = nil
+    
+    // if the image is already cached for the specified size, then use it
+    if let qrImageCache = self.qrCodeImageCache {
+      if size == qrImageCache.size {
+        qrCodeImage = qrImageCache.image
+        print("Used cached QR code for package: \(self.packageName)")
+      }
+    }
+    
+    // if no matching image cached, then create one and cache it
+    if qrCodeImage == nil
+      {
+      if let newImage = self.generateSharePackageQRCode(for: size) {
+        qrCodeImage = newImage
+        self.qrCodeImageCache = (newImage, size)
+        print("Cached QR code for package: \(self.packageName)")
+      }
+    }
+    
+    return qrCodeImage
+  }
+  
+  /**
+   * generate a QR code image for sharing the Keyman Package URL
+   */
+  func generateSharePackageQRCode(for size: CGFloat) -> NSImage? {
     guard let data = self.sharePackageUrl?.absoluteString.data(using: .utf8) else { return nil }
     
     // initialize the built-in Apple QR filter

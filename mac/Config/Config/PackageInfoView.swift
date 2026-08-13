@@ -95,14 +95,14 @@ public struct PackageInfoView: View {
       
       // the package QR Code and link to share the package online
       VStack {
-        let size: CGFloat = 106
-        if let qrCode = package.generateSharePackageQRCode(size: size) {
+        let qrCodeSize: CGFloat = 106
+        if let qrCode = package.getSharePackageQRCode(for: qrCodeSize) {
 
           // the package QR Code
           Image(nsImage: qrCode)
             .interpolation(.none) // important: ensures the edges of the QR Code remain sharp
             .resizable()
-            .frame(width: size, height: size)
+            .frame(width: qrCodeSize, height: qrCodeSize)
             .background(Color.white) // ensures good contrast for scanning
         }
         

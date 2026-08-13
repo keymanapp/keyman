@@ -316,12 +316,9 @@ public class InstallationCheck {
     print("completeNewInstallationEvaluation: created new installation state")
     var fullTaskList = neededTasks
     
-    // add prepareNewInstall, requestRestart and confirmRestart InstallationTask
+    // add prepareNewInstall InstallationTask
     fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .prepareNewInstall))
     
-    // MAC-CONFIG_TODO: should we always restart for a new install or only when enabling input method?
-    fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
-    fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
     let installationState = InstallationState(version: self.inputMethodVersion, tasks: fullTaskList)
     
     return installationState
@@ -376,7 +373,7 @@ static func readInstallationState(from repo: DefaultsRepo) -> InstallationState?
     if !self.inputMethodUtil.isKeymanInputMethodEnabled() {
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .enableInputMethod))
       
-      // prompt user to restart after enabling the input method
+      // when repairing, prompt to restart to ensure that the input method has been loaded by the system
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
     }
