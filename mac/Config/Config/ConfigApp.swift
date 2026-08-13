@@ -16,8 +16,8 @@ struct ConfigApp: App {
   @Environment(\.openWindow) private var openWindow
   
   var body: some Scene {
-    Window("Config Test", id: "config-debug") {
-      ConfigDebugView()
+    Window("Configuration", id: "main-config") {
+      MainConfigView()
         .environmentObject(settings)
         .task {
           if !installation.getHasDisplayedInstallationComplete() {
@@ -27,19 +27,19 @@ struct ConfigApp: App {
         .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in openWindow(id: "install")
         }
     }
-    Window("Install Test", id: "install-debug") {
-      InstallDebugView()
-        .environmentObject(installation)
-    }
     Window("Installation", id: "install") {
       MainInstallView()
         .environmentObject(installation)
     }
     .windowResizability(.contentSize)
     .defaultSize(width: 600, height: 450)
-    Window("Main Configuration", id: "main_config") {
-      MainConfigView()
+    Window("Config Test", id: "config-debug") {
+      ConfigDebugView()
         .environmentObject(settings)
+    }
+    Window("Install Test", id: "install-debug") {
+      InstallDebugView()
+        .environmentObject(installation)
     }
   }
 }
