@@ -270,7 +270,18 @@ begin
   if (scanCode = SCAN_LEFT_CONTROL_SIMULATED) and not isUp then
     IsSimulatedLControlDown := True
   else if ((scanCode = SCAN_LEFT_CONTROL) or (scanCode = SCAN_LEFT_CONTROL_SIMULATED)) and isUp then
-    IsSimulatedLControlDown := False;
+    IsSimulatedLControlDown := False
+  else if (VKCode = VK_RSHIFT) and isUp then
+  begin
+    if (GetAsyncKeyState(VK_LSHIFT) and $8000) = $8000 then
+    begin
+      // #12611: The physical right shift key has just been released by the
+      // user, but the user has previously clicked the left shift key in the
+      // OSK.  We need to force a key up for left shift as well to clear, both
+      // in the OSK and for apps that may differentiate L/R shift.
+      do_keybd_event(VK_LSHIFT, 0, KEYEVENTF_KEYUP, 0);
+    end;
+  end;
 
   // TODO: in the future, we might be able to eliminate tmrCheck and make all
   // modifier updates go through the WH_KEYBOARD_LL hook.
