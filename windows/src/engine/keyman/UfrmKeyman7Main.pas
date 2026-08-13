@@ -1227,16 +1227,35 @@ end;
 procedure TfrmKeyman7Main.SetTrayIcon(rp: TRunningProduct; kbd: IKeymanKeyboardInstalled);
 var
   cust: IKeymanCustomisation;
-  bb: IPicture;
-  h: OLE_HANDLE;
+  lskbd: TLangSwitchKeyboard;
+  icon: TIcon;
 begin
   if Assigned(rp) then
   begin
-    bb := kbd.Bitmap;
-    if Assigned(bb) then
+    lskbd := LangSwitchManager.FindKeyboardByKeymanID(kbd.KeymanID);
+    if Assigned(lskbd) and (lskbd is TLangSwitchKeyboard_TIP) then
+    try
+      icon := TIcon.Create;
+      try
+        icon.Handle := (lskbd as TLangSwitchKeyboard_TIP).IconHandle;
+        rp.FTrayIcon.Icon.Assign(icon);
+        icon.ReleaseHandle;
+      finally
+        icon.Free;
+      end;
+    except
+      on E:Exception do
+      begin
+        // #12905: icon is otherwise invalid
+        TKeymanSentryClient.ReportHandledException(E, 'SetTrayIcon: Invalid icon for keyboard "'+kbd.ID+'"; icon filename "'+kbd.IconFilename+'"');
+        // Use the default app icon
+        rp.FTrayIcon.Icon.Assign(FTrayIcon);
+      end;
+    end
+    else
     begin
-      bb.get_Handle(h);
-      rp.FTrayIcon.Icon.Handle := CopyIcon(h);
+      // Use the default app icon
+      rp.FTrayIcon.Icon.Assign(FTrayIcon);
     end;
 
     if VisualKeyboardVisible then
