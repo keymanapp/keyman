@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.264 alpha 2026-08-11
+
+* docs(android): update keyboardharness readme (#16220)
+* feat(android): design improvement for settings, add dark mode and tool menu (#15827)
+
 ## 19.0.263 alpha 2026-08-10
 
 * chore(deps): bump tar from 7.5.11 to 7.5.22 in /developer/src/server/src/win32/trayicon/addon-src (#16282)
