@@ -940,7 +940,11 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
 
     const kbdAspectRatio = width / height;
 
-    const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(this.layerId), kbdAspectRatio);
+    // When possible, correct to other keys on the same layer as the input key.
+    // Keys with nextLayer can cause the underlying layer to shift, so determine
+    // the actual correction layer before proceeding!
+    const layer = keySpec.layer ?? this.layerId;
+    const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(layer), kbdAspectRatio);
     return keyTouchDistances(touchKbdPos, correctiveLayout);
   }
   //#endregion
