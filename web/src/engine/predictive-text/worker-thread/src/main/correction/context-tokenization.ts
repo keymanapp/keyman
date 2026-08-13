@@ -1256,6 +1256,10 @@ export function assembleTransforms(stackedInserts: string[], stackedDeletes: num
  * @returns
  */
 export function determineTaillessTrueKeystroke(tokenizedInput: Map<number, Transform>) {
+  if(!tokenizedInput || tokenizedInput.size == 0) {
+    throw new Error(`tokenizedInput must not be nullish or empty; even an empty transform should have an entry`);
+  }
+
   // undefined by default; we haven't yet determined if we're still affecting
   // the same token that was the tail in the previous tokenization state.
   let taillessTrueKeystroke: Transform;
@@ -1276,10 +1280,7 @@ export function determineTaillessTrueKeystroke(tokenizedInput: Map<number, Trans
   // tokens.
   const transformKeys = [...tokenizedInput.keys()];
   do {
-    const penultimateKey = transformKeys[transformKeys.length - 2];
     const tailKey = transformKeys[transformKeys.length - 1];
-
-    const penultimateTransform = tokenizedInput.get(penultimateKey);
     const tailTransform = tokenizedInput.get(tailKey);
 
     // Do not treat pure-backspace transforms at the tail end of context as the
@@ -1288,9 +1289,14 @@ export function determineTaillessTrueKeystroke(tokenizedInput: Map<number, Trans
     if(TransformUtils.isBackspace(tailTransform) && transformKeys.length > 1) {
       transformKeys.pop();
       continue;
-    } else if(!penultimateTransform) {
+    } else if(transformKeys.length < 2) {
       break;
-    } else if(
+    }
+
+    const penultimateKey = transformKeys[transformKeys.length - 2];
+    const penultimateTransform = tokenizedInput.get(penultimateKey);
+
+    if(
       // Erasing a single-char whitespace requires deletion of two tokens, the
       // last of which is empty.  Check for this case and handle it accordingly
       // as well.
