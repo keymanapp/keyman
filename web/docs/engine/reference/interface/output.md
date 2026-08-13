@@ -8,13 +8,13 @@ Outputs the specified string to an element, overwriting `nd` characters before t
 
 ## Syntax
 
-```c
+```js
 keyman.interface.output(nd, Pelem, str);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KO(nd, Pelem, str); // Shorthand
 ```
 
@@ -46,7 +46,7 @@ This is a core element of keyboard input management within KeymanWeb, typically 
 
 a keyboard would, after checking that the initial context (`"a"`) matches, use
 
-```c
+```js
 keyman.interface.output(1, Pelem, "á");
 ```
 
