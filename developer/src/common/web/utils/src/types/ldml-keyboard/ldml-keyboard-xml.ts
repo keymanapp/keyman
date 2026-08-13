@@ -62,6 +62,8 @@ export interface LKInfo {
   author?: string;
   layout?: string;
   indicator?: string;
+  attribution?: string;
+  draft?: string;
 };
 
 export interface LKSettings {
