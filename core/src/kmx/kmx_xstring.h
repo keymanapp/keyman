@@ -208,13 +208,13 @@ inline bool Uni_IsValid(km_core_usv start, km_core_usv end) {
   if (!Uni_IsValid(end) || !Uni_IsValid(start) || (end < start)) {
     // start or end out of range, or inverted range
     return false;
-  } else if ((start <= Uni_SURROGATE_END) && (end >= Uni_SURROGATE_START)) {
+  } else if ((start <= (km_core_usv)Uni_SURROGATE_END) && (end >= (km_core_usv)Uni_SURROGATE_START)) {
     // contains some of the surrogate range
     return false;
-  } else if ((start <= Uni_FD_NONCHARACTER_END) && (end >= Uni_FD_NONCHARACTER_START)) {
+  } else if ((start <= (km_core_usv)Uni_FD_NONCHARACTER_END) && (end >= (km_core_usv)Uni_FD_NONCHARACTER_START)) {
     // contains some of the noncharacter range
     return false;
-  } else if ((start & Uni_PLANE_MASK) != (end & Uni_PLANE_MASK)) {
+  } else if ((start & (km_core_usv)Uni_PLANE_MASK) != (end & (km_core_usv)Uni_PLANE_MASK)) {
     // start and end are on different planes, meaning that the U+__FFFE/U+__FFFF noncharacters
     // are contained.
     // As a reminder, we already checked that start/end are themselves valid,
