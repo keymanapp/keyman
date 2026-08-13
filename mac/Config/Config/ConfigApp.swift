@@ -37,5 +37,9 @@ struct ConfigApp: App {
     }
     .windowResizability(.contentSize)
     .defaultSize(width: 600, height: 450)
+    Window("Main Configuration", id: "main_config") {
+      MainConfigView()
+        .environmentObject(settings)
+    }
   }
 }
