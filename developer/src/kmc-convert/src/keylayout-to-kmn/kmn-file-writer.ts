@@ -201,8 +201,7 @@ export class UnicodeCharacterConversion {
   }
 };
 
-// TODO-KMC-CONVERT: remove this?
-/*interface UnavailableModifier extends RuleReview {
+interface UnavailableModifier extends RuleReview {
   type: 'UnavailableModifier';
 };
 interface UnavailableSuperiorRule extends RuleReview {
@@ -216,7 +215,7 @@ interface AmbiguousRules extends RuleReview {
 };
 interface WarningTextSet extends RuleReview {
   type: 'WarningTextSet';
-};*/
+};
 export class KmnFileWriter {
 
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) { };
@@ -492,7 +491,7 @@ export class KmnFileWriter {
 
     for (let k = 0; k < uniqueDataRules.length; k++) {
       if (uniqueDataRules[k].ruleType === "C3") {
-        
+
         // use of Unicode Character vs Unicode Codepoint;
         // we always print out the Unicode Character  (A, W̊, 😎, ... ).
         // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
