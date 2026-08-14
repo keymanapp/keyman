@@ -228,13 +228,16 @@ end;
  * Handles OSK modifier events received from
  * keyman32:PostVisualKeyboardModifierEvent in k32_visualkeyboardinterface.cpp.
  *
- * This takes the chiral VK_LCONTROL / VK_RCONTROL / VK_LMENU / VK_RMENU virtual
- * key codes.
+ * This expects the chiral VK_LCONTROL / VK_RCONTROL / VK_LMENU / VK_RMENU /
+ * VK_LSHIFT / VK_RSHIFT virtual key codes (unlike most Windows contexts).
  *
- * This currently deals only with one situation: when Windows posts a simulated
- * LControl key when AltGr is pressed on a European layout. See
- * serialkeyeventserver.cpp:WndProc for a deeper discussion of the key events
- * that are generated in this scenario.
+ * This currently deals with two situations:
+ *
+ * 1. When Windows posts a simulated LControl key when AltGr is pressed on a
+ *    European layout. See serialkeyeventserver.cpp:WndProc for a deeper
+ *    discussion of the key events that are generated in this scenario.
+ * 2. When the physical RShift key is released, the OSK needs to release the
+ *    'clicked' LShift for consistency (#12611).
  *
  * @param VKCode virtual key code of the modifier key, chiral for Alt and Ctrl
  * @param Flags  as follows:
