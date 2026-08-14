@@ -85,10 +85,7 @@ struct MainInstallView: View {
       }
     }
     // While the installer is evaluating the Keyman installation, the loading screen will be shown
-    .onAppear {
-      print("From MainInstallView onAppear: ", installation.installationPhase)
-      print("From MainInstallView onAppear: ", installation.currentTask()?.taskType ?? "no task available")
-      
+    .onAppear {      
       if installation.installationPhase == .evaluatingInstallation {
         currentPage = .loading
         Task {

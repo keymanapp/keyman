@@ -14,7 +14,7 @@ struct CompletedInstallView: View {
   
   var versionText: String {
     if let version = installation.installationState?.keymanVersion {
-      return "Version: \(version)              "
+      return "Version: \(version)"
     } else {
       return "No version to display"
     }

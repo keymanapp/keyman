@@ -304,7 +304,7 @@ public class InstallationCheck {
    */
   func completeNewInstallationEvaluation(accessibilityPermissionGranted: Bool) {
     // see what tasks remain based on the evaluation
-    let neededTasks = determineInstallationTasksNeeded(for: accessibilityPermissionGranted)
+    let neededTasks = determineInstallationTasksNeeded(isRepair: false, with: accessibilityPermissionGranted)
     let newState = self.createNewInstallationState(with: neededTasks)
     self.applyNewInstallationState(state: newState)
   }
@@ -360,7 +360,7 @@ static func readInstallationState(from repo: DefaultsRepo) -> InstallationState?
    * The provided parameter `accessibilityPermissionGranted` was returned asynchronously from the input method.
    * Use it and other info to see what tasks are needed to complete installation.
    */
-  func determineInstallationTasksNeeded(for accessibilityPermissionGranted: Bool) -> Set<InstallationTask> {
+  func determineInstallationTasksNeeded(isRepair: Bool, with accessibilityPermissionGranted: Bool) -> Set<InstallationTask> {
     var newTasks = Set<InstallationTask>()
     
     // add task to request Accessibility permission if needed
@@ -373,9 +373,11 @@ static func readInstallationState(from repo: DefaultsRepo) -> InstallationState?
     if !self.inputMethodUtil.isKeymanInputMethodEnabled() {
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .enableInputMethod))
       
-      // when repairing, prompt to restart to ensure that the input method has been loaded by the system
-      newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
-      newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
+    // when repairing, prompt to restart to ensure that the input method has been loaded by the system
+      if (isRepair) {
+        newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
+        newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
+      }
     }
     
     return newTasks
@@ -389,7 +391,7 @@ static func readInstallationState(from repo: DefaultsRepo) -> InstallationState?
   func createRepairInstallationState(accessibilityPermissionGranted: Bool) -> InstallationState? {
     var repairInstallationState: InstallationState? = nil
     
-    var repairTasks = self.determineInstallationTasksNeeded(for: accessibilityPermissionGranted)
+    var repairTasks = self.determineInstallationTasksNeeded(isRepair: true, with: accessibilityPermissionGranted)
     if !repairTasks.isEmpty {
       // add prepareNewRepair
       repairTasks.insert(InstallationTask.createNewInstallationTask(type: .prepareNewRepair))

@@ -46,10 +46,10 @@ struct InitialRepairView: View {
         Text("Resolve Issues")
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
+        NavigationButton(action: .advance, onContinue: onContinue)
           .buttonStyle(.borderedProminent)
           .tint(.blue)
           .clipShape(Capsule())
-        NavigationButton(action: .advance, onContinue: onContinue)
       }
     }
   }

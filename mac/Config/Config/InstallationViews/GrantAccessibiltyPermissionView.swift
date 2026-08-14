@@ -36,7 +36,7 @@ struct GrantAccessibiltyPermissionView: View {
   
   var body: some View {
     VStack {
-      Text("Grant Accessibilty Permission")
+      Text("Grant Accessibility Permission")
         .font(.title)
         .bold()
         .frame(maxWidth: .infinity, alignment: .center)
@@ -54,7 +54,7 @@ struct GrantAccessibiltyPermissionView: View {
             .resizable()
             .aspectRatio(contentMode: .fit)
             .padding(.bottom, 8)
-          Text("Ensure Keyman.app is toggled to provide it with necessary control in System Settings > Privacy & Security > Accessibility.")
+          Text("Ensure Keyman.app is set to provide it with necessary control in System Settings > Privacy & Security > Accessibility.")
             .lineSpacing(6)
             .foregroundStyle(.secondary)
         }

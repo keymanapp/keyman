@@ -241,7 +241,6 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     if let qrImageCache = self.qrCodeImageCache {
       if size == qrImageCache.size {
         qrCodeImage = qrImageCache.image
-        print("Used cached QR code for package: \(self.packageName)")
       }
     }
     
@@ -251,7 +250,6 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
       if let newImage = self.generateSharePackageQRCode(for: size) {
         qrCodeImage = newImage
         self.qrCodeImageCache = (newImage, size)
-        print("Cached QR code for package: \(self.packageName)")
       }
     }
     

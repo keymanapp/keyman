@@ -189,8 +189,6 @@ public class SettingsContainer : ObservableObject {
     if let download = self.packageDownload {
       do {
         try download.replaceExistingPackageWithNewPackage()
-        self.replaceInstalledPackage()
-        self.packageDownload = nil
       } catch {
         print("unable to downgrade package: \(download.packageToInstall?.packageName ?? "unknown")")
       }
@@ -203,11 +201,7 @@ public class SettingsContainer : ObservableObject {
   public func userCanceledPackageDowngrade() {
     if let download = self.packageDownload {
       print("user cancelled package downgrade")
-      do {
-        try download.cleanupFailedInstallation()
-      } catch {
-        print("downgrade cancelled but failed to cancel installation")
-      }
+      download.cleanupFailedInstallation()
     }
   
     self.packageDownload = nil
