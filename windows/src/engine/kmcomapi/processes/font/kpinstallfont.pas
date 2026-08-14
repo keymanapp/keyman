@@ -40,15 +40,16 @@ uses
 function TKPInstallFont.Execute(const src_filename: string): Boolean;
 var
   filename, fontnm: string;
+  truetypeInfo: TTTInfo;
 begin
   Result := False;
 
   try
-    with TTTInfo.Create(src_filename, [tfNames]) do
+    truetypeInfo := TTTInfo.Create(src_filename, [tfNames]);
     try
-      fontnm := FullName;
+      fontnm := truetypeInfo.FullName;
     finally
-      Free;
+      FreeAndNil(truetypeInfo);
     end;
    except
      on E:Exception do
