@@ -4,17 +4,17 @@ title: deadkeyMatch (KDM) (Deprecated)
 
 ## Summary
 
-(Deprecated)Deadkey matching: Seeks to match the [`deadkey`](/developer/language/reference/deadkey) state `dk` at the relative caret position `n`.
+(Deprecated) Deadkey matching: Seeks to match the [`deadkey`](/developer/language/reference/deadkey) state `dk` at the relative caret position `n`.
 
 ## Syntax
 
-```c
+```js
 keyman.interface.deadkeyMatch(n, Pelem, dk);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KDM(n, Pelem, dk); // Shorthand
 ```
 
@@ -57,7 +57,7 @@ dk(backquote) + "a" > "à"
 
 The Developer compiler then generates a unique id for the deadkey state - say, `0`, and in order to detect the deadkey associated with the `` '`' `` character, compiles the `dk(backquote)` check to
 
-```c
+```js
 keyman.interface.deadkeyMatch(0, Pelem, 0)
 ```
 
