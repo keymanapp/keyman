@@ -4,6 +4,8 @@
 
 * chore(deps-dev): bump esbuild from 0.25.0 to 0.28.1 (#16095)
 * feat(web): add `keyman.versionInfo` API (#16351)
+* fix(web): cleanup `loaduserinterface` and `unloaduserinterface` events (#16353)
+* docs(web): deprecate unused and obsolete API endpoints and docs cleanup (#16354)
 * chore(common): cleanup and merge Preprocessor constants (#14360)
 
 ## 19.0.265 alpha 2026-08-12
