@@ -8,13 +8,13 @@ Inserts a text string and optional [`deadkey`](/developer/language/reference/dea
 
 ## Syntax
 
-```c
+```js
 keyman.interface.insertText(text, dk);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KT(text, dk); // Shorthand
 ```
 

@@ -13,15 +13,9 @@ and consists of these engineering keyboards:
 test9469.kmp is another engineering keyboard to show non-printing characters on the OSK.
 
 ### Compiling From Command Line
-1. Launch a command prompt to the `android/` folder
-2. Compile KMEA. This will build and copy `keyman-engine.aar` to the Samples and Test projects
-    ```
-    cd KMEA
-    ./build.sh
-    ```
+1. Launch a command prompt to the `android/Tests/KeyboardHarness` folder
 3. Compile KeyboardHarness
     ```
-    cd ../Tests/KeyboardHarness
     ./build.sh
     ```
 

@@ -77,8 +77,9 @@
 #include "cp1252.h"
 #include "virtualcharkeys.h"
 
-#include "../../../../common/include/vkeys.h"
-#include "../../../../common/include/keymanversion.h"
+#include "km_vkey.h"
+#include "vkeys.h"
+#include "keymanversion.h"
 
 #include "crc32.h"
 #include "debugstore.h"

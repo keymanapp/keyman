@@ -8,13 +8,13 @@ Flash body or element as substitute for an audible feedback [`beep`](/developer/
 
 ## Syntax
 
-```c
+```js
 keyman.interface.beep(Pelem);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KB(Pelem); // Shorthand
 ```
 
