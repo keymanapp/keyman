@@ -413,36 +413,42 @@ int main(int argc, char * argv[])
     clone_state_deleted_text
   ));
 
-// Add two actions before cloning the state again
-try_status(km_core_process_event(test_state, KM_CORE_VKEY_F3, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-try_status(km_core_state_clone(test_state, &test_clone_2));
+  // Add two actions before cloning the state again
+  try_status(km_core_process_event(test_state, KM_CORE_VKEY_F3, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
+  try_status(km_core_state_clone(test_state, &test_clone_2));
 
-// Now put an option in the test_clone_2 state only
-km_core_action_item action_clone = {KM_CORE_IT_PERSIST_OPT, {0,}, };
-action_clone.option = &clone_persist_opt;
-if (test_clone_2->actions().back().type == KM_CORE_IT_END) {
-      test_clone_2->actions().pop_back();
-}
-km_core_state_queue_action_items(test_clone_2, &action_clone);
-test_clone_2->actions().commit();
+  // Now put an option in the test_clone_2 state only
+  km_core_action_item action_clone = {KM_CORE_IT_PERSIST_OPT, {0,}, };
+  action_clone.option = &clone_persist_opt;
+  if (test_clone_2->actions().back().type == KM_CORE_IT_END) {
+        test_clone_2->actions().pop_back();
+  }
 
-  // Test debug dump
-auto doc3 = get_json_doc(*test_state), doc4 = get_json_doc(*test_clone_2);
-std::cout << "doc3:" << std::endl;
-std::cout << doc3 << std::endl;
-std::cout << "doc4:" << std::endl;
-std::cout << doc4 << std::endl;
-if (doc3 == doc4)           return __LINE__;
+  km_core_action_item action_clone_queue[] = {
+    action_clone,
+    {KM_CORE_IT_END}
+  };
 
-km_core_action_item action_tp3 = {KM_CORE_IT_PERSIST_OPT, {0,}, };
-action_tp3.option = &test_point_3_opt;
+  km_core_state_queue_action_items(test_clone_2, action_clone_queue);
+  test_clone_2->actions().commit();
 
-km_core_action_item action_tp4 = {KM_CORE_IT_PERSIST_OPT, {0,}, };
-action_tp4.option = &test_point_4_opt;
+    // Test debug dump
+  auto doc3 = get_json_doc(*test_state), doc4 = get_json_doc(*test_clone_2);
+  std::cout << "doc3:" << std::endl;
+  std::cout << doc3 << std::endl;
+  std::cout << "doc4:" << std::endl;
+  std::cout << doc4 << std::endl;
+  if (doc3 == doc4)           return __LINE__;
 
-test_assert(action_items(test_state, {action_tp3, action_tp4, {KM_CORE_IT_END}}));
-// Check that test_clone_2 has the same persisted options plus the extra queued option.
-test_assert(action_items(test_clone_2, {action_tp3, action_tp4, action_clone, {KM_CORE_IT_END}}));
+  km_core_action_item action_tp3 = {KM_CORE_IT_PERSIST_OPT, {0,}, };
+  action_tp3.option = &test_point_3_opt;
+
+  km_core_action_item action_tp4 = {KM_CORE_IT_PERSIST_OPT, {0,}, };
+  action_tp4.option = &test_point_4_opt;
+
+  test_assert(action_items(test_state, {action_tp3, action_tp4, {KM_CORE_IT_END}}));
+  // Check that test_clone_2 has the same persisted options plus the extra queued option.
+  test_assert(action_items(test_clone_2, {action_tp3, action_tp4, action_clone, {KM_CORE_IT_END}}));
 
   // Destroy them
    km_core_state_dispose(test_state);
