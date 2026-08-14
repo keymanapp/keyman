@@ -40,7 +40,7 @@ public struct LabelButtonView: View {
     Button(action: action) {
       Label(label, systemImage: systemImage)
         .font(font)
-        .buttonStyle(.bordered)
     }
+    .buttonStyle(.bordered)
   }
 }

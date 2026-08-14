@@ -32,7 +32,7 @@ struct ConfigApp: App {
         .environmentObject(installation)
     }
     .windowResizability(.contentSize)
-    .defaultSize(width: 600, height: 450)
+    .defaultSize(width: 600, height: 500)
     Window("Config Test", id: "config-debug") {
       ConfigDebugView()
         .environmentObject(settings)

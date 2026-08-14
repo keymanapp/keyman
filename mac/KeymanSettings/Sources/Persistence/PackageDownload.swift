@@ -134,8 +134,16 @@ public class PackageDownload {
    */
   func cleanupFailedInstallation() throws {
     print("cleanupFailedInstallation of: \(self.temporaryPackageLocation.lastPathComponent)")
-    try self.deleteDownloadedKmpFile()
-    try self.deleteDownloadedPackage()
+    do {
+      try self.deleteDownloadedKmpFile()
+    } catch {
+      print("cleanupFailedInstallation did not delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent)")
+    }
+    do {
+      try self.deleteDownloadedPackage()
+    } catch {
+      print("cleanupFailedInstallation did not delete downloaded package: \(self.temporaryPackageLocation.lastPathComponent)")
+    }
   }
   
   /**

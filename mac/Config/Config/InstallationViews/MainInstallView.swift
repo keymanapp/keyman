@@ -44,6 +44,7 @@ struct MainInstallView: View {
       case .requestAccess: currentPage = .allowSecurityPermission
       case .confirmAccess: currentPage = .allowSecurityPermission
       case .requestRestart: currentPage = .restartMac
+      case .confirmRestart: currentPage = .restartMac
       default: currentPage = .completed
       }
     } else {

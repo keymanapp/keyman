@@ -29,6 +29,9 @@ public struct HelpView: NSViewRepresentable {
     // only load the request if it's not already loading/loaded to prevent infinite loops
     if nsView.url != helpFileURL {
       nsView.load(request)
+      if let helpUrl = request.url {
+        nsView.loadFileURL(helpUrl, allowingReadAccessTo: helpUrl.deletingLastPathComponent())
+      }
     }
   }
 }

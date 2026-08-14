@@ -186,8 +186,15 @@ public class SettingsContainer : ObservableObject {
    * Called when user approves the downgrade of package
    */
   public func userConfirmedPackageDowngrade() {
-    self.replaceInstalledPackage()
-    self.packageDownload = nil
+    if let download = self.packageDownload {
+      do {
+        try download.replaceExistingPackageWithNewPackage()
+        self.replaceInstalledPackage()
+        self.packageDownload = nil
+      } catch {
+        print("unable to downgrade package: \(download.packageToInstall?.packageName ?? "unknown")")
+      }
+    }
   }
 
   /**

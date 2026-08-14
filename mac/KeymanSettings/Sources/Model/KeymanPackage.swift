@@ -26,7 +26,10 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   
   public let id: UUID
   
-  // the URL of the directory in which the package is contained
+  // the directory where this package is contained
+  // used to delete the package if requested
+  // this value must be updated when the package is moved
+  // from the temp directory during package installation  
   public var sourceDirectoryUrl: URL
   
   // the URL for downloading the package from keyman.com
@@ -45,14 +48,14 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   let readmeFilename: String?
   // the URL of the readme file within the package
   public var readmeFileUrl: URL? {
-    return readmeFilename.map { sourceDirectoryUrl.appendingPathComponent($0) }
+    return readmeFilename.map { sourceDirectoryUrl.appendingPathComponent($0).standardizedFileURL }
   }
 
   // the name of the help file used to generate the Url
   let helpFilename: String?
   // the URL of the help file within the package, named 'welcomeFile' in kmp.json
   public var helpFileUrl: URL? {
-    return helpFilename.map { sourceDirectoryUrl.appendingPathComponent($0) }
+    return helpFilename.map { sourceDirectoryUrl.appendingPathComponent($0).standardizedFileURL }
   }
 
   // the name of the graphicFile used to generate the Url
@@ -60,7 +63,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   // a cache of the image
   private var cachedGraphicImage: NSImage?
   private var graphicFileUrl: URL? {
-    return graphicFilename.map { sourceDirectoryUrl.appendingPathComponent($0) }
+    return graphicFilename.map { sourceDirectoryUrl.appendingPathComponent($0).standardizedFileURL }
   }
   public var graphicImage: NSImage? {
     get {

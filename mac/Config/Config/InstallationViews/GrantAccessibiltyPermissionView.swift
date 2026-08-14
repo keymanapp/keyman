@@ -115,14 +115,14 @@ struct GrantAccessibiltyPermissionView: View {
       }
     }
     // Triggered when the system confirms accessibility has been granted.
-    .onReceive( NotificationCenter.default.publisher(for: .accessibilityGranted)) { notification in
+    .onReceive( NotificationCenter.default.publisher(for: .checkAccessibilitySuccess)) { notification in
       withAnimation(.smooth) {
         permissionNotGrantedAfterPrompt = false
         onContinue() // Moves the user to the next screen
       }
     }
     // Triggered when the system confirms accessibility has not been granted.
-    .onReceive( NotificationCenter.default.publisher(for: .accessibilityNotGranted)) { notification in
+    .onReceive( NotificationCenter.default.publisher(for: .checkAccessibilityFailure)) { notification in
       withAnimation(.smooth) {
         checkingPermission = false // Stops showing the loading spinner
         permissionNotGrantedAfterPrompt = true // Shows the red error text
