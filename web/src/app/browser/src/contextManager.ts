@@ -24,21 +24,23 @@ export interface KeyboardCookie {
  * has the same directionality, text runs will be re-ordered which is confusing and causes
  * incorrect caret positioning
  *
- * @param       {Object}      Ptarg           Target element
+ * @param       {Object}      elem            Target element
  * @param       {Keyboard}    activeKeyboard  The active keyboard
  */
-function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
+function setTargetTextDirection(elem: HTMLElement, activeKeyboard: Keyboard): void {
+  if (!elem) {
+    return;
+  }
+
   const elDir = activeKeyboard?.isRTL ? 'rtl' : 'ltr';
 
-  if(Ptarg) {
-    if(Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLInputElement
-        || Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLTextAreaElement) {
-      if((Ptarg as HTMLInputElement|HTMLTextAreaElement).value.length == 0) {
-        Ptarg.dir=elDir;
-      }
-    } else if(typeof Ptarg.textContent == "string" && Ptarg.textContent.length == 0) { // As with contenteditable DIVs, for example.
-      Ptarg.dir=elDir;
+  if (elem instanceof elem.ownerDocument.defaultView.HTMLInputElement
+      || elem instanceof elem.ownerDocument.defaultView.HTMLTextAreaElement) {
+    if ((elem as HTMLInputElement|HTMLTextAreaElement).value.length == 0) {
+      elem.dir=elDir;
     }
+  } else if (typeof elem.textContent == "string" && elem.textContent.length == 0) { // As with contenteditable DIVs, for example.
+    elem.dir=elDir;
   }
 }
 
@@ -294,7 +296,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
       focusedElement = textStore.docRoot;
     }
     if(focusedElement && focusedElement.ownerDocument && focusedElement instanceof focusedElement.ownerDocument.defaultView.HTMLElement) {
-      _SetTargDir(focusedElement, this.activeKeyboard?.keyboard);
+      setTargetTextDirection(focusedElement, this.activeKeyboard?.keyboard);
     }
 
     if(textStore != originalTextStore) {
@@ -509,7 +511,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
       // Only do these if the active keyboard-textstore still matches the original keyboard-textStore;
       // otherwise, maintain what's correct for the currently active one.
       if(originalKeyboardTextStore == this.currentKeyboardSrcTextStore()) {
-        _SetTargDir(this.currentTextStore?.getElement(), this.keyboardCache.getKeyboard(keyboardId));
+        setTargetTextDirection(this.currentTextStore?.getElement(), this.keyboardCache.getKeyboard(keyboardId));
         this.page.setAttachmentFont(this.activeKeyboard?.metadata?.KFont, this.engineConfig.paths.fonts, this.engineConfig.hostDevice.OS);
 
         this.restoreLastActiveTextStore();

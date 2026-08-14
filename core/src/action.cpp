@@ -103,6 +103,10 @@ bool km::core::action_item_list_to_actions_object(
         break;
       case KM_CORE_IT_PERSIST_OPT:
       {
+        assert(action_items->option != nullptr);
+        if(action_items->option == nullptr) {
+           return false;
+        }
         // TODO: lowpri: replace existing item if already present in options vector?
         km::core::option opt(static_cast<km_core_option_scope>(action_items->option->scope),
           action_items->option->key,

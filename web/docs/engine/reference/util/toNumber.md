@@ -1,5 +1,5 @@
 ---
-title: toNumber
+title: toNumber (deprecated)
 ---
 
 ## Summary
@@ -8,7 +8,7 @@ String -&gt; number conversion, with default.
 
 ## Syntax
 
-```c
+```js
 keyman.util.toNumber(s, dflt);
 ```
 
@@ -29,4 +29,12 @@ keyman.util.toNumber(s, dflt);
 
 ## Description
 
-...
+This is a simple wrapper around `parseInt(s, 10)` to handle invalid inputs, for which
+`dflt` will be returned instead.
+
+This function has been deprecated and will be removed in a future version of
+KeymanWeb.
+
+## History
+
+19.0: deprecated

@@ -1,5 +1,30 @@
 # Keyman Version History
 
+## 19.0.266 alpha 2026-08-13
+
+* chore(deps-dev): bump esbuild from 0.25.0 to 0.28.1 (#16095)
+* feat(web): add `keyman.versionInfo` API (#16351)
+* fix(web): cleanup `loaduserinterface` and `unloaduserinterface` events (#16353)
+* docs(web): deprecate unused and obsolete API endpoints and docs cleanup (#16354)
+* chore(common): cleanup and merge Preprocessor constants (#14360)
+
+## 19.0.265 alpha 2026-08-12
+
+* fix(core): make coherence check a debug assert (#16343)
+* feat(windows): honour Windows "metered connection" flag for downloading updates (#16099)
+
+## 19.0.264 alpha 2026-08-11
+
+* docs(android): update keyboardharness readme (#16220)
+* feat(android): design improvement for settings, add dark mode and tool menu (#15827)
+
+## 19.0.263 alpha 2026-08-10
+
+* chore(deps): bump tar from 7.5.11 to 7.5.22 in /developer/src/server/src/win32/trayicon/addon-src (#16282)
+* chore(deps): bump brace-expansion from 5.0.6 to 5.0.9 in /developer/src/server/src/win32/trayicon/addon-src (#16295)
+* refactor(web): improve naming of `_SetTargetDir` function (#16311)
+* docs(web): add language identifier to the code blocks of event docs (#16333)
+
 ## 19.0.262 alpha 2026-08-04
 
 * chore(web): fire `keyboardloaded` event only once per keyboard (#16297)
