@@ -1,4 +1,4 @@
-Keyman/Language Modelling layer 
+Keyman/Language Modelling layer
 ================================
 
 This document introduces the protocol for communicating between
@@ -119,7 +119,7 @@ Message         | Direction          | Parameters          | Expected reply     
 ----------------|--------------------|---------------------|---------------------|---------------
 `config`        | LMLayer → worker   | capabilities        | No                  | No
 `load`          | keyboard → LMLayer | model               | Yes — `ready`       | No
-`unload`        | keyboard → LMLayer | none                | No                  | No 
+`unload`        | keyboard → LMLayer | none                | No                  | No
 `ready`         | LMLayer → keyboard | configuration       | No                  | No
 `predict`       | keyboard → LMLayer | transform, context  | Yes — `suggestions` | Yes
 `suggestions`   | LMLayer → keyboard | suggestions         | No                  | Yes
@@ -131,7 +131,7 @@ Message         | Direction          | Parameters          | Expected reply     
 `revert`        | keyboard → LMLayer | reversion, context  | Yes - `reversion`   | Yes
 `postrevert`    | LMLayer → keyboard | suggestions         | No                  | Yes
 `reset-context` | keyboard → LMLayer | context             | No                  | No
-              
+
 
 ### Message: `config`
 
@@ -182,8 +182,8 @@ loads a model. It will send `load` which is a plain
 JavaScript object specify the path to the model, as well configurations
 and platform restrictions.
 
-After a single `config` message, the keyboard **MUST NOT** send any messages 
-to the LMLayer prior to sending `load`. The keyboard **SHOULD NOT** send another 
+After a single `config` message, the keyboard **MUST NOT** send any messages
+to the LMLayer prior to sending `load`. The keyboard **SHOULD NOT** send another
 message to the keyboard until it receives `ready` message from the LMLayer
 before sending another message.
 
@@ -250,11 +250,28 @@ interface ReadyMessage {
     rightContextCodePoints: number,
 
     /**
-     * Whether or not the model appends characters to Suggestions for
-     * wordbreaking purposes.  (These characters need not be whitespace
-     * or actual wordbreak characters.)
+     * Specifies behaviors related to transforms that the active model appends
+     * to Suggestions for wordbreaking purposes.  (The Transforms need not apply
+     * whitespace or actual wordbreak characters.)
+     *
+     * If not specified, this will be auto-detected based on the model's
+     * punctuation properties (if they exist).  If left null/undefined, the model
+     * does not append wordbreaking transforms to Suggestions.
      */
-    wordbreaksAfterSuggestions: boolean
+    appendsWordbreaks?: {
+    /**
+     * Specifies strings that, when input, always act as word-boundaries on the
+     * input - both when typed after a manually-applied suggestion (replacing
+     * appended whitespace) and when typed with an auto-selected suggestion
+     * available (thus accepting it directly, as with whitespace).
+     *
+     * This is designed to allow language-appropriate punctuation marks to
+     * automatically remove whitespace (or other wordbreak characters) as
+     * appropriate, and to auto-accept for inputs that clearly signal intent
+     * to end the current word, both in order to improve user UX with autocorrect.
+     */
+    breakingMarks?: string[];
+  }
   };
 }
 ```
@@ -476,36 +493,36 @@ This message **MUST** be in response to a `wordbreak` message, and it
 ### Message: `accept`
 
 The `accept` message is sent from the keyboard to the LMLayer.  This
-message tells the LMLayer that a previously-returned `suggestion` 
-(from a `predict`-`suggestions` pair) has been accepted by the user.  
-The LMLayer **SHOULD** respond to each `accept` message with a 
+message tells the LMLayer that a previously-returned `suggestion`
+(from a `predict`-`suggestions` pair) has been accepted by the user.
+The LMLayer **SHOULD** respond to each `accept` message with a
 `postaccept` message providing a `reversion` capable of undoing it.
 
 The keyboard **MUST** send the `suggestion` and `context` parameters.
-The keyboard **MUST** send a unique token.  The `postTransform` parameter is 
+The keyboard **MUST** send a unique token.  The `postTransform` parameter is
 optional, but highly suggested.
 
 The semantics of the `accept` message **MUST** be from the perspective
 of this sequence of events:
 
 1. A user has just selected the `suggestion` as valid.
-2. The keystroke triggering the `suggestion` has NOT been committed to 
+2. The keystroke triggering the `suggestion` has NOT been committed to
    the `context`.  Its Transform data is sent as the `postTransform`
-   parameter.  (The "post" nomenclature component signifies that 
+   parameter.  (The "post" nomenclature component signifies that
    `postTransform` comes temporally "after" this context state.)
 3. Before the user inputs any additional keystrokes, which would trigger
    new suggestions.
 
 The `postTransform` parameter allows the base keystroke, which has **NOT**
-been applied to the provided `context`, to be restored by the `reversion` 
-that undoes acceptance of the `suggestion`.  
+been applied to the provided `context`, to be restored by the `reversion`
+that undoes acceptance of the `suggestion`.
 
 For reference, compare this to the ["Message: `predict`" section](#message-predict)
 For Suggestions returned by a `predict`->`suggestions` message sequence:
 
 * `predict`'s `context` there should match `context` here.
 * `predict`'s `transform` there should match `postTransform` here.
-    - In the case that a distribution of Transforms was specified, rather than 
+    - In the case that a distribution of Transforms was specified, rather than
     just one, only the 'base' keystroke's Transform should be used.
 
 These serve as a snapshot in time of the state in which the Suggestion was
@@ -573,7 +590,7 @@ would result in the following reply message:
 }
 ```
 
-Alternatively, if the insertion point is after the space... 
+Alternatively, if the insertion point is after the space...
 
 ```javascript
 {
@@ -605,9 +622,9 @@ word preceeds the final pre-insertion point wordbreaking character.
 
 #### Late responses
 
-Sometimes, a `currentword` message may arrive after an input event or 
+Sometimes, a `currentword` message may arrive after an input event or
 other UI interaction has already invalidated its request.  The LMLayer
-**MAY** send **late** results.  Consequently, the keyboard **MAY** discard 
+**MAY** send **late** results.  Consequently, the keyboard **MAY** discard
 the late wordbreaking `currentword` result.  This is no requirement for
 the keyboard to acknowledge late wordbreaking results, or for the LMLayer
 to avoid sending such late messages.  In either case, a `currentword` message
