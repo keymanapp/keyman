@@ -8,13 +8,13 @@ Registers and loads the keyboard.
 
 ## Syntax
 
-```c
+```js
 keyman.interface.registerKeyboard(Pk);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KR(Pk); // Shorthand
 ```
 
