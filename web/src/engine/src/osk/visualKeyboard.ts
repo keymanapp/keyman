@@ -1162,6 +1162,10 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
       return;
     }
 
+    // A re-layout operation can break an ongoing gesture operation.
+    // See #15226 - this is surprisingly relevant for backspaces!
+    this.activeGestures.forEach((g) => g.cancel());
+
     /*
       Phase 1:  calculations possible at the start without triggering _any_ additional layout reflow.
       (A single, initial reflow may happen depending on DOM manipulations before this method...,

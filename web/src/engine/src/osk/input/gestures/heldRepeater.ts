@@ -39,7 +39,7 @@ export class HeldRepeater implements GestureHandler {
   }
 
   cancel() {
-    this.deleteRepeater();
+    window.clearTimeout(this.timerHandle);
     this.source.cancel();
   }
 
