@@ -274,10 +274,8 @@ public class PackageRepository: PackageRepo {
     var packageSource: PackageSource?
     do {
       let jsonData = try Data(contentsOf: kmpFileUrl, options: .mappedIfSafe)
-      var source: PackageSource = try JSONDecoder().decode(PackageSource.self, from: jsonData)
+      packageSource = try JSONDecoder().decode(PackageSource.self, from: jsonData)
       
-      print("readPackage, packageName: \(source.packageName)")
-      packageSource = source
     } catch let error as LoadPackageError {
       // if we encounter a LoadPackageError, propagate it
       throw error
