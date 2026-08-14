@@ -11,7 +11,7 @@ to open the test page.
 
 Include the following script in the HEAD of your page:
 
-```js
+```html
 <script type="text/javascript">
   keyman.init({
     root: './',  // Note - if drawing the latest version of KeymanWeb from the CDN, this will

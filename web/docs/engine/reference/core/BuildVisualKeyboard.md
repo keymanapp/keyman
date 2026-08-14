@@ -8,7 +8,7 @@ Create a copy of the OSK for embedding in documentation or help page.
 
 ## Syntax
 
-```c
+```js
 keyman.BuildVisualKeyboard(keyboardID, staticFlag, layoutFormFactor, layerID)
 ```
 

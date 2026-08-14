@@ -1,7 +1,7 @@
 ---
 title: osk.configclick Event
 ---
-  
+
 ## Summary
 
 Called upon user request for the UI to present KeymanWeb configuration
@@ -9,7 +9,7 @@ options.
 
 ## Syntax
 
-```
+```js
 keyman.osk.addEventListener('configclick', function() {
   ...
 });

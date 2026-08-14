@@ -8,7 +8,7 @@ Add a reference to an external stylesheet file.
 
 ## Syntax
 
-```c
+```js
 keyman.util.linkStyleSheet(s);
 ```
 
