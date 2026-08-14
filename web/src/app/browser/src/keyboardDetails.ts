@@ -13,11 +13,12 @@ export interface KeyboardDetails {
      */
     HasLoaded: boolean,
     /**
-     * User-friendly name of the keyboard.
+     * User-friendly name of the keyboard, e.g. "IPA (SIL)"
      */
     Name: string,
     /**
-     * Internal name of the keyboard.
+     * Internal name of the keyboard in the format "Keyboard_${id}",
+     * e.g. "Keyboard_sil_ipa"
      */
     InternalName: string,
     /**

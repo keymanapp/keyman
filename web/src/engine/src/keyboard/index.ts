@@ -3,10 +3,11 @@ export { ButtonClass, ButtonClasses, LayoutLayer, LayoutFormFactor, LayoutRow, L
 export { JSKeyboard, LayoutState } from "./keyboards/jsKeyboard.js";
 export { Keyboard } from './keyboards/keyboard.js';
 export { KeyboardMinimalInterface } from './keyboards/keyboardMinimalInterface.js';
+export { KMXKeyboard } from './keyboards/kmxKeyboard.js';
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
 export { NotifyEventCode, KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
 export { KeyboardLoadErrorBuilder, KeyboardMissingError, KeyboardScriptError, KeyboardDownloadError, InvalidKeyboardError } from './keyboards/keyboardLoadError.js'
-export { BeepHandler, EventMap, KeyboardProcessor } from "./keyboards/keyboardProcessor.js";
+export { AbstractKeyboardProcessor, BeepHandler, EventMap, KeyboardProcessor } from "./keyboards/keyboardProcessor.js";
 export {
   CloudKeyboardFont,
   internalizeFont,
