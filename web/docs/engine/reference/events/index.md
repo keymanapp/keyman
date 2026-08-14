@@ -59,7 +59,7 @@ the object, using *addEventListener()*.
 For example, to define a user function to handle the KeymanWeb
 `keyboardchange` event, include:
 
-``` typescript
+```js
 keyman.addEventListener('keyboardchange',
   function(p)
   {
@@ -100,7 +100,7 @@ keyman.addEventListener('keyboardchange',
 For example, to add an event handler that modifies the user interface when the on-screen
 keyboard is displayed:
 
-``` typescript
+```js
 keyman.osk.addEventListener('show',
   function(p)
   {

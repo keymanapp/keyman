@@ -8,13 +8,13 @@ Context matching: Returns `true` if the current context matches the specified ru
 
 ## Syntax
 
-```c
+```js
 keyman.interface.fullContextMatch(n, Pelem, rule);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KFCM(n, Pelem, rule); // Shorthand
 ```
 
@@ -113,7 +113,7 @@ dk(money) 'c' any(pair_1) index(pair_2, 3) + '.' > 'taxi'
 
 would have Javascript roughly as follows:
 
-```c
+```js
 // In the keyboard store definitions:
 this.s_pair_1 = 'aA';            // store(pair_1) 'aA'
 this.s_pair_2 = 'bB';            // store(pair_2) 'bB'
