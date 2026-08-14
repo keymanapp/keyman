@@ -52,7 +52,6 @@
   },
   "devDependencies": {
     "@keymanapp/common-types": "*",
-    "@keymanapp/web-utils": "*",
     "c8": "^7.12.0",
     "typescript": "^5.4.5"
   },
