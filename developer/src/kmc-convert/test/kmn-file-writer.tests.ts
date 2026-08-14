@@ -94,12 +94,12 @@ describe('KmnFileWriter', function () {
       [[new Rule("C3", 'UNAVAILABLE_prev_dk', 'K_D', 1, 1, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
       ['c WARNING: unavailable modifier '],
       ['c WARNING: unavailable superior rule ( [UNAVAILABLE_prev_dk K_D]  >  dk(A1) ) unavailable modifier '],
-      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) ']],
+      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_prev_dk K_D]  >  dk(A1) ) unavailable superior rule ( dk(A1)  + [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) ']],
 
       [[new Rule("C3", 'UNAVAILABLE_prev_dk', 'K_D', 0, 0, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'UNAVAIL', 'K_C', new TextEncoder().encode('D'),)],
       ['c WARNING: unavailable modifier '],
       ['c WARNING: unavailable superior rule ( [UNAVAILABLE_prev_dk K_D]  >  dk(A0) ) unavailable modifier '],
-      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) unavailable modifier ']],
+      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_prev_dk K_D]  >  dk(A0) ) unavailable superior rule ( dk(A0)  + [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) unavailable modifier ']],
 
       [[new Rule("C3", 'CAPS', 'K_D', 0, 0, 'RALT', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
       [''],
@@ -109,7 +109,7 @@ describe('KmnFileWriter', function () {
       [[new Rule("C3", 'X', 'K_X', 1, 1, 'Y', 'K_Y', 0, 0, 'SHIFT', 'K_Z', new TextEncoder().encode('D'),)],
       ['c WARNING: unavailable modifier '],
       ['c WARNING: unavailable superior rule ( [X K_X]  >  dk(A1) ) unavailable modifier '],
-      ['c WARNING: unavailable superior rule ( [Y K_Y]  >  dk(B0) ) ']],
+      ['c WARNING: unavailable superior rule ( [X K_X]  >  dk(A1) ) unavailable superior rule ( dk(A1)  + [Y K_Y]  >  dk(B0) ) ']],
 
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('rule " ' + (values[0][0] as Rule).ruleType as string + ' "') + 'should create "' + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {

@@ -682,7 +682,7 @@ export class KmnFileWriter {
 
         outMsg[2] = outMsg[2]
           + (!mod_OK ? 'unavailable superior rule ( ' : '')
-          + 'G dk('
+          + 'dk('
           + inObj.dk_prefix[0]
           + inObj.dk_id[0]
           + ')  + ['
@@ -692,7 +692,7 @@ export class KmnFileWriter {
           + inObj.dk_prefix[1]
           + inObj.dk_id[1]
           + ') '
-          + (!mod_OK ? ')' : '');
+          + (!mod_OK ? ') ' : '');
       }
 
       if (inObj.modifier) {
