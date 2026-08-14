@@ -42,7 +42,18 @@ export class KeymanSentryManager {
     switch(location.protocol) {
       case 'http:':
         return 'http://' + location.host + '/' + filename;
+      case 'https:':
+        // Keyman for Android uses https://appassets.androidplatform.net
+        // to point to local files.  See #16146.
+        if(this.keymanPlatform == 'android') {
+          return 'file:///' + filename;
+        } else {
+          return 'https://' + location.host + '/' + filename;
+        }
       case 'file:':
+        return 'file:///' + filename;
+      // Used within the iOS Keyman engine.  See #16136.
+      case 'keyman-engine:':
         return 'file:///' + filename;
       default:
         return null;
