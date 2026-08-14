@@ -12,8 +12,6 @@ import Foundation
 
 public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
   public var id = UUID()
-  var directoryUrl: URL?
-  var kmpJsonFileUrl: URL?
   let system: SystemInfo?
   let options: Options?
   let info: Info
@@ -66,8 +64,6 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
   
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    directoryUrl = nil
-    kmpJsonFileUrl = nil
     
     self.info = try container.decode(Info.self, forKey: .info)
     self.keyboards = try container.decodeIfPresent([KeyboardSource].self, forKey: .keyboards)

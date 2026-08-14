@@ -146,10 +146,15 @@ public class PackageDownload {
   }
   
   /**
-   * Move the downloaded package into the keyman packages directory
+   * Move the downloaded package into the keyman packages directory.
    */
   func movePackageFromTemporaryToInstalled() throws {
     try FileManager.default.moveItem(at: self.temporaryPackageLocation, to: self.installPackageLocation)
+    
+    // Update the KeymanPackage object with its new location
+    if let package = self.packageToInstall {
+      package.sourceDirectoryUrl = self.installPackageLocation
+    }
   }
   
   /**

@@ -117,12 +117,12 @@ class PackageRepoStub: PackageRepo {
     let testPackageDirectoryName = extinctPackageName
     let testPackageUrl = packagesDirectoryUrl.appendingPathComponent(testPackageDirectoryName)
     let moabiteKeyboardId = "moabite_basic"
-    let moabiteKeyboard = Keyboard(name: "moabite basic", keyboardId: moabiteKeyboardId, keyboardDirectoryUrl: testPackageUrl, enabled: true)
+    let moabiteKeyboard = Keyboard(name: "moabite basic", keyboardId: moabiteKeyboardId, packageDirectoryName: testPackageDirectoryName, enabled: true)
     let hittiteKeyboardId = "hittite_basic"
-    let hittiteKeyboard = Keyboard(name: "hittite basic", keyboardId: hittiteKeyboardId, keyboardDirectoryUrl: testPackageUrl, enabled: false)
+    let hittiteKeyboard = Keyboard(name: "hittite basic", keyboardId: hittiteKeyboardId, packageDirectoryName: testPackageDirectoryName, enabled: false)
     
     let testPackage = KeymanPackage(sourceDirectoryUrl: testPackageUrl,
-                                    keyboards: [moabiteKeyboard, hittiteKeyboard], packageName: "Extinct Languages", packageVersion: "1.1.03", jsonFileUrl: testPackageUrl.appendingPathComponent("kmp.json"))
+                                    keyboards: [moabiteKeyboard, hittiteKeyboard], packageName: "Extinct Languages", packageVersion: "1.1.03")
     testPackageId = testPackage.id
     
     return [testPackage]

@@ -27,9 +27,8 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   public let id: UUID
   
   // the URL of the directory in which the package is contained
-  public let sourceDirectoryUrl: URL
-  // the URL of the kmp.json file for the package
-  public let jsonFileUrl: URL
+  public var sourceDirectoryUrl: URL
+  
   // the URL for downloading the package from keyman.com
   public let sharePackageUrl: URL?
 
@@ -41,21 +40,50 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   public let author: String?
   public let websiteUrl: URL?
   public let copyright: String?
+  
+  // the name of the readme file used to generate the Url
+  let readmeFilename: String?
   // the URL of the readme file within the package
-  public let readmeFileUrl: URL?
+  public var readmeFileUrl: URL? {
+    return readmeFilename.map { sourceDirectoryUrl.appendingPathComponent($0) }
+  }
+
+  // the name of the help file used to generate the Url
+  let helpFilename: String?
   // the URL of the help file within the package, named 'welcomeFile' in kmp.json
-  public let helpFileUrl: URL?
-  // the URL of the graphic file within the package
-  public let graphicFileUrl: URL?
-  public let graphicImage: NSImage?
+  public var helpFileUrl: URL? {
+    return helpFilename.map { sourceDirectoryUrl.appendingPathComponent($0) }
+  }
+
+  // the name of the graphicFile used to generate the Url
+  let graphicFilename: String?
+  // a cache of the image
+  private var cachedGraphicImage: NSImage?
+  private var graphicFileUrl: URL? {
+    return graphicFilename.map { sourceDirectoryUrl.appendingPathComponent($0) }
+  }
+  public var graphicImage: NSImage? {
+    get {
+      if let cachedImage = self.cachedGraphicImage {
+        return cachedImage
+      } else {
+        let newImage = KeymanPackage.loadImage(imageUrl: self.graphicFileUrl)
+        self.cachedGraphicImage = newImage
+        return newImage
+      }
+    }
+  }
+
   // the qrCode image does not change size so a single cached image per package is sufficient
   var qrCodeImageCache: (image: NSImage, size: CGFloat)? = nil
   
   /**
-   * create a KeymanPackage object using the PackageSource object created from the kmp.json
+   * create a KeymanPackage object using the location of the package and the PackageSource object created from the kmp.json
    */
-  init(packageSource: PackageSource) {
+  init(packageUrl: URL, packageSource: PackageSource) {
     self.id = UUID()
+    self.sourceDirectoryUrl = packageUrl
+
     self.packageName = packageSource.info.name.description
     self.packageVersion = packageSource.info.version.description
     self.author = packageSource.info.author?.description
@@ -65,43 +93,29 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
       self.websiteUrl = nil
     }
     self.copyright = packageSource.info.copyright?.description
-    self.sourceDirectoryUrl = packageSource.directoryUrl!
-    self.jsonFileUrl = packageSource.kmpJsonFileUrl!
     
-    if let readmeFilename = packageSource.readmeFilename {
-      let fileUrl = sourceDirectoryUrl.appendingPathComponent(readmeFilename)
-      self.readmeFileUrl = fileUrl
-    } else {
-      self.readmeFileUrl = nil
-    }
-
-    if let helpFilename = packageSource.helpFilename {
-      let fileUrl = sourceDirectoryUrl.appendingPathComponent(helpFilename)
-      self.helpFileUrl = fileUrl
-    } else {
-      self.helpFileUrl = nil
-    }
-
-    self.graphicFileUrl = KeymanPackage.buildGraphicFileUrl(source: packageSource)
-    self.graphicImage = KeymanPackage.loadImage(imageUrl: self.graphicFileUrl)
+    self.readmeFilename = packageSource.readmeFilename
+    self.helpFilename = packageSource.helpFilename
+    self.graphicFilename = packageSource.graphicFilename
     
     self.sharePackageUrl = KeymanPackage.buildSharePackageUrl(packageUrl: self.sourceDirectoryUrl)
  
-    let keyboardsArray = KeymanPackage.buildKeyboardsArray(packageSource: packageSource)
+    let packageDirectory = packageUrl.lastPathComponent
+    let keyboardsArray = KeymanPackage.buildKeyboardsArray(packageSource: packageSource, packageDirectoryName: packageDirectory)
     self.keyboards = keyboardsArray
     
     self.fonts = KeymanPackage.buildFontNamesArray(keyboards: keyboardsArray)
   }
   
   /**
-   * build an array of Keyboard objects using the array of KeyboardSource object created from the kmp.json
+   * build an array of Keyboard objects using the array of KeyboardSource object created from the kmp.json and the package URL
    */
-  private static func buildKeyboardsArray(packageSource: PackageSource) -> [Keyboard] {
+  private static func buildKeyboardsArray(packageSource: PackageSource, packageDirectoryName: String) -> [Keyboard] {
     var keyboardsArray = [Keyboard]()
     
-    if let keyboards = packageSource.keyboards, let directoryUrl = packageSource.directoryUrl {
+    if let keyboards = packageSource.keyboards {
       for keyboardSource in keyboards {
-        let keyboard = Keyboard(keyboardSource: keyboardSource, directoryUrl: directoryUrl)
+        let keyboard = Keyboard(keyboardSource: keyboardSource, packageDirectoryName: packageDirectoryName)
         keyboardsArray.append(keyboard)
       }
     }
@@ -128,7 +142,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   /**
    * initializer that does not rely on package source -- provided to create unit test data
    */
-  public init(sourceDirectoryUrl: URL, sharePackageUrl: URL? = nil, keyboards: [Keyboard], packageName: String, packageVersion: String, author: String? = nil, website: URL? = nil, copyright: String? = nil, jsonFileUrl: URL, readmeFileUrl: URL? = nil, helpFileUrl: URL? = nil, graphicFileUrl: URL? = nil, graphicImage: NSImage? = nil) {
+  public init(sourceDirectoryUrl: URL, sharePackageUrl: URL? = nil, keyboards: [Keyboard], packageName: String, packageVersion: String, author: String? = nil, website: URL? = nil, copyright: String? = nil, readmeFileName: String? = nil, helpFilename: String? = nil, graphicName: String? = nil) {
     self.id = UUID()
     self.sourceDirectoryUrl = sourceDirectoryUrl
     self.sharePackageUrl = sharePackageUrl
@@ -138,11 +152,9 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     self.author = author
     self.websiteUrl = website
     self.copyright = copyright
-    self.jsonFileUrl = jsonFileUrl
-    self.readmeFileUrl = readmeFileUrl
-    self.helpFileUrl = helpFileUrl
-    self.graphicFileUrl = graphicFileUrl
-    self.graphicImage = graphicImage
+    self.readmeFilename = readmeFileName
+    self.helpFilename = helpFilename
+    self.graphicFilename = graphicName
     self.fonts = []
   }
   
@@ -189,21 +201,8 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   public func validate() throws {
     // if validateKmxFile throws an error, then the loop is stopped and the error is propagated
     try self.keyboards.forEach { keyboard in
-      try keyboard.validateKmxFile()
+      try keyboard.validateKmxFile(in: self.sourceDirectoryUrl)
     }
-  }
-  
-  /**
-   * build the URL for the graphic file specified for the package
-   */
-  static func buildGraphicFileUrl(source: PackageSource) -> URL? {
-    var fileUrl: URL? = nil
-    
-    if let graphicFilename = source.graphicFilename {
-      fileUrl = source.directoryUrl!.appendingPathComponent(graphicFilename)
-    }
-    
-    return fileUrl
   }
   
   /**
