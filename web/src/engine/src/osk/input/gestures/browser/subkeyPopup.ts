@@ -506,6 +506,9 @@ export class SubkeyPopup implements GestureHandler {
 
     const rawSqDistances = keyTouchDistances(mappedCoord, this.buildCorrectiveLayout());
     const currentKey = rawSqDistances.get(lastCoord.item.key.spec.elementID);
+    if(!currentKey) {
+      console.error(`Could not find and prioritize subkey in its fat-finger distribution`);
+    }
 
     /*
      * - how long has the subkey menu been visible?
@@ -533,7 +536,7 @@ export class SubkeyPopup implements GestureHandler {
     // We only want to add a single distance 'dimension' - we'll choose the one that affects
     // the interpreted distance the least.  (This matters for upflick-shortcutting in particular)
     const layerDistance = Math.min(timeDistance * timeDistance, pathDistance * pathDistance);
-    const baseKeyDistance = currentKey.distance + layerDistance;
+    const baseKeyDistance = (currentKey?.distance ?? 0) + layerDistance;
 
     // Include the base key as a corrective option.
     const baseKeyMap: CorrectionDistanceMap = new Map();
