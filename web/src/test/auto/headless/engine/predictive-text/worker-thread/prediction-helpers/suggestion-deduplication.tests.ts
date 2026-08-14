@@ -4,7 +4,7 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { deepCopy } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { CorrectionPredictionTuple, dedupeSuggestions, models } from "@keymanapp/lm-worker/test-index";
+import { CompositedIntermediatePrediction, dedupeSuggestions, models } from "@keymanapp/lm-worker/test-index";
 
 import Context = LexicalModelTypes.Context;
 import DummyModel = models.DummyModel;
@@ -24,77 +24,89 @@ const testModel = new DummyModel({
  * @returns
  */
 const build_its_is_set = () => {
-  const its: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'its',
-      p: 0.8
-    },
-    prediction: {
-      sample: {
+  const its: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 's',
           deleteLeft: 0
         },
         displayAs: 'its'
       },
-      p: 0.2
+      correction: 'its'
     },
-    totalProb: 0.16
-    // matchLevel does not yet exist.
+    metadata: {
+      probabilities: {
+        prediction: .2,
+        correction: .8,
+        total: .2 * .8
+      },
+      autoSelectable: true
+      // matchLevel does not yet exist.
+    }
   };
 
-  const it_is: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'its',
-      p: 0.8
-    },
-    prediction: {
-      sample: {
+  const it_is: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: '\'s',
           deleteLeft: 0
         },
         displayAs: 'it\'s'
       },
-      p: 0.8
+      correction: 'its'
     },
-    totalProb: 0.64
+    metadata: {
+      probabilities: {
+        prediction: .8,
+        correction: .8,
+        total: .8 * .8
+      },
+      autoSelectable: true
+    }
   };
 
-  const is: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'is',
-      p: 0.2
-    },
-    prediction: {
-      sample: {
+  const is: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 's',
           deleteLeft: 1
         },
         displayAs: 'is'
       },
-      p: 0.5
+      correction: 'is'
     },
-    totalProb: 0.1
+    metadata: {
+      probabilities: {
+        prediction: .5,
+        correction: .2,
+        total: .5 * .2
+      },
+      autoSelectable: true
+    }
   };
 
-  const is_not: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'is',
-      p: 0.2
-    },
-    prediction: {
-      sample: {
+  const is_not: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 'sn\'t',
           deleteLeft: 1
         },
         displayAs: 'isn\'t'
       },
-      p: 0.5
+      correction: 'is'
     },
-    totalProb: 0.1
+    metadata: {
+      probabilities: {
+        prediction: .5,
+        correction: .2,
+        total: .5 * .2
+      },
+      autoSelectable: true
+    }
   };
 
   return {
@@ -145,7 +157,7 @@ describe('dedupeSuggestions', () => {
     // There's no mathematically safe way to combine the components if the
     // underlying correction sources differ between duplicated suggestions,
     // though it's mathematically safe to combine their product.
-    expected.forEach((entry) => entry.totalProb *= (entry.prediction.sample.transform.insert == '\'s') ? 3 : 2);
+    expected.forEach((entry) => entry.metadata.probabilities.total *= (entry.components.prediction.transform.insert == '\'s') ? 3 : 2);
 
     assert.deepEqual(deduplicated, expected);
   });
