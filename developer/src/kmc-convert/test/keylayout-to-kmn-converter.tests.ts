@@ -184,7 +184,7 @@ describe('KeylayoutToKmnConverter', function () {
       const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
       const converted = sut.unitTestEndpoints.convert(read as KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
       assert.isNotNull(converted);
-      assert.notEqual(converted.rules.length, 0);
+      assert.notEqual(converted?.rules.length, 0);
     });
 
     // ProcessedData from unavailable file
@@ -821,9 +821,9 @@ describe('KeylayoutToKmnConverter', function () {
       it('data of \'' + values[0] + "' passed into createRuleData() " + 'should create an array of rules', async function () {
         const inputFilename = makePathToFixture(values[0][0]);
         const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-        const processedData = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+        const processedData = sut.unitTestEndpoints.convert(read as KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
         assert.isNotNull(processedData);
-        assert.deepEqual(processedData.rules[0], values[1][0]);
+        assert.deepEqual(processedData?.rules[0], values[1][0]);
       });
     });
   });

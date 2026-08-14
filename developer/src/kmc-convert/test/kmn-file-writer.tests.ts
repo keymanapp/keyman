@@ -14,6 +14,7 @@ import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from '.
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
 import { KmnFileWriter, UnicodeCharacterConversion, ReplacedOutputString } from '../src/keylayout-to-kmn/kmn-file-writer.js';
 import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
+import { Keylayout } from '@keymanapp/developer-utils';
 
 describe('KmnFileWriter', function () {
 
@@ -27,7 +28,7 @@ describe('KmnFileWriter', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.unitTestEndpoints.convert(read as Keylayout.KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     it('writeDataRules() should return true (no error) if written', async function () {
       const result = sutW.writeDataRules(converted);
@@ -42,7 +43,7 @@ describe('KmnFileWriter', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     const inputFilename = makePathToFixture('../data/Test.keylayout');
     const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const converted = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+    const converted = sut.unitTestEndpoints.convert(read as Keylayout.KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     const outExpectedFirst: string =
       "c ..................................................................................................................\n"
@@ -88,16 +89,16 @@ describe('KmnFileWriter', function () {
       [[new Rule("C2", '', '', 1, 1, 'UNAVAILABLE_dk', 'K_EQUAL', 2, 2, 'UNAVAILABLE', 'K_C', new TextEncoder().encode('C'),)],
       [''],
       ['c WARNING: unavailable modifier '],
-      ['c WARNING: unavailable modifier ']],
+      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(A2) ) unavailable modifier ']],
 
-      [[new Rule("C3", 'UNAVAILABLE_prev_dk', 'K_D', 0, 0, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
+      [[new Rule("C3", 'UNAVAILABLE_prev_dk', 'K_D', 1, 1, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
       ['c WARNING: unavailable modifier '],
-      ['c WARNING: unavailable modifier '],
+      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_prev_dk K_D]  >  dk(A1) ) unavailable modifier '],
       ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) ']],
 
       [[new Rule("C3", 'UNAVAILABLE_prev_dk', 'K_D', 0, 0, 'UNAVAILABLE_dk', 'K_EQUAL', 0, 0, 'UNAVAIL', 'K_C', new TextEncoder().encode('D'),)],
       ['c WARNING: unavailable modifier '],
-      ['c WARNING: unavailable modifier '],
+      ['c WARNING: unavailable superior rule ( [UNAVAILABLE_prev_dk K_D]  >  dk(A0) ) unavailable modifier '],
       ['c WARNING: unavailable superior rule ( [UNAVAILABLE_dk K_EQUAL]  >  dk(B0) ) unavailable modifier ']],
 
       [[new Rule("C3", 'CAPS', 'K_D', 0, 0, 'RALT', 'K_EQUAL', 0, 0, 'SHIFT', 'K_C', new TextEncoder().encode('D'),)],
@@ -105,9 +106,9 @@ describe('KmnFileWriter', function () {
       [''],
       ['']],
 
-      [[new Rule("C3", 'X', 'K_X', 0, 0, 'Y', 'K_Y', 0, 0, 'SHIFT', 'K_Z', new TextEncoder().encode('D'),)],
+      [[new Rule("C3", 'X', 'K_X', 1, 1, 'Y', 'K_Y', 0, 0, 'SHIFT', 'K_Z', new TextEncoder().encode('D'),)],
       ['c WARNING: unavailable modifier '],
-      ['c WARNING: unavailable modifier '],
+      ['c WARNING: unavailable superior rule ( [X K_X]  >  dk(A1) ) unavailable modifier '],
       ['c WARNING: unavailable superior rule ( [Y K_Y]  >  dk(B0) ) ']],
 
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
@@ -129,7 +130,7 @@ describe('KmnFileWriter', function () {
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'SHIFT', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),],
       ['c WARNING: duplicate rule earlier: [LALT K_A]  >  dk(C0) '],
-      ["c WARNING: duplicate rule earlier: dk(B0) + [SHIFT K_B]  >  dk(B0) "],
+      ["c WARNING: duplicate rule earlier: dk(C0) + [SHIFT K_B]  >  dk(B0) "],
       ["c WARNING: duplicate rule earlier: dk(B0) + [CAPS K_C]  >  'X' "]],
 
       //6-6 dup
@@ -153,7 +154,7 @@ describe('KmnFileWriter', function () {
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 1, 'RALT', 'K_F', new TextEncoder().encode('X')),],
       ['c WARNING: duplicate rule earlier: [LALT K_A]  >  dk(C0) '],
-      ["c WARNING: ambiguous rule earlier: dk(B0) + [NCAPS K_B]  >  dk(B0) "], [''],
+      ["c WARNING: ambiguous rule earlier: dk(C0) + [NCAPS K_B]  >  dk(B0) "], [''],
       ],
 
       // 5-5 dup
@@ -161,7 +162,7 @@ describe('KmnFileWriter', function () {
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 0, 'CAPS', 'K_C', new TextEncoder().encode('X')),
         new Rule("C3", 'LALT', 'K_A', 0, 0, 'NCAPS', 'K_B', 0, 0, 'RALT', 'K_F', new TextEncoder().encode('X')),],
       ['c WARNING: duplicate rule earlier: [LALT K_A]  >  dk(C0) '],
-      ["c WARNING: duplicate rule earlier: dk(B0) + [NCAPS K_B]  >  dk(B0) "],
+      ["c WARNING: duplicate rule earlier: dk(C0) + [NCAPS K_B]  >  dk(B0) "],
       ['']],
 
       // 4-2 amb
@@ -295,7 +296,7 @@ describe('KmnFileWriter', function () {
     ],
     [''],
     [''],
-    ["c WARNING: ambiguous rule later: [RALT K_B]  >  dk(A0) ambiguous rule earlier: [RALT K_B]  >  'X' PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  "]],
+    ["c WARNING: ambiguous rule later: [RALT K_B]  >  dk(A0) ambiguous rule earlier: [RALT K_B]  >  'X' PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN ! "]],
     ].forEach(function (values: (string[] | Rule[])[], index: number) {
       it(('rule ' + (values[0][0] as Rule).ruleType as string + ' should create " ' + ' "') + values[1] + ' | ' + values[2] + ' | ' + values[3] + '"', async function () {
         const result: string[] = sutW.unitTestEndpoints.reviewRules(values[0] as Rule[], 2).warningMessages;
@@ -408,7 +409,7 @@ describe('KmnFileWriter', function () {
       });
     });
   });
-describe('writeCharacterOrUnicode and return values', function () {
+  describe('writeCharacterOrUnicode and return values', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
       ["A", "A", "Msg "],
@@ -416,23 +417,24 @@ describe('writeCharacterOrUnicode and return values', function () {
       ["😀", "😀", "Msg "],
       ["ẘ", "ẘ", "Msg "],
       ["U+0001", "U+0001", "Msg Use of a control character "],
-      ["U+0061", "a", "Msg "],
+      ["U+0061", "U+0061", "Msg invalid Unicode code point used "],
+      ["&#x0061;", "a", "Msg "],
       ["&#x0002;", "U+0002", "Msg Use of a control character "],
       ["&#x1234;", 'ሴ', "Msg "],
       ["&#0003;", "U+0003", "Msg Use of a control character "],
       ["&#4666;", "ሺ", "Msg "],
       ["", "U+0006", "Msg Use of a control character "],
-      ['', '', 'Msg empty output or unsupported numerical html entity: '],
+      ['', '', 'Msg empty output or unsupported numerical html entity '],
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
         const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg ");
         assert.isNotNull(result);
-        assert.equal(result.character, values[1]);
-        assert.equal(result.message, values[2]);
+        assert.equal(result?.character, values[1]);
+        assert.equal(result?.message, values[2]);
       });
     });
   });
-     
+
   describe('UnicodeCharacterConversion processXmlValue', function () {
     [
       ["", ''],

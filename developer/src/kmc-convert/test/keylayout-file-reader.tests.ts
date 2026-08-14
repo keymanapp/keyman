@@ -89,6 +89,7 @@ describe('KeylayoutFileReader', function () {
       const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
       assert.isFalse(validated);
     });
+
     it('validate() should return false on inputfile with missing tags', async function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_missingTags.keylayout');
@@ -214,7 +215,7 @@ describe('KeylayoutFileReader', function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const binaryData = compilerTestCallbacks.loadFile(inputFilename);
-      const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(binaryData);
+      const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(binaryData) as Keylayout.KeylayoutXMLSourceFile;
 
       assert.isNotNull(result);
       assert.notEqual(result.keyboard, null);

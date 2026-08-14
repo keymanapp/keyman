@@ -17,8 +17,7 @@ interface MessageCharacter {
   message: string;
   character: string;
 };
-// TODO-KMC-CONVERT: remove
-// Todo-kmc-convert edit interface see PR 16073
+
 interface RuleReview {
   warningMessages: string[];
   extraWarning: string;
@@ -204,22 +203,26 @@ export class UnicodeCharacterConversion {
 interface UnavailableModifier extends RuleReview {
   type: 'UnavailableModifier';
 };
+
 interface UnavailableSuperiorRule extends RuleReview {
   type: 'UnavailableSuperiorRule';
 };
+
 interface DuplicateRules extends RuleReview {
   type: 'DuplicateRule';
 };
+
 interface AmbiguousRules extends RuleReview {
   type: 'AmbiguousRule';
 };
+
 interface WarningTextSet extends RuleReview {
   type: 'WarningTextSet';
 };
+
 export class KmnFileWriter {
 
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) { };
-
   /**
    * @brief  member function to write data from object to a Uint8Array
    * @param  dataUkelele the array holding all keyboard data
@@ -352,7 +355,7 @@ export class KmnFileWriter {
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
         if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+          warnText[2] = (characterMessage.message === '') ? characterMessage.message : characterMessage.message;
         }
 
 
@@ -363,7 +366,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
-            warningTextToWrite = warnText[2] + "here: ";
+            warningTextToWrite = warnText[2] + 'here: ';
           }
 
           if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -418,7 +421,7 @@ export class KmnFileWriter {
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
         if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+          warnText[2] = (characterMessage.message === '') ? characterMessage.message : characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -428,7 +431,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
-            warningTextToWrite = warnText[1] + "here: ";
+            warningTextToWrite = warnText[1] + 'here: ';
           }
 
           if (!((warnText[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -444,7 +447,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
-            warningTextToWrite = warnText[2] + "here: ";
+            warningTextToWrite = warnText[2] + 'here: ';
           }
 
           if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -503,7 +506,7 @@ export class KmnFileWriter {
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
         if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+          warnText[2] = (characterMessage.message === '') ? characterMessage.message : characterMessage.message;
         }
 
 
@@ -515,7 +518,7 @@ export class KmnFileWriter {
           let warningTextToWrite = "";
 
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[0].length > 0)) {
-            warningTextToWrite = warnText[0] + "here: ";
+            warningTextToWrite = warnText[0] + 'here: ';
           }
 
           if (!((warnText[0].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -532,7 +535,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
-            warningTextToWrite = warnText[1] + "here: ";
+            warningTextToWrite = warnText[1] + 'here: ';
           }
 
           if (!((warnText[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -551,7 +554,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
-            warningTextToWrite = warnText[2] + "here: ";
+            warningTextToWrite = warnText[2] + 'here: ';
           }
 
           if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -617,7 +620,7 @@ export class KmnFileWriter {
           + ']  >  dk('
           + inObj.dk_prefix[1]
           + inObj.dk_id[1]
-          + ') ) : ';
+          + ') ) ';
       }
 
       if (inObj.modifier) {
@@ -636,20 +639,60 @@ export class KmnFileWriter {
           + ']  >  dk('
           + inObj.dk_prefix[0]
           + inObj.dk_id[0]
-          + ') ) : ';
-      }
+          + ') ) ';
 
+        outMsg[2] =
+          'unavailable superior rule ['
+          + inObj.prevDk_modifier + ' '
+          + inObj.prevDk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
+          + ')  '
 
-      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
-      if (inObj.Dk_modifier) {
-        outMsg[1] += 'unavailable modifier ';
-        outMsg[2] = 'unavailable superior rule ( ['
+          + 'unavailable superior rule ['
+          + inObj.prevDk_modifier + ' '
+          + inObj.prevDk_key
+          + '+'
+
           + inObj.Dk_modifier + ' '
           + inObj.Dk_key
           + ']  >  dk('
           + inObj.dk_prefix[1]
           + inObj.dk_id[1]
-          + ') ) : ';
+          + ')  ';
+
+      }
+
+      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
+      if (inObj.Dk_modifier) {
+
+        const mod_OK = new KeylayoutToKmnConverter(this.callbacks, this.options).isAcceptableKeymanModifier(inObj.Dk_modifier);
+
+        if ((outMsg[1].lastIndexOf('unavailable modifier') < 0))
+          outMsg[1] += (!mod_OK) ? 'unavailable modifier ' : '';
+
+        outMsg[2] = 'unavailable superior rule ( ['
+          + inObj.prevDk_modifier + ' '
+          + inObj.prevDk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
+          + ') ) ';
+
+        outMsg[2] = outMsg[2]
+          + (!mod_OK ? 'unavailable superior rule ( ' : '')
+          + 'G dk('
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
+          + ')  + ['
+          + inObj.Dk_modifier + ' '
+          + inObj.Dk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[1]
+          + inObj.dk_id[1]
+          + ') '
+          + (!mod_OK ? ')' : '');
       }
 
       if (inObj.modifier) {
@@ -660,7 +703,7 @@ export class KmnFileWriter {
     if (inObj.compare_type === 'amb_1_1' || inObj.compare_type === 'dup_1_1') {
 
       outMsg[posWarning] = inObj.warningMessages[posWarning]
-        + ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        + ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
         + (inObj.isEarlier ? 'earlier' : 'later')
         + ': [' + inObj.modifier + ' ' + inObj.key + ']  >  \''
         + inObj.output + '\' ';
@@ -672,7 +715,7 @@ export class KmnFileWriter {
       || inObj.compare_type === 'amb_2_4') {
 
       const textsegment = (
-        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
         + (inObj.isEarlier ? 'earlier' : 'later')
         + ': [' + inObj.Dk_modifier + ' ' + inObj.Dk_key + ']  >  dk('
         + inObj.dk_prefix[1] + inObj.dk_id[1] + ') ');
@@ -687,7 +730,7 @@ export class KmnFileWriter {
       || inObj.compare_type === 'amb_4_2') {
 
       const textsegment = (
-        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
         + (inObj.isEarlier ? 'earlier' : 'later')
         + ': [' + inObj.prevDk_modifier + ' ' + inObj.prevDk_key + ']  >  dk('
         + inObj.dk_prefix[0] + inObj.dk_id[0] + ') ');
@@ -700,7 +743,7 @@ export class KmnFileWriter {
     if (inObj.compare_type === 'amb_5_5' || inObj.compare_type === 'dup_5_5') {
 
       const textsegment = (
-        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
         + (inObj.isEarlier ? 'earlier' : 'later')
         + ': dk(' + inObj.dk_prefix[0] + inObj.dk_id[0] + ") + ["
         + inObj.Dk_modifier + " " + inObj.Dk_key + "]  >  "
@@ -716,7 +759,7 @@ export class KmnFileWriter {
       || inObj.compare_type === 'amb_6_6' || inObj.compare_type === 'dup_6_6') {
 
       const textsegment = (
-        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
         + (inObj.isEarlier ? 'earlier' : 'later')
         + ': dk(' + inObj.dk_prefix[1] + inObj.dk_id[1] + ") + ["
         + inObj.modifier + " " + inObj.key + "]  >  \'"
@@ -802,17 +845,20 @@ export class KmnFileWriter {
     else if (rule[index].ruleType === "C3") {
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierPrevDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C3';
-        unavailableSuperiWarnings.dk_prefix = ['A', ''];
+        unavailableSuperiWarnings.dk_prefix = ['A', 'B'];
         unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
         unavailableSuperiWarnings.prevDk_modifier = rule[index].modifierPrevDeadkey;
         unavailableSuperiWarnings.prevDk_key = rule[index].prevDeadkey;
+        unavailableSuperiWarnings.Dk_modifier = rule[index].modifierDeadkey;
+        unavailableSuperiWarnings.Dk_key = rule[index].deadkey;
         unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings, 2);
       }
 
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C3';
-        unavailableSuperiWarnings.prevDk_modifier = '';
-        unavailableSuperiWarnings.dk_prefix = ['', 'B'];
+        unavailableSuperiWarnings.prevDk_modifier = rule[index].modifierPrevDeadkey;
+        unavailableSuperiWarnings.prevDk_key = rule[index].prevDeadkey;
+        unavailableSuperiWarnings.dk_prefix = ['A', 'B'];
         unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
         unavailableSuperiWarnings.Dk_modifier = rule[index].modifierDeadkey;
         unavailableSuperiWarnings.Dk_key = rule[index].deadkey;
@@ -1233,11 +1279,11 @@ export class KmnFileWriter {
     //    assuming that if a C0/C1 and a C2/C3 rule is ambiguous the user prefers to use the C2/C3 rule over the C0/C1 rule
     // if both happens, nothing would be written, therefore this messsage
 
-    const extraWarning = "PLEASE CHECK THAT RULE AS IT WILL NOT BE WRITTEN !";
+    const extraWarning = "PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN ! ";
 
     for (let i = 0; i < 3; i++) {
       if (ambiguousWarnings.warningMessages[i] !== "") {
-        if ((ambiguousWarnings.warningMessages[i].indexOf("earlier:") > -1) && (ambiguousWarnings.warningMessages[i].indexOf("later:") > -1)) {
+        if ((ambiguousWarnings.warningMessages[i].indexOf("earlier") > -1) && (ambiguousWarnings.warningMessages[i].indexOf("later") > -1)) {
           ambiguousWarnings.warningMessages[i] = ambiguousWarnings.warningMessages[i] + extraWarning;
         }
       }
@@ -1246,11 +1292,12 @@ export class KmnFileWriter {
     for (let i = 0; i < 3; i++) {
       const completeWarning =
         unavailableSuperiWarnings.warningMessages[i]
+        + unavailableModiWarnings.warningMessages[i]
         + duplicateWarnings.warningMessages[i]
-        + ambiguousWarnings.warningMessages[i]
-        + unavailableModiWarnings.warningMessages[i];
+        + ambiguousWarnings.warningMessages[i];
 
-      completeWarning ? (resultWarningTextSet.warningMessages[i] = "c WARNING: " + completeWarning + " here: ") : resultWarningTextSet.warningMessages[i] = '';
+      completeWarning ? (resultWarningTextSet.warningMessages[i] = "c WARNING: " + completeWarning) : resultWarningTextSet.warningMessages[i] = '';
+
     }
 
     return resultWarningTextSet;
