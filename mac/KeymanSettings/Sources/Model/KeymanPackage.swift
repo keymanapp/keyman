@@ -26,10 +26,10 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   
   public let id: UUID
   
-  // the directory where this package is contained
-  // used to delete the package if requested
-  // this value must be updated when the package is moved
-  // from the temp directory during package installation  
+  // The directory where this package is contained.
+  // It is used to delete/uninstall the package if requested by the user.
+  // This value only changes when the package is moved
+  // from the temp directory during package installation.
   public var sourceDirectoryUrl: URL
   
   // the URL for downloading the package from keyman.com
