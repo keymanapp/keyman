@@ -8,7 +8,7 @@ Remove user-defined style sheet.
 
 ## Syntax
 
-```c
+```js
 keyman.util.removeStyleSheet(Pelem);
 ```
 
