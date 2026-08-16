@@ -82,7 +82,7 @@ struct ConfigDebugView: View {
           }
       }
       .padding()
-      // alert riggers automatically when $dropError becomes non-nil
+      // alert triggers automatically when $dropError becomes non-nil
       .alert("Package Installation Failed", isPresented: $isShowingDropKmpAlert) {
           Button("OK", role: .cancel) { }
       } message: {

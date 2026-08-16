@@ -21,6 +21,12 @@ struct MainConfigView: View {
   @State private var selectedTab = 0
   @State private var packageSelectedForHelpUrl: URL? = nil
   
+  // for drag and drop package installation
+  @State private var dropError: DropKmpError?
+  @State private var isShowingDropKmpAlert = false
+  @State private var alertMessage = ""
+  @State private var isHovering = false
+
   /**
    * Assigns packageSelectedForHelpUrl the url argument and changes the selected tab to the help tab
    */
@@ -58,7 +64,37 @@ struct MainConfigView: View {
             showHelpTab(for: url) })
         }
         .formStyle(.grouped)
-        
+        // highlight border with accent color when hovering over view
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.accentColor, lineWidth: 2).opacity(isHovering ? 1 : 0))
+        .animation(.easeInOut(duration: 0.2), value: isHovering)
+        // accepts URL drops
+        .dropDestination(for: URL.self) { urls, _ in
+          // reject drop if it is more than one file
+          guard let droppedFileUrl = urls.first, urls.count == 1 else {
+            let error = DropKmpError.tooManyFiles
+            self.alertMessage = error.localizedDescription
+            self.isShowingDropKmpAlert = true
+            return false // the drop failed
+          }
+          do {
+            try settings.processDroppedKmpFile(at: droppedFileUrl)
+            return true // the drop was successful
+          } catch {
+            self.alertMessage = error.localizedDescription
+            self.isShowingDropKmpAlert = true
+            return false
+            
+          }
+        } isTargeted: { hovering in
+          isHovering = hovering
+        }
+        // alert triggers automatically when $dropError becomes non-nil
+        .alert("Package Installation Failed", isPresented: $isShowingDropKmpAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(alertMessage)
+        }
+
         // the Spacer pushes the contents of the VStack to the top of the VStack
         Spacer()
       }
