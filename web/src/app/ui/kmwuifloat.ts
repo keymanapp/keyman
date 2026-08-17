@@ -202,10 +202,6 @@ if(!keyman) {
         //may also want to initialize style sheet here ??
       }
 
-      readonly _UnloadUserInterface = () => {
-        this.KeyboardSelector = this.innerDiv = this.outerDiv = this.kbdIcon = null;
-      };
-
       /**
        * UI removal - resource cleanup
        */
@@ -215,7 +211,7 @@ if(!keyman) {
           root.parentNode.removeChild(root);
         }
 
-        this._UnloadUserInterface();
+        this.KeyboardSelector = this.innerDiv = this.outerDiv = this.kbdIcon = null;
 
         if(window.removeEventListener) {
           window.removeEventListener('resize', this._Resize, false);
@@ -606,9 +602,6 @@ if(!keyman) {
 
     // but also call initialization when script loaded, which is after KMW initialization for asynchronous script loading
     ui.initialize();
-
-    // is/was never actually raised.  Note that the `shutdown` method likely fulfills a similar role.
-    // keyman.addEventListener('unloaduserinterface', ui._UnloadUserInterface);
 
   } catch(err){}
 
