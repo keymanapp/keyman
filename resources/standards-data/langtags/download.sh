@@ -7,11 +7,12 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 source "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+source "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 source "$KEYMAN_ROOT/resources/build/minimum-versions.inc.sh"
 
 builder_describe \
   "Get latest langtags.json" \
-  "download    Download latest release langtags.json" \
+  "download+   Download latest release langtags.json" \
   "staging     Download pre-release staging langtags.json"
 
 builder_parse "$@"
@@ -20,7 +21,7 @@ do_download() {
   local name="$1"
   local url="$2"
 
-  curl -f -o ./langtags.json "$url"
+  util_curl_download_file_with_retry "$url" ./langtags.json
 
   local LANGTAGS_API_VERSION LANGTAGS_DATE
 
@@ -35,7 +36,7 @@ do_download() {
 
   if [[ "$LANGTAGS_DATE" != "$KEYMAN_VERSION_LANGTAGS" ]]; then
     builder_warn "The downloaded $name langtags.json date ($LANGTAGS_DATE) differs from minimum-versions.inc.sh ($KEYMAN_VERSION_LANGTAGS)."
-    builder_warn "Enusre you update minimum-versions.inc.sh accordingly (and run the minimum-versions build)"
+    builder_warn "Ensure you update minimum-versions.inc.sh accordingly (and run the minimum-versions build)"
   fi
 }
 
