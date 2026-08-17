@@ -391,7 +391,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
       os_log_info([KMLogs configLog], "persisted options found in UserDefaults with key = %{public}@", key);
     }
     for (NSString *keyboardPath in optionsMap) {
-      os_log_info([KMLogs configLog], "persisted options keybaord path = %{public}@", keyboardPath);
+      os_log_info([KMLogs configLog], "persisted options keyboard path = %{public}@", keyboardPath);
       NSDictionary *keyboardOptions = [optionsMap objectForKey:keyboardPath];
       
       NSString *newPathString = [self trimObsoleteKeyboardPath:keyboardPath];
