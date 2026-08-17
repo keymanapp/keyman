@@ -1,8 +1,11 @@
-//
-//  AboutPanelView.swift
-//  Config
-//
-//  Created by Eli Schantz on 7/23/26.
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Eli Schantz on 2026-07-23
+ *
+ * View shown when About Keyman Configuration is selected from the menu.
+ */
+
 import SwiftUI
 import KeymanSettings
 
