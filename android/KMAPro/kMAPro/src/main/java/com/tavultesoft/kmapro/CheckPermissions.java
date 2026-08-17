@@ -33,12 +33,13 @@ public class CheckPermissions {
       // API 30-32
       permissionsOK = Environment.isExternalStorageManager() ||
         checkPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
-    } else {
+    }
+
+    else {
       // API 33+
-      // We had to remove these MEDIA permissions from AndroidManifest.xml so these will end up failing
-      // https://support.google.com/googleplay/android-developer/answer/14115180?hl=en
-      permissionsOK = permissionsOK && checkPermission(activity, Manifest.permission.READ_MEDIA_IMAGES);
-      permissionsOK = permissionsOK && checkPermission(activity, Manifest.permission.READ_MEDIA_VIDEO);
+      // No special permissions are needed.
+      // - https://developer.android.com/reference/android/Manifest.permission#READ_EXTERNAL_STORAGE
+      // - https://stackoverflow.com/a/73630987
     }
 
     return permissionsOK;
