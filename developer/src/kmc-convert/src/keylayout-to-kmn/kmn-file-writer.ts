@@ -16,6 +16,7 @@ interface MessageCharacter {
   message: string;
   character: string;
 };
+
 // Todo-kmc-convert edit interface
 interface RuleReview {
   warningMessage_0: string;
