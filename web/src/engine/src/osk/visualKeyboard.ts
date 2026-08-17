@@ -18,7 +18,7 @@ import { isEmptyTransform } from 'keyman/common/web-utils';
 import { DeviceSpec, timedPromise } from 'keyman/common/web-utils';
 
 import { buildCorrectiveLayout, correctionKeyFilter } from './correctionLayout.js';
-import { distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';
+import { CorrectionDistanceMap, distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';
 
 import {
   GestureRecognizer,
@@ -927,7 +927,7 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
    * @param keySpec The spec of the key directly triggered by the input event.  May be for a subkey.
    * @returns
    */
-  getSimpleTapCorrectionDistances(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): Map<ActiveKeyBase, number> {
+  getSimpleTapCorrectionDistances(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): CorrectionDistanceMap {
     // Note:  if subkeys are active, they will still be displayed at this time.
     const touchKbdPos = this.getTouchCoordinatesOnKeyboard(input);
     const layerGroup = this.layerGroup.element;  // Always has proper dimensions, unlike kbdDiv itself.
@@ -940,7 +940,11 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
 
     const kbdAspectRatio = width / height;
 
-    const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(this.layerId), kbdAspectRatio);
+    // When possible, correct to other keys on the same layer as the input key.
+    // Keys with nextLayer can cause the underlying layer to shift, so determine
+    // the actual correction layer before proceeding!
+    const layer = keySpec.layer ?? this.layerId;
+    const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(layer), kbdAspectRatio);
     return keyTouchDistances(touchKbdPos, correctiveLayout);
   }
   //#endregion
@@ -1647,9 +1651,12 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
     // that the user actually touched.  Even if it's not the most likely key.
     const keyDistribution = keyEvent.keyDistribution;
     if(keyDistribution && keyDistribution.length > 1) {
-      const matchIndex = keyDistribution.findIndex(keySample => keySample.keySpec == keySpec);
+      // While the references should match, it appears something disrupts this
+      // within the iOS WebView (#16254).  Fortunately, we can still check against the unique
+      // element ID, fortunately.
+      const matchIndex = keyDistribution.findIndex(keySample => keySample.elementID == keySpec.elementID);
       if(matchIndex < 0 && correctionKeyFilter(keySpec)) {
-        console.error("Could not find and prioritize output key in its fat-finger distribution");
+        console.error(`Could not find and prioritize output key in its fat-finger distribution`);
       } else if(matchIndex > 0) {
         // Possibly not ideal for easy reading during inspection, but it's
         // low-cost to just swap the entry with the most likely entry and call

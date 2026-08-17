@@ -10,7 +10,7 @@ keyboards. Please click [this link](__full-manual-control.html) to open the test
 
 Include the following script in the HEAD of your page:
 
-```js
+```html
 <script>
   var KWControl = null;
 

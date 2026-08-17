@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction } from "keyman/engine/keyboard";
 import { ProcessorInitOptions } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader } from "keyman/engine/keyboard";
@@ -332,10 +335,6 @@ export class KeymanEngineBase<
         this.config.deferForInitialization.then(eventRaiser);
       }
     });
-
-    this.keyboardRequisitioner.cache.on('keyboardadded', (keyboard) => {
-      this.legacyAPIEvents.callEvent('keyboardloaded', { keyboardName: keyboard.id });
-    });
     //
     // #endregion
 
@@ -344,6 +343,8 @@ export class KeymanEngineBase<
 
   /**
    * Public API:  Denotes the 'patch' component of the version of the current engine.
+   *
+   * 19.0: deprecated
    *
    * https://help.keyman.com/developer/engine/web/current-version/reference/core/build
    */
@@ -354,10 +355,39 @@ export class KeymanEngineBase<
   /**
    * Public API:  Denotes the major & minor components of the version of the current engine.
    *
+   * 19.0: deprecated
+   *
    * https://help.keyman.com/developer/engine/web/current-version/reference/core/version
    */
   public get version(): string {
     return KEYMAN_VERSION.VERSION_RELEASE;
+  }
+
+  /**
+   * Public API:  Returns version information for the current engine
+   *
+   * 19.0: introduced, replacing build and version properties
+   *
+   * https://help.keyman.com/developer/engine/web/current-version/reference/core/versionInfo
+   */
+  public get versionInfo(): {
+    full: string;
+    major: number;
+    minor: number;
+    patch: number;
+    version: string;
+    tier: string;
+    environment: string;
+  } {
+    return {
+      full:        KEYMAN_VERSION.VERSION_WITH_TAG,
+      major:       parseInt(KEYMAN_VERSION.VERSION_MAJOR, 10),
+      minor:       parseInt(KEYMAN_VERSION.VERSION_MINOR, 10),
+      patch:       parseInt(KEYMAN_VERSION.VERSION_PATCH, 10),
+      version:     KEYMAN_VERSION.VERSION,
+      tier:        KEYMAN_VERSION.TIER,
+      environment: KEYMAN_VERSION.VERSION_ENVIRONMENT,
+    }
   }
 
   public get hardKeyboard(): HardKeyboardT {

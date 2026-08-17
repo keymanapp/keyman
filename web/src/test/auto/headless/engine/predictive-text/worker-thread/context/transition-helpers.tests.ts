@@ -13,8 +13,11 @@ import { default as defaultBreaker } from '@keymanapp/models-wordbreakers';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
+import { KMWString } from 'keyman/common/web-utils';
+
 import {
   buildEdgeWindow,
+  ContextState,
   ContextToken,
   ContextTokenization,
   generateSubsetId,
@@ -26,6 +29,7 @@ import {
   precomputationSubsetKeyer,
   precomputeTransitions,
   SearchQuotientCluster,
+  SearchQuotientNode,
   TokenizationSubset,
   TokenizationTransitionEdits,
   TransformUtils,
@@ -99,6 +103,9 @@ function buildTokenizationForSimpleInputs (
     // Only the 'insert' and 'deleteLeft' fields are set during transform
     // tokenization at this time.
     map.set(0, { insert: sample.insert, deleteLeft: sample.deleteLeft });
+    if(sample.id !== undefined) {
+      map.get(0).id = sample.id;
+    }
     return { sample: map, p };
   })
 };
@@ -457,6 +464,54 @@ describe('precomputeTransitions', () => {
       });
     });
   });
+
+  it('correctly computes removed token count for multi-token-spanning backspace inputs', () => {
+    const tokens: ContextToken[] = [];
+    tokens.push(ContextToken.fromRawText(plainModel, 'an'));
+    tokens.push(ContextToken.fromRawText(plainModel, ' '));
+
+    let appleNode: SearchQuotientNode = new LegacyQuotientRoot(plainModel);
+    let appleDist1: Distribution<Transform> = [{
+      sample: {
+        insert: 'apt',
+        deleteLeft: 0,
+        id: 1
+      },
+      p: 1
+    }];
+    appleNode = new LegacyQuotientSpur(appleNode, appleDist1, appleDist1[0]);
+    let appleDist2: Distribution<Transform> = [{
+      sample: {
+        insert: 'ple',
+        deleteLeft: 1,
+        id: 2
+      },
+      p: 1
+    }];
+    appleNode = new LegacyQuotientSpur(appleNode, appleDist2, appleDist2[0]);
+    tokens.push(new ContextToken(appleNode));
+
+    // also add space token
+    tokens.push(ContextToken.fromRawText(plainModel, ' ', false, 3));
+    tokens.push(ContextToken.fromRawText(plainModel, '', true, 3));
+
+    const dist: Distribution<Transform> = [{
+      sample: {
+        insert: '',
+        deleteLeft: 2,
+        id: 4
+      },
+      p: 1
+    }]
+
+    const tokenization = new ContextTokenization(tokens);
+    const precomputedTransition = precomputeTransitions([tokenization], dist);
+    const displaySubset = precomputedTransition.subsets.get(precomputedTransition.keyMatchingUserContext);
+
+    assert.equal(displaySubset.transitionEdges.get(tokenization).alignment.removedTokenCount, 2);
+    assert.isOk(displaySubset.transitionEdges.get(tokenization).inputs[0].sample.get(-2));
+    assert.deepEqual(displaySubset.transitionEdges.get(tokenization).inputs[0].sample.get(-2), { insert: '', deleteLeft: 1, id: 4 });
+  });
 });
 
 describe('transitionTokenizations', () => {
@@ -500,5 +555,85 @@ describe('transitionTokenizations', () => {
 
       assertMatchingTokenization(actual, expected, msg);
     }
+  });
+
+  it('handles backspace transitions correctly for a recently reset context', () => {
+    const baseState = new ContextState({
+      left: 'an apple a',
+      startOfBuffer: true,
+      endOfBuffer: true
+    }, plainModel);
+
+    const dist: Distribution<Transform> = [{
+      sample: {
+        insert: '',
+        deleteLeft: 3
+      },
+      p: 1
+    }]
+    const precomputedTransition = precomputeTransitions([baseState.tokenization], dist);
+
+    const result = transitionTokenizations(precomputedTransition.subsets, dist);
+
+    const resultTokenization = result.get(precomputedTransition.keyMatchingUserContext);
+
+    assert.isOk(resultTokenization);
+    const resultTail = resultTokenization.tail;
+
+    assert.equal(resultTail.exampleInput, 'appl');
+    assert.equal(resultTail.inputCount, resultTail.searchModule.codepointLength);
+    assert.equal(resultTail.searchModule.codepointLength, KMWString.length(resultTail.exampleInput));
+  });
+
+  it('handles backspace transitions correctly for a context with recent complex transforms', () => {
+    const tokens: ContextToken[] = [];
+    tokens.push(ContextToken.fromRawText(plainModel, 'an'));
+    tokens.push(ContextToken.fromRawText(plainModel, ' '));
+
+    let appleNode: SearchQuotientNode = new LegacyQuotientRoot(plainModel);
+    let appleDist1: Distribution<Transform> = [{
+      sample: {
+        insert: 'apt',
+        deleteLeft: 0,
+        id: 1
+      },
+      p: 1
+    }];
+    appleNode = new LegacyQuotientSpur(appleNode, appleDist1, appleDist1[0]);
+    let appleDist2: Distribution<Transform> = [{
+      sample: {
+        insert: 'ple',
+        deleteLeft: 1,
+        id: 2
+      },
+      p: 1
+    }];
+    appleNode = new LegacyQuotientSpur(appleNode, appleDist2, appleDist2[0]);
+    tokens.push(new ContextToken(appleNode));
+
+    // also add space token
+    tokens.push(ContextToken.fromRawText(plainModel, ' ', false, 3));
+    tokens.push(ContextToken.fromRawText(plainModel, '', true, 3));
+
+    const dist: Distribution<Transform> = [{
+      sample: {
+        insert: '',
+        deleteLeft: 2,
+        id: 4
+      },
+      p: 1
+    }]
+
+    const precomputedTransition = precomputeTransitions([new ContextTokenization(tokens)], dist);
+    const result = transitionTokenizations(precomputedTransition.subsets, dist);
+    const resultTokenization = result.get(precomputedTransition.keyMatchingUserContext);
+
+    assert.isOk(resultTokenization);
+    assert.equal(resultTokenization.tokens.length, 3); // should land within the 'apple' token.
+    const resultTail = resultTokenization.tail;
+
+    assert.equal(resultTail.exampleInput, 'appl');
+    assert.equal(resultTail.inputCount, resultTail.searchModule.codepointLength);
+    assert.equal(resultTail.searchModule.codepointLength, KMWString.length(resultTail.exampleInput));
   });
 });

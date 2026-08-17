@@ -14,6 +14,7 @@ uses
   Sentry.Client,
 
   KeymanPaths,
+  Keyman.Configuration.Util.NetworkConnection,
   Keyman.System.ExecutionHistory,
   Keyman.System.UpdateCheckResponse,
   utilkmshell;
@@ -101,6 +102,14 @@ type
      * @returns True  if the Keyman is ready to install.
      *)
     function ValidateReadyToInstall: Boolean;
+    (**
+     * Is a download load of the updates required
+     * One use case is by the UI to warn the user in foreground manual update
+     * that the update needs to be downloaded
+     *
+     * @returns True  if in the UpdateAvailable or Downloading State
+     *)
+    function IsDownloadRequired: Boolean;
     function IsInstallingState: Boolean;
 
     function GetAutomaticUpdates: Boolean;
@@ -591,6 +600,13 @@ begin
   Result := (CurrentState is InstallingState);
 end;
 
+function TUpdateStateMachine.IsDownloadRequired: Boolean;
+begin
+  Result :=
+    (CurrentState is UpdateAvailableState) or
+    (CurrentState is DownloadingState);
+end;
+
 // base implmentation to be overiden
 
 procedure TState.HandleInstallPackages;
@@ -719,7 +735,9 @@ procedure UpdateAvailableState.EnterState;
 begin
   // Enter UpdateAvailableState
   bucStateContext.SetRegistryState(usUpdateAvailable);
-  if bucStateContext.FAutomaticUpdate then
+
+  if bucStateContext.FAutomaticUpdate and
+    not TNetworkConnection.IsBackgroundUpdateBlocked then
   begin
     StartDownloadProcess;
   end;
@@ -751,7 +769,8 @@ end;
 
 function UpdateAvailableState.HandleKmShell;
 begin
-  if bucStateContext.FAutomaticUpdate then
+  if bucStateContext.FAutomaticUpdate and
+    not TNetworkConnection.IsBackgroundUpdateBlocked then
   begin
     // we will use a new kmshell process to enable
     // the download as background process.
@@ -773,6 +792,8 @@ end;
 
 procedure UpdateAvailableState.HandleInstallNow;
 begin
+  // This is deliberate action therefore no
+  // need to check if background update is allowed.
   bucStateContext.SetApplyNow(True);
   // A new kmshell process will be used to download
   StartDownloadProcess;
