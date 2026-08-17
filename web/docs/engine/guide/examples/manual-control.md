@@ -11,7 +11,7 @@ activated by default. This example continues to use the KeymanWeb default interf
 
 Include the following script in the HEAD of your page:
 
-```js
+```html
 <script>
     keyman.init().then(async function() {
       await keyman.addKeyboards({

@@ -4,12 +4,12 @@ export class AttachmentInfo {
   /**
    * Tracks the language code corresponding to the `keyboard` field.
    */
-  languageCode:   string;
+  public languageCode:   string;
 
   /**
    * Tracks the inputmode originally set by the webpage.
    */
-  inputMode?: string;
+  public inputMode?: string;
 
   /**
    * Constructor for AttachmentInfo.
