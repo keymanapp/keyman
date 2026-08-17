@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+    <title>Keyman for macOS</title>
+    <welcome file="welcome.rtf" />
+    <license file="license.rtf" mime-type="text/rtf"/>
+    <!-- Light Mode Background -->
+    <background file="keyman-x20-y36-144.png" mime-type="image/png" alignment="center" scaling="none"/>
+    <!-- Dark Mode Background -->
+    <background-darkAqua file="keyman-x20-y36-144.png" mime-type="image/png" alignment="center" scaling="none"/>
+
+    <conclusion file="conclusion.rtf" mime-type="text/rtf"/>
+
+    <!-- Restrict to macOS 13 Ventura or newer -->
+    <allowed-os-versions>
+        <os-version min="13.0"/>
+    </allowed-os-versions>
+
+    <pkg-ref id="com.keyman.config.installer"/>
+    <pkg-ref id="com.keyman.im.installer"/>
+    <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.keyman.config.installer"/>
+            <line choice="com.keyman.im.installer"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="com.keyman.config.installer" visible="false">
+        <pkg-ref id="com.keyman.config.installer"/>
+    </choice>
+    <pkg-ref id="com.keyman.config.installer" version="${KEYMAN_VERSION}" onConclusion="none">keyman-config.pkg</pkg-ref>
+    <choice id="com.keyman.im.installer" visible="false">
+        <pkg-ref id="com.keyman.im.installer"/>
+    </choice>
+    <pkg-ref id="com.keyman.im.installer" version="${KEYMAN_VERSION}" onConclusion="RequireRestart">keyman-input-method.pkg</pkg-ref>
+</installer-gui-script>
