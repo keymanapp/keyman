@@ -121,7 +121,6 @@ describe('KmnFileWriter', function () {
     });
   });
 
-
   describe('reviewRules messages duplicate and ambiguous', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -409,6 +408,7 @@ describe('KmnFileWriter', function () {
       });
     });
   });
+
   describe('writeCharacterOrUnicode and return values', function () {
     const sutW = new KmnFileWriter(compilerTestCallbacks, compilerTestOptions);
     [

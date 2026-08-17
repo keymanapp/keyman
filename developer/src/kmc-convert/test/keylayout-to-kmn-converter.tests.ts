@@ -102,6 +102,7 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
   });
+
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -123,7 +124,6 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
   });
-
 
   describe('RunSpecialTestFiles - create Error: undefined action', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
