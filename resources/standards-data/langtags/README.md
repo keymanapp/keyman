@@ -11,7 +11,8 @@ langtags.json.
 ## Update
 
 ```bash
-./download.sh
+./download.sh           # download release version
+./download.sh staging   # download pre-release version
 ```
 
 ## File Format
