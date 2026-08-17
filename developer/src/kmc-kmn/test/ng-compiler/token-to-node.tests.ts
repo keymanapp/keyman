@@ -12,6 +12,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { TokenType } from "../../src/ng-compiler/token-type.js";
 import { TOKEN_TO_NODE } from '../../src/ng-compiler/token-to-node.js';
+import { readFileSync } from 'node:fs';
 
 describe("TOKEN_TO_NODE Tests", () => {
   it("is sorted in alphabetical order", () => {
@@ -27,5 +28,16 @@ describe("TOKEN_TO_NODE Tests", () => {
     });
     assert.deepEqual(tokenTypeValues, nodeTypeValues);
   });
-  // TODO-NG-COMPILER: test that TOKEN_TO_NODE contains all the BNF tokens
+  it("contains all the BNF tokens", () => {
+    const bnfBuffer: string = readFileSync('../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf').toString()
+    const match = [...bnfBuffer.matchAll(/[A-Z_]{2,}/g)];
+    const bnfTokens = match.map((x) => x[0]);
+    bnfTokens.sort();
+    const bnfTokenSet = new Set<String>(bnfTokens);
+    const tokenTypes: string[] = TOKEN_TO_NODE.map((row) => { return row.tokenType.toString(); })
+    // BNF tokens that do not get mapped directly to NodeTypes
+    tokenTypes.push('CHEVRON', 'COMMA', 'LEFT_BR', 'LEFT_SQ', 'OLDCHARPOSMATCHING', 'PLUS', 'RANGE', 'RIGHT_BR', 'RIGHT_SQ');
+    tokenTypes.sort();
+    assert.deepEqual([...bnfTokenSet], tokenTypes);
+  });
 });
