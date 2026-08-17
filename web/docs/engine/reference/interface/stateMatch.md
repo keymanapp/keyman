@@ -8,13 +8,13 @@ State-key matching: Returns `true` if the event matches the rule's state-key req
 
 ## Syntax
 
-```c
+```js
 keyman.interface.stateMatch(e, shiftCode);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KSM(e, shiftCode); // Shorthand
 ```
 
@@ -35,7 +35,7 @@ KeymanWeb.KSM(e, shiftCode); // Shorthand
 
 ## Description
 
-As of KeymanWeb 10.0, KeymanWeb now supports keyboard rules conditioned upon 'state keys' like Caps Lock [if specified by keyboard developers](/developer/language/guide/virtual-keys#toc-caps-lock). 
+As of KeymanWeb 10.0, KeymanWeb now supports keyboard rules conditioned upon 'state keys' like Caps Lock [if specified by keyboard developers](/developer/language/guide/virtual-keys#toc-caps-lock).
 
 The `stateMatch` function examines the bit-flags to determine the state keys being tested and compares the keyboard event against them as appropriate. As such, it is designed to be a condition check alongside [`keyman.interface.keyMatch()`](keyMatch) and [`keyman.interface.contextMatch()`](contextMatch).
 
@@ -48,7 +48,7 @@ For comparison with [Developer 'rules'](/developer/language/guide/virtual-keys#t
 
 a keyboard would check which rule the triggering keystroke (`"a"`) matches by using
 
-```c
+```js
 keyman.interface.stateMatch(e, 0x100)
 ```
 
