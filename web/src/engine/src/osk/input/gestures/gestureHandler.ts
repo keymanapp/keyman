@@ -1,8 +1,22 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2023-10-16.
+ *
+ * The GestureHandler interface defines methods common to all OSK
+ * gesture-handling classes, providing a common abstraction for common-path
+ * gesture support.
+ */
+
 import { ActiveKeyBase, KeyDistribution } from "keyman/engine/keyboard";
 
 export interface GestureHandler {
   /**
-   * Triggers cancellation of any further processing for the gesture being handled.
+   * Triggers cancellation of any further processing for the gesture being
+   * handled.
+   *
+   * The method should be able to safely handle the `cancel` method being called
+   * multiple times, much like `clearTimeout` in JS.
    */
   cancel(): void;
 
