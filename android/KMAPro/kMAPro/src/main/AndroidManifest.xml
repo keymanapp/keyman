@@ -111,6 +111,60 @@
         <data
           android:mimeType="application/x-keyman-package"
           android:scheme="content" />
+        <data
+          android:mimeType="application/vnd.keyman.kmp+zip"
+          android:scheme="content" />
+      </intent-filter>
+
+      <intent-filter android:priority="50">
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.BROWSABLE" />
+        <category android:name="android.intent.category.DEFAULT" />
+
+        <data android:scheme="file" />
+        <data android:scheme="content" />
+
+        <data android:host="*" />
+        <data android:pathPattern=".*\\.kmp" />
+        <data
+          android:mimeType="application/vnd.keyman.kmp+zip"
+          android:scheme="content" />
+
+        <!--
+          Backup MIME intents
+        -->
+        <data
+          android:mimeType="application/vnd.keyman"
+          android:scheme="content" />
+        <data
+          android:mimeType="application/octet-stream"
+          android:scheme="content" />
+        <data
+          android:mimeType="application/x-keyman-package"
+          android:scheme="content" />
+        <data
+          android:mimeType="application/vnd.keyman.kmp+zip"
+          android:scheme="content" />
+      </intent-filter>
+
+      <!--
+            Capture file open requests (pathPattern is honoured) where no
+            MIME type is provided in the Intent.  An Intent with a null
+            MIME type will never be matched by a filter with a set MIME
+            type, so we need a second intent-filter if we wish to also
+            match files with this extension and a non-null MIME type
+            (even if it is non-null but zero length).
+      -->
+      <intent-filter android:priority="50">
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.BROWSABLE" />
+        <category android:name="android.intent.category.DEFAULT" />
+
+        <data android:scheme="file" />
+        <data android:host="*" />
+        <data android:pathPattern="/.*\\.kmp" />
       </intent-filter>
 
       <intent-filter>
@@ -148,7 +202,7 @@
 
       </intent-filter>
 
-      <intent-filter android:priority="50">
+      <intent-filter android:priority="50" android:autoVerify="true">
         <!-- KMAPro should also be able to handle /keyboards/install links and convert to /go/package/download -->
         <action android:name="android.intent.action.VIEW" />
 
