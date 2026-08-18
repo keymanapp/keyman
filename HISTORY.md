@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.269 alpha 2026-08-18
+
+* chore(deps): bump body-parser from 1.20.5 to 1.20.6 (#16275)
+* maint(android): update FV Android Target API to 36 (#16355)
+* fix(web): cancel gestures on relayouts and context resets (#16384)
+
 ## 19.0.268 alpha 2026-08-17
 
 * feat(windows): pass UI language to keyboard download page (#16364)
