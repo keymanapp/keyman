@@ -36,9 +36,7 @@ export class HeldRepeater implements GestureHandler {
     this.timerHandle = window.setTimeout(() => this.repeatAction(), HeldRepeater.INITIAL_DELAY);
 
     this.source.on('complete', () => {
-      window.clearTimeout(this.timerHandle);
-      this.timerHandle = undefined;
-      this.baseKey.key.highlight(false);
+      this.cancel();
     });
   }
 
@@ -48,12 +46,14 @@ export class HeldRepeater implements GestureHandler {
       delete this.timerHandle;
     }
 
+    this.baseKey.key.highlight(false);
     this.source.cancel();
   }
 
   private repeatAction() {
     this.actionToRepeat();
-    // The repeat-closure may cancel key highlighting.  This restores it afterward.
+    // In case the action to repeat cancels key highlighting, we restore it
+    // afterward.
     this.baseKey.key.highlight(true);
     this.timerHandle = window.setTimeout(() => this.repeatAction(), HeldRepeater.REPEAT_DELAY);
   }
