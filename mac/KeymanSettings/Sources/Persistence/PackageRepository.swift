@@ -21,6 +21,7 @@ public enum LoadPackageError: LocalizedError {
   case missingKeyboardId
   case missingKeyboardVersion
   case missingKmxFile
+  case insufficientKeymanVersion(packageName: String, requiredKeymanVersion: String, actualKeymanVersion: String)
 
   public var errorDescription: String? {
     switch self {
@@ -34,6 +35,7 @@ public enum LoadPackageError: LocalizedError {
     case .missingKeyboardId: return "A keyboard in the package has no ID."
     case .missingKeyboardVersion: return "A keyboard in the package has no version."
     case .missingKmxFile: return "A keyboard in the package has no corresponding KMX file."
+    case .insufficientKeymanVersion(let packageName, let requiredKeymanVersion, let actualKeymanVersion): return "The keyboard package '\(packageName)' requires Keyman version \(requiredKeymanVersion) but your version is \(actualKeymanVersion)."
     }
   }
 }
