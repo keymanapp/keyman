@@ -1,3 +1,13 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2023-10-04.
+ *
+ * The HeldRepeater class models key input that is repeated when its
+ * corresponding key is held.  At this time, the class is mostly used to model a
+ * repeatable Backspace input.
+ */
+
 import { GestureSequence } from "keyman/engine/gesture-processor";
 import { KeyDistribution } from "keyman/engine/keyboard";
 
@@ -5,48 +15,47 @@ import { KeyElement } from "../../keyElement.js";
 import { GestureHandler } from './gestureHandler.js';
 
 export class HeldRepeater implements GestureHandler {
-  readonly directlyEmitsKeys = true;
+  public readonly directlyEmitsKeys = true;
+  public readonly hasModalVisualization = false;
 
-  static readonly INITIAL_DELAY = 500;
-  static readonly REPEAT_DELAY = 100;
+  public static readonly INITIAL_DELAY = 500; // msec
+  public static readonly REPEAT_DELAY = 100;  // msec
 
-  readonly source: GestureSequence<KeyElement, string>;
-  readonly hasModalVisualization = false;
-  readonly repeatClosure: () => void;
+  private readonly source: GestureSequence<KeyElement, string>;
+  private readonly baseKey: KeyElement
+  private readonly actionToRepeat: () => void;
+  private timerHandle: number;
 
-  timerHandle: number;
-
-  constructor(source: GestureSequence<KeyElement, string>, closureToRepeat: () => void) {
+  constructor(source: GestureSequence<KeyElement, string>, actionToRepeat: () => void) {
     this.source = source;
 
-    const baseKey = source.stageReports[0].item;
-    baseKey.key.highlight(true);
+    this.baseKey = source.stageReports[0].item;
+    this.baseKey.key.highlight(true);
+    this.actionToRepeat = actionToRepeat;
 
-    this.repeatClosure = () => {
-      closureToRepeat();
-      // The repeat-closure may cancel key highlighting.  This restores it afterward.
-      baseKey.key.highlight(true);
-    }
-
-
-    this.timerHandle = window.setTimeout(this.deleteRepeater, HeldRepeater.INITIAL_DELAY);
+    this.timerHandle = window.setTimeout(() => this.repeatAction(), HeldRepeater.INITIAL_DELAY);
 
     this.source.on('complete', () => {
-      window.clearTimeout(this.timerHandle);
-      this.timerHandle = undefined;
-      baseKey.key.highlight(false);
+      this.cancel();
     });
   }
 
   cancel() {
-    this.deleteRepeater();
+    if(this.timerHandle !== undefined) {
+      window.clearTimeout(this.timerHandle);
+      delete this.timerHandle;
+    }
+
+    this.baseKey.key.highlight(false);
     this.source.cancel();
   }
 
-  readonly deleteRepeater = () => {
-    this.repeatClosure();
-
-    this.timerHandle = window.setTimeout(this.deleteRepeater, HeldRepeater.REPEAT_DELAY);
+  private repeatAction() {
+    this.actionToRepeat();
+    // In case the action to repeat cancels key highlighting, we restore it
+    // afterward.
+    this.baseKey.key.highlight(true);
+    this.timerHandle = window.setTimeout(() => this.repeatAction(), HeldRepeater.REPEAT_DELAY);
   }
 
   currentStageKeyDistribution(): KeyDistribution {
