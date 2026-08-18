@@ -11,6 +11,8 @@
 import Foundation
 
 public enum LoadPackageError: LocalizedError {
+  case invalidUrl
+  case unzipError
   case containsNoFiles
   case containsNoKeyboards
   case kmpJsonFileUnreadable
@@ -19,9 +21,11 @@ public enum LoadPackageError: LocalizedError {
   case missingKeyboardId
   case missingKeyboardVersion
   case missingKmxFile
-  
+
   public var errorDescription: String? {
     switch self {
+    case .invalidUrl: return "The URL is not valid."
+    case .unzipError: return "The keyboard package could not be unzipped."
     case .containsNoFiles: return "The keyboard package contains no files."
     case .containsNoKeyboards: return "The keyboard package contains no keyboards."
     case .kmpJsonFileUnreadable: return "The package's kmp.json file could not be parsed."
@@ -30,18 +34,6 @@ public enum LoadPackageError: LocalizedError {
     case .missingKeyboardId: return "A keyboard in the package has no ID."
     case .missingKeyboardVersion: return "A keyboard in the package has no version."
     case .missingKmxFile: return "A keyboard in the package has no corresponding KMX file."
-    }
-  }
-}
-
-enum InstallPackageError: LocalizedError {
-  case invalidUrl
-  case unzipError
-  
-  public var errorDescription: String? {
-    switch self {
-    case .invalidUrl: return "The URL is not valid."
-    case .unzipError: return "The keyboard package could not be unzipped."
     }
   }
 }
@@ -85,7 +77,7 @@ public class PackageRepository: PackageRepo {
    */
   public func loadSinglePackage(packageUrl: URL) throws -> KeymanPackage {
     print("loadSinglePackage from url: \(packageUrl)")
-    guard let source =  try readPackageFromDirectory(packageDirectoryUrl: packageUrl) else { throw InstallPackageError.invalidUrl }
+    guard let source =  try readPackageFromDirectory(packageDirectoryUrl: packageUrl) else { throw LoadPackageError.invalidUrl }
       
     let package = KeymanPackage(packageUrl: packageUrl, packageSource: source)
     try package.validate()
@@ -182,7 +174,7 @@ public class PackageRepository: PackageRepo {
       print("Successfully unzipped the file!")
     } catch {
       print("Extraction failed: \(error.localizedDescription)")
-      throw InstallPackageError.unzipError
+      throw LoadPackageError.unzipError
     }
   }
 

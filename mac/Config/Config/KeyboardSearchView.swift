@@ -148,14 +148,17 @@ struct KeyboardSearchView: NSViewRepresentable {
       if let downloadFileUrl {
         print("Download of \(downloadFileUrl.path()) was successful.")
         if let settings {
-          settings.packageDownloadComplete(kmpFileUrl: downloadFileUrl)
+          do {
+            try settings.packageDownloadComplete(kmpFileUrl: downloadFileUrl)
+          } catch {
+            // MAC-CONFIG-TODO: communicate failed install to user
+          }
         }
       }
     }
-    
-    // MAC-CONFIG-TODO: remove package if it already exists
 
     func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
+      // MAC-CONFIG-TODO: communicate failed install to user
       print("Download failed with error: \(error.localizedDescription)")
     }
 

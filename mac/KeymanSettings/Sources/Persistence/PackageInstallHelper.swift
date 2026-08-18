@@ -3,8 +3,8 @@
  *
  * Created by Shawn Schantz on 2026-06-30
  *
- * Tracks the state of a package being downloaded with functions
- * to derive its temporary download location, compare it to a
+ * Tracks the state of a package being installed with functions
+ * to derive its temporary install location, compare it to a
  * package of the same type if it exists and replace or delete depending
  * on its version and user feedback.
  */
@@ -12,22 +12,24 @@
 import Foundation
 
 @MainActor // run on the main actor as it is called from SettingsContainer
-public class PackageDownload {
+public class PackageInstallHelper {
   let temporaryKmpFileLocation: URL
   let temporaryPackageLocation: URL
   let installPackageLocation: URL
   let installedPackages: [KeymanPackage]    // needed to check for existing package after download
+  let isDownload: Bool                      // if not download, then the package was opened from disk or dropped
   var packageToInstall: KeymanPackage?      // the newly downloaded package
   var packageToReplace: KeymanPackage?      // the package to replace, if it exists
   
   fileprivate let packageRepository: PackageRepo
   
-  public init(filename: String, packageName: String, packageRepo: PackageRepo, installedPackages: [KeymanPackage]) {
+  public init(filename: String, packageName: String, packageRepo: PackageRepo, installedPackages: [KeymanPackage], isDownload: Bool) {
     self.packageRepository = packageRepo
     self.temporaryKmpFileLocation = self.packageRepository.getDownloadUrl(for: filename)
     self.temporaryPackageLocation = self.packageRepository.getUnzipDestinationUrl(for: packageName)
     self.installPackageLocation = self.packageRepository.buildInstallationUrlForPackageName(packageName: packageName)
     self.installedPackages = installedPackages
+    self.isDownload = isDownload
     
     // cannot be initialized until after download when packageName of new package is known
     self.packageToReplace = nil
@@ -37,25 +39,32 @@ public class PackageDownload {
   }
   
   /**
-   * Indicates that a package has been downloaded and is ready to be unzipped and installed
+   * Indicates that a package has been downloaded and can be prepared for installation
    */
-  public func packageDownloadComplete(for kmpFileUrl: URL) {
+  public func packageDownloadComplete(for kmpFileUrl: URL) throws {
     print ("packageDownloadComplete \(kmpFileUrl)")
+    
+    try self.prepareToInstall(for: kmpFileUrl)
+  }
+  
+  /**
+   * Indicates that a package is ready to be unzipped and installed
+   */
+  public func prepareToInstall(for kmpFileUrl: URL) throws {
+    print ("prepareToInstall \(kmpFileUrl)")
     
     do {
       try self.unzipDownloadedPackage(for: kmpFileUrl)
       try self.handleNewPackage()
     } catch {
       self.cleanupFailedInstallation()
-
-       print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
-      // MAC-CONFIG-TODO: handle error
-      // send notification that installation failed?
+      print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
+      throw error
     }
   }
   
   /**
-   * Unzip the and load the downloaded package
+   * Unzip and load the downloaded package
    */
   func unzipDownloadedPackage(for kmpFileUrl: URL) throws {
     try self.packageRepository.unzipKmpFile(at: kmpFileUrl, to: self.temporaryPackageLocation)
@@ -110,7 +119,13 @@ public class PackageDownload {
    */
   func installNewPackage() throws {
     try self.movePackageFromTemporaryToInstalled()
-    try self.deleteDownloadedKmpFile()
+    if (self.isDownload) {
+      do {
+        try self.deleteDownloadedKmpFile()
+      } catch {
+        print("installNewPackage failed to delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent)")
+      }
+    }
     
     NotificationCenter.default.post(name: .newPackageInstalled, object: nil)
   }

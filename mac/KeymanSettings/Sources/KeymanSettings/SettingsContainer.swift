@@ -25,6 +25,16 @@ import Foundation
 import Combine
 import ZIPFoundation
 
+public enum InstallPackageError: LocalizedError {
+  case downloadInProgress
+  
+  public var errorDescription: String? {
+    switch self {
+    case .downloadInProgress: return "A download is already in progress."
+    }
+  }
+}
+
 // distributed notifications
 public extension Notification.Name {
   // sent from input method, received by InstallationCheck
@@ -59,6 +69,7 @@ public enum DropKmpError: LocalizedError {
 }
 
 private let kmpFileExtension = ".kmp"
+private let kmpFileExtensionWithoutDot = "kmp"
 
 @MainActor // run on the main actor since data is published directly to the UI
 public class SettingsContainer : ObservableObject {
@@ -79,7 +90,7 @@ public class SettingsContainer : ObservableObject {
   @Published public private(set) var multiKeyboardPackages: [KeymanPackage]
 
   // when a new package is downloaded, it is tracked here
-  public private(set) var packageDownload: PackageDownload? = nil
+  public private(set) var packageDownload: PackageInstallHelper? = nil
   
   fileprivate let packageRepository: PackageRepo
   fileprivate let defaultsRepository: DefaultsRepo
@@ -436,19 +447,19 @@ public class SettingsContainer : ObservableObject {
    */
   public func isDownloadInProgress() -> Bool {
     // MAC-CONFIG-TODO: add logic, this does not actually prevent downloads when hard-coded to true
-   return false
+    return self.packageDownload != nil
   }
 
   /**
    * Called by the WebView Coordinator before initiating a package download.
-   * Creates a PackageDownload instance to manage the state of the package being downloaded with the specified name.
+   * Creates a PackageInstallHelper instance to manage the state of the package being downloaded with the specified name.
    * Returns a URL to the temporary location where the package is to be downloaded as a .kmp file.
    */
   public func preparePackageDownload(kmpFileName: String) -> URL? {
     // package name is filename minus .kmp extension
     let packageName = kmpFileName.replacingOccurrences(of: kmpFileExtension, with: "")
     
-    let packageDownload = PackageDownload(filename: kmpFileName, packageName: packageName, packageRepo: self.packageRepository, installedPackages: self.installedPackages)
+    let packageDownload = PackageInstallHelper(filename: kmpFileName, packageName: packageName, packageRepo: self.packageRepository, installedPackages: self.installedPackages, isDownload: true)
 
     self.packageDownload = packageDownload
     return packageDownload.temporaryKmpFileLocation
@@ -456,12 +467,12 @@ public class SettingsContainer : ObservableObject {
   
   /**
    * Called by the WebView Coordinator after the download is complete.
-   * Delegates to the PackageDownload instance to decide whether the package should be installed.
+   * Delegates to the PackageInstallHelper instance to decide whether the package should be installed.
    */
-  public func packageDownloadComplete(kmpFileUrl: URL) {
+  public func packageDownloadComplete(kmpFileUrl: URL) throws {
     print ("packageDownloadComplete \(kmpFileUrl)")
 
-    self.packageDownload?.packageDownloadComplete(for: kmpFileUrl)
+    try self.packageDownload?.packageDownloadComplete(for: kmpFileUrl)
   }
 
   /**
@@ -495,11 +506,47 @@ public class SettingsContainer : ObservableObject {
    * Attempt to install a package from a KMP file. Called when file is dropped on the Configuration view
    */
   public func processDroppedKmpFile(at fileLocation: URL) throws {
-    // validate URL and get the location where the package will be installed
-    let destinationURL = try self.validateDropUrlForInstallation(from: fileLocation)
+    guard !self.isDownloadInProgress() else {
+      throw InstallPackageError.downloadInProgress
+    }
     
+    // validate URL and get the location where the package will be installed
+    try self.validateDroppedFile(from: fileLocation)
     // install it
-    try self.installDroppedKmpFile(from: fileLocation, to: destinationURL)
+//    try self.installDroppedKmpFile(from: fileLocation, to: destinationURL)
+    
+    let droppedFilename = fileLocation.lastPathComponent
+    if let packageDownload = self.preparePackageDrop(kmpFileName: droppedFilename) {
+      self.packageDownload = packageDownload
+      do {
+        try packageDownload.prepareToInstall(for: fileLocation)
+      } catch {
+        // clear failed download
+        self.packageDownload = nil
+        throw error
+      }
+    }
+  }
+
+  /**
+   * Creates a PackageInstallHelper instance to manage the state of the package being downloaded with the specified name.
+   * Returns a URL to the temporary location where the package is to be downloaded as a .kmp file.
+   */
+  public func preparePackageDrop(kmpFileName: String) -> PackageInstallHelper? {
+    // package name is filename minus .kmp extension
+    let packageName = kmpFileName.replacingOccurrences(of: kmpFileExtension, with: "")
+    
+    return PackageInstallHelper(filename: kmpFileName, packageName: packageName, packageRepo: self.packageRepository, installedPackages: self.installedPackages, isDownload: false)
+  }
+
+  /**
+   * Validate the URL for the file we are dropping
+   */
+  func validateDroppedFile(from fileLocation: URL) throws {
+    // if the file does not end with .kmp, reject it
+    if fileLocation.pathExtension.lowercased() != kmpFileExtensionWithoutDot {
+      throw DropKmpError.invalidFileType(fileLocation.lastPathComponent)
+    }
   }
 
   /**
@@ -508,7 +555,7 @@ public class SettingsContainer : ObservableObject {
    */
   func validateDropUrlForInstallation(from fileLocation: URL) throws -> URL {
     // if the file does not end with .kmp, reject it
-    guard fileLocation.pathExtension.lowercased() == "kmp" else {
+    guard fileLocation.pathExtension.lowercased() == kmpFileExtensionWithoutDot else {
       throw DropKmpError.invalidFileType(fileLocation.lastPathComponent)
     }
     
