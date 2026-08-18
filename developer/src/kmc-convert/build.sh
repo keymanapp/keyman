@@ -10,6 +10,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 
 builder_describe "Keyman kmc-convert keyboard conversion tools module" \
+  "@/common/web/keyman-version" \
+  "@/common/web/types" \
   "@/developer/src/common/web/utils" \
   "@/developer/src/common/web/test-helpers" \
   "configure" \
@@ -47,4 +49,3 @@ do_test() {
 }
 
 builder_run_action test        do_test
-builder_run_action publish     ci_publish_npm
