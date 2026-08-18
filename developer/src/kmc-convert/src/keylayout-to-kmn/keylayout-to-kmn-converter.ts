@@ -144,9 +144,7 @@ export class KeylayoutToKmnConverter {
     }
     const result: ConverterToKmnResult = {
       artifacts: {
-        kmn: {
-          data: outputKmn, filename: processedData.kmnFilename
-        }
+        kmn: { data: outputKmn, filename: processedData?.kmnFilename ?? '' }
       }
     };
     return result;
@@ -234,7 +232,39 @@ export class KeylayoutToKmnConverter {
           // ...............e. g. <key code="1" output="s"/> ...............................................................................
           // ...............................................................................................................................
 
-          if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] !== undefined) {
+          // Todo-kmc-convert will be removed before merge into PR 12564 
+          if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] === "") {
+            /* this.callbacks.reportMessage(ConverterMessages.Warn_EmptyOutput({
+             keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['index'],
+             key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code'],
+             KeyName: this.mapUkeleleKeycodeToVK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code']))
+           }));
+           return null;*/
+
+            for (let l = 0; l < dataUkelele.modifiers[i].length; l++) {
+
+              ruleObj = new Rule(
+                  /*   ruleType */                "C0",
+
+                  /*   modifierPrevDeadkey*/      "",
+                  /*   prevDeadkey */             "",
+                  /*   idPrevDeadkey */           0,
+                  /*   unique A */                0,
+
+                  /*   modifierDeadkey */         "",
+                  /*   deadkey */                 "",
+                  /*   dk for C2*/                0,
+                  /*   unique B */                0,
+
+                  /*   modifierKey*/             this.createKmnModifier(String(dataUkelele.modifiers[i][l]), isCapsused),
+                  /*   key */                    this.mapUkeleleKeycodeToVK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code'])),
+                  /*   output */                 new TextEncoder().encode(''),
+              );
+              rules.push(ruleObj);
+            }
+          }
+
+          else if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] !== undefined) {
 
             // loop modifiers
             for (let l = 0; l < dataUkelele.modifiers[i].length; l++) {
@@ -1005,8 +1035,6 @@ export class KeylayoutToKmnConverter {
       }
     }
 
-    //.............................................................................
-
     // remove duplicates
     const uniqueactionOutputBehaviorKey = actionOutputBehaviorKeyModi.reduce<KeylayoutFileData[]>((unique, o) => {
       if (!unique.some(obj =>
@@ -1051,4 +1079,3 @@ export class KeylayoutToKmnConverter {
     convert: this.convert.bind(this),
   };
 }
-

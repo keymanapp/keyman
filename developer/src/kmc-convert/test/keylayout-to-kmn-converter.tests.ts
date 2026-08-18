@@ -21,6 +21,42 @@ describe('KeylayoutToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
+  describe('Run kmc-convert with or without outputfile name', async function () {
+
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const infile = '../data/Test.keylayout';
+    [
+      [makePathToFixture('../data/Test.kmn')],
+      [],
+      [makePathToFixture('../data/Test_OtherOutputName.kmn')],
+    ].forEach(function (files) {
+      it(infile + " should run ", async function () {
+        await NodeAssert.doesNotReject(async () =>await sut.run(makePathToFixture(infile), files[0]));
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+      });
+    });
+  });
+
+  describe('RunTestFiles resulting in errors', function () {
+    const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    [
+      [makePathToFixture('../data/Test_DifferentAmountOfMapSelectInKeyMapERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingkeyERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingkeyMapERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingLayoutsERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingmodifierMapERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingkeyMapSetERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingActionsERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingTerminatorsERROR.keylayout')],
+      [makePathToFixture('../data/Test_MissingAllERROR.keylayout')],
+    ].forEach(function (files) {
+      it(files + " should give an error ", async function () {
+        await sut.run(files[0]);
+        assert.isTrue(compilerTestCallbacks.messages.length > 0);
+      });
+    });
+  });
+
   describe('RunSpecialTestFiles', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -60,13 +96,13 @@ describe('KeylayoutToKmnConverter', function () {
       ['../data/Test.keylayout'],
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
-        await  sut.run(makePathToFixture(files[0]));
-        assert.isTrue(compilerTestCallbacks.messages.length === 0);
         await sut.run(makePathToFixture(files[0]));
-        assert.equal(compilerTestCallbacks.messages.length, 0);
+        assert.isTrue(compilerTestCallbacks.messages.length === 0);
+
       });
     });
   });
+
   describe('RunTestFiles resulting in errors ', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
@@ -88,7 +124,6 @@ describe('KeylayoutToKmnConverter', function () {
       });
     });
   });
-
 
   describe('RunSpecialTestFiles - create Error: undefined action', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
@@ -149,7 +184,7 @@ describe('KeylayoutToKmnConverter', function () {
       const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
       const converted = sut.unitTestEndpoints.convert(read as KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
       assert.isNotNull(converted);
-      assert.notEqual(converted.rules.length, 0);
+      assert.notEqual(converted?.rules.length, 0);
     });
 
     // ProcessedData from unavailable file
@@ -786,9 +821,9 @@ describe('KeylayoutToKmnConverter', function () {
       it('data of \'' + values[0] + "' passed into createRuleData() " + 'should create an array of rules', async function () {
         const inputFilename = makePathToFixture(values[0][0]);
         const read = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-        const processedData = sut.unitTestEndpoints.convert(read, inputFilename.replace(/\.keylayout$/, '.kmn'));
+        const processedData = sut.unitTestEndpoints.convert(read as KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
         assert.isNotNull(processedData);
-        assert.deepEqual(processedData.rules[0], values[1][0]);
+        assert.deepEqual(processedData?.rules[0], values[1][0]);
       });
     });
   });

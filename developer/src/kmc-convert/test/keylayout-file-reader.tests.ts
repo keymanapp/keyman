@@ -28,7 +28,7 @@ describe('KeylayoutFileReader', function () {
       const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
       assert.isTrue(validated);
     });
-
+      // TODO-KMC-CONVERT; Do we need these 6 tests?
     it('validate() should return false on inputfile with unknown tags', async function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_unknownTags.keylayout');
@@ -74,29 +74,28 @@ describe('KeylayoutFileReader', function () {
     });
   });
 
-  describe('validate() should return false on inputfiles with errors ', function () {
-    const sut = new KeylayoutFileReader(compilerTestCallbacks);
-    [
-      ['../data/Test_moreKeymapSelectThanKeymapERROR.keylayout'],
-      ['../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout'],
-      ['../data/Test_moreKeyMapThanKeyMapselectAndJisERROR.keylayout'],
-      ['../data/Test_MissingkeyERROR.keylayout'],
-      ['../data/Test_MissingkeyMapERROR.keylayout'],
-      ['../data/Test_MissingLayoutsERROR.keylayout'],
-      ['../data/Test_MissingmodifierMapERROR.keylayout'],
-      ['../data/Test_MissingkeyMapSetERROR.keylayout'],
-      ['../data/Test_MissingActionsERROR.keylayout'],
-      ['../data/Test_MissingTerminatorsERROR.keylayout'],
-      ['../data/Test_MissingAllERROR.keylayout'],
-      ['../data/Test_unknownTags.keylayout'],
-      ['../data/Test_additionalTags.keylayout'],
-      ['../data/Test_missingTags.keylayout'],
-    ].forEach(function (files) {
-      it(files + " should not be valid ", async function () {
-        const result: Keylayout.KeylayoutXMLSourceFile | null = sut.read(compilerTestCallbacks.loadFile(makePathToFixture(files[0])));
-        const validated = sut.validate(result as Keylayout.KeylayoutXMLSourceFile, makePathToFixture(files[0]));
-        assert.isFalse(validated);
-      });
+    it('validate() should return false on inputfile with unknown tags', async function () {
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const inputFilename = makePathToFixture('../data/Test_unknownTags.keylayout');
+      const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      assert.isFalse(validated);
+    });
+
+    it('validate() should return false on inputfile with additional tags', async function () {
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const inputFilename = makePathToFixture('../data/Test_additionalTags.keylayout');
+      const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      assert.isFalse(validated);
+    });
+
+    it('validate() should return false on inputfile with missing tags', async function () {
+      const sutR = new KeylayoutFileReader(compilerTestCallbacks);
+      const inputFilename = makePathToFixture('../data/Test_missingTags.keylayout');
+      const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      assert.isFalse(validated);
     });
   });
 
@@ -157,7 +156,7 @@ describe('KeylayoutFileReader', function () {
       it(("findMapIndexinKeymap(keyMapSelect.mapIndex = '" + values[0] + "')").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
         keyMapSelect.mapIndex = values[0] as string;
         const result = sutR.findMapIndexinKeymap(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMapSelect);
-        assert.equal(result, values[1]);
+        assert.isTrue(result === values[1]);
       });
     });
   });
@@ -187,11 +186,11 @@ describe('KeylayoutFileReader', function () {
       it(("findIndexinKeymapSelect(keyMap.index = '" + values[0] + "')").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
         keyMap.index = values[0] as string;
         const result = sutR.findIndexinKeymapSelect(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMap);
-        assert.equal(result, values[1]);
+        assert.isTrue(result === values[1]);
       });
     });
   });
-
+  // TODO-KMC-CONVERT: Do we need all tests here? 
   describe('checkForCorrespondingElements ', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     [
@@ -201,10 +200,10 @@ describe('KeylayoutFileReader', function () {
       ['../data/Test_moreKeyMapThanKeyMapselectERROR.keylayout', false],
       ['../data/Test_moreKeyMapThanKeyMapselectAndJisERROR.keylayout', false],
     ].forEach(function (values) {
-      it(("checkForCorrespondingElements in " + values[0]).padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
+      it(("checkForCorrespondingElements in " + values[0]).padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
         const jsonO: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(makePathToFixture(values[0] as string)));
         const result = sutR.checkForCorrespondingElements(jsonO as Keylayout.KeylayoutXMLSourceFile);
-        assert.equal(result, values[1]);
+        assert.isTrue(result === values[1]);
       });
     });
   });
@@ -216,7 +215,7 @@ describe('KeylayoutFileReader', function () {
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const binaryData = compilerTestCallbacks.loadFile(inputFilename);
-      const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(binaryData);
+      const result: Keylayout.KeylayoutXMLSourceFile = sutR.read(binaryData) as Keylayout.KeylayoutXMLSourceFile;
 
       assert.isNotNull(result);
       assert.notEqual(result.keyboard, null);
@@ -252,6 +251,5 @@ describe('KeylayoutFileReader', function () {
         }
       }
     });
-  });
 
-});
+  });

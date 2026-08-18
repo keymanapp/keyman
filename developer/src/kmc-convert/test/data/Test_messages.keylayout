@@ -8,6 +8,10 @@
     a test showing different warning types
     note: if an identical rule is specified multiple times, it is printed only once
 
+    In this test html control characters ( "&#x000;" - "#x001F;" ) might be used in the output of a key.  
+    This is not technically valid XML but some .keylayout files include control characters.  
+    The converter should process these characters and produce a warning message.
+
 -->
 <keyboard group="126" id="-1272" name="Test" maxout="1">
     <layouts>
@@ -39,7 +43,11 @@
     <keyMapSet id="ANSI">
         <keyMap index="0">
             <key code="5" output="G"/>
-            <key code="5" output="G"/>
+            <key code="9" output="U+0047"/>
+            <key code="11" output="&#x0026;gt"/>
+            <key code="12" output="&#0001;"/>
+            <key code="13" output=""/>
+            <key code="14" output="&#x0009;"/>
         </keyMap>
         <keyMap index="1">
             <key code="5" output="&#x0007;"/>
@@ -48,7 +56,7 @@
             <key code="25" action="a0"/>
             <key code="6" output="Z"/>
             <key code="7" output="X"/>
-            <key code="7" output="ẍ"/>
+            <key code="8" output="ẍ"/>
         </keyMap>
         <keyMap index="3">
             <key code="5" output="∞"/>

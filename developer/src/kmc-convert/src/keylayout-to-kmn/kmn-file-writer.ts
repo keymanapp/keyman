@@ -4,12 +4,14 @@
  * Created by S. Schmitt on 2025-05-12
  *
  * Write Keyman .kmn files from an in-memory representation generated
- *
+ * note: for now we focus on a conversion where data is stored in an array  - later an AST will be used
+ * (further reading:  developer\docs\internal\kmc-convert\keylayout-to-kmn\index.md)
  */
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from './keylayout-to-kmn-converter.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { util } from '@keymanapp/common-types';
 
 interface MessageCharacter {
   message: string;
@@ -36,18 +38,184 @@ interface RuleReview {
   output: string;
 };
 
+
+export interface ReplacedOutputString {
+  // input: substring of the original string that is currently being processed
+  input: string | undefined;
+  // replaced_character: the character that was replaced
+  replaced_character: string | undefined;
+  // replaced_string: the string that contains all processed characters
+  replaced_string: string | undefined;
+  // rest_string: the remaining string after the replaced portion
+  rest_string: string;
+  // carryOver: if we need '&' as carry over
+  carryOver: string;
+};
+
+export class UnicodeCharacterConversion {
+
+  // U+ followed by 1.-6. hex digits (U+1234;)
+  public static re_uni = /^U\+([0-9a-f]{1,6})$/i;
+
+  // &#x followed by 1.-6. hex digits (&#x1234;)
+  public static re_hex = /^&#x([0-9a-f]{1,6});$/i;
+
+  // &# followed by 1.-7. decimal digits (&#4660;)
+  public static re_dec = /^&#([0-9]{1,7});$/;
+
+  // &#x followed by 1.-6. hex digits or &# followed by 1.-7. decimal digits
+  private static re_hexdec = /^&#(?:x[0-9a-f]{1,6}|[0-9]{1,7});/i;
+
+  /**
+    * @brief  function to convert a (character or) numeric html character reference to a character
+    *         if input is a valid single character or Codepoint like 'c','ä', 'ሴ', 'ẘ', '😎',  the same character or Codepoint is returned (e.g. 'c' -> 'c', '😎' -> '😎')
+    *         if input is a valid numeric html character reference in hex or decimal, the corresponding character (e.g. &#x1F60E; -> 😎)
+    * @param  inputString the string or stringvalue that will converted
+    * @return the input character/numeric html character reference if input is a valid character
+    *         a converted character if input is a numeric html character reference in hex or decimal,
+    *         or undefined if input is null or undefined, half a surrogate pair, or not recognized
+  */
+  public static convert_htmlToCharacter(inputString: string): string | undefined {
+
+    const m_hex = UnicodeCharacterConversion.re_hex.exec(inputString);
+    const m_dec = UnicodeCharacterConversion.re_dec.exec(inputString);
+
+    // valid '&#x...'
+    if (m_hex) {
+      const codePoint_h = parseInt(m_hex[1], 16);
+      // Reject surrogates and invalid codepoints
+      if (!(util.isValidUnicode(codePoint_h))) {
+        return undefined;
+      }
+      return String.fromCodePoint(codePoint_h);
+    }
+
+    // valid '&#...'
+    else if (m_dec) {
+      const codePoint_d = parseInt(m_dec[1], 10);
+      // Reject surrogates and invalid codepoints
+      if (!(util.isValidUnicode(codePoint_d))) {
+        return undefined;
+      }
+      return String.fromCodePoint(codePoint_d);
+    }
+    return inputString;
+  }
+
+  /**
+    * @brief  recursive function to unescape all occuring &gt; &lt; &amp; &quot; &apos
+    * @param  inputString the string that will unescaped
+    * @return the input unescaped string or
+    *         undefined if input is null or undefined
+  */
+  public static unescape_string(inputString: string): string | undefined {
+
+    if (inputString === null || inputString === undefined)
+      return undefined;
+
+    const unescaped = inputString
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, "\"")
+      .replace(/&apos;/g, "'")
+      .replace(/&amp;/g, "&");
+
+    if ((unescaped === inputString))
+      return unescaped;
+    return this.unescape_string(unescaped);
+  }
+
+  /**
+    * @brief  recursive function to read a string 'step' by 'step' and return an object containing the 
+    * input string, replaced_character, replaced_string, rest_string and a carryOver.
+    * A 'step' is either a character or a hex, dec or named html entitiy.
+    * @param  inputString an object containing all data that will be read and converted:
+    *  - input the inputstring; replaced by rest_tring after each iteration until no characters/entities are left to convert
+    *  - replaced_character: the first character of the input string or the converted html entity
+    *  - replaced_string: a concatination of all replaced characters
+    *  - rest_string: the input string with the first character or html entity chopped off
+    *  - carryOver: a '&' in case a non html named specification of '&' is used in the input string ( e.g. '&#x0026;gt;' -> &gt; )    * 
+    * @return an ReplacedOutputString containing all data
+    *         undefined if input is null or undefined
+    */
+  public static processXmlValue(inputString: ReplacedOutputString): ReplacedOutputString {
+
+    if ((inputString.input === null) || (inputString.input === undefined)) {
+      inputString.replaced_character = undefined;
+      inputString.replaced_string = undefined;
+      inputString.rest_string = '';
+      return inputString;
+    }
+
+    let returnChar;
+    inputString.carryOver = '';
+    inputString.input = this.unescape_string(inputString.input) ?? '';
+
+    const m_hexdec = UnicodeCharacterConversion.re_hexdec.exec(inputString.input);
+
+    // if the (remaining) input string starts with a hex or dec html entity ( &#x...; or &#...;) we need to convert this part to a character
+    if (m_hexdec) {
+      returnChar = this.convert_htmlToCharacter(m_hexdec[0] as string);
+      const to_be_replaced = m_hexdec[0] as string;
+      const replace_len = [...to_be_replaced].length;
+
+      // Use of a carry over happens for example when the input string is '&#x0026;gt;' which should result in '&gt;' and then '>'  (without the carry over we would get 'gt;' and then 'gt' which is wrong)
+      // if we use a carryOver('&') we need to keep the '&' in inputString.rest_string and do not copy it into inputString.replaced_character
+      returnChar === '&' ? inputString.carryOver = '&' : inputString.carryOver = '';
+
+      if (inputString.carryOver === '&')
+        inputString.rest_string = inputString.carryOver + inputString.input.substring(replace_len);
+      else {
+        inputString.rest_string = inputString.input.substring(replace_len);
+        inputString.replaced_character = returnChar;
+
+        // create a string; if if one character of the string converts to 'undefined' we set the whole string to 'undefined'
+        if (inputString.replaced_character === undefined) {
+          inputString.replaced_string = undefined;
+        }
+        else if (inputString.replaced_string !== undefined) {
+          inputString.replaced_string = inputString.replaced_string + inputString.replaced_character;
+        }
+      }
+      // use the rest of the string after the replaced portion and use carryOver if available
+      inputString.input = inputString.carryOver + inputString.input.substring(replace_len);
+    }
+    // for all other characters we just copy the first character and remove it from inputString.input
+    else {
+      const to_be_replaced = inputString.input[0] ?? '';;
+      const replace_len = [...to_be_replaced].length;
+
+      inputString.rest_string = inputString.input.substring(replace_len);
+      if (inputString.replaced_string !== undefined) {
+        inputString.replaced_string += to_be_replaced;
+      }
+      // use the rest of the string after the replaced portion
+      inputString.input = inputString.input.substring(replace_len);
+    }
+
+    if (inputString.rest_string.length === 0) {
+      return inputString;
+    }
+    return this.processXmlValue(inputString);
+  }
+};
+
 interface UnavailableModifier extends RuleReview {
   type: 'UnavailableModifier';
 };
+
 interface UnavailableSuperiorRule extends RuleReview {
   type: 'UnavailableSuperiorRule';
 };
+
 interface DuplicateRules extends RuleReview {
   type: 'DuplicateRule';
 };
+
 interface AmbiguousRules extends RuleReview {
   type: 'AmbiguousRule';
 };
+
 interface WarningTextSet extends RuleReview {
   type: 'WarningTextSet';
 };
@@ -55,7 +223,6 @@ interface WarningTextSet extends RuleReview {
 export class KmnFileWriter {
 
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) { };
-
   /**
    * @brief  member function to write data from object to a Uint8Array
    * @param  dataUkelele the array holding all keyboard data
@@ -91,7 +258,7 @@ export class KmnFileWriter {
     data += "c ..................................................................................................................\n";
     data += "c ..................................................................................................................\n";
     data += "c Keyman keyboard generated by kmn-convert version: " + KEYMAN_VERSION.VERSION + "\n";
-    data += "c from Ukelele file: " + dataUkelele.keylayoutFilename + "\n";
+    data += "c from Ukelele file: " + (dataUkelele?.keylayoutFilename ?? '') + "\n";
     data += "c ..................................................................................................................\n";
     data += "c ..................................................................................................................\n";
     data += "\n";
@@ -122,7 +289,7 @@ export class KmnFileWriter {
     // during the process of creating Rule[], duplicate rules might occur
     // (e.g. when in a keylayout file the same modifiers occur in several behaviors thus producing the same rules).
     // This is to filter out those duplicate Rule objects
-    const uniqueDataRules: Rule[] = dataUkelele.rules.filter((curr) => {
+    const uniqueDataRules: Rule[] = (dataUkelele?.rules ?? []).filter((curr) => {
       return (!(curr.output === undefined)
         && (curr.key !== "")
         && ((curr.ruleType === "C0")
@@ -174,12 +341,13 @@ export class KmnFileWriter {
         if ((k > 1) && (uniqueDataRules[k - 1].key !== uniqueDataRules[k].key) && (uniqueDataRules[k - 1].ruleType === uniqueDataRules[k].ruleType)) {
           data += '\n';
         }
-
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
 
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
+
+        // TODO-KMC-CONVERT: remove
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
@@ -187,7 +355,7 @@ export class KmnFileWriter {
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
         if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+          warnText[2] = (characterMessage.message === '') ? characterMessage.message : characterMessage.message;
         }
 
 
@@ -198,7 +366,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
-            warningTextToWrite = warnText[2];
+            warningTextToWrite = warnText[2] + 'here: ';
           }
 
           if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -239,13 +407,13 @@ export class KmnFileWriter {
     for (let k = 0; k < uniqueDataRules.length; k++) {
 
       if (uniqueDataRules[k].ruleType === "C2") {
-
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
 
         let versionOutputCharacter;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
+        // TODO-KMC-CONVERT: remove
         // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
         // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
         // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
@@ -253,7 +421,7 @@ export class KmnFileWriter {
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
         if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+          warnText[2] = (characterMessage.message === '') ? characterMessage.message : characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -263,7 +431,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
-            warningTextToWrite = warnText[1];
+            warningTextToWrite = warnText[1] + 'here: ';
           }
 
           if (!((warnText[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -279,7 +447,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
-            warningTextToWrite = warnText[2];
+            warningTextToWrite = warnText[2] + 'here: ';
           }
 
           if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -328,7 +496,8 @@ export class KmnFileWriter {
       if (uniqueDataRules[k].ruleType === "C3") {
 
         // use of Unicode Character vs Unicode Codepoint;
-        // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
+        // we always print out the Unicode Character  (A, W̊, 😎, ... ).
+        // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
 
         const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
@@ -337,7 +506,7 @@ export class KmnFileWriter {
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
         if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+          warnText[2] = (characterMessage.message === '') ? characterMessage.message : characterMessage.message;
         }
 
 
@@ -349,7 +518,7 @@ export class KmnFileWriter {
           let warningTextToWrite = "";
 
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[0].length > 0)) {
-            warningTextToWrite = warnText[0];
+            warningTextToWrite = warnText[0] + 'here: ';
           }
 
           if (!((warnText[0].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -366,7 +535,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
-            warningTextToWrite = warnText[1];
+            warningTextToWrite = warnText[1] + 'here: ';
           }
 
           if (!((warnText[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -385,7 +554,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
-            warningTextToWrite = warnText[2];
+            warningTextToWrite = warnText[2] + 'here: ';
           }
 
           if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -451,7 +620,7 @@ export class KmnFileWriter {
           + ']  >  dk('
           + inObj.dk_prefix[1]
           + inObj.dk_id[1]
-          + ') ) : ';
+          + ') ) ';
       }
 
       if (inObj.modifier) {
@@ -470,20 +639,60 @@ export class KmnFileWriter {
           + ']  >  dk('
           + inObj.dk_prefix[0]
           + inObj.dk_id[0]
-          + ') ) : ';
-      }
+          + ') ) ';
 
+        outMsg[2] =
+          'unavailable superior rule ['
+          + inObj.prevDk_modifier + ' '
+          + inObj.prevDk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
+          + ')  '
 
-      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
-      if (inObj.Dk_modifier) {
-        outMsg[1] += 'unavailable modifier ';
-        outMsg[2] = 'unavailable superior rule ( ['
+          + 'unavailable superior rule ['
+          + inObj.prevDk_modifier + ' '
+          + inObj.prevDk_key
+          + '+'
+
           + inObj.Dk_modifier + ' '
           + inObj.Dk_key
           + ']  >  dk('
           + inObj.dk_prefix[1]
           + inObj.dk_id[1]
-          + ') ) : ';
+          + ')  ';
+
+      }
+
+      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
+      if (inObj.Dk_modifier) {
+
+        const mod_OK = new KeylayoutToKmnConverter(this.callbacks, this.options).isAcceptableKeymanModifier(inObj.Dk_modifier);
+
+        if ((outMsg[1].lastIndexOf('unavailable modifier') < 0))
+          outMsg[1] += (!mod_OK) ? 'unavailable modifier ' : '';
+
+        outMsg[2] = 'unavailable superior rule ( ['
+          + inObj.prevDk_modifier + ' '
+          + inObj.prevDk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
+          + ') ) ';
+
+        outMsg[2] = outMsg[2]
+          + (!mod_OK ? 'unavailable superior rule ( ' : '')
+          + 'dk('
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
+          + ')  + ['
+          + inObj.Dk_modifier + ' '
+          + inObj.Dk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[1]
+          + inObj.dk_id[1]
+          + ') '
+          + (!mod_OK ? ') ' : '');
       }
 
       if (inObj.modifier) {
@@ -494,7 +703,7 @@ export class KmnFileWriter {
     if (inObj.compare_type === 'amb_1_1' || inObj.compare_type === 'dup_1_1') {
 
       outMsg[posWarning] = inObj.warningMessages[posWarning]
-        + ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        + ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
         + (inObj.isEarlier ? 'earlier' : 'later')
         + ': [' + inObj.modifier + ' ' + inObj.key + ']  >  \''
         + inObj.output + '\' ';
@@ -506,7 +715,7 @@ export class KmnFileWriter {
       || inObj.compare_type === 'amb_2_4') {
 
       const textsegment = (
-        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
         + (inObj.isEarlier ? 'earlier' : 'later')
         + ': [' + inObj.Dk_modifier + ' ' + inObj.Dk_key + ']  >  dk('
         + inObj.dk_prefix[1] + inObj.dk_id[1] + ') ');
@@ -521,7 +730,7 @@ export class KmnFileWriter {
       || inObj.compare_type === 'amb_4_2') {
 
       const textsegment = (
-        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
         + (inObj.isEarlier ? 'earlier' : 'later')
         + ': [' + inObj.prevDk_modifier + ' ' + inObj.prevDk_key + ']  >  dk('
         + inObj.dk_prefix[0] + inObj.dk_id[0] + ') ');
@@ -534,7 +743,7 @@ export class KmnFileWriter {
     if (inObj.compare_type === 'amb_5_5' || inObj.compare_type === 'dup_5_5') {
 
       const textsegment = (
-        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
         + (inObj.isEarlier ? 'earlier' : 'later')
         + ': dk(' + inObj.dk_prefix[0] + inObj.dk_id[0] + ") + ["
         + inObj.Dk_modifier + " " + inObj.Dk_key + "]  >  "
@@ -550,7 +759,7 @@ export class KmnFileWriter {
       || inObj.compare_type === 'amb_6_6' || inObj.compare_type === 'dup_6_6') {
 
       const textsegment = (
-        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule: '
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
         + (inObj.isEarlier ? 'earlier' : 'later')
         + ': dk(' + inObj.dk_prefix[1] + inObj.dk_id[1] + ") + ["
         + inObj.modifier + " " + inObj.key + "]  >  \'"
@@ -636,17 +845,20 @@ export class KmnFileWriter {
     else if (rule[index].ruleType === "C3") {
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierPrevDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C3';
-        unavailableSuperiWarnings.dk_prefix = ['A', ''];
+        unavailableSuperiWarnings.dk_prefix = ['A', 'B'];
         unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
         unavailableSuperiWarnings.prevDk_modifier = rule[index].modifierPrevDeadkey;
         unavailableSuperiWarnings.prevDk_key = rule[index].prevDeadkey;
+        unavailableSuperiWarnings.Dk_modifier = rule[index].modifierDeadkey;
+        unavailableSuperiWarnings.Dk_key = rule[index].deadkey;
         unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings, 2);
       }
 
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C3';
-        unavailableSuperiWarnings.prevDk_modifier = '';
-        unavailableSuperiWarnings.dk_prefix = ['', 'B'];
+        unavailableSuperiWarnings.prevDk_modifier = rule[index].modifierPrevDeadkey;
+        unavailableSuperiWarnings.prevDk_key = rule[index].prevDeadkey;
+        unavailableSuperiWarnings.dk_prefix = ['A', 'B'];
         unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
         unavailableSuperiWarnings.Dk_modifier = rule[index].modifierDeadkey;
         unavailableSuperiWarnings.Dk_key = rule[index].deadkey;
@@ -1067,11 +1279,11 @@ export class KmnFileWriter {
     //    assuming that if a C0/C1 and a C2/C3 rule is ambiguous the user prefers to use the C2/C3 rule over the C0/C1 rule
     // if both happens, nothing would be written, therefore this messsage
 
-    const extraWarning = "PLEASE CHECK THAT RULE AS IT WILL NOT BE WRITTEN !";
+    const extraWarning = "PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN ! ";
 
     for (let i = 0; i < 3; i++) {
       if (ambiguousWarnings.warningMessages[i] !== "") {
-        if ((ambiguousWarnings.warningMessages[i].indexOf("earlier:") > -1) && (ambiguousWarnings.warningMessages[i].indexOf("later:") > -1)) {
+        if ((ambiguousWarnings.warningMessages[i].indexOf("earlier") > -1) && (ambiguousWarnings.warningMessages[i].indexOf("later") > -1)) {
           ambiguousWarnings.warningMessages[i] = ambiguousWarnings.warningMessages[i] + extraWarning;
         }
       }
@@ -1080,11 +1292,12 @@ export class KmnFileWriter {
     for (let i = 0; i < 3; i++) {
       const completeWarning =
         unavailableSuperiWarnings.warningMessages[i]
+        + unavailableModiWarnings.warningMessages[i]
         + duplicateWarnings.warningMessages[i]
-        + ambiguousWarnings.warningMessages[i]
-        + unavailableModiWarnings.warningMessages[i];
+        + ambiguousWarnings.warningMessages[i];
 
-      completeWarning ? (resultWarningTextSet.warningMessages[i] = "c WARNING: " + completeWarning + " here: ") : resultWarningTextSet.warningMessages[i] = '';
+      completeWarning ? (resultWarningTextSet.warningMessages[i] = "c WARNING: " + completeWarning) : resultWarningTextSet.warningMessages[i] = '';
+
     }
 
     return resultWarningTextSet;
@@ -1112,9 +1325,9 @@ export class KmnFileWriter {
       character: ctr
     };
 
-    const m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(ctr);
-    const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(ctr);
-    const m_dec = /^&#([0-9]{1,7});$/.exec(ctr);
+    const m_uni = UnicodeCharacterConversion.re_uni.exec(ctr);
+    const m_hex = UnicodeCharacterConversion.re_hex.exec(ctr);
+    const m_dec = UnicodeCharacterConversion.re_dec.exec(ctr);
 
     // find the value of output character which may be specified in unicode, html hex or html dec format ( e.g. U+1234 -> 1234; &#x1234; -> 1234; &#4660; -> 1234)
     const ctr_val = (
@@ -1128,17 +1341,17 @@ export class KmnFileWriter {
     );
 
     if (ctr.length === 0) {
-      msg_entity = "empty output or unsupported numerical html entity: ";
+      msg_entity = "empty output or unsupported numerical html entity ";
     }
 
-    // for control characters in 'U+...', '&#x...' or '&#...' format as well as in "" format
+    // for control characters in 'U+...', '&#x...' or '&#...' format
     if ((ctr_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) || (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
 
       // for control characters in 'U+...', '&#x...'  or '&#...' format
       if (ctr_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
         versionOutputCharacter = "U+" + ctr_val.toString(16).toUpperCase().padStart(4, '0');
       }
-      // for control characters in "" format
+      // for other control characters
       if (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
         versionOutputCharacter = "U+" + ctr.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
       }
@@ -1148,7 +1361,22 @@ export class KmnFileWriter {
       msg_control = "Use of a control character ";
     }
     else {
-      out.character = this.convertToUnicodeCharacter(ctr) ?? "";
+      const xmlOutputData: ReplacedOutputString = {
+        input: ctr as string,
+        replaced_character: '',
+        replaced_string: '',
+        rest_string: ctr as string,
+        carryOver: ''
+      };
+      out.character = (UnicodeCharacterConversion.processXmlValue(xmlOutputData)).replaced_string ?? "";
+
+      // msg if a possibly invalid html will be written e.g. &commat; &gt &123 &abc &#x1234
+      if ((out.character.indexOf('&') > -1) && (out.character.length > 1)) {
+        msg_entity = msg_entity + "specified string might not be a valid html entity ";
+      }
+      if ((out.character.indexOf('U+') > -1) && (out.character.length > 2)) {
+        msg_entity = msg_entity + "invalid Unicode code point used ";
+      }
     }
 
     // add a warning message
@@ -1163,103 +1391,6 @@ export class KmnFileWriter {
     return out;
   }
 
-  // TODO: move to util in PR 14569
-  /**
-   * @brief  function to convert a numeric character reference or a unicode value to a unicode character e.g. &#x63 -> c;  U+1F60E -> 😎
-   * @param  inputString the value that will converted
-   * @return a unicode character like 'c', 'ሴ', '😎' or undefined if inputString is not recognized
-   */
-  public convertToUnicodeCharacter(inputString: string): string | undefined {
-
-    // null, undefined will later be treated as '' in conversion
-    if (inputString == null || inputString == undefined) {
-      return undefined;
-    }
-
-    //  U+ followed by 1.-6. hex digits will later be used for conversion
-    const m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(inputString);
-
-    // invalid U+ ( U+ followed by anything) will later be refused for conversion
-    const m_uni_inv = /^(U\+)+(.?)+$/i.exec(inputString);
-
-    // &#x followed by 1.-6. hex digits will later be used for conversion
-    const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(inputString);
-
-    // &# followed by 1.-6. decimal digits will later be used for conversion
-    const m_dec = /^&#([0-9]{1,7});$/.exec(inputString);
-
-    // & followed by gt, lt, quot, amp, apos will later be used for conversion
-    const m_nam = /^&(gt|lt|quot|amp|apos);$/i.exec(inputString);
-
-    //  &# followed by anything will later be refused for conversion
-    const m_html_inv = /^(&#)+(.?)+$/i.exec(inputString);
-
-    // one or more characters except starting with U+ or & will later be used for conversion
-    const m_chr = /^(?!U\+|&).+$/i.exec(inputString);
-
-    // '&', '&#','&#x', or 'U+' with or without ; will later be refused for conversion
-    const m_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+|(U\+)+;?)$|^$/i.exec(inputString);
-
-    // valid 'U+xxxx'
-    if (m_uni) {
-      const codePoint_u = parseInt(m_uni[1], 16);
-      // Reject surrogates and invalid codepoints
-      if ((codePoint_u >= 0xD800 && codePoint_u <= 0xDFFF) || codePoint_u > 0x10FFFF) {
-        return undefined;
-      }
-      return String.fromCodePoint(codePoint_u);
-    }
-
-    // invalid 'U+xxxx'
-    else if (m_uni_inv) {
-      return undefined;
-    }
-
-    // valid '&#x...'
-    else if (m_hex) {
-      const codePoint_h = parseInt(m_hex[1], 16);
-      // Reject surrogates and invalid codepoints
-      if ((codePoint_h >= 0xD800 && codePoint_h <= 0xDFFF) || codePoint_h > 0x10FFFF) {
-        return undefined;
-      }
-      return String.fromCodePoint(codePoint_h);
-    }
-    // valid '&#...'
-    else if (m_dec) {
-      const codePoint_d = parseInt(m_dec[1], 10);
-      // Reject surrogates and invalid codepoints
-      if ((codePoint_d >= 0xD800 && codePoint_d <= 0xDFFF) || codePoint_d > 0x10FFFF) {
-        return undefined;
-      }
-      return String.fromCodePoint(codePoint_d);
-    }
-    // valid '&gt', '&lt',..
-    else if (m_nam) {
-      switch (m_nam[1].toLowerCase()) {
-        case 'gt': return '>';
-        case 'lt': return '<';
-        case 'quot': return '"';
-        case 'amp': return '&';
-        case 'apos': return "'";
-        default: return undefined;
-      }
-    }
-    // invalid  '&...'
-    else if (m_html_inv) {
-      return undefined;
-    }
-
-    // single 'U+', '&', ''
-    else if (m_chr_inv) {
-      return inputString;
-    }
-
-    // if no matches so far, check for one or more characters ('a','ab', 'ẘ','😎', '😎😎',  )
-    else if (m_chr) {
-      return inputString;
-    }
-    return undefined;
-  }
 
   /** @internal */
   public unitTestEndpoints = {
