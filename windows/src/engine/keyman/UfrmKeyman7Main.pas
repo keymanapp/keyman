@@ -1228,21 +1228,13 @@ procedure TfrmKeyman7Main.SetTrayIcon(rp: TRunningProduct; kbd: IKeymanKeyboardI
 var
   cust: IKeymanCustomisation;
   lskbd: TLangSwitchKeyboard;
-  icon: TIcon;
 begin
   if Assigned(rp) then
   begin
     lskbd := LangSwitchManager.FindKeyboardByKeymanID(kbd.KeymanID);
     if Assigned(lskbd) and (lskbd is TLangSwitchKeyboard_TIP) then
     try
-      icon := TIcon.Create;
-      try
-        icon.Handle := (lskbd as TLangSwitchKeyboard_TIP).IconHandle;
-        rp.FTrayIcon.Icon.Assign(icon);
-        icon.ReleaseHandle;
-      finally
-        icon.Free;
-      end;
+      rp.FTrayIcon.Icon.Handle := CopyIcon((lskbd as TLangSwitchKeyboard_TIP).IconHandle);
     except
       on E:Exception do
       begin
