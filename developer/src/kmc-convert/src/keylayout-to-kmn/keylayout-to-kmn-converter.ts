@@ -1,5 +1,6 @@
 /*
- * Keyman is copyright (C) SIL Global. MIT License.
+ * Keyman is 2025 copyright (C) SIL International. MIT License.
+
  *
  * Created by S. Schmitt on 2025-05-12
  *
@@ -7,7 +8,6 @@
  *
  */
 
-// ToDo-kmc-convert all warnings/squiggely lines will be adressed in PR #15860
 import { CompilerCallbacks, CompilerOptions, KeymanCompilerResult, Keylayout } from "@keymanapp/developer-utils";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
@@ -73,7 +73,7 @@ export class Rule {
   constructor(
     public readonly ruleType: string,             /* C0, C1, C2, C3, or C4 */
 
-    public readonly modifierPrevDeadkey: string, /* first key used by C3 rules*/
+    public readonly modifierPrevDeadkey: string,  /* first key used by C3 rules*/
     public readonly prevDeadkey: string,
     public idPrevDeadkey: number,
     public uniquePrevDeadkey: number,
@@ -85,7 +85,7 @@ export class Rule {
 
     public readonly modifierKey: string,          /* third key used by C0,C1,C2,C3,C4 rules*/
     public readonly key: string,
-    public readonly output: Uint8Array,            /* output used by C0,C1,C2,C3,C4 rules*/
+    public readonly output: Uint8Array,           /* output used by C0,C1,C2,C3,C4 rules*/
   ) { }
 
 }
@@ -113,7 +113,6 @@ export class KeylayoutToKmnConverter {
 
     if (!inputFilename) {
       throw new Error('Input filename is required');
-      return null;
     }
     const KeylayoutReader = new KeylayoutFileReader(this.callbacks/*, this.options*/);
 
@@ -228,18 +227,13 @@ export class KeylayoutToKmnConverter {
           // ...............................................................................................................................
           // case C0: output ...............................................................................................................
           // C0 see: https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd ...
+          //         or /docs/internal/kmc-convert/keylayout-to-kmn/index.md ...............................................................
           // a key is mapped to a character directly ( code -> output) .....................................................................
           // ...............e. g. <key code="1" output="s"/> ...............................................................................
           // ...............................................................................................................................
 
-          // Todo-kmc-convert will be removed before merge into PR 12564 
+
           if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['output'] === "") {
-            /* this.callbacks.reportMessage(ConverterMessages.Warn_EmptyOutput({
-             keymapIndex: jsonObj.keyboard.keyMapSet[0].keyMap[i]['index'],
-             key: jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code'],
-             KeyName: this.mapUkeleleKeycodeToVK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['code']))
-           }));
-           return null;*/
 
             for (let l = 0; l < dataUkelele.modifiers[i].length; l++) {
 
@@ -299,8 +293,9 @@ export class KeylayoutToKmnConverter {
             // ...............................................................................................................................
             // case C1: action + state none + output .........................................................................................
             // C1 see: https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.g7jwx3lx0ydd ...
+            //         or /docs/internal/kmc-convert/keylayout-to-kmn/index.md ...............................................................
             // a key is mapped to an action and then to an output ............................................................................
-            // KeyMap:code -> KeyMap:action->action:actionState(none) -> actionOutput ......................................................
+            // KeyMap:code -> KeyMap:action->action:actionState(none) -> actionOutput ........................................................
             // ...............e. g. <when state="none" output="a" ............................................................................
             // ...............................................................................................................................
 

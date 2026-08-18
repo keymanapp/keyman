@@ -26,12 +26,12 @@ describe('KeylayoutToKmnConverter', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     const infile = '../data/Test.keylayout';
     [
-      [makePathToFixture('../data/Test.kmn')],
+      ['../data/Test.kmn'],
       [],
-      [makePathToFixture('../data/Test_OtherOutputName.kmn')],
+      ['../data/Test_OtherOutputName.kmn'],
     ].forEach(function (files) {
-      it(infile + " should run ", async function () {
-        await NodeAssert.doesNotReject(async () =>await sut.run(makePathToFixture(infile), files[0]));
+      it(infile + " -> " + (files[0] ?? '') + " should run ", async function () {
+        await NodeAssert.doesNotReject(async () => await sut.run(makePathToFixture(infile), makePathToFixture((files[0]) || '')));
         assert.equal(compilerTestCallbacks.messages.length, 0);
       });
     });
@@ -40,18 +40,18 @@ describe('KeylayoutToKmnConverter', function () {
   describe('RunTestFiles resulting in errors', function () {
     const sut = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [makePathToFixture('../data/Test_DifferentAmountOfMapSelectInKeyMapERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingkeyERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingkeyMapERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingLayoutsERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingmodifierMapERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingkeyMapSetERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingActionsERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingTerminatorsERROR.keylayout')],
-      [makePathToFixture('../data/Test_MissingAllERROR.keylayout')],
+      ['../data/Test_DifferentAmountOfMapSelectInKeyMapERROR.keylayout'],
+      ['../data/Test_MissingkeyERROR.keylayout'],
+      ['../data/Test_MissingkeyMapERROR.keylayout'],
+      ['../data/Test_MissingLayoutsERROR.keylayout'],
+      ['../data/Test_MissingmodifierMapERROR.keylayout'],
+      ['../data/Test_MissingkeyMapSetERROR.keylayout'],
+      ['../data/Test_MissingActionsERROR.keylayout'],
+      ['../data/Test_MissingTerminatorsERROR.keylayout'],
+      ['../data/Test_MissingAllERROR.keylayout'],
     ].forEach(function (files) {
       it(files + " should give an error ", async function () {
-        await sut.run(files[0]);
+        await sut.run(makePathToFixture(files[0]));
         assert.isTrue(compilerTestCallbacks.messages.length > 0);
       });
     });

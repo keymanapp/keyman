@@ -65,7 +65,6 @@ export class Converter implements KeymanCompiler {
 
     if (!inputFilename) {
       throw new Error('Input filename is required');
-      return null;
     }
 
     const ConverterClass = ConverterClassFactory.find(inputFilename, outputFilename ?? '.kmn');

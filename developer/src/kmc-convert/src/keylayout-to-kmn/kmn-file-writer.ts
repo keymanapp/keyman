@@ -38,7 +38,6 @@ interface RuleReview {
   output: string;
 };
 
-
 export interface ReplacedOutputString {
   // input: substring of the original string that is currently being processed
   input: string | undefined;
@@ -182,7 +181,7 @@ export class UnicodeCharacterConversion {
     }
     // for all other characters we just copy the first character and remove it from inputString.input
     else {
-      const to_be_replaced = inputString.input[0] ?? '';;
+      const to_be_replaced = inputString.input[0] ?? '';
       const replace_len = [...to_be_replaced].length;
 
       inputString.rest_string = inputString.input.substring(replace_len);
@@ -344,20 +343,14 @@ export class KmnFileWriter {
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
-
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
 
-        // TODO-KMC-CONVERT: remove
-        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
-        // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
-        // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
         let versionOutputCharacter;
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
         if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
           warnText[2] = (characterMessage.message === '') ? characterMessage.message : characterMessage.message;
         }
-
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -410,14 +403,9 @@ export class KmnFileWriter {
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
         const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
+        const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
 
         let versionOutputCharacter;
-        const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO-KMC-CONVERT: remove
-        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
-        // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
-        // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
-
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
         if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
@@ -498,17 +486,15 @@ export class KmnFileWriter {
         // use of Unicode Character vs Unicode Codepoint;
         // we always print out the Unicode Character  (A, W̊, 😎, ... ).
         // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
-
         const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
+
         let versionOutputCharacter;
         const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
         if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
           warnText[2] = (characterMessage.message === '') ? characterMessage.message : characterMessage.message;
         }
-
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
         // if warning contains duplicate rules we do not write out the entire rule
@@ -777,6 +763,7 @@ export class KmnFileWriter {
    *         Keyman can not handle duplicate rules so we need to make sure a rule is written only once by either omitting a duplicate rule or commenting out an ambiguous rule.
    *         Omitting rules and definition of comparisons e.g. 1-1, 2-4, 6-6
    *         see https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.pcz8rjyrl5ug
+   *         or /docs/internal/kmc-convert/keylayout-to-kmn/index.md
    * @param  rule : Rule[] - an array of all rules
    * @param  index the index of a rule in Rule[]
    * @return a string[] containing possible warnings for a rule
