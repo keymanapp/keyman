@@ -209,16 +209,46 @@
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
 
-        <data
-          android:host="keyman-staging.com"
-          android:scheme="http"
-          android:pathPrefix="/keyboards/install" />
+        <!-- Our servers' initial folder represents a language code. -->
+        <data android:host="keyman-staging.com" />
+        <data android:scheme="http" />
+        <!-- Matches 2-letter language folders specifically. -->
+        <data android:pathPattern="/.._*/keyboards/install/.*" />
+        <!-- Matches 2-letter language folders specifically. -->
+        <data android:pathPattern="/..._*/keyboards/install/.*" />
+        <!-- Matches 4-letter language folders specifically. -->
+        <data android:pathPattern="/...._*/keyboards/install/.*" />
+        <!-- Matches 5-letter language folders specifically. -->
+        <data android:pathPattern="/....._*/keyboards/install/.*" />
+        <!-- Matches 6-letter language folders specifically. -->
+        <data android:pathPattern="/......_*/keyboards/install/.*" />
+        <!-- Matches 7-letter language folders specifically. -->
+        <data android:pathPattern="/......._*/keyboards/install/.*" />
+      </intent-filter>
 
-        <data
-          android:host="keyman.com"
-          android:scheme="https"
-          android:pathPrefix="/keyboards/install" />
+      <intent-filter android:priority="50" android:autoVerify="true">
+        <!-- KMAPro should also be able to handle /keyboards/install links and convert to /go/package/download -->
+        <action android:name="android.intent.action.VIEW" />
 
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <!-- Our servers' initial folder represents a language code. -->
+        <data android:host="keyman.com" />
+        <data android:scheme="https" />
+        <!-- Must rely on the .._* pattern when targetSdk < 31 -->
+        <!-- Matches 2-letter language folders specifically. -->
+        <data android:pathPattern="/.._*/keyboards/install/.*" />
+        <!-- Matches 3-letter language folders specifically. -->
+        <data android:pathPattern="/..._*/keyboards/install/.*" />
+        <!-- Matches 4-letter language folders specifically. -->
+        <data android:pathPattern="/...._*/keyboards/install/.*" />
+        <!-- Matches 5-letter language folders specifically. -->
+        <data android:pathPattern="/....._*/keyboards/install/.*" />
+        <!-- Matches 6-letter language folders specifically. -->
+        <data android:pathPattern="/......_*/keyboards/install/.*" />
+        <!-- Matches 7-letter language folders specifically. -->
+        <data android:pathPattern="/......._*/keyboards/install/.*" />
       </intent-filter>
 
     </activity>
