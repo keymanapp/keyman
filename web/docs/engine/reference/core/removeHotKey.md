@@ -8,7 +8,7 @@ Remove the hotkey handler from document's list of hotkey handlers.
 
 ## Syntax
 
-```c
+```js
 keyman.removeHotkey(keyCode, shiftState);
 ```
 

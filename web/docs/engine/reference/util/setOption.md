@@ -8,7 +8,7 @@ Set a KeymanWeb, On-Screen Keyboard or User Interface option value.
 
 ## Syntax
 
-```c
+```js
 keyman.util.setOption(optionName, value);
 ```
 

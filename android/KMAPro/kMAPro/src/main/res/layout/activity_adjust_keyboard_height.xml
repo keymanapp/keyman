@@ -7,7 +7,11 @@
   android:layout_height="match_parent"
   android:orientation="vertical">
 
-  <include layout="@layout/titlebar" />
+  <include layout="@layout/titlebar"
+      android:id="@+id/titlebar"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+  />
 
   <TextView
     android:id="@+id/adjust_instructions"
@@ -18,6 +22,7 @@
     android:layout_marginTop="8dp"
     android:text="@string/adjust_keyboard_instructions"
     android:textSize="@dimen/adjust_keyboard_height_label_textsize"
+    android:textColor="@color/main_text_color"
     app:layout_constraintTop_toBottomOf="@id/titlebar" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
