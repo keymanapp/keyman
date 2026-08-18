@@ -21,8 +21,8 @@ export class HeldRepeater implements GestureHandler {
   public static readonly INITIAL_DELAY = 500; // msec
   public static readonly REPEAT_DELAY = 100;  // msec
 
-  readonly source: GestureSequence<KeyElement, string>;
-  readonly baseKey: KeyElement
+  private readonly source: GestureSequence<KeyElement, string>;
+  private readonly baseKey: KeyElement
   private readonly actionToRepeat: () => void;
   private timerHandle: number;
 
