@@ -16,6 +16,7 @@ import { LegacyQuotientRoot } from "./legacy-quotient-root.js";
 import { generateSubsetId } from './tokenization-subsets.js';
 
 import LexicalModel = LexicalModelTypes.LexicalModel;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
 /**
@@ -147,7 +148,11 @@ export class ContextToken implements ContextTokenLike {
         bestProbFromSet: BASE_PROBABILITY,
         subsetId: generateSubsetId()
       };
-      searchModule = new LegacyQuotientSpur(searchModule, [{sample: transform, p: BASE_PROBABILITY}], inputMetadata);
+      const edge: ProbabilityMass<Transform> = {sample: transform, p: BASE_PROBABILITY};
+      if(transitionId !== undefined) {
+        edge.sample.id = transitionId;
+      }
+      searchModule = new LegacyQuotientSpur(searchModule, [edge], inputMetadata);
     });
 
     return new ContextToken(searchModule, isPartial);

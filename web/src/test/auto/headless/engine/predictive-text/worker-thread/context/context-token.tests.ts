@@ -51,21 +51,8 @@ describe('ContextToken', function() {
     KMWString.enableSupplementaryPlane(true);
   });
 
-  describe("<constructor>", () => {
-    it("(model: LexicalModel)", async () => {
-      let token = new ContextToken(new LegacyQuotientRoot(plainModel));
-
-      assert.equal(token.searchModule.inputCount, 0);
-      assert.isEmpty(token.exampleInput);
-      assert.isFalse(token.isWhitespace);
-
-      // While searchSpace has no inputs, it _can_ match lexicon entries (via insertions).
-      let searchIterator = getBestMatches([token.searchModule], new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
-      let firstEntry = await searchIterator.next();
-      assert.isFalse(firstEntry.done);
-    });
-
-    it("(model: LexicalModel, text: string)", () => {
+  describe('fromRawText', () => {
+    it("may construct a fresh ContextToken from a model and plain text", () => {
       let token = ContextToken.fromRawText(plainModel, "and");
 
       assert.equal(token.searchModule.bestExample.text, 'and');
@@ -82,7 +69,40 @@ describe('ContextToken', function() {
       assert.isFalse(token.isWhitespace);
     });
 
-    it("(token: ContextToken", () => {
+    it("may assign a transition ID to the constructed ContextToken", () => {
+      const TRANSITION_ID = 6;
+      let token = ContextToken.fromRawText(plainModel, "and", false, TRANSITION_ID);
+
+      assert.equal(token.searchModule.bestExample.text, 'and');
+      assert.equal(token.exampleInput, 'and');
+
+      assert.equal(token.searchModule.inputCount, 3);
+      assert.isTrue(quotientPathHasInputs(
+        token.searchModule, [
+        [{sample: { insert: 'a', deleteLeft: 0, id: TRANSITION_ID }, p: 1}],
+        [{sample: { insert: 'n', deleteLeft: 0, id: TRANSITION_ID }, p: 1}],
+        [{sample: { insert: 'd', deleteLeft: 0, id: TRANSITION_ID }, p: 1}]
+      ]));
+
+      assert.isFalse(token.isWhitespace);
+    });
+  });
+
+  describe("<constructor>", () => {
+    it("constructs from SearchQuotient root nodes", async () => {
+      let token = new ContextToken(new LegacyQuotientRoot(plainModel));
+
+      assert.equal(token.searchModule.inputCount, 0);
+      assert.isEmpty(token.exampleInput);
+      assert.isFalse(token.isWhitespace);
+
+      // While searchSpace has no inputs, it _can_ match lexicon entries (via insertions).
+      let searchIterator = getBestMatches([token.searchModule], new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
+      let firstEntry = await searchIterator.next();
+      assert.isFalse(firstEntry.done);
+    });
+
+    it("may clone a previously-existing ContextToken", () => {
       // Same as in a test above, since we verified that it works correctly.
       let baseToken = ContextToken.fromRawText(plainModel, "and");
       let clonedToken = new ContextToken(baseToken);

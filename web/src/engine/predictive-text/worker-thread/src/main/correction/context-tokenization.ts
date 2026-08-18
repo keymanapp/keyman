@@ -793,11 +793,18 @@ export function mapWhitespacedTokenization(
   // Mutates stackedInserts, stackedDeletes.
   const baseRemovedTokenCount = Math.max(0, stackedDeletes.length - stackedInserts.length);
   const transformMap = assembleTransforms(stackedInserts, stackedDeletes, tailIndex);
+  if(transform.id !== undefined) {
+    transformMap.forEach((v) => v.id = transform.id);
+  }
 
   // If there's an empty transform in the 0 position and we already know we're
   // dropping tokens - and only deleting - we're dropping an
   // otherwise-untracked empty token - make sure it's included!
-  const droppedFinalTransform = baseRemovedTokenCount > 0 && transform.insert == '' && TransformUtils.isEmpty(transformMap.get(0));
+  const droppedFinalTransform = baseRemovedTokenCount > 0
+    && transform.insert == ''
+    && TransformUtils.isEmpty(transformMap.get(0))
+    && shiftDeletes;
+
   // Past that, if we have more delete entries than insert entries for our transforms, we
   // dropped some tokens outright.
   const removedTokenCount = baseRemovedTokenCount + (droppedFinalTransform ? 1 : 0);
