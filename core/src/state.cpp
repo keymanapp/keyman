@@ -45,12 +45,8 @@ actions::actions(actions const &other)
   size_t opt_index = 0;
   for (auto &item : *this) {
     if (item.type == KM_CORE_IT_PERSIST_OPT) {
-      if (opt_index < _option_items_stack.size()) {
-        item.option = &_option_items_stack[opt_index++];
-      } else {
-        // no matching item in the stack; clear pointer.
-        item.option = nullptr;
-      }
+      assert(opt_index < _option_items_stack.size());
+      item.option = &_option_items_stack[opt_index++];
     }
   }
 }

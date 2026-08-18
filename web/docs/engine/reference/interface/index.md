@@ -18,7 +18,7 @@ the same as `keyman.interface`. Use `keyman.interface` in preference to
 Custom user interfaces should not use these functions. These functions are intended
 for use in a keyboard context, in particular during a keystroke event cycle.
 
-[`any` Function (Deprecated)](any)
+[`any` Function](any) (deprecated)
 :   Returns whether or not the char `ch` is found within the [`any`](/developer/language/reference/any)([`store`](/developer/language/reference/store)) string, setting an internally-tracked index for use in the `indexOutput` function.
 :   Shorthand name: `keyman.interface.KA`
 
@@ -30,7 +30,7 @@ for use in a keyboard context, in particular during a keystroke event cycle.
 :   Cancels a previous feedback [`beep`](/developer/language/reference/beep) operation on a page element.
 :   Shorthand name: `keyman.interface.KBR`
 
-[`context` Function (Deprecated)](context)
+[`context` Function](context) (deprecated)
 :   Gets [`context`](/developer/language/reference/context) for an ongoing keyboard operation relative to the caret's present position.
 :   Shorthand name: `keyman.interface.KC`
 
@@ -38,11 +38,11 @@ for use in a keyboard context, in particular during a keystroke event cycle.
 :   Emits the character or object at `contextOffset` from the current matched rule's context.
 :   Shorthand name: `keyman.interface.KCXO`
 
-[`contextMatch` Function (Deprecated)](contextMatch)
+[`contextMatch` Function](contextMatch) (deprecated)
 :   Context matching: Returns `true` if the specified `context` call matches a provided string.
 :   Shorthand name: `keyman.interface.KCM`
 
-[`deadkeyMatch` Function (Deprecated)](deadkeyMatch)
+[`deadkeyMatch` Function](deadkeyMatch) (deprecated)
 :   Deadkey matching: Seeks to match the [`deadkey`](/developer/language/reference/deadkey) state `dk` at the relative caret position `n`.
 :   Shorthand name: `keyman.interface.KDM`
 
@@ -129,19 +129,19 @@ for use in a keyboard context, in particular during a keystroke event cycle.
 The following functions have been retained for compatibility with existing IME
 keyboards, but should not be used in any new keyboards or user interfaces.
 
-[`GetLastActiveElement` or `getLastActiveElement` Function (Deprecated)](GetLastActiveElement)
+[`GetLastActiveElement` or `getLastActiveElement` Function](GetLastActiveElement) (deprecated)
 :   Use [`keyman.interface.getLastActiveTextStore()`](getLastActiveTextStore)
 
-[`FocusLastActiveElement` or `focusLastActiveElement` Function (Deprecated)](FocusLastActiveElement)
+[`FocusLastActiveElement` or `focusLastActiveElement` Function](FocusLastActiveElement) (deprecated)
 :   Use [`keyman.interface.focusLastActiveTextStore()`](focusLastActiveTextStore)
 
-[`HideHelp` or `hideHelp` Function (Deprecated)](HideHelp)
+[`HideHelp` or `hideHelp` Function](HideHelp) (deprecated)
 :   Use [`keyman.osk.hide()`](../osk/hide)
 
-[`ShowHelp` or `showHelp` Function (Deprecated)](ShowHelp)
+[`ShowHelp` or `showHelp` Function](ShowHelp) (deprecated)
 :   Use [`keyman.osk.setPos()`](../osk/setPos)
 :   Use [`keyman.osk.show()`](../osk/show)
 
-[`ShowPinnedHelp` or `showPinnedHelp` Function (Deprecated)](ShowPinnedHelp)
+[`ShowPinnedHelp` or `showPinnedHelp` Function](ShowPinnedHelp) (deprecated)
 :   Use [`keyman.osk.setRect()`](../osk/setRect)
 :   Use [`keyman.osk.show()`](../osk/show)
