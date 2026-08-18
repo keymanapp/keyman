@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 19.0.268 alpha 2026-08-17
+
+* feat(windows): pass UI language to keyboard download page (#16364)
+* fix(developer): mark touch layout file as modified after applying template (#16370)
+* chore(resources): update langtags to 2026-06-09, iso639-3 to current, language-subtag-registry to 2026-08-08, cleanup and add download scripts (#16371)
+* chore(common): disable strictNullChecks for TypeScript for now (#16387)
+
+## 19.0.267 alpha 2026-08-14
+
+* chore(common): add missing history (#16369)
+* chore(windows): remove junk files from kmshell (#16365)
+* fix(windows): release shift key on OSK when user releases physical right shift (#16361)
+* fix(web): adjust sourcemap linking pattern used for error reporting within mobile apps (#16368)
+* chore(android,ios): Update Crowdin strings for Spanish - Latin America (#16358)
+
 ## 19.0.266 alpha 2026-08-13
 
 * chore(deps-dev): bump esbuild from 0.25.0 to 0.28.1 (#16095)
