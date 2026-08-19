@@ -1,10 +1,10 @@
 import { type KeyElement } from '../../../keyElement.js';
 import { VisualKeyboard } from '../../../visualKeyboard.js';
 
-import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution, KeyEvent } from 'keyman/engine/keyboard';
+import { ActiveKey, ActiveKeyBase, ActiveSubKey, KeyDistribution } from 'keyman/engine/keyboard';
 import { ConfigChangeClosure, CumulativePathStats, GestureRecognizerConfiguration, GestureSequence, GestureSource, GestureSourceSubview, InputSample, RecognitionZoneSource } from 'keyman/engine/gesture-processor';
 import { GestureHandler } from '../gestureHandler.js';
-import { distributionFromDistanceMaps } from '../../../corrections.js';
+import { CorrectionDistanceMap, distributionFromDistanceMaps } from '../../../corrections.js';
 import { GestureParams } from '../specsForLayout.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
 import { TouchLayout } from '@keymanapp/common-types';
@@ -94,7 +94,7 @@ export class Flick implements GestureHandler {
   private readonly baseSpec: ActiveKey;
   readonly hasModalVisualization: false;
 
-  private baseKeyDistances: Map<ActiveKeyBase, number>;
+  private baseKeyDistances: CorrectionDistanceMap;
   private computedFlickDistribution: KeyDistribution;
   private lockedDir: typeof OrderedFlickDirections[number];
   private lockedSelectable: ActiveSubKey;
@@ -159,7 +159,7 @@ export class Flick implements GestureHandler {
         }
         return;
       } else if(result.matchedId == 'flick-mid') {
-        if(baseSelection == this.baseSpec) {
+        if(baseSelection.elementID == this.baseSpec.elementID) {
           // Do not store a locked direction; the direction we WOULD lock has
           // no valid flick available.
           return;
@@ -197,20 +197,21 @@ export class Flick implements GestureHandler {
   }
 
   private emitKey(vkbd: VisualKeyboard, selection: ActiveKeyBase, pathStats: CumulativePathStats<any>) {
-    let keyEvent: KeyEvent;
+    let finalSelection: ActiveKeyBase;
     const projectedDistance = calcLockedDistance(pathStats, this.lockedDir);
     if(projectedDistance > this.gestureParams.flick.triggerDist) {
-      keyEvent = vkbd.keyEventFromSpec(selection);
+      finalSelection = selection;
     } else {
       // Even if mid-way between base key and actual key.
-      keyEvent = vkbd.keyEventFromSpec(this.baseSpec);
+      finalSelection = this.baseSpec;
     }
 
+    const keyEvent = vkbd.keyEventFromSpec(finalSelection);
     keyEvent.keyDistribution = this.currentStageKeyDistribution(this.baseKeyDistances);
     keyEvent.inputBreadcrumb = this.sequence.trace();
 
     // emit the keystroke
-    vkbd.raiseKeyEvent(keyEvent, null);
+    vkbd.raiseKeyEvent(keyEvent, finalSelection, null);
   }
 
   private buildPopupRecognitionConfig(vkbd: VisualKeyboard): GestureRecognizerConfiguration<KeyElement, string> {
@@ -242,7 +243,7 @@ export class Flick implements GestureHandler {
    * @param pathStats
    * @returns
    */
-  flickDistribution(pathStats: CumulativePathStats, ignoreThreshold?: boolean) {
+  flickDistribution(pathStats: CumulativePathStats, ignoreThreshold?: boolean): KeyDistribution {
     // NOTE:  does not consider flick direction-locking.
     const flickSet = this.baseSpec.flick;
 
@@ -315,6 +316,7 @@ export class Flick implements GestureHandler {
       totalMass += mass;
 
       return {
+        elementID: entry.spec.elementID,
         keySpec: entry.spec,
         p: mass
       }
@@ -327,16 +329,17 @@ export class Flick implements GestureHandler {
     return distribution.sort((a, b) => b.p - a.p);
   }
 
-  currentStageKeyDistribution(baseDistMap: Map<ActiveKeyBase, number>): KeyDistribution {
+  currentStageKeyDistribution(baseDistanceMap: CorrectionDistanceMap): KeyDistribution {
     const baseSpec = this.baseSpec;
     const baseDistances = this.baseKeyDistances;
     const flickDistrib = this.computedFlickDistribution;
-    const entry = baseDistances.get(baseSpec);
+    const entry = baseDistances.get(baseSpec.elementID);
 
     if(!entry) {
       const best = flickDistrib[0];
       return [
         {
+          elementID: best.keySpec.elementID,
           keySpec: best.keySpec,
           p: 1
         }
@@ -344,15 +347,18 @@ export class Flick implements GestureHandler {
     }
 
     // Corrections are enabled:  return a full distribution
-    const baseKeyFlickProbIndex = flickDistrib.findIndex((entry) => entry.keySpec == baseSpec);
+    const baseKeyFlickProbIndex = flickDistrib.findIndex((entry) => entry.keySpec.elementID == baseSpec.elementID);
     // Remove the base-key entry from the flick distribution but save its probability.
     // We'll scale the base distribution down so that its sum equals that value, enabling
     // us to merge the distributions while preserving normalization.
     const baseKeyFlickProb = flickDistrib.splice(baseKeyFlickProbIndex, 1)[0].p;
 
     const baseDistribution = distributionFromDistanceMaps(baseDistances);
-    return flickDistrib.concat(baseDistribution.map((entry) => {
+    return flickDistrib.map((entry) => {
+      return { elementID: entry.keySpec.elementID, keySpec: entry.keySpec, p: entry.p };
+    }).concat(baseDistribution.map((entry) => {
       return {
+        elementID: entry.elementID,
         keySpec: entry.keySpec,
         // Scale down all base key probabilities by how likely the base key's selection from
         // the flick itself is.

@@ -172,7 +172,6 @@ describe('predictFromCorrections', () => {
     assert.sameOrderedMembers(predictions.map((entry) => entry.prediction.sample.displayAs), ["it's", "its"]);
     assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions.map((entry) => {
       entry = deepCopy(entry);
-      entry.transformId = 314159;
       return entry;
     }));
 

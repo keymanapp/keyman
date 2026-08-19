@@ -8,7 +8,8 @@
  * gesture support.
  */
 
-import { ActiveKeyBase, KeyDistribution } from "keyman/engine/keyboard";
+import { KeyDistribution } from "keyman/engine/keyboard";
+import { type CorrectionDistanceMap } from "../../corrections.js";
 
 export interface GestureHandler {
   /**
@@ -46,7 +47,7 @@ export interface GestureHandler {
    * simple-tap corrections, allowing gestures to utilize the values as a basis
    * for their own calculations as appropriate.
    *
-   * @param baseDistMap The distance map used for simple-tap corrections
+   * @param baseDistanceMap The distance map used for simple-tap corrections
    */
-  currentStageKeyDistribution(baseDistMap: Map<ActiveKeyBase, number>): KeyDistribution | null;
+  currentStageKeyDistribution(baseDistanceMap: CorrectionDistanceMap): KeyDistribution | null;
 }
