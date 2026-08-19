@@ -245,7 +245,11 @@ begin
     try
       Width := 16;
       Height := 16;
-      Canvas.Draw(0,0,FRegKeyboard.Icon);
+      try
+        Canvas.Draw(0,0,FRegKeyboard.Icon);
+      except
+        on E:EInvalidGraphic do ; // ignore invalid icons
+      end;
       SaveToFile(FBitmap);
     finally
       Free;
