@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.270 alpha 2026-08-19
+
+* fix(windows): support .png format icon in tray icon (#16362)
+* fix(windows): handle font and package .zip format errors during package installation (#16363)
+* chore(deps-dev): bump form-data from 4.0.4 to 4.0.6 (#16103)
+* chore(deps-dev): bump js-yaml from 4.1.1 to 4.3.0 in /resources/build/pr-build-status (#16240)
+* epic: autocorrect (#12893)
+* change(android): enable autocorrect by default (#16403)
+
 ## 19.0.269 alpha 2026-08-18
 
 * chore(deps): bump body-parser from 1.20.5 to 1.20.6 (#16275)
