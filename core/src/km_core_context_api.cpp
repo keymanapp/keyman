@@ -15,7 +15,6 @@
 #include "keyman_core.h"
 
 #include "context.hpp"
-#include "jsonpp.hpp"
 #include "utfcodec.hpp"
 
 namespace {
@@ -301,30 +300,3 @@ km_core_context_item_list_size(km_core_context_item const *context_items)
   return n;
 }
 
-json & operator << (json & j, km::core::context const & ctxt) {
-  j << json::array;
-  for (auto & i: ctxt)  j << i;
-  return j << json::close;
-}
-
-json & operator << (json & j, km_core_context_item const & i)
-{
-  utf8::codeunit_t cps[7] = {0,}; // 6 bytes for maximal UTF-8 char (e.g. U+10FFFF) + nul terminator
-  int8_t l = 4;
-
-  switch (i.type)
-  {
-    case KM_CORE_CT_CHAR:
-      utf8::codec::put(cps, i.character, l);
-      j << json::string(&cps[0]);
-      break;
-    case KM_CORE_CT_MARKER:
-      j << json::integer_u(i.marker);
-      break;
-    default:
-      j << json::flat << json::object
-          << "invalid type" << i.type
-          << json::close;
-  }
-  return j;
-}

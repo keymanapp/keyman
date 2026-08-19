@@ -108,10 +108,12 @@ describe('InputProcessor', function() {
     describe('without fat-fingering', function() {
       it('with minimal context (no fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
+        const processorInitOptions = { ...DEFAULT_PROCESSOR_INIT_OPTIONS };
+        processorInitOptions.keyboardInterface = keyboardWithHarness;
+
+        let core = new InputProcessor(device, null, processorInitOptions);
         let context = new SyntheticTextStore("", 0);
 
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
@@ -127,11 +129,12 @@ describe('InputProcessor', function() {
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
+        const processorInitOptions = { ...DEFAULT_PROCESSOR_INIT_OPTIONS };
+        processorInitOptions.keyboardInterface = keyboardWithHarness;
 
-        let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);  // I mean, it IS long context, and time
+        let core = new InputProcessor(device, null, processorInitOptions);  // I mean, it IS long context, and time
                                           // thresholding is disabled within Node.
 
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
@@ -145,10 +148,12 @@ describe('InputProcessor', function() {
     describe('with fat-fingering', function() {
       it('with minimal context (with fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
+        const processorInitOptions = { ...DEFAULT_PROCESSOR_INIT_OPTIONS };
+        processorInitOptions.keyboardInterface = keyboardWithHarness;
+
+        let core = new InputProcessor(device, null, processorInitOptions);
         let context = new SyntheticTextStore("", 0);
 
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
@@ -169,10 +174,12 @@ describe('InputProcessor', function() {
                                           // Keep at the same 'order of magnitude' as the
                                           // 'without fat-fingers' test.
 
-        let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);  // It IS long context, and time
+        const processorInitOptions = { ...DEFAULT_PROCESSOR_INIT_OPTIONS };
+        processorInitOptions.keyboardInterface = keyboardWithHarness;
+
+        let core = new InputProcessor(device, null, processorInitOptions);  // It IS long context, and time
                                           // thresholding is disabled within Node.
 
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(utils.DeviceSpec.FormFactor.Phone);
         let key = layout.getLayer('default').getKey('K_A');
@@ -206,10 +213,12 @@ describe('InputProcessor', function() {
     for (let testSet of testDefinitions.inputTestSets[0]['testSet']) {
       it(testSet.msg ?? 'test', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
+        const processorInitOptions = { ...DEFAULT_PROCESSOR_INIT_OPTIONS };
+        processorInitOptions.keyboardInterface = keyboardWithHarness;
+
+        let core = new InputProcessor(device, null, processorInitOptions);
         let context = new SyntheticTextStore("", 0);
 
-        core.keyboardProcessor.keyboardInterface = keyboardWithHarness;
         let keyboard = keyboardWithHarness.activeKeyboard;
 
         for (let keystroke of testSet.inputs) {

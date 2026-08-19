@@ -22,9 +22,10 @@ import Section = KMXPlus.Section;
 import { ElemCompiler, ListCompiler, StrsCompiler } from '../../src/compiler/empty-compiler.js';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { VarsCompiler } from '../../src/compiler/vars.js';
+import { KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 
 /**
- * Builds a path to the fixture with the given path components.
+ * Builds a path to the /developer/src/kmc-ldml fixture with the given path components.
  *
  * e.g., makePathToFixture('basic.xml')
  *
@@ -33,6 +34,20 @@ import { VarsCompiler } from '../../src/compiler/vars.js';
 export function makePathToFixture(...components: string[]): string {
   return fileURLToPath(new URL(path.join('..', '..', '..', 'test', 'fixtures', ...components), import.meta.url));
 }
+
+/**
+ * Builds a path to the /common/test file with the given path components. Note
+ * that this links to the base of /common/test, not /common/test/fixtures,
+ * because the /common/test folder currently has a mix of paths.
+ *
+ * e.g., makePathToFixture('basic.xml')
+ *
+ * @param components One or more path components.
+ */
+export function makePathToCommonFixture(...components: string[]): string {
+  return fileURLToPath(new URL(path.join('..', '..', '..', '..', '..', '..', 'common', 'test', ...components), import.meta.url));
+}
+
 
 export const compilerTestCallbacks = new TestCompilerCallbacks();
 
@@ -54,7 +69,7 @@ afterEach(function() {
 });
 
 
-export async function loadSectionFixture(compilerClass: SectionCompilerNew, filename: string, callbacks: TestCompilerCallbacks, dependencies?: SectionCompilerNew[], postValidateFail?: boolean): Promise<Section> {
+export async function loadSectionFixture(compilerClass: SectionCompilerNew, filename: string, callbacks: TestCompilerCallbacks, targetVersion: KMXPlusVersion, dependencies?: SectionCompilerNew[], postValidateFail?: boolean): Promise<Section> {
   callbacks.messages = [];
   const inputFilename = makePathToFixture(filename);
   const data = callbacks.loadFile(inputFilename);
@@ -74,7 +89,7 @@ export async function loadSectionFixture(compilerClass: SectionCompilerNew, file
     return null; // mimic kmc behavior - bail if validate fails
   }
 
-  const compiler = new compilerClass(source, callbacks);
+  const compiler = new compilerClass(source, callbacks, targetVersion);
 
   if(!compiler.validate()) {
     return null;
@@ -111,7 +126,7 @@ async function loadDepsFor(sections: DependencySections, parentCompiler: Section
     dependencies = [ StrsCompiler, ListCompiler, ElemCompiler, VarsCompiler ];
   }
   for (const dep of dependencies) {
-    const compiler = new dep(source, callbacks);
+    const compiler = new dep(source, callbacks, parentCompiler.targetVersion);
     assert.notEqual(compiler.id, parentId, `${parentId} depends on itself`);
     const didValidate = compiler.validate();
     if (!callbacks.hasError()) {
@@ -285,7 +300,7 @@ export function scrubContextFromMessages(messages: CompilerEvent[]): CompilerEve
  * @param compiler argument to loadSectionFixture()
  * @param callbacks argument to loadSectionFixture()
  */
-export function testCompilationCases(compiler: SectionCompilerNew, cases : CompilationCase[], dependencies?: (SectionCompilerNew)[]) {
+export function testCompilationCases(compiler: SectionCompilerNew, cases : CompilationCase[], targetVersion: KMXPlusVersion, dependencies?: (SectionCompilerNew)[]) {
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
   for (const testcase of cases) {
@@ -296,10 +311,10 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
       callbacks.clear();
       // special case for an expected exception
       if (testcase.throws) {
-        assert.throws(async () => await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies), testcase.throws, 'expected exception from compilation');
+        assert.throws(async () => await loadSectionFixture(compiler, testcase.subpath, callbacks, targetVersion, testcase.dependencies || dependencies), testcase.throws, 'expected exception from compilation');
         return;
       }
-      const section = await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies);
+      const section = await loadSectionFixture(compiler, testcase.subpath, callbacks, targetVersion, testcase.dependencies || dependencies);
       let messagesToCheck = callbacks.messages;
       // scrub offsets from messages to reduce churn in the test casws
       if (!testcase.retainOffsetInMessages && callbacks.messages) {
