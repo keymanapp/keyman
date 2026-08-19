@@ -14,7 +14,7 @@ Keyman keyboards now always display a banner above the keyboard for one of the f
 
 The banner mode can be controlled by going to Keyman Settings --> (select an installed language)
 
-At the bottom of the language settings menu are three controls for the banner:
+At the bottom of the language settings menu are four controls for the banner:
 
 ![](../android_images/disable-suggestions.png)
 
