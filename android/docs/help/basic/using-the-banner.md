@@ -21,6 +21,7 @@ At the bottom of the language settings menu are three controls for the banner:
 * Disable suggestions (Display image banner instead)
 * Predictions only (Suggestion banner displays predictions)
 * Predictions with corrections (Suggestion banner displays predictions and corrections)
+* Predictions with auto-corrections (Tapping the space bar may automatically apply the best suggestion)
 
 ## Using the Suggestion Banner
 
@@ -34,6 +35,6 @@ If a [dictionary is installed](installing-dictionaries) and enabled for the acti
 
 ## The Keyman Themed Banner
 
-When suggestions are disabled or unavailable, the Keyman-themed banner will display instead. This is displayed so popups and gestures for the top row of keys are visible. 
+When suggestions are disabled or unavailable, the Keyman-themed banner will display instead. This is displayed so popups and gestures for the top row of keys are visible.
 
 ![](../android_images/themed-banner.png)
