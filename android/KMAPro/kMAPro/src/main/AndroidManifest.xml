@@ -96,10 +96,6 @@
         <category android:name="android.intent.category.BROWSABLE" />
         <category android:name="android.intent.category.DEFAULT" />
 
-        <!-- needed for properly formatted email messages -->
-        <data
-          android:mimeType="application/vnd.keyman"
-          android:scheme="content" />
         <!-- needed for mangled email messages -->
         <data
           android:mimeType="application/keyman"
@@ -107,9 +103,6 @@
         <!-- needed for mangled email messages -->
         <data
           android:mimeType="application/octet-stream"
-          android:scheme="content" />
-        <data
-          android:mimeType="application/x-keyman-package"
           android:scheme="content" />
         <data
           android:mimeType="application/vnd.keyman.kmp+zip"
@@ -135,16 +128,7 @@
           Backup MIME intents
         -->
         <data
-          android:mimeType="application/vnd.keyman"
-          android:scheme="content" />
-        <data
           android:mimeType="application/octet-stream"
-          android:scheme="content" />
-        <data
-          android:mimeType="application/x-keyman-package"
-          android:scheme="content" />
-        <data
-          android:mimeType="application/vnd.keyman.kmp+zip"
           android:scheme="content" />
       </intent-filter>
 
