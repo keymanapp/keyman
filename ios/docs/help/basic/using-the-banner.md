@@ -1,5 +1,5 @@
 ---
-title: Using the Banner on the Keyboard - Keyman for iPhone and iPad Help
+title: Predictive-Text Settings and the Banner - Keyman for iPhone and iPad Help
 ---
 
 ## About the Keyboard Banner
@@ -10,7 +10,7 @@ Keyman keyboards now always display a banner above the keyboard for one of the f
 * Display a Keyman-themed banner so popups and gestures for the top row of keys are visible
 * Reserved for future functionality
 
-## Controlling the Keyboard Banner Mode
+## Adjusting Text Suggestion Settings
 
 The banner mode can be controlled by going to Keyman Settings --> (select an installed language)
 
