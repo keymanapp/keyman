@@ -12,7 +12,7 @@ struct KeymanLogo: View {
   let namespace: Namespace.ID
   
   var body: some View {
-    Image("KeymanLogo-BIG")
+    Image("keyman-logo")
       .interpolation(.high)
       .resizable()
       .scaledToFit()

@@ -23,7 +23,7 @@ struct GradientDivider: View {
         startPoint: .leading,
         endPoint: .trailing
       ))
-      .frame(height: 1)
+      .frame(height: 2)
       .opacity(0.5)
       .matchedGeometryEffect(id: id, in: namespace)
   }

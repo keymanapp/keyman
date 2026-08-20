@@ -43,24 +43,25 @@ struct GrantAccessibiltyPermissionView: View {
         .matchedGeometryEffect(id: "title", in: namespace)
       GradientDivider(namespace: namespace)
       
-      Color.clear
-        .frame(height: 50)
-        .hidden()
-      
       Form {
         Section {
-          Image("AccessibilityPermission")
+          Image("accessibility-permission")
             .interpolation(.high)
             .resizable()
             .aspectRatio(contentMode: .fit)
             .padding(.bottom, 8)
-          Text("Ensure Keyman.app is set to provide it with necessary control in System Settings > Privacy & Security > Accessibility.")
-            .lineSpacing(6)
-            .foregroundStyle(.secondary)
+          VStack(alignment: .leading, spacing: 8) {
+            Text("Ensure Keyman.app is set to provide it with necessary control in System Settings > Privacy & Security > Accessibility.")
+              .lineSpacing(6)
+              .lineLimit(2)
+              .fixedSize(horizontal: false, vertical: true) // prevents vertical compression
+              .foregroundStyle(.secondary)
+          }
         }
       }
       .formStyle(.grouped)
       .frame(maxHeight: .infinity, alignment: .center)
+      .padding(.top, 10)
       
       HStack {
         
@@ -81,7 +82,6 @@ struct GrantAccessibiltyPermissionView: View {
             .background(.thinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-
         
         Button {
           if installation.currentTask()?.taskType == .requestAccess {

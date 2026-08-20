@@ -23,14 +23,11 @@ struct EnableInputMethodView: View {
         .matchedGeometryEffect(id: "title", in: namespace)
       GradientDivider(namespace: namespace)
       
-      Color.clear
-        .frame(height: 25)
-      
       Form {
         Section {
           HStack {
             Spacer()
-            Image("EnableKeyman")
+            Image("enable-keyman")
               .interpolation(.high)
               .resizable()
               .scaledToFit()
@@ -43,7 +40,8 @@ struct EnableInputMethodView: View {
         }
       }
       .formStyle(.grouped)
-            
+      .padding(.top, 25)
+
       HStack {
         
         Spacer()
