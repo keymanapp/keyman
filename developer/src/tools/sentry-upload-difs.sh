@@ -57,6 +57,7 @@ sourcemap_paths=(
   ./src/kmc/build
   ./src/kmc-analyze/build
   ./src/kmc-copy/build
+  ./src/kmc-convert/build
   ./src/kmc-generate/build
   ./src/kmc-keyboard-info/build
   ./src/kmc-kmn/build
