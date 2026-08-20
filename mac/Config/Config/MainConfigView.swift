@@ -22,7 +22,7 @@ struct MainConfigView: View {
   @State private var packageSelectedForHelpUrl: URL? = nil
   
   // for drag and drop package installation
-  @State private var dropError: DropKmpError?
+  @State private var packageInstallHelper: PackageInstallHelper? = nil
   @State private var isShowingDropKmpAlert = false
   @State private var alertMessage = ""
   @State private var isHovering = false
@@ -77,22 +77,36 @@ struct MainConfigView: View {
             return false // the drop failed
           }
           do {
-            try settings.processDroppedKmpFile(at: droppedFileUrl)
+            packageInstallHelper = try settings.initiateKmpFileInstallation(at: droppedFileUrl)
             return true // the drop was successful
           } catch {
             self.alertMessage = error.localizedDescription
             self.isShowingDropKmpAlert = true
             return false
-            
           }
         } isTargeted: { hovering in
           isHovering = hovering
         }
-        // alert triggers automatically when $dropError becomes non-nil
+        // alert triggers automatically when $isShowingDropKmpAlert is true
         .alert("Package Installation Failed", isPresented: $isShowingDropKmpAlert) {
             Button("OK", role: .cancel) { }
         } message: {
             Text(alertMessage)
+        }
+        .sheet(item: $packageInstallHelper) { helper in
+          PackageInstallView(installHelper: helper) { accepted in
+            if accepted {
+              print("Processing validated package: \(helper.packageName ?? "unknown package")")
+              do {
+                try helper.install()
+              } catch {
+                print("failed to install package: \(helper.packageName ?? "unknown package") with error: \(error.localizedDescription)")
+              }
+            } else {
+              settings.userCanceledPackageInstallation()
+            }
+            packageInstallHelper = nil
+          }
         }
 
         // the Spacer pushes the contents of the VStack to the top of the VStack
@@ -103,7 +117,7 @@ struct MainConfigView: View {
       .tag(0)
       
       if let url = packageSelectedForHelpUrl {
-        HelpView(helpFileURL: url)
+        PackageContentWebView(packageFileUrl: url)
           .padding()
           .tabItem { Text("Help") }
           .tag(1)

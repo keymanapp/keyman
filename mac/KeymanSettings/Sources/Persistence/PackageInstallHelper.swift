@@ -12,14 +12,21 @@
 import Foundation
 
 @MainActor // run on the main actor as it is called from SettingsContainer
-public class PackageInstallHelper {
+public class PackageInstallHelper: Identifiable {
+  public let id = UUID()
+//  public var installationError: LocalizedError?
+//  public var errorMessage: String?
   let temporaryKmpFileLocation: URL
   let temporaryPackageLocation: URL
   let installPackageLocation: URL
   let installedPackages: [KeymanPackage]    // needed to check for existing package after download
   let isDownload: Bool                      // if not download, then the package was opened from disk or dropped
-  var packageToInstall: KeymanPackage?      // the newly downloaded package
+  public private(set) var packageToInstall: KeymanPackage?      // the newly downloaded package
   var packageToReplace: KeymanPackage?      // the package to replace, if it exists
+  
+  public var packageName: String? {
+    return packageToInstall?.packageName
+  }
   
   fileprivate let packageRepository: PackageRepo
   
@@ -48,14 +55,13 @@ public class PackageInstallHelper {
   }
   
   /**
-   * Indicates that a package is ready to be unzipped and installed
+   * Indicates that a package is ready to be unzipped and loaded
    */
   public func prepareToInstall(for kmpFileUrl: URL) throws {
     print ("prepareToInstall \(kmpFileUrl)")
     
     do {
-      try self.unzipDownloadedPackage(for: kmpFileUrl)
-      try self.handleNewPackage()
+      try self.unzipPackage(for: kmpFileUrl)
     } catch {
       self.cleanupFailedInstallation()
       print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
@@ -64,9 +70,24 @@ public class PackageInstallHelper {
   }
   
   /**
+   * Indicates that a package is ready to be unzipped and installed
+   */
+  public func install() throws {
+    print ("install \(self.packageToInstall?.packageName ?? "unknown package")")
+    
+    do {
+      try self.handleNewPackage()
+    } catch {
+      self.cleanupFailedInstallation()
+      print ("package installation failed with error '\(self.packageToInstall?.packageName ?? "unknown package")")
+      throw error
+    }
+  }
+  
+  /**
    * Unzip and load the downloaded package
    */
-  func unzipDownloadedPackage(for kmpFileUrl: URL) throws {
+  func unzipPackage(for kmpFileUrl: URL) throws {
     try self.packageRepository.unzipKmpFile(at: kmpFileUrl, to: self.temporaryPackageLocation)
     
     // load the unzipped package from the temporary location and save a reference to it
@@ -145,14 +166,16 @@ public class PackageInstallHelper {
    * Clean up the downloaded .kmp file and package folder
    */
   func cleanupFailedInstallation() {
-    print("cleanupFailedInstallation of: \(self.temporaryPackageLocation.lastPathComponent)")
-    do {
-      try self.deleteDownloadedKmpFile()
-    } catch {
-      print("cleanupFailedInstallation did not delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent)")
+    // we only have a .kmp file in the temp directory for downloads
+    if (self.isDownload) {
+      do {
+        try self.deleteDownloadedKmpFile()
+      } catch {
+        print("cleanupFailedInstallation did not delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent)")
+      }
     }
     do {
-      try self.deleteDownloadedPackage()
+      try self.deleteUnzippedPackage()
     } catch {
       print("cleanupFailedInstallation did not delete downloaded package: \(self.temporaryPackageLocation.lastPathComponent)")
     }
@@ -185,9 +208,9 @@ public class PackageInstallHelper {
   }
   
   /**
-   * Delete the downloaded package from the temp directory
+   * Delete the unzipped package in the temp directory
    */
-  func deleteDownloadedPackage() throws {
+  func deleteUnzippedPackage() throws {
     try FileManager.default.removeItem(at: self.temporaryPackageLocation)
   }
   

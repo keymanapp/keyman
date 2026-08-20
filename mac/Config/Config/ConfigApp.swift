@@ -18,6 +18,10 @@ struct ConfigApp: App {
   var body: some Scene {
     Window("Configuration", id: "main-config") {
       MainConfigView()
+        .frame(
+            minWidth: 600, maxWidth: 800,
+            minHeight: 400, maxHeight: .infinity
+        )
         .environmentObject(settings)
         .task {
           if !installation.getHasDisplayedInstallationComplete() {
@@ -27,6 +31,10 @@ struct ConfigApp: App {
         .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in openWindow(id: "install")
         }
     }
+    // the size of the window when first opened
+    //    .defaultSize(width: 1024, height: 768)
+        .defaultSize(width: 800, height: 600)
+        .windowResizability(.contentSize)
     Window("Installation", id: "install") {
       MainInstallView()
         .environmentObject(installation)
