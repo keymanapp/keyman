@@ -9,10 +9,10 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 // import { KmnCompiler } from '../../src/compiler/compiler.js';
 import { KMX, TouchLayout } from '@keymanapp/common-types';
 import { KmwCompilerMessages } from '../../src/kmw-compiler/kmw-compiler-messages.js';
-import { unitTestEndpoints } from '../../src/kmw-compiler/validate-layout-file.js';
+import { unitTestEndpoints } from '../../src/kmw-compiler/compile-layout-file.js';
 import { setupGlobals } from '../../src/kmw-compiler/compiler-globals.js';
 
-describe('validate-layout-file', function() {
+describe('compile-layout-file', function() {
   const callbacks = new TestCompilerCallbacks(this);
   const options = {
       shouldAddCompilerVersion: false,

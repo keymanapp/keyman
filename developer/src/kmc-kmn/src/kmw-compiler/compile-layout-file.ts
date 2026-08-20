@@ -245,7 +245,18 @@ function TransformSpecialKeys17(FDebug: boolean, sLayoutFile: string): string {
   return sLayoutFile;
 }
 
-export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFile: string, sVKDictionary: string, displayMap: Osk.PuaMap): VLFOutput {   // I4060   // I4139
+/**
+ * Compile a .keyman-touch-layout file into the internal Javascript object that KeymanWeb expects
+ * @param data
+ * @param FDictionary
+ * @returns  null if the file is structurally invalid; false if the file contains content errors, true otherwise
+ *
+ * This function performs several steps:
+ * - load and validate the touch layout file
+ * - remap the layout keys with displayMap
+ * - injects 'special keys' javascript transforms for downlevel support
+ */
+export function CompileLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFile: string, sVKDictionary: string, displayMap: Osk.PuaMap): VLFOutput {   // I4060   // I4139
   const FDictionary: string[] = sVKDictionary.split(/\s+/);
 
   CheckDictionaryKeyValidity(fk, FDictionary);   // I4142
@@ -362,7 +373,7 @@ function validateLayoutFileContent(data: TouchLayout.TouchLayoutFile, FDictionar
           let direction: keyof TouchLayout.TouchLayoutFlick;
           if(key.flick) {
             if(typeof(key.flick) != "object") {
-              callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFileFormat({msg: 'platform.layer must be an array'}));
+              callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFileFormat({msg: 'key.flick must be an object'}));
               return null;
             }
             for(direction in key.flick) {
