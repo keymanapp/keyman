@@ -127,8 +127,8 @@ To install emscripten, `cd` to an appropriate path, and then:
 ```bash
 git clone https://github.com/emscripten-core/emsdk
 cd emsdk
-emsdk install 3.1.58
-emsdk activate 3.1.58
+./emsdk install 3.1.64
+./emsdk activate 3.1.64
 cd upstream/emscripten
 npm install
 export EMSCRIPTEN_BASE="$(pwd)"
