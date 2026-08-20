@@ -278,8 +278,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     }
     
     // if no matching image cached, then create one and cache it
-    if qrCodeImage == nil
-      {
+    if qrCodeImage == nil {
       if let newImage = self.generateSharePackageQRCode(for: size) {
         qrCodeImage = newImage
         self.qrCodeImageCache = (newImage, size)

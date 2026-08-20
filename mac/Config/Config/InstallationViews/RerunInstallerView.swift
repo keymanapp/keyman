@@ -27,12 +27,9 @@ struct RerunInstallerView: View {
       Form {
         HStack {
           Spacer()
-          Image("InstallerIcon")
-            .interpolation(.high)
-            .resizable()
-            .scaledToFit()
-            .frame(height: 130)
-            .padding(.bottom, 8)
+          Image(systemName: "wrench.and.screwdriver.fill")
+            .font(.system(size: 100))
+            .padding(.bottom, 16)
           Spacer()
         }
         Text("Your Keyman input method is either missing or outdated. Run the Keyman installer to install a new version.")

@@ -7,8 +7,6 @@
  */
 
 import SwiftUI
-
-import SwiftUI
 import AppKit
 internal import UniformTypeIdentifiers
 
@@ -26,9 +24,6 @@ struct InitialRepairView: View {
         .matchedGeometryEffect(id: "title", in: namespace)
       GradientDivider(namespace: namespace)
       
-      Color.clear
-        .frame(height: 50)
-      
       Form {
         HStack {
           Spacer()
@@ -41,7 +36,8 @@ struct InitialRepairView: View {
           .multilineTextAlignment(.center)
       }
       .formStyle(.grouped)
-      
+      .padding(.top, 50)
+
       HStack {
         Text("Resolve Issues")
           .font(.title2)
