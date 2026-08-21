@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) 2004 - 2024 SIL International. MIT License.
+ * Keyman is copyright (C)  SIL Global. MIT License.
  *
  * Mnemonic layout support for Linux
  *
