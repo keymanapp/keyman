@@ -11,7 +11,7 @@ import Combine
 import KeymanSettings
 
 public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelegate, WKDownloadDelegate {
-  @Published var showInstallSheet = false
+  @Published var showConfirmPackageSheet = false
   @Published var installHelper: PackageInstallHelper?
   var downloadFileUrl: URL? = nil
   var settings: SettingsContainer?
@@ -113,7 +113,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   public func downloadDidFinish(_ download: WKDownload) {
     DispatchQueue.main.async {
         // Trigger the SwiftUI modal sheet
-        self.showInstallSheet = true
+        self.showConfirmPackageSheet = true
     }
 
     if let downloadFileUrl {

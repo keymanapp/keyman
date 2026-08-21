@@ -49,7 +49,7 @@ struct MainConfigView: View {
         .padding([.top, .leading, .trailing])
         // binds the visibility state to the sheet builder
         .sheet(isPresented: $isShowingAddKeyboardSheet) {
-          InstallKeyboardView()
+          AddKeyboardView()
             .frame(width: 960, height: 390)
           // MAC-CONFIG-TODO: Make width and height percentages
         }
@@ -95,8 +95,12 @@ struct MainConfigView: View {
         }
         .sheet(item: $packageInstallHelper) { helper in
           PackageConfirmationView(installHelper: helper) { accepted in
+            
+            // close PackageConfirmationView sheet before updating list
+            packageInstallHelper = nil
+
             if accepted {
-              print("Processing validated package: \(helper.packageName ?? "unknown package")")
+              print("installing validated package: \(helper.packageName ?? "unknown package")")
               do {
                 try settings.installPackage()
               } catch {
@@ -105,7 +109,6 @@ struct MainConfigView: View {
             } else {
               settings.userCanceledPackageInstallation()
             }
-            packageInstallHelper = nil
           }
         }
 

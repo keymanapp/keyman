@@ -10,9 +10,9 @@
 import SwiftUI
 import KeymanSettings
 
-struct InstallKeyboardView: View {
+struct AddKeyboardView: View {
   @EnvironmentObject var settings: SettingsContainer
-  @Environment(\.dismiss) private var dismiss
+  @Environment(\.dismiss) private var dismissAddKeyboardView
   @StateObject private var downloadCoordinator = DownloadCoordinator()
   
   var body: some View {
@@ -25,15 +25,15 @@ struct InstallKeyboardView: View {
       // Placement determines where on the bar it sits
       ToolbarItem(placement: .cancellationAction) {
         Button("Close") {
-          dismiss()
+          dismissAddKeyboardView()
         }
       }
     }
-    .sheet(isPresented: $downloadCoordinator.showInstallSheet) {
+    .sheet(isPresented: $downloadCoordinator.showConfirmPackageSheet) {
       if let helper = downloadCoordinator.installHelper {
         PackageConfirmationView(installHelper: helper) { accepted in
           if accepted {
-            print("Processing validated package: \(helper.packageName ?? "unknown package")")
+            print("installing validated package: \(helper.packageName ?? "unknown package")")
             do {
               try settings.installPackage()
             } catch {
@@ -42,8 +42,11 @@ struct InstallKeyboardView: View {
           } else {
             settings.userCanceledPackageInstallation()
           }
-          downloadCoordinator.showInstallSheet = false
-          dismiss()
+          
+          // close sheet
+          downloadCoordinator.showConfirmPackageSheet = false
+          // close
+          dismissAddKeyboardView()
         }
       }
     }

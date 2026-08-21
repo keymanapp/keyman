@@ -36,7 +36,7 @@ struct ConfigDebugView: View {
       .frame(width: 700, height: 100)
       // Binds the visibility state to the sheet builder
       .sheet(isPresented: $isShowingSheet) {
-        InstallKeyboardView()
+        AddKeyboardView()
           .presentationDetents([.medium, .large])
           .frame(width: 700, height: 500)
       }

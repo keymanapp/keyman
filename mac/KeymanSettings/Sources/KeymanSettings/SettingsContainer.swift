@@ -305,7 +305,6 @@ public class SettingsContainer : ObservableObject {
    * remove/uninstall the package with the specified UUID
    */
   public func removeInstalledPackage(with id: UUID) {
-    
     if let package = findInstalledPackage(with: id) {
       self.removeInstalledPackage(package: package)
     } else {
@@ -581,8 +580,17 @@ public class SettingsContainer : ObservableObject {
    */
   public func installPackage() throws {
     if let install = self.packageInstall {
-      
       try install.installPackage()
+      
+      commitPackageInstall()
+    }
+  }
+  
+  /**
+   * Update the data model for the installed package. This is separated so that it can be animated in SwiftUI.
+   */
+  func commitPackageInstall() {
+    if let install = self.packageInstall {
 
       guard let installationType = install.packageInstallationType else { return }
       
@@ -592,12 +600,13 @@ public class SettingsContainer : ObservableObject {
       case .replaceSameVersionPackage, .replaceNewerPackage, .replaceOlderPackage:
         self.replaceInstalledPackage()
       case .packageNotFound:
-        throw DropKmpError.installFailed("unknown package installation type")
+        print("commitPackageInstall: package not found")
       }
     }
     
     self.packageInstall = nil
   }
+
   
   /**
    * Creates a PackageInstallHelper instance to manage the state of the package being downloaded with the specified name.

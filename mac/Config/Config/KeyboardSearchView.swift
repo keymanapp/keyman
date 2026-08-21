@@ -3,7 +3,7 @@
  *
  * Created by Shawn Schantz on 2026-06-16
  *
- * Webview to search for Keyman keyboards
+ * Webview to search for Keyman keyboards/packages
  */
 
 import Foundation
