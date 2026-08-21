@@ -8,27 +8,11 @@
  *
  */
 
-import { CompilerCallbacks, CompilerOptions, KeymanCompilerResult, Keylayout } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, CompilerOptions, Keylayout } from "@keymanapp/developer-utils";
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
-import { ConverterArtifacts, ConverterToKmnArtifacts } from "../converter-artifacts.js";
-
-export interface ConverterResult extends KeymanCompilerResult {
-  /**
-   * Internal in-memory build artifacts from a successful compilation. Caller
-   * can write these to disk with {@link Converter.write}
-   */
-  artifacts: ConverterArtifacts;
-};
-
-interface ConverterToKmnResult extends ConverterResult {
-  /**
-   * Internal in-memory build artifacts from a successful compilation. Caller
-   * can write these to disk with {@link Converter.write}
-   */
-  artifacts: ConverterToKmnArtifacts;
-};
+import { ConverterToKmnResult } from "../main.js";
 
 /**
  * Interface for all data read from a .keylayout file. Also contains all rules processed from input data.

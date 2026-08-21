@@ -7,20 +7,11 @@ import {
   CompilerCallbacks,
   CompilerOptions,
   defaultCompilerOptions,
-  KeymanCompiler,
-  KeymanCompilerResult,
+  KeymanCompiler
 } from "@keymanapp/developer-utils";
 import { ConverterClassFactory } from './converter-class-factory.js';
-import { ConverterArtifacts } from "./converter-artifacts.js";
+import { ConverterArtifacts, ConverterResult } from "./main.js";
 import { ConverterMessages } from "./converter-messages.js";
-
-export interface ConverterResult extends KeymanCompilerResult {
-  /**
-   * Internal in-memory build artifacts from a successful compilation. Caller
-   * can write these to disk with {@link Converter.write}
-   */
-  artifacts: ConverterArtifacts;
-};
 
 /**
  * @public
