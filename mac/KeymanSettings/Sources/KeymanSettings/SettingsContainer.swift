@@ -541,7 +541,8 @@ public class SettingsContainer : ObservableObject {
   }
 
   /**
-   * Attempt to install a package from a KMP file. Called when file is dropped on the Configuration view
+   * Begin installation of a package from a KMP file.
+   * Called when a .KMP file is dropped on the Configuration view
    */
   public func initiateKmpFileInstallation(at fileLocation: URL) throws -> PackageInstallHelper? {
     guard !self.isDownloadInProgress() else {
@@ -567,6 +568,29 @@ public class SettingsContainer : ObservableObject {
     return self.packageInstall
   }
 
+  /**
+   * Install the package and add it to the installedPackages array and UserDefaults
+   */
+  public func installPackage() throws {
+    if let install = self.packageInstall {
+      
+      try install.installPackage()
+
+      guard let installationType = install.packageInstallationType else { return }
+      
+      switch installationType {
+      case .newPackage:
+        self.addInstalledPackage()
+      case .replaceSameVersionPackage, .replaceNewerPackage, .replaceOlderPackage:
+        self.replaceInstalledPackage()
+      case .packageNotFound:
+        throw DropKmpError.installFailed("unknown package installation type")
+      }
+    }
+    
+    self.packageInstall = nil
+  }
+  
   /**
    * Creates a PackageInstallHelper instance to manage the state of the package being downloaded with the specified name.
    * Returns a URL to the temporary location where the package is to be downloaded as a .kmp file.

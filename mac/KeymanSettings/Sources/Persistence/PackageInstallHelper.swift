@@ -11,6 +11,29 @@
 
 import Foundation
 
+public enum PackageInstallationType {
+  case newPackage(String)
+  case replaceSameVersionPackage(String)
+  case replaceOlderPackage(String, String, String)
+  case replaceNewerPackage(String, String, String)
+  case packageNotFound
+  
+  public var prompt: LocalizedStringResource {
+    switch self {
+    case .newPackage(let packageName):               
+      return "The package \(packageName) is ready to install"
+    case .replaceSameVersionPackage(let packageName):
+      return "The package \(packageName) is ready to re-install"
+    case .replaceOlderPackage(let packageName, let existingVersion, let newVersion):
+      return "The package \(packageName) is ready to update from version \(existingVersion) to \(newVersion)"
+    case .replaceNewerPackage(let packageName, let existingVersion, let newVersion):
+      return "The package \(packageName) is ready to downgrade from version \(existingVersion) to \(newVersion)"
+    case .packageNotFound:
+      return "No package to install"
+    }
+  }
+}
+
 @MainActor // run on the main actor as it is called from SettingsContainer
 public class PackageInstallHelper: Identifiable {
   public let id = UUID()
@@ -22,12 +45,13 @@ public class PackageInstallHelper: Identifiable {
   let installedPackages: [KeymanPackage]    // needed to check for existing package after download
   let isDownload: Bool                      // if not download, then the package was opened from disk or dropped
   public private(set) var packageToInstall: KeymanPackage?      // the newly downloaded package
-  var packageToReplace: KeymanPackage?      // the package to replace, if it exists
+  public private(set) var packageToReplace: KeymanPackage?      // the package to replace, if it exists
+  public private(set) var packageInstallationType: PackageInstallationType?
   
   public var packageName: String? {
     return packageToInstall?.packageName
   }
-  
+
   fileprivate let packageRepository: PackageRepo
   
   public init(filename: String, packageName: String, packageRepo: PackageRepo, installedPackages: [KeymanPackage], isDownload: Bool) {
@@ -67,10 +91,12 @@ public class PackageInstallHelper: Identifiable {
       print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
       throw error
     }
+    
+    self.packageInstallationType = self.determinePackageInstallationType()
   }
   
   /**
-   * Indicates that a package is ready to be unzipped and installed
+   * Install the unzipped package
    */
   public func install() throws {
     print ("install \(self.packageToInstall?.packageName ?? "unknown package")")
@@ -85,6 +111,25 @@ public class PackageInstallHelper: Identifiable {
   }
   
   /**
+   * Install the new package and replace existing package if necessary
+   */
+  public func installPackage() throws {
+    print ("installPackage \(self.packageToInstall?.packageName ?? "unknown package")")
+
+    guard let installationType = self.packageInstallationType else { return }
+    
+    switch installationType {
+    case .newPackage:
+      try self.installNewPackage()
+    case .replaceSameVersionPackage, .replaceNewerPackage, .replaceOlderPackage:
+      try self.replaceExistingPackageWithNewPackage()
+    case .packageNotFound:
+      throw DropKmpError.installFailed("unknown package installation type")
+    }
+  }
+
+
+  /**
    * Unzip and load the downloaded package
    */
   func unzipPackage(for kmpFileUrl: URL) throws {
@@ -93,6 +138,46 @@ public class PackageInstallHelper: Identifiable {
     // load the unzipped package from the temporary location and save a reference to it
     let newPackage = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
     self.packageToInstall = newPackage
+    
+    
+  }
+  
+  /**
+   * Decides what type of package installation this is:
+   * - a new package
+   * - an update of an existing package
+   * - a downgrade of an existing package
+   */
+  func determinePackageInstallationType() -> PackageInstallationType {
+    let packageAlreadyInstalled = self.checkForExistingPackage()
+    
+    guard let newPackage = self.packageToInstall else {
+      return PackageInstallationType.packageNotFound
+    }
+    
+    if !packageAlreadyInstalled {
+      return PackageInstallationType.newPackage(newPackage.packageName)
+    } else {
+      if let installedPackage = self.packageToReplace {
+        let newVersion = newPackage.packageVersion
+        let existingVersion = installedPackage.packageVersion
+        
+        let comparisonResult = newVersion.compare(existingVersion, options: .numeric)
+        
+        if comparisonResult == .orderedAscending {
+          print("package downgrade: new version is older than existing version")
+          return PackageInstallationType.replaceNewerPackage(newPackage.packageName, existingVersion, newVersion)
+        } else if comparisonResult == .orderedDescending {
+          print("package upgrade: new version is newer than existing version")
+          return PackageInstallationType.replaceOlderPackage(newPackage.packageName, existingVersion, newVersion)
+        } else {
+          print("new and existing package versions are identical")
+          return PackageInstallationType.replaceSameVersionPackage(newPackage.packageName)
+        }
+      }
+    }
+
+    return PackageInstallationType.packageNotFound
   }
   
   /**
@@ -156,7 +241,13 @@ public class PackageInstallHelper: Identifiable {
    */
   func replaceExistingPackageWithNewPackage() throws {
     try self.deleteInstalledPackage()
-    try self.deleteDownloadedKmpFile()
+    if (self.isDownload) {
+      do {
+        try self.deleteDownloadedKmpFile()
+      } catch {
+        print("replaceExistingPackageWithNewPackage failed to delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent)")
+      }
+    }
     try self.movePackageFromTemporaryToInstalled()
     
     NotificationCenter.default.post(name: .packageReplaced, object: nil)

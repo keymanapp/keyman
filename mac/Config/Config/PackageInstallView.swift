@@ -16,11 +16,11 @@ struct PackageInstallView: View {
   
   var body: some View {
     VStack(spacing: 20) {
-      Text("Install Package?")
-        .font(.headline)
-      
-      Text("Ready to install: \(installHelper.packageName ?? "unknown package")")
-        .multilineTextAlignment(.center)
+      if let installationPrompt = installHelper.packageInstallationType?.prompt {
+        Text(installationPrompt)
+          .font(.title2)
+          .multilineTextAlignment(.leading)
+      }
 
       if let readmeFileUrl = installHelper.packageToInstall?.readmeFileUrl {
         PackageContentWebView(packageFileUrl: readmeFileUrl)
@@ -36,7 +36,7 @@ struct PackageInstallView: View {
         }
         .keyboardShortcut(.cancelAction)
         
-        Button("Accept & Install") {
+        Button("Install") {
           completion(true)
         }
         .buttonStyle(.borderedProminent)

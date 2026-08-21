@@ -98,7 +98,7 @@ struct MainConfigView: View {
             if accepted {
               print("Processing validated package: \(helper.packageName ?? "unknown package")")
               do {
-                try helper.install()
+                try settings.installPackage()
               } catch {
                 print("failed to install package: \(helper.packageName ?? "unknown package") with error: \(error.localizedDescription)")
               }
