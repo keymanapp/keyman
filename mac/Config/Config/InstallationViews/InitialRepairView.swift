@@ -17,7 +17,8 @@ struct InitialRepairView: View {
   
   var body: some View {
     VStack {
-      Label("Repairs Required", systemImage: "hand.raised.fill")
+//      Label("Repairs Required", systemImage: "hand.raised.fill")
+      Text("Repairs Required")
         .font(.title)
         .bold()
         .frame(maxWidth: .infinity, alignment: .center)
@@ -27,13 +28,18 @@ struct InitialRepairView: View {
       Form {
         HStack {
           Spacer()
-          Image(systemName: "hammer.circle.fill")
+          Image(systemName: "wrench.and.screwdriver.fill")
             .font(.system(size: 100))
+            .symbolRenderingMode(.palette)
+            .foregroundStyle(
+                Color("Keyman Blue"),     // first color for the wrench
+                Color("Keyman Orange")    // second color for the screwdriver
+            )
             .padding(.bottom, 16)
           Spacer()
         }
         Text("One or more Keyman components or permissions require your attention. Complete the following steps to restore your Keyman installation.")
-          .multilineTextAlignment(.center)
+          .multilineTextAlignment(.leading)
       }
       .formStyle(.grouped)
       .padding(.top, 50)

@@ -44,7 +44,7 @@ struct InitialInstallView: View {
       HStack {
         Text("Proceed to continue with installation")
           .font(.title2)
-          .multilineTextAlignment(.center)
+          .multilineTextAlignment(.leading)
           .frame(maxWidth: .infinity, alignment: .leading)
         NavigationButton(action: .advance, onContinue: onContinue)
       }

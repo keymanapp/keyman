@@ -94,7 +94,7 @@ struct MainConfigView: View {
             Text(alertMessage)
         }
         .sheet(item: $packageInstallHelper) { helper in
-          PackageInstallView(installHelper: helper) { accepted in
+          PackageConfirmationView(installHelper: helper) { accepted in
             if accepted {
               print("Processing validated package: \(helper.packageName ?? "unknown package")")
               do {

@@ -31,7 +31,7 @@ struct InstallKeyboardView: View {
     }
     .sheet(isPresented: $downloadCoordinator.showInstallSheet) {
       if let helper = downloadCoordinator.installHelper {
-        PackageInstallView(installHelper: helper) { accepted in
+        PackageConfirmationView(installHelper: helper) { accepted in
           if accepted {
             print("Processing validated package: \(helper.packageName ?? "unknown package")")
             do {
