@@ -65,9 +65,11 @@ _build_vs_environment() {
 
 _locate_rsvars() {
   #
-  # Delphi Compiler Configuration - Delphi 10.3.2
+  # Delphi Compiler Configuration - defaults to Delphi 10.3 (BDS 20.0).
+  # Override via the KEYMAN_DELPHI_VERSION environment variable to build with
+  # a newer Delphi installation (e.g., KEYMAN_DELPHI_VERSION=23.0 for Delphi 12).
   #
-  DELPHI_VERSION=20.0
+  DELPHI_VERSION="${KEYMAN_DELPHI_VERSION:-20.0}"
   DCC32PATH="$(cygpath -u "$ProgramFilesx86\\Embarcadero\\Studio\\$DELPHI_VERSION\\bin")"
   RSVars_path="$DCC32PATH/rsvars.bat"
 }

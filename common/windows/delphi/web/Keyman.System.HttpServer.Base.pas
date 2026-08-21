@@ -44,10 +44,15 @@ begin
   end;
 
   // Indy's UTF8 handling of URLs is *completely* broken.
-  // We may need to check this with updated versions of Delphi
-{$IFNDEF VER330}
-  ERROR! Check if this is still needed with Delphi update
-{$ENDIF}
+  // We may need to check this with updated versions of Delphi.
+  // VER340/VER350/VER360 (10.4/11/12): unblocked but not re-verified; workaround kept.
+{$IF Defined(VER340) or Defined(VER350) or Defined(VER360)}
+  {$MESSAGE WARN 'TODO: Check if Indy URL UTF-8 handling is still needed with Delphi 10.4/11.0/12.0'}
+{$ELSEIF Defined(VER330)}
+  // Verified against Delphi 10.3 (VER330)
+{$ELSE}
+  {$MESSAGE ERROR 'Check if Indy URL UTF-8 handling is still needed with Delphi update'}
+{$IFEND}
 
   SetLength(s, p.Length);
   for i := 1 to p.Length do

@@ -1075,7 +1075,10 @@ constructor TJclMutex.Create(SecAttr: PSecurityAttributes; InitialOwner: Boolean
 begin
   inherited Create;
   FName := Name;
-  FHandle := JclWin32.CreateMutex(SecAttr, InitialOwner, PChar(Name));
+  // Keyman patch (D12, source-compiled JCL): JclWin32.CreateMutex is an external
+  // decl with a BOOL param; D12 rejects Boolean->BOOL there (E2010). Route via the
+  // RTL like OpenMutex below. Only bites when JCL is built from source.
+  FHandle := {$IFDEF HAS_UNITSCOPE}Winapi.{$ENDIF}Windows.CreateMutex(SecAttr, BOOL(InitialOwner), PChar(Name));
   if FHandle = 0 then
     raise EJclMutexError.CreateRes(@RsSynchCreateMutex);
   FExisted := GetLastError = ERROR_ALREADY_EXISTS;

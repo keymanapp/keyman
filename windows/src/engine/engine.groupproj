@@ -15,7 +15,7 @@
         <Projects Include="tsysinfox64\tsysinfox64.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="inst\insthelper\insthelper.dproj">
+        <Projects Include="insthelper\insthelper.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -63,13 +63,13 @@
         <MSBuild Projects="tsysinfox64\tsysinfox64.dproj" Targets="Make"/>
     </Target>
     <Target Name="insthelper">
-        <MSBuild Projects="inst\insthelper\insthelper.dproj"/>
+        <MSBuild Projects="insthelper\insthelper.dproj"/>
     </Target>
     <Target Name="insthelper:Clean">
-        <MSBuild Projects="inst\insthelper\insthelper.dproj" Targets="Clean"/>
+        <MSBuild Projects="insthelper\insthelper.dproj" Targets="Clean"/>
     </Target>
     <Target Name="insthelper:Make">
-        <MSBuild Projects="inst\insthelper\insthelper.dproj" Targets="Make"/>
+        <MSBuild Projects="insthelper\insthelper.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
         <CallTarget Targets="keyman;kmcomapi;tsysinfo;tsysinfox64;insthelper"/>

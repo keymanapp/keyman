@@ -99,7 +99,54 @@ tds2dbg() {
   builder_if_release_build_level "$TDS2DBG" "$@"
 }
 
+# Check whether the expected Delphi output for a project is already fresh —
+# useful when a developer has pre-built everything via a .groupproj Build All
+# in the IDE. Compares bin/<Platform>/Debug/<base>.{exe,dll,bpl} mtime against
+# the .dpr or .dpk source. Returns 0 (up-to-date, skip prompt) if any match.
+_delphi_ce_output_fresh() {
+  local project="$1" platform="$2"
+  local base="${project%.dproj}"
+  local source
+  if [[ -f "${base}.dpr" ]]; then source="${base}.dpr"
+  elif [[ -f "${base}.dpk" ]]; then source="${base}.dpk"
+  else return 1  # can't judge freshness without a source file
+  fi
+  local candidate ext
+  for ext in exe dll bpl; do
+    candidate="bin/${platform}/Debug/${base}.${ext}"
+    if [[ -f "$candidate" && "$candidate" -nt "$source" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 delphi_msbuild() {
+  # When KEYMAN_DELPHI_CE=1 the Delphi Community Edition blocks CLI
+  # compilation. Pause and prompt the developer to build in the IDE.
+  if [[ "${KEYMAN_DELPHI_CE:-}" == "1" ]]; then
+    local project="${1:-<project.dproj>}"
+    local platform="Win32"
+    local arg
+    for arg in "$@"; do
+      [[ "$arg" == *Platform=Win64* ]] && platform="Win64"
+    done
+
+    # Skip prompt if the expected Debug output is already fresh — supports the
+    # "open .groupproj + Build All once, then Enter through each script prompt"
+    # workflow. Subsequent prompts become no-ops as long as outputs are newer
+    # than their sources.
+    if _delphi_ce_output_fresh "$project" "$platform"; then
+      builder_echo "Delphi CE: $project ($platform) — output is up-to-date, skipping prompt."
+      return 0
+    fi
+
+    builder_echo warning "Delphi CE: CLI compilation is not available."
+    builder_echo warning "Please build ${project} (Platform: ${platform}, Config: Debug) in the Delphi IDE now, then press Enter to continue (or Ctrl-C to abort)."
+    builder_echo warning "Tip: opening the parent .groupproj and running Build All pre-builds all sibling projects at once; subsequent CE prompts in this script will auto-skip when their outputs are fresh."
+    read -r _
+    return 0
+  fi
   run_in_delphi_env msbuild.exe "$@" "$DELPHI_MSBUILD_FLAG_DEBUG"
 }
 
