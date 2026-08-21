@@ -600,6 +600,10 @@ extension KeymanWebViewController: WKNavigationDelegate {
     keyboardLoaded(self)
     delegate?.keyboardLoaded(self)
   }
+
+  func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+    reloadKeyboard()
+  }
 }
 
 // MARK: - KeymanWebDelegate
