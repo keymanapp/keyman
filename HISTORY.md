@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 19.0.271 alpha 2026-08-20
+
+* feat(ios): pass current display language to keyboard download (#16401)
+* epic: kmc-convert (#12191)
+* chore(deps): bump multer from 2.1.1 to 2.2.0 (#16109)
+* fix(developer): tighten touch layout file structural validity checks (#16347)
+* chore(deps): bump ws from 8.20.1 to 8.21.0 (#16104)
+* chore(deps): bump ip-address from 10.2.0 to 10.4.0 (#16301)
+* chore(deps): bump ip-address from 10.2.0 to 10.5.0 in /developer/src/server/src/win32/trayicon/addon-src (#16302)
+* chore(deps): bump fast-uri from 3.1.2 to 3.1.5 (#16309)
+* chore: refresh package-lock.json after dependabot merges (#16410)
+
+## 19.0.270 alpha 2026-08-19
+
+* fix(windows): support .png format icon in tray icon (#16362)
+* fix(windows): handle font and package .zip format errors during package installation (#16363)
+* chore(deps-dev): bump form-data from 4.0.4 to 4.0.6 (#16103)
+* chore(deps-dev): bump js-yaml from 4.1.1 to 4.3.0 in /resources/build/pr-build-status (#16240)
+* epic: autocorrect (#12893)
+* change(android): enable autocorrect by default (#16403)
+
 ## 19.0.269 alpha 2026-08-18
 
 * chore(deps): bump body-parser from 1.20.5 to 1.20.6 (#16275)
