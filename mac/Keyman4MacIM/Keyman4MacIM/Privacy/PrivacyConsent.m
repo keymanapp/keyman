@@ -89,6 +89,30 @@
 }
 
 /**
+ * Designed to be called from main.m when Keyman is invoked from Keyman Configuration
+ * Does not pose privacy dialog
+ * No need to support OS version prior to 11.0
+ */
+- (void)requestPrivacyAccessForKeyman19:(void (^)(void))withCompletionHandler
+{
+  BOOL hasAccessibility = NO;
+  
+  // check if we already have accessibility
+  hasAccessibility = [self checkPostEventAccess];
+  
+  if (hasAccessibility) {
+    os_log([KMLogs privacyLog], "already has Accessibility: no need to make request.");
+    // call completionHandler immediately
+    withCompletionHandler();
+  } else {
+    os_log([KMLogs privacyLog], "does not have Accessibility, calling requestListenEventAccess");
+    [self requestPostEventAccess];
+    withCompletionHandler();
+  }
+}
+
+
+/**
  * For macOS earlier than 11.0: request Accessibility access.
  */
 - (void)requestAccessibility

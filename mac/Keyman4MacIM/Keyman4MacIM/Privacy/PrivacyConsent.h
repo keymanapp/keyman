@@ -18,7 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) void (^completionHandler)(void);
 + (PrivacyConsent *)shared;
 - (BOOL)checkAccessibility;
+- (BOOL)checkPostEventAccess;
 - (void)requestPrivacyAccess:(void (^)(void))withCompletionHandler;
+- (void)requestPrivacyAccessForKeyman19:(void (^)(void))withCompletionHandler;
 @end
 
 NS_ASSUME_NONNULL_END
