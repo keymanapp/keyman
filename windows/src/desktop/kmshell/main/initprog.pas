@@ -90,7 +90,7 @@ type
                     fmKeyboardWelcome,  // I2569
                     fmKeyboardPrint,  // I2329
                     fmBaseKeyboard,   // I4169
-                    fmMCompile,
+                    fmMCompileKbds,
                     fmUpgradeMnemonicLayout,    // I4553
                     fmRepair,
                     fmKeepInTouch,
@@ -263,9 +263,9 @@ begin
       else if s = '-bd' then FMode := fmBackgroundDownload
       else if s = '-an' then FMode := fmApplyInstallNow
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
-      else if s = '-mcompile' then
+      else if s = '-mcompilekbds' then
       begin
-        FMode := fmMCompile;
+        FMode := fmMCompileKbds;
         Inc(i);
         if i > ParamCount then Exit;
         FQuery := ParamStr(i);
@@ -553,7 +553,7 @@ begin
         then ExitCode := 0
         else ExitCode := 1;
 
-    fmMCompile:
+    fmMCompileKbds:
       if MCompileBaseKeyboard(FQuery)
         then ExitCode := 0
         else ExitCode := 1;

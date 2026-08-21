@@ -21,6 +21,7 @@ type
 function ConfigureBaseKeyboard(out BaseKeyboardID: Integer): Boolean;
 function SetBaseKeyboard(WindowHandle: THandle; BaseKeyboardID: Integer): Boolean;
 function MCompileBaseKeyboard(const BaseKeyboardIDText: string): Boolean;
+function CompileForBaseKeyboard(BaseKeyboardID: Integer): Boolean;
 
 implementation
 
@@ -78,80 +79,12 @@ end;
 function MCompileBaseKeyboard(const BaseKeyboardIDText: string): Boolean;
 var
   BaseKeyboardID: Integer;
-  PreviousBaseKeyboardID: Integer;
-  PreviousBaseKeyboardValue: string;
-  PreviousBaseKeyboardValueExists: Boolean;
-
-  procedure SavePreviousRegistryBaseKeyboardValue;
-  var
-      Reg: TRegistryErrorControlled;
-  begin
-    PreviousBaseKeyboardValueExists := False;
-    PreviousBaseKeyboardValue := '';
-
-    Reg := TRegistryErrorControlled.Create;
-    try
-      if Reg.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and Reg.ValueExists(SRegValue_UnderlyingLayout) then
-      begin
-        PreviousBaseKeyboardValueExists := True;
-        PreviousBaseKeyboardValue := Reg.ReadString(SRegValue_UnderlyingLayout);
-      end;
-    finally
-      Reg.Free;
-    end;
-  end;
-
-  procedure RestorePreviousBaseKeyboardValue;
-  var
-    Reg: TRegistryErrorControlled;
-  begin
-    Reg := TRegistryErrorControlled.Create;
-    try
-      if Reg.OpenKey(SRegKey_KeymanEngine_CU, True) then
-        if PreviousBaseKeyboardValueExists then
-          Reg.WriteString(SRegValue_UnderlyingLayout, PreviousBaseKeyboardValue)
-        else if Reg.ValueExists(SRegValue_UnderlyingLayout) then
-          Reg.DeleteValue(SRegValue_UnderlyingLayout);
-    finally
-      Reg.Free;
-    end;
-  end;
-
-  procedure ForceBaseLayoutChange;
-  var
-    Reg: TRegistryErrorControlled;
-  begin
-    // This is hacky, maybe just remove the registry value, however that
-    // would not force a recompile if the was the default base layout.
-    // Options.Apply re-compiles only when it observes a changed base layout.
-    // The caller may be repairing missing files for the already-selected layout.
-    Reg := TRegistryErrorControlled.Create;
-    try
-      if Reg.OpenKey(SRegKey_KeymanEngine_CU, True) then
-        Reg.WriteString(SRegValue_UnderlyingLayout, '00000000');
-    finally
-      Reg.Free;
-    end;
-  end;
-
 begin
   Result := False;
   if not TryStrToInt('$' + BaseKeyboardIDText, BaseKeyboardID) or
     not kmcom.SystemInfo.IsAdministrator then
     Exit;
-
-  SavePreviousRegistryBaseKeyboardValue;
-  PreviousBaseKeyboardID := kmcom.Options['koBaseLayout'].Value;
-  kmcom.Options['koBaseLayout'].Value := BaseKeyboardID;
-  try
-    if PreviousBaseKeyboardID = BaseKeyboardID then
-      ForceBaseLayoutChange;
-    kmcom.Options.Apply;
-    Result := True;
-  finally
-    kmcom.Options['koBaseLayout'].Value := PreviousBaseKeyboardID;
-    RestorePreviousBaseKeyboardValue;
-  end;
+  Result := CompileForBaseKeyboard(BaseKeyboardID);
 end;
 
 function BaseKeyboardNeedsMCompile(BaseKeyboardID: Integer): Boolean;
@@ -180,13 +113,33 @@ var
 begin
   MCompileResult := True;
   Result := False;
-  if BaseKeyboardNeedsMCompile(BaseKeyboardID) and not kmcom.SystemInfo.IsAdministrator then
-      MCompileResult := WaitForElevatedConfiguration(WindowHandle, '-mcompile ' + IntToHex(BaseKeyboardID, 8)) = 0;
+  if BaseKeyboardNeedsMCompile(BaseKeyboardID) then
+  begin
+    if not kmcom.SystemInfo.IsAdministrator then
+      begin
+        MCompileResult := WaitForElevatedConfiguration(WindowHandle, '-mcompilekbds ' + IntToHex(BaseKeyboardID, 8)) = 0;
+      end
+    else
+      MCompileResult := CompileForBaseKeyboard(BaseKeyboardID);
+  end;
   if not MCompileResult then
     Exit;
+
   kmcom.Options['koBaseLayout'].Value := BaseKeyboardID;
-  kmcom.Options.Apply; // This will trigger a recompile if needed
+  kmcom.Options.Apply;
   Result := True;
+end;
+
+function CompileForBaseKeyboard(BaseKeyboardID: Integer): Boolean;
+var
+  i: Integer;
+  kbd: IKeymanKeyboardInstalled;
+begin
+  for i := 0 to kmcom.Keyboards.Count - 1 do
+    begin
+      kbd := kmcom.Keyboards[i];
+      (kbd as IKeymanKeyboardInstalled2).MCompileForBaseKeyboard(BaseKeyboardID);
+    end;
 end;
 
 end.

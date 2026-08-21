@@ -112,32 +112,8 @@ begin
 end;
 
 procedure TKeymanOptions.Apply;
-var
-  I: Integer;
-  FOldBaseLayout: Integer;
-  FNewBaseLayout: Integer;
 begin
-  with TRegistryErrorControlled.Create do   // I3717
-  try
-    if OpenKey(SRegKey_KeymanEngine_CU, True) then
-    begin
-      if ValueExists(SRegValue_UnderlyingLayout)
-        then FOldBaseLayout := StrToIntDef('$'+ReadString(SRegValue_UnderlyingLayout),0)   // I3759
-        else FOldBaseLayout := TBaseKeyboard.GetDefaultBaseLayoutID;
-    end
-    else
-      FOldBaseLayout := TBaseKeyboard.GetDefaultBaseLayoutID;
-  finally
-    Free;
-  end;
-
   FInternalOptions.Save(Context);
-
-  FNewBaseLayout := Get_Items('koBaseLayout').Value;
-  if IsAdministrator and (FOldBaseLayout <> FNewBaseLayout) then
-    for I := 0 to Context.Keyboards.Count - 1 do   // I4169
-      (Context.Keyboards.Items[I] as IIntKeymanKeyboardInstalled).UpdateBaseLayout;
-
   Context.Control.AutoApplyKeyman;
 end;
 
