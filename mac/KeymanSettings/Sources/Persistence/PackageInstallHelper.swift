@@ -21,13 +21,13 @@ public enum PackageInstallationType {
   public var prompt: LocalizedStringResource {
     switch self {
     case .newPackage(let packageName):               
-      return "The package \(packageName) is ready to install"
+      return "The package '\(packageName)' is ready to install"
     case .replaceSameVersionPackage(let packageName):
-      return "The package \(packageName) is ready to re-install"
+      return "The package '\(packageName)' is ready to re-install"
     case .replaceOlderPackage(let packageName, let existingVersion, let newVersion):
-      return "The package \(packageName) is ready to update from version \(existingVersion) to \(newVersion)"
+      return "The package '\(packageName)' is ready to update from version \(existingVersion) to \(newVersion)"
     case .replaceNewerPackage(let packageName, let existingVersion, let newVersion):
-      return "The package \(packageName) is ready to downgrade from version \(existingVersion) to \(newVersion)"
+      return "The package '\(packageName)' is ready to downgrade from version \(existingVersion) to \(newVersion)"
     case .packageNotFound:
       return "No package to install"
     }
@@ -39,7 +39,7 @@ public class PackageInstallHelper: Identifiable {
   public let id = UUID()
 //  public var installationError: LocalizedError?
 //  public var errorMessage: String?
-  let temporaryKmpFileLocation: URL
+  public let temporaryKmpFileLocation: URL
   let temporaryPackageLocation: URL
   let installPackageLocation: URL
   let installedPackages: [KeymanPackage]    // needed to check for existing package after download

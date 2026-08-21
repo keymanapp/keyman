@@ -14,7 +14,7 @@ struct MainConfigView: View {
   
   @EnvironmentObject var settings: SettingsContainer
   // visibilty state for the add package sheet
-  @State private var isShowingSheet = false
+  @State private var isShowingAddKeyboardSheet = false
   // used to identify the expanded KeymanPackage id
   // both single and multi package views share the same state variable so only a single disclosure group is expanded at once
   @State private var expandedPackageID: UUID? = nil
@@ -40,7 +40,7 @@ struct MainConfigView: View {
       VStack {
         // the add keyboard button
         LabelButtonView(
-          action: { isShowingSheet = true },
+          action: { isShowingAddKeyboardSheet = true },
           label: "Add Keyboard",
           systemImage: "plus",
           font: .title2
@@ -48,7 +48,7 @@ struct MainConfigView: View {
         .clipShape(.capsule)
         .padding([.top, .leading, .trailing])
         // binds the visibility state to the sheet builder
-        .sheet(isPresented: $isShowingSheet) {
+        .sheet(isPresented: $isShowingAddKeyboardSheet) {
           InstallKeyboardView()
             .frame(width: 960, height: 390)
           // MAC-CONFIG-TODO: Make width and height percentages
