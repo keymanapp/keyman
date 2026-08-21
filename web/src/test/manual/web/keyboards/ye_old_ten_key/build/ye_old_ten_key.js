@@ -814,9 +814,6 @@ function Keyboard_ye_old_ten_key()
   this.gs=function(t,e) {
     return this.g_main_0(t,e);
   };
-  this.gs=function(t,e) {
-    return this.g_main_0(t,e);
-  };
   this.g_main_0=function(t,e) {
     var k=KeymanWeb,r=0,m=0;
     return r;

@@ -1360,9 +1360,6 @@ function Keyboard_start_of_sentence_3621()
   this.gpk=function(t,e) {
     return this.g_PostKeystroke_1(t,e);
   };
-  this.gs=function(t,e) {
-    return this.g_main_3(t,e);
-  };
   this.g_NewContext_0=function(t,e) {
     var k=KeymanWeb,r=1,m=0;
     if(!m) {
