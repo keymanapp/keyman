@@ -14,7 +14,15 @@ const DelphiMajorVersion = '20.0';
 {$IFDEF VER340}
 const DelphiMajorVersion = '21.0';
 {$ELSE}
+{$IFDEF VER350}
+const DelphiMajorVersion = '22.0';
+{$ELSE}
+{$IFDEF VER360}
+const DelphiMajorVersion = '23.0';
+{$ELSE}
 ERROR: must define Delphi version
+{$ENDIF}
+{$ENDIF}
 {$ENDIF}
 {$ENDIF}
 {$ENDIF}
