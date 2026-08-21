@@ -28,6 +28,7 @@ The following projects **cannot** be built on macOS:
 ## System Requirements
 
 * Minimum macOS version: macOS Catalina 10.15 or Big Sur 11.0
+(make sure bash 4.0 is installed and used as modern macOS defaults to Zsh as its primary system shell)
 
 **Note:** to make a fully M1-compatible release build of Keyman for macOS (for
 the setup Applescript), Big Sur 11.0 is required, as osacompile on earlier
@@ -41,6 +42,8 @@ Many dependencies are only required for specific projects.
 
 * XCode (iOS, macOS) 12.4 or later is needed only for Keyman for macOS and Keyman
   for iOS.
+  (Be sure to install XCode 26.2 or 26.3 maximum as they use clang 17.0 . Higher versions of XCode use Clang 21.0 which may not work)
+
   * Install from App Store
   * Accept the Xcode license: `sudo xcodebuild -license accept`
 
