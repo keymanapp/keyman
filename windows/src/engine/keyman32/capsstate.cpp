@@ -29,3 +29,21 @@
 BOOL IsCapsLockOn(void) {
   return GetKeyState(VK_CAPITAL) & 1;
 }
+
+/*
+  RefreshToggleState:
+
+  Resyncs the caps and numlock state, because it may have been changed while
+  Keyman was not aware of it
+*/
+void RefreshToggleState(void) {
+  DWORD n = Globals::get_ShiftState();
+
+  if (GetKeyState(VK_CAPITAL) & 1) *Globals::ShiftState() |= CAPITALFLAG;
+  else *Globals::ShiftState() &= ~CAPITALFLAG;
+
+  if (GetKeyState(VK_NUMLOCK) & 1) *Globals::ShiftState() |= NUMLOCKFLAG;
+  else *Globals::ShiftState() &= ~NUMLOCKFLAG;
+
+  SendDebugMessageFormat("Enter: %x Exit: %x", n, Globals::get_ShiftState());
+}
