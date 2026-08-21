@@ -37,8 +37,6 @@ public enum PackageInstallationType {
 @MainActor // run on the main actor as it is called from SettingsContainer
 public class PackageInstallHelper: Identifiable {
   public let id = UUID()
-//  public var installationError: LocalizedError?
-//  public var errorMessage: String?
   public let temporaryKmpFileLocation: URL
   let temporaryPackageLocation: URL
   let installPackageLocation: URL
@@ -96,21 +94,6 @@ public class PackageInstallHelper: Identifiable {
   }
   
   /**
-   * Install the unzipped package
-   */
-  public func install() throws {
-    print ("install \(self.packageToInstall?.packageName ?? "unknown package")")
-    
-    do {
-      try self.handleNewPackage()
-    } catch {
-      self.cleanupFailedInstallation()
-      print ("package installation failed with error '\(self.packageToInstall?.packageName ?? "unknown package")")
-      throw error
-    }
-  }
-  
-  /**
    * Install the new package and replace existing package if necessary
    */
   public func installPackage() throws {
@@ -128,7 +111,6 @@ public class PackageInstallHelper: Identifiable {
     }
   }
 
-
   /**
    * Unzip and load the downloaded package
    */
@@ -138,8 +120,6 @@ public class PackageInstallHelper: Identifiable {
     // load the unzipped package from the temporary location and save a reference to it
     let newPackage = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
     self.packageToInstall = newPackage
-    
-    
   }
   
   /**
@@ -181,26 +161,6 @@ public class PackageInstallHelper: Identifiable {
   }
   
   /**
-   * Decides whether the package should be installed.
-   * - If this package is not replacing a package, then it is installed.
-   * - If this package is replacing an older package, the new package replaces the old.
-   * - If this package is replacing a newer package, then the user is notified to confirm.
-   */
-  func handleNewPackage() throws {
-    // first check whether this install is replacing an existing package,
-    if self.checkForExistingPackage() {
-      if self.replacingInstalledPackageWithEarlierVersion() {
-        // check with the user before allowing a downgrade
-        self.sendNotificationToConfirmPackageDowngrade()
-      } else {
-        try self.replaceExistingPackageWithNewPackage()
-      }
-    } else {
-      try self.installNewPackage()
-    }
-  }
-  
-  /**
    * Check whether a package of the same name is already installed which may be replaced.
    */
   func checkForExistingPackage() -> Bool {
@@ -211,13 +171,6 @@ public class PackageInstallHelper: Identifiable {
       packageExists = true
     }
     return packageExists
-  }
-  
-  /**
-   * Send a notification that an attempt to downgrade a package has been detected
-   */
-  func sendNotificationToConfirmPackageDowngrade() {
-    NotificationCenter.default.post(name: .packageDowngradeRequested, object: nil)
   }
   
   /**
@@ -232,8 +185,6 @@ public class PackageInstallHelper: Identifiable {
         print("installNewPackage failed to delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent)")
       }
     }
-    
-    NotificationCenter.default.post(name: .newPackageInstalled, object: nil)
   }
   
   /**
@@ -249,8 +200,6 @@ public class PackageInstallHelper: Identifiable {
       }
     }
     try self.movePackageFromTemporaryToInstalled()
-    
-    NotificationCenter.default.post(name: .packageReplaced, object: nil)
   }
   
   /**
