@@ -17,9 +17,12 @@ export function declareConvert(program: Command) {
   BaseOptions.addLogLevel(command);
   BaseOptions.addLogFormat(command);
   command
-    .description('Convert keyboard source files between formats')
+    // TODO kmc-convert: add more conversions later, then alter text here
+    //.description('Convert keyboard source files between formats:')
+    .description('Convert keyboard source files from keylayout -> .kmn:')
     .option('-p, --out-path <path>', 'Path for output files')
-    .requiredOption('-t, --out-type <type>', 'File extension for output files, e.g. .kmn, required')
+    // TODO kmc-convert: add more conversions later, then File extension for output files is required
+    // .requiredOption('-t, --out-type <type>', 'File extension for output files, e.g. .kmn, required')
     .action(async (filenames: string[], _options: any, commander: any): Promise<never|void> => {
       const options = commander.optsWithGlobals();
       const callbacks = new NodeCompilerCallbacks({logLevel: options.logLevel});
