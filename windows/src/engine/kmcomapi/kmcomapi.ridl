@@ -60,6 +60,7 @@ library keymanapi
   interface IKeymanKeyboardLanguagesInstalled;
   interface IKeymanKeyboardLanguagesFile;
   interface IKeymanKeyboardsInstalled2;
+  interface IKeymanKeyboardInstalled2;
   interface IKeymanPackagesInstalled2;
   interface IKeymanKeyboardFile2;
   interface IKeymanPackageFile2;
@@ -934,6 +935,19 @@ library keymanapi
     HRESULT _stdcall Install2([in] BSTR Filename, [in] VARIANT_BOOL Force, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
     [id(0x00000259)]
     HRESULT _stdcall RefreshInstalledKeyboards(void);
+  };
+
+  [
+    uuid(3086C85C-932A-4726-BF76-2D74DD133AC9),
+    version(19.0),
+    helpstring("https://help.keyman.com/developer/engine/windows/19.0/api/IKeymanKeyboardInstalled2"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardInstalled2: IKeymanKeyboardInstalled
+  {
+    [id(0x00000120)]
+    HRESULT _stdcall MCompileForBaseKeyboard(long KLID);
   };
 
   [

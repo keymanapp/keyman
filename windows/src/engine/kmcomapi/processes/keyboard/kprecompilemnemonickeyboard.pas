@@ -1,18 +1,18 @@
 (*
   Name:             kprecompilemnemonickeyboard
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      24 Apr 2014
 
   Modified Date:    13 Mar 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          24 Apr 2014 - mcdurdin - I4174 - V9 - mcompile logs should be stored in diag folder
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
                     13 Mar 2015 - mcdurdin - I4615 - CrashID:kmshell.exe_9.0.481.0_2C6795CE_EOleException
@@ -27,7 +27,7 @@ uses
 
 type
   TKPRecompileMnemonicKeyboard = class(TKPBase)
-    procedure Execute(const FileName: string; const PackageName: string);
+    procedure Execute(const FileName: string; const PackageName: string; BaseKeyboardID: Cardinal);
   end;
 
 implementation
@@ -42,10 +42,8 @@ uses
   Winapi.Windows,
 
   errorcontrolledregistry,
-  keymancontext,
   keymanerrorcodes,
   KeymanPaths,
-  keymanapi_TLB,
   RegistryKeys,
   utilexecute,
   utilkeyman,
@@ -67,7 +65,7 @@ begin
   Result := '';
 end;
 
-procedure TKPRecompileMnemonicKeyboard.Execute(const FileName,PackageName: string);
+procedure TKPRecompileMnemonicKeyboard.Execute(const FileName,PackageName: string; BaseKeyboardID: Cardinal);
 var
   FDestPath, FDestFileName: string;
   FBaseKeyboardIDHex: string;
@@ -76,16 +74,12 @@ var
   FExitCode: Integer;
   FMCompilePath: string;
   FBaseKeyboardFileName: string;
-  BaseKeyboardID: Cardinal;
   FDestDeadkeyFileName: string;
   FCommand: string;
 begin
   if PackageName <> ''
     then FDestPath := GetPackageInstallPath(PackageName)   // I3581
     else FDestPath := GetKeyboardInstallPath(FileName);   // I3581
-
-  with Context as TKeymanContext do
-    BaseKeyboardID := (Options as IKeymanOptions).Items['koBaseLayout'].Value;
 
   FBaseKeyboardIDHex := IntToHex(BaseKeyboardID, 8);
   FBaseFileName := FDestPath + '\' + ExtractFileName(FileName);   // I3581

@@ -63,7 +63,8 @@ type
   TKeymanKeyboardInstalled = class(   // I3581
     TKeymanKeyboard,
     IIntKeymanKeyboardInstalled,
-    IKeymanKeyboardInstalled)
+    IKeymanKeyboardInstalled,
+    IKeymanKeyboardInstalled2)
   private
     FRegKeyboard: TRegKeyboard;
     FVisualKeyboard: IKeymanVisualKeyboard;
@@ -112,6 +113,9 @@ type
     procedure UpdateBaseLayout;   // I4169
     procedure RefreshInstallation;
 
+    { IKeymanKeyboardInstalled2 }
+    procedure MCompileForBaseKeyboard(KLID: Integer); safecall;
+
   public
     constructor Create(AContext: TKeymanContext; const Name: string);
     destructor Destroy; override;
@@ -152,14 +156,19 @@ begin
 end;
 
 procedure TKeymanKeyboardInstalled.UpdateBaseLayout;   // I4169
+var
+  BaseKeyboardID: Integer;
 begin
   if FRegKeyboard.MnemonicLayout and FileExists(FRegKeyboard.KeymanFile) then   // I4615
+  begin
+    BaseKeyboardID := (Context.Options as IKeymanOptions).Items['koBaseLayout'].Value;
     with TKPRecompileMnemonicKeyboard.Create(Context) do
     try
-      Execute(FRegKeyboard.KeymanFile, FRegKeyboard.PackageName);
+      Execute(FRegKeyboard.KeymanFile, FRegKeyboard.PackageName, BaseKeyboardID);
     finally
       Free;
     end;
+  end;
 end;
 
 function TKeymanKeyboardInstalled.Get_Copyright: WideString;
@@ -473,6 +482,22 @@ end;
 function TKeymanKeyboardInstalled.RegKeyboard: TRegKeyboard;
 begin
   Result := FRegKeyboard;
+end;
+
+{ IKeymanKeyboardInstalled2 }
+procedure TKeymanKeyboardInstalled.MCompileForBaseKeyboard(KLID: Integer); safecall;
+var
+  RecompileMnemonicKeyboard: TKPRecompileMnemonicKeyboard;
+begin
+  if FRegKeyboard.MnemonicLayout and FileExists(FRegKeyboard.KeymanFile) then
+    begin
+      RecompileMnemonicKeyboard := TKPRecompileMnemonicKeyboard.Create(Context);
+    try
+      RecompileMnemonicKeyboard.Execute(FRegKeyboard.KeymanFile, FRegKeyboard.PackageName, KLID);
+    finally
+      RecompileMnemonicKeyboard.Free;
+    end;
+  end;
 end;
 
 end.

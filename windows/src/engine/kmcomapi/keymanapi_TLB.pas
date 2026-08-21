@@ -1570,6 +1570,16 @@ type
   end;
 
 // *********************************************************************//
+// Interface: IKeymanKeyboardInstalled2
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {3086C85C-932A-4726-BF76-2D74DD133AC9}
+// *********************************************************************//
+  IKeymanKeyboardInstalled2 = interface(IKeymanKeyboardInstalled)
+    ['{3086C85C-932A-4726-BF76-2D74DD133AC9}']
+    procedure MCompileForBaseKeyboard(KLID: Integer); safecall;
+  end;
+
+// *********************************************************************//
 // DispIntf:  IKeymanKeyboardsInstalled2Disp
 // Flags:     (4416) Dual OleAutomation Dispatchable
 // GUID:      {EA57C94F-C140-485E-941A-3F1D5A229024}
