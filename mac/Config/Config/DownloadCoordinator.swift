@@ -13,6 +13,9 @@ import KeymanSettings
 public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelegate, WKDownloadDelegate {
   @Published var showConfirmPackageSheet = false
   @Published var installHelper: PackageInstallHelper?
+  @Published var loadFailureMessage: String?
+  @Published var loadPackageFailed = false
+
   var downloadFileUrl: URL? = nil
   var settings: SettingsContainer?
   
@@ -83,10 +86,14 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     print("webView navigationResponse:didBecome called")
     download.delegate = self
   }
-
+  
   public func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String, completionHandler: @escaping @MainActor @Sendable (URL?) -> Void) {
     print("download initiated")
-    
+    DispatchQueue.main.async {
+      self.loadFailureMessage = nil // Reset previous error
+      self.loadPackageFailed = false
+    }
+
     guard let keymanSettings = self.settings else {
       print("tried to access settings before they were intialized in updateNSView")
       completionHandler(nil)
@@ -103,34 +110,46 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
         completionHandler(downloadFileUrl)
       }
     } catch {
-      print("could not initiate KMP package download")
+      print("could not initiate KMP package download, error: \(error)")
       completionHandler(nil)
     }
-    
-//    downloadFileUrl = keymanSettings.preparePackageDownload(kmpFileName: suggestedFilename)
   }
-  
+ 
+//  func download(_ download: WKDownload, didStart navigationResponse: WKNavigationResponse) {
+//    print("download did start")
+//    DispatchQueue.main.async {
+//      self.loadFailureMessage = nil // Reset previous error
+//      self.loadPackageFailed = false
+//    }
+//  }
+//
   public func downloadDidFinish(_ download: WKDownload) {
-    DispatchQueue.main.async {
-        // Trigger the SwiftUI modal sheet
-        self.showConfirmPackageSheet = true
-    }
-
     if let downloadFileUrl {
       print("Download of \(downloadFileUrl.path()) was successful.")
       if let settings {
+        
         do {
           try settings.packageDownloadComplete(kmpFileUrl: downloadFileUrl)
+          DispatchQueue.main.async {
+              // Trigger the SwiftUI modal sheet
+              self.showConfirmPackageSheet = true
+          }
         } catch {
-          // MAC-CONFIG-TODO: communicate failed install to user
+          DispatchQueue.main.async {
+            self.loadPackageFailed = true
+            self.loadFailureMessage = error.localizedDescription
+          }
         }
       }
     }
   }
 
   public func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
-    // MAC-CONFIG-TODO: communicate failed install to user
     print("Download failed with error: \(error.localizedDescription)")
+    DispatchQueue.main.async {
+      self.loadPackageFailed = true
+      self.loadFailureMessage = error.localizedDescription
+    }
   }
 
   public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {

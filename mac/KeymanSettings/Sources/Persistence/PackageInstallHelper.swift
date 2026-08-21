@@ -83,7 +83,7 @@ public class PackageInstallHelper: Identifiable {
     print ("prepareToInstall \(kmpFileUrl)")
     
     do {
-      try self.unzipPackage(for: kmpFileUrl)
+      try self.unzipAndLoadPackage(for: kmpFileUrl)
     } catch {
       self.cleanupFailedInstallation()
       print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
@@ -114,10 +114,11 @@ public class PackageInstallHelper: Identifiable {
   /**
    * Unzip and load the downloaded package
    */
-  func unzipPackage(for kmpFileUrl: URL) throws {
+  func unzipAndLoadPackage(for kmpFileUrl: URL) throws {
+    // unzip to the temp directory
     try self.packageRepository.unzipKmpFile(at: kmpFileUrl, to: self.temporaryPackageLocation)
     
-    // load the unzipped package from the temporary location and save a reference to it
+    // load the unzipped package from the temp directory and save a reference to it
     let newPackage = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
     self.packageToInstall = newPackage
   }

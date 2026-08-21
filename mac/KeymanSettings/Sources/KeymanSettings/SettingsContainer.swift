@@ -398,7 +398,13 @@ public class SettingsContainer : ObservableObject {
   public func packageDownloadComplete(kmpFileUrl: URL) throws {
     print ("packageDownloadComplete \(kmpFileUrl)")
 
-    try self.packageInstall?.packageDownloadComplete(for: kmpFileUrl)
+    do {
+      try self.packageInstall?.packageDownloadComplete(for: kmpFileUrl)
+    } catch {
+      // clear failed download
+      self.packageInstall = nil
+      throw error
+    }
   }
 
   /**
@@ -460,8 +466,12 @@ public class SettingsContainer : ObservableObject {
    */
   public func installPackage() throws {
     if let install = self.packageInstall {
-      try install.installPackage()
-      
+      do {
+        try install.installPackage()
+      } catch {
+        self.packageInstall = nil
+        throw error
+      }
       commitPackageInstall()
     }
   }

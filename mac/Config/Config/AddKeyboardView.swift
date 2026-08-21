@@ -29,6 +29,13 @@ struct AddKeyboardView: View {
         }
       }
     }
+    .alert("Package Installation Failed", isPresented: $downloadCoordinator.loadPackageFailed) {
+        Button("OK", role: .cancel) { }
+    } message: {
+      if let message = downloadCoordinator.loadFailureMessage {
+        Text(message)
+      }
+    }
     .sheet(isPresented: $downloadCoordinator.showConfirmPackageSheet) {
       if let helper = downloadCoordinator.installHelper {
         PackageConfirmationView(installHelper: helper) { accepted in

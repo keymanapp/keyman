@@ -147,7 +147,7 @@ struct Website: Decodable {
 }
 
 struct SystemInfo: Decodable {
-  let keymanDeveloperVersion: String
+  let keymanDeveloperVersion: String?
   let fileVersion: String
   
   enum CodingKeys: String, CodingKey {
