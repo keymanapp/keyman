@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#
+# Keyman is copyright (C) SIL International. MIT License.
+#
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -7,6 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
 . "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 
 builder_describe "Keyman kmc-convert keyboard conversion tools module" \
@@ -14,14 +18,7 @@ builder_describe "Keyman kmc-convert keyboard conversion tools module" \
   "@/common/web/types" \
   "@/developer/src/common/web/utils" \
   "@/developer/src/common/web/test-helpers" \
-  "configure" \
-  "build" \
-  "api                       analyze API and prepare API documentation" \
-  "clean" \
-  "test" \
-  "publish                   publish to npm" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  clean configure build api test
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -35,17 +32,5 @@ builder_parse "$@"
 builder_run_action clean       rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure   node_select_version_and_npm_ci
 builder_run_action build       tsc --build
-builder_run_action api         api-extractor run --local --verbose
-
-do_test() {
-  eslint .
-  cd test
-  tsc -b
-  cd ..
-  readonly C8_THRESHOLD=20
-  c8 -skip-full --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha "${builder_extra_params[@]}"
-  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
-  builder_echo warning "Please increase threshold in build.sh as test coverage improves."
-}
-
-builder_run_action test        do_test
+builder_run_action api         typescript_run_api_extractor developer/src/kmc-convert main.d.ts
+builder_run_action test        typescript_run_eslint_mocha_tests
