@@ -7,3 +7,4 @@
 export { Converter } from './converter.js';
 export { ConverterOptions } from './converter-options.js';
 export { ConverterMessages } from './converter-messages.js';
+export { ConverterArtifacts, ConverterToKmnArtifacts, ConverterResult, ConverterToKmnResult } from './converter-artifacts.js';
