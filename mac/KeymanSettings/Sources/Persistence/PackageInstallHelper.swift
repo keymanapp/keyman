@@ -16,7 +16,6 @@ public enum PackageInstallationType {
   case replaceSameVersionPackage(String)
   case replaceOlderPackage(String, String, String)
   case replaceNewerPackage(String, String, String)
-  case packageNotFound
   
   public var prompt: LocalizedStringResource {
     switch self {
@@ -28,8 +27,6 @@ public enum PackageInstallationType {
       return "The package '\(packageName)' is ready to update from version \(existingVersion) to \(newVersion)"
     case .replaceNewerPackage(let packageName, let existingVersion, let newVersion):
       return "The package '\(packageName)' is ready to downgrade from version \(existingVersion) to \(newVersion)"
-    case .packageNotFound:
-      return "No package to install"
     }
   }
 }
@@ -89,8 +86,6 @@ public class PackageInstallHelper: Identifiable {
       print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
       throw error
     }
-    
-    self.packageInstallationType = self.determinePackageInstallationType()
   }
   
   /**
@@ -99,15 +94,17 @@ public class PackageInstallHelper: Identifiable {
   public func installPackage() throws {
     print ("installPackage \(self.packageToInstall?.packageName ?? "unknown package")")
 
-    guard let installationType = self.packageInstallationType else { return }
+    // prepareToInstall will always set this
+    guard let installationType = self.packageInstallationType else {
+      print("error: installationType not set before call to installPackage")
+      throw InstallPackageError.internalError
+    }
     
     switch installationType {
     case .newPackage:
       try self.installNewPackage()
     case .replaceSameVersionPackage, .replaceNewerPackage, .replaceOlderPackage:
       try self.replaceExistingPackageWithNewPackage()
-    case .packageNotFound:
-      throw DropKmpError.installFailed("unknown package installation type")
     }
   }
 
@@ -119,8 +116,10 @@ public class PackageInstallHelper: Identifiable {
     try self.packageRepository.unzipKmpFile(at: kmpFileUrl, to: self.temporaryPackageLocation)
     
     // load the unzipped package from the temp directory and save a reference to it
-    let newPackage = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
-    self.packageToInstall = newPackage
+    self.packageToInstall = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
+    
+    // now that we know what we are installing, determine the type of install
+    self.packageInstallationType = self.determinePackageInstallationType()
   }
   
   /**
@@ -131,13 +130,18 @@ public class PackageInstallHelper: Identifiable {
    */
   func determinePackageInstallationType() -> PackageInstallationType {
     let packageAlreadyInstalled = self.checkForExistingPackage()
+    var installationType: PackageInstallationType = .newPackage("unknown package")
     
+    // If there is no new package, return bogus value of .newPackage.
+    // Without a package, the installation will fail elsewhere and the
+    // type of installation is completely irrelevant.
     guard let newPackage = self.packageToInstall else {
-      return PackageInstallationType.packageNotFound
+      print("error: packageToInstall not set when determining package installation type")
+      return installationType
     }
     
     if !packageAlreadyInstalled {
-      return PackageInstallationType.newPackage(newPackage.packageName)
+      installationType =  PackageInstallationType.newPackage(newPackage.packageName)
     } else {
       if let installedPackage = self.packageToReplace {
         let newVersion = newPackage.packageVersion
@@ -147,18 +151,18 @@ public class PackageInstallHelper: Identifiable {
         
         if comparisonResult == .orderedAscending {
           print("package downgrade: new version is older than existing version")
-          return PackageInstallationType.replaceNewerPackage(newPackage.packageName, existingVersion, newVersion)
+          installationType =  PackageInstallationType.replaceNewerPackage(newPackage.packageName, existingVersion, newVersion)
         } else if comparisonResult == .orderedDescending {
           print("package upgrade: new version is newer than existing version")
-          return PackageInstallationType.replaceOlderPackage(newPackage.packageName, existingVersion, newVersion)
+          installationType = PackageInstallationType.replaceOlderPackage(newPackage.packageName, existingVersion, newVersion)
         } else {
           print("new and existing package versions are identical")
-          return PackageInstallationType.replaceSameVersionPackage(newPackage.packageName)
+          installationType = PackageInstallationType.replaceSameVersionPackage(newPackage.packageName)
         }
       }
     }
-
-    return PackageInstallationType.packageNotFound
+    
+    return installationType
   }
   
   /**
@@ -253,31 +257,5 @@ public class PackageInstallHelper: Identifiable {
    */
   func deleteUnzippedPackage() throws {
     try FileManager.default.removeItem(at: self.temporaryPackageLocation)
-  }
-  
-  /**
-   * Determine whether the new package is older than the currently installed package
-   */
-  func replacingInstalledPackageWithEarlierVersion() -> Bool {
-    var downgrade = false
-    
-    guard let installedVersion = self.packageToReplace?.packageVersion,
-          let newVersion = self.packageToInstall?.packageVersion else {
-      return false
-    }
-    
-    let comparisonResult = newVersion.compare(installedVersion, options: .numeric)
-    
-    if comparisonResult == .orderedAscending {
-      // downgrade detected
-      downgrade = true
-      print("downgrade: new version is older than installed version")
-    } else if comparisonResult == .orderedDescending {
-      print("upgrade: new version is newer than installed version")
-    } else {
-      print("new and installed versions are identical")
-    }
-    
-    return downgrade
   }
 }

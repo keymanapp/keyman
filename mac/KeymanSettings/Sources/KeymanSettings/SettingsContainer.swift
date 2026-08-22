@@ -27,10 +27,12 @@ import ZIPFoundation
 
 public enum InstallPackageError: LocalizedError {
   case downloadInProgress
-  
+  case internalError // due to invalid state, should never occur
+
   public var errorDescription: String? {
     switch self {
     case .downloadInProgress: return "A download is already in progress."
+    case .internalError: return "An internal error occurred."
     }
   }
 }
@@ -501,8 +503,6 @@ public class SettingsContainer : ObservableObject {
         self.addInstalledPackage()
       case .replaceSameVersionPackage, .replaceNewerPackage, .replaceOlderPackage:
         self.replaceInstalledPackage()
-      case .packageNotFound:
-        print("commitPackageInstall: package not found")
       }
     }
     
@@ -528,14 +528,5 @@ public class SettingsContainer : ObservableObject {
     if fileLocation.pathExtension.lowercased() != kmpFileExtensionWithoutDot {
       throw DropKmpError.invalidFileType(fileLocation.lastPathComponent)
     }
-  }
-
-  /**
-   * Build the URL where the package will be installed
-   */
-  func buildInstalledPackageUrl(for draggedKmpFile: URL) -> URL? {
-    // package name is filename minus .kmp extension
-    let packageName = draggedKmpFile.lastPathComponent.replacingOccurrences(of: kmpFileExtension, with: "")
-    return self.packageRepository.buildInstallationUrlForPackageName(packageName: packageName)
   }
 }

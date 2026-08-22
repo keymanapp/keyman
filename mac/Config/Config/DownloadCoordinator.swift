@@ -3,7 +3,12 @@
  *
  * Created by Shawn Schantz on 2026-08-21
  *
- * For coordination between WKWebview and SwiftUI views
+ * For coordination between WKWebview and SwiftUI views.
+ * Implements WKNavigationDelegate and WKDownloadDelegate to trigger downloads
+ * of Keyman packages and publishes several fields to allow SwiftUI views to
+ * - display download progress
+ * - display errors that cause the download or package validation to fail
+ * - prompt with a confirm sheet including a package read me and button to install
  */
 
 import WebKit
@@ -16,7 +21,6 @@ import KeymanSettings
 
 @MainActor
 public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelegate, WKDownloadDelegate {
-  @Published var showDownloadSheet = false
   @Published var isDownloading = false
   // progress is between 0.0 and 1.0
   @Published var downloadProgress: Double = 0.0
@@ -71,6 +75,8 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     } else {
       guard let keymanSettings = self.settings else {
         print("webView decidePolicyFor:decisionHandler: no settings")
+        self.loadPackageFailed = true
+        self.loadFailureMessage = InstallPackageError.internalError.localizedDescription
         decisionHandler(.cancel)
         return
       }
@@ -78,6 +84,8 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
       // if a download is already in progress then stop another from starting
       if keymanSettings.isDownloadInProgress() {
         print("download already in progress, download canceled")
+        self.loadPackageFailed = true
+        self.loadFailureMessage = InstallPackageError.downloadInProgress.localizedDescription
         decisionHandler(.cancel)
       } else {
         decisionHandler(.download)
@@ -124,6 +132,8 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     
     guard let keymanSettings = self.settings else {
       print("tried to access settings before they were intialized in updateNSView")
+      self.loadPackageFailed = true
+      self.loadFailureMessage = InstallPackageError.internalError.localizedDescription
       completionHandler(nil)
       return
     }
@@ -134,33 +144,30 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     do {
       if let helper = try keymanSettings.initiateKmpFileDownload(kmpFilename: suggestedFilename) {
         
-        self.isDownloading = true
-        self.downloadProgress = 0.0
         self.loadFailureMessage = nil // Reset previous error
         self.loadPackageFailed = false
         
         self.installHelper = helper
-        let targetUrl = helper.temporaryKmpFileLocation
-        self.downloadFileUrl = targetUrl
         
-        completionHandler(targetUrl)
+        completionHandler(helper.temporaryKmpFileLocation)
       }
     } catch {
-      print("could not initiate KMP package download, error: \(error)")
+      print("Could not initiate package download, error: \(error)")
+      self.loadPackageFailed = true
+      self.loadFailureMessage = error.localizedDescription
       completionHandler(nil)
     }
   }
   
   public func downloadDidFinish(_ download: WKDownload) {
     self.isDownloading = false
-    self.showDownloadSheet = true
     self.progressObserver = nil
     
-    if let downloadFileUrl {
-      print("Download of \(downloadFileUrl.path()) was successful.")
+    if let downloadDestination = installHelper?.temporaryKmpFileLocation {
+      print("Download of \(downloadDestination.path()) was successful.")
       if let settings {
         do {
-          try settings.packageDownloadComplete(kmpFileUrl: downloadFileUrl)
+          try settings.packageDownloadComplete(kmpFileUrl: downloadDestination)
           // Trigger the SwiftUI modal sheet
           self.showConfirmPackageSheet = true
         } catch {
@@ -177,6 +184,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     self.progressObserver = nil
     self.loadPackageFailed = true
     self.loadFailureMessage = error.localizedDescription
+    self.installHelper = nil
     if let settings {
       settings.packageInstallationFailed()
     }
