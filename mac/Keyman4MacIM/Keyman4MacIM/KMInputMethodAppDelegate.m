@@ -788,18 +788,30 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  * namely, the keyboard data on disk and the settings in UserDefaults
  */
 - (void)prepareStorage {
-  os_log_debug([KMLogs dataLog], "*** prepareStorage ***");
+  SettingsState state = [KMSettingsRepository.shared determineSettingsState];
 
-  // if necessary, migrate settings and keyboard data for compatibility with Keyman 19
-  if ([KMSettingsRepository.shared keyman19SettingsMigrationNeeded]) {
-    [KMDataRepository.shared migrateDataForKeyman19];
-    [KMSettingsRepository.shared migrateSettingsForKeyman19];
+  switch (state) {
+    case KeymanSettingsVersion17:
+      os_log_info([KMLogs dataLog], "prepareStorage, migration needed for Keyman 17 to current");
+      [KMDataRepository.shared createSharedDirectoriesIfNecessary];
+      [KMDataRepository.shared migrateDataFromKeyman17];
+      [KMSettingsRepository.shared migrateSettingsFromKeyman17];
+      break;
+    case KeymanSettingsVersion18:
+      os_log_info([KMLogs dataLog], "prepareStorage, migration needed for Keyman 18 to current");
+      [KMDataRepository.shared createSharedDirectoriesIfNecessary];
+      [KMDataRepository.shared migrateDataFromKeyman18];
+      [KMSettingsRepository.shared migrateSettingsFromKeyman18];
+      break;
+    case KeymanSettingsNotFound:
+      os_log_info([KMLogs dataLog], "prepareStorage, settings not found, create them");
+      [KMDataRepository.shared createSharedDirectoriesIfNecessary];
+      [KMSettingsRepository.shared createSharedSettingsIfNecessary];
+      break;
+    case KeymanSettingsVersionCurrent:
+      os_log_info([KMLogs dataLog], "prepareStorage: settings are current, no migration needed");
+      break;
   }
-  
-  // if this is a fresh install, then create the shared directories
-  [KMDataRepository.shared createKeyman19SharedDirectoriesIfNecessary];
-  
-  // MAC-CONFIG-TODO: are settings created for fresh install?
 }
 
 - (void)setDefaultKeymanMenuItems {

@@ -53,7 +53,6 @@ NSString *const kAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 NSString *const kUseVerboseLogging = @"KMUseVerboseLogging";
 
 NSString *const kObsoletePathComponent = @"/Documents/Keyman-Keyboards";
-NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputmethod.Keyman/";
 
 /**
  * Store the version number of the data model in the UserDefaults with this key.
@@ -89,133 +88,74 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   return self;
 }
 
-// MAC-CONFIG-TODO: add support for migration from Keyman 18 and earlier to Keyman 19
-
 /**
- * Determines whether the keyboard data needs to be moved from pre-Keyman-18 location to the Keyman 18 location
- * This is true if
- * 1) the UserDefaults exist (indicating that this is not a new installation of Keyman) and
- * 2) the value for kVersionStoreDataInLibraryDirectory is < 1,
+ * Determines the current state of the Keyman settings (UserDefaults), indicating
+ * whether migration is needed to a new format and/or location or whether this is
+ * a first-time install and settings must be created.
  */
-- (BOOL)keyman18DataMigrationNeeded {
-  BOOL keymanSettingsExist = [self settingsExist];
-  os_log([KMLogs dataLog], "keyman settings exist: %{public}@", keymanSettingsExist ? @"YES" : @"NO" );
+- (SettingsState)determineSettingsState {
+  SettingsState state = KeymanSettingsVersionCurrent;
   
-  BOOL keyboardsStoredInLibrary = [self dataModelWithKeyboardsInLibrary];
-  os_log([KMLogs dataLog], "settings indicate that keyboards are stored in ~/Library: %{public}@", keyboardsStoredInLibrary ? @"YES" : @"NO" );
+  // settings were moved to share app group beginning in Keyman 19
+  if ([self settingsExistForAppGroup]) {
+    os_log([KMLogs dataLog], "keyman shared settings exist, version is current");
+    state = KeymanSettingsVersionCurrent;
+  } else if ([self settingsExistForInputMethod]) {
+    // In Keyman 18, KMDataModelVersion was added to settings and set to value of 1
+    // No need to check the value, if it exists in the app UserDefaults, then it needs to be migrated
+    if ([self version18SettingsExistForInputMethod]) {
+      os_log([KMLogs dataLog], "keyman app (unshared) settings version indicates Keyman 18, packages stored in ~/Library");
+      state = KeymanSettingsVersion18;
+    } else {
+      // no KMDataModelVersion key is found in the app UserDefaults
+      os_log([KMLogs dataLog], "lack of keyman settings version indicates Keyman 17 or earlier, packages stored in ~/Documents");
+      state = KeymanSettingsVersion17;
+    }
+  } else {
+    // settings do not exist, must be a new install
+    os_log([KMLogs dataLog], "keyman settings do not exist, must be created for new install");
+    state = KeymanSettingsNotFound;
+  }
   
-  BOOL migrationNeeded = keymanSettingsExist && !keyboardsStoredInLibrary;
-  os_log([KMLogs dataLog], "keyman18DataMigrationNeeded: %{public}@", migrationNeeded ? @"YES" : @"NO" );
-
-  return migrationNeeded;
+  return state;
 }
 
-/**
- * Determines whether the keyboard data needs to be moved from the Keyman 18 location to the Keyman 19 location
- * This is true if the UserDefaults exist in the old location for the input method
- */
-- (BOOL)keyman19SettingsMigrationNeeded {
-  BOOL keymanSettingsExistForInputMethod = [self inputMethodUserDefaultsExist];
-  os_log([KMLogs dataLog], "keyman input method settings exist (for 18 and earlier): %{public}@", keymanSettingsExistForInputMethod ? @"YES" : @"NO" );
-  
-  BOOL keyboardsStoredInLibrary = [self dataModelWithKeyboardsInLibrary];
-  os_log([KMLogs dataLog], "settings indicate that keyboards are stored in ~/Library: %{public}@", keyboardsStoredInLibrary ? @"YES" : @"NO" );
-  
-  BOOL migrationNeeded = keymanSettingsExistForInputMethod;
-  os_log([KMLogs dataLog], "keyman19SettingsMigrationNeeded: %{public}@", migrationNeeded ? @"YES" : @"NO" );
-
-  return migrationNeeded;
+- (void)createSharedSettingsIfNecessary {
+  // set kDataModelVersion for the current format
+  [self writeCurrentDataModelVersion];
 }
 
-- (void)migrateSettingsForKeyman19 {
-  [self migrateInputMethodSettingsToAppGroup];
-
-  // set kDataModelVersion to indicate that we are using the group container
-  [self.groupDefaults setInteger:kVersionStoreDataInGroupContainer forKey:kDataModelVersion];
-  
-  [self removeMigratedInputMethodSettings];
+- (void)writeCurrentDataModelVersion {
+  [self.groupDefaults setInteger:kCurrentDataModelVersionNumber forKey:kDataModelVersion];
 }
 
 /**
- * Move userdefaults from app to app group
- * Read the settings in the input method's user defaults
- * Write them to the shared app group user defaults
- * Delete them from the input method's user defaults
+ * The dataModelVersion field will always exist for Keyman 18 and later, and starting
+ * with Keyman 19, it will be located in the UserDefaults for the app group.
  */
-- (BOOL)migrateInputMethodSettingsToAppGroup {
-  NSString *selectedKeyboard = [self.appDefaults stringForKey:kSelectedKeyboardKey];
-  if (selectedKeyboard != nil) {
-    [self.groupDefaults setObject:selectedKeyboard forKey:kSelectedKeyboardKey];
-  }
-
-  NSArray * activeKeyboards = [self.appDefaults arrayForKey:kActiveKeyboardsKey];
-  if (activeKeyboards != nil) {
-    [self.groupDefaults setObject:activeKeyboards forKey:kEnabledKeyboardsKey];
-  }
-
-  if ([self.appDefaults objectForKey:kShowOskOnActivate] != nil) {
-    BOOL showOsk = [self.appDefaults boolForKey:kShowOskOnActivate];
-    [self.groupDefaults setBool:showOsk forKey:kShowOskOnActivate];
-  }
-  
-  if ([self.appDefaults objectForKey:kForceSentryError] != nil) {
-    BOOL forceSentryError = [self.appDefaults boolForKey:kForceSentryError];
-    [self.groupDefaults setBool:forceSentryError forKey:kForceSentryError];
-  }
-  
-  NSDictionary * persistedOptions = [self.appDefaults dictionaryForKey:kPersistedOptionsKey];
-  if (persistedOptions != nil) {
-    [self.groupDefaults setObject:persistedOptions forKey:kPersistedOptionsKey];
-  }
-  
-  return true;
+- (BOOL)settingsExistForAppGroup
+{
+  return ([self.groupDefaults objectForKey:kDataModelVersion] != nil);
 }
 
 /**
- * Removes input method settings that have been migrated to the app group.
- * Does not eradicate everything but only those created by Keyman code.
- * For example, the OSK window coordinates, created by NSWindow, must remain.
+ * If the selectedKeyboard exists in the app UserDefaults, as opposed to the shared app group
+ * UserDefaults, then this is version 18 or earlier of Keyman.
+ * For versions of Keyman, 17 and earlier, there was no`KMDataModelVersion` to check, but
+ * the format and location of the settings was the same for those versions.
  */
-- (void)removeMigratedInputMethodSettings {
-  [self.appDefaults removeObjectForKey:kSelectedKeyboardKey];
-  [self.appDefaults removeObjectForKey:kActiveKeyboardsKey];
-  [self.appDefaults removeObjectForKey:kShowOskOnActivate];
-  [self.appDefaults removeObjectForKey:kForceSentryError];
-  [self.appDefaults removeObjectForKey:kPersistedOptionsKey];
-  [self.appDefaults removeObjectForKey:kDataModelVersion];
-}
-
-- (void)migrateSettingsForKeyman18 {
-  os_log_debug([KMLogs dataLog], "converting settings in UserDefaults for migration");
-  [self convertSelectedKeyboardPathForKeyman18Migration];
-  [self convertActiveKeyboardArrayForKeyman18Migration];
-  [self convertOptionsPathsForKeyman18Migration];
-}
-
-- (void)setDataModelVersionIfNecessary {
-  if (![self dataModelWithKeyboardsInLibrary]) {
-    [self.groupDefaults setInteger:kVersionStoreDataInLibraryDirectory forKey:kDataModelVersion];
-  }
-}
-
-// MAC-CONFIG-TODO: remove if obsolete
-/**
- * If the selectedKeyboard has not been set, then the settings have not been saved in the UserDefaults.
- * If this method is called after applicationDidFinishLaunching, then it will always return true.
- * If called from awakeFromNib, then it will return false when running for the first time.
- */
-- (BOOL)settingsExist
+- (BOOL)settingsExistForInputMethod
 {
   return ([self.appDefaults objectForKey:kSelectedKeyboardKey] != nil);
 }
 
 /**
- * Returns true for Keyman 18 and earlier when settings were stored exclusively for the input method rather than for the app group.
- * If the selectedKeyboard has not been set, then the settings are not saved in the input method's UserDefaults.
+ * The dataModelVersion field will always exist for Keyman 18 and later, but, for version 18 only, it will be located
+ * in the app UserDefaults instead of the shared app group UserDefaults
  */
-- (BOOL)inputMethodUserDefaultsExist
+- (BOOL)version18SettingsExistForInputMethod
 {
-  return ([self.appDefaults objectForKey:kSelectedKeyboardKey] != nil);
+  return ([self.appDefaults objectForKey:kDataModelVersion] != nil);
 }
 
 - (void)writeOptionForSelectedKeyboard:(NSString *)key withValue:(NSString*)value {
@@ -253,17 +193,6 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   }
 
   [self writeFullOptionsMap:newFullOptionsMap];
-}
-
-/**
- * For the first numbered version of the data model, the app stores the keyboards under the ~/Library directory
- * For versions before version 1, the keyboards were stored under the ~/Documents directory.
- */
-- (BOOL)dataModelWithKeyboardsInLibrary {
-  // [NSUserDefaults integerForKey] returns zero if the key does not exist
-  NSInteger dataModelVersion = [self.groupDefaults integerForKey:kDataModelVersion];
-  
-  return dataModelVersion >= kVersionStoreDataInLibraryDirectory;
 }
 
 - (NSString *)readSelectedKeyboard {
@@ -307,7 +236,6 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   [self.groupDefaults setObject:nil forKey:kEnabledKeyboardsKey];
 }
 
-
 /**
  * returns dictionary of persisted options for the single selected keyboard
  */
@@ -327,6 +255,13 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
 }
 
 /**
+ * Read options map from the obsolete app defaults location: used only for migration to group defaults
+ */
+- (NSDictionary *)readFullOptionsMapFromAppDefaults {
+  return [self.appDefaults dictionaryForKey:kPersistedOptionsKey];
+}
+
+/**
  * returns dictionary of all persisted options for all keyboards
  * (options are stored in UserDefaults as a map of maps)
  */
@@ -342,8 +277,62 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   return [self.groupDefaults removeObjectForKey:kPersistedOptionsKey];
 }
 
-- (void)convertSelectedKeyboardPathForKeyman18Migration {
-  NSString *selectedKeyboardPath = [self readSelectedKeyboard];
+- (BOOL)readShowOskOnActivate {
+  return [self.groupDefaults boolForKey:kShowOskOnActivate];
+}
+
+- (void)writeShowOskOnActivate:(BOOL)show {
+  [self.groupDefaults setBool:show forKey:kShowOskOnActivate];
+}
+
+- (BOOL)readForceSentryError {
+  return [self.groupDefaults boolForKey:kForceSentryError];
+}
+
+// MARK: Settings Migration
+
+- (void)migrateSettingsFromKeyman17 {
+  os_log_debug([KMLogs dataLog], "migrating settings in UserDefaults from Keyman 17 ");
+  
+  [self migrateSettingsFromKeyman17ToAppGroup];
+
+  // set kDataModelVersion for the current format
+  [self writeCurrentDataModelVersion];
+
+  [self removeMigratedInputMethodSettings];
+}
+
+/**
+ * Used only for setting migration from Keyman 17 to 19
+ * Read the settings in the input method's user defaults
+ * Convert paths from full path to partial path
+ * Write to share app group user defaults (and write to a different key for enabled keyboards)
+ */
+- (void)migrateSettingsFromKeyman17ToAppGroup {
+  [self convertSelectedKeyboardPathFromKeyman17];
+  [self convertActiveKeyboardArrayFromKeyman17];
+  
+  // read showOsk from one defaults suite to another
+  if ([self.appDefaults objectForKey:kShowOskOnActivate] != nil) {
+    BOOL showOsk = [self.appDefaults boolForKey:kShowOskOnActivate];
+    [self.groupDefaults setBool:showOsk forKey:kShowOskOnActivate];
+  }
+  
+  // read forceSentryError from one defaults suite to another
+  if ([self.appDefaults objectForKey:kForceSentryError] != nil) {
+    BOOL forceSentryError = [self.appDefaults boolForKey:kForceSentryError];
+    [self.groupDefaults setBool:forceSentryError forKey:kForceSentryError];
+  }
+  
+  [self convertOptionsPathsFromKeyman17];
+}
+
+/**
+ * Convert the selectedKeyboard path from the full path of Keyman 17 to a partial path.
+ * Read it from the app defaults and write it to the group defaults.
+ */
+- (void)convertSelectedKeyboardPathFromKeyman17 {
+  NSString *selectedKeyboardPath = [self.appDefaults objectForKey:kSelectedKeyboardKey];
   if (selectedKeyboardPath != nil) {
     NSString *newPathString = [self trimObsoleteKeyboardPath:selectedKeyboardPath];
     
@@ -351,6 +340,75 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
       [self writeSelectedKeyboard:newPathString];
       os_log_debug([KMLogs dataLog], "converted selected keyboard setting from '%{public}@' to '%{public}@'", selectedKeyboardPath, newPathString);
     }
+  }
+}
+
+/**
+ * Convert the activeKeyboards array and the full path for each keyboard from Keyman 17 to
+ * a partial path for each in the enabledKeyboards array.
+ * Read the array from the app defaults and write it to the group defaults.
+ */
+- (void)convertActiveKeyboardArrayFromKeyman17 {
+  // load from old location with old key name
+  NSArray *activeKeyboards = [self.appDefaults arrayForKey:kActiveKeyboardsKey];
+  if (activeKeyboards != nil) {
+    NSMutableArray *enabledKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
+    BOOL didConvert = NO;
+    
+    for (NSString *oldPath in activeKeyboards) {
+      // shorten from full path to partial path
+      NSString *newPath = [self trimObsoleteKeyboardPath:oldPath];
+      if ([oldPath isNotEqualTo:newPath]) {
+        [enabledKeyboards addObject:newPath];
+        os_log_debug([KMLogs dataLog], "converted enabled keyboard from old path '%{public}@' to '%{public}@'", oldPath, newPath);
+        // if we have adjusted at least one path, set flag
+        didConvert = YES;
+      } else {
+        // if, somehow, the path does not need converting then retain it in new array
+        [enabledKeyboards addObject:oldPath];
+      }
+    }
+    
+    // only write array to UserDefaults if we actually converted something
+    if (didConvert) {
+      [self writeEnabledKeyboards:enabledKeyboards];
+    }
+  }
+}
+
+/**
+ * Convert the options paths map from the full path of Keyman 17 to a partial path.
+ * Read it from the app defaults and write it to the group defaults.
+ */
+- (void)convertOptionsPathsFromKeyman17 {
+  NSDictionary * optionsMap = [self readFullOptionsMapFromAppDefaults];
+  NSMutableDictionary *mutableOptionsMap = nil;
+
+  if (optionsMap != nil) {
+    os_log_info([KMLogs configLog], "optionsMap != nil");
+    mutableOptionsMap = [[NSMutableDictionary alloc] initWithCapacity:0];
+    for (id key in optionsMap) {
+      os_log_info([KMLogs configLog], "persisted options found in UserDefaults with key = %{public}@", key);
+    }
+    for (NSString *keyboardPath in optionsMap) {
+      os_log_info([KMLogs configLog], "persisted options keyboard path = %{public}@", keyboardPath);
+      NSDictionary *keyboardOptions = [optionsMap objectForKey:keyboardPath];
+      
+      NSString *newPathString = [self trimObsoleteKeyboardPath:keyboardPath];
+      os_log_info([KMLogs configLog], "persisted options converted key = %{public}@", newPathString);
+
+      if ([keyboardPath isNotEqualTo:newPathString]) {
+        // insert options into new map with newly converted path as key
+        [mutableOptionsMap setObject:keyboardOptions forKey:newPathString];
+        os_log_debug([KMLogs dataLog], "converted option key from '%{public}@' to '%{public}@'", keyboardPath, newPathString);
+      } else {
+        // retain options that did not need converting
+        [mutableOptionsMap setObject:keyboardOptions forKey:keyboardPath];
+        os_log_debug([KMLogs dataLog], "no conversion needed, adding options for '%{public}@'", keyboardPath);
+      }
+    }
+    // write the full option map for all keyboards to the group UserDefaults
+    [self writeFullOptionsMap:mutableOptionsMap];
   }
 }
 
@@ -371,72 +429,60 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInGroupContain
   return newPath;
 }
 
-- (void)convertActiveKeyboardArrayForKeyman18Migration {
-  NSMutableArray *keyboards = [self enabledKeyboards];
-  NSMutableArray *convertedActiveKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
-  BOOL didConvert = NO;
-  
-  for (NSString *oldPath in keyboards) {
-    NSString *newPath = [self trimObsoleteKeyboardPath:oldPath];
-    if ([oldPath isNotEqualTo:newPath]) {
-      [convertedActiveKeyboards addObject:newPath];
-      os_log_debug([KMLogs dataLog], "converted active keyboard from old path '%{public}@' to '%{public}@'", oldPath, newPath);
-      // if we have adjusted at least one path, set flag
-      didConvert = YES;
-    } else {
-      // if, somehow, the path does not need converting then retain it in new array
-      [convertedActiveKeyboards addObject:oldPath];
-    }
+- (void)migrateSettingsFromKeyman18 {
+  os_log_debug([KMLogs dataLog], "migrating settings in UserDefaults from Keyman 18");
+  [self migrateSettingsFromKeyman18ToAppGroup];
+
+  // set kDataModelVersion for the current format
+  [self writeCurrentDataModelVersion];
+
+  [self removeMigratedInputMethodSettings];
+}
+
+/**
+ * Used only for setting migration from Keyman 18 to 19
+ * Read the settings in the input method's user defaults
+ * Write them to the shared app group user defaults
+ * Delete them from the input method's user defaults
+ */
+- (void)migrateSettingsFromKeyman18ToAppGroup {
+  NSString *selectedKeyboard = [self.appDefaults stringForKey:kSelectedKeyboardKey];
+  if (selectedKeyboard != nil) {
+    [self.groupDefaults setObject:selectedKeyboard forKey:kSelectedKeyboardKey];
+  }
+
+  NSArray * activeKeyboards = [self.appDefaults arrayForKey:kActiveKeyboardsKey];
+  if (activeKeyboards != nil) {
+    [self.groupDefaults setObject:activeKeyboards forKey:kEnabledKeyboardsKey];
+  }
+
+  if ([self.appDefaults objectForKey:kShowOskOnActivate] != nil) {
+    BOOL showOsk = [self.appDefaults boolForKey:kShowOskOnActivate];
+    [self.groupDefaults setBool:showOsk forKey:kShowOskOnActivate];
   }
   
-  // only write array to UserDefaults if we actually converted something
-  if (didConvert) {
-    [self writeEnabledKeyboards:convertedActiveKeyboards];
+  if ([self.appDefaults objectForKey:kForceSentryError] != nil) {
+    BOOL forceSentryError = [self.appDefaults boolForKey:kForceSentryError];
+    [self.groupDefaults setBool:forceSentryError forKey:kForceSentryError];
+  }
+  
+  NSDictionary * persistedOptions = [self.appDefaults dictionaryForKey:kPersistedOptionsKey];
+  if (persistedOptions != nil) {
+    [self.groupDefaults setObject:persistedOptions forKey:kPersistedOptionsKey];
   }
 }
 
-- (void)convertOptionsPathsForKeyman18Migration {
-  NSDictionary * optionsMap = [self readFullOptionsMap];
-  NSMutableDictionary *mutableOptionsMap = nil;
-  BOOL optionsChanged = NO;
-
-  if (optionsMap != nil) {
-    os_log_info([KMLogs configLog], "optionsMap != nil");
-    mutableOptionsMap = [[NSMutableDictionary alloc] initWithCapacity:0];
-    for(id key in optionsMap) {
-      os_log_info([KMLogs configLog], "persisted options found in UserDefaults with key = %{public}@", key);
-    }
-    for (NSString *key in optionsMap) {
-      NSString *newPathString = [self trimObsoleteKeyboardPath:key];
-      NSDictionary *optionsValue = [optionsMap objectForKey:key];
-
-      if ([key isNotEqualTo:newPathString]) {
-        optionsChanged = YES;
-        
-        // insert options into new map with newly converted path as key
-        [mutableOptionsMap setObject:optionsValue forKey:newPathString];
-        os_log_debug([KMLogs dataLog], "converted option key from '%{public}@' to '%{public}@'", key, newPathString);
-      } else {
-        // retain options that did not need converting
-        [mutableOptionsMap setObject:optionsValue forKey:key];
-      }
-    }
-    if (optionsChanged) {
-      [self writeFullOptionsMap:mutableOptionsMap];
-    }
-  }
+/**
+ * Removes input method settings that have been migrated to the app group.
+ * Does not eradicate everything but only those created by Keyman code.
+ * For example, the OSK window coordinates, created by NSWindow, must remain.
+ */
+- (void)removeMigratedInputMethodSettings {
+  [self.appDefaults removeObjectForKey:kSelectedKeyboardKey];
+  [self.appDefaults removeObjectForKey:kActiveKeyboardsKey];
+  [self.appDefaults removeObjectForKey:kShowOskOnActivate];
+  [self.appDefaults removeObjectForKey:kForceSentryError];
+  [self.appDefaults removeObjectForKey:kPersistedOptionsKey];
+  [self.appDefaults removeObjectForKey:kDataModelVersion];
 }
-
-- (BOOL)readShowOskOnActivate {
-  return [self.groupDefaults boolForKey:kShowOskOnActivate];
-}
-
-- (void)writeShowOskOnActivate:(BOOL)show {
-  [self.groupDefaults setBool:show forKey:kShowOskOnActivate];
-}
-
-- (BOOL)readForceSentryError {
-  return [self.groupDefaults boolForKey:kForceSentryError];
-}
-
 @end
