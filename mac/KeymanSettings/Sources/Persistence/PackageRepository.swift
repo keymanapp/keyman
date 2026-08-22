@@ -67,21 +67,18 @@ public class PackageRepository: PackageRepo {
    */
   public func loadAllPackages() -> [KeymanPackage] {
     var installedPackages: [KeymanPackage] = []
-    let packageSourceArray = self.readKeymanPackagesForKeyman19()
+    let packageSourceMap = self.readKeymanPackagesForKeyman19()
     
-    // create a KeymanPackage object for each PackageSource object and insert it in the array if it is valid
-    for source in packageSourceArray {
-      let package = KeymanPackage(packageSource: source)
+    for (url, source) in packageSourceMap {
+      let package = KeymanPackage(packageUrl: url, packageSource: source)
       do {
         try package.validate()
-
-        // only install packages that pass validation
         installedPackages.append(package)
       } catch {
-        print("** package '\(source.packageName)' is not valid: \(error.localizedDescription)")
+        print("validation failed for \(url) with error: \(error)")
       }
     }
-    
+
     return installedPackages
   }
   
@@ -94,7 +91,7 @@ public class PackageRepository: PackageRepo {
     print("loadSinglePackage from url: \(packageUrl)")
     guard let source =  try readPackageFromDirectory(packageDirectoryUrl: packageUrl) else { throw InstallPackageError.invalidUrl }
       
-    let package = KeymanPackage(packageSource: source)
+    let package = KeymanPackage(packageUrl: packageUrl, packageSource: source)
     try package.validate()
     return package
   }
@@ -212,15 +209,15 @@ public class PackageRepository: PackageRepo {
   /**
    * read packages at Keyman 19 location, inside Group Containers directory
    */
-  func readKeymanPackagesForKeyman19() -> [PackageSource] {
+  func readKeymanPackagesForKeyman19() -> [URL: PackageSource] {
     return readPackageSource(packageDirectoryUrl: self.pathUtil.keyman19PackagesDirectory)
   }
   
   /**
    * loop through all the sub-directories in the packages directory and try to read them as packages
    */
-  func readPackageSource(packageDirectoryUrl: URL) -> [PackageSource] {
-    var packages: [PackageSource] = []
+  func readPackageSource(packageDirectoryUrl: URL) -> [URL: PackageSource] {
+    var packageMap: [URL: PackageSource] = [:]
     
     do {
       // Get the URLs for all items in the directory that are not hidden
@@ -235,7 +232,7 @@ public class PackageRepository: PackageRepo {
         if (itemUrl.hasDirectoryPath) {
           do {
             if let packageSource =  try readPackageFromDirectory(packageDirectoryUrl: itemUrl) {
-              packages.append(packageSource)
+              packageMap[itemUrl] = packageSource
             }
           } catch let error as LoadPackageError {
             print("** package at \(itemUrl) could not be loaded: \(error.localizedDescription)")
@@ -246,8 +243,8 @@ public class PackageRepository: PackageRepo {
       print("Failed to read directory: \(error.localizedDescription)")
     }
     
-    print("\(packages.count) packages read")
-    return packages
+    print("\(packageMap.count) packages read")
+    return packageMap
   }
   
   /**
@@ -262,9 +259,8 @@ public class PackageRepository: PackageRepo {
       throw LoadPackageError.kmpJsonFileNotFound
     }
     
-    // use try without do block
-    // if an error occurs, it will not be handled but propagated to caller
-    if let source = try readPackage(packageDirectoryUrl: packageDirectoryUrl, kmpFileUrl: kmpJsonFileUrl) {
+    // if an error occurs, it will be propagated to caller
+    if let source = try readPackage(kmpFileUrl: kmpJsonFileUrl) {
       packageSource = source
     }
     
@@ -274,17 +270,12 @@ public class PackageRepository: PackageRepo {
   /**
    * read and parse the kmp.json file at the specified URL
    */
-  func readPackage(packageDirectoryUrl: URL, kmpFileUrl: URL) throws -> PackageSource? {
+  func readPackage(kmpFileUrl: URL) throws -> PackageSource? {
     var packageSource: PackageSource?
     do {
       let jsonData = try Data(contentsOf: kmpFileUrl, options: .mappedIfSafe)
-      var source: PackageSource = try JSONDecoder().decode(PackageSource.self, from: jsonData)
+      packageSource = try JSONDecoder().decode(PackageSource.self, from: jsonData)
       
-      print("readPackage, packageName: \(source.packageName)")
-      // save the keyboard directory and path of the kmp.json for this keyboard
-      source.directoryUrl = packageDirectoryUrl
-      source.kmpJsonFileUrl = kmpFileUrl
-      packageSource = source
     } catch let error as LoadPackageError {
       // if we encounter a LoadPackageError, propagate it
       throw error
