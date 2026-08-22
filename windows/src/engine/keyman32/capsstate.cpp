@@ -35,7 +35,7 @@ BOOL IsCapsLockOn(void) {
  * changed while Keyman was not aware of it
  */
 void RefreshToggleState(void) {
-  DWORD n = Globals::get_ShiftState();
+  DWORD previousShiftState = Globals::get_ShiftState();
 
   if (GetKeyState(VK_CAPITAL) & 1) *Globals::ShiftState() |= CAPITALFLAG;
   else *Globals::ShiftState() &= ~CAPITALFLAG;
