@@ -68,7 +68,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateKeyboard(GUID *profile) 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
 
-  RefreshToggleState();   // #16422 - a keyboard switch does not change window focus
+  RefreshToggleState();
 
   if(profile != NULL) {
     for(int i = 0; i < _td->nKeyboards; i++) {
