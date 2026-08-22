@@ -30,12 +30,10 @@ BOOL IsCapsLockOn(void) {
   return GetKeyState(VK_CAPITAL) & 1;
 }
 
-/*
-  RefreshToggleState:
-
-  Resyncs the caps and numlock state, because it may have been changed while
-  Keyman was not aware of it
-*/
+/**
+ * Resync the Caps Lock and Num Lock state, because it may have been 
+ * changed while Keyman was not aware of it
+ */
 void RefreshToggleState(void) {
   DWORD n = Globals::get_ShiftState();
 
