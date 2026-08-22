@@ -247,6 +247,9 @@ public class InputMethodUtil {
     NSWorkspace.shared.openApplication(at: inputMethodUrl, configuration: openConfig) { (app, error) in
       if let error = error {
         print("Could not launch Keyman input method at \(inputMethodUrl), due to error: \(error.localizedDescription), code: \(error._code)")
+        Thread.callStackSymbols.forEach { symbol in
+            print(symbol)
+        }
       }
     }
   }

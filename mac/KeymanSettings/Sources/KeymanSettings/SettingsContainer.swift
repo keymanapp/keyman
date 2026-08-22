@@ -177,6 +177,18 @@ public class SettingsContainer : ObservableObject {
   }
 
   /**
+   * Called when user chooses to cancel downgrade of package
+   */
+  public func packageInstallationFailed() {
+    if let install = self.packageInstall {
+      print("packageInstallationFailed")
+      install.cleanupFailedInstallation()
+    }
+  
+    self.packageInstall = nil
+  }
+
+  /**
    *  for each enabled keyboard in the package being installed, add it to the enabled keyboards set and save it in the UserDefaults
    */
   func addEnabledKeyboards(for installedPackage: KeymanPackage) {
