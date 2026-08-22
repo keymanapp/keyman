@@ -26,7 +26,7 @@ struct RestartComputerView: View {
         .font(.system(size: 100))
         .padding(16)
       Text("Restart your Mac to complete the installation. After restarting, open Keyman Configuration again if it doesn't launch automatically.")
-        .multilineTextAlignment(.center)
+        .multilineTextAlignment(.leading)
         .padding(.bottom, 8)
       
       Spacer()

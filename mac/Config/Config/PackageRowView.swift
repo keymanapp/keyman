@@ -62,7 +62,7 @@ public struct PackageRowView: View {
               // if the package contains one keyboard, show the keyboard name, otherwise show the package name
               Text(isSingleKeyboardPackage ? keyboard.name: package.packageName)
                 .font(.title)
-              
+
               // see keyboard help button
               if let url = package.helpFileUrl {
                 IconButtonView(
@@ -84,8 +84,6 @@ public struct PackageRowView: View {
                   .toggleStyle(.switch)
                   .gridColumnAlignment(.leading)
               }
-              
-              
             }
             
             // if the package contains multiple keyboards shows an HStack with the keyboard name and toggle button for each keyboard in the package
@@ -124,6 +122,8 @@ public struct PackageRowView: View {
         }
       }
     }
+    // animate changes in the package list
+    .animation(.easeInOut, value: packages)
     // binds the visibilty state to the alert builder
     .alert("Are you sure you want to delete the keyboard \"\(selectedPackage?.packageName ?? "")\"?",
            isPresented: $isShowingDeleteAlert,

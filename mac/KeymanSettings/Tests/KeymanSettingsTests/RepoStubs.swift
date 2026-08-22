@@ -94,7 +94,7 @@ class PackageRepoStub: PackageRepo {
     return URL(fileURLWithPath: "")
   }
   
-  func getInstallationUrlForPackageName(packageName: String) -> URL {
+  func buildInstallationUrlForPackageName(packageName: String) -> URL {
     return URL(fileURLWithPath: "")
   }
   
