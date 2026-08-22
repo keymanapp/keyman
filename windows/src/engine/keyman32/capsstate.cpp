@@ -43,5 +43,5 @@ void RefreshToggleState(void) {
   if (GetKeyState(VK_NUMLOCK) & 1) *Globals::ShiftState() |= NUMLOCKFLAG;
   else *Globals::ShiftState() &= ~NUMLOCKFLAG;
 
-  SendDebugMessageFormat("Enter: %x Exit: %x", n, Globals::get_ShiftState());
+  SendDebugMessageFormat("Enter: %x Exit: %x", previousShiftState, Globals::get_ShiftState());
 }
