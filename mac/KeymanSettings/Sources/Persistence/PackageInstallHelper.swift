@@ -121,24 +121,6 @@ public class PackageInstallHelper: Identifiable {
     }
   }
 
-//  /**
-//   * Unzip and load the downloaded package
-//   */
-//  func unzipAndLoadPackage(for kmpFileUrl: URL) throws {
-//    // unzip to the temp directory
-//    try self.packageRepository.unzipKmpFile(at: kmpFileUrl, to: self.temporaryPackageLocation)
-//    
-//    // load the unzipped package from the temp directory and save a reference to it
-//    let package = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
-//    self.packageToInstall = package
-//
-//    // now that the package is loaded, we can build the installation directory from the packageName
-//    self.installPackageLocation = self.packageRepository.buildInstallationUrlForPackageName(packageName: package.packageName)
-//
-//    // now that we know what we are installing, determine the type of install
-//    self.packageInstallationType = self.determinePackageInstallationType()
-//  }
-//  
   /**
    * Decides what type of package installation this is:
    * - a new package
@@ -184,30 +166,40 @@ public class PackageInstallHelper: Identifiable {
   
   /**
    * Install all fonts found in the package (files with an extension of .ttf or .otf).
-   * The fonts have been copied to the installation directory, so they sit at `installPackageLocation`
+   * The package has been copied to the installation directory, so all fonts are located at `installPackageLocation`
+   * If any fonts fail to install, log the error but continue to the next font
    */
-  func installFontsForPackage() throws {
+  func installFontsForPackage() {
     let fileManager = FileManager.default
     
     guard let installLocation = self.installPackageLocation else {
       print("error: installPackageLocation not set when installing fonts")
-      throw InstallPackageError.internalError
+      return
     }
     
-    let fileUrls = try fileManager.contentsOfDirectory(
-      at: installLocation,
-      includingPropertiesForKeys: [.isDirectoryKey],
-      options: [.skipsHiddenFiles]
-    )
+    var fileUrls: [URL] = []
+    do {
+      fileUrls = try fileManager.contentsOfDirectory(
+        at: installLocation,
+        includingPropertiesForKeys: [.isDirectoryKey],
+        options: [.skipsHiddenFiles]) }
+    catch {
+      print("error: unable to get contents of directory at \(installLocation.path) with error: \(String(describing: error))")
+    }
     
     for fontUrl in fileUrls {
       let ext = fontUrl.pathExtension.lowercased()
       if ext == "ttf" || ext == "otf" {
-        if self.validateFont(at: fontUrl) {
+        // if a font fails to install, log error and continue
+        guard self.validateFont(at: fontUrl) else {
+          print("error: the font \(fontUrl.lastPathComponent) is not valid")
+          continue
+        }
+        do {
           try self.copyFontToFontsDirectory(at: fontUrl)
           try self.registerFontWithSystem(at: fontUrl)
-        } else {
-          print("error: the font \(fontUrl.lastPathComponent) is not valid")
+        } catch {
+          print("error: the font \(fontUrl.lastPathComponent) could not be installed with error: \(String(describing: error))")
         }
       }
     }
@@ -225,25 +217,21 @@ public class PackageInstallHelper: Identifiable {
 
   /**
    * Copy the font to the fonts directory and return the URL for its new location.
+   * If a font of the same name already exists, then remove it before copying the new one.
    */
   func copyFontToFontsDirectory(at fontUrl: URL) throws {
     let fontsDirectory = KeymanPaths.getFontsDirectory
     let fontDestinationUrl = fontsDirectory.appendingPathComponent(fontUrl.lastPathComponent)
     let fileManager = FileManager.default
-
+    
     // remove the font from the fonts directory just in case it is an old one
     if fileManager.fileExists(atPath: fontDestinationUrl.path) {
       print("removed existing font: \(fontDestinationUrl.lastPathComponent)")
       try? fileManager.removeItem(at: fontDestinationUrl)
     }
     
-    do {
-      print("added font: \(fontDestinationUrl.lastPathComponent)")
-      try fileManager.copyItem(at: fontUrl, to: fontDestinationUrl)
-    } catch {
-      print("Error copying font: \(error.localizedDescription)")
-      throw InstallPackageError.fontCopyError
-    }
+    try fileManager.copyItem(at: fontUrl, to: fontDestinationUrl)
+    print("added font: \(fontDestinationUrl.lastPathComponent)")
   }
 
   /**
@@ -275,7 +263,7 @@ public class PackageInstallHelper: Identifiable {
           }
 
           // if it's any other error, capture it to throw later
-          print("registerFontWithSystem failed for \(fontUrl.lastPathComponent), error: \(cfError.localizedDescription)")
+          print("registerFontWithSystem failed for \(fontUrl.lastPathComponent), error: \(String(describing: cfError))")
           registrationError = InstallPackageError.fontRegistrationError
         }
 
@@ -315,9 +303,6 @@ public class PackageInstallHelper: Identifiable {
    * Install the newly downloaded package (no existing package to replace)
    */
   func installNewPackage() throws {
-    try self.movePackageFromTemporaryToInstalled()
-    try self.installFontsForPackage()
-    
     if (self.isDownload) {
       do {
         try self.deleteDownloadedKmpFile()
@@ -325,6 +310,9 @@ public class PackageInstallHelper: Identifiable {
         print("installNewPackage failed to delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent)")
       }
     }
+
+    try self.movePackageFromTemporaryToInstalled()
+    try self.installFontsForPackage()
   }
   
   /**

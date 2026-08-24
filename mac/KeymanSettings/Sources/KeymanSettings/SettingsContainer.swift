@@ -33,7 +33,7 @@ public enum InstallPackageError: LocalizedError {
 
   public var errorDescription: String? {
     switch self {
-    case .packageInstallationAlreadyInProgress: return "A download is already in progress."
+    case .packageInstallationAlreadyInProgress: return "A package installatino is already in progress."
     case .fontCopyError: return "There was an error copying the font."
     case .fontRegistrationError: return "There was an error registering the font."
     case .internalError: return "An internal error occurred."
@@ -372,7 +372,7 @@ public class SettingsContainer : ObservableObject {
   // MARK: Package Download and Installation
   
   /**
-   * check whether a download is already in progress
+   * check whether an installation is already in progress
    */
   public func isInstallationInProgress() -> Bool {
     return self.packageInstall != nil
