@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 19.0.273 alpha 2026-08-22
+
+* feat(linux): use display language for keyboard search (#16393)
+
+## 19.0.272 alpha 2026-08-21
+
+* chore(mac): put coreutils on path on mac and improve docs (#16409)
+* docs(mac): add XCode version requirement (#16408)
+* fix(developer): clean kmc-convert build.sh with new publish patterns (#16412)
+* feat(developer): kmc convert follow-up tasks (#16420)
+* docs(android): document autocorrect toggle within Android help (#16405)
+* docs(ios): document autocorrect toggle within iOS help (#16406)
+
 ## 19.0.271 alpha 2026-08-20
 
 * feat(ios): pass current display language to keyboard download (#16401)
