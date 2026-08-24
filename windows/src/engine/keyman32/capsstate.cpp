@@ -31,8 +31,10 @@ BOOL IsCapsLockOn(void) {
 }
 
 /**
- * Resync the Caps Lock and Num Lock state, because it may have been 
- * changed while Keyman was not aware of it
+ * Resync the Caps Lock and Num Lock state cache.
+ * 
+ * Use when state may be stale after focus changes or when the toggle keys
+ * changed while this Keyman engine instance was not processing key events.
  */
 void RefreshToggleState(void) {
   DWORD previousShiftState = Globals::get_ShiftState();
