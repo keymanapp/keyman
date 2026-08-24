@@ -11,15 +11,15 @@ import SwiftUI
 import KeymanSettings
 
 struct VisualEffectBlur: NSViewRepresentable {
-    func makeNSView(context: Context) -> NSVisualEffectView {
-        let view = NSVisualEffectView()
-        view.material = .hudWindow      // Matches native dark/light HUD styling
-        view.blendingMode = .withinWindow
-        view.state = .active
-        return view
-    }
-    
-    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
+  func makeNSView(context: Context) -> NSVisualEffectView {
+    let view = NSVisualEffectView()
+    view.material = .hudWindow      // Matches native dark/light HUD styling
+    view.blendingMode = .withinWindow
+    view.state = .active
+    return view
+  }
+  
+  func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
 }
 
 struct AddKeyboardView: View {
@@ -52,7 +52,7 @@ struct AddKeyboardView: View {
             .foregroundColor(.secondary)
         }
         .padding(24)
-        // Gives it a beautiful native translucent macOS look
+        // translucent macOS look
         .background(VisualEffectBlur())
         .cornerRadius(12)
         .shadow(radius: 10)
@@ -64,9 +64,17 @@ struct AddKeyboardView: View {
       // Placement determines where on the bar it sits
       ToolbarItem(placement: .cancellationAction) {
         Button("Close") {
+          print("close button clicked")
           dismissAddKeyboardView()
+          if settings.isInstallationInProgress() {
+            settings.userCanceledPackageInstallation()
+          }
         }
       }
+    }
+    .onDisappear {
+      print("AddKeyboardView onDisappear")
+      downloadCoordinator.cancelActiveDownload()
     }
     .alert("Package Installation Failed", isPresented: $downloadCoordinator.loadPackageFailed) {
       Button("OK", role: .cancel) { }

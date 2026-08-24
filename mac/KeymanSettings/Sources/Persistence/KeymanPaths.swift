@@ -50,11 +50,32 @@ public struct KeymanPaths {
   static private let preKeyman19PackagesDirectoryName = "Keyman-Keyboards"
   static private let keymanSubdirectoryName = keymanBundleId
   
+  static public var getFontsDirectory: URL {
+    // force unwrap is safe here because the system user domain library always exists
+    let libraryURL = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first!
+    let fontsDirectory = libraryURL.appendingPathComponent(fontsDirectoryName, isDirectory: true)
+    
+    // if for some reason it doesn't exist, create it
+    let fileManager = FileManager.default
+    if !fileManager.fileExists(atPath: fontsDirectory.path) {
+      do {
+        try fileManager.createDirectory(at: fontsDirectory, withIntermediateDirectories: true, attributes: nil)
+      } catch {
+        print("error: could not create fonts directory: \(error.localizedDescription)")
+      }
+    }
+
+    return fontsDirectory
+  }
+  
   // keyman 19 directory names
   static private let containerPreferencesPartialPath = "Library/Preferences"
   static private let containerPackagesPartialPath = "Library/Application Support/Keyman-Packages"
   static private let containerTempPartialPath = "Library/Application Support/temp"
 
+  // system directory names
+  static private let fontsDirectoryName = "Fonts"
+  
   // keyman 17 and earlier
   let keyman17DocumentsDirectory: URL?
   let keyman17PackagesDirectory: URL?
@@ -92,9 +113,9 @@ public struct KeymanPaths {
     self.keyman19ContainerDirectory = containerDir
     self.keyman19PreferencesDirectory = KeymanPaths.buildContainerPreferencesUrl(container: containerDir)
     
-    
     self.keyman19PackagesDirectory = KeymanPaths.buildKeyman19PackagesUrl(container: containerDir)
     self.keyman19TempDirectory = KeymanPaths.buildKeyman19TempUrl(container: containerDir)
+    
     //self.logPaths()
   }
   

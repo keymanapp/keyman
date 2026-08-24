@@ -29,11 +29,7 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
     return info.version.description
   }
   var copyright: String? {
-    if let copy = info.copyright?.description {
-      return copy
-    } else {
-      return nil
-    }
+    return info.copyright?.description
   }
   var readmeFilename: String? {
     if let filename = options.readmeFile {
@@ -47,9 +43,8 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
     return nil
   }
   var helpFilename: String? {
-    if let filename = options.welcomeFile {
-      return filename
-    }
+    if let filename = options.welcomeFile { return filename }
+
     if let fileArray = self.files {
       if fileArray.contains(where: { $0.name == defaultHelpFilename }) {
         return defaultHelpFilename
@@ -59,11 +54,7 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
     return nil
   }
   var graphicFilename: String? {
-    if let filename = options.graphicFile {
-      return filename
-    } else {
-      return nil
-    }
+    return options.graphicFile
   }
   
   enum CodingKeys: String, CodingKey {

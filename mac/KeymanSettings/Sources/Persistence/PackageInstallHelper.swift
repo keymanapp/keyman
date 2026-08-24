@@ -10,6 +10,7 @@
  */
 
 import Foundation
+import CoreText
 
 public enum PackageInstallationType {
   case newPackage(String)
@@ -36,9 +37,11 @@ public class PackageInstallHelper: Identifiable {
   public let id = UUID()
   public let temporaryKmpFileLocation: URL
   let temporaryPackageLocation: URL
-  let installPackageLocation: URL
   let installedPackages: [KeymanPackage]    // needed to check for existing package after download
   let isDownload: Bool                      // if not download, then the package was opened from disk or dropped
+  
+  // following properties cannot be set until new package is unzipped and loaded
+  public private(set) var installPackageLocation: URL?          // derived from new package name
   public private(set) var packageToInstall: KeymanPackage?      // the newly downloaded package
   public private(set) var packageToReplace: KeymanPackage?      // the package to replace, if it exists
   public private(set) var packageInstallationType: PackageInstallationType?
@@ -49,16 +52,15 @@ public class PackageInstallHelper: Identifiable {
 
   fileprivate let packageRepository: PackageRepo
   
-  public init(filename: String, packageName: String, packageRepo: PackageRepo, installedPackages: [KeymanPackage], isDownload: Bool) {
+  public init(filename: String, packageRepo: PackageRepo, installedPackages: [KeymanPackage], isDownload: Bool) {
     self.packageRepository = packageRepo
     self.temporaryKmpFileLocation = self.packageRepository.getDownloadUrl(for: filename)
-    self.temporaryPackageLocation = self.packageRepository.getUnzipDestinationUrl(for: packageName)
-    self.installPackageLocation = self.packageRepository.buildInstallationUrlForPackageName(packageName: packageName)
+    
+    //  filename minus .kmp extension
+    let directoryName = filename.replacingOccurrences(of: kmpFileExtension, with: "")
+    self.temporaryPackageLocation = self.packageRepository.getUnzipDestinationUrl(for: directoryName)
     self.installedPackages = installedPackages
     self.isDownload = isDownload
-    
-    // cannot be initialized until after download when packageName of new package is known
-    self.packageToReplace = nil
     
     // if any packages are remaining from an earlier download, delete them
     self.packageRepository.cleanupTempDirectory()
@@ -72,7 +74,7 @@ public class PackageInstallHelper: Identifiable {
     
     try self.prepareToInstall(for: kmpFileUrl)
   }
-  
+
   /**
    * Indicates that a package is ready to be unzipped and loaded
    */
@@ -80,7 +82,18 @@ public class PackageInstallHelper: Identifiable {
     print ("prepareToInstall \(kmpFileUrl)")
     
     do {
-      try self.unzipAndLoadPackage(for: kmpFileUrl)
+      // unzip to the temp directory
+      try self.packageRepository.unzipKmpFile(at: kmpFileUrl, to: self.temporaryPackageLocation)
+      
+      // load the unzipped package from the temp directory and save a reference to it
+      let package = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
+      self.packageToInstall = package
+
+      // now that the package is loaded, we can build the installation directory from the packageName
+      self.installPackageLocation = self.packageRepository.buildInstallationUrlForPackageName(packageName: package.packageName)
+
+      // now that we know what we are installing, determine the type of install
+      self.packageInstallationType = self.determinePackageInstallationType()
     } catch {
       self.cleanupFailedInstallation()
       print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
@@ -108,20 +121,24 @@ public class PackageInstallHelper: Identifiable {
     }
   }
 
-  /**
-   * Unzip and load the downloaded package
-   */
-  func unzipAndLoadPackage(for kmpFileUrl: URL) throws {
-    // unzip to the temp directory
-    try self.packageRepository.unzipKmpFile(at: kmpFileUrl, to: self.temporaryPackageLocation)
-    
-    // load the unzipped package from the temp directory and save a reference to it
-    self.packageToInstall = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
-    
-    // now that we know what we are installing, determine the type of install
-    self.packageInstallationType = self.determinePackageInstallationType()
-  }
-  
+//  /**
+//   * Unzip and load the downloaded package
+//   */
+//  func unzipAndLoadPackage(for kmpFileUrl: URL) throws {
+//    // unzip to the temp directory
+//    try self.packageRepository.unzipKmpFile(at: kmpFileUrl, to: self.temporaryPackageLocation)
+//    
+//    // load the unzipped package from the temp directory and save a reference to it
+//    let package = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
+//    self.packageToInstall = package
+//
+//    // now that the package is loaded, we can build the installation directory from the packageName
+//    self.installPackageLocation = self.packageRepository.buildInstallationUrlForPackageName(packageName: package.packageName)
+//
+//    // now that we know what we are installing, determine the type of install
+//    self.packageInstallationType = self.determinePackageInstallationType()
+//  }
+//  
   /**
    * Decides what type of package installation this is:
    * - a new package
@@ -166,6 +183,122 @@ public class PackageInstallHelper: Identifiable {
   }
   
   /**
+   * Install all fonts found in the package (files with an extension of .ttf or .otf).
+   * The fonts have been copied to the installation directory, so they sit at `installPackageLocation`
+   */
+  func installFontsForPackage() throws {
+    let fileManager = FileManager.default
+    
+    guard let installLocation = self.installPackageLocation else {
+      print("error: installPackageLocation not set when installing fonts")
+      throw InstallPackageError.internalError
+    }
+    
+    let fileUrls = try fileManager.contentsOfDirectory(
+      at: installLocation,
+      includingPropertiesForKeys: [.isDirectoryKey],
+      options: [.skipsHiddenFiles]
+    )
+    
+    for fontUrl in fileUrls {
+      let ext = fontUrl.pathExtension.lowercased()
+      if ext == "ttf" || ext == "otf" {
+        if self.validateFont(at: fontUrl) {
+          try self.copyFontToFontsDirectory(at: fontUrl)
+          try self.registerFontWithSystem(at: fontUrl)
+        } else {
+          print("error: the font \(fontUrl.lastPathComponent) is not valid")
+        }
+      }
+    }
+  }
+  
+  /**
+   * Check to see whether the font appears to be valid before installing it.
+   */
+  func validateFont(at url: URL) -> Bool {
+      guard let descriptors = CTFontManagerCreateFontDescriptorsFromURL(url as CFURL) as? [CTFontDescriptor] else {
+          return false
+      }
+      return !descriptors.isEmpty
+  }
+
+  /**
+   * Copy the font to the fonts directory and return the URL for its new location.
+   */
+  func copyFontToFontsDirectory(at fontUrl: URL) throws {
+    let fontsDirectory = KeymanPaths.getFontsDirectory
+    let fontDestinationUrl = fontsDirectory.appendingPathComponent(fontUrl.lastPathComponent)
+    let fileManager = FileManager.default
+
+    // remove the font from the fonts directory just in case it is an old one
+    if fileManager.fileExists(atPath: fontDestinationUrl.path) {
+      print("removed existing font: \(fontDestinationUrl.lastPathComponent)")
+      try? fileManager.removeItem(at: fontDestinationUrl)
+    }
+    
+    do {
+      print("added font: \(fontDestinationUrl.lastPathComponent)")
+      try fileManager.copyItem(at: fontUrl, to: fontDestinationUrl)
+    } catch {
+      print("Error copying font: \(error.localizedDescription)")
+      throw InstallPackageError.fontCopyError
+    }
+  }
+
+  /**
+   * Register the font in the macOS font manager.
+   * The scope is specified as `CTFontManagerScope.user` which makes the font available to any app
+   * and causes it to appear in the macOS Font Book application.
+   */
+  func registerFontWithSystem(at fontUrl: URL) throws {
+    let dispatchGroup = DispatchGroup()
+    var registrationError: Error?
+    
+    // pause current thread until background tasks are complete
+    dispatchGroup.enter()
+    
+    // CTFontManagerRegisterFontURLs returns void -- errors must be captured in the block
+    CTFontManagerRegisterFontURLs([fontUrl] as CFArray, .user, true) { (errors, done) -> Bool in
+      let errorArray = errors as? [CFError] ?? []
+      
+      if !errorArray.isEmpty {
+        
+        for cfError in errorArray {
+          let errorCode = CFErrorGetCode(cfError)
+          
+          // code 105 = kCTFontManagerErrorAlreadyRegistered
+          // It is safe to ignore because the font is
+          if errorCode == 105 {
+            print("font \(fontUrl.lastPathComponent) is already registered.")
+            continue
+          }
+
+          // if it's any other error, capture it to throw later
+          print("registerFontWithSystem failed for \(fontUrl.lastPathComponent), error: \(cfError.localizedDescription)")
+          registrationError = InstallPackageError.fontRegistrationError
+        }
+
+        dispatchGroup.leave()
+        return false // stop registration execution
+      }
+      
+      if done {
+        dispatchGroup.leave()
+      }
+      return true // Continue processing
+    }
+    
+    // wait synchronously for CoreText to finish processing the font file
+    dispatchGroup.wait()
+    
+    // throw an error out to your installation pipeline if registration failed
+    if let error = registrationError {
+      throw error
+    }
+  }
+
+  /**
    * Check whether a package of the same name is already installed which may be replaced.
    */
   func checkForExistingPackage() -> Bool {
@@ -183,6 +316,8 @@ public class PackageInstallHelper: Identifiable {
    */
   func installNewPackage() throws {
     try self.movePackageFromTemporaryToInstalled()
+    try self.installFontsForPackage()
+    
     if (self.isDownload) {
       do {
         try self.deleteDownloadedKmpFile()
@@ -205,6 +340,7 @@ public class PackageInstallHelper: Identifiable {
       }
     }
     try self.movePackageFromTemporaryToInstalled()
+    try self.installFontsForPackage()
   }
   
   /**
@@ -230,18 +366,22 @@ public class PackageInstallHelper: Identifiable {
    * Delete the existing installed package that matches the downloaded package
    */
   func deleteInstalledPackage() throws {
-    try FileManager.default.removeItem(at: self.installPackageLocation)
+    if let installLocation = self.installPackageLocation {
+      try FileManager.default.removeItem(at: installLocation)
+    }
   }
   
   /**
    * Move the downloaded package into the keyman packages directory.
    */
   func movePackageFromTemporaryToInstalled() throws {
-    try FileManager.default.moveItem(at: self.temporaryPackageLocation, to: self.installPackageLocation)
-    
-    // Update the KeymanPackage object with its new location
-    if let package = self.packageToInstall {
-      package.sourceDirectoryUrl = self.installPackageLocation
+    if let installLocation = self.installPackageLocation {
+      try FileManager.default.moveItem(at: self.temporaryPackageLocation, to: installLocation)
+      
+      // Update the KeymanPackage object with its new location
+      if let package = self.packageToInstall {
+        package.sourceDirectoryUrl = installLocation
+      }
     }
   }
   

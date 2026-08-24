@@ -26,12 +26,16 @@ import Combine
 import ZIPFoundation
 
 public enum InstallPackageError: LocalizedError {
-  case downloadInProgress
+  case packageInstallationAlreadyInProgress
+  case fontCopyError
+  case fontRegistrationError
   case internalError // due to invalid state, should never occur
 
   public var errorDescription: String? {
     switch self {
-    case .downloadInProgress: return "A download is already in progress."
+    case .packageInstallationAlreadyInProgress: return "A download is already in progress."
+    case .fontCopyError: return "There was an error copying the font."
+    case .fontRegistrationError: return "There was an error registering the font."
     case .internalError: return "An internal error occurred."
     }
   }
@@ -63,8 +67,8 @@ public enum DropKmpError: LocalizedError {
   }
 }
 
-private let kmpFileExtension = ".kmp"
-private let kmpFileExtensionWithoutDot = "kmp"
+package let kmpFileExtension = ".kmp"
+package let kmpFileExtensionWithoutDot = "kmp"
 
 @MainActor // run on the main actor since data is published directly to the UI
 public class SettingsContainer : ObservableObject {
@@ -85,7 +89,7 @@ public class SettingsContainer : ObservableObject {
   @Published public private(set) var multiKeyboardPackages: [KeymanPackage]
 
   // when a new package is being installed, it is tracked here
-  public private(set) var packageInstall: PackageInstallHelper? = nil
+  fileprivate var packageInstall: PackageInstallHelper? = nil
   
   fileprivate let packageRepository: PackageRepo
   fileprivate let defaultsRepository: DefaultsRepo
@@ -170,10 +174,8 @@ public class SettingsContainer : ObservableObject {
    * Called when user chooses to cancel downgrade of package
    */
   public func userCanceledPackageInstallation() {
-    if let install = self.packageInstall {
-      print("user cancelled package installation")
-      install.cleanupFailedInstallation()
-    }
+    print("user cancelled package installation")
+    self.packageInstall?.cleanupFailedInstallation()
   
     self.packageInstall = nil
   }
@@ -182,10 +184,8 @@ public class SettingsContainer : ObservableObject {
    * Called when user chooses to cancel downgrade of package
    */
   public func packageInstallationFailed() {
-    if let install = self.packageInstall {
-      print("packageInstallationFailed")
-      install.cleanupFailedInstallation()
-    }
+    print("packageInstallationFailed")
+    self.packageInstall?.cleanupFailedInstallation()
   
     self.packageInstall = nil
   }
@@ -374,7 +374,7 @@ public class SettingsContainer : ObservableObject {
   /**
    * check whether a download is already in progress
    */
-  public func isDownloadInProgress() -> Bool {
+  public func isInstallationInProgress() -> Bool {
     return self.packageInstall != nil
   }
 
@@ -384,8 +384,8 @@ public class SettingsContainer : ObservableObject {
    */
   public func initiateKmpFileDownload(kmpFilename: String) throws -> PackageInstallHelper? {
 
-    guard !self.isDownloadInProgress() else {
-      throw InstallPackageError.downloadInProgress
+    guard !self.isInstallationInProgress() else {
+      throw InstallPackageError.packageInstallationAlreadyInProgress
     }
     
     if let helper = self.preparePackageDownload(kmpFilename: kmpFilename) {
@@ -399,10 +399,7 @@ public class SettingsContainer : ObservableObject {
    * Creates a PackageInstallHelper instance to manage the state of the package being downloaded with the specified name.
    */
   func preparePackageDownload(kmpFilename: String) -> PackageInstallHelper? {
-    // package name is filename minus .kmp extension
-    let packageName = kmpFilename.replacingOccurrences(of: kmpFileExtension, with: "")
-    
-    return PackageInstallHelper(filename: kmpFilename, packageName: packageName, packageRepo: self.packageRepository, installedPackages: self.installedPackages, isDownload: true)
+    return PackageInstallHelper(filename: kmpFilename, packageRepo: self.packageRepository, installedPackages: self.installedPackages, isDownload: true)
   }
 
   /**
@@ -413,7 +410,7 @@ public class SettingsContainer : ObservableObject {
     print ("packageDownloadComplete \(kmpFileUrl)")
 
     do {
-      try self.packageInstall?.packageDownloadComplete(for: kmpFileUrl)
+      try self.packageInstall?.prepareToInstall(for: kmpFileUrl)
     } catch {
       // clear failed download
       self.packageInstall = nil
@@ -453,8 +450,8 @@ public class SettingsContainer : ObservableObject {
    * Called when a .KMP file is dropped on the Configuration view
    */
   public func initiateKmpFileInstallation(at fileLocation: URL) throws -> PackageInstallHelper? {
-    guard !self.isDownloadInProgress() else {
-      throw InstallPackageError.downloadInProgress
+    guard !self.isInstallationInProgress() else {
+      throw InstallPackageError.packageInstallationAlreadyInProgress
     }
     
     // validate the URL of the KMP file
@@ -514,10 +511,7 @@ public class SettingsContainer : ObservableObject {
    * Returns a URL to the temporary location where the package is to be downloaded as a .kmp file.
    */
   func preparePackageDrop(kmpFilename: String) -> PackageInstallHelper? {
-    // package name is filename minus .kmp extension
-    let packageName = kmpFilename.replacingOccurrences(of: kmpFileExtension, with: "")
-    
-    return PackageInstallHelper(filename: kmpFilename, packageName: packageName, packageRepo: self.packageRepository, installedPackages: self.installedPackages, isDownload: false)
+    return PackageInstallHelper(filename: kmpFilename, packageRepo: self.packageRepository, installedPackages: self.installedPackages, isDownload: false)
   }
 
   /**

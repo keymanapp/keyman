@@ -50,8 +50,10 @@ struct MainConfigView: View {
         // binds the visibility state to the sheet builder
         .sheet(isPresented: $isShowingAddKeyboardSheet) {
           AddKeyboardView()
-            .frame(width: 960, height: 390)
+            // disable escape key for closing view to avoid issues with canceling downloads
+            .interactiveDismissDisabled(true)
           // MAC-CONFIG-TODO: Make width and height percentages
+            .frame(width: 960, height: 390)
         }
         
         Form {
@@ -70,7 +72,7 @@ struct MainConfigView: View {
         // accepts URL drops
         .dropDestination(for: URL.self) { urls, _ in
           // reject drop if it is more than one file
-          guard let droppedFileUrl = urls.first, urls.count == 1 else {
+          guard let droppedFileUrl = urls.first, urls.count < 2 else {
             let error = DropKmpError.tooManyFiles
             self.alertMessage = error.localizedDescription
             self.isShowingDropKmpAlert = true
@@ -110,6 +112,8 @@ struct MainConfigView: View {
               settings.userCanceledPackageInstallation()
             }
           }
+          // disable escape key for closing view to avoid issues with canceling downloads
+          .interactiveDismissDisabled(true)
         }
 
         // the Spacer pushes the contents of the VStack to the top of the VStack

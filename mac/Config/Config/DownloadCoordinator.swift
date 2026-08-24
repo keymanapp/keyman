@@ -29,9 +29,9 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   @Published var loadFailureMessage: String?
   @Published var loadPackageFailed = false
   
-  var downloadFileUrl: URL?
   var settings: SettingsContainer?
   private var progressObserver: NSKeyValueObservation?
+  private var activeDownload: WKDownload?
   
   public func webView(_ webView: WKWebView,
                       decidePolicyFor navigationAction: WKNavigationAction,
@@ -82,10 +82,10 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
       }
       
       // if a download is already in progress then stop another from starting
-      if keymanSettings.isDownloadInProgress() {
+      if keymanSettings.isInstallationInProgress() {
         print("download already in progress, download canceled")
         self.loadPackageFailed = true
-        self.loadFailureMessage = InstallPackageError.downloadInProgress.localizedDescription
+        self.loadFailureMessage = InstallPackageError.packageInstallationAlreadyInProgress.localizedDescription
         decisionHandler(.cancel)
       } else {
         decisionHandler(.download)
@@ -113,6 +113,9 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   private func setupDownloadTracking(_ download: WKDownload) {
     download.delegate = self
     
+    // record download in case we need to cancel
+    self.activeDownload = download
+    
     // reset progress states
     self.isDownloading = true
     self.downloadProgress = 0.0
@@ -125,6 +128,20 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
         print("Download Progress: \(Int(newValue * 100))%")
       }
     }
+  }
+  
+  /**
+   * Called when the AddKeyboardView is closed. If there is a download in progress, it will be canceled.
+   */
+  public func cancelActiveDownload() {
+    guard isDownloading else { return }   // only applied during downloads
+    
+    self.activeDownload?.cancel()
+    self.activeDownload = nil
+    self.progressObserver = nil
+    self.isDownloading = false
+    self.installHelper = nil
+    self.settings?.userCanceledPackageInstallation()
   }
   
   public func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String, completionHandler: @escaping @MainActor @Sendable (URL?) -> Void) {
