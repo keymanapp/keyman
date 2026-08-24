@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.274 alpha 2026-08-24
+
+* maint(windows): move to vs2026 arm runner for GHA (#16418)
+* chore(web): skip guide-examples.tests.ts until race is fixed (#16427)
+
 ## 19.0.273 alpha 2026-08-22
 
 * feat(linux): use display language for keyboard search (#16393)
