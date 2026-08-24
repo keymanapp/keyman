@@ -73,10 +73,29 @@ export const CORRECTION_SEARCH_THRESHOLDS = {
 }
 
 /**
+ * Tracks common intermediate prediction data, such as its underlying probabilities and its similarity to the actual context.
+ */
+export interface PredictionMetadata {
+  /**
+   * How directly the prediction matches the current token in the context.
+   *
+   * This is determined later in the suggestion-analysis project and is not
+   * available upon initial construction of this type.
+   */
+  matchLevel: SuggestionSimilarity;
+
+  /**
+   * Text from the triggering input that should _not_ be affected by the
+   * prediction.
+   */
+  preservationTransform: Transform;
+}
+
+/**
  * Collates information related to suggestions during the suggestion generation
  * process.
  */
-export type CorrectionPredictionTuple = {
+export interface CorrectionPredictionTupleCore {
   /**
    * The potential Suggestion (or Keep)
    */
@@ -90,19 +109,18 @@ export type CorrectionPredictionTuple = {
    * by the keystroke-sequence + correction likelihood.
    */
   totalProb: number;
-  /**
-   * How directly the prediction matches the current token in the context.
-   *
-   * This is determined later in the suggestion-analysis project and is not
-   * available upon initial construction of this type.
-   */
-  matchLevel?: SuggestionSimilarity;
-  /**
-   * Text from the triggering input that should _not_ be affected by the
-   * prediction.
-   */
-  preservationTransform?: Transform;
 };
+
+export interface CorrectionPredictionTuple extends CorrectionPredictionTupleCore {
+  /**
+   * Contains additional metadata about the prediction and its properties.
+   *
+   * This object will generally remain unset by the `predictFromCorrections`
+   * method, with its values set afterward a layer or two removed from that
+   * specific call.
+   */
+  metadata: PredictionMetadata;
+}
 
 /**
  * An enum to be used when categorizing the level of similarity between
@@ -140,9 +158,15 @@ export enum SuggestionSimilarity {
   exact = 3
 }
 
-export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: CorrectionPredictionTuple) {
+export function tupleDisplayOrderSort(
+  a: CorrectionPredictionTuple,
+  b: CorrectionPredictionTuple
+) {
+  const matchLevelA = a.metadata.matchLevel ?? 0;
+  const matchLevelB = b.metadata.matchLevel ?? 0;
+
   // Similarity distance
-  const simDist = (b.matchLevel ?? 0) - (a.matchLevel ?? 0);
+  const simDist = matchLevelB - matchLevelA;
   if(simDist != 0) {
     return simDist;
   }
@@ -177,7 +201,7 @@ export async function correctAndEnumerateWithoutTraversals(
   revertableTransitionId?: number
 }> {
   const inputTransform = transformDistribution[0].sample;
-  let rawPredictions: CorrectionPredictionTuple[] = [];
+  let rawPredictions: CorrectionPredictionTupleCore[] = [];
 
   let predictionRoots: ProbabilityMass<Transform>[];
 
@@ -212,13 +236,20 @@ export async function correctAndEnumerateWithoutTraversals(
 
   // Running in bulk over all suggestions, duplicate entries may be possible.
   rawPredictions = predictFromCorrections(lexicalModel, predictionRoots, context);
-  if(allowSpace) {
-    rawPredictions.forEach((entry) => entry.preservationTransform = inputTransform);
-  }
+  const predictions = rawPredictions.map((entry) => {
+    const preservationTransform = allowSpace ? inputTransform : null;
+    return {
+      ...entry,
+      metadata: {
+        preservationTransform,
+        matchLevel: SuggestionSimilarity.none // will be overwritten later
+      }
+    };
+  });
 
   return {
     postContextState: null,
-    rawPredictions: rawPredictions
+    rawPredictions: predictions
   };
 }
 
@@ -499,10 +530,17 @@ export function buildAndMapPredictions(
 
   // Worth considering:  extend Traversal to allow direct prediction lookups?
   // let traversal = match.finalTraversal; // ...
-  let predictions = predictFromCorrections(model, [predictionRoot], predictionContext);
-  predictions.forEach((entry) => {
-    entry.preservationTransform = tokenization.taillessTrueKeystroke;
+  let rawPredictions = predictFromCorrections(model, [predictionRoot], predictionContext);
+  const predictions = rawPredictions.map((entry) => {
     entry.prediction.sample.transform.deleteLeft += committedDeleteLeft;
+
+    return {
+      ...entry,
+      metadata: {
+        preservationTransform: tokenization.taillessTrueKeystroke,
+        matchLevel: SuggestionSimilarity.none // will be overwritten later
+      }
+    };
   });
 
   return predictions;
@@ -649,7 +687,7 @@ export async function correctAndEnumerate(
 export function shouldStopSearchingEarly(
   bestCorrectionCost: number,
   currentCorrectionCost: number,
-  rawPredictions: CorrectionPredictionTuple[]
+  rawPredictions: CorrectionPredictionTupleCore[]
 ) {
   if(currentCorrectionCost >= bestCorrectionCost + CORRECTION_SEARCH_THRESHOLDS.MAX_SEARCH_THRESHOLD) {
     return true;
@@ -659,10 +697,11 @@ export function shouldStopSearchingEarly(
       // Very useful for stopping 'sooner' when words reach a sufficient length.
       return true;
     } else {
-      // Sort the prediction list; we need them in descending order for the next check.
-      rawPredictions.sort(tupleDisplayOrderSort);
+      // Sort the prediction list; we need them in descending probability order
+      // for the next check.
+      rawPredictions.sort((a, b) => b.totalProb - a.totalProb);
 
-      // If the best suggestion from the search's current tier fails to beat the worst
+      // If the best result at the current state of the search fails to beat the worst
       // pending suggestion from previous tiers, assume all further corrections will
       // similarly fail to win; terminate the search-loop.
       if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].totalProb > Math.exp(-currentCorrectionCost)) {
@@ -690,8 +729,8 @@ export function predictFromCorrections(
   lexicalModel: LexicalModel,
   corrections: ProbabilityMass<Transform>[],
   context: Context
-): CorrectionPredictionTuple[] {
-  let returnedPredictions: CorrectionPredictionTuple[] = [];
+): CorrectionPredictionTupleCore[] {
+  let returnedPredictions: CorrectionPredictionTupleCore[] = [];
   const wordbreak = determineModelWordbreaker(lexicalModel);
 
   for(let correction of corrections) {
@@ -707,14 +746,13 @@ export function predictFromCorrections(
         pair.sample.transform.id = correctionTransform.id;
       }
 
-      let tuple: CorrectionPredictionTuple = {
+      let tuple: CorrectionPredictionTupleCore = {
         prediction: pair,
         correction: {
           sample: correctionRoot,
           p: correctionProb
         },
-        totalProb: pair.p * correctionProb,
-        matchLevel: SuggestionSimilarity.none
+        totalProb: pair.p * correctionProb
       };
       return tuple;
     });
@@ -847,7 +885,7 @@ export function processSimilarity(
     if(keyed(tuple.correction.sample) == keyedPrefix) {
       if(predictedWord == truePrefix) {
         // Exact match:  it's a perfect 'keep' suggestion.
-        tuple.matchLevel = SuggestionSimilarity.exact;
+        tuple.metadata.matchLevel = SuggestionSimilarity.exact;
         keepOption = toAnnotatedSuggestion(lexicalModel, tuple.prediction.sample, 'keep',  models.QuoteBehavior.noQuotes);
 
         // Indicates that this suggestion exists directly within the lexical
@@ -859,15 +897,15 @@ export function processSimilarity(
         keepOption = tuple.prediction.sample as Outcome<Keep>;
       } else if(keyCased(predictedWord) == lowercasedPrefix) {
         // Case-insensitive match.  No diacritic differences; the ONLY difference is casing.
-        tuple.matchLevel = SuggestionSimilarity.sameText;
+        tuple.metadata.matchLevel = SuggestionSimilarity.sameText;
       } else if(keyed(predictedWord) == keyedPrefix) {
         // Diacritic-insensitive / exact-key match.
-        tuple.matchLevel = SuggestionSimilarity.sameKey;
+        tuple.metadata.matchLevel = SuggestionSimilarity.sameKey;
       } else {
-        tuple.matchLevel = SuggestionSimilarity.none;
+        tuple.metadata.matchLevel = SuggestionSimilarity.none;
       }
     } else {
-      tuple.matchLevel = SuggestionSimilarity.none;
+      tuple.metadata.matchLevel = SuggestionSimilarity.none;
     }
   }
 
@@ -932,7 +970,10 @@ export function createDefaultKeep(
       sample: truePrefix,
       p: inputTransformProb * MAX_PROB
     },
-    matchLevel: SuggestionSimilarity.exact
+    metadata: {
+      preservationTransform: null,
+      matchLevel: SuggestionSimilarity.exact
+    }
   };
 }
 
@@ -1019,14 +1060,14 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
   // - such as replacing `cant` with `can't` if the latter is much more frequent -
   // we may wish to group matchLevel values below by 'mapping' them with an appropriate
   // function.  (Both on the next line and within the reduce functor.)
-  const bestSuggestionTier = bestSuggestion.matchLevel;
+  const bestSuggestionTier = bestSuggestion.metadata.matchLevel;
 
   // compare best vs other probabilities of compatible tier.
   const probSum = suggestionDistribution.reduce((accum, current) => {
     // If the suggestion is from a different similarity tier, do not count it against
     // the required auto-select probability ratio threshold.  That threshold should
     // only apply within the suggestion's tier.
-    return accum + (current.matchLevel == bestSuggestionTier ? current.totalProb : 0)
+    return accum + (current.metadata.matchLevel == bestSuggestionTier ? current.totalProb : 0)
   }, 0);
   const proportionOfBest = bestSuggestion.totalProb / probSum;
   if(proportionOfBest < AUTOSELECT_PROPORTION_THRESHOLD) {
@@ -1076,9 +1117,9 @@ export function finalizeSuggestions(
     // from prior tokens!
     //
     // Note:  may need adjustment if/when supporting phrase-level correction.
-    if(tuple.preservationTransform) {
-      const presDL = tuple.preservationTransform.deleteLeft;
-      const mergedTransform = models.buildMergedTransform(tuple.preservationTransform, prediction.sample.transform);
+    if(tuple.metadata.preservationTransform) {
+      const presDL = tuple.metadata.preservationTransform.deleteLeft;
+      const mergedTransform = models.buildMergedTransform(tuple.metadata.preservationTransform, prediction.sample.transform);
       // Any preserved delete-left is applied early because it directly affects the suggestion
       // root; we need to remove that preserved delete-left here.
       if(presDL > 0) {

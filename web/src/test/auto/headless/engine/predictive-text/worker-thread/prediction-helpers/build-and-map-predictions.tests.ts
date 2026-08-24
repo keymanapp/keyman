@@ -46,7 +46,6 @@ describe('buildAndMapPredictions', () => {
     ];
 
     const basePredictions = predictFromCorrections(plainModel, correctionDistribution, context);
-    basePredictions.forEach((entry) => assert.isNotOk(entry.preservationTransform));
 
     // must construct the taillessTrueKeystroke appropriately.
     const tailless = { insert: 'TEST', deleteLeft: 0 };
@@ -64,8 +63,8 @@ describe('buildAndMapPredictions', () => {
     );
 
     assert.deepEqual(mappedPredictions.map((tuple) => tuple.prediction), basePredictions.map((tuple) => tuple.prediction));
-    mappedPredictions.forEach((tuple) => assert.isOk(tuple.preservationTransform));
-    mappedPredictions.forEach((tuple) => tuple.preservationTransform == tailless);
+    mappedPredictions.forEach((tuple) => assert.isOk(tuple.metadata?.preservationTransform));
+    mappedPredictions.forEach((tuple) => tuple.metadata?.preservationTransform == tailless);
   });
 
   it('properly handles empty prediction roots from deleted same-token codepoints', () => {
