@@ -83,7 +83,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
       
       // if an installation is already in progress then stop another from starting
       if keymanSettings.isInstallationInProgress() {
-        print("download already in progress, download canceled")
+        print("installation already in progress, download canceled")
         self.loadPackageFailed = true
         self.loadFailureMessage = InstallPackageError.packageInstallationAlreadyInProgress.localizedDescription
         decisionHandler(.cancel)

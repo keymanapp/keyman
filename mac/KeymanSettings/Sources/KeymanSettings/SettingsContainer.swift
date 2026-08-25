@@ -33,7 +33,7 @@ public enum InstallPackageError: LocalizedError {
 
   public var errorDescription: String? {
     switch self {
-    case .packageInstallationAlreadyInProgress: return "A package installatino is already in progress."
+    case .packageInstallationAlreadyInProgress: return "A package installation is already in progress."
     case .fontCopyError: return "There was an error copying the font."
     case .fontRegistrationError: return "There was an error registering the font."
     case .internalError: return "An internal error occurred."
@@ -507,8 +507,7 @@ public class SettingsContainer : ObservableObject {
   }
   
   /**
-   * Creates a PackageInstallHelper instance to manage the state of the package being downloaded with the specified name.
-   * Returns a URL to the temporary location where the package is to be downloaded as a .kmp file.
+   * Creates a PackageInstallHelper instance to manage the state of the package being installed with the specified name.
    */
   func preparePackageDrop(kmpFilename: String) -> PackageInstallHelper? {
     return PackageInstallHelper(filename: kmpFilename, packageRepo: self.packageRepository, installedPackages: self.installedPackages, isDownload: false)
