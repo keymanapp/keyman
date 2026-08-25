@@ -21,9 +21,6 @@ struct ConfigDebugView: View {
           .foregroundColor(.accentColor)
         Text("multiple keyboard package count = \(settings.multiKeyboardPackages.count)")
         Text("single keyboard package count = \(settings.singleKeyboardPackages.count)")
-        Button("debug") {
-          settings.debug()
-        }
         Button("log defaults") {
           settings.logUserDefaults()
         }
@@ -50,22 +47,6 @@ struct ConfigDebugView: View {
           ForEach(Array(settings.singleKeyboardPackages.enumerated()), id: \.offset) { index, package in
             VStack {
               HStack(alignment: .center, spacing: 10) {
-                VStack(spacing: 16) {
-                    Text("Scan to visit website:")
-                        .font(.headline)
-                    
-                  if let qrImage = package.generateSharePackageQRCode(size: 200) {
-                        Image(nsImage: qrImage)
-                            .interpolation(.none) // important: keeps the QR edges sharp
-                            .resizable()
-                            .frame(width: 200, height: 200)
-                            .background(Color.white) // ensures good scanning contrast
-                    } else {
-                        Text("Failed to generate QR Code")
-                            .foregroundColor(.red)
-                    }
-                }
-                .padding()
                 Text(package.packageName)
                   .font(.headline)
                 Text(package.packageVersion)

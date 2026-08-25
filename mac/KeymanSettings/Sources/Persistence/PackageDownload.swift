@@ -32,7 +32,6 @@ public class PackageDownload {
     // cannot be initialized until after download when packageName of new package is known
     self.packageToReplace = nil
     
-    // MAC-CONFIG-TODO: should we resume a download if the app was quit or killed before completing a keyboard install?
     // if any packages are remaining from an earlier download, delete them
     self.packageRepository.cleanupTempDirectory()
   }
@@ -47,7 +46,9 @@ public class PackageDownload {
       try self.unzipDownloadedPackage(for: kmpFileUrl)
       try self.handleNewPackage()
     } catch {
-      print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
+      self.cleanupFailedInstallation()
+
+       print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
       // MAC-CONFIG-TODO: handle error
       // send notification that installation failed?
     }
@@ -128,9 +129,18 @@ public class PackageDownload {
   /**
    * Clean up the downloaded .kmp file and package folder
    */
-  func cancelInstallation() throws {
-    try self.deleteDownloadedKmpFile()
-    try self.deleteDownloadedPackage()
+  func cleanupFailedInstallation() {
+    print("cleanupFailedInstallation of: \(self.temporaryPackageLocation.lastPathComponent)")
+    do {
+      try self.deleteDownloadedKmpFile()
+    } catch {
+      print("cleanupFailedInstallation did not delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent)")
+    }
+    do {
+      try self.deleteDownloadedPackage()
+    } catch {
+      print("cleanupFailedInstallation did not delete downloaded package: \(self.temporaryPackageLocation.lastPathComponent)")
+    }
   }
   
   /**
@@ -141,10 +151,15 @@ public class PackageDownload {
   }
   
   /**
-   * Move the downloaded package into the keyman packages directory
+   * Move the downloaded package into the keyman packages directory.
    */
   func movePackageFromTemporaryToInstalled() throws {
     try FileManager.default.moveItem(at: self.temporaryPackageLocation, to: self.installPackageLocation)
+    
+    // Update the KeymanPackage object with its new location
+    if let package = self.packageToInstall {
+      package.sourceDirectoryUrl = self.installPackageLocation
+    }
   }
   
   /**

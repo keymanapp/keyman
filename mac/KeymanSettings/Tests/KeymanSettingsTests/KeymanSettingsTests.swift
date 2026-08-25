@@ -50,7 +50,7 @@ import Foundation
     
     // verify that we cannot find the test package after removing it
     #expect(settingsContainer.findInstalledPackage(with: packageRepo.testPackageId) != nil)
-    settingsContainer.removeMultipleKeyboardPackage(at: 0)
+    settingsContainer.removeInstalledPackage(with: packageRepo.testPackageId)
     #expect(settingsContainer.findInstalledPackage(with: packageRepo.testPackageId) == nil)
   }
   
@@ -223,7 +223,7 @@ import Foundation
   fileprivate init() async throws {
     try packageRepo = PackageRepository()
     self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
-    source = try packageRepo.readPackage(packageDirectoryUrl: fakePackageUrl, kmpFileUrl: self.kmpUrl)
+    source = try packageRepo.readPackage(kmpFileUrl: self.kmpUrl)
   }
   
   @Test("Read package name") func readPackageName() async throws {
@@ -264,25 +264,23 @@ import Foundation
     fileprivate init() async throws {
       try packageRepo = PackageRepository()
       self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
-      self.packageSource = try packageRepo.readPackage(packageDirectoryUrl: fakePackageUrl, kmpFileUrl: self.kmpUrl)
+      self.packageSource = try packageRepo.readPackage(kmpFileUrl: self.kmpUrl)
     }
 
     @Test("Check keyboard is disabled") func checkKeyboardDisabled() async throws {
       let package = try #require(self.packageSource)
-      let directoryUrl = try #require(package.directoryUrl)
       let keyboards = try #require(package.keyboards)
       let keyboardSource = try #require(keyboards.first)
-      let keyboard = Keyboard(keyboardSource: keyboardSource, directoryUrl: directoryUrl)
+      let keyboard = Keyboard(keyboardSource: keyboardSource, packageDirectoryName: "amharic-fake")
       
       #expect(keyboard.enabled)
     }
 
     @Test("Check keyboard key") func checkKeyboardKey() async throws {
       let package = try #require(self.packageSource)
-      let directoryUrl = try #require(package.directoryUrl)
       let keyboards = try #require(package.keyboards)
       let keyboardSource = try #require(keyboards.first)
-      let keyboard = Keyboard(keyboardSource: keyboardSource, directoryUrl: directoryUrl)
+      let keyboard = Keyboard(keyboardSource: keyboardSource, packageDirectoryName: "amharic-fake")
       
       #expect(keyboard.keyboardKey == "/amharic-fake/gff_amharic.kmx")
     }

@@ -186,8 +186,13 @@ public class SettingsContainer : ObservableObject {
    * Called when user approves the downgrade of package
    */
   public func userConfirmedPackageDowngrade() {
-    self.replaceInstalledPackage()
-    self.packageDownload = nil
+    if let download = self.packageDownload {
+      do {
+        try download.replaceExistingPackageWithNewPackage()
+      } catch {
+        print("unable to downgrade package: \(download.packageToInstall?.packageName ?? "unknown")")
+      }
+    }
   }
 
   /**
@@ -195,23 +200,11 @@ public class SettingsContainer : ObservableObject {
    */
   public func userCanceledPackageDowngrade() {
     if let download = self.packageDownload {
-      do {
-        try download.cancelInstallation()
-      } catch {
-        print("downgrade cancelled but failed to cancel installation")
-      }
+      print("user cancelled package downgrade")
+      download.cleanupFailedInstallation()
     }
   
     self.packageDownload = nil
-  }
-  
-  // MAC-CONFIG-TODO: delete test code
-  public func debug() {
-    self.installedPackages .forEach { package in
-      package.keyboards.forEach { keyboard in
-        print("\(keyboard.keyboardId) enabled: \(keyboard.enabled)")
-      }
-    }
   }
   
   /**

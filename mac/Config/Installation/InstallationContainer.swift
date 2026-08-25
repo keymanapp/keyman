@@ -417,7 +417,7 @@ public class InstallationContainer : ObservableObject {
    * register it first, just to be safe
    */
   public func enableKeymanInputMethod() -> Bool {
-    var success = self.inputMethodUtil.registerInputMethod(bundleId: KeymanPaths.keymanBundleId)
+    var success = self.inputMethodUtil.registerKeymanInputMethod()
     if success {
       success = self.inputMethodUtil.enableKeymanInputMethod()
     }

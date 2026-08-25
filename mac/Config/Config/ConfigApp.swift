@@ -16,6 +16,23 @@ struct ConfigApp: App {
   @Environment(\.openWindow) private var openWindow
   
   var body: some Scene {
+    Window("Configuration", id: "main-config") {
+      MainConfigView()
+        .environmentObject(settings)
+        .task {
+          if !installation.getHasDisplayedInstallationComplete() {
+            openWindow(id: "install")
+          }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in openWindow(id: "install")
+        }
+    }
+    Window("Installation", id: "install") {
+      MainInstallView()
+        .environmentObject(installation)
+    }
+    .windowResizability(.contentSize)
+    .defaultSize(width: 600, height: 500)
     Window("Config Test", id: "config-debug") {
       ConfigDebugView()
         .environmentObject(settings)
