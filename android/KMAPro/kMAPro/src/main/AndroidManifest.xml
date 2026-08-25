@@ -186,7 +186,7 @@
 
       </intent-filter>
 
-      <intent-filter android:priority="50" android:autoVerify="true">
+      <intent-filter android:priority="50">
         <!-- KMAPro should also be able to handle /keyboards/install links and convert to /go/package/download -->
         <action android:name="android.intent.action.VIEW" />
 
