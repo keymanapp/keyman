@@ -18,8 +18,9 @@ struct ConfigApp: App {
   var body: some Scene {
     Window("Configuration", id: "main-config") {
       MainConfigView()
+//        .background(Color(.underPageBackgroundColor))
         .frame(
-            minWidth: 600, maxWidth: 800,
+            minWidth: 600, maxWidth: 1000,
             minHeight: 400, maxHeight: .infinity
         )
         .environmentObject(settings)

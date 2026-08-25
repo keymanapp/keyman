@@ -26,6 +26,23 @@ struct MainConfigView: View {
   @State private var isShowingDropKmpAlert = false
   @State private var alertMessage = ""
   @State private var isHovering = false
+  
+  // item being targeted for deletion
+  @State private var idToDelete: UUID? = nil
+
+  private var packageNameToDelete: String {
+    guard let uuid = idToDelete else { return "this item" }
+    guard let package = settings.findInstalledPackage(with: uuid) else { return "this item" }
+    return package.packageName
+  }
+
+  @Environment(\.colorScheme) var colorScheme
+  var canvasColor: Color {
+      colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.94)
+  }
+  var cardColor: Color {
+      colorScheme == .dark ? Color(white: 0.20) : Color(.white)
+  }
 
   /**
    * Assigns packageSelectedForHelpUrl the url argument and changes the selected tab to the help tab
@@ -34,7 +51,7 @@ struct MainConfigView: View {
     packageSelectedForHelpUrl = url
     selectedTab = 1
   }
-  
+    
   var body: some View {
     TabView (selection: $selectedTab) {
       VStack {
@@ -56,16 +73,44 @@ struct MainConfigView: View {
             .frame(width: 960, height: 390)
         }
         
-        Form {
+        List {
           // the view  for single keyboard packages
-          PackageRowView(packages: settings.singleKeyboardPackages, isSingleKeyboardPackage: true, expandedPackageID: $expandedPackageID, showHelpTab: { url in
+          PackageRowView(packages: settings.singleKeyboardPackages, isSingleKeyboardPackage: true, expandedPackageID: $expandedPackageID,
+                         idToDelete: $idToDelete, showHelpTab: { url in
           showHelpTab(for: url)})
           
           // the view  for multi keyboard packages
-          PackageRowView(packages: settings.multiKeyboardPackages, isSingleKeyboardPackage: false, expandedPackageID: $expandedPackageID, showHelpTab: { url in
+          PackageRowView(packages: settings.multiKeyboardPackages, isSingleKeyboardPackage: false, expandedPackageID: $expandedPackageID,
+                         idToDelete: $idToDelete, showHelpTab: { url in
             showHelpTab(for: url) })
         }
-        .formStyle(.grouped)
+        .listStyle(.inset)
+        .confirmationDialog(
+          "Are you sure you want to delete the Keyman package '\(packageNameToDelete)'?",
+          isPresented: Binding(
+            get: { idToDelete != nil },
+            set: { if !$0 { idToDelete = nil } }
+          ),
+          titleVisibility: .visible
+        ) {
+          Button("Delete", role: .destructive) {
+            if let uuid = idToDelete {
+              print("deleting package.id: \(uuid)")
+              // use multiple expanded states?
+              //expandedStates.removeValue(forKey: uuid)
+              
+              withAnimation(.easeInOut(duration: 0.3)) {
+                expandedPackageID = nil
+                settings.removeInstalledPackage(with: uuid)
+              }
+            }
+            idToDelete = nil // dismiss safely
+          }
+          
+          Button("Cancel", role: .cancel) {
+            idToDelete = nil
+          }
+        }
         // highlight border with accent color when hovering over view
         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.accentColor, lineWidth: 2).opacity(isHovering ? 1 : 0))
         .animation(.easeInOut(duration: 0.2), value: isHovering)
@@ -106,6 +151,8 @@ struct MainConfigView: View {
               do {
                 try settings.installPackage()
               } catch {
+                self.alertMessage = error.localizedDescription
+                self.isShowingDropKmpAlert = true
                 print("failed to install package: \(helper.packageName ?? "unknown package") with error: \(error.localizedDescription)")
               }
             } else {

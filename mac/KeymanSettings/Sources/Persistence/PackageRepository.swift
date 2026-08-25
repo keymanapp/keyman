@@ -160,11 +160,12 @@ public class PackageRepository: PackageRepo {
   public func getUnzipDestinationUrl(for packageName: String) -> URL {
     return self.pathUtil.keyman19TempDirectory.appendingPathComponent(packageName)
   }
+  
   /**
    * build the URL where the specified package will be installed
    */
-  public func buildInstallationUrlForPackageName(packageName: String) -> URL {
-    return self.pathUtil.keyman19PackagesDirectory.appendingPathComponent(packageName)
+  public func buildInstallationUrlForPackageName(directoryName: String) -> URL {
+    return self.pathUtil.keyman19PackagesDirectory.appendingPathComponent(directoryName)
   }
 
   /**

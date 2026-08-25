@@ -56,9 +56,8 @@ public class PackageInstallHelper: Identifiable {
     self.packageRepository = packageRepo
     self.temporaryKmpFileLocation = self.packageRepository.getDownloadUrl(for: filename)
     
-    //  filename minus .kmp extension
-    let directoryName = filename.replacingOccurrences(of: kmpFileExtension, with: "")
-    self.temporaryPackageLocation = self.packageRepository.getUnzipDestinationUrl(for: directoryName)
+    //  unzip in a directory named the same as the kmp file minus .kmp extension
+    self.temporaryPackageLocation = self.packageRepository.getUnzipDestinationUrl(for: filename.replacingOccurrences(of: kmpFileExtension, with: ""))
     self.installedPackages = installedPackages
     self.isDownload = isDownload
     
@@ -76,7 +75,8 @@ public class PackageInstallHelper: Identifiable {
   }
 
   /**
-   * Indicates that a package is ready to be unzipped and loaded
+   * Prepare for installation by unzipping and loading the package and determining where it should be installed.
+   *
    */
   public func prepareToInstall(for kmpFileUrl: URL) throws {
     print ("prepareToInstall \(kmpFileUrl)")
@@ -89,11 +89,18 @@ public class PackageInstallHelper: Identifiable {
       let package = try self.packageRepository.loadSinglePackage(packageUrl: self.temporaryPackageLocation)
       self.packageToInstall = package
 
-      // now that the package is loaded, we can build the installation directory from the packageName
-      self.installPackageLocation = self.packageRepository.buildInstallationUrlForPackageName(packageName: package.packageName)
+      // if there is an existing package of the same name, use its location as the place to install
+      if let existingPackage = findExistingPackage() {
+        self.packageToReplace = existingPackage
+        self.installPackageLocation = existingPackage.sourceDirectoryUrl
+      } else {
+        // if this is a new package, then use the same name as the temporary install directory
+        let directoryName = self.temporaryPackageLocation.lastPathComponent
+        self.installPackageLocation = self.packageRepository.buildInstallationUrlForPackageName(directoryName: directoryName)
+      }
 
       // now that we know what we are installing, determine the type of install
-      self.packageInstallationType = self.determinePackageInstallationType()
+      self.packageInstallationType = self.determinePackageInstallationType(newPackage: package)
     } catch {
       self.cleanupFailedInstallation()
       print ("package installation failed with error '\(error)' for \(kmpFileUrl)")
@@ -127,37 +134,26 @@ public class PackageInstallHelper: Identifiable {
    * - an update of an existing package
    * - a downgrade of an existing package
    */
-  func determinePackageInstallationType() -> PackageInstallationType {
-    let packageAlreadyInstalled = self.checkForExistingPackage()
-    var installationType: PackageInstallationType = .newPackage("unknown package")
+  func determinePackageInstallationType(newPackage: KeymanPackage) -> PackageInstallationType {
+    var installationType: PackageInstallationType = .newPackage(newPackage.packageName)
+    let packageAlreadyInstalled = self.packageToReplace != nil
     
-    // If there is no new package, return bogus value of .newPackage.
-    // Without a package, the installation will fail elsewhere and the
-    // type of installation is completely irrelevant.
-    guard let newPackage = self.packageToInstall else {
-      print("error: packageToInstall not set when determining package installation type")
-      return installationType
-    }
-    
-    if !packageAlreadyInstalled {
-      installationType =  PackageInstallationType.newPackage(newPackage.packageName)
-    } else {
-      if let installedPackage = self.packageToReplace {
-        let newVersion = newPackage.packageVersion
-        let existingVersion = installedPackage.packageVersion
-        
-        let comparisonResult = newVersion.compare(existingVersion, options: .numeric)
-        
-        if comparisonResult == .orderedAscending {
-          print("package downgrade: new version is older than existing version")
-          installationType =  PackageInstallationType.replaceNewerPackage(newPackage.packageName, existingVersion, newVersion)
-        } else if comparisonResult == .orderedDescending {
-          print("package upgrade: new version is newer than existing version")
-          installationType = PackageInstallationType.replaceOlderPackage(newPackage.packageName, existingVersion, newVersion)
-        } else {
-          print("new and existing package versions are identical")
-          installationType = PackageInstallationType.replaceSameVersionPackage(newPackage.packageName)
-        }
+    // if we are replacing an existing package, then determine what type of replacement this is
+    if let existingPackage = self.packageToReplace {
+      let newVersion = newPackage.packageVersion
+      let existingVersion = existingPackage.packageVersion
+      
+      let comparisonResult = newVersion.compare(existingVersion, options: .numeric)
+      
+      if comparisonResult == .orderedAscending {
+        print("package downgrade: new version is older than existing version")
+        installationType =  PackageInstallationType.replaceNewerPackage(newPackage.packageName, existingVersion, newVersion)
+      } else if comparisonResult == .orderedDescending {
+        print("package upgrade: new version is newer than existing version")
+        installationType = PackageInstallationType.replaceOlderPackage(newPackage.packageName, existingVersion, newVersion)
+      } else {
+        print("new and existing package versions are identical")
+        installationType = PackageInstallationType.replaceSameVersionPackage(newPackage.packageName)
       }
     }
     
@@ -293,10 +289,21 @@ public class PackageInstallHelper: Identifiable {
     var packageExists = false
     
     if let package = self.installedPackages.first(where: { $0.packageName == self.packageToInstall?.packageName }) {
-      self.packageToReplace = package
       packageExists = true
     }
     return packageExists
+  }
+  
+  /**
+   * If a package of the same name exists, return it.
+   */
+  func findExistingPackage() -> KeymanPackage? {
+    var existingPackage: KeymanPackage? = nil
+    
+    if let package = self.installedPackages.first(where: { $0.packageName == self.packageToInstall?.packageName }) {
+      existingPackage = package
+    }
+    return existingPackage
   }
   
   /**

@@ -15,33 +15,33 @@ import KeymanSettings
 public struct PackageRowView: View {
   
   @EnvironmentObject var settings: SettingsContainer
-  // visibilty state for the delete package alert
-  @State private var isShowingDeleteAlert = false
   // used to identify the selected KeymanPackage for the delete package alert
-  @State private var selectedPackage: KeymanPackage? = nil
-  
-  // settings.singleKeyboardPackages or settings.multiKeyboardPackages
+   
+  @Environment(\.colorScheme) var colorScheme
+  var canvasColor: Color {
+      colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.94)
+  }
+  var cardColor: Color {
+      colorScheme == .dark ? Color(white: 0.20) : Color(.white)
+  }
+
+  // could be settings.singleKeyboardPackages or settings.multiKeyboardPackages
   let packages: [KeymanPackage]
   // a boolean for whether or not a package contains multiple keyboards
   let isSingleKeyboardPackage: Bool
   // binded to the shared state variable in the parent view
   @Binding var expandedPackageID: UUID?
+  @Binding var idToDelete: UUID?
   // closure passed from the parent view
   let showHelpTab: (URL) -> Void
   
-  init(packages: [KeymanPackage], isSingleKeyboardPackage: Bool, expandedPackageID: Binding<UUID?>, showHelpTab: @escaping (URL) -> Void) {
+
+  init(packages: [KeymanPackage], isSingleKeyboardPackage: Bool, expandedPackageID: Binding<UUID?>, idToDelete: Binding<UUID?>, showHelpTab: @escaping (URL) -> Void) {
     self.packages = packages
     self.isSingleKeyboardPackage = isSingleKeyboardPackage
     self._expandedPackageID = expandedPackageID
+    self._idToDelete = idToDelete
     self.showHelpTab = showHelpTab
-  }
-  
-  /**
-   * Sets isShowingDeleteAlert to true and assigns the state variable selectedPackage the KeymanPackage argument
-   */
-  public func showDeleteAlert(for package: KeymanPackage) {
-    isShowingDeleteAlert = true
-    selectedPackage = package
   }
   
   public var body: some View {
@@ -51,11 +51,13 @@ public struct PackageRowView: View {
           // the package info view is shown inside each disclosure group
           if expandedPackageID == package.id {
             PackageInfoView(package: package, showAlertFunction: { package in
-              showDeleteAlert(for: package)
+              idToDelete = package.id
+              //showDeleteAlert(for: package)
             })
               .transition(.move(edge: .top))
           }
-        } label: {
+        }
+        label: {
           // a VStack is shown as the label for each disclosure group
           VStack (alignment: .leading, spacing: 0) {
             HStack {
@@ -120,23 +122,15 @@ public struct PackageRowView: View {
             }
           }
         }
+        .listRowBackground(
+            Rectangle()
+              .fill(cardColor) // native Mac card color = Color(.controlBackgroundColor)
+        )
       }
     }
     // animate changes in the package list
     .animation(.easeInOut, value: packages)
-    // binds the visibilty state to the alert builder
-    .alert("Are you sure you want to delete the keyboard \"\(selectedPackage?.packageName ?? "")\"?",
-           isPresented: $isShowingDeleteAlert,
-           presenting: selectedPackage) { package in
-      // cancel button
-      Button("Cancel", role: .cancel) { }
-      // delete button
-      Button("Delete", role: .destructive) {
-        settings.removeInstalledPackage(with: package.id)
-      }
-    } message: { package in
-      Text("You can't undo this action.")
-    }
+    .padding(.vertical, 8)
   }
   
   // the helper method to generate the custom binding for whether a package's disclosure group is expanded or not

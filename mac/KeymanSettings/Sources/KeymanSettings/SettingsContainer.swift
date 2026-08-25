@@ -241,7 +241,7 @@ public class SettingsContainer : ObservableObject {
     self.packageRepository.deletePackage(package: package)
     
     // remove package from installed packages list
-    if let index = self.installedPackages.firstIndex(where: { $0.packageName == package.packageName }) {
+    if let index = self.installedPackages.firstIndex(where: { $0.id == package.id }) {
       self.installedPackages.remove(at: index)
     }
     
@@ -434,6 +434,8 @@ public class SettingsContainer : ObservableObject {
    */
   func replaceInstalledPackage() {
     if let package = self.packageInstall?.packageToInstall {
+      // find the existing package with the same name in the installedPackages array and replace it
+      // (we cannot use the id for this search, as the ids are unique)
       if let index = self.installedPackages.firstIndex(where: { $0.packageName == package.packageName }) {
         self.installedPackages[index] = package
         self.addEnabledKeyboards(for: package)
@@ -480,6 +482,7 @@ public class SettingsContainer : ObservableObject {
       do {
         try install.installPackage()
       } catch {
+        self.packageInstall?.cleanupFailedInstallation()
         self.packageInstall = nil
         throw error
       }
