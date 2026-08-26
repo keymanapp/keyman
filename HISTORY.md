@@ -1,5 +1,93 @@
 # Keyman Version History
 
+## 19.0.266 alpha 2026-08-13
+
+* chore(deps-dev): bump esbuild from 0.25.0 to 0.28.1 (#16095)
+* feat(web): add `keyman.versionInfo` API (#16351)
+* fix(web): cleanup `loaduserinterface` and `unloaduserinterface` events (#16353)
+* docs(web): deprecate unused and obsolete API endpoints and docs cleanup (#16354)
+* chore(common): cleanup and merge Preprocessor constants (#14360)
+
+## 19.0.265 alpha 2026-08-12
+
+* fix(core): make coherence check a debug assert (#16343)
+* feat(windows): honour Windows "metered connection" flag for downloading updates (#16099)
+
+## 19.0.264 alpha 2026-08-11
+
+* docs(android): update keyboardharness readme (#16220)
+* feat(android): design improvement for settings, add dark mode and tool menu (#15827)
+
+## 19.0.263 alpha 2026-08-10
+
+* chore(deps): bump tar from 7.5.11 to 7.5.22 in /developer/src/server/src/win32/trayicon/addon-src (#16282)
+* chore(deps): bump brace-expansion from 5.0.6 to 5.0.9 in /developer/src/server/src/win32/trayicon/addon-src (#16295)
+* refactor(web): improve naming of `_SetTargetDir` function (#16311)
+* docs(web): add language identifier to the code blocks of event docs (#16333)
+
+## 19.0.262 alpha 2026-08-04
+
+* chore(web): fire `keyboardloaded` event only once per keyboard (#16297)
+
+## 19.0.261 alpha 2026-07-30
+
+* fix(core): clone state actions deep copy (#15961)
+* maint(android): update Android Target API to 36 (#16280)
+* refactor(web): adjust function visibility and variable names (#16286)
+
+## 19.0.260 alpha 2026-07-27
+
+* fix(web): ignore exception trying to access cookie (#16283)
+* chore(web): update help links to use latest version (#16285)
+
+## 19.0.259 alpha 2026-07-20
+
+* docs(web): fix typos following #16170 (#16225)
+
+## 19.0.258 alpha 2026-07-15
+
+* chore(android): remove doc for non-existing deprecated functions (#16244)
+
+## 19.0.257 alpha 2026-07-14
+
+* chore(linux): remove questing, add stonking (#16236)
+* chore(android): cleanup Android build scripts and artifact filenames (#16234)
+* chore(web): declare scope for stubAndKeyboardCache members (#16221)
+* fix(android): improve clarity of keyboard script error popup (#16228)
+* chore(android): log legacy cloud keyboards (#16237)
+* chore(android): cleanup font variable names, remove obsolete code (#16211)
+
+## 19.0.256 alpha 2026-07-13
+
+* fix(android): add permissions for Sentry and set default keyboard (#16216)
+* maint(resources): add extra debug reporting for builder (#16230)
+
+## 19.0.255 alpha 2026-07-11
+
+* maint(android): use KEYMAN_TIER instead of TIER.md (#16219)
+* feat(ios): add keyman-version to package-version check (#16138)
+* docs(web): cleanup of index pages and page titles (#16171)
+* feat(android): add keyman-version to package-version check (#16139)
+
+## 19.0.254 alpha 2026-07-10
+
+* fix(android): handle blank keyboard tap properly (#16217)
+* fix(web): define IME interfaces in `KeyboardInterfaceBase` (#16170)
+
+## 19.0.253 alpha 2026-07-09
+
+* fix(web): resync model in `set osk()` (as used by Server) (#16127)
+* chore(developer): consolidate api-extractor usage in Developer (#16135)
+
+## 19.0.252 alpha 2026-07-08
+
+* chore(linux): reorder buttons on kmp install window (#16210)
+* refactor(web): rename `keymanweb` to `keyman` in UI modules (#16174)
+* chore: remove deprecated "X-UA-Compatible" and "apple-mobile-web-app-capable" metas (#16176)
+* fix(android): refactor `KMLog` - simplification and added resilience (#16152)
+* fix(android): differentiate between fontPath and fontUrl in Keyman Engine for Android (#16188)
+* fix(web): fixes cookie unit-tests and path for OSK resources during testing (#16209)
+
 ## 19.0.251 alpha 2026-07-02
 
 * fix(android): skip test on Windows that triggers androidx WebKit bug (#16184)

@@ -10,10 +10,11 @@
 
 import Foundation
 
+let defaultHelpFilename = "welcome.htm"
+let defaultReadmeFilename = "readme.htm"
+
 public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
   public var id = UUID()
-  var directoryUrl: URL?
-  var kmpJsonFileUrl: URL?
   let system: SystemInfo?
   let options: Options?
   let info: Info
@@ -37,16 +38,25 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
   var readmeFilename: String? {
     if let filename = options?.readmeFile {
       return filename
-    } else {
-      return nil
     }
+    if let fileArray = self.files {
+      if fileArray.contains(where: { $0.name == defaultReadmeFilename }) {
+        return defaultReadmeFilename
+      }
+    }
+    return nil
   }
   var helpFilename: String? {
     if let filename = options?.welcomeFile {
       return filename
-    } else {
-      return nil
     }
+    if let fileArray = self.files {
+      if fileArray.contains(where: { $0.name == defaultHelpFilename }) {
+        return defaultHelpFilename
+      }
+    }
+    
+    return nil
   }
   var graphicFilename: String? {
     if let filename = options?.graphicFile {
@@ -66,8 +76,6 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
   
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    directoryUrl = nil
-    kmpJsonFileUrl = nil
     
     self.info = try container.decode(Info.self, forKey: .info)
     self.keyboards = try container.decodeIfPresent([KeyboardSource].self, forKey: .keyboards)

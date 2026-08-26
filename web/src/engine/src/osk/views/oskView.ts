@@ -43,7 +43,7 @@ export type OSKRect = {
 
 /**
  * Definition for OSK events documented at
- * https://help.keyman.com/developer/engine/web/16.0/reference/events/.
+ * https://help.keyman.com/developer/engine/web/current-version/reference/events/.
  */
 export interface LegacyOSKEventMap {
   'configclick'(obj: {}): void;
@@ -301,19 +301,17 @@ export abstract class OSKView
 
   private setBaseMouseEventListeners() {
     this._Box.onmouseenter = (e) => {
-      if(this.mouseEnterPromise) {
-        // The chain was somehow interrupted, with the mouseleave never occurring!
-        this.mouseEnterPromise.resolve();
-      }
+      // Ensure that previous promise resolves, if the chain was somehow
+      // interrupted, with the mouseleave never occurring
+      this.mouseEnterPromise?.resolve();
 
       this.mouseEnterPromise = new ManagedPromise<void>();
       this.emit('pointerinteraction', this.mouseEnterPromise.corePromise);
     };
 
     this._Box.onmouseleave = (e) => {
-      this.mouseEnterPromise.resolve();
+      this.mouseEnterPromise?.resolve();
       this.mouseEnterPromise = null;
-      // focusAssistant.setMaintainingFocus(false);
     };
   }
 

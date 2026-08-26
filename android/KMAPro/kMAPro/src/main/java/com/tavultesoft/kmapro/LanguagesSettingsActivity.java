@@ -205,7 +205,7 @@ public final class LanguagesSettingsActivity extends BaseActivity {
       }
 
       holder.textLang.setText(data.name);
-      holder.img.setImageResource(R.drawable.ic_action_forward);
+      holder.img.setImageResource(R.drawable.ic_action_forward_mode);
 
       holder.textCount.setText(getContext().getResources().getQuantityString(R.plurals.keyboard_count, data.keyboards.size(), data.keyboards.size()));
 

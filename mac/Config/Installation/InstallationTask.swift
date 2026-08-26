@@ -12,11 +12,13 @@ import KeymanSettings
 // String raw value for each task type is used as key for Dictionary
 // when storing the task state in the UserDefaults
 public enum InstallationTaskType: String {
-  case prepareNewInstall = "prepareNewInstall"  // only called for new install
+  case prepareNewInstall = "prepareNewInstall"  // only added for new installs
+  case prepareNewRepair = "prepareRepair"       // only added for repairs
   case enableInputMethod = "enableInputMethod"  // triggers register and enable
   case requestAccess = "requestAccess"          // causes prompt to user to grant Accessibility
   case confirmAccess = "confirmAccess"          // confirms that Accessibility was granted
-  case restartMac = "restartMac"                // prompts user to restart machine
+  case requestRestart = "requestRestart"        // prompts user to restart machine
+  case confirmRestart = "confirmRestart"        // confirms that the machine was restarted
 }
 
 public struct InstallationTask: Hashable, Equatable {

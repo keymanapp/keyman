@@ -27,8 +27,9 @@ public class InstallationContainer : ObservableObject {
     return self.installationCheck.installationPhase
   }
   
-  // installationState describes the remaining tasks to complete the installation
-  @Published public var installationState: InstallationState?
+  var installationState: InstallationState? {
+    return self.installationCheck.installationState
+  }
 
   fileprivate let installationCheck: InstallationCheck
   fileprivate let defaultsRepository: DefaultsRepo
@@ -53,22 +54,16 @@ public class InstallationContainer : ObservableObject {
     } catch {
       fatalError("Unable to access group container path for InputMethodUtil: \(error.localizedDescription).")
     }
-    
 
     self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
     
-    // if installation is still being evaluated, set the installation state later when it is done
-    // otherwise, set it immediately
-    if self.installationCheck.isEvaluatingInstallation {
-      self.installationState = nil
-    } else {
-      self.installationState = self.installationCheck.installationState
-      print("installation phase = \(self.installationCheck.installationPhase), hasTasks = \(self.installationCheck.installationPhase.hasTasks)")
+    // If we can now confirm that the user restarted (the final task), then the installation
+    // will be complete and there is no need to evaluate the state.
+    // Otherwise, evaluate the installation to prepare for a new installation or check for repairs.
+    if !self.validateConfirmRestart() {
+      self.registerObservers()
+      self.installationCheck.startInstallationEvaluation()
     }
-    
-    self.registerObservers()
-    
-    self.installationCheck.startInstallationEvaluation()
   }
   
   /**
@@ -106,46 +101,33 @@ public class InstallationContainer : ObservableObject {
    * called when `NSNotification.Name.startNewInstallation` is received
    */
   @objc func handleStartNewInstallation(_ notification: Notification) {
-    // now that the installation has been evaluated
-    // we can set the installationState
-    
-    if let newState = notification.object as? InstallationState {
-      self.installationState = newState
-      
-      // the evaluation is done
-      self.installationCheck.isEvaluatingInstallation = false
-      print("handleStartNewInstallation, new state provided")
-    } else {
-      print("handleStartNewInstallation received but did not include new InstallationState")
-    }
+    print("handleStartNewInstallation received")
+    // the evaluation is done
+    self.installationCheck.isEvaluatingNewInstallation = false
   }
 
   /**
    * called when `NSNotification.Name.startInstallationRepair` is received
    */
   @objc func handleStartInstallationRepair(_ notification: Notification) {
-    print("handleStartInstallationRepair")
-    // Extract message from the notification if available
-    if let newState = notification.object as? InstallationState {
-      self.installationState = newState
-      
-      // now that the repair has been determined, we can notify that a repair is needed
-      // so that the repair UI can presented to the user
-      
-      NotificationCenter.default.post(name: .installationRepairStarted, object: nil, userInfo: nil)
-    } else {
-      print("handleStartInstallationRepair received but did not include new InstallationState")
-    }
+    print("handleStartInstallationRepair received")
+    
+    // notify observers
+    NotificationCenter.default.post(name: .installationRepairStarted, object: nil, userInfo: nil)
   }
 
   /**
    * called when `NSNotification.Name.accessibilityGranted` is received
    */
   @objc func handleAccessibilityGranted(_ notification: Notification) {
-    guard let state = self.installationState else { return }
+    guard self.installationState != nil else { return }
     
     // the confirmAccess task can now be marked as completed
-    self.updateTaskAsCompleted(taskType: .confirmAccess, for: state)
+    if let task = self.currentTask() {
+      if task.taskType == .confirmAccess {
+        self.updateTaskAsCompleted(taskType: .confirmAccess)
+      }
+    }
     
     NotificationCenter.default.post(name: .checkAccessibilitySuccess, object: nil, userInfo: nil)
   }
@@ -155,6 +137,22 @@ public class InstallationContainer : ObservableObject {
    */
   @objc func handleAccessibilityNotGranted(_ notification: Notification) {
     NotificationCenter.default.post(name: .checkAccessibilityFailure, object: nil, userInfo: nil)
+  }
+  
+  /**
+   * If the current task is confirmRestart, mark it as complete if the user has restarted.
+   */
+  func validateConfirmRestart() -> Bool {
+    guard let task = self.currentTask() else { return false }
+    guard self.installationState != nil else { return false }
+    
+    if task.taskType == .confirmRestart &&  self.validateUserHasRestarted() {
+      // the confirmAccess task can now be marked as completed
+      self.updateTaskAsCompleted(taskType: .confirmRestart)
+      return true
+    } else {
+      return false
+    }
   }
   
   /**
@@ -190,13 +188,17 @@ public class InstallationContainer : ObservableObject {
     
     if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .prepareNewInstall }) {
       return incompleteTask
+    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .prepareNewRepair }) {
+      return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .enableInputMethod }) {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .requestAccess }) {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .confirmAccess }) {
       return incompleteTask
-    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .restartMac }) {
+    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .requestRestart }) {
+      return incompleteTask
+    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .confirmRestart }) {
       return incompleteTask
     }
     
@@ -207,7 +209,7 @@ public class InstallationContainer : ObservableObject {
    * Executes the specified installation task.
    */
   func executeTask(_ task: InstallationTask) {
-    guard let state = self.installationState else { return }
+    guard self.installationState != nil else { return }
     guard self.installationPhase.hasTasks else {
       print("the installation phase \(self.installationPhase) has no tasks");
       return
@@ -218,6 +220,8 @@ public class InstallationContainer : ObservableObject {
     switch task.taskType {
     case .prepareNewInstall:
       completedTask = self.migrateData()
+    case .prepareNewRepair:
+      completedTask = true
     case .enableInputMethod:
       completedTask = self.enableKeymanInputMethod()
     case .requestAccess:
@@ -226,28 +230,35 @@ public class InstallationContainer : ObservableObject {
       self.checkAccessibilityPermissionGranted()
       // this task is completed asynchronously when the response is returned from the input method
       completedTask = false
-    case .restartMac:
+    case .requestRestart:
       completedTask = self.notifyUserPromptedToRestart()
+    case .confirmRestart:
+      completedTask = self.validateUserHasRestarted()
     }
     
     if completedTask {
-      self.updateTaskAsCompleted(taskType: task.taskType, for: state)
+      self.updateTaskAsCompleted(taskType: task.taskType)
     }
   }
 
   /**
-   * Executes the next installation task which is incomplete, if there is one remaining.
+   * Marks the specified task as completed and saves it to the UserDefaults.
+   * Note that this actually creates a copy of the InstallationState object and updates
+   * the property in InstallationCheck with the new reference.
    */
-  public func updateTaskAsCompleted(taskType: InstallationTaskType, for state: InstallationState) {
+  public func updateTaskAsCompleted(taskType: InstallationTaskType) {
     print("executeTask: \(taskType.rawValue) completed")
-    state.updateTaskAsCompleted(task: taskType)
-    self.writeInstallationState()
+    if let existingState = self.installationState {
+      let updatedState = InstallationState.createCopyWithCompletedTask(from: existingState, with: taskType)
+      self.installationCheck.installationState = updatedState
+      self.writeInstallationState()
+    }
   }
 
   /**
-   * Executes the next installation task which is incomplete, if there is one remaining.
+   * Executes the current incomplete installation task, if one remains.
    */
-  public func executeNextInstallationTask() {
+  public func executeCurrentInstallationTask() {
     if let installTask = self.currentTask() {
       self.executeTask(installTask)
     }
@@ -271,17 +282,40 @@ public class InstallationContainer : ObservableObject {
 
     self.defaultsRepository.writeInstallationState(state.toUserDefaultsDictionary())
   }
+
+  /**
+   * Record that the installation complete view has been shown to the user
+   */
+  public func setHasDisplayedInstallationComplete() {
+    if let existingState = self.installationState {
+      let updatedState = InstallationState.createCopy(from: existingState)
+      updatedState.hasDisplayedInstallComplete = true
+      self.installationCheck.installationState = updatedState
+      self.writeInstallationState()
+    }
+  }
   
- /**
+  /**
+   * Return whether the installation complete view has been shown to the user
+   */
+  func getHasDisplayedInstallationComplete() -> Bool {
+    guard let state = self.installationState else { return false }
+    
+    return state.hasDisplayedInstallComplete
+  }
+  
+  /**
    * Write the time that the user was requested to restart their machine
    */
   func writeRestartRequestTime() {
-    guard let state = self.installationState else { return }
-
-    state.dateRestartRequested = Date()
-    self.writeInstallationState()
+    if let existingState = self.installationState {
+      let updatedState = InstallationState.createCopy(from: existingState)
+      updatedState.dateRestartRequested = Date()
+      self.installationCheck.installationState = updatedState
+      self.writeInstallationState()
+    }
   }
-  
+
   /**
    * Read the time that the user was requested to restart their machine
    */
@@ -318,13 +352,6 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
-   * for testing purposes, validate the installation
-   */
-  func forceValidateInstallation() {
-    self.installationCheck.startValidation()
-  }
-
-  /**
    * return the last time the system was booted
    */
   func getMostRecentRestartTime() -> Date? {
@@ -357,7 +384,6 @@ public class InstallationContainer : ObservableObject {
 
     print("Keyman status, version: \(version), enabled: \(enabled), running: \(running), permissionGranted: \(permissionString)")
   }
-  
 
   /**
    * register may need to happen before enabling
@@ -380,15 +406,6 @@ public class InstallationContainer : ObservableObject {
   }
   
   /**
-   * Verify that the input method has been correctly installed.
-   * This may be superflous as we are verifying this before creating the installation tasks
-   */
-  public func verifyInputMethod()  -> Bool {
-    // MAC-CONFIG-TODO: currently does nothing, already verified when InstallationCheck is created
-    return true
-  }
-  
-  /**
    * true if the system recognizes Keyman as an enabled input method
    */
   public func isKeymanInputMethodEnabled() -> Bool {
@@ -400,7 +417,7 @@ public class InstallationContainer : ObservableObject {
    * register it first, just to be safe
    */
   public func enableKeymanInputMethod() -> Bool {
-    var success = self.inputMethodUtil.registerInputMethod(bundleId: KeymanPaths.keymanBundleId)
+    var success = self.inputMethodUtil.registerKeymanInputMethod()
     if success {
       success = self.inputMethodUtil.enableKeymanInputMethod()
     }

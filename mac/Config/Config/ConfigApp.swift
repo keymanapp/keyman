@@ -17,20 +17,31 @@ struct ConfigApp: App {
   @Environment(\.openWindow) private var openWindow
   
   var body: some Scene {
-    
-    Window("Configuration", id: "config") {
-      ConfigView()
+    Window("Configuration", id: "main-config") {
+      MainConfigView()
         .environmentObject(settings)
         .task {
-          if !installation.isInstallationComplete() {
+          if !installation.getHasDisplayedInstallationComplete() {
             openWindow(id: "install")
             openWindow(id: "new install")
           }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in openWindow(id: "install")
+        }
     }
     
     Window("Installation", id: "install") {
-      InstallView()
+      MainInstallView()
+        .environmentObject(installation)
+    }
+    .windowResizability(.contentSize)
+    .defaultSize(width: 600, height: 500)
+    Window("Config Test", id: "config-debug") {
+      ConfigDebugView()
+        .environmentObject(settings)
+    }
+    Window("Install Test", id: "install-debug") {
+      InstallDebugView()
         .environmentObject(installation)
     }
     

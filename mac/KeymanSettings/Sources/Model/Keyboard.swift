@@ -19,39 +19,31 @@ public class Keyboard: Identifiable, Hashable, Equatable {
   public let oskFont: String?
   public let displayFont: String?
   public var keyboardId: String
-  // the directory we are reading the keyboard from
-  public var keyboardDirectoryUrl: URL
-  // the URL of the .kmx file for the package
-  public let kmxFileUrl: URL
   // a key to uniquely identify the keyboard
   // in the UserDefaults this key is used for the selected Keyboard and enabled keyboards properties
   // the key is in the form "/[package directory]/[package name].kmx"
   // for example, "/khmer_angkor/khmer_angkor.kmx"
   public let keyboardKey: String
   
-  public init(keyboardSource: KeyboardSource, directoryUrl: URL) {
+  public init(keyboardSource: KeyboardSource, packageDirectoryName: String) {
     self.enabled = true
     self.name = keyboardSource.name
     self.oskFont = keyboardSource.oskFont
     self.displayFont = keyboardSource.displayFont
     self.keyboardId = keyboardSource.id
-    self.keyboardDirectoryUrl = directoryUrl
-    self.kmxFileUrl = Keyboard.deriveKmxFileUrl(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
-    self.keyboardKey = Keyboard.deriveKeyboardSettingsKey(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
+    self.keyboardKey = Keyboard.deriveKeyboardSettingsKey(from: packageDirectoryName, keyboardId: self.keyboardId)
   }
   
   /**
    * initializer that does not rely on package source -- provided to create unit test data
    */
-  public init(name: String, oskFont: String? = nil, displayFont: String? = nil, keyboardId: String, keyboardDirectoryUrl: URL, enabled: Bool) {
+  public init(name: String, oskFont: String? = nil, displayFont: String? = nil, keyboardId: String, packageDirectoryName: String, enabled: Bool) {
     self.name = name
     self.oskFont = oskFont
     self.displayFont = displayFont
     self.keyboardId = keyboardId
-    self.keyboardDirectoryUrl = keyboardDirectoryUrl
-    self.kmxFileUrl = Keyboard.deriveKmxFileUrl(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
     self.enabled = enabled
-    self.keyboardKey = Keyboard.deriveKeyboardSettingsKey(from: self.keyboardDirectoryUrl, keyboardId: self.keyboardId)
+    self.keyboardKey = Keyboard.deriveKeyboardSettingsKey(from: packageDirectoryName, keyboardId: self.keyboardId)
   }
   
   /**
@@ -71,22 +63,19 @@ public class Keyboard: Identifiable, Hashable, Equatable {
   /**
    * generate the url for the keyboard's kmx file
    */
-  static func deriveKmxFileUrl(from keyboardDirectory: URL, keyboardId: String) -> URL {
+  func deriveKmxFileUrl(from keyboardDirectory: URL) -> URL {
     return keyboardDirectory.appendingPathComponent("\(keyboardId).kmx")
   }
-  
+
   /**
    * generate the keyboard's key
    * see the above comment for `keyboardKey` for a description of the format of the key
    */
- static func deriveKeyboardSettingsKey(from keyboardDirectory: URL, keyboardId: String) -> String {
-    // get parent directory
-    let parentDirectoryName = keyboardDirectory.lastPathComponent
-    
+ static func deriveKeyboardSettingsKey(from packageDirectoryName: String, keyboardId: String) -> String {
     // get filename from keyboardId
     let kmxFilename = "\(keyboardId).kmx"
     
-    let settingsKey = "/\(parentDirectoryName)/\(kmxFilename)"
+    let settingsKey = "/\(packageDirectoryName)/\(kmxFilename)"
     
     return settingsKey
   }
@@ -94,9 +83,10 @@ public class Keyboard: Identifiable, Hashable, Equatable {
   /**
    * validate whether a corresponding kmx file exists for this keyboard
    */
-  public func validateKmxFile() throws {
-    if !FileManager.default.fileExists(atPath: self.kmxFileUrl.path) {
-      print("** error: could not find kmx file \(self.kmxFileUrl.path)")
+  public func validateKmxFile(in packageDirectory: URL) throws {
+    let kmxFilePath = self.deriveKmxFileUrl(from: packageDirectory).path
+    if !FileManager.default.fileExists(atPath: kmxFilePath) {
+      print("** error: could not find kmx file \(kmxFilePath)")
       throw LoadPackageError.missingKmxFile
     }
   }

@@ -1,5 +1,5 @@
 ---
-title: Utility Module
+title: `keyman.util` - Utility Module
 ---
 
 The KeymanWeb Utility Function module is exposed to the developer as `window.keyman.util`.
@@ -45,7 +45,7 @@ The KeymanWeb Utility Function module is exposed to the developer as `window.key
 [`removeStyleSheet` Function](removeStyleSheet)
 :   Remove user-defined style sheet.
 
-[`rgba` Function](rgba)
+[`rgba` Function](rgba) (deprecated)
 :   Browser-independent alpha-channel management.
 
 [`saveCookie` Function](saveCookie)
@@ -54,12 +54,12 @@ The KeymanWeb Utility Function module is exposed to the developer as `window.key
 [`setOption` Function](setOption)
 :   Set a KeymanWeb, On-Screen Keyboard or User Interface option value.
 
-[`toFloat` Function](toFloat)
+[`toFloat` Function](toFloat) (deprecated)
 :   Floating conversion with default.
 
-[`toNumber` Function](toNumber)
+[`toNumber` Function](toNumber) (deprecated)
 :   Integer conversion with default.
 
-[`toNzString` Function](toNzString)
+[`toNzString` Function](toNzString) (deprecated)
 :   Returns default string value if argument is null, false, an empty
     string, or undefined.

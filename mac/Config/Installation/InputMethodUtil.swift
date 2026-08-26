@@ -53,14 +53,6 @@ public class InputMethodUtil {
   }
   
   /**
-   * true if the Keyman input method of the correct version exists in the correct location
-   */
-  public func isKeymanInputMethodCurrent()  -> Bool {
-    // MAC-CONFIG-TODO: implement with version check
-    return true
-  }
-  
-  /**
    * Returns version number string of Keyman input method
    */
   public func getKeymanInputMethodVersion() throws -> String {
@@ -280,7 +272,7 @@ public class InputMethodUtil {
   
   /**
    * Kill the application with the specified bundle Id
-   * This is only permitted when running oustide sandbox
+   * This is only permitted when running outside sandbox
    */
   func killApplication(bundleId: String) -> Bool {
     let runningApps = NSRunningApplication.runningApplications(withBundleIdentifier: bundleId)
