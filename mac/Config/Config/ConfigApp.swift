@@ -7,6 +7,7 @@
  */
 
 import SwiftUI
+import AppKit
 import KeymanSettings
 
 @main
@@ -22,11 +23,13 @@ struct ConfigApp: App {
         .task {
           if !installation.getHasDisplayedInstallationComplete() {
             openWindow(id: "install")
+            openWindow(id: "new install")
           }
         }
         .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in openWindow(id: "install")
         }
     }
+    
     Window("Installation", id: "install") {
       MainInstallView()
         .environmentObject(installation)
@@ -41,5 +44,53 @@ struct ConfigApp: App {
       InstallDebugView()
         .environmentObject(installation)
     }
+    
+    Window("New Installation", id: "new install") {
+      ParentInstallView()
+        .environmentObject(installation)
+    }
+    .defaultSize(width: 500, height: 400)
+    .windowResizability(.contentSize)
+    .commands {
+      CommandGroup(replacing: .appInfo) {
+        Button {
+          AboutPanelPresenter.showAboutPanel()
+        } label: {
+          Label("About Keyman Configuration", systemImage: "info.circle")
+        }
+      }
+    }
+  }
+}
+
+@MainActor
+private enum AboutPanelPresenter {
+  private static var aboutWindow: NSWindow?
+  
+  static func showAboutPanel() {
+    let contentView = AboutPanelView()
+    
+    let window = aboutWindow ?? makeAboutWindow()
+    window.contentView = NSHostingView(rootView: contentView)
+    window.center()
+    window.makeKeyAndOrderFront(nil)
+    aboutWindow = window
+    
+    NSApp.activate(ignoringOtherApps: true)
+  }
+  
+  private static func makeAboutWindow() -> NSWindow {
+    let window = NSWindow(
+      contentRect: NSRect(x: 0, y: 0, width: 570, height: 200),
+      styleMask: [.titled, .closable],
+      backing: .buffered,
+      defer: false
+    )
+    
+    window.titleVisibility = .hidden
+    window.titlebarAppearsTransparent = true
+    window.isReleasedWhenClosed = false
+    window.backgroundColor = .windowBackgroundColor
+    return window
   }
 }

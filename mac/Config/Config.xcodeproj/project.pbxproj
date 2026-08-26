@@ -51,6 +51,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		3A8B4F0F301263BC00A18F80 /* Resources */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		D87D6F492FAF95400083A95E /* Installation */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Installation;
@@ -101,6 +106,7 @@
 		D88F03BD2F50ED5000C02A31 = {
 			isa = PBXGroup;
 			children = (
+				3A8B4F0F301263BC00A18F80 /* Resources */,
 				D87D6F492FAF95400083A95E /* Installation */,
 				D88F03C82F50ED5000C02A31 /* Config */,
 				D88F03E02F50ED5100C02A31 /* ConfigUITests */,
@@ -142,6 +148,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				3A8B4F0F301263BC00A18F80 /* Resources */,
 				D87D6F492FAF95400083A95E /* Installation */,
 				D88F03C82F50ED5000C02A31 /* Config */,
 			);
