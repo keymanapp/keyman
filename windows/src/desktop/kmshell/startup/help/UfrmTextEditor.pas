@@ -154,8 +154,6 @@ type
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUserCheckFonts(var Message: TMessage); message WM_USER_CheckFonts;
     procedure PostKeymanControlMessage(msg, wParam: UINT; lParam: Cardinal);
-    {function SendKeymanControlMessage(msg, wParam: UINT;
-      lParam: Cardinal): Cardinal;}
     function CurrText: TTextAttributes;
     procedure GetFontNames;
     procedure SetEditRect;
@@ -347,18 +345,6 @@ begin
   if hKeymanControl <> 0 then
     PostMessage(hKeymanControl, wm_keyman_control, MAKELONG(msg, wParam), lParam);
 end;
-
-{function TfrmTextEditor.SendKeymanControlMessage(msg: UINT; wParam: UINT; lParam: Cardinal): Cardinal;
-var
-  hKeymanControl: THandle;
-begin
-  hKeymanControl := FindWindow('TApplication', 'keyman');
-  if hKeymanControl <> 0 then
-    Result := SendMessage(hKeymanControl, wm_keyman_control, MAKELONG(msg, wParam), lParam)
-  else
-    Result := 0;
-end;}
-
 
 procedure TfrmTextEditor.LoadWebBox(web: TframeCEFHost; const AdditionalData: WideString = '');   // I4181
 var
