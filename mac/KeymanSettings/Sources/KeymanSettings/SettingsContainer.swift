@@ -49,6 +49,12 @@ public extension Notification.Name {
   static let keyboardsChanged = Notification.Name("com.keyman.keyboards.changed")
 }
 
+// in-app notifications
+public extension Notification.Name {
+  // sent from InstallationContainer to SettingsContainer
+  static let dataMigrated = Notification.Name("com.keyman.data.migrated")
+}
+
 // define LocalizedError so that UI can present a localizable message
 // when the attempt to install a KMP file using drag and drop fails
 public enum DropKmpError: LocalizedError {
@@ -98,6 +104,15 @@ public class SettingsContainer : ObservableObject {
   // not indicated in the Config app but this could change
   fileprivate var selectedKeyboard: String
   
+  private let keyboardSearchPrefix = "https://keyman.com/go/macos/14.0/download-keyboards/?version="
+  
+  public var keyboardSearchUrl: URL {
+    let currentVersion = ConfigAppUtil.configAppVersion()
+    let searchString: String = keyboardSearchPrefix + currentVersion
+    let searchUrl = URL(string: searchString)!
+    return searchUrl
+  }
+  
   public init() {
     // initialize arrays before loading packages
     self.singleKeyboardPackages = []
@@ -116,7 +131,7 @@ public class SettingsContainer : ObservableObject {
 
     // create the settings repository, gaining access to the app group UserDefaults
     do {
-      try self.defaultsRepository = DefaultsRepository(suiteName: KeymanPaths.groupId)
+      try self.defaultsRepository = DefaultsRepository(suiteName: InputMethodUtil.groupId)
       print("Found defaults group container")
     } catch UserDefaultsError.unknownSuite {
       fatalError("Defaults group container not found.")
@@ -134,6 +149,8 @@ public class SettingsContainer : ObservableObject {
     // next, apply the settings to the packages
     // this mainly consists of marking them as enabled or not
     self.applyUserDefaultsToInstalledPackages()
+    
+    self.registerObservers()
   }
   
   /**
@@ -148,7 +165,24 @@ public class SettingsContainer : ObservableObject {
     self.multiKeyboardPackages = []
     self.installedPackages = []
   }
-    
+
+  /**
+   * register observers to receive
+   */
+  func registerObservers() {
+    NotificationCenter.default.addObserver(self, selector: #selector(self.reloadPackages), name: .dataMigrated, object: nil)
+  }
+  
+  /**
+   * Refresh the packages array and apply settings.
+   * This should only be needed after a migration and could be removed if
+   * the migration were made earlier.
+   */
+  @objc public func reloadPackages() {
+    self.loadPackages()
+    self.applyUserDefaultsToInstalledPackages()
+  }
+
   /**
    * Whenever the installedPackages array changes, recreate the two subarrays
    */
@@ -293,14 +327,7 @@ public class SettingsContainer : ObservableObject {
    *  read the Keyman packages from the group container directory and store in the installedPackages array
    */
   func loadPackages() {
-    var packagesArray = nil as [KeymanPackage]?
-    
-    // read keyboards from disk
-    packagesArray = self.packageRepository.loadAllPackages()
-    
-    if let persistedPackages = packagesArray {
-      self.installedPackages = persistedPackages
-    }
+    self.installedPackages = self.packageRepository.loadAllPackages()
   }
   
   /**

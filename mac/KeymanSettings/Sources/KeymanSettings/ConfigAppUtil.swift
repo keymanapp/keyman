@@ -9,6 +9,8 @@
 import Foundation
 
 public struct ConfigAppUtil {
+  static public let configBundleId = "com.keyman.config"
+
   /**
    * returns the short version string from the bundle of the Config app
    */

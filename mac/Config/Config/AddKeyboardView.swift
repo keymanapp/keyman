@@ -3,24 +3,12 @@
  *
  * Created by Shawn Schantz on 2026-06-16
  *
- * Contains webview to search for keyboards and injects
- * DownloadCoordinator to bridge back to SwiftUI
+ * Contains webview to search for keyboards
+ * Injects DownloadCoordinator to bridge back to SwiftUI
  */
 
 import SwiftUI
 import KeymanSettings
-
-struct VisualEffectBlur: NSViewRepresentable {
-  func makeNSView(context: Context) -> NSVisualEffectView {
-    let view = NSVisualEffectView()
-    view.material = .hudWindow      // Matches native dark/light HUD styling
-    view.blendingMode = .withinWindow
-    view.state = .active
-    return view
-  }
-  
-  func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
-}
 
 struct AddKeyboardView: View {
   @EnvironmentObject var settings: SettingsContainer
@@ -106,3 +94,16 @@ struct AddKeyboardView: View {
     }
   }
 }
+
+struct VisualEffectBlur: NSViewRepresentable {
+  func makeNSView(context: Context) -> NSVisualEffectView {
+    let view = NSVisualEffectView()
+    view.material = .hudWindow      // matches native dark/light HUD styling
+    view.blendingMode = .withinWindow
+    view.state = .active
+    return view
+  }
+  
+  func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
+}
+

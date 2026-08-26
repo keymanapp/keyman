@@ -136,7 +136,6 @@ public class PackageInstallHelper: Identifiable {
    */
   func determinePackageInstallationType(newPackage: KeymanPackage) -> PackageInstallationType {
     var installationType: PackageInstallationType = .newPackage(newPackage.packageName)
-    let packageAlreadyInstalled = self.packageToReplace != nil
     
     // if we are replacing an existing package, then determine what type of replacement this is
     if let existingPackage = self.packageToReplace {
@@ -283,18 +282,6 @@ public class PackageInstallHelper: Identifiable {
   }
 
   /**
-   * Check whether a package of the same name is already installed which may be replaced.
-   */
-  func checkForExistingPackage() -> Bool {
-    var packageExists = false
-    
-    if let package = self.installedPackages.first(where: { $0.packageName == self.packageToInstall?.packageName }) {
-      packageExists = true
-    }
-    return packageExists
-  }
-  
-  /**
    * If a package of the same name exists, return it.
    */
   func findExistingPackage() -> KeymanPackage? {
@@ -319,7 +306,7 @@ public class PackageInstallHelper: Identifiable {
     }
 
     try self.movePackageFromTemporaryToInstalled()
-    try self.installFontsForPackage()
+    self.installFontsForPackage()
   }
   
   /**
@@ -335,7 +322,7 @@ public class PackageInstallHelper: Identifiable {
       }
     }
     try self.movePackageFromTemporaryToInstalled()
-    try self.installFontsForPackage()
+    self.installFontsForPackage()
   }
   
   /**

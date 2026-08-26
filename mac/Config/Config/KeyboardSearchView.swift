@@ -19,9 +19,6 @@ struct KeyboardSearchView: NSViewRepresentable {
   
   // note that the EnvironmentObject is not available within init (if we were to implement that)
   // it is injected just before makeNSView and updateNSView are called
-  
-  // MAC-CONFIG-TODO: build URL rather than hard-code
-  let searchURL = URL(string: "https://keyman.com/go/macos/14.0/download-keyboards/?version=19.0.284")!
 
   /** Creates the underlying NSView (WKWebView) for macOS */
   func makeNSView(context: Context) -> WKWebView {
@@ -31,7 +28,7 @@ struct KeyboardSearchView: NSViewRepresentable {
     // assign the coordinator as the navigation delegate
     webView.navigationDelegate = self.coordinator
     
-    let request = URLRequest(url: searchURL)
+    let request = URLRequest(url: settings.keyboardSearchUrl)
     webView.load(request)
     return webView
   }

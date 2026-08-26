@@ -4,7 +4,6 @@
  * Created by Gabriel Schantz on 2026-06-29
  *
  * Main view used for configuring Keyman
- * MAC-CONFIG-TODO: Set default width and height for window
  */
 
 import SwiftUI
@@ -69,9 +68,8 @@ struct MainConfigView: View {
           AddKeyboardView()
             // disable escape key for closing view to avoid issues with canceling downloads
             .interactiveDismissDisabled(true)
-          // MAC-CONFIG-TODO: Make width and height percentages
-            .frame(width: 960, height: 390)
-        }
+            .frame(minWidth: 800, minHeight: 600)
+       }
         
         List {
           // the view  for single keyboard packages
@@ -85,6 +83,9 @@ struct MainConfigView: View {
             showHelpTab(for: url) })
         }
         .listStyle(.inset)
+        
+        // confirmation dialog for deleting a package
+        
         .confirmationDialog(
           "Are you sure you want to delete the Keyman package '\(packageNameToDelete)'?",
           isPresented: Binding(
@@ -111,6 +112,9 @@ struct MainConfigView: View {
             idToDelete = nil
           }
         }
+        
+        // drag and drop
+        
         // highlight border with accent color when hovering over view
         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.accentColor, lineWidth: 2).opacity(isHovering ? 1 : 0))
         .animation(.easeInOut(duration: 0.2), value: isHovering)
@@ -134,12 +138,17 @@ struct MainConfigView: View {
         } isTargeted: { hovering in
           isHovering = hovering
         }
-        // alert triggers automatically when $isShowingDropKmpAlert is true
+        
+        // alert to indicate failed package installation
+        
         .alert("Package Installation Failed", isPresented: $isShowingDropKmpAlert) {
             Button("OK", role: .cancel) { }
         } message: {
             Text(alertMessage)
         }
+        
+        // package installation confirmation, displays readme contents for package
+        
         .sheet(item: $packageInstallHelper) { helper in
           PackageConfirmationView(installHelper: helper) { accepted in
             

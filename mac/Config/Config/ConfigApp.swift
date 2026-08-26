@@ -18,7 +18,6 @@ struct ConfigApp: App {
   var body: some Scene {
     Window("Configuration", id: "main-config") {
       MainConfigView()
-//        .background(Color(.underPageBackgroundColor))
         .frame(
             minWidth: 600, maxWidth: 1000,
             minHeight: 400, maxHeight: .infinity
@@ -33,18 +32,20 @@ struct ConfigApp: App {
         }
     }
     // the size of the window when first opened
-    //    .defaultSize(width: 1024, height: 768)
         .defaultSize(width: 800, height: 600)
         .windowResizability(.contentSize)
+    
     Window("Installation", id: "install") {
       MainInstallView()
         .environmentObject(installation)
     }
     .windowResizability(.contentSize)
     .defaultSize(width: 600, height: 500)
-    Window("Install Test", id: "install-debug") {
-      InstallDebugView()
-        .environmentObject(installation)
-    }
+    
+    // for testing purposes
+//    Window("Install Test", id: "install-debug") {
+//      InstallDebugView()
+//        .environmentObject(installation)
+//    }
   }
 }

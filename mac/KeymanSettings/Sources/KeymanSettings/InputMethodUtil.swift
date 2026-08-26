@@ -10,7 +10,6 @@
 import Foundation
 import Carbon.HIToolbox
 import AppKit
-import KeymanSettings
 
 public enum KeymanVersionCheckError: Error {
   case inputMethodNotFound
@@ -25,6 +24,13 @@ public enum KeymanInvocationError: Error {
 public let kAccessibilityPermissionGrantedMessage = "granted"
 
 public class InputMethodUtil {
+  public static let keymanBundleId = "keyman.inputmethod.Keyman"
+  public static let groupId = "group.com.keyman"
+  
+  public static let keymanDomain = "keyman.com"
+  public static let keymanHelpDomain = "help.keyman.com"
+  public static let keymanApiDomain = "api.keyman.com"
+
   public let keymanInputMethodApplicationName = "Keyman.app"
 
   // only initialized after message is received from input method
@@ -63,14 +69,14 @@ public class InputMethodUtil {
    * Returns true if the Keyman input method is running
    */
   public func isKeymanInputMethodRunning() -> Bool {
-    return self.isApplicationRunning(bundleId: KeymanPaths.keymanBundleId)
+    return self.isApplicationRunning(bundleId: InputMethodUtil.keymanBundleId)
   }
   
   /**
    * returns true if the specified bundleId is enabled
    */
   public func isKeymanInputMethodEnabled() -> Bool {
-    return self.isInputMethodEnabled(bundleId: KeymanPaths.keymanBundleId)
+    return self.isInputMethodEnabled(bundleId: InputMethodUtil.keymanBundleId)
   }
   
   /**
@@ -78,40 +84,40 @@ public class InputMethodUtil {
    * a newly installed input method must be registered before enabling
    */
   public func registerKeymanInputMethod() -> Bool {
-    return self.registerInputMethod(bundleId: KeymanPaths.keymanBundleId)
+    return self.registerInputMethod(bundleId: InputMethodUtil.keymanBundleId)
   }
   
   /**
    * attempts to enable the Keyman input method and returns true if successful
    */
   public func enableKeymanInputMethod() -> Bool {
-    return self.enableInputMethod(bundleId: KeymanPaths.keymanBundleId)
+    return self.enableInputMethod(bundleId: InputMethodUtil.keymanBundleId)
   }
   
   /**
    * attempts to select the Keyman input method and returns true if successful
    */
   public func selectKeymanInputMethod() -> Bool {
-    return self.selectInputSource(inputSourceId: KeymanPaths.keymanBundleId)
+    return self.selectInputSource(inputSourceId: InputMethodUtil.keymanBundleId)
   }
   
   /**
    * attempts to disable the Keyman input method and returns true if successful
    */
   public func disableKeymanInputMethod() -> Bool {
-    return self.disableInputMethod(bundleId: KeymanPaths.keymanBundleId)
+    return self.disableInputMethod(bundleId: InputMethodUtil.keymanBundleId)
   }
   
   /**
    * Kill Keyman -- only permitted when running oustide sandbox
    */
   public func killKeymanInputMethod() -> Bool {
-    return killApplication(bundleId: KeymanPaths.keymanBundleId)
+    return killApplication(bundleId: InputMethodUtil.keymanBundleId)
   }
   
-  // MAC-CONFIG_TODO: deleting the app files with default security settings, need some other approach to uninstall
   /**
    * uninstalls the Keyman input method
+   * note: not useful to expose to users as default security systems prevent us from deleting the app
    */
   public func uninstallKeyman() {
     _ = self.killKeymanInputMethod()
@@ -160,12 +166,12 @@ public class InputMethodUtil {
     }
   }
   
-  func invokeKeymanInputMethodMigration() -> Bool {
+  public func invokeKeymanInputMethodMigration() -> Bool {
     print("invokeKeymanInputMethodMigration()")
     return self.invokeKeymanInputMethodAsSubProcess(argument: kMigrateCommand) == 0
   }
   
-  func invokeKeymanInputMethodRequestAccess() -> Bool {
+  public func invokeKeymanInputMethodRequestAccess() -> Bool {
     var success = false
     do {
       print("invokeKeymanInputMethodRequestAccess()")
@@ -215,7 +221,7 @@ public class InputMethodUtil {
     var currentEnv = ProcessInfo.processInfo.environment
     print("current env: \(String(describing: currentEnv))")
     
-    currentEnv["__CFBundleIdentifier"] = KeymanPaths.keymanBundleId // set bundle ID to that of the Keyman input method
+    currentEnv["__CFBundleIdentifier"] = InputMethodUtil.keymanBundleId // set bundle ID to that of the Keyman input method
     process.environment = currentEnv
     
     do {
@@ -258,7 +264,7 @@ public class InputMethodUtil {
    * Calls Keyman input method to check whether it has accessibility permission granted.
    * Receives response as distributed notification named `accessibilityStateResponse`
    */
-  func doAsyncAccessibilityCheck() {
+  public func doAsyncAccessibilityCheck() {
     do {
       try self.invokeKeymanInputMethodCheckAccess()
     } catch {
@@ -295,7 +301,7 @@ public class InputMethodUtil {
    * returns the TISInputSource for the specified bundleId
    */
   func getKeymanInputSource() -> TISInputSource? {
-    return self.getInputSource(bundleId: KeymanPaths.keymanBundleId)
+    return self.getInputSource(bundleId: InputMethodUtil.keymanBundleId)
   }
   
   /**

@@ -35,20 +35,11 @@ public enum KeymanPathError: Error {
 }
 
 public struct KeymanPaths {
-  // MAC-CONFIG-TODO: move to input method util?
-  static public let keymanBundleId = "keyman.inputmethod.Keyman"
-  static public let configBundleId = "com.keyman.config"
-  static public let groupId = "group.com.keyman"
-  
-  static public let keymanDomain = "keyman.com"
-  static public let keymanHelpDomain = "help.keyman.com"
-  static public let keymanApiDomain = "api.keyman.com"
-
     // keyman file extensions
   static public let keymanPackageFileExtension: String = "kmp"
 
   static private let preKeyman19PackagesDirectoryName = "Keyman-Keyboards"
-  static private let keymanSubdirectoryName = keymanBundleId
+  static private let keymanSubdirectoryName = InputMethodUtil.keymanBundleId
   
   static public var getFontsDirectory: URL {
     // force unwrap is safe here because the system user domain library always exists
@@ -248,7 +239,7 @@ public struct KeymanPaths {
    * build the URL to the app group container
    */
   private static func buildContainerUrl() -> URL? {
-    return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: KeymanPaths.groupId)
+    return FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: InputMethodUtil.groupId)
   }
   
   /**
@@ -270,20 +261,5 @@ public struct KeymanPaths {
    */
   private static func buildKeyman19TempUrl(container: URL) -> URL {
     return container.appendingPathComponent(KeymanPaths.containerTempPartialPath, isDirectory: true)
-  }
-
-  // MAC-CONFIG-TODO: remove
-  fileprivate func checkContainerUrl() -> Bool {
-    var containerValid = false
-    let sharedFileManager = FileManager.default
-    
-    /* a URL of the expected form is always returned, even if the app group is invalid, so verify access before using" */
-    
-    if let containerUrl = sharedFileManager.containerURL(forSecurityApplicationGroupIdentifier: KeymanPaths.groupId) {
-      containerValid = true
-      print("containerUrl = \(containerUrl)")
-    }
-    
-    return containerValid
   }
 }

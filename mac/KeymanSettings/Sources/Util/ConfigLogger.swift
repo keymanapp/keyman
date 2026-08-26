@@ -10,7 +10,7 @@ import OSLog
 class ConfigLogger {
   //static let shared = ConfigLogger()
 
-  fileprivate let subsystem = KeymanPaths.configBundleId
+  fileprivate let subsystem = ConfigAppUtil.configBundleId
   fileprivate let testCategory = "test"
   public let testLogger: Logger
   
