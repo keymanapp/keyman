@@ -1,3 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2024-07-08.
+ *
+ * This file defines many predictive-text engine's helper methods used for the
+ * overall process of text prediction.
+ */
+
 import * as models from '@keymanapp/models-templates';
 import { KMWString } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
