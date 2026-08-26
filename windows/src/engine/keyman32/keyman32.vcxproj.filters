@@ -210,7 +210,7 @@
     <ClInclude Include="keyman64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="keymancontrol.h">
+    <ClInclude Include="..\..\..\include\keymancontrol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="keystate.h">

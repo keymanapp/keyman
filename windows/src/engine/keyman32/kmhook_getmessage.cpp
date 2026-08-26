@@ -157,7 +157,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
     BYTE scan = KEYMSG_LPARAM_SCAN(mp->lParam);
     BYTE keyTransitionEvent = KEYMSG_FLAG_TRANSITION(mp->lParam);
-    CheckScheduledRefresh();
+    RefreshThreadKeyboardsIfRequired();
     UpdateLastKeyCache(_td, mp->wParam, scan, keyTransitionEvent);
 
     switch (mp->wParam) {
@@ -393,20 +393,24 @@ void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam)
 void
 ProcessWMKeymanControl(WPARAM wParam, LPARAM lParam) {
 
-  switch (wParam) {
-  case KMC_PROFILECHANGED:
-    {
-      if (!Globals::IsControllerThread(GetCurrentThreadId())) {
-        break;
-      }
-      WORD wAtom = HIWORD(lParam);
-      char atomStr[128];
-      if (GlobalGetAtomName(wAtom, atomStr, 128)) {
-        isKeymanKeyboardActive = strstr(atomStr, cs_clsidKMTipTextService) != nullptr;
-      }
-      break;
+  if (!Globals::IsControllerThread(GetCurrentThreadId())) {
+    return;
+  }
+
+  if (wParam == KMC_PROFILECHANGED) {
+    WORD wAtom = HIWORD(lParam);
+    char atomStr[128];
+    if (GlobalGetAtomName(wAtom, atomStr, 128)) {
+      isKeymanKeyboardActive = strstr(atomStr, cs_clsidKMTipTextService) != nullptr;
     }
   }
+#ifndef _WIN64
+  else if(wParam == KMC_REGISTER_HOST_WINDOW_X64) {
+    *Globals::hwndHostX64() = (HWND) lParam;
+  } else if(wParam == KMC_REGISTER_HOST_WINDOW_ARM64) {
+    *Globals::hwndHostARM64() = (HWND) lParam;
+  }
+#endif
 }
 
 /*
