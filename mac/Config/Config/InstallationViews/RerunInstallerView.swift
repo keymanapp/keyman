@@ -17,7 +17,6 @@ struct RerunInstallerView: View {
   
   var body: some View {
     VStack {
-//      Label("Missing Keyman Components", systemImage: "hand.raised.fill")
       Text("Missing Keyman Components")
         .font(.title)
         .bold()

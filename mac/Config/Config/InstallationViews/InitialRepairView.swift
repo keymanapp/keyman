@@ -17,7 +17,6 @@ struct InitialRepairView: View {
   
   var body: some View {
     VStack {
-//      Label("Repairs Required", systemImage: "hand.raised.fill")
       Text("Repairs Required")
         .font(.title)
         .bold()

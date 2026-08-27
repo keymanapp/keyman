@@ -50,23 +50,43 @@ public struct PackageContentWebView: NSViewRepresentable {
   @MainActor
   public class Coordinator: NSObject, WKNavigationDelegate {
     public func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void) {
-      
-      // check whether the user clicked a link
-      if navigationAction.navigationType == .linkActivated,
-         let url = navigationAction.request.url {
-        
-        // if it is an external link, intercept it and open it a browser window
-        if url.scheme == "http" || url.scheme == "https" {
-          NSWorkspace.shared.open(url) // opens default macOS browser
-          decisionHandler(.cancel)     // blocks the webview from loading it
-          return
-        }
+                        decidePolicyFor navigationAction: WKNavigationAction,
+                        decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void) {
+
+      // if not url, cancel
+      guard let url = navigationAction.request.url else {
+        decisionHandler(.cancel)
+        return
       }
       
-      // allow local navigation
-      decisionHandler(.allow)
+      // if not user-activated, pass through, e.g. for redirects
+      guard navigationAction.navigationType == .linkActivated else {
+          decisionHandler(.allow)
+          return
+      }
+
+      // local files load in webview
+      if url.isFileURL {
+          decisionHandler(.allow)
+          return
+      }
+
+      // handle external links by opening in web browser
+      decisionHandler(.cancel)
+
+      var externalUrl = url
+
+      // strip "link:" prefix if present
+      let urlString = url.absoluteString
+      if urlString.hasPrefix("link:https://") || urlString.hasPrefix("link:http://") {
+          let cleanString = urlString.replacingOccurrences(of: "link:", with: "")
+          if let cleanUrl = URL(string: cleanString) {
+              externalUrl = cleanUrl
+          }
+      }
+
+      // Open the external link in the default browser
+      NSWorkspace.shared.open(externalUrl)
     }
   }
 }
