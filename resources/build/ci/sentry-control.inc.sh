@@ -40,3 +40,17 @@ function makeSentryRelease() {
   fi
 }
 
+function sentry_upload_web () {
+  if ! isSentryConfigured; then
+    echo "Skipping Sentry upload: SENTRY_ORG and/or SENTRY_PROJECT are unset."
+    return
+  fi
+
+  echo "Uploading $1 to Sentry..."
+
+  # --strip-common-prefix does not take an argument, unlike --strip-prefix.  It auto-detects
+  # the most common prefix instead.
+  sentry-cli releases files "${KEYMAN_VERSION_GIT_TAG}" upload-sourcemaps --strip-common-prefix "$1" \
+    --rewrite --ext js --ext map --ext ts
+  echo "Upload successful."
+}
