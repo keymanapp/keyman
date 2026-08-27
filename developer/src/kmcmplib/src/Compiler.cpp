@@ -138,7 +138,7 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode);
-KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets);
+KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &targets);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -1331,7 +1331,16 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
   return TRUE;
 }
 
-KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets) {
+/**
+ * Extract the compile targets from the &targets store, and rewrite the
+ * &targets dpString value to remove unnecessary whitespace. Does not
+ * reallocate sp->dpString, but overwrites its value with a string the
+ * same length or shorter.
+ * @param sp          store value to rewrite
+ * @param targets     (output)
+ * @return FALSE if no targets found or invalid targets found
+ */
+KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &targets) {
   // Compile to .kmx
   const std::vector<std::u16string> KMXKeymanTargets{
     u"windows", u"macosx", u"linux", u"desktop"
@@ -1347,10 +1356,17 @@ KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets)
 
   targets = 0;
   auto p = new KMX_WCHAR[u16len(store)+1];
-  u16cpy(p, store);
+  auto q = p;
+  *p = 0;
   KMX_WCHAR* ctx;
-  auto token = u16tok(p, u" ", &ctx);
+  auto token = u16tok(store, u" ", &ctx);
   while(token) {
+    if(q > p) {
+      // Insert a delimiter between tokens, if
+      // more than one token
+      *q++ = ' ';
+      *q = 0;
+    }
     bool found = false;
     if(*token) {
       if(AnyTarget == token) {
@@ -1378,9 +1394,16 @@ KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets)
         targets = 0;
         return FALSE;
       }
+
+      // Append the token to the output, we know it is long enough
+      // because the buffer is the same length as the input
+      u16cpy(q, token);
+      q = const_cast<KMX_WCHAR*>(u16chr(q, 0));
+      *q = 0;
     }
     token = u16tok(nullptr, u" ", &ctx);
   }
+  u16cpy(store, p);
   delete[] p;
 
   if(targets == 0) {
