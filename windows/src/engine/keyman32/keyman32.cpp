@@ -612,8 +612,7 @@ void HandleRefresh(int code, LONG tag) {
       break;
     }
 
-  #ifndef _WIN64
-
+#ifndef _WIN64
     // This RefreshTag is only ever incremented here by the controller thread
     // for x86 so this is a thread safe operation
     *Globals::RefreshTag() = Globals::get_RefreshTag() + 1;
@@ -626,7 +625,7 @@ void HandleRefresh(int code, LONG tag) {
     }
 #else
     *Globals::RefreshTag() = tag;
-    #endif
+#endif
 
     SendDebugMessageFormat("HandleRefresh: new tag = %d", Globals::get_RefreshTag());
     RefreshThreadKeyboardsIfRequired();
