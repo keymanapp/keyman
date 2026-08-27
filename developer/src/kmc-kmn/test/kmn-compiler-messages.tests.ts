@@ -285,4 +285,13 @@ describe('KmnCompilerMessages', function () {
     await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_square_brackets-deadkey.kmn'], [KmnCompilerMessages.ERROR_NameMustNotContainSquareBrackets, KmnCompilerMessages.ERROR_InvalidDeadkey]);
   });
 
+  // WARN_DeprecatedStatement
+
+  it('should generate WARN_DeprecatedStatement if the file has `clearcontext` or `fix` statements and is 19.0', async function() {
+    await testForMessage(this, ['keyboards', 'warn_deprecated_statement-clearcontext-19.kmn'], KmnCompilerMessages.WARN_DeprecatedStatement);
+    await testForMessage(this, ['keyboards', 'warn_deprecated_statement-fix-19.kmn'], KmnCompilerMessages.WARN_DeprecatedStatement);
+    await testForMessage(this, ['keyboards', 'warn_deprecated_statement-clearcontext-17.kmn']);
+    await testForMessage(this, ['keyboards', 'warn_deprecated_statement-fix-17.kmn']);
+  });
+
 });
