@@ -662,7 +662,17 @@ export async function correctAndEnumerate(
       continue;
     }
 
-    if(match.editCount > 0 && !searchModules.find(s => s.correctionsEnabled)) {
+    // In the case of a backspace, we wipe out the original form of the search
+    // module and replace it with a format that also signals that corrections
+    // aren't enabled.
+    //
+    // To resolve this, we check the pre-transition form in order to check if
+    // corrections were enabled before a backspace.
+    const correctionsWereEnabled = transition.base.displayTokenization.tail.searchModule.correctionsEnabled;
+    if(match.editCount > 0
+      && !searchModules.find(s => s.correctionsEnabled)
+      && !(TransformUtils.isBackspace(inputTransform) && correctionsWereEnabled)
+    ) {
       continue;
     }
 
@@ -1075,19 +1085,6 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
   if(baseCorrection.length == 0) {
     // If the correction is rooted on an empty root, there's no basis for
     // auto-correcting to this suggestion.
-    return;
-  }
-
-  // Find the highest probability for any correction that led to a valid prediction.
-  // No need to full-on re-sort everything, though.
-  const bestCorrection = suggestionDistribution.reduce(
-    (prev, current) => prev?.correction.p > current.correction.p ? prev : current,
-    null
-  ).correction;
-  if(bestCorrection.p > bestSuggestion.correction.p) {
-    // Here, the best suggestion didn't come from the best correction.
-    // Is it actually reasonable to auto-correct?  We're probably just very
-    // biased toward its frequency.  (Maybe a threshold should be considered?)
     return;
   }
 

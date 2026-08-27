@@ -9,9 +9,9 @@
  */
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { KMWString } from 'keyman/common/web-utils';
+import { KMWString, PriorityQueue } from 'keyman/common/web-utils';
 
-import { PathResult } from './correction-searchable.js';
+import { CORRECTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';
 import { SearchNode } from './distance-modeler.js';
 import { SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
@@ -24,6 +24,9 @@ import Transform = LexicalModelTypes.Transform;
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class LegacyQuotientSpur extends SearchQuotientSpur {
+  private transposeQueue: PriorityQueue<SearchNode> = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR);
+  private incomingTransposeRootNodes: TokenResultMapping[] = [];
+
   public readonly insertLength: number;
   public readonly leftDeleteLength: number;
 
@@ -44,14 +47,22 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     super(space, inputs, inputSource, codepointLength);
     this.insertLength = insertLength;
     this.leftDeleteLength = inputSample.deleteLeft;
-    return;
+
+    // Link to the grandparent node if it exists; transposes start construction rooted there.
+    const grandparentNode = this.parents[0].parents[0]
+    if(grandparentNode) {
+      this.incomingTransposeRootNodes = [...grandparentNode.previousResults];
+      this.linkAndQueueFromParent(grandparentNode, this.incomingTransposeRootNodes);
+    }
   }
 
   construct(parentNode: SearchQuotientNode, inputs?: Distribution<Transform>, inputSource?: PathInputProperties): this {
     return new LegacyQuotientSpur(parentNode, inputs, inputSource) as this;
   }
 
-  protected buildEdgesFromResults(priorResults: ReadonlyArray<TokenResultMapping>): SearchNode[] {
+  protected buildEdgesFromResults(priorResults: ReadonlyArray<TokenResultMapping>, inputs?: Distribution<Transform>): SearchNode[] {
+    const edgeInputs = inputs ?? this.inputs;
+
     // With a newly-available input, we can extend new input-dependent paths from
     // our previously-reached 'extractedResults' nodes.
     let outboundNodes = priorResults.map((result) => {
@@ -61,9 +72,9 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
 
       let deletionEdges: SearchNode[] = [];
       if(!substitutionsOnly) {
-        deletionEdges         = result.buildDeletionEdges(this.inputs, this.spaceId);
+        deletionEdges         = result.buildDeletionEdges(edgeInputs, this.spaceId);
       }
-      const substitutionEdges = result.buildSubstitutionEdges(this.inputs, this.spaceId);
+      const substitutionEdges = result.buildSubstitutionEdges(edgeInputs, this.spaceId);
 
       // Skip the queue for the first pass; there will ALWAYS be at least one pass,
       // and queue-enqueing does come with a cost - avoid unnecessary overhead here.
@@ -73,6 +84,13 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     return outboundNodes;
   }
 
+  get currentCost() {
+    const defaultCost = super.currentCost;
+    const transposeCost = this.transposeQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
+
+    return Math.min(transposeCost, defaultCost);
+  }
+
   /**
    * Retrieves the lowest-cost / lowest-distance edge from the selection queue,
    * checks its validity as a correction to the input text, and reports on what
@@ -80,6 +98,42 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
    * @returns
    */
   public handleNextNode(): PathResult<TokenResultMapping> {
+    this.processPendingRoots();
+    const transposeCost = this.transposeQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY;
+
+    // Handle transposition cases
+    if(transposeCost < super.currentCost) {
+      let currentNode = this.transposeQueue.dequeue();
+
+      let unmatchedResult: PathResult<TokenResultMapping> = {
+        type: 'intermediate',
+        cost: currentNode.currentCost
+      }
+
+      // Stage 1:  filter out nodes/edges we want to prune
+
+      // Forbid a raw edit-distance of greater than 2.
+      // Note:  .knownCost is not scaled, while its contribution to .currentCost _is_ scaled.
+      if(currentNode.editCount > 2) {
+        return unmatchedResult;
+      }
+
+      // Stage 2:  process subset further OR build remaining edges
+
+      if(currentNode.hasPartialInput) {
+        // Re-use the current queue; the number of total inputs considered still holds.
+        this.transposeQueue.enqueueAll(currentNode.processSubsetEdge());
+        return unmatchedResult;
+      }
+
+      // If here, we've properly done the first half of a transpose.  Now for the other half...
+
+      // const transposeSecondHalfNodes = currentNode.buildSubstitutionEdges((this.parents[0] as LegacyQuotientSpur).inputs, this.spaceId);
+      const transposeSecondHalfNodes = this.buildEdgesFromResults([new TokenResultMapping(this, currentNode)], (this.parents[0] as LegacyQuotientSpur).inputs);
+      this.queueNodes(transposeSecondHalfNodes);
+      return unmatchedResult;
+    }
+
     const result = super.handleNextNode();
 
     if(result.type == 'complete') {
@@ -94,5 +148,16 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     }
 
     return result;
+  }
+
+  protected processPendingRoots(): void {
+    super.processPendingRoots();
+
+    while(this.incomingTransposeRootNodes.length > 0) {
+      // Build only substitution edges from these.
+      const transpositionFirstHalves = this.incomingTransposeRootNodes.pop().buildSubstitutionEdges(this.inputs, this.spaceId);
+      transpositionFirstHalves.forEach((n) => n.addEdit());
+      this.transposeQueue.enqueueAll(transpositionFirstHalves);
+    }
   }
 }
