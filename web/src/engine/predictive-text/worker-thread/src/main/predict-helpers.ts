@@ -557,7 +557,7 @@ export function buildAndMapPredictions(
 
   // Worth considering:  extend Traversal to allow direct prediction lookups?
   // let traversal = match.finalTraversal; // ...
-  let rawPredictions = predictFromCorrections(model, [predictionRoot], predictionContext);
+  const rawPredictions = predictFromCorrections(model, [predictionRoot], predictionContext);
   const predictions: CorrectionPredictionTuple[] = rawPredictions.map((entry) => {
     entry.prediction.sample.transform.deleteLeft += committedDeleteLeft;
 
