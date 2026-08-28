@@ -15,8 +15,8 @@ let defaultReadmeFilename = "readme.htm"
 
 public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
   public var id = UUID()
-  let system: SystemInfo?
-  let options: Options?
+  let system: SystemInfo
+  let options: Options
   let info: Info
   let files: [PackageFile]?
   let keyboards: [KeyboardSource]?
@@ -29,14 +29,10 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
     return info.version.description
   }
   var copyright: String? {
-    if let copy = info.copyright?.description {
-      return copy
-    } else {
-      return nil
-    }
+    return info.copyright?.description
   }
   var readmeFilename: String? {
-    if let filename = options?.readmeFile {
+    if let filename = options.readmeFile {
       return filename
     }
     if let fileArray = self.files {
@@ -47,9 +43,8 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
     return nil
   }
   var helpFilename: String? {
-    if let filename = options?.welcomeFile {
-      return filename
-    }
+    if let filename = options.welcomeFile { return filename }
+
     if let fileArray = self.files {
       if fileArray.contains(where: { $0.name == defaultHelpFilename }) {
         return defaultHelpFilename
@@ -59,11 +54,7 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
     return nil
   }
   var graphicFilename: String? {
-    if let filename = options?.graphicFile {
-      return filename
-    } else {
-      return nil
-    }
+    return options.graphicFile
   }
   
   enum CodingKeys: String, CodingKey {
@@ -79,8 +70,8 @@ public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
     
     self.info = try container.decode(Info.self, forKey: .info)
     self.keyboards = try container.decodeIfPresent([KeyboardSource].self, forKey: .keyboards)
-    self.system = try container.decodeIfPresent(SystemInfo.self, forKey: .system)
-    self.options = try container.decodeIfPresent(Options.self, forKey: .options)
+    self.system = try container.decode(SystemInfo.self, forKey: .system)
+    self.options = try container.decode(Options.self, forKey: .options)
     self.files = try container.decodeIfPresent([PackageFile].self, forKey: .files)
     
     if files?.isEmpty ?? true {
@@ -148,7 +139,7 @@ struct Website: Decodable {
 
 struct SystemInfo: Decodable {
   let keymanDeveloperVersion: String?
-  let fileVersion: String?
+  let fileVersion: String
   
   enum CodingKeys: String, CodingKey {
     case keymanDeveloperVersion

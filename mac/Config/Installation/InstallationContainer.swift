@@ -39,7 +39,7 @@ public class InstallationContainer : ObservableObject {
     let defaultsRepo: DefaultsRepository
     // create the settings repository, gaining access to the app group UserDefaults
     do {
-      defaultsRepo = try DefaultsRepository(suiteName: KeymanPaths.groupId)
+      defaultsRepo = try DefaultsRepository(suiteName: InputMethodUtil.groupId)
       print("Found group container")
     } catch UserDefaultsError.unknownSuite {
       fatalError("Group container not found.")
@@ -271,6 +271,10 @@ public class InstallationContainer : ObservableObject {
     let success = self.inputMethodUtil.invokeKeymanInputMethodMigration()
     print("migration suceeded: \(success)")
     
+    // check whether
+    if success {
+      NotificationCenter.default.post(name: .dataMigrated, object: nil)
+    }
     return success
   }
   

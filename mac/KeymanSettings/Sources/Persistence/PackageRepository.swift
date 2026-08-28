@@ -10,7 +10,9 @@
 
 import Foundation
 
-enum LoadPackageError: Error {
+public enum LoadPackageError: LocalizedError {
+  case invalidUrl
+  case unzipError
   case containsNoFiles
   case containsNoKeyboards
   case kmpJsonFileUnreadable
@@ -19,33 +21,21 @@ enum LoadPackageError: Error {
   case missingKeyboardId
   case missingKeyboardVersion
   case missingKmxFile
-}
+  case insufficientKeymanVersion(packageName: String, requiredKeymanVersion: String, actualKeymanVersion: String)
 
-enum InstallPackageError: Error {
-  case invalidUrl
-  case unzipError
-}
-
-// Conform to LocalizedError to provide the description
-extension LoadPackageError: LocalizedError {
-  var errorDescription: String? {
+  public var errorDescription: String? {
     switch self {
-    case .containsNoFiles:
-      return NSLocalizedString("The package contains no files.", comment: "")
-    case .containsNoKeyboards:
-      return NSLocalizedString("The package contains no keyboards", comment: "")
-    case .kmpJsonFileUnreadable:
-      return NSLocalizedString("The package's kmp.json file could not be parsed", comment: "")
-    case .kmpJsonFileNotFound:
-      return NSLocalizedString("The package's kmp.json file was not found", comment: "")
-    case .missingKeyboardName:
-      return NSLocalizedString("A keyboard in the package has no name", comment: "")
-    case .missingKeyboardId:
-      return NSLocalizedString("A keyboard in the package has no id", comment: "")
-    case .missingKeyboardVersion:
-      return NSLocalizedString("A keyboard in the package has no version", comment: "")
-    case .missingKmxFile:
-      return NSLocalizedString("A keyboard in the package has no corresponding KMX file", comment: "")
+    case .invalidUrl: return "The URL is not valid."
+    case .unzipError: return "The keyboard package could not be unzipped."
+    case .containsNoFiles: return "The keyboard package contains no files."
+    case .containsNoKeyboards: return "The keyboard package contains no keyboards."
+    case .kmpJsonFileUnreadable: return "The package's kmp.json file could not be parsed."
+    case .kmpJsonFileNotFound: return "The package's kmp.json file was not found."
+    case .missingKeyboardName: return "A keyboard in the package has no name."
+    case .missingKeyboardId: return "A keyboard in the package has no ID."
+    case .missingKeyboardVersion: return "A keyboard in the package has no version."
+    case .missingKmxFile: return "A keyboard in the package has no corresponding KMX file."
+    case .insufficientKeymanVersion(let packageName, let requiredKeymanVersion, let actualKeymanVersion): return "The keyboard package '\(packageName)' requires Keyman version \(requiredKeymanVersion) but your version is \(actualKeymanVersion)."
     }
   }
 }
@@ -89,7 +79,7 @@ public class PackageRepository: PackageRepo {
    */
   public func loadSinglePackage(packageUrl: URL) throws -> KeymanPackage {
     print("loadSinglePackage from url: \(packageUrl)")
-    guard let source =  try readPackageFromDirectory(packageDirectoryUrl: packageUrl) else { throw InstallPackageError.invalidUrl }
+    guard let source =  try readPackageFromDirectory(packageDirectoryUrl: packageUrl) else { throw LoadPackageError.invalidUrl }
       
     let package = KeymanPackage(packageUrl: packageUrl, packageSource: source)
     try package.validate()
@@ -170,11 +160,12 @@ public class PackageRepository: PackageRepo {
   public func getUnzipDestinationUrl(for packageName: String) -> URL {
     return self.pathUtil.keyman19TempDirectory.appendingPathComponent(packageName)
   }
+  
   /**
-   * get the url to where the specified package should be installed
+   * build the URL where the specified package will be installed
    */
-  public func getInstallationUrlForPackageName(packageName: String) -> URL {
-    return self.pathUtil.keyman19PackagesDirectory.appendingPathComponent(packageName)
+  public func buildInstallationUrlForPackageName(directoryName: String) -> URL {
+    return self.pathUtil.keyman19PackagesDirectory.appendingPathComponent(directoryName)
   }
 
   /**
@@ -186,7 +177,7 @@ public class PackageRepository: PackageRepo {
       print("Successfully unzipped the file!")
     } catch {
       print("Extraction failed: \(error.localizedDescription)")
-      throw InstallPackageError.unzipError
+      throw LoadPackageError.unzipError
     }
   }
 

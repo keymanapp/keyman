@@ -39,6 +39,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   public let fonts: [String]
   public let packageName: String
   public let packageVersion: String
+  public let minimumSupportedKeymanVersion: String
   
   public let author: String?
   public let websiteUrl: URL?
@@ -89,6 +90,8 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
 
     self.packageName = packageSource.info.name.description
     self.packageVersion = packageSource.info.version.description
+    self.minimumSupportedKeymanVersion = packageSource.system.fileVersion.description
+    
     self.author = packageSource.info.author?.description
     if let websiteUrlString = packageSource.info.website?.url {
       self.websiteUrl = URL(string: websiteUrlString)
@@ -145,13 +148,16 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   /**
    * initializer that does not rely on package source -- provided to create unit test data
    */
-  public init(sourceDirectoryUrl: URL, sharePackageUrl: URL? = nil, keyboards: [Keyboard], packageName: String, packageVersion: String, author: String? = nil, website: URL? = nil, copyright: String? = nil, readmeFileName: String? = nil, helpFilename: String? = nil, graphicName: String? = nil) {
+  public init(sourceDirectoryUrl: URL, sharePackageUrl: URL? = nil, keyboards: [Keyboard], packageName: String, packageVersion: String,
+              minimumKeymanVersion: String = "7.0.0", author: String? = nil, website: URL? = nil, copyright: String? = nil,
+              readmeFileName: String? = nil, helpFilename: String? = nil, graphicName: String? = nil) {
     self.id = UUID()
     self.sourceDirectoryUrl = sourceDirectoryUrl
     self.sharePackageUrl = sharePackageUrl
     self.keyboards = keyboards
     self.packageName = packageName
     self.packageVersion = packageVersion
+    self.minimumSupportedKeymanVersion = minimumKeymanVersion
     self.author = author
     self.websiteUrl = website
     self.copyright = copyright
@@ -199,12 +205,39 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   }
   
   /**
-   * validate whether the package contain a kmx file for each of its keyboards
+   * validate the package
+   * 1. whether the package can be loaded by this version of Keyman
+   * 2. whether it contains a kmx file for each of its keyboards
    */
   public func validate() throws {
+    try self.validateKeymanVersionForPackage()
+    
     // if validateKmxFile throws an error, then the loop is stopped and the error is propagated
     try self.keyboards.forEach { keyboard in
       try keyboard.validateKmxFile(in: self.sourceDirectoryUrl)
+    }
+  }
+  
+  /**
+   * verify that the version of Keyman is equal to our newer than the
+   * minimum required Keyman version specifed by the package
+   */
+  func validateKeymanVersionForPackage() throws {
+    let keymanVersion = ConfigAppUtil.configAppVersion()
+    let minimumKeymanVersion = self.minimumSupportedKeymanVersion
+    var meetsRequiredVersion: Bool = false
+    let comparisonResult = keymanVersion.compare(minimumKeymanVersion, options: .numeric)
+    
+    if comparisonResult == .orderedAscending {
+      // keyman version is too old
+      meetsRequiredVersion = false
+      print("for package '\(self.packageName)' keyman version \(keymanVersion) is older than required version \(minimumKeymanVersion)")
+    } else {
+      meetsRequiredVersion = true
+    }
+
+    if (!meetsRequiredVersion) {
+      throw LoadPackageError.insufficientKeymanVersion(packageName: self.packageName, requiredKeymanVersion: minimumKeymanVersion, actualKeymanVersion: keymanVersion)
     }
   }
   
@@ -228,7 +261,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
    * build the URL where the keyboard can be installed from the Keyman website
    */
   static func buildSharePackageUrl(packageUrl: URL) -> URL? {
-    return URL(string: "https://\(KeymanPaths.keymanDomain)/go/keyboard/\(packageUrl.lastPathComponent)/share")
+    return URL(string: "https://\(InputMethodUtil.keymanDomain)/go/keyboard/\(packageUrl.lastPathComponent)/share")
   }
   
   /**

@@ -27,13 +27,18 @@ struct RerunInstallerView: View {
       Form {
         HStack {
           Spacer()
-          Image(systemName: "wrench.and.screwdriver.fill")
-            .font(.system(size: 100))
-            .padding(.bottom, 16)
+            Image(systemName: "wrench.and.screwdriver.fill")
+              .font(.system(size: 100))
+              .symbolRenderingMode(.palette)
+              .foregroundStyle(
+                  Color("Keyman Blue"),     // first color for the wrench
+                  Color("Keyman Orange")    // second color for the screwdriver
+              )
+              .padding(.bottom, 16)
           Spacer()
         }
         Text("Your Keyman input method is either missing or outdated. Run the Keyman installer to install a new version.")
-          .multilineTextAlignment(.center)
+          .multilineTextAlignment(.leading)
           .foregroundStyle(.secondary)
       }
       .formStyle(.grouped)

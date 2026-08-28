@@ -25,6 +25,22 @@ import Foundation
 import Combine
 import ZIPFoundation
 
+public enum InstallPackageError: LocalizedError {
+  case packageInstallationAlreadyInProgress
+  case fontCopyError
+  case fontRegistrationError
+  case internalError // due to invalid state, should never occur
+
+  public var errorDescription: String? {
+    switch self {
+    case .packageInstallationAlreadyInProgress: return "A package installation is already in progress."
+    case .fontCopyError: return "There was an error copying the font."
+    case .fontRegistrationError: return "There was an error registering the font."
+    case .internalError: return "An internal error occurred."
+    }
+  }
+}
+
 // distributed notifications
 public extension Notification.Name {
   // sent from input method, received by InstallationCheck
@@ -35,14 +51,30 @@ public extension Notification.Name {
 
 // in-app notifications
 public extension Notification.Name {
-  static let newPackageInstalled = Notification.Name("com.keyman.package.installed")
-  static let packageReplaced = Notification.Name("com.keyman.package.replaced")
-  static let packageDowngradeRequested = Notification.Name("com.keyman.package.downgrade.requested")
+  // sent from InstallationContainer to SettingsContainer
+  static let dataMigrated = Notification.Name("com.keyman.data.migrated")
 }
 
-public enum SettingsError: Error {
-  case unknownPackage
+// define LocalizedError so that UI can present a localizable message
+// when the attempt to install a KMP file using drag and drop fails
+public enum DropKmpError: LocalizedError {
+  case invalidFileType(String)
+  case alreadyInstalled(String)
+  case installFailed(String)
+  case tooManyFiles
+  
+  public var errorDescription: String? {
+    switch self {
+    case .invalidFileType(let fileName): return "The file \(fileName) is not a .KMP file."
+    case .alreadyInstalled(let fileName): return "The package \(fileName) is already installed."
+    case .installFailed(let fileName): return "The file \(fileName) could not be installed."
+    case .tooManyFiles: return "Only a single .KMP file can be installed at a time."
+    }
+  }
 }
+
+package let kmpFileExtension = ".kmp"
+package let kmpFileExtensionWithoutDot = "kmp"
 
 @MainActor // run on the main actor since data is published directly to the UI
 public class SettingsContainer : ObservableObject {
@@ -62,8 +94,8 @@ public class SettingsContainer : ObservableObject {
   @Published public private(set) var singleKeyboardPackages: [KeymanPackage]
   @Published public private(set) var multiKeyboardPackages: [KeymanPackage]
 
-  // when a new package is downloaded, it is tracked here
-  public private(set) var packageDownload: PackageDownload? = nil
+  // when a new package is being installed, it is tracked here
+  fileprivate var packageInstall: PackageInstallHelper? = nil
   
   fileprivate let packageRepository: PackageRepo
   fileprivate let defaultsRepository: DefaultsRepo
@@ -71,6 +103,15 @@ public class SettingsContainer : ObservableObject {
   // the selected keyboard is stored in the UserDefaults
   // not indicated in the Config app but this could change
   fileprivate var selectedKeyboard: String
+  
+  private let keyboardSearchPrefix = "https://keyman.com/go/macos/14.0/download-keyboards/?version="
+  
+  public var keyboardSearchUrl: URL {
+    let currentVersion = ConfigAppUtil.configAppVersion()
+    let searchString: String = keyboardSearchPrefix + currentVersion
+    let searchUrl = URL(string: searchString)!
+    return searchUrl
+  }
   
   public init() {
     // initialize arrays before loading packages
@@ -90,7 +131,7 @@ public class SettingsContainer : ObservableObject {
 
     // create the settings repository, gaining access to the app group UserDefaults
     do {
-      try self.defaultsRepository = DefaultsRepository(suiteName: KeymanPaths.groupId)
+      try self.defaultsRepository = DefaultsRepository(suiteName: InputMethodUtil.groupId)
       print("Found defaults group container")
     } catch UserDefaultsError.unknownSuite {
       fatalError("Defaults group container not found.")
@@ -109,7 +150,6 @@ public class SettingsContainer : ObservableObject {
     // this mainly consists of marking them as enabled or not
     self.applyUserDefaultsToInstalledPackages()
     
-    // use NotificationCenter to receive keyboard installation notifications
     self.registerObservers()
   }
   
@@ -125,42 +165,24 @@ public class SettingsContainer : ObservableObject {
     self.multiKeyboardPackages = []
     self.installedPackages = []
   }
-  
-  /**
-   * register observers to handle notifications
-   */
-  func registerObservers() {
-    // for installation of a new package
-    NotificationCenter.default.addObserver(
-        self, selector: #selector(newPackageInstalled(_:)),
-        name: .newPackageInstalled, object: nil
-    )
-    
-    // for replacement of an existing package
-    NotificationCenter.default.addObserver(
-        self, selector: #selector(existingPackageReplaced(_:)),
-        name: .packageReplaced, object: nil
-    )
-  }
-  
-  /**
-   * called for `newPackageInstalled` notification
-   */
-  @objc func newPackageInstalled(_ notification: Notification) {
-    print("newPackageInstalled notification received")
-    self.addInstalledPackage()
-    self.packageDownload = nil
-  }
 
   /**
-   * called for `packageReplaced` notification
+   * register observers to receive
    */
-  @objc func existingPackageReplaced(_ notification: Notification) {
-    print("existingPackageReplaced notification received")
-    self.replaceInstalledPackage()
-    self.packageDownload = nil
+  func registerObservers() {
+    NotificationCenter.default.addObserver(self, selector: #selector(self.reloadPackages), name: .dataMigrated, object: nil)
   }
   
+  /**
+   * Refresh the packages array and apply settings.
+   * This should only be needed after a migration and could be removed if
+   * the migration were made earlier.
+   */
+  @objc public func reloadPackages() {
+    self.loadPackages()
+    self.applyUserDefaultsToInstalledPackages()
+  }
+
   /**
    * Whenever the installedPackages array changes, recreate the two subarrays
    */
@@ -183,102 +205,25 @@ public class SettingsContainer : ObservableObject {
   }
 
   /**
-   * Called when user approves the downgrade of package
+   * Called when user chooses to cancel downgrade of package
    */
-  public func userConfirmedPackageDowngrade() {
-    if let download = self.packageDownload {
-      do {
-        try download.replaceExistingPackageWithNewPackage()
-      } catch {
-        print("unable to downgrade package: \(download.packageToInstall?.packageName ?? "unknown")")
-      }
-    }
+  public func userCanceledPackageInstallation() {
+    print("user cancelled package installation")
+    self.packageInstall?.cleanupFailedInstallation()
+  
+    self.packageInstall = nil
   }
 
   /**
    * Called when user chooses to cancel downgrade of package
    */
-  public func userCanceledPackageDowngrade() {
-    if let download = self.packageDownload {
-      print("user cancelled package downgrade")
-      download.cleanupFailedInstallation()
-    }
+  public func packageInstallationFailed() {
+    print("packageInstallationFailed")
+    self.packageInstall?.cleanupFailedInstallation()
   
-    self.packageDownload = nil
-  }
-  
-  /**
-   * for debugging: prints UserDefaults values
-   */
-  public func logUserDefaults() {
-    self.defaultsRepository.logDefaults()
-  }
-  
-  /**
-   * for debugging: clears all UserDefaults values
-   */
-  public func clearUserDefaults() {
-    self.defaultsRepository.clearDefaults()
-  }
-  
-  /**
-   * check whether a download is already in progress
-   */
-  public func isDownloadInProgress() -> Bool {
-    // MAC-CONFIG-TODO: add logic, this does not actually prevent downloads when hard-coded to true
-   return false
+    self.packageInstall = nil
   }
 
-  /**
-   * Called by the WebView Coordinator before initiating a package download.
-   * Creates a PackageDownload instance to manage the state of the package being downloaded with the specified name.
-   * Returns a URL to the temporary location where the package is to be downloaded as a .kmp file.
-   */
-  public func preparePackageDownload(kmpFileName: String) -> URL? {
-    // package name is filename minus .kmp extension
-    let packageName = kmpFileName.replacingOccurrences(of: ".kmp", with: "")
-    
-    let packageDownload = PackageDownload(filename: kmpFileName, packageName: packageName, packageRepo: self.packageRepository, installedPackages: self.installedPackages)
-
-    self.packageDownload = packageDownload
-    return packageDownload.temporaryKmpFileLocation
-  }
-  
-  /**
-   * Called by the WebView Coordinator after the download is complete.
-   * Delegates to the PackageDownload instance to decide whether the package should be installed.
-   */
-  public func packageDownloadComplete(kmpFileUrl: URL) {
-    print ("packageDownloadComplete \(kmpFileUrl)")
-
-    self.packageDownload?.packageDownloadComplete(for: kmpFileUrl)
-  }
-
-  /**
-   * The package is approved for installation, so add it to the package list and update the UserDefaults for enabled keyboards
-   */
-  func addInstalledPackage() {
-    if let package = self.packageDownload?.packageToInstall {
-      self.installedPackages.append(package)
-      self.addEnabledKeyboards(for: package)
-    }
-  }
-  
-  /**
-   * The package is approved for installation, so replace the package of the same name in the package list.
-   * Also update the UserDefaults for enabled keyboards because the new package is enabled by default, and the existing may be disabled
-   */
-  func replaceInstalledPackage() {
-    if let package = self.packageDownload?.packageToInstall {
-      if let index = self.installedPackages.firstIndex(where: { $0.packageName == package.packageName }) {
-        self.installedPackages[index] = package
-        self.addEnabledKeyboards(for: package)
-      } else {
-        print("Error: package '\(package.packageName)' not found for replacement")
-      }
-    }
-  }
-  
   /**
    *  for each enabled keyboard in the package being installed, add it to the enabled keyboards set and save it in the UserDefaults
    */
@@ -309,22 +254,9 @@ public class SettingsContainer : ObservableObject {
   }
 
   /**
-   * find the installed package with the specified package name
-   */
-  public func findInstalledPackage(with packageName: String) -> KeymanPackage? {
-    guard let package = self.installedPackages.first(where: { $0.packageName == packageName }) else {
-      print ("Error: could not find package with name: \(packageName)")
-      return nil
-    }
-    
-    return package
-  }
-
-  /**
    * remove/uninstall the package with the specified UUID
    */
   public func removeInstalledPackage(with id: UUID) {
-    
     if let package = findInstalledPackage(with: id) {
       self.removeInstalledPackage(package: package)
     } else {
@@ -343,7 +275,7 @@ public class SettingsContainer : ObservableObject {
     self.packageRepository.deletePackage(package: package)
     
     // remove package from installed packages list
-    if let index = self.installedPackages.firstIndex(where: { $0.packageName == package.packageName }) {
+    if let index = self.installedPackages.firstIndex(where: { $0.id == package.id }) {
       self.installedPackages.remove(at: index)
     }
     
@@ -395,14 +327,7 @@ public class SettingsContainer : ObservableObject {
    *  read the Keyman packages from the group container directory and store in the installedPackages array
    */
   func loadPackages() {
-    var packagesArray = nil as [KeymanPackage]?
-    
-    // read keyboards from disk
-    packagesArray = self.packageRepository.loadAllPackages()
-    
-    if let persistedPackages = packagesArray {
-      self.installedPackages = persistedPackages
-    }
+    self.installedPackages = self.packageRepository.loadAllPackages()
   }
   
   /**
@@ -468,6 +393,163 @@ public class SettingsContainer : ObservableObject {
       {
         $0.enabled = enabledKeyboards.contains($0.keyboardKey)
       }
+    }
+  }
+  
+  // MARK: Package Download and Installation
+  
+  /**
+   * check whether an installation is already in progress
+   */
+  public func isInstallationInProgress() -> Bool {
+    return self.packageInstall != nil
+  }
+
+  /**
+   * Called by the WebView DownloadCoordinator before initiating a package download.
+   * Returns a PackageInstallHelper instance to manage the state of the package being downloaded with the specified name.
+   */
+  public func initiateKmpFileDownload(kmpFilename: String) throws -> PackageInstallHelper? {
+
+    guard !self.isInstallationInProgress() else {
+      throw InstallPackageError.packageInstallationAlreadyInProgress
+    }
+    
+    if let helper = self.preparePackageDownload(kmpFilename: kmpFilename) {
+      self.packageInstall = helper
+    }
+    
+    return self.packageInstall
+  }
+
+  /**
+   * Creates a PackageInstallHelper instance to manage the state of the package being downloaded with the specified name.
+   */
+  func preparePackageDownload(kmpFilename: String) -> PackageInstallHelper? {
+    return PackageInstallHelper(filename: kmpFilename, packageRepo: self.packageRepository, installedPackages: self.installedPackages, isDownload: true)
+  }
+
+  /**
+   * Called by the WebView DownloadCoordinator after the download is complete.
+   * Delegates to the PackageInstallHelper instance to decide whether the package should be installed.
+   */
+  public func packageDownloadComplete(kmpFileUrl: URL) throws {
+    print ("packageDownloadComplete \(kmpFileUrl)")
+
+    do {
+      try self.packageInstall?.prepareToInstall(for: kmpFileUrl)
+    } catch {
+      // clear failed download
+      self.packageInstall = nil
+      throw error
+    }
+  }
+
+  /**
+   * The package is approved for installation, so add it to the package list and update the UserDefaults for enabled keyboards
+   */
+  func addInstalledPackage() {
+    if let package = self.packageInstall?.packageToInstall {
+      self.installedPackages.append(package)
+      self.addEnabledKeyboards(for: package)
+    }
+  }
+  
+  /**
+   * The package is approved for installation, so replace the package of the same name in the package list.
+   * Also update the UserDefaults for enabled keyboards because the new package is enabled by default, and the existing may be disabled
+   */
+  func replaceInstalledPackage() {
+    if let package = self.packageInstall?.packageToInstall {
+      // find the existing package with the same name in the installedPackages array and replace it
+      // (we cannot use the id for this search, as the ids are unique)
+      if let index = self.installedPackages.firstIndex(where: { $0.packageName == package.packageName }) {
+        self.installedPackages[index] = package
+        self.addEnabledKeyboards(for: package)
+      } else {
+        print("Error: package '\(package.packageName)' not found for replacement")
+      }
+    }
+  }
+  
+  // MARK: Drag and drop Package Installation
+  
+  /**
+   * Begin installation of a package from a KMP file.
+   * Called when a .KMP file is dropped on the Configuration view
+   */
+  public func initiateKmpFileInstallation(at fileLocation: URL) throws -> PackageInstallHelper? {
+    guard !self.isInstallationInProgress() else {
+      throw InstallPackageError.packageInstallationAlreadyInProgress
+    }
+    
+    // validate the URL of the KMP file
+    try self.validateDroppedFile(from: fileLocation)
+    
+    let kmpFilename = fileLocation.lastPathComponent
+    if let helper = self.preparePackageDrop(kmpFilename: kmpFilename) {
+      self.packageInstall = helper
+      do {
+        try helper.prepareToInstall(for: fileLocation)
+      } catch {
+        // clear failed download
+        self.packageInstall = nil
+        throw error
+      }
+    }
+    
+    return self.packageInstall
+  }
+
+  /**
+   * Install the package and add it to the installedPackages array and UserDefaults
+   */
+  public func installPackage() throws {
+    if let install = self.packageInstall {
+      do {
+        try install.installPackage()
+      } catch {
+        self.packageInstall?.cleanupFailedInstallation()
+        self.packageInstall = nil
+        throw error
+      }
+      commitPackageInstall()
+    }
+  }
+  
+  /**
+   * Update the data model for the installed package.
+   */
+  func commitPackageInstall() {
+    if let install = self.packageInstall {
+
+      guard let installationType = install.packageInstallationType else { return }
+      
+      switch installationType {
+      case .newPackage:
+        self.addInstalledPackage()
+      case .replaceSameVersionPackage, .replaceNewerPackage, .replaceOlderPackage:
+        self.replaceInstalledPackage()
+      }
+    }
+    
+    self.packageInstall = nil
+  }
+  
+  /**
+   * Creates a PackageInstallHelper instance to manage the state of the package being installed with the specified name.
+   */
+  func preparePackageDrop(kmpFilename: String) -> PackageInstallHelper? {
+    return PackageInstallHelper(filename: kmpFilename, packageRepo: self.packageRepository, installedPackages: self.installedPackages, isDownload: false)
+  }
+
+  /**
+   * Validate the URL for the file we are dropping
+   */
+  func validateDroppedFile(from fileLocation: URL) throws {
+    // if the file does not end with .kmp, reject it
+    if fileLocation.pathExtension.lowercased() != kmpFileExtensionWithoutDot {
+      throw DropKmpError.invalidFileType(fileLocation.lastPathComponent)
     }
   }
 }
