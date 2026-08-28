@@ -13,3 +13,11 @@ ios_capture_build_artifacts() {
   "${KEYMAN_ROOT}/ios/tools/prepRelease.sh"
   builder_echo end "prep-release" success "Finished capturing build artifacts"
 }
+
+ios_publish_symbols() {
+  builder_echo start "publish to Sentry" "Publishing source map to Sentry"
+
+  builder_launch /ios/build.sh "publish-symbols"
+
+  builder_echo end "publish to Sentry" success "Finished publishing source map to Sentry"
+}
