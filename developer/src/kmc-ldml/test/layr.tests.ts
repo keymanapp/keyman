@@ -94,7 +94,7 @@ describe('layr', function () {
       errors: [],
     },
     {
-      subpath: 'sections/keys/invalid-bad-modifier.xml',
+      subpath: 'sections/layr/invalid-bad-modifier.xml',
       errors: [
         LdmlCompilerMessages.Error_InvalidModifier({
           modifiers: 'altR-shift',

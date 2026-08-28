@@ -310,12 +310,6 @@ describe('keys.kmap', function () {
       },
     },
     {
-      subpath: 'sections/keys/invalid-bad-modifier.xml',
-      errors: [
-        LdmlCompilerMessages.Error_InvalidModifier({ modifiers: 'altR-shift' }),
-      ]
-    },
-    {
       subpath: 'sections/keys/invalid-missing-flick.xml',
       errors: [
         LdmlCompilerMessages.Error_MissingFlicks({flickId:'an-undefined-flick-id',id:'Q'}),
