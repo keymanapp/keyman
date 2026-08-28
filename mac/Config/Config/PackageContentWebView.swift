@@ -13,6 +13,9 @@ import WebKit
 import KeymanSettings
 
 public struct PackageContentWebView: NSViewRepresentable {
+  private static let allowedLocalExtensions = ["pdf", "txt", "png", "jpg", "jpeg"]
+  private static let allowedMimeTypes = ["application/pdf", "text/plain", "image/jpeg", "image/png"]
+
   let packageFileUrl: URL
   
   // create the AppKit view instance
@@ -65,10 +68,21 @@ public struct PackageContentWebView: NSViewRepresentable {
           return
       }
 
-      // local files load in webview
+      // load local files in webview, force-loading some common file types
       if url.isFileURL {
-          decisionHandler(.allow)
+        let fileExtension = url.pathExtension.lowercased()
+        
+        if PackageContentWebView.allowedLocalExtensions.contains(fileExtension) {
+          // cancel the automatic navigation (which fails silently)
+          decisionHandler(.cancel)
+          
+          // force-load the file into the web view frame
+          webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
           return
+        }
+        
+        decisionHandler(.allow)
+        return
       }
 
       // handle external links by opening in web browser
@@ -88,5 +102,21 @@ public struct PackageContentWebView: NSViewRepresentable {
       // Open the external link in the default browser
       NSWorkspace.shared.open(externalUrl)
     }
+  }
+  
+  /**
+   * Allow display of some common file types that may be linked in the package help
+   */
+  public func webView(_ webView: WKWebView,
+               decidePolicyFor navigationResponse: WKNavigationResponse,
+               decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+    
+    if let mimeType = navigationResponse.response.mimeType {
+      if PackageContentWebView.allowedMimeTypes.contains(mimeType) {
+        decisionHandler(.allow)
+        return
+      }
+    }
+    decisionHandler(.allow)
   }
 }
