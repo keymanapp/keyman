@@ -192,7 +192,7 @@ export interface KL_Key {
    * Ether the action attribute or the output attribute must be specified for a key, but not both.
    * kmc-convert does not use the concept of 'anonymous actions' at present.
    */
-  action?: string;  //TODO-KMC-CONVERT: Support <action> sub-element 'anonymous actions' in the future
+  action?: string;
   /**
    * The output attribute specifies the character that is produced when a key is pressed.
    * Ether the action attribute or the output attribute must be specified for a key, but not both.
