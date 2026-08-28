@@ -148,10 +148,13 @@ describe('Compiler class', function() {
     const result = await compileTestKeyboard(callbacks, ['keyboards', 'targets-with-whitespace.kmn']);
     assert.isNotNull(result);
 
-    // Verifies that targets has 'any' as it contains both JS and KMX targets
+    // Verify implictly that `&targets` store was interpreted correctly as 'any'
+    // because the compiler generated both JS and KMX targets (#13721)
     assert.isNotNull(result.artifacts.js);
     assert.isNotNull(result.artifacts.kmx);
 
+    // Then verify directly that the `&targets` store was trimmed by looking at
+    // the final value in the kmx data
     const reader = new KmxFileReader();
     const keyboard = reader.read(result.artifacts.kmx.data);
     assert.equal(keyboard.targets, 'any');

@@ -1336,7 +1336,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
  * &targets dpString value to remove unnecessary whitespace. Does not
  * reallocate sp->dpString, but overwrites its value with a string the
  * same length or shorter.
- * @param sp          store value to rewrite
+ * @param store       store value to rewrite
  * @param targets     (output)
  * @return FALSE if no targets found or invalid targets found
  */
