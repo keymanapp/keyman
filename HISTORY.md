@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.276 alpha 2026-08-28
+
+* fix(windows): add manifest to insthelper and set trustinfo to asInvoker (#16430)
+* fix(windows): resync caps lock state when Keyman keyboard is activated (#16423)
+
 ## 19.0.275 alpha 2026-08-27
 
 * docs(mac): refresh build/setup docs and remove APPSTORECONNECT_PROVIDER (#16432)
