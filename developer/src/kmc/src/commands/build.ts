@@ -1,3 +1,8 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Implementation of the `kmc build` command
+ */
 import * as fs from 'fs';
 import * as path from 'path';
 import { Command } from 'commander';
@@ -13,7 +18,12 @@ import { isProject } from '../util/projectLoader.js';
 import { buildTestData } from './buildTestData/index.js';
 import { buildWindowsPackageInstaller } from './buildWindowsPackageInstaller/index.js';
 import { commanderOptionsToCompilerOptions } from '../util/extendedCompilerOptions.js';
-import { exitProcess } from '../util/sysexits.js';
+import { exitProcess, SysExits } from '../util/sysexits.js';
+
+interface OutFileSpecification {
+  isFolder?: boolean;
+  path?: string;
+};
 
 export function declareBuild(program: Command) {
   // TODO: localization?
@@ -28,7 +38,8 @@ export function declareBuild(program: Command) {
     .option('-m, --message <number>', 'Adjust severity of info, hint or warning message to Disable (default), Info, Hint, Warn or Error (option can be repeated)',
       (value, previous) => previous.concat([value]), [])
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
-    .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles');
+    .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles')
+    .option('--continue-on-error', 'Continue build of subsequent files even if earlier files have errors');
 
   BuildBaseOptions.addAll(buildCommand);
 
@@ -92,27 +103,43 @@ async function buildFile(filenames: string[], _options: any, commander: any): Pr
     filenames.push('.');
   }
 
-  /* c8 ignore next 6 */
-  // full test on console log of error message not justified; check with user test recommended
-  if(filenames.length > 1 && commanderOptions.outFile) {
-    // -o can only be specified with a single input file
-    callbacks.reportMessage(InfrastructureMessages.Error_OutFileCanOnlyBeSpecifiedWithSingleInfile());
-    return await exitProcess(1);
-  }
-
   if(!expandFileLists(filenames, callbacks)) {
     return await exitProcess(1);
   }
 
+  const spec = interpretOutFile(commanderOptions.outFile, filenames.length, fs.statSync);
+  if(!spec) {
+    callbacks.reportMessage(InfrastructureMessages.Error_OutFileMustBeAFolder());
+    return await exitProcess(1);
+  }
+
+  let result = true;
   for(const filename of filenames) {
-    if(!await build(filename, commanderOptions.outFile, callbacks, options)) {
-      // Once a file fails to build, we bail on subsequent builds
-      return await exitProcess(1);
+    const buildResult = await build(filename, spec, callbacks, options);
+    if(!buildResult) {
+      result = false;
+      if(buildResult === null) {
+        // We always die on fatal exceptions
+        return await exitProcess(SysExits.EX_SOFTWARE);
+      }
+      if(!commanderOptions.continueOnError) {
+        // Once a file fails to build, we bail on subsequent builds
+        return await exitProcess(1);
+      }
     }
+  }
+
+  if(!result) {
+    // If any file failed to build, then we return failure,
+    return await exitProcess(1);
   }
 }
 
-async function build(filename: string, outfile: string, parentCallbacks: NodeCompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+/**
+ * Build a single file
+ * @returns true on success, false on build failure, null on internal errors
+ */
+async function build(filename: string, outfileSpec: OutFileSpecification, parentCallbacks: NodeCompilerCallbacks, options: CompilerOptions): Promise<boolean> {
   try {
     // TEST: allow command-line simulation of infrastructure fatal errors, and
     // also for unit tests
@@ -158,6 +185,21 @@ async function build(filename: string, outfile: string, parentCallbacks: NodeCom
     const callbacks = new CompilerFileCallbacks(buildFilename, options, parentCallbacks);
     callbacks.reportMessage(InfrastructureMessages.Info_BuildingFile({filename:buildFilename, relativeFilename}));
 
+    let outfile = outfileSpec?.path;
+
+    // Special case for directory outfile - create folder if required
+    if(outfileSpec?.isFolder) {
+      if(!fs.existsSync(outfileSpec.path)) {
+        fs.mkdirSync(outfileSpec.path, { recursive: true });
+      }
+
+      let base = path.basename(filename);
+      if(base.endsWith(builder.sourceExtension)) {
+        base = base.substring(base.length - builder.sourceExtension.length) + builder.compiledExtension;
+      }
+      outfile = path.join(outfile, base);
+    }
+
     let result = await builder.build(filename, outfile, callbacks, options);
     result = result && !callbacks.hasFailureMessage();
     if(result) {
@@ -178,8 +220,55 @@ async function build(filename: string, outfile: string, parentCallbacks: NodeCom
     return result;
   } catch(e) {
     parentCallbacks.reportMessage(InfrastructureMessages.Fatal_UnexpectedException({e}));
-    return false;
+    return null;
   }
+}
+
+/**
+ * Interpret the output filename based on shape of input and filesystem status.
+ *
+ * The output path is treated as a folder if:
+ *   (a) more than one input file is specified, or
+ *   (b) it ends with a trailing slash or backslash, or
+ *   (c) it already exists and is a folder
+ *
+ * @param path
+ * @param inputFilenameCount
+ * @returns null if a regular file is in the way of a folder, otherwise a specification
+ */
+function interpretOutFile(path: string|undefined, inputFilenameCount: number, statSync: (path: fs.PathLike, options?: fs.StatSyncOptions) => {isDirectory?: ()=>boolean}): OutFileSpecification {
+  if(path === null || !inputFilenameCount || inputFilenameCount < 1) {
+    throw new Error('Invalid parameters');
+  }
+
+  const spec: OutFileSpecification = {
+    isFolder: false,
+    path
+  };
+
+  if(!path) {
+    return spec;
+  }
+
+  if(inputFilenameCount > 1 ||
+    (path.endsWith('/') || path.endsWith('\\')) ||
+    statSync(path, {throwIfNoEntry: false})?.isDirectory()) {
+
+    spec.isFolder = true;
+
+    if(path.endsWith('/') || path.endsWith('\\')) {
+      // remove trailing delimiter
+      spec.path = path.substring(0, path.length-1);
+    }
+
+    const stats = statSync(spec.path, {throwIfNoEntry: false});
+    if(stats && !stats.isDirectory()) {
+      // existing file is in the way
+      return null;
+    }
+  }
+
+  return spec;
 }
 
 /**
@@ -187,4 +276,5 @@ async function build(filename: string, outfile: string, parentCallbacks: NodeCom
  */
 export const unitTestEndpoints = {
   build,
+  interpretOutFile,
 };
