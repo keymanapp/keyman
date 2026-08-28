@@ -14,6 +14,7 @@
 import WebKit
 import Combine
 import KeymanSettings
+import OSLog
 
 // safe to designate the whole Coordinator class as @MainActor with Swift 6.0
 // when delegate calls come on a background thread, Swift 6 will
@@ -24,8 +25,10 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   @Published var isDownloading = false
   // progress is between 0.0 and 1.0
   @Published var downloadProgress: Double = 0.0
+  
   @Published var showConfirmPackageSheet = false
   @Published var installHelper: PackageInstallHelper?
+  
   @Published var loadFailureMessage: String?
   @Published var loadPackageFailed = false
   
@@ -33,86 +36,79 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   private var progressObserver: NSKeyValueObservation?
   private var activeDownload: WKDownload?
   
-  public func webView(_ webView: WKWebView,
-                      decidePolicyFor navigationAction: WKNavigationAction,
-                      preferences: WKWebpagePreferences,
-                      decisionHandler: @escaping @MainActor (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+  public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
+                      decisionHandler: @escaping @MainActor (WKNavigationActionPolicy) -> Void) {
     
-    print("deciding navigation based on action")
-    
-    if let url = navigationAction.request.url {
-      print("webView navigationAction.request.url: \(url)")
+    guard let urlString = navigationAction.request.url?.absoluteString else {
+      decisionHandler(.cancel)
+      return
     }
+    Logger.download.info("received url: \(urlString, privacy: .public)")
+
+    // modern Swift regex literals (Requires macOS 13+ / iOS 16+)
+    let regexInstall = /^http(s)?:\/\/keyman(-staging)?\.com(\.localhost)?\/keyboards\/install\/([^?\/]+)(\?(.+))?$/
+    let regexRoot    = /^http(s)?:\/\/keyman(-staging)?\.com(\.localhost)?\/keyboards([\/?].*)?$/
+    let regexGo      = /^http(s)?:\/\/keyman(-staging)?\.com(\.localhost)?\/go\/macos\/[^\/]+\/download-keyboards/
     
-    // Trust HTML download attribute if present
     if navigationAction.shouldPerformDownload {
       print("webView called decisionHandler for download")
-      decisionHandler(.download, preferences)
+      decisionHandler(.download)
       return
     }
     
-    // MAC-CONFIG-TODO: is this necessary or is download attribute enough to identify
-    // check if URL ends with a target file extension
-    if let url = navigationAction.request.url {
-      if url.pathExtension.lowercased() == KeymanPaths.keymanPackageFileExtension {
-        decisionHandler(.download, preferences)
-        print("webView found .kmp, called decisionHandler for download")
-        return
+    if let match = try? regexInstall.firstMatch(in: urlString) {
+      decisionHandler(.cancel)
+      
+      let matchPackageId = String(match.4)
+      if let downloadUrl = self.settings?.buildDownloadPackageUrl(for: matchPackageId) {
+        Logger.download.info("package install, download url = \(downloadUrl.absoluteString, privacy: .public)")
+        
+        let newRequest = URLRequest(url: downloadUrl)
+        
+        DispatchQueue.main.async {
+          webView.startDownload(using: newRequest) { download in
+            print("download initiated to \(newRequest.url?.absoluteString ?? "nil")")
+            download.delegate = self
+            self.setupDownloadTracking(download)
+          }
+        }
       }
     }
-    
-    decisionHandler(.allow, preferences)
-  }
-  
-  /** decide whether the navigation should be allowed, canceled or result in a download */
-  public func webView(_ webView: WKWebView,
-                      decidePolicyFor navigationResponse: WKNavigationResponse,
-                      decisionHandler: @escaping @MainActor (WKNavigationResponsePolicy) -> Void) {
-    print("deciding navigation based on response")
-    
-    if navigationResponse.canShowMIMEType {
+    else if urlString.contains(regexRoot) || urlString.contains(regexGo) {
+      Logger.download.info("root or go url, .allow")
+
       decisionHandler(.allow)
-    } else {
-      guard let keymanSettings = self.settings else {
-        print("webView decidePolicyFor:decisionHandler: no settings")
-        self.loadPackageFailed = true
-        self.loadFailureMessage = InstallPackageError.internalError.localizedDescription
+    }
+    else if urlString.hasPrefix("keyman:") {
+      if urlString.hasPrefix("keyman:link?url=") {
+        Logger.download.info("starts with 'keyman' and 'keyman:link?url' open external url -> .cancel")
+
         decisionHandler(.cancel)
-        return
-      }
-      
-      // if an installation is already in progress then stop another from starting
-      if keymanSettings.isInstallationInProgress() {
-        print("installation already in progress, download canceled")
-        self.loadPackageFailed = true
-        self.loadFailureMessage = InstallPackageError.packageInstallationAlreadyInProgress.localizedDescription
-        decisionHandler(.cancel)
+        
+        let targetUrlString = String(urlString.dropFirst("keyman:link?url=".count))
+        if let targetUrl = URL(string: targetUrlString) {
+          NSWorkspace.shared.open(targetUrl)
+        }
       } else {
+        Logger.download.info("starts with 'keyman' but not 'keyman:link?url' open external url -> .download")
+
         decisionHandler(.download)
       }
     }
+    else {
+      Logger.download.info("default case, open in external browser")
+
+      decisionHandler(.cancel)
+      if let targetUrl = URL(string: urlString) {
+        NSWorkspace.shared.open(targetUrl)
+      }
+    }
   }
-  
-  public func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
-    print("📍 didBecome called via navigationAction")
-    download.delegate = self // Assign delegate for file saving
-    
-    setupDownloadTracking(download)
-  }
-  
-  public func webView(_ webView: WKWebView,
-                      navigationResponse: WKNavigationResponse,
-                      didBecome download: WKDownload) {
-    print("📍 didBecome called via navigationResponse")
-    download.delegate = self
-    
-    setupDownloadTracking(download)
-  }
-  
-  // Common setup function to attach the delegate and the KVO progress observer
+
+  /**
+   *  Setup the observer to track progress of the download.
+   */
   private func setupDownloadTracking(_ download: WKDownload) {
-    download.delegate = self
-    
     // record download in case we need to cancel
     self.activeDownload = download
     
@@ -125,7 +121,6 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
       
       Task { @MainActor [weak self] in
         self?.downloadProgress = newValue
-        print("Download Progress: \(Int(newValue * 100))%")
       }
     }
   }
@@ -160,7 +155,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     
     do {
       if let helper = try keymanSettings.initiateKmpFileDownload(kmpFilename: suggestedFilename) {
-        
+        print("download suggested filename: \(suggestedFilename)")
         self.loadFailureMessage = nil // Reset previous error
         self.loadPackageFailed = false
         

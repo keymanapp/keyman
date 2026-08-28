@@ -204,6 +204,20 @@ public class SettingsContainer : ObservableObject {
     self.multiKeyboardPackages = partitionedPackages.multiple.sorted { $0.packageName.caseInsensitiveCompare($1.packageName) == .orderedAscending }
   }
 
+  
+  /**
+   *  Build the URL necessary to download the specified package from the Keyman website
+   */
+  public func buildDownloadPackageUrl(for packageId: String) -> URL? {
+    let urlString = "https://keyman.com/go/package/download/\(packageId)?platform=macos&tier=\(ConfigAppUtil.configAppTier())"
+    
+    guard let downloadPackageUrl = URL(string: urlString) else {
+      return nil
+    }
+    
+    return downloadPackageUrl
+  }
+
   /**
    * Called when user chooses to cancel downgrade of package
    */

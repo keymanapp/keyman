@@ -214,7 +214,8 @@ do_build_config_app ( ) {
   xcodebuild -resolvePackageDependencies -workspace $KEYMAN_WORKSPACE_PATH -scheme Config
   echo "building $KEYMAN_WORKSPACE_PATH with scheme Config"
   execBuildCommand "Keyman Configuration" xcodebuild -workspace $KEYMAN_WORKSPACE_PATH \
-    $BUILD_OPTIONS $BUILD_ACTIONS -scheme Config -derivedDataPath ./Config/build
+    $BUILD_OPTIONS $BUILD_ACTIONS -scheme Config -derivedDataPath ./Config/build \
+    APP_TIER="$KEYMAN_TIER"
 }
 
 do_update_app_metadata ( ) {

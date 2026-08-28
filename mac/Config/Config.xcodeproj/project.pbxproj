@@ -33,6 +33,16 @@
 		D88F03DD2F50ED5100C02A31 /* ConfigUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ConfigUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D88532ED3040EF85009D61EE /* Exceptions for "Config" folder in "Config" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D88F03C52F50ED5000C02A31 /* Config */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D87D6F492FAF95400083A95E /* Installation */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -41,6 +51,9 @@
 		};
 		D88F03C82F50ED5000C02A31 /* Config */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D88532ED3040EF85009D61EE /* Exceptions for "Config" folder in "Config" target */,
+			);
 			path = Config;
 			sourceTree = "<group>";
 		};
@@ -406,6 +419,7 @@
 		D88F03E82F50ED5100C02A31 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_TIER = "";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				CODE_SIGN_ENTITLEMENTS = Config/ConfigDebug.entitlements;
@@ -420,7 +434,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "$(COPYRIGHT_STRING)";
+				INFOPLIST_FILE = Config/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © SIL Global.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -445,6 +460,7 @@
 		D88F03E92F50ED5100C02A31 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_TIER = "";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "";
 				CODE_SIGN_ENTITLEMENTS = Config/ConfigRelease.entitlements;
@@ -459,7 +475,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "$(COPYRIGHT_STRING)";
+				INFOPLIST_FILE = Config/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © SIL Global.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

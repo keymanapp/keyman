@@ -8,6 +8,14 @@
 
 import SwiftUI
 import KeymanSettings
+import OSLog
+
+extension Logger {
+  private static var subsystem = ConfigAppUtil.configBundleId
+  static let package = Logger(subsystem: subsystem, category: "package")
+  static let download   = Logger(subsystem: subsystem, category: "download")
+  static let ui   = Logger(subsystem: subsystem, category: "ui")
+}
 
 @main
 struct ConfigApp: App {
