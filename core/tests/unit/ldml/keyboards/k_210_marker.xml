@@ -21,7 +21,7 @@
   </keys>
 
   <layers formId="us">
-    <layer modifiers="none" id="base">
+    <layer modifiers="none">
       <row keys="grave acute caret hacek squiggle" />
       <row keys="q w e" /> <!-- etc -->
       <row keys="a s d" /> <!-- etc -->
