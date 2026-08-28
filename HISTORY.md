@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 19.0.275 alpha 2026-08-27
+
+* docs(mac): refresh build/setup docs and remove APPSTORECONNECT_PROVIDER (#16432)
+* chore(mac): update setup document (#16415)
+* change(web): enhance missing-stubs error (#16437)
+
+## 19.0.274 alpha 2026-08-24
+
+* maint(windows): move to vs2026 arm runner for GHA (#16418)
+* chore(web): skip guide-examples.tests.ts until race is fixed (#16427)
+
+## 19.0.273 alpha 2026-08-22
+
+* feat(linux): use display language for keyboard search (#16393)
+
 ## 19.0.272 alpha 2026-08-21
 
 * chore(mac): put coreutils on path on mac and improve docs (#16409)
