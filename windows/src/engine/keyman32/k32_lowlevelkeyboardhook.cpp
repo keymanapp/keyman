@@ -192,7 +192,15 @@ LRESULT _kmnLowLevelKeyboardProc(
   // later in this function. This is intentional, as the WM_KEYMAN_MODIFIER_EVENT
   // message only updates our internal modifier state, and does not do
   // any additional processing or other serialization of the input queue.
-  if (isModifierKey(hs->vkCode) && flag_ShouldSerializeInput) {
+  // #8064 Keyman's own injected modifiers must not feed the cache. The release and restore halves
+  // of a batch echo back through this hook; a balanced batch cancels out, but when the user
+  // releases the key while the batch is in flight the restore press is applied last and the cache
+  // is left holding a modifier nobody holds -- which the reconcile cannot detect, because the same
+  // press latched the OS and the two now agree. This post is above the pass-through check at the
+  // end of this function on purpose, so that modifier state keeps being tracked when no Keyman
+  // keyboard is active; the provenance test therefore has to happen here as well.
+  if (isModifierKey(hs->vkCode) && flag_ShouldSerializeInput &&
+      !IsKeymanInjectedKeyEvent(hs->scanCode, hs->dwExtraInfo)) {
     PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
   }
 

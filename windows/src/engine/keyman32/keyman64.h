@@ -133,6 +133,17 @@
 
 #define EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT 0x4B4D0000
 
+// #8064 Marks the modifier release/restore events keybd_shift wraps an injected batch in, so the
+// low level hook can keep them out of the serial key event server's modifier cache. Shares the
+// 0x4B4D ("KM") high word with the serialized-user tag above, which has carried a non-zero
+// dwExtraInfo through SendInput to the hook since 2018; the low word distinguishes the two, since
+// they mean opposite things -- that one is a user keystroke Keyman re-injected, this one is
+// Keyman's own synthetic modifier. Not the 2014 KEYEVENT_EXTRAINFO_KEYMAN (I4370/I4378): that was
+// read back with GetMessageExtraInfo, which is per-thread and went stale under rapid typing.
+// KBDLLHOOKSTRUCT.dwExtraInfo is per-event and is the only channel that survives the Right Shift
+// scan code rewrite in do_keybd_event.
+#define EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP 0x4B4D0001
+
 /***************************************************************************/
 // wm_keyman
 

@@ -545,33 +545,9 @@ private:
    reality.
   */
   void UpdateLocalModifierState(BYTE bVk, BOOL fIsExtendedKey, BYTE bScan, BOOL fIsUp) {
-    switch (bVk) {
-    case VK_CONTROL:
-      // Left and right control are distinguished by a 0xE0 prefix byte
-      bVk = fIsExtendedKey ? VK_RCONTROL : VK_LCONTROL;
-      break;
-    case VK_MENU:
-      // Left and right alt are distinguished by a 0xE0 prefix byte
-      bVk = fIsExtendedKey ? VK_RMENU : VK_LMENU;
-      break;
-    case VK_SHIFT:
-      // Left and right shift are distinguished by scan code alone
-      bVk = bScan == SCANCODE_RSHIFT ? VK_RSHIFT : VK_LSHIFT;
-      break;
-    case VK_LCONTROL:
-    case VK_RCONTROL:
-    case VK_LSHIFT:
-    case VK_RSHIFT:
-    case VK_LMENU:
-    case VK_RMENU:
-      // These are technically not needed but perhaps some app will send them through SendInput
-      // and we'll have to deal with them?
-      break;
-    default:
-      return;
-    }
-
-    m_ModifierKeyboardState[bVk] = fIsUp ? 0 : 0x80;
+    // In keybd_shift.cpp so the gtest project can reach it; this file is #ifndef _WIN64 and this is
+    // a private member, so nothing here is testable. See #8064.
+    UpdateModifierCacheFromKeyEvent(m_ModifierKeyboardState, bVk, fIsExtendedKey, bScan, fIsUp);
   }
 };
 
