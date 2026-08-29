@@ -22,13 +22,8 @@
 #include "pch.h"
 #include "kbd.h"
 
-/**
-  The modifier virtual keys Keyman manages. Every modifier loop iterates this table, and
-  KEYMAN_MODIFIER_VK_COUNT derives MAX_KEYEVENT_INPUTS_MODIFIERS, so adding one is a single edit.
-
-  Not the low level hook's accepted-VK set: that is nine VKs (isModifierKey, guarded by
-  IsModifierKeyAcceptsExactlyNineVks) which collapse into these six. Do not unify them.
-*/
+// The modifier VKs Keyman manages. Not the hook's accepted-VK set: isModifierKey takes nine VKs,
+// which collapse onto these six. Do not unify them.
 const BYTE KeymanModifierVks[KEYMAN_MODIFIER_VK_COUNT] = {
   VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT
 };
@@ -216,18 +211,21 @@ void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE const kbd) {
   Parameters: liveOut              256 bytes, 0x80 for each modifier the OS reports held
               pfnGetAsyncKeyState  live modifier state reader; production passes GetAsyncKeyState
 
-  The single acquisition point for live state in a batch. Everything downstream reads liveOut, so
-  the reconcile and the release set are computed from one snapshot. A reading per consumer let the
-  two disagree -- the user can press or release in between -- and a batch assembled from two
-  snapshots can release a modifier and then decline to restore it. Exactly
-  KEYMAN_MODIFIER_VK_COUNT readings, pinned by BatchTakesOneLiveReadingPerManagedModifier.
+  One acquisition point per batch, so the reconcile and the release set cannot disagree about what
+  was held. GetAsyncKeyState, not GetKeyState/GetKeyboardState: those read the calling thread's
+  processed queue, the stale source.
 
-  GetAsyncKeyState, not GetKeyState or GetKeyboardState: those read the calling thread's processed
-  queue, the stale source.
+  Not widened to the generic VK_SHIFT/CONTROL/MENU isModifierKey also accepts -- GetAsyncKeyState
+  reports the chiral halves even for a generic injection. Measured rather than assumed:
+  GenericShiftSendInputReflectsInBothAsyncKeyStates injects a generic wVk with scan 0 and reads back
+  the chiral half, and the recorded run is in the GH-8064 manual test's evidence directory.
 
-  Not a gap, measured: SendInput does not return until the injected press is visible to
-  GetAsyncKeyState, so a previous batch's re-press cannot still be in flight here. Pinned by
-  DISABLED_ReconcileDoesNotRaceItsOwnInjectedRestorePress, which also records what would break.
+  That test is also the trip-wire, so this is what trips it: if it ever reports VK_LSHIFT and
+  VK_RSHIFT both up while VK_SHIFT reads down, widen this to OR the generic reading into both chiral
+  halves when neither already reports held. Safe in that direction -- over-reporting live state can
+  only add a release or a reconcile-clear, never the unmatched KEYDOWN of #8064 -- but deliberately
+  not added ahead of the need: it costs three more reader calls every batch and breaks the
+  one-reading-per-managed-modifier invariant BatchTakesOneLiveReadingPerManagedModifier pins.
 */
 void CaptureLiveModifierState(LPBYTE liveOut, PGETASYNCKEYSTATE pfnGetAsyncKeyState) {
   // Zeroed in full: no caller stack residue is mistaken for a held modifier.
@@ -247,10 +245,9 @@ void CaptureLiveModifierState(LPBYTE liveOut, PGETASYNCKEYSTATE pfnGetAsyncKeySt
   Parameters: kbd   the modifier cache (256 byte array), reconciled in place
               live  the live snapshot from CaptureLiveModifierState. Read, never written
 
-  A dropped modifier KEYUP leaves that cache byte set for the life of the process, and
-  keybd_shift_reset then presses the modifier for real. See #8064.
-
-  Clears but never sets, since the user may release before SendInput runs.
+  A dropped modifier KEYUP otherwise leaves that byte set for the life of the process, and
+  keybd_shift_reset presses the modifier for real (#8064). Clears but never sets: the user may
+  release before SendInput runs.
 */
 BOOL ReconcileModifierCache(LPBYTE const kbd, LPBYTE const live) {
   BOOL disagreed = FALSE;
@@ -275,9 +272,11 @@ BOOL ReconcileModifierCache(LPBYTE const kbd, LPBYTE const live) {
               releaseStateOut  256 bytes, the release set. Must not alias kbd
               live             the live snapshot from CaptureLiveModifierState. Read, never written
 
-  The mirror of #8064: a modifier the OS holds that the cache never saw would otherwise let the
-  batch inject its output keys with that modifier live. The union is explicit so that removing the
-  reconcile cannot quietly make this a cache-only read.
+  The mirror of #8064: a modifier the OS holds but the cache never saw would let the batch inject
+  its output keys with that modifier live.
+
+  The union is explicit, and must stay that way: simplified to a copy of kbd, this quietly becomes a
+  cache-only read again, which is the defect above.
 */
 void ComputeModifierReleaseState(LPBYTE const kbd, LPBYTE releaseStateOut, LPBYTE const live) {
   // Zeroed in full: no caller stack residue reaches keybd_shift_release.
@@ -299,31 +298,43 @@ void ComputeModifierReleaseState(LPBYTE const kbd, LPBYTE releaseStateOut, LPBYT
               kbd                  the modifier cache (256 bytes), reconciled in place
               pSharedData          the output keys to wrap; nInputs is clamped here
               pfnGetAsyncKeyState  live modifier state reader; production passes GetAsyncKeyState
+              cacheIsFed           FALSE degrades the release set to a plain copy of kbd; see below
+              pRestorePressedMask  optional out; bitmask over KeymanModifierVks of what the restore
+                                   half pressed, scoping PrepareModifierVerificationCorrection
 
   A free function so the gtest project can reach it; serialkeyeventserver.cpp is #ifndef _WIN64.
   The output-key copy stops MAX_KEYEVENT_INPUTS_MODIFIERS short of the end so the restore half
-  fits: the worst case fills the buffer exactly, so an off-by-one is a heap overrun. See #8064.
+  fits: the worst case fills the buffer exactly, so an off-by-one is a heap overrun.
+
+  cacheIsFed mirrors flag_ShouldSerializeInput, which gates the hook's cache feed. With the feed
+  off, kbd never updates after its launch seed, so a union-added release can never be balanced by a
+  later restore, which reads kbd. The plain copy keeps both halves reading the same stale kbd.
 */
 int PrepareInjectedInputBatch(
   LPINPUT pInputs,
   LPBYTE const kbd,
   const SerialKeyEventSharedData *pSharedData,
-  PGETASYNCKEYSTATE pfnGetAsyncKeyState) {
+  PGETASYNCKEYSTATE pfnGetAsyncKeyState,
+  BOOL cacheIsFed,
+  DWORD *pRestorePressedMask) {
   DWORD nInputs = min(pSharedData->nInputs, MAX_KEYEVENT_INPUTS);
   int n         = 0;
 
-  // One reading per modifier for the whole batch. Both consumers below read this, so they cannot
-  // disagree about what the OS held at the top of the batch.
   BYTE live[256];
   CaptureLiveModifierState(live, pfnGetAsyncKeyState);
 
-  // Clear any modifier the cache thinks is held but the OS does not, before keybd_shift_reset
-  // below presses it for real. See #8064.
+  // Clear before keybd_shift below presses it for real (#8064). Only ever clears, so this stays
+  // safe when !cacheIsFed.
   ReconcileModifierCache(kbd, live);
 
   // Locals, never member state: a second long-lived cache is a second thing to keep in sync.
   BYTE releaseState[256];
-  ComputeModifierReleaseState(kbd, releaseState, live);
+  if (cacheIsFed) {
+    ComputeModifierReleaseState(kbd, releaseState, live);
+  } else {
+    // See cacheIsFed above.
+    memcpy(releaseState, kbd, 256);
+  }
 
   keybd_shift(pInputs, &n, FALSE, releaseState);
 
@@ -336,10 +347,73 @@ int PrepareInjectedInputBatch(
     pInputs[n].ki.dwExtraInfo = (ULONG_PTR)pSharedData->inputs[i].extraInfo;
   }
 
-  // Not reconciled here: mid-batch the OS state is Keyman's own doing, not ground truth. And kbd,
-  // never releaseState -- re-pressing on the OS's word is unsafe, since the user may let go before
-  // SendInput runs. That unmatched KEYDOWN is #8064.
+  // kbd, not releaseState: re-pressing on the OS's word risks the unmatched KEYDOWN of #8064 if the
+  // user let go. No reconcile -- mid-batch OS state is Keyman's own doing, not ground truth.
   keybd_shift(pInputs, &n, TRUE, kbd);
+
+  if (pRestorePressedMask != NULL) {
+    DWORD mask = 0;
+    for (int i = 0; i < _countof(KeymanModifierVks); i++) {
+      if (kbd[KeymanModifierVks[i]] & 0x80) {
+        mask |= (1u << i);
+      }
+    }
+    *pRestorePressedMask = mask;
+  }
+
+  return n;
+}
+
+/**
+  PrepareModifierVerificationCorrection releases modifiers the OS still holds that the cache says
+  nobody holds: a batch's restore press can outlive a user release that raced it, and
+  ReconcileModifierCache only catches that on the *next* batch, which may never arrive.
+
+  Parameters: pInputs              at least MAX_KEYEVENT_INPUTS_MODIFIERS INPUT structures
+              kbd                  the modifier cache, read only. The CURRENT cache, not a snapshot
+                                   from when the batch was built -- see
+                                   WM_KEYMAN_VERIFY_MODIFIER_EVENT for why that is safe here
+              restorePressedMask   PrepareInjectedInputBatch's out-param, via the verify message's
+                                   wParam. Scopes the check to the VKs that batch touched; any
+                                   other disagreement belongs to some other batch
+              pfnGetAsyncKeyState  live modifier state reader; production passes GetAsyncKeyState
+
+  Emitted through keybd_shift_release for its prefix protection (an isolated Alt release opens the
+  window menu) and its Keyman tagging, which keeps the correction out of the cache.
+
+  Known false positive: a fresh user KEYDOWN posted after the verify message is still queued behind
+  it, so this can release a hold that has become genuine again. Accepted -- an unmatched KEYUP is
+  re-pressable, an unmatched KEYDOWN on hardware with no physical Right Ctrl is not.
+
+  Rejected: widening this to also *set* cache bytes so that false positive cannot arise. That
+  reintroduces the unmatched KEYDOWN from a third direction, and it breaks ReconcileModifierCache's
+  clears-but-never-sets rule, which this deliberately mirrors.
+*/
+int PrepareModifierVerificationCorrection(
+  LPINPUT pInputs,
+  LPBYTE const kbd,
+  DWORD restorePressedMask,
+  PGETASYNCKEYSTATE pfnGetAsyncKeyState) {
+  int n = 0;
+
+  BYTE live[256];
+  CaptureLiveModifierState(live, pfnGetAsyncKeyState);
+
+  BYTE correction[256];
+  memset(correction, 0, 256);
+
+  for (int i = 0; i < _countof(KeymanModifierVks); i++) {
+    if (!(restorePressedMask & (1u << i))) {
+      continue; // outside the set this batch touched -- not this verification's problem
+    }
+    const BYTE vk = KeymanModifierVks[i];
+    if (!(kbd[vk] & 0x80) && (live[vk] & 0x80)) {
+      SendDebugMessageFormat("verification: OS holds vkey=%s that the cache says nobody holds, correcting", Debug_VirtualKey(vk));
+      correction[vk] = 0x80;
+    }
+  }
+
+  keybd_shift_release(pInputs, &n, correction);
 
   return n;
 }
@@ -354,12 +428,10 @@ int PrepareInjectedInputBatch(
               bScan            the event's scan code; for VK_SHIFT this is the only chirality signal
               fIsUp            TRUE for a KEYUP
 
-  Applies every modifier event the hook posts, including Keyman's own injected ones: the post at
-  k32_lowlevelkeyboardhook.cpp:196 runs before the "generated by Keyman" pass-through at :224, so
-  the cache is not a record of what the user is physically holding. A balanced batch cancels out --
-  the release half's KEYUP and the restore half's KEYDOWN net to the original byte -- so this is
-  invisible until a real user event interleaves. See
-  KeymanOwnRestorePressOutlivesTheUsersRealRelease for what that costs.
+  Applies every modifier event the hook posts, Keyman's own included -- the post precedes the
+  "generated by Keyman" pass-through -- so this is not a record of what the user physically holds.
+  A balanced batch nets out; see KeymanOwnRestorePressOutlivesTheUsersRealRelease for the cost when
+  a real user event interleaves.
 */
 void UpdateModifierCacheFromKeyEvent(LPBYTE kbd, BYTE bVk, BOOL fIsExtendedKey, BYTE bScan, BOOL fIsUp) {
   switch (bVk) {
@@ -392,34 +464,21 @@ void UpdateModifierCacheFromKeyEvent(LPBYTE kbd, BYTE bVk, BOOL fIsExtendedKey, 
 }
 
 /**
-  IsKeymanInjectedKeyEvent reports whether a key event the low level hook received was injected by
-  Keyman itself rather than produced by the user's keyboard.
+  IsKeymanInjectedKeyEvent reports whether a key event the hook received was injected by Keyman
+  rather than produced by the user's keyboard.
 
   Parameters: scanCode   the event's scan code as the hook reported it
               extraInfo  the event's dwExtraInfo as the hook reported it
 
-  Two arms, because neither covers the managed set alone:
+  Two arms; neither covers the managed set alone. SCAN_FLAG_KEYMAN_KEY_EVENT catches everything
+  injected with the 0xFF scan overload, including keybd_event callers, which have no extraInfo
+  parameter at all. EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP catches Right Shift, whose 0xFF scan
+  do_keybd_event overwrites with SCANCODE_RSHIFT so the receiving app can tell which Shift it was.
 
-  - scanCode == SCAN_FLAG_KEYMAN_KEY_EVENT catches every event Keyman injects with the 0xFF scan
-    overload, including the keybd_event callers that cannot set dwExtraInfo at all
-    (kmhook_keyboard.cpp:147). This arm is not legacy: keybd_event has no extraInfo parameter, so
-    it cannot be deprecated away while those callers exist.
-  - extraInfo == EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP catches Right Shift, whose 0xFF scan is
-    overwritten with SCANCODE_RSHIFT by do_keybd_event because 0x36 is how the receiving app knows
-    which Shift it was. Measured to survive SendInput to the hook by
-    DISABLED_DwExtraInfoSurvivesSendInputWhereTheScanCodeDoesNot.
-
-  Equality on the tag, never extraInfo != 0. mstsc stamps 0x4321DCBA on genuine remote user input
-  and other injectors stamp their own values; treating any non-zero value as Keyman's would blind
-  the modifier cache to a remote user's real modifiers, and the next batch would strip them.
-
-  Deliberately does not match EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT. Those are user keystrokes
-  Keyman re-injected, not Keyman's own synthetic modifiers, and the server already applies them to
-  the cache directly, so the echo is an idempotent duplicate rather than a corruption.
-
-  Says nothing about LLKHF_INJECTED. That flag is set by every injector, the On-Screen Keyboard
-  included, and an OSK sticky modifier is meant to be real machine-wide. Filtering on it would
-  strip it. See #8064.
+  Equality on the tag, never extraInfo != 0: mstsc stamps 0x4321DCBA on genuine remote user input,
+  which the next batch would then strip. Not EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT either --
+  those are real user keystrokes the server already applies to the cache. Not LLKHF_INJECTED: the
+  OSK sets it too, and an OSK sticky modifier is meant to be real machine-wide (#8064).
 */
 BOOL IsKeymanInjectedKeyEvent(DWORD scanCode, ULONG_PTR extraInfo) {
   return scanCode == SCAN_FLAG_KEYMAN_KEY_EVENT || extraInfo == EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP;

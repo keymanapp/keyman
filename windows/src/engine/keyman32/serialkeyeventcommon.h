@@ -27,6 +27,19 @@ between low level keyboard hook and serial key event server
 */
 #define WM_KEYMAN_KEY_EVENT (WM_USER + 1)
 #define WM_KEYMAN_MODIFIER_EVENT (WM_USER + 2)
+
+/**
+  #8064 Posted by the serial key event server to itself after a batch's SendInput returns, when the
+  restore half pressed at least one modifier. wParam is PrepareInjectedInputBatch's
+  pRestorePressedMask, consumed by PrepareModifierVerificationCorrection.
+
+  Posted, never an inline check after SendInput: posted messages are FIFO, so by the time this is
+  dispatched, every modifier event the hook posted earlier -- including a user release that raced
+  the batch -- has reached the cache. Inline, those are still undispatched in this thread's queue,
+  since nothing pumps it until the current DispatchMessage returns.
+*/
+#define WM_KEYMAN_VERIFY_MODIFIER_EVENT (WM_USER + 3)
+
 /**
   The INPUT structure and the KEYBDINPUT structure both vary in size between x86 and x64
   because of the presence of the ULONG_PTR member dwExtraInfo. Thus we need to maintain an
@@ -50,12 +63,22 @@ struct SerialKeyEventSharedData {
 // keyman32.tests.vcxproj, so the tests bind a file-local stub.
 typedef SHORT (WINAPI *PGETASYNCKEYSTATE)(int vKey);
 
-// Defined in keybd_shift.cpp. Outside any _WIN64 guard on purpose, so both architectures and the
-// gtest project can reach it.
+// Defined in keybd_shift.cpp, outside any _WIN64 guard so both architectures and the gtest project
+// can reach it. #8064 added cacheIsFed and pRestorePressedMask, both defaulted so existing call
+// sites are unaffected; see the doc comment there.
 int PrepareInjectedInputBatch(
   LPINPUT pInputs,
   LPBYTE const kbd,
   const SerialKeyEventSharedData *pSharedData,
+  PGETASYNCKEYSTATE pfnGetAsyncKeyState,
+  BOOL cacheIsFed = TRUE,
+  DWORD *pRestorePressedMask = NULL);
+
+// #8064. Defined in keybd_shift.cpp; see its doc comment and WM_KEYMAN_VERIFY_MODIFIER_EVENT above.
+int PrepareModifierVerificationCorrection(
+  LPINPUT pInputs,
+  LPBYTE const kbd,
+  DWORD restorePressedMask,
   PGETASYNCKEYSTATE pfnGetAsyncKeyState);
 
 

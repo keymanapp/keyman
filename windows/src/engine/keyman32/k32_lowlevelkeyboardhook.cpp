@@ -192,28 +192,19 @@ LRESULT _kmnLowLevelKeyboardProc(
   // later in this function. This is intentional, as the WM_KEYMAN_MODIFIER_EVENT
   // message only updates our internal modifier state, and does not do
   // any additional processing or other serialization of the input queue.
-  // #8064 Keyman's own injected modifiers must not feed the cache. The release and restore halves
-  // of a batch echo back through this hook; a balanced batch cancels out, but when the user
-  // releases the key while the batch is in flight the restore press is applied last and the cache
-  // is left holding a modifier nobody holds -- which the reconcile cannot detect, because the same
-  // press latched the OS and the two now agree. This post is above the pass-through check at the
-  // end of this function on purpose, so that modifier state keeps being tracked when no Keyman
-  // keyboard is active; the provenance test therefore has to happen here as well.
+  // #8064 Keyman's own injected modifiers must not feed the cache: a batch's restore press can
+  // outlive the user's release, leaving the cache holding a modifier nobody holds -- undetectable
+  // by the reconcile, because the OS agrees. Tested here, not at the pass-through check below,
+  // which this post precedes on purpose so modifiers are tracked with no Keyman keyboard active.
   if (isModifierKey(hs->vkCode)) {
-    // #8064 Trace the cache-feed decision, not every keystroke: 348b5980 removed the old
-    // unconditional per-keystroke trace as noise once the issue was believed resolved, but
-    // specs/003-8064-debug-log-adequacy/spec.md (R-6) finds the posting-side modifier trace is
-    // one of the few signals that actually helps diagnose a stuck modifier. It comes back here
-    // scoped to modifier keys only, and records what the old message didn't: whether the event
-    // was filtered as Keyman's own, and whether the post actually reached the server.
+    // #8064 Trace the cache-feed decision, not every keystroke (348b5980 removed the old
+    // per-keystroke trace as noise): whether the event was filtered as Keyman's own, and whether
+    // the post reached the server.
     BOOL isKeymanInjected = IsKeymanInjectedKeyEvent(hs->scanCode, hs->dwExtraInfo);
     if (flag_ShouldSerializeInput && !isKeymanInjected) {
-      // This post is not an eat -- processing continues below regardless of whether it succeeds --
-      // so a failed feed here does not destroy input. It does mean the cache can fall out of sync
-      // with what actually happened, which is the class of bug #8064 is, so we still guard against
-      // a NULL server window (GetWindow() can be NULL during server startup/shutdown; PostMessage
-      // to NULL does not fail, it silently misroutes the message to this thread's own queue) and
-      // log the outcome so a stale cache has a cause on record instead of being unexplained later.
+      // Not an eat: processing continues either way, so a failed feed costs sync, not input. Still
+      // guarded and logged, because PostMessage to a NULL hwnd does not fail -- it misroutes to
+      // this thread's own queue -- and a stale cache is exactly the #8064 class of bug.
       ISerialKeyEventServer *server = ISerialKeyEventServer::GetServer();
       HWND hwndServer = server ? server->GetWindow() : NULL;
       if (hwndServer == NULL) {
@@ -283,16 +274,10 @@ LRESULT _kmnLowLevelKeyboardProc(
 
       HWND hwnd = gui.hwndFocus ? gui.hwndFocus : gui.hwndActive;
       if (!IsConsoleWindow(hwnd)) {
-        // #8064 Only eat this event (return 1, so CallNextHookEx below is never reached) once the
-        // handoff to the serializer has actually succeeded. Eating unconditionally and trusting
-        // PostMessage destroys the user's real key event whenever the handoff fails -- a NULL
-        // server window during startup/shutdown, a full posted-message queue, or a stalled client
-        // holding KeymanEngine_KeyMutex while ProcessQueuedKeyEvents waits INFINITE on it -- and
-        // for a modifier KEYUP that loss is exactly how #8064 re-asserts: the OS keeps the earlier
-        // re-injected KEYDOWN latched, the cache still says down, cache and OS agree, and the
-        // clear-only reconcile can never see it again. Falling through to CallNextHookEx instead
-        // lets the event through natively: an unserialized keystroke is a far smaller defect than
-        // a destroyed one.
+        // #8064 Only eat the event (return 1) once the handoff has actually succeeded. Eating on
+        // trust destroys the user's key event whenever PostMessage fails, and for a modifier KEYUP
+        // that is how #8064 re-asserts: the OS stays latched, the cache still says down, and the
+        // clear-only reconcile can never see it. Unserialized beats destroyed.
         ISerialKeyEventServer *server = ISerialKeyEventServer::GetServer();
         HWND hwndServer = server ? server->GetWindow() : NULL;
         if (hwndServer == NULL) {

@@ -249,7 +249,7 @@ private:
     m_pInputs = new INPUT[MAX_KEYEVENT_INPUTS];
 
     // This thread has no input queue yet, so GetKeyboardState looks like it should return nothing;
-    // it returns live state. See DISABLED_FreshThreadKeyboardStateReflectsLiveModifiers. A modifier
+    // it returns live state. See FreshThreadKeyboardStateReflectsLiveModifiers. A modifier
     // held at launch is captured here and goes stale if released before the hook feed starts.
     GetKeyboardState(m_ModifierKeyboardState);
 
@@ -353,7 +353,7 @@ private:
     //
     // Copy the shared data from the buffer
     //
-    PrepareInjectedInput();
+    DWORD restorePressedMask = PrepareInjectedInput();
 
     //
     // Reset the shared buffer and ensure the data is written out of cache for
@@ -379,17 +379,45 @@ private:
     }
     m_nInputs = 0;
 
+    // #8064 Schedule the post-batch verification pass; WM_KEYMAN_VERIFY_MODIFIER_EVENT says why it
+    // must be a self-post. Skipped with the feed off, where m_ModifierKeyboardState is stale by
+    // construction and "the cache says up" means nothing.
+    if (flag_ShouldSerializeInput && restorePressedMask != 0) {
+      PostMessage(m_hwnd, WM_KEYMAN_VERIFY_MODIFIER_EVENT, (WPARAM)restorePressedMask, 0);
+    }
+
     return TRUE;
   }
 
   /**
-    Add modifier state adjustment events and then copy the new input
-    events from the shared buffer
+    Add modifier state adjustment events and then copy the new input events from the shared
+    buffer. Returns the bitmask of managed modifiers this batch's restore half pressed (see
+    PrepareInjectedInputBatch's pRestorePressedMask), so the caller can decide whether the
+    post-batch verification pass (#8064) is needed.
   */
-  void PrepareInjectedInput() {
+  DWORD PrepareInjectedInput() {
     // In keybd_shift.cpp so the gtest project can reach it; this file is #ifndef _WIN64 and this is
     // a private member, so nothing here is testable. See #8064.
-    m_nInputs = PrepareInjectedInputBatch(m_pInputs, m_ModifierKeyboardState, m_pSharedData, GetAsyncKeyState);
+    DWORD restorePressedMask = 0;
+    m_nInputs = PrepareInjectedInputBatch(
+      m_pInputs, m_ModifierKeyboardState, m_pSharedData, GetAsyncKeyState, flag_ShouldSerializeInput, &restorePressedMask);
+    return restorePressedMask;
+  }
+
+  /**
+    #8064 Handles WM_KEYMAN_VERIFY_MODIFIER_EVENT: rechecks the VKs the batch restored against the
+    cache and live state as they stand now, and releases any the OS still holds that the cache says
+    nobody holds.
+  */
+  void ProcessModifierVerification(DWORD restorePressedMask) {
+    INPUT correction[MAX_KEYEVENT_INPUTS_MODIFIERS];
+    // In keybd_shift.cpp so the gtest project can reach it, same reasoning as PrepareInjectedInput.
+    int n = PrepareModifierVerificationCorrection(correction, m_ModifierKeyboardState, restorePressedMask, GetAsyncKeyState);
+    if (n > 0) {
+      if (!SendInput(n, correction, sizeof(INPUT))) {
+        DebugLastError("SendInput");
+      }
+    }
   }
 
   /**
@@ -410,6 +438,12 @@ private:
   LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (msg == WM_USER) {
       ProcessQueuedKeyEvents();
+    }
+
+    // #8064 Not inline in ProcessQueuedKeyEvents: the point of posting is to land behind every
+    // WM_KEYMAN_MODIFIER_EVENT already queued when the batch's SendInput returned.
+    if (msg == WM_KEYMAN_VERIFY_MODIFIER_EVENT) {
+      ProcessModifierVerification((DWORD)wParam);
     }
 
     /*
