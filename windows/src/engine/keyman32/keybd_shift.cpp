@@ -211,33 +211,84 @@ void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE const kbd) {
 
 
 /**
-  ReconcileModifierCache clears any modifier the cache reports held while the OS reports it up.
-  Returns TRUE if the two disagreed.
+  CaptureLiveModifierState takes one reading per managed modifier into liveOut.
 
-  Parameters: kbd                  the modifier cache (256 byte array)
+  Parameters: liveOut              256 bytes, 0x80 for each modifier the OS reports held
               pfnGetAsyncKeyState  live modifier state reader; production passes GetAsyncKeyState
+
+  The single acquisition point for live state in a batch. Everything downstream reads liveOut, so
+  the reconcile and the release set are computed from one snapshot. A reading per consumer let the
+  two disagree -- the user can press or release in between -- and a batch assembled from two
+  snapshots can release a modifier and then decline to restore it. Exactly
+  KEYMAN_MODIFIER_VK_COUNT readings, pinned by BatchTakesOneLiveReadingPerManagedModifier.
+
+  GetAsyncKeyState, not GetKeyState or GetKeyboardState: those read the calling thread's processed
+  queue, the stale source.
+
+  Not a gap, measured: SendInput does not return until the injected press is visible to
+  GetAsyncKeyState, so a previous batch's re-press cannot still be in flight here. Pinned by
+  DISABLED_ReconcileDoesNotRaceItsOwnInjectedRestorePress, which also records what would break.
+*/
+void CaptureLiveModifierState(LPBYTE liveOut, PGETASYNCKEYSTATE pfnGetAsyncKeyState) {
+  // Zeroed in full: no caller stack residue is mistaken for a held modifier.
+  memset(liveOut, 0, 256);
+
+  for (int i = 0; i < _countof(KeymanModifierVks); i++) {
+    if (pfnGetAsyncKeyState(KeymanModifierVks[i]) < 0) {
+      liveOut[KeymanModifierVks[i]] = 0x80;
+    }
+  }
+}
+
+/**
+  ReconcileModifierCache clears any modifier the cache reports held while the live state reports it
+  up. Returns TRUE if the two disagreed.
+
+  Parameters: kbd   the modifier cache (256 byte array), reconciled in place
+              live  the live snapshot from CaptureLiveModifierState. Read, never written
 
   A dropped modifier KEYUP leaves that cache byte set for the life of the process, and
   keybd_shift_reset then presses the modifier for real. See #8064.
 
-  GetAsyncKeyState, not GetKeyState or GetKeyboardState: those read the calling thread's processed
-  queue, the stale source. Clears but never sets, since the user may release before SendInput runs.
-
-  Known gap: a previous batch's re-press may not have reached GetAsyncKeyState, so a genuinely held
-  modifier is cleared and one batch goes out unshifted.
+  Clears but never sets, since the user may release before SendInput runs.
 */
-BOOL ReconcileModifierCache(LPBYTE const kbd, PGETASYNCKEYSTATE pfnGetAsyncKeyState) {
+BOOL ReconcileModifierCache(LPBYTE const kbd, LPBYTE const live) {
   BOOL disagreed = FALSE;
 
   for (int i = 0; i < _countof(KeymanModifierVks); i++) {
-    if ((kbd[KeymanModifierVks[i]] & 0x80) && pfnGetAsyncKeyState(KeymanModifierVks[i]) >= 0) {
-      SendDebugMessageFormat("cache says held but OS says up, clearing vkey=%s", Debug_VirtualKey(KeymanModifierVks[i]));
-      kbd[KeymanModifierVks[i]] = 0;
+    const BYTE vk = KeymanModifierVks[i];
+    if ((kbd[vk] & 0x80) && !(live[vk] & 0x80)) {
+      SendDebugMessageFormat("cache says held but OS says up, clearing vkey=%s", Debug_VirtualKey(vk));
+      kbd[vk] = 0;
       disagreed = TRUE;
     }
   }
 
   return disagreed;
+}
+
+/**
+  ComputeModifierReleaseState fills releaseStateOut with the union of the modifiers the cache holds
+  and the modifiers the OS holds.
+
+  Parameters: kbd              the modifier cache (256 bytes). Read, never written
+              releaseStateOut  256 bytes, the release set. Must not alias kbd
+              live             the live snapshot from CaptureLiveModifierState. Read, never written
+
+  The mirror of #8064: a modifier the OS holds that the cache never saw would otherwise let the
+  batch inject its output keys with that modifier live. The union is explicit so that removing the
+  reconcile cannot quietly make this a cache-only read.
+*/
+void ComputeModifierReleaseState(LPBYTE const kbd, LPBYTE releaseStateOut, LPBYTE const live) {
+  // Zeroed in full: no caller stack residue reaches keybd_shift_release.
+  memset(releaseStateOut, 0, 256);
+
+  for (int i = 0; i < _countof(KeymanModifierVks); i++) {
+    const BYTE vk = KeymanModifierVks[i];
+    if ((kbd[vk] & 0x80) || (live[vk] & 0x80)) {
+      releaseStateOut[vk] = 0x80;
+    }
+  }
 }
 
 /**
@@ -261,11 +312,20 @@ int PrepareInjectedInputBatch(
   DWORD nInputs = min(pSharedData->nInputs, MAX_KEYEVENT_INPUTS);
   int n         = 0;
 
+  // One reading per modifier for the whole batch. Both consumers below read this, so they cannot
+  // disagree about what the OS held at the top of the batch.
+  BYTE live[256];
+  CaptureLiveModifierState(live, pfnGetAsyncKeyState);
+
   // Clear any modifier the cache thinks is held but the OS does not, before keybd_shift_reset
   // below presses it for real. See #8064.
-  ReconcileModifierCache(kbd, pfnGetAsyncKeyState);
+  ReconcileModifierCache(kbd, live);
 
-  keybd_shift(pInputs, &n, FALSE, kbd);
+  // Locals, never member state: a second long-lived cache is a second thing to keep in sync.
+  BYTE releaseState[256];
+  ComputeModifierReleaseState(kbd, releaseState, live);
+
+  keybd_shift(pInputs, &n, FALSE, releaseState);
 
   for (DWORD i = 0; i < nInputs && n < MAX_KEYEVENT_INPUTS - MAX_KEYEVENT_INPUTS_MODIFIERS; i++, n++) {
     pInputs[n].type           = INPUT_KEYBOARD;
@@ -276,6 +336,9 @@ int PrepareInjectedInputBatch(
     pInputs[n].ki.dwExtraInfo = (ULONG_PTR)pSharedData->inputs[i].extraInfo;
   }
 
+  // Not reconciled here: mid-batch the OS state is Keyman's own doing, not ground truth. And kbd,
+  // never releaseState -- re-pressing on the OS's word is unsafe, since the user may let go before
+  // SendInput runs. That unmatched KEYDOWN is #8064.
   keybd_shift(pInputs, &n, TRUE, kbd);
 
   return n;

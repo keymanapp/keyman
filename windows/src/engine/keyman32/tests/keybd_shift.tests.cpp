@@ -253,25 +253,106 @@ TEST(K32LowLevelKeyboardHook, IsModifierKeyAcceptsExactlyNineVks) {
 #endif // !_WIN64
 
 namespace {
-// Stub live-modifier-state reader. A file-local array rather than a mock, because gmock is not
-// linked into keyman32.tests.vcxproj -- which is why ReconcileModifierCache takes its reader.
-BYTE g_stubAsyncState[256];
+// The simulated live modifier state. Functions that take a snapshot are handed this array directly;
+// PrepareInjectedInputBatch takes a reader, so StubGetAsyncKeyState reads the same array. A file
+// local rather than a mock, because gmock is not linked into keyman32.tests.vcxproj.
+BYTE g_liveModifierState[256];
+
+// Counts reader calls, so a batch's total can be pinned.
+int g_readerCalls = 0;
 
 SHORT WINAPI
 StubGetAsyncKeyState(int vKey) {
+  g_readerCalls++;
   // 0x8000 is negative as a SHORT, which is what the "< 0 means down" convention tests.
-  return (vKey >= 0 && vKey < 256 && g_stubAsyncState[vKey]) ? (SHORT)0x8000 : (SHORT)0;
+  return (vKey >= 0 && vKey < 256 && g_liveModifierState[vKey]) ? (SHORT)0x8000 : (SHORT)0;
 }
 } // namespace
 
-class RECONCILE_MODIFIER_CACHE : public KEYBD_SHIFT {
+// Every case below reads or writes the simulated live state, so reset it and the reader counter.
+class LIVE_MODIFIER_STATE : public KEYBD_SHIFT {
 public:
   void
   SetUp() {
     KEYBD_SHIFT::SetUp();
-    memset(g_stubAsyncState, 0, sizeof(g_stubAsyncState));
+    memset(g_liveModifierState, 0, sizeof(g_liveModifierState));
+    g_readerCalls = 0;
   }
 };
+
+class CAPTURE_LIVE_MODIFIER_STATE : public LIVE_MODIFIER_STATE {
+protected:
+  BYTE live[256];
+
+  // True if vk is one of the modifiers Keyman manages.
+  static bool
+  IsManaged(int vk) {
+    for (int i = 0; i < KEYMAN_MODIFIER_VK_COUNT; i++) {
+      if (KeymanModifierVks[i] == vk) {
+        return true;
+      }
+    }
+    return false;
+  }
+};
+
+/*
+  The snapshot reports what the reader reported, for the managed set and nothing else.
+*/
+TEST_F(CAPTURE_LIVE_MODIFIER_STATE, SetsAByteForEachModifierTheOsHolds) {
+  g_liveModifierState[VK_LSHIFT]   = 0x80;
+  g_liveModifierState[VK_RCONTROL] = 0x80;
+
+  CaptureLiveModifierState(live, StubGetAsyncKeyState);
+
+  EXPECT_EQ(live[VK_LSHIFT], (BYTE)0x80);
+  EXPECT_EQ(live[VK_RCONTROL], (BYTE)0x80);
+  EXPECT_EQ(live[VK_RSHIFT], (BYTE)0) << "a modifier the OS does not hold must read clear";
+}
+
+/*
+  Pre-fill with 0xFF: no caller stack residue may survive as a held modifier.
+*/
+TEST_F(CAPTURE_LIVE_MODIFIER_STATE, ZeroesTheWholeArrayFirst) {
+  memset(live, 0xFF, sizeof(live));
+
+  CaptureLiveModifierState(live, StubGetAsyncKeyState);
+
+  for (int i = 0; i < 256; i++) {
+    ASSERT_EQ(live[i], (BYTE)0) << "caller residue survived at vk " << i;
+  }
+}
+
+/*
+  Even with every key reading down, only the managed slots are written.
+*/
+TEST_F(CAPTURE_LIVE_MODIFIER_STATE, SetsNoByteOutsideTheManagedSet) {
+  memset(g_liveModifierState, 0x80, sizeof(g_liveModifierState));
+
+  CaptureLiveModifierState(live, StubGetAsyncKeyState);
+
+  for (int i = 0; i < 256; i++) {
+    if (!IsManaged(i)) {
+      ASSERT_EQ(live[i], (BYTE)0) << "wrote outside the managed set at vk " << i;
+    }
+  }
+}
+
+/*
+  One reading per managed modifier, not one per consumer. This is the property that makes the
+  snapshot coherent: two readings of the same modifier could disagree if the user pressed or
+  released between them.
+*/
+TEST_F(CAPTURE_LIVE_MODIFIER_STATE, TakesExactlyOneReadingPerManagedModifier) {
+  memset(g_liveModifierState, 0x80, sizeof(g_liveModifierState));
+  g_readerCalls = 0;
+
+  CaptureLiveModifierState(live, StubGetAsyncKeyState);
+
+  EXPECT_EQ(g_readerCalls, KEYMAN_MODIFIER_VK_COUNT);
+}
+
+class RECONCILE_MODIFIER_CACHE : public LIVE_MODIFIER_STATE {};
 
 /*
   Once the stale byte is cleared, reset emits nothing at all: no modifier KEYDOWN and, because
@@ -279,9 +360,9 @@ public:
 */
 TEST_F(RECONCILE_MODIFIER_CACHE, ClearsCachedModifierTheOsReportsUp) {
   kbd[VK_LSHIFT]              = 0x80; // cache: held
-  g_stubAsyncState[VK_LSHIFT] = 0;    // OS: up
+  g_liveModifierState[VK_LSHIFT] = 0;    // OS: up
 
-  EXPECT_TRUE(ReconcileModifierCache(kbd, StubGetAsyncKeyState));
+  EXPECT_TRUE(ReconcileModifierCache(kbd, g_liveModifierState));
   EXPECT_EQ(kbd[VK_LSHIFT], (BYTE)0);
 
   keybd_shift(inputs, &n, TRUE, kbd);
@@ -293,9 +374,9 @@ TEST_F(RECONCILE_MODIFIER_CACHE, ClearsCachedModifierTheOsReportsUp) {
 */
 TEST_F(RECONCILE_MODIFIER_CACHE, KeepsCachedModifierTheOsReportsDown) {
   kbd[VK_LSHIFT]              = 0x80; // cache: held
-  g_stubAsyncState[VK_LSHIFT] = 0x80; // OS: agrees
+  g_liveModifierState[VK_LSHIFT] = 0x80; // OS: agrees
 
-  EXPECT_FALSE(ReconcileModifierCache(kbd, StubGetAsyncKeyState));
+  EXPECT_FALSE(ReconcileModifierCache(kbd, g_liveModifierState));
   EXPECT_EQ(kbd[VK_LSHIFT], (BYTE)0x80);
 
   keybd_shift(inputs, &n, TRUE, kbd);
@@ -308,9 +389,9 @@ TEST_F(RECONCILE_MODIFIER_CACHE, KeepsCachedModifierTheOsReportsDown) {
 */
 TEST_F(RECONCILE_MODIFIER_CACHE, NeverSetsAModifierTheCacheDoesNotHold) {
   kbd[VK_RCONTROL]              = 0;    // cache: up
-  g_stubAsyncState[VK_RCONTROL] = 0x80; // OS: down
+  g_liveModifierState[VK_RCONTROL] = 0x80; // OS: down
 
-  EXPECT_FALSE(ReconcileModifierCache(kbd, StubGetAsyncKeyState));
+  EXPECT_FALSE(ReconcileModifierCache(kbd, g_liveModifierState));
   EXPECT_EQ(kbd[VK_RCONTROL], (BYTE)0);
 
   keybd_shift(inputs, &n, TRUE, kbd);
@@ -323,7 +404,7 @@ TEST_F(RECONCILE_MODIFIER_CACHE, ClearsAllSixSlots) {
     kbd[allSix[i]] = 0x80;
   }
 
-  EXPECT_TRUE(ReconcileModifierCache(kbd, StubGetAsyncKeyState));
+  EXPECT_TRUE(ReconcileModifierCache(kbd, g_liveModifierState));
 
   for (int i = 0; i < (int)_countof(allSix); i++) {
     EXPECT_EQ(kbd[allSix[i]], (BYTE)0) << "slot for vkCode " << (int)allSix[i] << " was not cleared";
@@ -343,7 +424,7 @@ TEST_F(RECONCILE_MODIFIER_CACHE, LeavesNonModifierBytesAlone) {
   kbd[VK_NUMLOCK]  = 0x01;
   kbd[VK_INSERT]   = 0x80;
 
-  EXPECT_FALSE(ReconcileModifierCache(kbd, StubGetAsyncKeyState));
+  EXPECT_FALSE(ReconcileModifierCache(kbd, g_liveModifierState));
 
   EXPECT_EQ(kbd['A'], (BYTE)0x80);
   EXPECT_EQ(kbd[VK_CAPITAL], (BYTE)0x01);
@@ -357,7 +438,7 @@ TEST_F(RECONCILE_MODIFIER_CACHE, LeavesNonModifierBytesAlone) {
 TEST_F(RECONCILE_MODIFIER_CACHE, ReconcileThenResetPressesNothing) {
   kbd[VK_LSHIFT] = 0x80;
 
-  ReconcileModifierCache(kbd, StubGetAsyncKeyState);
+  ReconcileModifierCache(kbd, g_liveModifierState);
   keybd_shift(inputs, &n, TRUE, kbd);
 
   EXPECT_EQ(Count(VK_SHIFT, false), 0);
@@ -402,7 +483,7 @@ protected:
 */
 TEST_F(PREPARE_INJECTED_INPUT_BATCH, StaleCachedModifierYieldsNoKeydownInTheBatch) {
   kbd[VK_LSHIFT]              = 0x80; // cache: held, the dropped-KEYUP residue
-  g_stubAsyncState[VK_LSHIFT] = 0;    // OS: up
+  g_liveModifierState[VK_LSHIFT] = 0;    // OS: up
   AddOutputKey('A');
 
   RunBatch();
@@ -418,7 +499,7 @@ TEST_F(PREPARE_INJECTED_INPUT_BATCH, StaleCachedModifierYieldsNoKeydownInTheBatc
 */
 TEST_F(PREPARE_INJECTED_INPUT_BATCH, StaleRightControlYieldsNoExtendedKeydownInTheBatch) {
   kbd[VK_RCONTROL]              = 0x80;
-  g_stubAsyncState[VK_RCONTROL] = 0;
+  g_liveModifierState[VK_RCONTROL] = 0;
   AddOutputKey('A');
 
   RunBatch();
@@ -437,10 +518,10 @@ TEST_F(PREPARE_INJECTED_INPUT_BATCH, NoStaleSlotProducesAKeydownInTheBatch) {
   for (int i = 0; i < (int)_countof(expected); i++) {
     Rewind();
     memset(&sharedData, 0, sizeof(sharedData));
-    memset(g_stubAsyncState, 0, sizeof(g_stubAsyncState));
+    memset(g_liveModifierState, 0, sizeof(g_liveModifierState));
 
     kbd[expected[i]] = 0x80; // cache: held
-    AddOutputKey('A');       // OS: up, g_stubAsyncState is clear
+    AddOutputKey('A');       // OS: up, g_liveModifierState is clear
 
     RunBatch();
 
@@ -456,7 +537,7 @@ TEST_F(PREPARE_INJECTED_INPUT_BATCH, NoStaleSlotProducesAKeydownInTheBatch) {
 */
 TEST_F(PREPARE_INJECTED_INPUT_BATCH, EventOrderIsReleaseThenOutputThenRestore) {
   kbd[VK_LSHIFT]              = 0x80; // cache: held
-  g_stubAsyncState[VK_LSHIFT] = 0x80; // OS: agrees, so both halves act
+  g_liveModifierState[VK_LSHIFT] = 0x80; // OS: agrees, so both halves act
   AddOutputKey('A');
 
   RunBatch();
@@ -480,7 +561,7 @@ TEST_F(PREPARE_INJECTED_INPUT_BATCH, EventOrderIsReleaseThenOutputThenRestore) {
 TEST_F(PREPARE_INJECTED_INPUT_BATCH, NeverWritesPastTheBufferWhenTheSharedBufferOverflows) {
   for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
     kbd[KeymanModifierVks[i]]              = 0x80;
-    g_stubAsyncState[KeymanModifierVks[i]] = 0x80; // all six genuinely held: both halves emit
+    g_liveModifierState[KeymanModifierVks[i]] = 0x80; // all six genuinely held: both halves emit
   }
 
   // Deliberately larger than the buffer. Clamping is the callee's job, not the caller's.
@@ -493,6 +574,254 @@ TEST_F(PREPARE_INJECTED_INPUT_BATCH, NeverWritesPastTheBufferWhenTheSharedBuffer
 
   EXPECT_LE(n, MAX_KEYEVENT_INPUTS) << "the batch wrote past the end of a 256-entry buffer";
   EXPECT_EQ(n, MAX_KEYEVENT_INPUTS) << "worst case should fill the buffer exactly, 256 of 256";
+}
+
+/*
+  The mirror of #8064: the cache byte clear while the OS reports the modifier held. The release half
+  reads only the cache and the reconcile only ever clears, so nothing emitted a KEYUP and the output
+  keys went out with the modifier live.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, OsHeldModifierIsReleasedBeforeTheOutputKeys) {
+  kbd[VK_LSHIFT]              = 0;    // cache: clear -- Keyman never saw the KEYDOWN
+  g_liveModifierState[VK_LSHIFT] = 0x80; // OS: genuinely held right now
+  AddOutputKey('A');
+
+  RunBatch();
+
+  const int release = IndexOf(VK_SHIFT, true);
+  const int output  = IndexOf('A', false);
+
+  ASSERT_NE(release, -1) << "no KEYUP was emitted for a modifier the OS reports held: the output "
+                         << "keys are injected while Shift is physically down";
+  ASSERT_NE(output, -1);
+  EXPECT_LT(release, output) << "the release must precede the output keys to have any effect";
+}
+
+/*
+  The restore half must read the cache alone. Re-pressing on the OS's word is unsafe: the user may
+  let go before SendInput runs, which is #8064 inverted. Passes before the fix as well as after.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, OsHeldModifierIsNotRestoredAfterTheOutputKeys) {
+  kbd[VK_LSHIFT]              = 0;    // cache: clear
+  g_liveModifierState[VK_LSHIFT] = 0x80; // OS: held
+  AddOutputKey('A');
+
+  RunBatch();
+
+  EXPECT_EQ(Count(VK_SHIFT, false), 0)
+      << "the restore half pressed a modifier the cache never held. The user may release it "
+      << "before SendInput runs, and that unmatched KEYDOWN is #8064 from the other direction";
+  EXPECT_EQ(kbd[VK_LSHIFT], (BYTE)0) << "the batch must not write the OS's view into the cache";
+}
+
+/*
+  Where cache and OS agree, behaviour is exactly as it was.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, AgreementCasesAreUnchanged) {
+  // Both held: released before the output keys, restored after, exactly as today.
+  kbd[VK_LSHIFT]              = 0x80;
+  g_liveModifierState[VK_LSHIFT] = 0x80;
+  AddOutputKey('A');
+
+  RunBatch();
+
+  EXPECT_EQ(Count(VK_SHIFT, true), 1) << "a genuinely held modifier is released once";
+  EXPECT_EQ(Count(VK_SHIFT, false), 1) << "and restored once";
+  EXPECT_LT(IndexOf(VK_SHIFT, true), IndexOf(VK_SHIFT, false));
+
+  // Both up: no modifier events at all, and no prefix keystroke either.
+  Rewind();
+  memset(&sharedData, 0, sizeof(sharedData));
+  memset(g_liveModifierState, 0, sizeof(g_liveModifierState));
+  AddOutputKey('A');
+
+  RunBatch();
+
+  EXPECT_EQ(Count(VK_SHIFT, true), 0);
+  EXPECT_EQ(Count(VK_SHIFT, false), 0);
+  EXPECT_EQ(Count(PREFIX_VK, false), 0) << "nothing to release, so not even a prefix keystroke";
+  EXPECT_EQ(n, 1) << "the output key and nothing else";
+}
+
+/*
+  The whole batch takes KEYMAN_MODIFIER_VK_COUNT readings and no more, whatever the cache holds.
+  Before the snapshot was hoisted the reconcile and the release set each read for themselves, so a
+  batch took between six and twelve readings depending on state, and two readings of the same
+  modifier could disagree.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, BatchTakesOneLiveReadingPerManagedModifier) {
+  // Cache empty, which is normal typing.
+  AddOutputKey('A');
+  g_readerCalls = 0;
+  RunBatch();
+  EXPECT_EQ(g_readerCalls, KEYMAN_MODIFIER_VK_COUNT) << "empty cache";
+
+  // Cache holds all six and the OS agrees.
+  Rewind();
+  memset(&sharedData, 0, sizeof(sharedData));
+  for (int i = 0; i < KEYMAN_MODIFIER_VK_COUNT; i++) {
+    kbd[KeymanModifierVks[i]]                 = 0x80;
+    g_liveModifierState[KeymanModifierVks[i]] = 0x80;
+  }
+  AddOutputKey('A');
+  g_readerCalls = 0;
+  RunBatch();
+  EXPECT_EQ(g_readerCalls, KEYMAN_MODIFIER_VK_COUNT) << "cache and OS agree, all six held";
+
+  // Cache holds all six and the OS holds none: twelve readings before the hoist.
+  Rewind();
+  memset(&sharedData, 0, sizeof(sharedData));
+  memset(g_liveModifierState, 0, sizeof(g_liveModifierState));
+  for (int i = 0; i < KEYMAN_MODIFIER_VK_COUNT; i++) {
+    kbd[KeymanModifierVks[i]] = 0x80;
+  }
+  AddOutputKey('A');
+  g_readerCalls = 0;
+  RunBatch();
+  EXPECT_EQ(g_readerCalls, KEYMAN_MODIFIER_VK_COUNT) << "all six stale, the pre-hoist worst case";
+}
+
+/*
+  ComputeModifierReleaseState at the function level rather than through the batch.
+*/
+class COMPUTE_MODIFIER_RELEASE_STATE : public RECONCILE_MODIFIER_CACHE {
+protected:
+  BYTE releaseState[256];
+
+  void
+  Fill(BYTE value) {
+    memset(releaseState, value, sizeof(releaseState));
+  }
+};
+
+/*
+  Pre-fill with 0xFF and confirm every byte the function does not set comes back zero.
+*/
+TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, ZeroesTheWholeArrayFirst) {
+  Fill(0xFF);
+
+  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
+
+  for (int vk = 0; vk < 256; vk++) {
+    EXPECT_EQ(releaseState[vk], (BYTE)0) << "byte " << vk << " kept caller stack residue";
+  }
+}
+
+/*
+  The union, over each of the four cache/OS combinations.
+*/
+TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, IsTheUnionOfCacheAndLiveState) {
+  // cache only
+  Fill(0xFF);
+  kbd[VK_LSHIFT] = 0x80;
+  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
+  EXPECT_EQ(releaseState[VK_LSHIFT], (BYTE)0x80) << "cache-held must be released, as today";
+
+  // OS only -- the mirror direction
+  Fill(0xFF);
+  memset(kbd, 0, sizeof(kbd));
+  g_liveModifierState[VK_LCONTROL] = 0x80;
+  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
+  EXPECT_EQ(releaseState[VK_LCONTROL], (BYTE)0x80) << "OS-held must be released: this is G1";
+
+  // both
+  Fill(0xFF);
+  kbd[VK_RMENU]              = 0x80;
+  g_liveModifierState[VK_RMENU] = 0x80;
+  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
+  EXPECT_EQ(releaseState[VK_RMENU], (BYTE)0x80);
+
+  // neither
+  Fill(0xFF);
+  memset(kbd, 0, sizeof(kbd));
+  memset(g_liveModifierState, 0, sizeof(g_liveModifierState));
+  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
+  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+    EXPECT_EQ(releaseState[KeymanModifierVks[i]], (BYTE)0) << "nothing held, nothing released";
+  }
+}
+
+/*
+  Nothing outside the managed set is set, whatever the OS reports. A stuck letter or toggle key is a
+  different defect.
+*/
+TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, SetsNoByteOutsideTheManagedSet) {
+  Fill(0xFF);
+  memset(g_liveModifierState, 0x80, sizeof(g_liveModifierState)); // OS: every key held
+  memset(kbd, 0x80, sizeof(kbd));                          // cache: every key held
+
+  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
+
+  for (int vk = 0; vk < 256; vk++) {
+    bool managed = false;
+    for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+      if (KeymanModifierVks[i] == vk) {
+        managed = true;
+      }
+    }
+    if (managed) {
+      EXPECT_EQ(releaseState[vk], (BYTE)0x80) << "managed slot " << vk << " should be set";
+    } else {
+      EXPECT_EQ(releaseState[vk], (BYTE)0) << "byte " << vk << " is outside the managed set";
+    }
+  }
+}
+
+/*
+  A reader of the cache, never a writer: writing the OS's view into kbd is what the restore half
+  would then press.
+*/
+TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, NeverModifiesTheCache) {
+  BYTE before[256];
+  for (int vk = 0; vk < 256; vk++) {
+    kbd[vk] = (BYTE)(vk & 0xFF);
+  }
+  memcpy(before, kbd, sizeof(before));
+  memset(g_liveModifierState, 0x80, sizeof(g_liveModifierState)); // OS: everything held
+
+  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
+
+  EXPECT_EQ(memcmp(kbd, before, sizeof(before)), 0) << "the cache was modified";
+}
+
+/*
+  The release set is a superset of the cache, so the release half never emits fewer releases than it
+  does today.
+*/
+TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, IsASupersetOfTheCache) {
+  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+    kbd[KeymanModifierVks[i]] = 0x80; // cache: all six held
+  }
+  memset(g_liveModifierState, 0, sizeof(g_liveModifierState)); // OS: none held
+
+  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
+
+  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+    const BYTE vk = KeymanModifierVks[i];
+    EXPECT_TRUE((kbd[vk] & 0x80) == 0 || (releaseState[vk] & 0x80) != 0)
+        << "slot " << (int)vk << " is held in the cache but not in the release set";
+  }
+}
+
+/*
+  The reserve must hold for the union too. An all-zero cache with the OS reporting every modifier
+  held is the widest the release half gets.
+*/
+TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, ModifierEventCountNeverExceedsReserveForTheUnion) {
+  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+    g_liveModifierState[KeymanModifierVks[i]] = 0x80; // OS: all six held
+  }
+  // kbd stays all zero: the cache holds nothing at all. This is the union's widest divergence.
+
+  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
+
+  keybd_shift(inputs, &n, FALSE, releaseState);
+  EXPECT_EQ(n, 8) << "prefix down + prefix up + 6 modifier keyups, from the OS side alone";
+  EXPECT_LE(n, MAX_KEYEVENT_INPUTS_MODIFIERS);
+
+  n = 0;
+  keybd_shift(inputs, &n, TRUE, kbd);
+  EXPECT_EQ(n, 0) << "the restore half must not press what the cache never held";
 }
 
 namespace {
@@ -576,6 +905,134 @@ TEST_F(KEYBD_SHIFT, DISABLED_FreshThreadKeyboardStateReflectsLiveModifiers) {
   EXPECT_EQ(callerState[VK_LSHIFT] & 0x80, 0)
       << "the calling thread's GetKeyboardState saw the injected key, so this run does not "
       << "demonstrate the queue-dependence the fresh-thread reading is being compared against";
+
+  EXPECT_GE(GetAsyncKeyState(VK_LSHIFT), 0) << "the probe left Left Shift asserted machine-wide";
+}
+
+namespace {
+// Injects one batch the way the restore half does: fillerCount inert events, then a KEYDOWN for
+// vk, in a single SendInput call, so vk's press is queued behind the filler exactly as a real
+// batch queues it behind the release half and the output keys.
+bool
+InjectRestorePress(BYTE vk, int fillerCount) {
+  INPUT batch[MAX_KEYEVENT_INPUTS];
+  int m = 0;
+
+  memset(batch, 0, sizeof(batch));
+
+  // KEYUPs for unassigned function keys that are not down: queue depth without side effects.
+  for (int i = 0; i < fillerCount; i++, m++) {
+    batch[m].type       = INPUT_KEYBOARD;
+    batch[m].ki.wVk     = (WORD)(VK_F13 + (i % 8));
+    batch[m].ki.wScan   = SCAN_FLAG_KEYMAN_KEY_EVENT;
+    batch[m].ki.dwFlags = KEYEVENTF_KEYUP;
+  }
+
+  batch[m].type     = INPUT_KEYBOARD;
+  batch[m].ki.wVk   = vk;
+  batch[m].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
+  m++;
+
+  return SendInput(m, batch, sizeof(INPUT)) == (UINT)m;
+}
+
+void
+ReleaseAndSettle(BYTE vk) {
+  keybd_event(vk, 0, KEYEVENTF_KEYUP, 0);
+  for (int i = 0; i < 200000 && GetAsyncKeyState(vk) < 0; i++) {
+    Sleep(0);
+  }
+}
+} // namespace
+
+/*
+  Tests whether ReconcileModifierCache can race a press its own previous batch injected: if the
+  restore KEYDOWN had not yet reached GetAsyncKeyState, the reconcile would read "OS says up" and
+  clear a byte the user genuinely holds.
+
+  This is the race itself, not a proxy: the production function and the production reader, called
+  with no delay after a SendInput that queues the press behind filler, which is tighter than any
+  real batch sequence -- there is no client post or thread wake in between.
+
+  It does not happen, and the reason is in the numbers this prints. SendInput does not return until
+  the press is visible to GetAsyncKeyState (0x8001, sign bit set), at every batch depth. The
+  reconcile at the top of the next batch runs strictly after that, so there is no window.
+
+  Measured 0 races and 0 stale reads in 300 attempts at depths 1, 33 and 201, on Windows 11 Pro
+  26200, debug x86, with Keyman running -- so its global WH_KEYBOARD_LL hook was in the chain for
+  every injected event, which is the configuration production actually runs in.
+
+  The SendInput timing this prints is not a clean measurement of SendInput: a live Keyman reacts to
+  these events, and their 0xFF scan code makes them look like its own. Treat it as an upper bound
+  on a loaded machine, not as the cost of the call.
+
+  An oracle, not just a measurement: this goes red if a future Windows makes SendInput return before
+  the state is visible. If it ever does, the consequence is worse than an unshifted batch -- the
+  wrongly cleared byte creates the OS-holds-it-but-the-cache-does-not case, which the release half
+  releases and the restore half will not press again, so the user's modifier is dropped until they
+  release and re-press the physical key. The fix would be to skip the reconcile for a modifier this
+  process's own previous batch pressed, capped at one consecutive skip per VK so a genuine latch is
+  still cleared on the batch after.
+
+  DISABLED_ deliberately: it asserts real modifiers machine-wide. Run by hand with
+  --gtest_also_run_disabled_tests, nothing else focused.
+*/
+TEST_F(KEYBD_SHIFT, DISABLED_ReconcileDoesNotRaceItsOwnInjectedRestorePress) {
+  if (GetAsyncKeyState(VK_LSHIFT) < 0) {
+    GTEST_LOG_(WARNING) << "Left Shift already reads down; precondition unmet, not evaluated";
+    SUCCEED();
+    return;
+  }
+
+  LARGE_INTEGER freq;
+  QueryPerformanceFrequency(&freq);
+
+  // An empty batch, a typical one, and a nearly full one.
+  const int fillers[]  = { 0, 32, 200 };
+  const int kIterations = 100;
+
+  for (int f = 0; f < _countof(fillers); f++) {
+    int races = 0, staleReads = 0;
+    double sendUs = 0.0;
+
+    for (int i = 0; i < kIterations; i++) {
+      LARGE_INTEGER t0, t1;
+
+      Rewind();
+      kbd[VK_LSHIFT] = 0x80; // as a hook KEYDOWN left it, with the user still holding
+
+      QueryPerformanceCounter(&t0);
+      ASSERT_TRUE(InjectRestorePress(VK_LSHIFT, fillers[f])) << "SendInput did not queue the batch";
+      QueryPerformanceCounter(&t1);
+      sendUs += (double)(t1.QuadPart - t0.QuadPart) * 1e6 / (double)freq.QuadPart;
+
+      // What the OS reports the instant SendInput returns, before the reconcile reads anything.
+      if (GetAsyncKeyState(VK_LSHIFT) >= 0) {
+        staleReads++;
+      }
+
+      // The production question, asked with no delay: does the reconcile clear a byte whose press
+      // is still in flight?
+      BYTE live[256];
+      CaptureLiveModifierState(live, GetAsyncKeyState);
+      if (ReconcileModifierCache(kbd, live)) {
+        races++;
+      }
+
+      ReleaseAndSettle(VK_LSHIFT);
+    }
+
+    printf("RACE PROBE  filler=%3d  races=%d/%d  staleReads=%d/%d  SendInput mean=%.0fus\n",
+           fillers[f], races, kIterations, staleReads, kIterations, sendUs / (double)kIterations);
+
+    EXPECT_EQ(staleReads, 0)
+        << "GetAsyncKeyState did not see the injected press by the time SendInput returned. "
+        << "SendInput is no longer synchronous with respect to the async key state, so the "
+        << "reconcile can now clear a modifier the user is holding. See this test's comment";
+    EXPECT_EQ(races, 0)
+        << "ReconcileModifierCache cleared a byte whose press its own batch had just injected. "
+        << "That modifier is now dropped, not latched. See this test's comment";
+  }
 
   EXPECT_GE(GetAsyncKeyState(VK_LSHIFT), 0) << "the probe left Left Shift asserted machine-wide";
 }

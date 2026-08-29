@@ -236,7 +236,11 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 // Defined once in keybd_shift.cpp.
 extern const BYTE KeymanModifierVks[KEYMAN_MODIFIER_VK_COUNT];
 
-BOOL ReconcileModifierCache(LPBYTE const kbd, PGETASYNCKEYSTATE pfnGetAsyncKeyState);
+void CaptureLiveModifierState(LPBYTE liveOut, PGETASYNCKEYSTATE pfnGetAsyncKeyState);
+
+BOOL ReconcileModifierCache(LPBYTE const kbd, LPBYTE const live);
+
+void ComputeModifierReleaseState(LPBYTE const kbd, LPBYTE releaseStateOut, LPBYTE const live);
 
 //#define KEYEVENT_EXTRAINFO_KEYMAN 0xF00F0000   // I4370
 
