@@ -230,11 +230,13 @@ DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep);
 
 void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 
-// for KEYMAN_MODIFIER_VK_COUNT
+// for KEYMAN_MODIFIER_VK_COUNT and PGETASYNCKEYSTATE
 #include "serialkeyeventcommon.h"
 
 // Defined once in keybd_shift.cpp.
 extern const BYTE KeymanModifierVks[KEYMAN_MODIFIER_VK_COUNT];
+
+BOOL ReconcileModifierCache(LPBYTE const kbd, PGETASYNCKEYSTATE pfnGetAsyncKeyState);
 
 //#define KEYEVENT_EXTRAINFO_KEYMAN 0xF00F0000   // I4370
 

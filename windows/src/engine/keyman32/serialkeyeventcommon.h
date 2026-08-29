@@ -46,11 +46,16 @@ struct SerialKeyEventSharedData {
   CSDINPUT inputs[MAX_KEYEVENT_INPUTS];
 };
 
+// Live modifier-state reader. A function pointer, not a mock: gmock is not linked into
+// keyman32.tests.vcxproj, so the tests bind a file-local stub.
+typedef SHORT (WINAPI *PGETASYNCKEYSTATE)(int vKey);
+
 // Defined in keybd_shift.cpp. Outside any _WIN64 guard on purpose, so both architectures and the
 // gtest project can reach it.
 int PrepareInjectedInputBatch(
   LPINPUT pInputs,
   LPBYTE const kbd,
-  const SerialKeyEventSharedData *pSharedData);
+  const SerialKeyEventSharedData *pSharedData,
+  PGETASYNCKEYSTATE pfnGetAsyncKeyState);
 
 

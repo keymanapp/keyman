@@ -211,12 +211,43 @@ void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE const kbd) {
 
 
 /**
+  ReconcileModifierCache clears any modifier the cache reports held while the OS reports it up.
+  Returns TRUE if the two disagreed.
+
+  Parameters: kbd                  the modifier cache (256 byte array)
+              pfnGetAsyncKeyState  live modifier state reader; production passes GetAsyncKeyState
+
+  A dropped modifier KEYUP leaves that cache byte set for the life of the process, and
+  keybd_shift_reset then presses the modifier for real. See #8064.
+
+  GetAsyncKeyState, not GetKeyState or GetKeyboardState: those read the calling thread's processed
+  queue, the stale source. Clears but never sets, since the user may release before SendInput runs.
+
+  Known gap: a previous batch's re-press may not have reached GetAsyncKeyState, so a genuinely held
+  modifier is cleared and one batch goes out unshifted.
+*/
+BOOL ReconcileModifierCache(LPBYTE const kbd, PGETASYNCKEYSTATE pfnGetAsyncKeyState) {
+  BOOL disagreed = FALSE;
+
+  for (int i = 0; i < _countof(KeymanModifierVks); i++) {
+    if ((kbd[KeymanModifierVks[i]] & 0x80) && pfnGetAsyncKeyState(KeymanModifierVks[i]) >= 0) {
+      SendDebugMessageFormat("cache says held but OS says up, clearing vkey=%s", Debug_VirtualKey(KeymanModifierVks[i]));
+      kbd[KeymanModifierVks[i]] = 0;
+      disagreed = TRUE;
+    }
+  }
+
+  return disagreed;
+}
+
+/**
   PrepareInjectedInputBatch assembles one injected batch into pInputs and returns the event count:
   release half, output keys, restore half.
 
   Parameters: pInputs              at least MAX_KEYEVENT_INPUTS INPUT structures
-              kbd                  the modifier cache (256 bytes)
+              kbd                  the modifier cache (256 bytes), reconciled in place
               pSharedData          the output keys to wrap; nInputs is clamped here
+              pfnGetAsyncKeyState  live modifier state reader; production passes GetAsyncKeyState
 
   A free function so the gtest project can reach it; serialkeyeventserver.cpp is #ifndef _WIN64.
   The output-key copy stops MAX_KEYEVENT_INPUTS_MODIFIERS short of the end so the restore half
@@ -225,9 +256,14 @@ void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE const kbd) {
 int PrepareInjectedInputBatch(
   LPINPUT pInputs,
   LPBYTE const kbd,
-  const SerialKeyEventSharedData *pSharedData) {
+  const SerialKeyEventSharedData *pSharedData,
+  PGETASYNCKEYSTATE pfnGetAsyncKeyState) {
   DWORD nInputs = min(pSharedData->nInputs, MAX_KEYEVENT_INPUTS);
   int n         = 0;
+
+  // Clear any modifier the cache thinks is held but the OS does not, before keybd_shift_reset
+  // below presses it for real. See #8064.
+  ReconcileModifierCache(kbd, pfnGetAsyncKeyState);
 
   keybd_shift(pInputs, &n, FALSE, kbd);
 

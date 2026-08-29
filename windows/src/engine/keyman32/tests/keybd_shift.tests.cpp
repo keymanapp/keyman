@@ -253,6 +253,249 @@ TEST(K32LowLevelKeyboardHook, IsModifierKeyAcceptsExactlyNineVks) {
 #endif // !_WIN64
 
 namespace {
+// Stub live-modifier-state reader. A file-local array rather than a mock, because gmock is not
+// linked into keyman32.tests.vcxproj -- which is why ReconcileModifierCache takes its reader.
+BYTE g_stubAsyncState[256];
+
+SHORT WINAPI
+StubGetAsyncKeyState(int vKey) {
+  // 0x8000 is negative as a SHORT, which is what the "< 0 means down" convention tests.
+  return (vKey >= 0 && vKey < 256 && g_stubAsyncState[vKey]) ? (SHORT)0x8000 : (SHORT)0;
+}
+} // namespace
+
+class RECONCILE_MODIFIER_CACHE : public KEYBD_SHIFT {
+public:
+  void
+  SetUp() {
+    KEYBD_SHIFT::SetUp();
+    memset(g_stubAsyncState, 0, sizeof(g_stubAsyncState));
+  }
+};
+
+/*
+  Once the stale byte is cleared, reset emits nothing at all: no modifier KEYDOWN and, because
+  needsPrefix stays FALSE, no prefix keystroke either.
+*/
+TEST_F(RECONCILE_MODIFIER_CACHE, ClearsCachedModifierTheOsReportsUp) {
+  kbd[VK_LSHIFT]              = 0x80; // cache: held
+  g_stubAsyncState[VK_LSHIFT] = 0;    // OS: up
+
+  EXPECT_TRUE(ReconcileModifierCache(kbd, StubGetAsyncKeyState));
+  EXPECT_EQ(kbd[VK_LSHIFT], (BYTE)0);
+
+  keybd_shift(inputs, &n, TRUE, kbd);
+  EXPECT_EQ(n, 0) << "nothing to restore, so not even a prefix keystroke";
+}
+
+/*
+  Restoring a genuinely held modifier is what keeps Alt+F from opening the window menu.
+*/
+TEST_F(RECONCILE_MODIFIER_CACHE, KeepsCachedModifierTheOsReportsDown) {
+  kbd[VK_LSHIFT]              = 0x80; // cache: held
+  g_stubAsyncState[VK_LSHIFT] = 0x80; // OS: agrees
+
+  EXPECT_FALSE(ReconcileModifierCache(kbd, StubGetAsyncKeyState));
+  EXPECT_EQ(kbd[VK_LSHIFT], (BYTE)0x80);
+
+  keybd_shift(inputs, &n, TRUE, kbd);
+  EXPECT_EQ(Count(VK_SHIFT, false), 1) << "a real hold must still be restored";
+}
+
+/*
+  The asymmetry is deliberate: between this read and SendInput the user may release the key, and
+  asserting it would create the very latch this is removing.
+*/
+TEST_F(RECONCILE_MODIFIER_CACHE, NeverSetsAModifierTheCacheDoesNotHold) {
+  kbd[VK_RCONTROL]              = 0;    // cache: up
+  g_stubAsyncState[VK_RCONTROL] = 0x80; // OS: down
+
+  EXPECT_FALSE(ReconcileModifierCache(kbd, StubGetAsyncKeyState));
+  EXPECT_EQ(kbd[VK_RCONTROL], (BYTE)0);
+
+  keybd_shift(inputs, &n, TRUE, kbd);
+  EXPECT_EQ(n, 0);
+}
+
+TEST_F(RECONCILE_MODIFIER_CACHE, ClearsAllSixSlots) {
+  const BYTE allSix[6] = {VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT};
+  for (int i = 0; i < (int)_countof(allSix); i++) {
+    kbd[allSix[i]] = 0x80;
+  }
+
+  EXPECT_TRUE(ReconcileModifierCache(kbd, StubGetAsyncKeyState));
+
+  for (int i = 0; i < (int)_countof(allSix); i++) {
+    EXPECT_EQ(kbd[allSix[i]], (BYTE)0) << "slot for vkCode " << (int)allSix[i] << " was not cleared";
+  }
+
+  keybd_shift(inputs, &n, TRUE, kbd);
+  EXPECT_EQ(n, 0);
+}
+
+/*
+  Nothing outside the six slots may be touched, whatever the OS reports. A stuck letter or toggle is
+  a different defect.
+*/
+TEST_F(RECONCILE_MODIFIER_CACHE, LeavesNonModifierBytesAlone) {
+  kbd['A']         = 0x80;
+  kbd[VK_CAPITAL]  = 0x01;
+  kbd[VK_NUMLOCK]  = 0x01;
+  kbd[VK_INSERT]   = 0x80;
+
+  EXPECT_FALSE(ReconcileModifierCache(kbd, StubGetAsyncKeyState));
+
+  EXPECT_EQ(kbd['A'], (BYTE)0x80);
+  EXPECT_EQ(kbd[VK_CAPITAL], (BYTE)0x01);
+  EXPECT_EQ(kbd[VK_NUMLOCK], (BYTE)0x01);
+  EXPECT_EQ(kbd[VK_INSERT], (BYTE)0x80);
+}
+
+/*
+  DISABLED_ResetDoesNotPressAKeyThatIsNotHeld, with the reconcile call inserted.
+*/
+TEST_F(RECONCILE_MODIFIER_CACHE, ReconcileThenResetPressesNothing) {
+  kbd[VK_LSHIFT] = 0x80;
+
+  ReconcileModifierCache(kbd, StubGetAsyncKeyState);
+  keybd_shift(inputs, &n, TRUE, kbd);
+
+  EXPECT_EQ(Count(VK_SHIFT, false), 0);
+}
+
+/*
+  Batch-level assertions against PrepareInjectedInputBatch. The cases above pin
+  ReconcileModifierCache; these pin the production call to it, which no test could reach before.
+
+  No SCOPED_TRACE below: gtest 1.8.1 retains its trace-stack capacity after the scope exits and
+  gtest_main.cpp's _CrtMemDifference check reports that as a leak.
+*/
+class PREPARE_INJECTED_INPUT_BATCH : public RECONCILE_MODIFIER_CACHE {
+public:
+  void
+  SetUp() {
+    RECONCILE_MODIFIER_CACHE::SetUp();
+    memset(&sharedData, 0, sizeof(sharedData));
+  }
+
+protected:
+  SerialKeyEventSharedData sharedData;
+
+  // Append one output key event to the shared buffer, as the client side would.
+  void
+  AddOutputKey(WORD wVk) {
+    sharedData.inputs[sharedData.nInputs].wVk     = wVk;
+    sharedData.inputs[sharedData.nInputs].wScan   = SCAN_FLAG_KEYMAN_KEY_EVENT;
+    sharedData.inputs[sharedData.nInputs].dwFlags = 0;
+    sharedData.nInputs++;
+  }
+
+  void
+  RunBatch() {
+    n = PrepareInjectedInputBatch(inputs, kbd, &sharedData, StubGetAsyncKeyState);
+  }
+};
+
+/*
+  One stale cache byte, the OS reporting that modifier up, and no KEYDOWN for it anywhere in the
+  batch. An unmatched modifier KEYDOWN latches machine-wide once SendInput runs.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, StaleCachedModifierYieldsNoKeydownInTheBatch) {
+  kbd[VK_LSHIFT]              = 0x80; // cache: held, the dropped-KEYUP residue
+  g_stubAsyncState[VK_LSHIFT] = 0;    // OS: up
+  AddOutputKey('A');
+
+  RunBatch();
+
+  EXPECT_EQ(Count(VK_SHIFT, false), 0)
+      << "the batch pressed a modifier the OS reports up: that is the unmatched KEYDOWN of #8064";
+  EXPECT_EQ(kbd[VK_LSHIFT], (BYTE)0) << "the batch must reconcile the cache in place";
+}
+
+/*
+  Right Ctrl is the worst field case: emitted as VK_CONTROL | KEYEVENTF_EXTENDEDKEY, so on hardware
+  without that key no keystroke the user can produce will clear it.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, StaleRightControlYieldsNoExtendedKeydownInTheBatch) {
+  kbd[VK_RCONTROL]              = 0x80;
+  g_stubAsyncState[VK_RCONTROL] = 0;
+  AddOutputKey('A');
+
+  RunBatch();
+
+  EXPECT_EQ(Count(VK_CONTROL, false), 0)
+      << "a latched Right Ctrl is unclearable on hardware without the key";
+  EXPECT_EQ(kbd[VK_RCONTROL], (BYTE)0);
+}
+
+/*
+  Every managed slot, one at a time, so a reconcile that covers only some of the table fails here.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, NoStaleSlotProducesAKeydownInTheBatch) {
+  const BYTE expected[6] = {VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT};
+
+  for (int i = 0; i < (int)_countof(expected); i++) {
+    Rewind();
+    memset(&sharedData, 0, sizeof(sharedData));
+    memset(g_stubAsyncState, 0, sizeof(g_stubAsyncState));
+
+    kbd[expected[i]] = 0x80; // cache: held
+    AddOutputKey('A');       // OS: up, g_stubAsyncState is clear
+
+    RunBatch();
+
+    // do_keybd_event collapses the chiral VKs, so count what actually reaches SendInput.
+    EXPECT_EQ(Count(VK_SHIFT, false) + Count(VK_CONTROL, false) + Count(VK_MENU, false), 0)
+        << "stale slot for vkCode " << (int)expected[i] << " produced a modifier KEYDOWN";
+    EXPECT_EQ(kbd[expected[i]], (BYTE)0) << "slot for vkCode " << (int)expected[i] << " was not reconciled";
+  }
+}
+
+/*
+  The restore half must be last, so a truncated SendInput drops presses rather than releases.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, EventOrderIsReleaseThenOutputThenRestore) {
+  kbd[VK_LSHIFT]              = 0x80; // cache: held
+  g_stubAsyncState[VK_LSHIFT] = 0x80; // OS: agrees, so both halves act
+  AddOutputKey('A');
+
+  RunBatch();
+
+  const int release = IndexOf(VK_SHIFT, true);
+  const int output  = IndexOf('A', false);
+  const int restore = IndexOf(VK_SHIFT, false);
+
+  ASSERT_NE(release, -1) << "a genuinely held modifier must be released before the output keys";
+  ASSERT_NE(output, -1);
+  ASSERT_NE(restore, -1) << "a genuinely held modifier must be restored after the output keys";
+
+  EXPECT_LT(release, output) << "release half must precede the output keys";
+  EXPECT_LT(output, restore) << "restore half must be last, so truncation drops presses not releases";
+}
+
+/*
+  The worst case fills the buffer exactly, so an off-by-one in the output-key loop bound is a heap
+  overrun rather than a failing test. An over-long shared buffer must be clamped by the callee.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, NeverWritesPastTheBufferWhenTheSharedBufferOverflows) {
+  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+    kbd[KeymanModifierVks[i]]              = 0x80;
+    g_stubAsyncState[KeymanModifierVks[i]] = 0x80; // all six genuinely held: both halves emit
+  }
+
+  // Deliberately larger than the buffer. Clamping is the callee's job, not the caller's.
+  for (int i = 0; i < MAX_KEYEVENT_INPUTS; i++) {
+    AddOutputKey('A');
+  }
+  sharedData.nInputs = MAX_KEYEVENT_INPUTS + 50;
+
+  RunBatch();
+
+  EXPECT_LE(n, MAX_KEYEVENT_INPUTS) << "the batch wrote past the end of a 256-entry buffer";
+  EXPECT_EQ(n, MAX_KEYEVENT_INPUTS) << "worst case should fill the buffer exactly, 256 of 256";
+}
+
+namespace {
 struct SeedProbeResult {
   BOOL getKeyboardStateOk;
   BYTE keyboardStateByte; // GetKeyboardState's byte for VK_LSHIFT, from the fresh thread

@@ -372,6 +372,8 @@ private:
     //
     // Send the input to the system input queue
     //
+    // == 0 misses a partial send; != m_nInputs would be the honest check. Not a latch source, so
+    // left alone: the restore KEYDOWNs are last, so truncation drops presses, never releases.
     if (SendInput(m_nInputs, m_pInputs, sizeof(INPUT)) == 0) {
       DebugLastError("SendInput");
     }
@@ -387,7 +389,7 @@ private:
   void PrepareInjectedInput() {
     // In keybd_shift.cpp so the gtest project can reach it; this file is #ifndef _WIN64 and this is
     // a private member, so nothing here is testable. See #8064.
-    m_nInputs = PrepareInjectedInputBatch(m_pInputs, m_ModifierKeyboardState, m_pSharedData);
+    m_nInputs = PrepareInjectedInputBatch(m_pInputs, m_ModifierKeyboardState, m_pSharedData, GetAsyncKeyState);
   }
 
   /**
