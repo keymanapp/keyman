@@ -9,6 +9,7 @@ builder_describe "Keystroke processing engine" \
   @/common/include \
   @/core:win \
   clean configure build test publish install \
+  "test-interactive  Run the opt-in interactive keyboard-injection tests (#8064 FR-023)" \
   :x86 :x64 :arm64
 
 builder_parse "$@"
@@ -44,8 +45,10 @@ function do_clean_arm64() {
 }
 
 function do_configure() {
-  # Install NuGet packages for keyman32.test.vcxproj
+  # Install NuGet packages for keyman32.tests.vcxproj and keyman32.interactive.tests.vcxproj. They
+  # share tests/packages.config, but each project needs its own restore.
   run_in_vs_env msbuild.exe tests/keyman32.tests.vcxproj -t:Restore "-clp:Verbosity=minimal" -nologo "-p:RestorePackagesConfig=true"
+  run_in_vs_env msbuild.exe tests/keyman32.interactive.tests.vcxproj -t:Restore "-clp:Verbosity=minimal" -nologo "-p:RestorePackagesConfig=true"
   configure_windows_build_environment
 }
 
@@ -131,6 +134,37 @@ function do_test() {
   "./tests/bin/${Platform}/${Configuration}/keyman32.tests.exe"
 }
 
+# #8064 FR-023: the opt-in interactive tests. Same build shape as do_test, a different project and
+# a different executable, and deliberately NOT reachable from the `test` action -- these four tests
+# inject real keyboard input and read it back, which a Session-0 CI service account cannot do. On the
+# default target they could only report PASSED without asserting anything (FR-022, SC-005); in
+# keybd_shift.interactive.tests.cpp an absent capability is FAIL() instead, which is only honest
+# because this action is invoked by a person on a desktop where the capability should exist.
+#
+# The action is spelled `test-interactive` and not `test:interactive` because builder.inc.sh splits a
+# command-line parameter on its FIRST colon into action and target, so `test:interactive:x86` would
+# parse as action `test` with target `:interactive:x86`; declaring that as a target would make the
+# bare `test` action sweep it in, which is exactly what FR-023 forbids.
+#
+# Requires an interactive desktop, and is a named step of the release manual-test pass -- see
+# windows/src/test/manual-tests/GH-8064 - stuck-modifier-phantom-keydown/README.md.
+#
+# Parameters:
+#   1: Platform = Win32 | x64
+function do_test_interactive() {
+  local Platform="$1"
+  local Configuration=Release
+  if builder_is_debug_build; then
+    Configuration=Debug
+  fi
+
+  run_in_vs_env --quiet msbuild.exe keyman32.vcxproj "-clp:Verbosity=minimal" -noLogo "//p:Configuration=${Configuration} Static Library" "//t:Build" "//p:Platform=${Platform}"
+  run_in_vs_env --quiet msbuild.exe tests/keyman32.interactive.tests.vcxproj "-clp:Verbosity=minimal" -noLogo "//p:Configuration=${Configuration}" //t:Build "//p:Platform=${Platform}"
+  echo
+
+  "./tests/bin/${Platform}/${Configuration}/keyman32.interactive.tests.exe"
+}
+
 builder_run_action clean:x86        do_clean_x86
 builder_run_action clean:x64        do_clean_x64
 builder_run_action clean:arm64      do_clean_arm64
@@ -146,6 +180,10 @@ builder_run_action test:x64         do_test x64
 # Next line is currently disabled until we do processor-level checks on the executable,
 # as we have no arm64 build agents yet (#15065)
 # builder_run_action test:arm64       do_test arm64
+
+builder_run_action test-interactive:x86  do_test_interactive Win32
+builder_run_action test-interactive:x64  do_test_interactive x64
+# No arm64 leg here for the same reason test:arm64 has none (#15065).
 
 builder_run_action publish:x86      do_publish_x86
 builder_run_action publish:x64      do_publish_x64

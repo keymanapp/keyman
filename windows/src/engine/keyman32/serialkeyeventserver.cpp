@@ -40,6 +40,88 @@
 
 // TODO: refactor this into the SerialKeyEventServer class and provide getters for them
 
+/**
+  #8064 FR-002 / FR-006. The production end of the PMODIFIERDIAGNOSTIC seam: turn a
+  ModifierDiagnosticCode into a debug line. The batch reports a code and a VK, never a string, so
+  the wording below can be rewritten by anyone without touching what the suite asserts -- which is
+  the whole reason the seam is typed. The suite binds a recorder instead of this, because
+  SendDebugMessageFormat resolves to ETW (K32_DBG.CPP) and nothing in-process can read it back.
+
+  A file-local free function rather than a member: PMODIFIERDIAGNOSTIC is a plain function pointer,
+  for the same reason PGETASYNCKEYSTATE is (gmock is not linked into the test project).
+*/
+/*
+  #8064 FR-104. WTSRegisterSessionNotification lives in wtsapi32.dll, and it is bound at RUNTIME
+  rather than linked.
+
+  keyman32.dll is loaded into every process that takes keyboard input, so a new static import is a
+  new DLL every one of those processes must load, whether or not it ever reaches this code path. That
+  is a real cost for one notification. Binding it here keeps the import table as it was, and it makes
+  the absent case explicit instead of fatal: if either export cannot be found the signal is simply
+  poisoned and stays that way for keys it does not re-observe, which is exactly the degradation
+  FR-104 already specifies for "the signal cannot report".
+
+  NOTIFY_FOR_THIS_SESSION is 0 -- defined here rather than pulled in with wtsapi32.h, which would
+  reintroduce the header dependency this avoids.
+*/
+typedef BOOL (WINAPI *PWTSREGISTERSESSIONNOTIFICATION)(HWND hWnd, DWORD dwFlags);
+typedef BOOL (WINAPI *PWTSUNREGISTERSESSIONNOTIFICATION)(HWND hWnd);
+
+#define KM_NOTIFY_FOR_THIS_SESSION 0
+
+static HMODULE g_hWtsApi                                        = NULL;
+static PWTSREGISTERSESSIONNOTIFICATION g_pWtsRegisterSession     = NULL;
+static PWTSUNREGISTERSESSIONNOTIFICATION g_pWtsUnregisterSession = NULL;
+
+// Returns TRUE when both entry points are available. Idempotent; the module is released in
+// CleanupThread.
+static BOOL
+BindSessionNotificationApi() {
+  if (g_pWtsRegisterSession != NULL && g_pWtsUnregisterSession != NULL) {
+    return TRUE;
+  }
+
+  if (g_hWtsApi == NULL) {
+    g_hWtsApi = LoadLibraryW(L"wtsapi32.dll");
+    if (g_hWtsApi == NULL) {
+      return FALSE;
+    }
+  }
+
+  g_pWtsRegisterSession =
+    (PWTSREGISTERSESSIONNOTIFICATION)GetProcAddress(g_hWtsApi, "WTSRegisterSessionNotification");
+  g_pWtsUnregisterSession =
+    (PWTSUNREGISTERSESSIONNOTIFICATION)GetProcAddress(g_hWtsApi, "WTSUnRegisterSessionNotification");
+
+  return g_pWtsRegisterSession != NULL && g_pWtsUnregisterSession != NULL;
+}
+
+static void
+ReportModifierDiagnostic(ModifierDiagnosticCode code, BYTE vk) {
+  switch (code) {
+  case ReleasedWithoutCacheClaim:
+    // The hold this batch could not keep. FR-001 accepts the drop; FR-002 is why it is not silent.
+    SendDebugMessageFormat(
+      "#8064 dropped hold: released vkey=%s that the OS reports held and the cache does not claim, "
+      "so the restore half will not press it back. Expect the user to report this modifier dead "
+      "until they press it again",
+      Debug_VirtualKey(vk));
+    break;
+  case PossibleDesktopSwitch:
+    // vk is 0 here by contract: the condition is a property of the batch. The keys involved are
+    // named by ReconcileModifierCache's own clearing lines, which follow immediately.
+    UNREFERENCED_PARAMETER(vk);
+    SendDebugMessageFormat(
+      "#8064 possible desktop switch: every managed modifier reads up live while the cache claimed "
+      "two or more held. The reconcile is clearing them and the restore half will press nothing, so "
+      "those holds are lost. The 'clearing vkey=' lines that follow name them");
+    break;
+  default:
+    SendDebugMessageFormat("#8064 unknown modifier diagnostic code=%d vkey=%s", (int)code, Debug_VirtualKey(vk));
+    break;
+  }
+}
+
 class SerialKeyEventServer: public ISerialKeyEventServer {
 
 private:
@@ -53,6 +135,24 @@ private:
   HWND m_hwnd;
   int m_nInputs;
   PINPUT m_pInputs;
+
+  // #8064 FR-015b. One entry per bit of the restore mask, giving the m_pInputs index of that
+  // modifier's restore KEYDOWN, or -1. Filled by PrepareInjectedInput, read after SendInput returns
+  // so a short send can be reconciled exactly rather than conservatively.
+  int m_restoreEventIndex[KEYMAN_MODIFIER_VK_COUNT];
+
+  // #8064 W5. The user-held signal: what a NON-KEYMAN source last said about each managed modifier,
+  // fed from WM_INPUT. See UserHeldModifierSignal in serialkeyeventcommon.h. It starts fully
+  // poisoned, so before the feed is established the restore half falls back to the cache alone
+  // (FR-104) -- an unfed signal must never look like "nothing is held", because "nothing is held"
+  // is an assertion and this has none to make yet.
+  UserHeldModifierSignal m_userHeld;
+
+  // #8064 FR-104b. RegisterRawInputDevices is per-process LAST-WRITER-WINS for a usage page, so a
+  // later registration anywhere in keyman.exe silently redirects this feed with no error surfaced.
+  // TRUE once we have registered; checked against GetRegisteredRawInputDevices on the loop's
+  // existing wake, and every key is poisoned on a mismatch.
+  BOOL m_rawInputRegistered;
   SerialKeyEventSharedData *m_pSharedData;
 
   //////////////////////////////////////////////////////
@@ -73,6 +173,15 @@ public:
     m_nInputs = 0;
     m_pInputs = NULL;
     m_pSharedData = NULL;
+    for (int i = 0; i < KEYMAN_MODIFIER_VK_COUNT; i++) {
+      m_restoreEventIndex[i] = -1;
+    }
+
+    // #8064 W5 / FR-104: born unknown. held is zero and every managed modifier is poisoned, so the
+    // signal contributes nothing until it has actually observed something.
+    memset(&m_userHeld, 0, sizeof(m_userHeld));
+    PoisonAllUserHeldKeys(&m_userHeld);
+    m_rawInputRegistered = FALSE;
 
     // We create the file mapping and global data on the main thread but release it on the
     // local thread. This ensures that these objects are available for other processes to
@@ -271,6 +380,43 @@ private:
 
     SetClassLongPtr(m_hwnd, 0, (LONG_PTR)this);
 
+    // #8064 W5 / FR-100. Register for raw keyboard input against THE EXISTING message-only window,
+    // on THIS thread. Not a new window and not a new thread: the W0 probe measured that WM_INPUT
+    // reaches a message-only window on a worker thread even while the main thread is stalled, which
+    // is the whole reason this route carried -- the stall is the failure window the signal has to
+    // survive.
+    //
+    // RIDEV_INPUTSINK, so input arrives whether or not this window has focus. It never has focus.
+    RAWINPUTDEVICE rid;
+    rid.usUsagePage = 0x01; // generic desktop controls
+    rid.usUsage     = 0x06; // keyboard
+    rid.dwFlags     = RIDEV_INPUTSINK;
+    rid.hwndTarget  = m_hwnd;
+
+    if (!RegisterRawInputDevices(&rid, 1, sizeof(rid))) {
+      // Not fatal, and deliberately so: the serializer's job does not depend on the signal. Every
+      // key stays poisoned, so the restore half falls back to the cache alone and behaves exactly
+      // as it did before US0. Degrading is the safe direction; failing to start is not.
+      DebugLastError("RegisterRawInputDevices");
+      SendDebugMessageFormat(
+        "#8064 raw keyboard registration failed; the user-held signal stays unavailable and the "
+        "restore half will use the cache alone");
+    } else {
+      m_rawInputRegistered = TRUE;
+    }
+
+    // #8064 FR-104. Console session changes -- fast user switching, RDP connect and disconnect, lock
+    // and unlock. On any of them the signal has no standing to speak about any key until it observes
+    // one again.
+    if (!BindSessionNotificationApi() || !g_pWtsRegisterSession(m_hwnd, KM_NOTIFY_FOR_THIS_SESSION)) {
+      // Also not fatal. Without it a session change goes unnoticed, so say so rather than pretend.
+      DebugLastError("WTSRegisterSessionNotification");
+      SendDebugMessageFormat(
+        "#8064 session notifications unavailable; a session change will not poison the user-held "
+        "signal, so it is poisoned now and stays that way for keys it does not re-observe");
+      PoisonAllUserHeldKeys(&m_userHeld);
+    }
+
     return TRUE;
   }
 
@@ -295,6 +441,19 @@ private:
       delete[] m_pInputs;
       m_pInputs = NULL;
     }
+
+    // #8064 W5. Raw input registration is torn down with the window; the session notification is
+    // not, so it is unregistered explicitly.
+    if (m_hwnd != NULL && g_pWtsUnregisterSession != NULL) {
+      g_pWtsUnregisterSession(m_hwnd);
+    }
+
+    if (g_hWtsApi != NULL) {
+      FreeLibrary(g_hWtsApi);
+      g_hWtsApi               = NULL;
+      g_pWtsRegisterSession   = NULL;
+      g_pWtsUnregisterSession = NULL;
+    }
   }
 
   /**
@@ -314,6 +473,12 @@ private:
         PostMessage(m_hwnd, WM_USER, 0, 0);
         break;
       case WAIT_OBJECT_0 + 2: // Windows message received
+        // #8064 FR-104b. On the loop's EXISTING wake, not on a new timer: check that our raw-input
+        // registration is still ours. A timer would be a second reason to wake this thread, and the
+        // check has nothing to do with elapsed time -- it only matters when something happened, and
+        // something happening is what woke us.
+        CheckRawInputRegistrationStillOurs();
+
         MSG msg;
         while (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {
           DispatchMessage(&msg);
@@ -324,6 +489,125 @@ private:
         return;
       }
     }
+  }
+
+  /**
+    #8064 FR-104. Is the active input desktop the one this thread is attached to?
+
+    If it is not -- the UAC secure desktop, the lock screen, a switched-to desktop -- then this
+    process is not receiving the user's input at all, so whatever the signal last observed is stale
+    and it must say so. There is no notification for entering the secure desktop, which is why this
+    is checked per batch rather than waited on.
+
+    A failure to open the desktop is itself the answer: no access means it is not ours.
+  */
+  BOOL ActiveDesktopIsTheUsers() {
+    HDESK hInput = OpenInputDesktop(0, FALSE, DESKTOP_READOBJECTS);
+    if (hInput == NULL) {
+      return FALSE;
+    }
+
+    HDESK hThread   = GetThreadDesktop(GetCurrentThreadId());
+    BOOL sameDesktop = FALSE;
+
+    if (hThread != NULL) {
+      WCHAR inputName[256]  = { 0 };
+      WCHAR threadName[256] = { 0 };
+      DWORD needed          = 0;
+
+      if (GetUserObjectInformationW(hInput, UOI_NAME, inputName, sizeof(inputName), &needed) &&
+          GetUserObjectInformationW(hThread, UOI_NAME, threadName, sizeof(threadName), &needed)) {
+        sameDesktop = (wcscmp(inputName, threadName) == 0);
+      }
+    }
+
+    CloseDesktop(hInput);
+    return sameDesktop;
+  }
+
+  /**
+    #8064 FR-104b. Is the raw keyboard feed still pointed at our window?
+
+    RegisterRawInputDevices is per-process last-writer-wins for a usage page. Another component
+    inside keyman.exe registering page 1 / usage 6 silently redirects this feed, and NOTHING is
+    surfaced: no error, no message, no callback. The failure is that the signal quietly stops being
+    updated while continuing to report its last observations -- a stale shadow, which is the sharpest
+    risk in this whole design because it manufactures an unmatched press in the one state
+    ReconcileModifierCache is structurally blind to.
+
+    So it is detected rather than assumed away, by reading the registration back. On a mismatch every
+    key is poisoned: the signal has no standing to speak about any of them, and the restore half
+    falls back to the cache alone until each key is observed again.
+
+    Cheap enough for the loop's wake: two calls and a small stack array, only while registered.
+  */
+  void CheckRawInputRegistrationStillOurs() {
+    if (!m_rawInputRegistered || m_hwnd == NULL) {
+      return;
+    }
+
+    UINT count = 0;
+    if (GetRegisteredRawInputDevices(NULL, &count, sizeof(RAWINPUTDEVICE)) == (UINT)-1 && count == 0) {
+      // Cannot tell. Unknown is the honest answer, and unknown is what the signal is for.
+      PoisonAllUserHeldKeys(&m_userHeld);
+      return;
+    }
+
+    // A handful of devices at most in practice; a cap keeps this off the heap on the input path.
+    const UINT kMaxDevices = 32;
+    RAWINPUTDEVICE devices[kMaxDevices];
+    if (count > kMaxDevices) {
+      count = kMaxDevices;
+    }
+
+    const UINT got = GetRegisteredRawInputDevices(devices, &count, sizeof(RAWINPUTDEVICE));
+    if (got == (UINT)-1) {
+      PoisonAllUserHeldKeys(&m_userHeld);
+      return;
+    }
+
+    BOOL stillOurs = FALSE;
+    for (UINT i = 0; i < got; i++) {
+      if (devices[i].usUsagePage == 0x01 && devices[i].usUsage == 0x06 && devices[i].hwndTarget == m_hwnd) {
+        stillOurs = TRUE;
+        break;
+      }
+    }
+
+    if (!stillOurs) {
+      SendDebugMessageFormat(
+        "#8064 raw keyboard registration has been displaced -- page 1 usage 6 no longer targets this "
+        "window. Poisoning every key: the user-held signal cannot be trusted until each is observed "
+        "again");
+      PoisonAllUserHeldKeys(&m_userHeld);
+      m_rawInputRegistered = FALSE; // do not keep re-reporting the same displacement every wake
+    }
+  }
+
+  /**
+    #8064 W5 / FR-100a. Feeds one WM_INPUT keyboard event into the user-held signal.
+
+    The policy lives in UpdateUserHeldFromRawKeyboard (keybd_shift.cpp, so the suite can reach it);
+    this only unpacks the message. In particular the "is it ours" decision is NOT made here and is
+    NOT made on hDevice: the discriminator is "not Keyman's own", and RDP and the OSK deliver genuine
+    user input as OS-injected events.
+  */
+  void ProcessRawInput(HRAWINPUT hRawInput) {
+    RAWINPUT raw;
+    UINT size = sizeof(raw);
+
+    if (GetRawInputData(hRawInput, RID_INPUT, &raw, &size, sizeof(RAWINPUTHEADER)) == (UINT)-1) {
+      DebugLastError("GetRawInputData");
+      return;
+    }
+
+    if (raw.header.dwType != RIM_TYPEKEYBOARD) {
+      return;
+    }
+
+    UpdateUserHeldFromRawKeyboard(
+      &m_userHeld, raw.data.keyboard.VKey, raw.data.keyboard.MakeCode, raw.data.keyboard.Flags,
+      raw.data.keyboard.ExtraInformation);
   }
 
   /**
@@ -372,10 +656,33 @@ private:
     //
     // Send the input to the system input queue
     //
-    // == 0 misses a partial send; != m_nInputs would be the honest check. Not a latch source, so
-    // left alone: the restore KEYDOWNs are last, so truncation drops presses, never releases.
-    if (SendInput(m_nInputs, m_pInputs, sizeof(INPUT)) == 0) {
+    // #8064 FR-015b. `!= m_nInputs`, not `== 0`. The old check's own excuse -- "not a latch source:
+    // the restore KEYDOWNs are last, so truncation drops presses, never releases" -- is true about
+    // latching and false about the mask. The restore presses being last is exactly why a short send
+    // drops THEM, and restorePressedMask would then name presses the OS never received. The
+    // verification pass corrects on cache-up-and-live-down; for a press that was never sent, live IS
+    // down, so it would release a modifier on the strength of an event that does not exist.
+    //
+    // Reported with the counts, because "SendInput failed" and "SendInput sent 251 of 256" need
+    // different responses and GetLastError does not distinguish them.
+    const UINT sent = SendInput(m_nInputs, m_pInputs, sizeof(INPUT));
+    if (sent != (UINT)m_nInputs) {
       DebugLastError("SendInput");
+      SendDebugMessageFormat("#8064 short send: SendInput accepted %u of %d events", sent, m_nInputs);
+
+      // EXACTLY the bits whose press did not go out, and not one more. Clearing the whole mask on
+      // any short send would suppress the correction for the presses that DID land -- trading a
+      // second dropped hold for the first, which is not a fix. m_restoreEventIndex says where each
+      // press was, so the boundary is decidable rather than guessed.
+      for (int i = 0; i < KEYMAN_MODIFIER_VK_COUNT; i++) {
+        if ((restorePressedMask & (1u << i)) && m_restoreEventIndex[i] >= (int)sent) {
+          SendDebugMessageFormat(
+            "#8064 short send: restore press at index %d was not delivered, dropping it from the "
+            "verification mask",
+            m_restoreEventIndex[i]);
+          restorePressedMask &= ~(1u << i);
+        }
+      }
     }
     m_nInputs = 0;
 
@@ -399,9 +706,78 @@ private:
     // In keybd_shift.cpp so the gtest project can reach it; this file is #ifndef _WIN64 and this is
     // a private member, so nothing here is testable. See #8064.
     DWORD restorePressedMask = 0;
+    // #8064 FR-104. The signal is handed over only when the active desktop is the user's -- on any
+    // other desktop this process cannot observe input, so its last observations are stale by
+    // construction. Poisoned rather than withheld, so the reason survives into the next batch too.
+    if (!ActiveDesktopIsTheUsers()) {
+      PoisonAllUserHeldKeys(&m_userHeld);
+    }
+
     m_nInputs = PrepareInjectedInputBatch(
-      m_pInputs, m_ModifierKeyboardState, m_pSharedData, GetAsyncKeyState, flag_ShouldSerializeInput, &restorePressedMask);
+      m_pInputs, m_ModifierKeyboardState, m_pSharedData, GetAsyncKeyState, flag_ShouldSerializeInput,
+      &restorePressedMask, ReportModifierDiagnostic, m_restoreEventIndex, &m_userHeld);
     return restorePressedMask;
+  }
+
+  /**
+    #8064 FR-103a. Applies every raw keyboard event already sitting in this thread's queue to the
+    user-held signal, and returns only when there is nothing left to apply.
+
+    THIS IS NOT AN OPTIMISATION AND IT IS NOT DEFENSIVE PADDING. Without it, the signal that
+    ProcessModifierVerification reads has NOT yet seen observations the OS made BEFORE the verify
+    message was even posted -- and a signal reporting a hold the user has already let go of is
+    precisely the input that makes the correction decline. It is the stale shadow
+    CheckRawInputRegistrationStillOurs was written to prevent, arriving by a second route.
+
+    The reason is message RETRIEVAL ORDER, which is by class and not by arrival time. GetMessage and
+    PeekMessage return sent messages, then POSTED messages, then INPUT (hardware) messages, then
+    WM_PAINT, then WM_TIMER. WM_INPUT is signalled by QS_RAWINPUT, QS_RAWINPUT is part of QS_INPUT,
+    so WM_INPUT is retrieved in the input class -- BEHIND every posted message, however much earlier
+    it arrived. WM_KEYMAN_VERIFY_MODIFIER_EVENT is posted. So a user's modifier KEYUP the OS observed
+    before the batch's SendInput even returned is still undispatched when the verify runs, and
+    m_userHeld still reports that key held.
+
+    The self-post's OTHER ordering guarantee is untouched by this, and deliberately: the drain
+    filters on WM_INPUT alone, so it removes nothing from the posted queue. Every
+    WM_KEYMAN_MODIFIER_EVENT posted before the verify was already dispatched before it by
+    posted-message FIFO -- that claim is between two posted messages and it was always sound. This
+    repairs only the half of the ordering that spans two different message classes.
+
+    Dispatched rather than handled inline, so ProcessRawInput reads each HRAWINPUT inside its own
+    WM_INPUT dispatch and WndProc still falls through to DefWindowProc for the system's cleanup. A
+    raw input handle is valid only for the delivery of the message that carries it; nothing is
+    stashed and nothing is read after its message is done.
+
+    Pulling forward a raw event that arrived AFTER the verify post is possible and harmless. A KEYUP
+    pulled forward makes the correction fire, which is the outcome wanted. A KEYDOWN pulled forward
+    makes it decline, which is the safe-direction error PrepareModifierVerificationCorrection's own
+    doc comment already accepts -- an unmatched KEYUP is re-pressable, an unmatched KEYDOWN on
+    hardware with no physical Right Ctrl is not.
+  */
+  void DrainPendingRawInput() {
+    if (m_hwnd == NULL) {
+      return;
+    }
+
+    // A bound, because typematic repeat refills the queue while we empty it and this runs on the
+    // input path. Two orders of magnitude above a realistic repeat rate for the microseconds this
+    // takes, so reaching it means something pathological -- and it is reported rather than passed
+    // over, because a silent cap here reads as "the signal is current" when it is not.
+    const int kMaxDrain = 256;
+    int drained = 0;
+
+    MSG msg;
+    while (drained < kMaxDrain && PeekMessage(&msg, m_hwnd, WM_INPUT, WM_INPUT, PM_REMOVE)) {
+      DispatchMessage(&msg);
+      drained++;
+    }
+
+    if (drained >= kMaxDrain) {
+      SendDebugMessageFormat(
+        "#8064 verification: stopped draining raw input at %d events with more still queued; the "
+        "user-held signal is more current than it was but is not guaranteed current",
+        kMaxDrain);
+    }
   }
 
   /**
@@ -410,9 +786,17 @@ private:
     nobody holds.
   */
   void ProcessModifierVerification(DWORD restorePressedMask) {
+    // #8064 FR-103a. BEFORE the signal is read, never after: posted messages are retrieved ahead of
+    // input messages, so raw observations older than this verify message are still queued behind it.
+    // See DrainPendingRawInput.
+    DrainPendingRawInput();
+
     INPUT correction[MAX_KEYEVENT_INPUTS_MODIFIERS];
     // In keybd_shift.cpp so the gtest project can reach it, same reasoning as PrepareInjectedInput.
-    int n = PrepareModifierVerificationCorrection(correction, m_ModifierKeyboardState, restorePressedMask, GetAsyncKeyState);
+    // #8064 FR-103a: the same signal the restore half consulted, or the pass would release what the
+    // batch just pressed. FR-101/FR-103 and FR-103a land together or not at all.
+    int n = PrepareModifierVerificationCorrection(
+      correction, m_ModifierKeyboardState, restorePressedMask, GetAsyncKeyState, &m_userHeld);
     if (n > 0) {
       if (!SendInput(n, correction, sizeof(INPUT))) {
         DebugLastError("SendInput");
@@ -444,6 +828,39 @@ private:
     // WM_KEYMAN_MODIFIER_EVENT already queued when the batch's SendInput returned.
     if (msg == WM_KEYMAN_VERIFY_MODIFIER_EVENT) {
       ProcessModifierVerification((DWORD)wParam);
+    }
+
+    // #8064 W5 / FR-100a. The user-held signal's feed.
+    //
+    // NO LOOP CHANGE IS NEEDED, and that is worth stating because the obvious instinct is to add a
+    // wait: MsgWaitForMultipleObjectsEx already waits on QS_ALLINPUT, and QS_ALLINPUT includes
+    // QS_INPUT which includes QS_RAWINPUT. The loop already wakes for raw input.
+    //
+    // WHAT THE LOOP DOES NOT GIVE IS ORDER. An earlier draft of this comment claimed FIFO dispatch
+    // put a raw event that arrived before WM_KEYMAN_VERIFY_MODIFIER_EVENT ahead of it. That is
+    // wrong, and it was the load-bearing assumption under FR-103a. Retrieval is ordered by message
+    // CLASS -- sent, then posted, then input, then WM_PAINT, then WM_TIMER -- so a posted message is
+    // returned ahead of a WM_INPUT that has been queued since long before it. The posted-FIFO claim
+    // holds only between two posted messages, which is the WM_KEYMAN_MODIFIER_EVENT case, and is
+    // stated that way in JUSTIFICATION.md.
+    //
+    // So the verify pass drains this queue itself before reading the signal: see
+    // DrainPendingRawInput. Ordinary arrivals are still applied here, in dispatch order.
+    if (msg == WM_INPUT) {
+      ProcessRawInput((HRAWINPUT)lParam);
+    }
+
+    // #8064 FR-104 / FR-104a. A session change means the signal has no standing to speak about any
+    // key: fast user switching, RDP connect and disconnect, lock and unlock all move input somewhere
+    // this feed cannot see, and the UAC secure desktop is the same problem without a notification.
+    // Poison is per key and clears only on a fresh observation of that key -- never on a timer -- so
+    // a modifier the user releases on the secure desktop is not reported held on their return.
+    if (msg == WM_WTSSESSION_CHANGE) {
+      SendDebugMessageFormat(
+        "#8064 session change (%x): poisoning the user-held signal; each key becomes usable again "
+        "only when it is next observed",
+        (unsigned)wParam);
+      PoisonAllUserHeldKeys(&m_userHeld);
     }
 
     /*

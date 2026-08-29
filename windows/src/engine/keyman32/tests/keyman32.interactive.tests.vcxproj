@@ -1,5 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+    #8064 FR-023: the OPT-IN interactive test target.
+
+    keybd_shift.interactive.tests.cpp injects real keyboard input and reads it back. It needs an
+    interactive input desktop, and for two of its four tests a desktop that routes keyboard messages
+    to a pumped, hooked message queue. A Session-0 CI service account has neither, which is why
+    these tests are NOT in keyman32.tests.vcxproj and why build.sh exposes them as
+    `test-interactive:x86` / `test-interactive:x64` rather than as part of the `test` action.
+
+    In that file an absent capability is FAIL(), not SUCCEED(). That is only correct because this
+    project is built and run deliberately, by a person, on a desktop where the capability is
+    supposed to exist. Do not add it to the default target (FR-022, SC-005).
+
+    Everything below is keyman32.tests.vcxproj with three differences: a different ProjectGuid, its
+    own IntDir (so the two projects do not share pch.pch), and a single source file. The IntDir sits
+    under obj\$(Platform)\ rather than beside it, so windows/src/.gitignore's **/obj/Win32/ and
+    **/obj/x64/ rules cover this project's intermediates too.
+  -->
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM64">
       <Configuration>Debug</Configuration>
@@ -35,7 +53,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{46399ED7-79A1-4E7E-BD96-4B1AEEC838AE}</ProjectGuid>
+    <ProjectGuid>{5C7F3A21-9D4E-4B86-B1C2-7E0A6F35D9B4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
     <ConfigurationType>Application</ConfigurationType>
@@ -51,17 +69,17 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)obj\$(Platform)\interactive\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)obj\$(Platform)\interactive\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)obj\$(Platform)\interactive\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)obj\$(Platform)\interactive\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">$(ProjectDir)obj\$(Platform)\interactive\$(Configuration)\</IntDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">$(ProjectDir)obj\$(Platform)\interactive\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(ProjectDir)..\;$(ProjectDir)..\..\..\..\..\common\include;$(ProjectDir)..\..\..\..\..\core\build\x86\$(Configuration)\include;$(ProjectDir)..\..\..\..\..\core\include;$(IncludePath)</IncludePath>
@@ -81,7 +99,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64EC'">
     <IncludePath>$(ProjectDir)..\..\..\..\..\..\common\include;$(ProjectDir)..\..\..\..\..\..\core\build\x64\$(Configuration)\include;$(ProjectDir)..\..\..\..\..\..\core\include;$(ProjectDir)..\..\..\..\..\..\core\build\x64\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\..\..\core\build\x64\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\global\inc;$(ProjectDir)..\..;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(ProjectDir)obj\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>$(ProjectDir)obj\$(Platform)\interactive\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <IncludePath>$(ProjectDir)..\;$(ProjectDir)..\..\..\..\..\common\include;$(ProjectDir)..\..\..\..\..\core\build\arm64\$(Configuration)\include;$(ProjectDir)..\..\..\..\..\core\include;$(IncludePath)</IncludePath>
@@ -228,18 +246,8 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
-    <!--
-      #8064 FR-023 / SC-005: keybd_shift.interactive.tests.cpp is deliberately NOT listed here, and
-      must not be added. It injects real keyboard input, which a Session-0 CI service account cannot
-      observe, so on this target its tests could only report PASSED without asserting anything. It is
-      built by keyman32.interactive.tests.vcxproj and run by `build.sh test-interactive:x86` /
-      `test-interactive:x64` instead, an action that is deliberately not part of `test`.
-    -->
     <ClCompile Include="gtest_main.cpp" />
-    <ClCompile Include="appint.tests.cpp" />
-    <ClCompile Include="keyboardoptions.tests.cpp" />
-    <ClCompile Include="kmprocessactions.tests.cpp" />
-    <ClCompile Include="keybd_shift.tests.cpp" />
+    <ClCompile Include="keybd_shift.interactive.tests.cpp" />
     <ClCompile Include="..\..\..\global\cpp\kmtip_guids.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

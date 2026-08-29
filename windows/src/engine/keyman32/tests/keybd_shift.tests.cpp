@@ -9,6 +9,60 @@
   end-to-end test: manual-tests/GH-8064 - stuck-modifier-phantom-keydown/README.md.
 */
 
+/*
+  #8064 FR-018 / SC-008 -- THE LEDGER. Every case in this file that passes with its corresponding
+  fix reverted, and what was done about it. The verdicts marked MEASURED come from a 34-mutation
+  sweep of keybd_shift.cpp and k32_lowlevelkeyboardhook.cpp run against this suite: each mutation
+  reverts or widens one production decision, the suite is rebuilt, and the set that goes red is
+  recorded. A case that no mutation can turn red is guaranteeing nothing.
+
+  PAIRED -- a positive was added or strengthened, so the case now discriminates:
+
+    CAPTURE_LIVE_MODIFIER_STATE.SetsAByteForEachModifierTheOsHolds
+      StubGetAsyncKeyState answers 0x8000 or 0 and nothing else, so this holds whatever
+      CaptureLiveModifierState tests: replacing its `< 0` with `!= 0` left all 73 cases green.
+      Paired with OnlyTheSignBitCountsAsHeld, which answers 0x0001 and turns that mutation red.
+
+    PREPARE_INJECTED_INPUT_BATCH.RestorePressedMaskIsZeroWhenNothingIsRestored
+      Asserted zero against an out-param the harness had already zeroed, so it passed whether or
+      not PrepareInjectedInputBatch ever wrote it. RunBatch now seeds kRestoreMaskUnwritten, which
+      makes the same assertion demand the write as well. See RunBatch.
+
+    PREPARE_INJECTED_INPUT_BATCH.OsHeldModifierIsNotRestoredAfterTheOutputKeys
+      Its own comment conceded that it passes before the fix as well as after -- true of the
+      reconcile, but not of the restore half it actually guards: pointing the restore half at live
+      instead of kbd turns it red, and so does letting the reconcile set as well as clear. Paired
+      by CacheNotFedLeavesALiveHeldModifierUntouched, which the same two mutations also turn red.
+
+  DEFECT CHARACTERISATION -- green with the fix reverted, deliberately. Labelled structurally, on
+  the fixture name, not in a comment a later reader has to interpret:
+
+    DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER, all four cases. See that fixture.
+
+  DISABLED BY DESIGN:
+
+    KEYBD_SHIFT.DISABLED_ResetDoesNotPressAKeyThatIsNotHeld -- see its own comment. Its
+    with-the-fix positive is RECONCILE_MODIFIER_CACHE.ReconcileThenResetPressesNothing.
+
+  MOVED, AND WHERE TO -- the four interactive probes. They inject real input and need an interactive
+  input desktop, so on this target they could only SUCCEED() without asserting anything, which is
+  what FR-022 and SC-005 forbid. FR-023 moved them, unchanged except that an absent capability is now
+  FAIL() instead of SUCCEED(), to keybd_shift.interactive.tests.cpp -- built by
+  keyman32.interactive.tests.vcxproj and run by `build.sh test-interactive:x86` / `test-interactive:x64`,
+  deliberately not part of the `test` action. Comments in this file still cite them by name, because
+  each one measures a platform property a test here rests on:
+
+    KEYBD_SHIFT.FreshThreadKeyboardStateReflectsLiveModifiers
+    KEYBD_SHIFT.ReconcileDoesNotRaceItsOwnInjectedRestorePress
+    KEYBD_SHIFT.DwExtraInfoSurvivesSendInputWhereTheScanCodeDoesNot
+    KEYBD_SHIFT.GenericShiftSendInputReflectsInBothAsyncKeyStates
+
+  Not on the ledger, and worth saying why: KEYBD_SHIFT.ResetRepressesFromCache reads like
+  characterisation -- its last assertion is labelled #8064 -- but it is a pin. It goes red when
+  keybd_shift_reset's prefix protection is dropped, so it holds production behaviour and stays
+  where it is.
+*/
+
 // Globals::InitSettings (k32_globals.cpp) seeds the prefix virtual key from _VK_PREFIX_DEFAULT
 // (appint/aiTIP.h) or from the registry, and Globals_InitProcess does not call it. Pin it here
 // rather than depend on the machine's registry.
@@ -194,6 +248,9 @@ TEST_F(KEYBD_SHIFT, ModifierEventCountNeverExceedsReserve) {
   DISABLED_ deliberately, and must stay so: re-pressing a genuinely held modifier is what
   keybd_shift is for, and from inside it a stale byte and a real one are indistinguishable.
   RECONCILE_MODIFIER_CACHE.ReconcileThenResetPressesNothing is this test with the fix applied.
+
+  #8064 FR-018: on the ledger at the top of this file, under DISABLED BY DESIGN. It is not an
+  unpaired negative that nobody got round to enabling.
 */
 TEST_F(KEYBD_SHIFT, DISABLED_ResetDoesNotPressAKeyThatIsNotHeld) {
   // gtest 1.8.1 has no GTEST_SKIP(); bail out visibly rather than pass for the wrong reason.
@@ -265,6 +322,17 @@ StubGetAsyncKeyState(int vKey) {
   // 0x8000 is negative as a SHORT, which is what the "< 0 means down" convention tests.
   return (vKey >= 0 && vKey < 256 && g_liveModifierState[vKey]) ? (SHORT)0x8000 : (SHORT)0;
 }
+
+// #8064 The same simulated state, reported through GetAsyncKeyState's other bit. The real API sets
+// 0x0001 for "pressed since the last call" and leaves the sign bit clear once the key is back up,
+// so this is the answer that separates held-now from was-held. Only OnlyTheSignBitCountsAsHeld
+// uses it; the FR-018 ledger at the top of this file says why the 0x8000-or-0 stub above cannot do
+// that job.
+SHORT WINAPI
+StubGetAsyncKeyStateToggledOnly(int vKey) {
+  g_readerCalls++;
+  return (vKey >= 0 && vKey < 256 && g_liveModifierState[vKey]) ? (SHORT)0x0001 : (SHORT)0;
+}
 } // namespace
 
 // Every case below reads or writes the simulated live state, so reset it and the reader counter.
@@ -306,6 +374,38 @@ TEST_F(CAPTURE_LIVE_MODIFIER_STATE, SetsAByteForEachModifierTheOsHolds) {
   EXPECT_EQ(live[VK_LSHIFT], (BYTE)0x80);
   EXPECT_EQ(live[VK_RCONTROL], (BYTE)0x80);
   EXPECT_EQ(live[VK_RSHIFT], (BYTE)0) << "a modifier the OS does not hold must read clear";
+}
+
+/*
+  #8064 FR-018's positive for the case above, which cannot be it. SetsAByteForEachModifierTheOsHolds
+  drives StubGetAsyncKeyState, whose only two answers are 0x8000 and 0 -- and both sort the same way
+  under `< 0` as under `!= 0`. So it asserts the snapshot's contents while holding nothing about the
+  test that produces them: measured, replacing CaptureLiveModifierState's `< 0` with `!= 0` leaves
+  the whole suite green.
+
+  0x0001 is the reading that separates the two, and it is not a contrivance. GetAsyncKeyState's low
+  bit means the key was pressed since the last call, and it is set with the key already back up.
+  Read as held, it fabricates a modifier the OS is not holding -- which costs a spurious KEYUP in
+  the release half, and, worse, keeps a stale cache byte alive through ReconcileModifierCache, whose
+  only clearing condition is the live reading being clear. A stale byte the reconcile can no longer
+  reach is #8064 with its own repair disabled.
+
+  Turns red when: the `< 0` in CaptureLiveModifierState becomes `!= 0`, or any other test that is
+  not the sign bit.
+*/
+TEST_F(CAPTURE_LIVE_MODIFIER_STATE, OnlyTheSignBitCountsAsHeld) {
+  memset(g_liveModifierState, 0x80, sizeof(g_liveModifierState)); // every VK answers 0x0001 below
+  g_readerCalls = 0;
+
+  CaptureLiveModifierState(live, StubGetAsyncKeyStateToggledOnly);
+
+  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+    EXPECT_EQ(live[KeymanModifierVks[i]], (BYTE)0)
+        << "vkCode " << (int)KeymanModifierVks[i] << ": the reader answered 0x0001 -- pressed since "
+        << "the last call, not held now -- and the snapshot recorded it as held";
+  }
+
+  EXPECT_EQ(g_readerCalls, KEYMAN_MODIFIER_VK_COUNT) << "the reading count must not move with the answer";
 }
 
 /*
@@ -443,6 +543,82 @@ TEST_F(RECONCILE_MODIFIER_CACHE, ReconcileThenResetPressesNothing) {
 }
 
 /*
+  FR-019's replacement contract, and the reason PrepareInjectedInputBatch can pass live straight to
+  the release half. The reconcile clears every byte the cache holds while the OS reports it up, so
+  afterwards kbd is a subset of live over the managed six -- which is exactly what makes
+  kbd union live == live, and the union the batch used to compute redundant rather than merely
+  unnecessary. Delete this and the comment at that keybd_shift call is a guess again.
+
+  All four cache/OS combinations are present in the one array, so none can pass by never being
+  exercised.
+*/
+TEST_F(RECONCILE_MODIFIER_CACHE, ReconcileLeavesTheCacheASubsetOfLiveState) {
+  kbd[VK_LSHIFT]                 = 0x80; // cache holds, OS agrees
+  g_liveModifierState[VK_LSHIFT] = 0x80;
+  kbd[VK_LCONTROL]               = 0x80; // cache holds, OS says up -- the stale byte of #8064
+  kbd[VK_RMENU]                  = 0;    // cache up, OS holds -- the mirror direction
+  g_liveModifierState[VK_RMENU]  = 0x80;
+  // VK_LMENU, VK_RCONTROL and VK_RSHIFT: neither side holds them.
+
+  EXPECT_TRUE(ReconcileModifierCache(kbd, g_liveModifierState)) << "the stale VK_LCONTROL byte is a disagreement";
+
+  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+    const BYTE vk = KeymanModifierVks[i];
+    EXPECT_TRUE(!(kbd[vk] & 0x80) || (g_liveModifierState[vk] & 0x80))
+        << "slot " << (int)vk << " is held in the cache but not in the live state: kbd is not a subset of live";
+    // The corollary the deletion rests on: the union carries nothing live does not already carry.
+    EXPECT_EQ((BYTE)((kbd[vk] | g_liveModifierState[vk]) & 0x80), (BYTE)(g_liveModifierState[vk] & 0x80))
+        << "slot " << (int)vk << ": the union of cache and live diverges from live";
+  }
+}
+
+// #8064 FR-018. A value PrepareInjectedInputBatch cannot produce -- the mask is six bits wide --
+// so PREPARE_INJECTED_INPUT_BATCH::RunBatch can seed the out-param with it and every mask case
+// then fails if the write never happens. File scope, not a static class member: gtest binds its
+// arguments by const reference, which would ODR-use a member with no out-of-line definition.
+static const DWORD kRestoreMaskUnwritten = 0xFFFFFFFF;
+
+// #8064 FR-015b. Same trick as kRestoreMaskUnwritten, one level down: a value
+// PrepareInjectedInputBatch cannot produce for pRestorePressIndex -- it writes a buffer index or
+// -1 -- so a case that reads an index is forced to demand the write rather than read back the
+// harness's own initialisation.
+static const int kRestoreEventIndexUnwritten = -2;
+
+// do_keybd_event collapses each chiral modifier onto its generic VK, so an assertion about a queued
+// event has to name the generic one. Mirrors that switch rather than restating its result, so the
+// two cannot drift apart silently.
+static WORD
+CollapsedVk(BYTE vk) {
+  switch (vk) {
+  case VK_LCONTROL:
+  case VK_RCONTROL:
+    return VK_CONTROL;
+  case VK_LMENU:
+  case VK_RMENU:
+    return VK_MENU;
+  case VK_LSHIFT:
+  case VK_RSHIFT:
+    return VK_SHIFT;
+  default:
+    return vk;
+  }
+}
+
+// #8064 FR-015b, expressed once so the test asserts the caller's rule and not a paraphrase of it:
+// given a mask, the per-bit press indices and how many events SendInput actually sent, how many
+// bits stand for a press that never left the buffer.
+static int
+DroppedBitCount(DWORD mask, const int *index, int sent) {
+  int dropped = 0;
+  for (int i = 0; i < KEYMAN_MODIFIER_VK_COUNT; i++) {
+    if ((mask & (1u << i)) && index[i] >= sent) {
+      dropped++;
+    }
+  }
+  return dropped;
+}
+
+/*
   Batch-level assertions against PrepareInjectedInputBatch, the production caller of the cases above.
   No SCOPED_TRACE: gtest 1.8.1 retains its trace-stack capacity after the scope exits, and
   gtest_main.cpp's _CrtMemDifference check reports that as a leak.
@@ -467,14 +643,27 @@ protected:
     sharedData.nInputs++;
   }
 
-  // #8064: cacheIsFed and restorePressedMask both default, so the many existing call sites above
-  // stay exactly as they are.
+  // #8064: feedIsConfigured and restorePressedMask both default, so the many existing call sites
+  // above stay exactly as they are.
   DWORD restorePressedMask;
 
+  // #8064 FR-018. Seeded with this and never with 0. RestorePressedMaskIsZeroWhenNothingIsRestored
+  // asserts the mask is zero, and while the harness pre-set it to zero that assertion passed
+  // whether or not PrepareInjectedInputBatch ever wrote the out-param -- it was reading back its
+  // own initialisation. A value no real mask can hold makes the same assertion demand the write
+  // too, which is the positive the case was missing. 0xFFFFFFFF: the mask is six bits wide.
+  // #8064 FR-015b. One int per mask bit; see pRestorePressIndex in keybd_shift.cpp.
+  int restoreEventIndex[KEYMAN_MODIFIER_VK_COUNT];
+
   void
-  RunBatch(BOOL cacheIsFed = TRUE) {
-    restorePressedMask = 0;
-    n                  = PrepareInjectedInputBatch(inputs, kbd, &sharedData, StubGetAsyncKeyState, cacheIsFed, &restorePressedMask);
+  RunBatch(BOOL feedIsConfigured = TRUE) {
+    restorePressedMask = kRestoreMaskUnwritten;
+    for (int i = 0; i < KEYMAN_MODIFIER_VK_COUNT; i++) {
+      restoreEventIndex[i] = kRestoreEventIndexUnwritten;
+    }
+    n = PrepareInjectedInputBatch(
+      inputs, kbd, &sharedData, StubGetAsyncKeyState, feedIsConfigured, &restorePressedMask, NULL,
+      restoreEventIndex);
   }
 };
 
@@ -578,6 +767,109 @@ TEST_F(PREPARE_INJECTED_INPUT_BATCH, NeverWritesPastTheBufferWhenTheSharedBuffer
 }
 
 /*
+  FR-021's pin, and the reason the reserve gets a test rather than a comment. It is one number that
+  has to be exactly right in both directions. One too small and the restore half writes past the end
+  of the server's `new INPUT[MAX_KEYEVENT_INPUTS]` (serialkeyeventserver.cpp:249) -- a heap overrun,
+  silent, in the process that owns the keyboard. One too large and output keys that would have fitted
+  are dropped instead, silently as well: the truncation at 248 is logged nowhere (see the truncation
+  policy comment in serialkeyeventcommon.h). Neither direction shows up as a failure anywhere else,
+  so the boundary is pinned here from both sides.
+
+  The expected numbers are derived from the literal worst case, NOT recomputed from the production
+  expression `MAX_KEYEVENT_INPUTS - MAX_KEYEVENT_INPUTS_MODIFIERS`. Recomputing it would make the
+  assertion move with the constant and pin nothing:
+
+    release half   2 prefix events + 6 modifier KEYUPs                        =    8
+    output keys    the loop bound is the running total, not the output count  =  240
+    restore half   6 modifier KEYDOWNs + 2 prefix events                      =    8
+                                                                                ----
+                                                                                 256
+
+  The 240 is worth stating, because "248 output keys + 8 restore events" is the arithmetic one
+  reaches for and it is not reachable: the release half spends from the same 248 slots the output
+  keys do. Nor can a batch dodge that by having an empty release half and a full restore half --
+  ReconcileModifierCache leaves the cache a subset of live state, so the restore half can only be
+  non-empty where the release half already was. 8 + 240 + 8 is the true ceiling.
+
+  The batch goes into a buffer deliberately larger than MAX_KEYEVENT_INPUTS, pre-filled with a
+  sentinel, so a reserve one too small is caught here as a written-guard-slot failure instead of
+  corrupting this process's stack the way it would corrupt the server's heap.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, WorstCaseBatchFillsTheBufferToItsLastSlotAndNotOneFurther) {
+  const int kPrefixEventsPerHalf   = 2;   // keybd_sendprefix emits one KEYDOWN and one KEYUP
+  const int kModifierEventsPerHalf = 6;   // KeymanModifierVks, every one of them held
+  const int kReleaseHalfEvents     = kPrefixEventsPerHalf + kModifierEventsPerHalf;
+  const int kRestoreHalfEvents     = kModifierEventsPerHalf + kPrefixEventsPerHalf;
+  const int kOutputKeysThatFit     = 240;
+  const int kWorstCaseTotal        = kReleaseHalfEvents + kOutputKeysThatFit + kRestoreHalfEvents;
+
+  // Room to record an overrun rather than commit one. 32 only has to exceed the largest overrun a
+  // plausible error in the loop bound could produce; dropping the bound entirely yields 16 past.
+  const int kGuardSlots      = 32;
+  const DWORD kUntouchedSlot = 0xCDCDCDCD;
+  INPUT guarded[MAX_KEYEVENT_INPUTS + kGuardSlots];
+  memset(guarded, 0xCD, sizeof(guarded));
+
+  // Both halves at full stretch: all six managed modifiers held by the OS, so the release half emits
+  // its 8, and held in the cache too, so the reconcile clears none of them and the restore half
+  // emits its 8 as well.
+  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+    kbd[KeymanModifierVks[i]]                 = 0x80;
+    g_liveModifierState[KeymanModifierVks[i]] = 0x80;
+  }
+
+  // More output keys than can fit, so the loop bound is what stops the copy. Exactly the shared
+  // buffer's capacity: the over-large nInputs case is
+  // NeverWritesPastTheBufferWhenTheSharedBufferOverflows above, and is a different guard.
+  for (int i = 0; i < MAX_KEYEVENT_INPUTS; i++) {
+    AddOutputKey('A');
+  }
+  ASSERT_EQ(sharedData.nInputs, (DWORD)MAX_KEYEVENT_INPUTS);
+
+  DWORD restoreMask = 0;
+  const int total = PrepareInjectedInputBatch(guarded, kbd, &sharedData, StubGetAsyncKeyState, TRUE, &restoreMask);
+
+  // Fits -- the last slot of the real buffer was written.
+  EXPECT_EQ(total, kWorstCaseTotal) << "the worst case no longer fills a " << MAX_KEYEVENT_INPUTS
+                                    << "-entry buffer exactly";
+  EXPECT_NE(guarded[kWorstCaseTotal - 1].type, kUntouchedSlot)
+      << "slot " << (kWorstCaseTotal - 1) << " was never written: the reserve is one too large, and "
+      << "an output key that would have fitted was dropped for nothing";
+
+  // Exactly -- one more event would be past the end of the buffer the server actually allocates.
+  EXPECT_EQ(kWorstCaseTotal, (int)MAX_KEYEVENT_INPUTS)
+      << "the worst case and the allocation no longer agree; one of the two moved without the other";
+  for (int i = kWorstCaseTotal; i < kWorstCaseTotal + kGuardSlots; i++) {
+    ASSERT_EQ(guarded[i].type, kUntouchedSlot)
+        << "slot " << i << " was written: in production that is " << (i - kWorstCaseTotal + 1)
+        << " INPUT structure(s) past the end of new INPUT[MAX_KEYEVENT_INPUTS], on the heap";
+  }
+
+  // The composition, so a failure above says which of the three parts moved rather than only that
+  // the total did.
+  int outputKeys = 0, prefixEvents = 0, modifierUps = 0, modifierDowns = 0;
+  for (int i = 0; i < total; i++) {
+    const WORD vk   = guarded[i].ki.wVk;
+    const bool isUp = (guarded[i].ki.dwFlags & KEYEVENTF_KEYUP) != 0;
+    if (vk == 'A') {
+      outputKeys++;
+    } else if (vk == PREFIX_VK) {
+      prefixEvents++;
+    } else if (isUp) {
+      modifierUps++;
+    } else {
+      modifierDowns++;
+    }
+  }
+
+  EXPECT_EQ(outputKeys, kOutputKeysThatFit)
+      << "the release half spends from the same slots the output keys do, so 240 fit, not 248";
+  EXPECT_EQ(prefixEvents, kPrefixEventsPerHalf * 2) << "one prefix down/up pair per half";
+  EXPECT_EQ(modifierUps, kModifierEventsPerHalf) << "the release half must emit all six KEYUPs";
+  EXPECT_EQ(modifierDowns, kModifierEventsPerHalf) << "the restore half must emit all six KEYDOWNs";
+}
+
+/*
   The mirror of #8064: the cache byte clear while the OS reports the modifier held. The release half
   reads only the cache and the reconcile only ever clears, so nothing emitted a KEYUP and the output
   keys went out with the modifier live.
@@ -600,7 +892,14 @@ TEST_F(PREPARE_INJECTED_INPUT_BATCH, OsHeldModifierIsReleasedBeforeTheOutputKeys
 
 /*
   The restore half must read the cache alone. Re-pressing on the OS's word is unsafe: the user may
-  let go before SendInput runs, which is #8064 inverted. Passes before the fix as well as after.
+  let go before SendInput runs, which is #8064 inverted.
+
+  #8064 FR-018. This used to concede here that it passes before the fix as well as after, which is
+  true of the reconcile and false of the thing it actually guards. Measured: it goes red when the
+  restore half is pointed at live instead of kbd, and again when ReconcileModifierCache is made to
+  set as well as clear -- the two production shapes that would press a modifier the cache never
+  held. CacheNotFedLeavesALiveHeldModifierUntouched goes red under both as well, so the pair holds
+  the same boundary from the other side.
 */
 TEST_F(PREPARE_INJECTED_INPUT_BATCH, OsHeldModifierIsNotRestoredAfterTheOutputKeys) {
   kbd[VK_LSHIFT]              = 0;    // cache: clear
@@ -714,12 +1013,19 @@ TEST_F(PREPARE_INJECTED_INPUT_BATCH, EveryWrapEventIsIdentifiableAsKeymanInjecte
   #8064 The verification pass scopes itself to restorePressedMask, so the mask must name exactly the
   VKs the restore half pressed. keybd_shift_reset never writes kbd, so it is just kbd's
   post-reconcile state as a bitmask; these pin that translation.
+
+  #8064 FR-018. The first of them makes two claims in one assertion, and it only ever made one of
+  them until RunBatch stopped seeding zero: that the mask is empty when the restore half pressed
+  nothing, and that the mask was written at all. Against a pre-zeroed out-param the second was free,
+  so a PrepareInjectedInputBatch that never touched pRestorePressedMask passed here. The sentinel is
+  what buys it. See RunBatch.
 */
 TEST_F(PREPARE_INJECTED_INPUT_BATCH, RestorePressedMaskIsZeroWhenNothingIsRestored) {
   AddOutputKey('A'); // cache empty, OS empty: nothing released, nothing restored
 
   RunBatch();
 
+  ASSERT_NE(restorePressedMask, kRestoreMaskUnwritten) << "the out-param was never written";
   EXPECT_EQ(restorePressedMask, (DWORD)0);
 }
 
@@ -780,9 +1086,9 @@ TEST_F(PREPARE_INJECTED_INPUT_BATCH, RestorePressedMaskExcludesAModifierReleased
   #8064 With flag_ShouldSerializeInput off the hook never posts WM_KEYMAN_MODIFIER_EVENT, so kbd
   never changes after its launch seed. The union would then release a live-held modifier no later
   batch could restore -- a lost modifier the pre-#8064 code could not produce, since release and
-  restore both read the same stale kbd there. cacheIsFed=FALSE must restore that symmetry.
+  restore both read the same stale kbd there. feedIsConfigured=FALSE must restore that symmetry.
 
-  To watch it fail, make the cacheIsFed branch in PrepareInjectedInputBatch unconditional:
+  To watch it fail, make the feedIsConfigured branch in PrepareInjectedInputBatch unconditional:
   Count(VK_SHIFT, true) becomes 1.
 */
 TEST_F(PREPARE_INJECTED_INPUT_BATCH, CacheNotFedLeavesALiveHeldModifierUntouched) {
@@ -817,146 +1123,47 @@ TEST_F(PREPARE_INJECTED_INPUT_BATCH, CacheNotFedStillReconciles) {
 
   RunBatch(FALSE);
 
-  EXPECT_EQ(kbd[VK_LSHIFT], (BYTE)0) << "the reconcile runs regardless of cacheIsFed -- it only ever "
+  EXPECT_EQ(kbd[VK_LSHIFT], (BYTE)0) << "the reconcile runs regardless of feedIsConfigured -- it only ever "
                                      << "clears, which is safe whether or not the cache is kept current";
   EXPECT_EQ(Count(VK_SHIFT, false), 0);
 }
 
 /*
-  ComputeModifierReleaseState at the function level rather than through the batch.
+  The release half at the function level rather than through the batch. Post-FR-019 the release set
+  IS the live snapshot: ComputeModifierReleaseState and its union are gone, on the theorem
+  ReconcileLeavesTheCacheASubsetOfLiveState pins. The two properties that were never about the union
+  -- the residue guard and the reserve-size guard -- are held here against live instead.
+
+  First, what the union's memset defended, re-expressed on live: CaptureLiveModifierState zeroes all
+  256 bytes before it writes, so caller stack residue in the release set cannot reach
+  keybd_shift_release as a keyup.
 */
-class COMPUTE_MODIFIER_RELEASE_STATE : public RECONCILE_MODIFIER_CACHE {
-protected:
-  BYTE releaseState[256];
+TEST_F(RECONCILE_MODIFIER_CACHE, ZeroesTheWholeArrayFirst) {
+  BYTE live[256];
+  memset(live, 0xFF, sizeof(live)); // caller stack residue, every byte reading held
 
-  void
-  Fill(BYTE value) {
-    memset(releaseState, value, sizeof(releaseState));
-  }
-};
+  CaptureLiveModifierState(live, StubGetAsyncKeyState); // the OS holds nothing
 
-/*
-  Pre-fill with 0xFF and confirm every byte the function does not set comes back zero.
-*/
-TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, ZeroesTheWholeArrayFirst) {
-  Fill(0xFF);
+  keybd_shift(inputs, &n, FALSE, live);
 
-  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
-
-  for (int vk = 0; vk < 256; vk++) {
-    EXPECT_EQ(releaseState[vk], (BYTE)0) << "byte " << vk << " kept caller stack residue";
-  }
+  EXPECT_EQ(n, 0) << "caller residue reached the release half -- with nothing held, not even a prefix is due";
 }
 
 /*
-  The union, over each of the four cache/OS combinations.
+  The reserve must hold for the release set. An all-zero cache with the OS reporting every managed
+  modifier held is the widest the release half gets, and post-FR-019 that release set is live
+  itself. The reconcile runs first, exactly as PrepareInjectedInputBatch orders it; it has nothing
+  to clear here, which is the point -- the width comes from the OS side alone.
 */
-TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, IsTheUnionOfCacheAndLiveState) {
-  // cache only
-  Fill(0xFF);
-  kbd[VK_LSHIFT] = 0x80;
-  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
-  EXPECT_EQ(releaseState[VK_LSHIFT], (BYTE)0x80) << "cache-held must be released, as today";
-
-  // OS only -- the mirror direction
-  Fill(0xFF);
-  memset(kbd, 0, sizeof(kbd));
-  g_liveModifierState[VK_LCONTROL] = 0x80;
-  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
-  EXPECT_EQ(releaseState[VK_LCONTROL], (BYTE)0x80) << "OS-held must be released: this is G1";
-
-  // both
-  Fill(0xFF);
-  kbd[VK_RMENU]              = 0x80;
-  g_liveModifierState[VK_RMENU] = 0x80;
-  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
-  EXPECT_EQ(releaseState[VK_RMENU], (BYTE)0x80);
-
-  // neither
-  Fill(0xFF);
-  memset(kbd, 0, sizeof(kbd));
-  memset(g_liveModifierState, 0, sizeof(g_liveModifierState));
-  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
-  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
-    EXPECT_EQ(releaseState[KeymanModifierVks[i]], (BYTE)0) << "nothing held, nothing released";
-  }
-}
-
-/*
-  Nothing outside the managed set is set, whatever the OS reports. A stuck letter or toggle key is a
-  different defect.
-*/
-TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, SetsNoByteOutsideTheManagedSet) {
-  Fill(0xFF);
-  memset(g_liveModifierState, 0x80, sizeof(g_liveModifierState)); // OS: every key held
-  memset(kbd, 0x80, sizeof(kbd));                          // cache: every key held
-
-  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
-
-  for (int vk = 0; vk < 256; vk++) {
-    bool managed = false;
-    for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
-      if (KeymanModifierVks[i] == vk) {
-        managed = true;
-      }
-    }
-    if (managed) {
-      EXPECT_EQ(releaseState[vk], (BYTE)0x80) << "managed slot " << vk << " should be set";
-    } else {
-      EXPECT_EQ(releaseState[vk], (BYTE)0) << "byte " << vk << " is outside the managed set";
-    }
-  }
-}
-
-/*
-  A reader of the cache, never a writer: writing the OS's view into kbd is what the restore half
-  would then press.
-*/
-TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, NeverModifiesTheCache) {
-  BYTE before[256];
-  for (int vk = 0; vk < 256; vk++) {
-    kbd[vk] = (BYTE)(vk & 0xFF);
-  }
-  memcpy(before, kbd, sizeof(before));
-  memset(g_liveModifierState, 0x80, sizeof(g_liveModifierState)); // OS: everything held
-
-  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
-
-  EXPECT_EQ(memcmp(kbd, before, sizeof(before)), 0) << "the cache was modified";
-}
-
-/*
-  The release set is a superset of the cache, so the release half never emits fewer releases than it
-  does today.
-*/
-TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, IsASupersetOfTheCache) {
-  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
-    kbd[KeymanModifierVks[i]] = 0x80; // cache: all six held
-  }
-  memset(g_liveModifierState, 0, sizeof(g_liveModifierState)); // OS: none held
-
-  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
-
-  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
-    const BYTE vk = KeymanModifierVks[i];
-    EXPECT_TRUE((kbd[vk] & 0x80) == 0 || (releaseState[vk] & 0x80) != 0)
-        << "slot " << (int)vk << " is held in the cache but not in the release set";
-  }
-}
-
-/*
-  The reserve must hold for the union too. An all-zero cache with the OS reporting every modifier
-  held is the widest the release half gets.
-*/
-TEST_F(COMPUTE_MODIFIER_RELEASE_STATE, ModifierEventCountNeverExceedsReserveForTheUnion) {
+TEST_F(RECONCILE_MODIFIER_CACHE, ModifierEventCountNeverExceedsReserveForTheUnion) {
   for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
     g_liveModifierState[KeymanModifierVks[i]] = 0x80; // OS: all six held
   }
-  // kbd stays all zero: the cache holds nothing at all. This is the union's widest divergence.
+  // kbd stays all zero: the cache holds nothing at all. This is the widest the two can diverge.
 
-  ComputeModifierReleaseState(kbd, releaseState, g_liveModifierState);
+  ReconcileModifierCache(kbd, g_liveModifierState);
 
-  keybd_shift(inputs, &n, FALSE, releaseState);
+  keybd_shift(inputs, &n, FALSE, g_liveModifierState);
   EXPECT_EQ(n, 8) << "prefix down + prefix up + 6 modifier keyups, from the OS side alone";
   EXPECT_LE(n, MAX_KEYEVENT_INPUTS_MODIFIERS);
 
@@ -1092,6 +1299,44 @@ TEST_F(PREPARE_MODIFIER_VERIFICATION_CORRECTION, TheCorrectionIsIdentifiableAsKe
 }
 
 /*
+  #8064 FR-017 mutation 4's positive, and the case the one above cannot be. For Left Shift the scan
+  code is still SCAN_FLAG_KEYMAN_KEY_EVENT when the correction is emitted, so
+  IsKeymanInjectedKeyEvent's scan arm answers TRUE whatever dwExtraInfo carries: drop
+  EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP from every event keybd_shift_release emits and that case stays
+  green. It asserts the tag; it does not hold it.
+
+  Right Shift is the one VK where the tag is load-bearing. do_keybd_event overwrites the 0xFF scan
+  with SCANCODE_RSHIFT (keybd_shift.cpp), by design and unavoidably -- scan code is the only thing
+  that tells the receiving app which Shift it was -- so the scan arm is blinded and dwExtraInfo is
+  the only channel left. Untagged, this correction re-enters the cache through the hook's gate as
+  though the user had pressed Right Shift, and the cache reacquires the very byte the correction
+  exists to deny. That is the same shape as TheGateCoversRightShiftThroughDwExtraInfo, on the
+  emitting side rather than the receiving one.
+
+  Turns red when: EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP is dropped from the events
+  keybd_shift_release emits. The ASSERT_EQ on the scan code is what keeps that honest -- it pins
+  that this really is the event the scan arm cannot rescue, so the EXPECT below is testing the tag
+  and nothing else.
+*/
+TEST_F(PREPARE_MODIFIER_VERIFICATION_CORRECTION, TheRightShiftCorrectionIsIdentifiableThroughDwExtraInfoAlone) {
+  kbd[VK_RSHIFT]                 = 0;    // cache: nobody holds it
+  g_liveModifierState[VK_RSHIFT] = 0x80; // OS: still held, by this batch's own restore press
+
+  RunCorrection(MaskBit(VK_RSHIFT));
+
+  int i = IndexOf(VK_SHIFT, true); // Right Shift is emitted as VK_SHIFT plus the right scan code
+  ASSERT_NE(i, -1) << "nothing was corrected, so there is no tag to inspect";
+  ASSERT_EQ(inputs[i].ki.wScan, (WORD)SCANCODE_RSHIFT)
+      << "if this is SCAN_FLAG_KEYMAN_KEY_EVENT then the case has stopped testing what it claims to: "
+      << "the scan arm would carry the identification and dwExtraInfo would be free to be wrong";
+
+  EXPECT_EQ(inputs[i].ki.dwExtraInfo, (ULONG_PTR)EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP)
+      << "the wrap tag is the only signal left once the scan code has been rewritten to 0x36";
+  EXPECT_TRUE(IsKeymanInjectedKeyEvent(inputs[i].ki.wScan, inputs[i].ki.dwExtraInfo))
+      << "an untagged Right Shift correction feeds the cache as though the user had pressed it";
+}
+
+/*
   Every managed VK, one at a time, so a check that covers only some of restorePressedMask's bits
   fails here rather than in the field.
 */
@@ -1112,16 +1357,80 @@ TEST_F(PREPARE_MODIFIER_VERIFICATION_CORRECTION, CorrectsEveryManagedVkInTurn) {
 
 /*
   The cache is fed by every modifier event the hook posts, Keyman's own included, because the
-  WM_KEYMAN_MODIFIER_EVENT post precedes the "generated by Keyman" pass-through. These pin what that
-  costs when a real user event interleaves with a batch's release and restore.
+  WM_KEYMAN_MODIFIER_EVENT post precedes the "generated by Keyman" pass-through. Every case on this
+  fixture drives ShouldFeedModifierCache -- the production gate -- so every one of them pins the fix.
+  The cases that characterise what the gate costs when it is absent are on
+  DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER below, with the ungated helpers they need.
 
   The helpers feed the collapsed VK_SHIFT form; the hook actually reports the re-chiralised VK
-  (0xA0/0xA1, measured by DwExtraInfoSurvivesSendInputWhereTheScanCodeDoesNot). Either resolves by
+  (0xA0/0xA1, measured by DwExtraInfoSurvivesSendInputWhereTheScanCodeDoesNot, in
+  keybd_shift.interactive.tests.cpp). Either resolves by
   scan code to the same kbd byte, so this keeps the VK_SHIFT branch covered -- read it as coverage,
   not as a claim about what the hook reports.
 */
 class MODIFIER_CACHE_EVENT_ORDER : public KEYBD_SHIFT {
 protected:
+  // #8064 What the hook does, calling the production decision rather than restating it.
+  // ShouldFeedModifierCache (keybd_shift.cpp) is the same function k32_lowlevelkeyboardhook.cpp
+  // calls before it posts WM_KEYMAN_MODIFIER_EVENT, so the cases below now fail when its
+  // !IsKeymanInjectedKeyEvent term is removed. The test-local ApplyThroughTheGate mirror this
+  // replaces did not: with the production term deleted, the whole suite stayed green (FR-016).
+  //
+  // serializeInput is TRUE throughout: these cases characterise the injected-event arm, and the
+  // hook only reaches the post at all with the feed configured on.
+  void
+  FeedThroughTheGate(BYTE bVk, BYTE bScan, ULONG_PTR extraInfo, BOOL fIsUp) {
+    if (ShouldFeedModifierCache(TRUE, bScan, extraInfo)) {
+      UpdateModifierCacheFromKeyEvent(kbd, bVk, FALSE, bScan, fIsUp);
+    }
+  }
+
+  void
+  GatedUserReleasesLeftShift() {
+    FeedThroughTheGate(VK_LSHIFT, 0x2A, 0, TRUE);
+  }
+
+  void
+  GatedKeymanReleasesLeftShift() {
+    FeedThroughTheGate(VK_SHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP, TRUE);
+  }
+
+  void
+  GatedKeymanRestoresLeftShift() {
+    FeedThroughTheGate(VK_SHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP, FALSE);
+  }
+
+  // Right Shift is the case the scan arm cannot carry: do_keybd_event rewrites 0xFF to 0x36.
+  void
+  GatedKeymanRestoresRightShift() {
+    FeedThroughTheGate(VK_SHIFT, SCANCODE_RSHIFT, EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP, FALSE);
+  }
+};
+
+/*
+  #8064 FR-018 / SC-008 -- the one designated structural place. Every case on this fixture
+  characterises the defect: each asserts what the *unfixed* path does, so each stays green when the
+  fix is reverted. That is deliberate and it is the whole point of them. The fixture name is where
+  that intent lives, so a reader who greps for what the suite actually guarantees can subtract these
+  four without reading a comment and inferring it.
+
+  Nothing here may be read as a pin on production behaviour. The pins for the same code paths are on
+  MODIFIER_CACHE_EVENT_ORDER above, which drives ShouldFeedModifierCache itself and goes red when
+  its !IsKeymanInjectedKeyEvent term is deleted. These four drive the ungated helpers below instead:
+  the pre-fix feed, reconstructed on purpose, which is why those helpers live here and not on the
+  base fixture where something pinning the fix could reach them.
+
+  Measured, not asserted from the armchair: across the 34-mutation sweep behind the FR-018 ledger at
+  the top of this file, no revert of any part of the #8064 fix turns any of these four red.
+
+  If one of these ever fails, that is not a regression. It is the defect no longer being
+  reproducible, and the case should be deleted rather than repaired.
+*/
+class DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER : public MODIFIER_CACHE_EVENT_ORDER {
+protected:
+  // The ungated feed: the cache as it was fed before ShouldFeedModifierCache existed, with Keyman's
+  // own injected modifiers going in alongside the user's.
+
   // The user physically releases Left Shift. Real scan code, chiral VK, untagged.
   void
   UserReleasesLeftShift() {
@@ -1139,36 +1448,6 @@ protected:
   KeymanRestoresLeftShift() {
     UpdateModifierCacheFromKeyEvent(kbd, VK_SHIFT, FALSE, SCAN_FLAG_KEYMAN_KEY_EVENT, FALSE);
   }
-
-  // What the hook now does: apply the event only if it is not Keyman's own. Mirrors the condition
-  // at k32_lowlevelkeyboardhook.cpp's WM_KEYMAN_MODIFIER_EVENT post.
-  void
-  ApplyThroughTheGate(BYTE bVk, BYTE bScan, ULONG_PTR extraInfo, BOOL fIsUp) {
-    if (!IsKeymanInjectedKeyEvent(bScan, extraInfo)) {
-      UpdateModifierCacheFromKeyEvent(kbd, bVk, FALSE, bScan, fIsUp);
-    }
-  }
-
-  void
-  GatedUserReleasesLeftShift() {
-    ApplyThroughTheGate(VK_LSHIFT, 0x2A, 0, TRUE);
-  }
-
-  void
-  GatedKeymanReleasesLeftShift() {
-    ApplyThroughTheGate(VK_SHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP, TRUE);
-  }
-
-  void
-  GatedKeymanRestoresLeftShift() {
-    ApplyThroughTheGate(VK_SHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP, FALSE);
-  }
-
-  // Right Shift is the case the scan arm cannot carry: do_keybd_event rewrites 0xFF to 0x36.
-  void
-  GatedKeymanRestoresRightShift() {
-    ApplyThroughTheGate(VK_SHIFT, SCANCODE_RSHIFT, EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP, FALSE);
-  }
 };
 
 /*
@@ -1176,7 +1455,7 @@ protected:
   posted first and Keyman's two events followed. The restore press applies last, so the cache ends
   up reporting a modifier the user is no longer holding -- a stale byte of Keyman's own making.
 */
-TEST_F(MODIFIER_CACHE_EVENT_ORDER, KeymanOwnRestorePressOutlivesTheUsersRealRelease) {
+TEST_F(DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER, KeymanOwnRestorePressOutlivesTheUsersRealRelease) {
   kbd[VK_LSHIFT] = 0x80; // the hook posted the user's KEYDOWN before the batch started
 
   UserReleasesLeftShift();
@@ -1192,7 +1471,7 @@ TEST_F(MODIFIER_CACHE_EVENT_ORDER, KeymanOwnRestorePressOutlivesTheUsersRealRele
   The same three events with the user's release last -- they let go after the batch landed -- and
   the cache is correct. Ordering alone is the difference, which is why the defect is intermittent.
 */
-TEST_F(MODIFIER_CACHE_EVENT_ORDER, TheUsersReleaseArrivingLastLeavesTheCacheCorrect) {
+TEST_F(DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER, TheUsersReleaseArrivingLastLeavesTheCacheCorrect) {
   kbd[VK_LSHIFT] = 0x80;
 
   KeymanReleasesLeftShift();
@@ -1206,7 +1485,7 @@ TEST_F(MODIFIER_CACHE_EVENT_ORDER, TheUsersReleaseArrivingLastLeavesTheCacheCorr
   A balanced batch with no user event cancels out, which is why this has stayed invisible: the
   release half's KEYUP and the restore half's KEYDOWN net back to the byte they started from.
 */
-TEST_F(MODIFIER_CACHE_EVENT_ORDER, ABalancedBatchLeavesTheCacheUnchanged) {
+TEST_F(DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER, ABalancedBatchLeavesTheCacheUnchanged) {
   kbd[VK_LSHIFT] = 0x80;
 
   KeymanReleasesLeftShift();
@@ -1216,8 +1495,11 @@ TEST_F(MODIFIER_CACHE_EVENT_ORDER, ABalancedBatchLeavesTheCacheUnchanged) {
 }
 
 /*
-  The same ordering through the gate production now uses. Keyman's own two events are filtered, so
-  the cache follows the user and the stale byte is never created. This is the fix for #8064.
+  The same ordering through the gate production uses -- ShouldFeedModifierCache itself, not a copy
+  of it. Keyman's own two events are filtered, so the cache follows the user and the stale byte is
+  never created. This is the fix for #8064, and this case is what holds it in place: remove the
+  !IsKeymanInjectedKeyEvent term from ShouldFeedModifierCache and the restore press lands in the
+  cache again, so this goes red.
 */
 TEST_F(MODIFIER_CACHE_EVENT_ORDER, TheGateLeavesTheCacheFollowingTheUserAlone) {
   kbd[VK_LSHIFT] = 0x80;
@@ -1231,14 +1513,15 @@ TEST_F(MODIFIER_CACHE_EVENT_ORDER, TheGateLeavesTheCacheFollowingTheUserAlone) {
 }
 
 /*
-  The same, for Right Shift. Its wrap events reach the hook with SCANCODE_RSHIFT rather than the
-  0xFF flag, so the scan arm of the gate cannot see them and the dwExtraInfo arm has to. If the tag
-  is ever dropped from do_keybd_event's callers, this is the case that goes red.
+  The same, for Right Shift, and likewise through the production gate. Its wrap events reach the
+  hook with SCANCODE_RSHIFT rather than the 0xFF flag, so the scan arm of the gate cannot see them
+  and the dwExtraInfo arm has to. If the tag is ever dropped from do_keybd_event's callers, or the
+  !IsKeymanInjectedKeyEvent term from ShouldFeedModifierCache, this is the case that goes red.
 */
 TEST_F(MODIFIER_CACHE_EVENT_ORDER, TheGateCoversRightShiftThroughDwExtraInfo) {
   kbd[VK_RSHIFT] = 0x80;
 
-  ApplyThroughTheGate(VK_RSHIFT, SCANCODE_RSHIFT, 0, TRUE); // the user's physical release
+  FeedThroughTheGate(VK_RSHIFT, SCANCODE_RSHIFT, 0, TRUE); // the user's physical release
   GatedKeymanRestoresRightShift();
 
   EXPECT_EQ(kbd[VK_RSHIFT], (BYTE)0)
@@ -1251,9 +1534,8 @@ TEST_F(MODIFIER_CACHE_EVENT_ORDER, TheGateCoversRightShiftThroughDwExtraInfo) {
   held too -- Keyman's own restore press latched it -- so the two agree and the reconcile has
   nothing to clear. The batch then releases and re-presses, reproducing the latch indefinitely.
 */
-TEST_F(MODIFIER_CACHE_EVENT_ORDER, TheStaleByteSurvivesTheReconcileBecauseTheOsAgrees) {
+TEST_F(DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER, TheStaleByteSurvivesTheReconcileBecauseTheOsAgrees) {
   BYTE live[256];
-  BYTE releaseState[256];
 
   // The state the first case leaves: cache held, and the OS holding it by Keyman's own doing.
   kbd[VK_LSHIFT] = 0x80;
@@ -1264,7 +1546,6 @@ TEST_F(MODIFIER_CACHE_EVENT_ORDER, TheStaleByteSurvivesTheReconcileBecauseTheOsA
       << "cache and OS agree, so there is no disagreement to detect";
   EXPECT_EQ(kbd[VK_LSHIFT], (BYTE)0x80) << "the stale byte survives";
 
-  ComputeModifierReleaseState(kbd, releaseState, live);
   n = 0;
   keybd_shift(inputs, &n, TRUE, kbd);
 
@@ -1279,7 +1560,8 @@ TEST_F(MODIFIER_CACHE_EVENT_ORDER, TheStaleByteSurvivesTheReconcileBecauseTheOsA
   the reconcile would erase the byte that event had just set correctly.
 
   This pins the reconcile side, given a live reading that reports the chiral VK held.
-  GenericShiftSendInputReflectsInBothAsyncKeyStates measures that assumption for real.
+  GenericShiftSendInputReflectsInBothAsyncKeyStates, in keybd_shift.interactive.tests.cpp, measures
+  that assumption for real.
 */
 TEST_F(MODIFIER_CACHE_EVENT_ORDER, GenericVkEventReconcilesAgainstTheChiralLiveReading) {
   BYTE live[256];
@@ -1291,7 +1573,7 @@ TEST_F(MODIFIER_CACHE_EVENT_ORDER, GenericVkEventReconcilesAgainstTheChiralLiveR
   ASSERT_EQ(kbd[VK_LSHIFT], (BYTE)0x80) << "the generic event did not reach the chiral slot it should";
 
   // The live reading, if Windows re-chiralises the async state the way
-  // GenericShiftSendInputReflectsInBothAsyncKeyStates measures.
+  // GenericShiftSendInputReflectsInBothAsyncKeyStates measures (interactive target).
   memset(live, 0, sizeof(live));
   live[VK_LSHIFT] = 0x80;
 
@@ -1302,6 +1584,65 @@ TEST_F(MODIFIER_CACHE_EVENT_ORDER, GenericVkEventReconcilesAgainstTheChiralLiveR
 }
 
 /*
+  #8064 FR-017 mutation 3's positive, and the pair to the case above. That one covers VK_SHIFT,
+  whose chirality is carried by the scan code. Ctrl and Alt are the two whose chirality is carried
+  by the extended bit instead, and before this case existed nothing in this file fed
+  UpdateModifierCacheFromKeyEvent a VK_CONTROL or a VK_MENU at all -- so inverting that arm was
+  survivable by the whole suite.
+
+  Getting the hand wrong does not merely mislabel a byte, it deletes one. With the arm inverted, an
+  extended Right Ctrl KEYDOWN files into kbd[VK_LCONTROL] while the OS holds VK_RCONTROL; the
+  reconcile then finds a cache byte the live reading does not support and clears it, so the modifier
+  the user is physically holding drops out of the cache and the restore half never re-presses it.
+  That is A1's dropped-hold shape, manufactured by a swapped ternary -- and the mirror-image byte,
+  the one the user is not holding, is the direction that latches.
+
+  Turns red when: either extended-bit arm of UpdateModifierCacheFromKeyEvent is inverted --
+  fIsExtendedKey ? VK_LCONTROL : VK_RCONTROL, or the same swap for the Alt pair. Each of the four
+  EXPECT_EQ pairs discriminates on its own; the reconcile at the end is what it costs.
+*/
+TEST_F(MODIFIER_CACHE_EVENT_ORDER, ExtendedBitChiralisesControlAndAltIntoTheSlotTheLiveReadingUses) {
+  BYTE live[256];
+
+  // Right Ctrl reaches the hook as VK_CONTROL with the extended bit set; the scan code is 0x1D for
+  // both hands, so the bit is the only signal there is.
+  UpdateModifierCacheFromKeyEvent(kbd, VK_CONTROL, TRUE, 0x1D, FALSE);
+  EXPECT_EQ(kbd[VK_RCONTROL], (BYTE)0x80) << "the extended bit means right";
+  EXPECT_EQ(kbd[VK_LCONTROL], (BYTE)0) << "and it must not also, or instead, reach the left slot";
+
+  // Left Ctrl: same VK, same scan code, bit clear.
+  Rewind();
+  UpdateModifierCacheFromKeyEvent(kbd, VK_CONTROL, FALSE, 0x1D, FALSE);
+  EXPECT_EQ(kbd[VK_LCONTROL], (BYTE)0x80) << "no extended bit means left";
+  EXPECT_EQ(kbd[VK_RCONTROL], (BYTE)0);
+
+  // Alt, on the same rule and the same shared scan code.
+  Rewind();
+  UpdateModifierCacheFromKeyEvent(kbd, VK_MENU, TRUE, 0x38, FALSE);
+  EXPECT_EQ(kbd[VK_RMENU], (BYTE)0x80) << "the extended bit means right for the Alt pair too";
+  EXPECT_EQ(kbd[VK_LMENU], (BYTE)0);
+
+  Rewind();
+  UpdateModifierCacheFromKeyEvent(kbd, VK_MENU, FALSE, 0x38, FALSE);
+  EXPECT_EQ(kbd[VK_LMENU], (BYTE)0x80);
+  EXPECT_EQ(kbd[VK_RMENU], (BYTE)0);
+
+  // What the collapse is for. CaptureLiveModifierState reads the six chiral VKs, so a cache byte
+  // filed under the wrong hand is a cache byte the reconcile has grounds to erase.
+  Rewind();
+  UpdateModifierCacheFromKeyEvent(kbd, VK_CONTROL, TRUE, 0x1D, FALSE);
+  memset(live, 0, sizeof(live));
+  live[VK_RCONTROL] = 0x80; // the OS agrees, and names the same hand
+
+  EXPECT_FALSE(ReconcileModifierCache(kbd, live))
+      << "cache and OS name the same hand, so there is nothing here to reconcile";
+  EXPECT_EQ(kbd[VK_RCONTROL], (BYTE)0x80)
+      << "with the extended-bit arm inverted this byte was filed as VK_LCONTROL, unsupported by the "
+      << "live reading, and the reconcile has just cleared it -- the user is still holding Right "
+      << "Ctrl and the cache is not";
+}
+
+/*
   IsKeymanInjectedKeyEvent decides which events may feed the modifier cache. The mstsc and OSK rows
   are regression guards: filtering on LLKHF_INJECTED, or on dwExtraInfo != 0, would classify those
   as Keyman's and strip a modifier the user or the OSK genuinely holds.
@@ -1309,8 +1650,14 @@ TEST_F(MODIFIER_CACHE_EVENT_ORDER, GenericVkEventReconcilesAgainstTheChiralLiveR
 class IS_KEYMAN_INJECTED_KEY_EVENT : public ::testing::Test {};
 
 TEST_F(IS_KEYMAN_INJECTED_KEY_EVENT, TheScanFlagAloneIsEnough) {
+  // The scan arm stands alone because those events carry no tag today, not because keybd_event
+  // lacks a channel for one: its fourth parameter is dwExtraInfo, and all five direct callers
+  // already pass it, as 0 (keyman32.cpp:924-925, kmhook_keyboard.cpp:147,
+  // kmprocessactions.cpp:101-102). Tagging those five is what would retire this arm -- which makes
+  // the TODO this row overrides, keyman64.h's "Deprecate overloading of scancodes and use
+  // dwExtraInfo instead", actionable again.
   EXPECT_TRUE(IsKeymanInjectedKeyEvent(SCAN_FLAG_KEYMAN_KEY_EVENT, 0))
-      << "keybd_event callers cannot set dwExtraInfo, so the scan arm has to stand alone";
+      << "Keyman's five keybd_event callers pass dwExtraInfo 0 today, so the scan arm has to stand alone";
 }
 
 TEST_F(IS_KEYMAN_INJECTED_KEY_EVENT, TheWrapTagAloneIsEnough) {
@@ -1344,515 +1691,1020 @@ TEST_F(IS_KEYMAN_INJECTED_KEY_EVENT, ReInjectedUserKeystrokesAreNotKeymans) {
 }
 
 namespace {
-struct SeedProbeResult {
-  BOOL getKeyboardStateOk;
-  BYTE keyboardStateByte; // GetKeyboardState's byte for VK_LSHIFT, from the fresh thread
-  SHORT asyncState;       // GetAsyncKeyState's answer for the same key, from the same thread
-};
+// #8064 The message-post seam, recorded. PostKeyEventAndDecideEat takes a PPOSTMESSAGEFN
+// (serialkeyeventcommon.h) for the same reason PrepareInjectedInputBatch takes a PGETASYNCKEYSTATE:
+// gmock is not linked into keyman32.tests.vcxproj, so the suite binds file-local stubs. Two of them,
+// one per outcome, rather than one stub with a mutable result flag -- what these cases are about is
+// which outcome the production code is looking at, so the outcome belongs in the binding.
+int g_postCalls     = 0;
+HWND g_postHwnd     = NULL;
+UINT g_postMsg      = 0;
+WPARAM g_postWParam = 0;
+LPARAM g_postLParam = 0;
 
-// A thread that has never pumped input -- the situation InitThread seeds the cache from.
-DWORD WINAPI
-SeedProbeThread(LPVOID param) {
-  SeedProbeResult *r = (SeedProbeResult *)param;
-  BYTE state[256];
+void
+RecordPost(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
+  g_postCalls++;
+  g_postHwnd   = hWnd;
+  g_postMsg    = Msg;
+  g_postWParam = wParam;
+  g_postLParam = lParam;
+}
 
-  // 0xCC so a GetKeyboardState that writes nothing is distinguishable from one that writes zeroes.
-  memset(state, 0xCC, sizeof(state));
+// The handoff succeeded: the serializer owns the event now and will re-inject it.
+BOOL WINAPI
+StubPostSucceeds(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
+  RecordPost(hWnd, Msg, wParam, lParam);
+  return TRUE;
+}
 
-  r->getKeyboardStateOk = GetKeyboardState(state);
-  r->keyboardStateByte  = state[VK_LSHIFT];
-  r->asyncState         = GetAsyncKeyState(VK_LSHIFT);
-  return 0;
+// The handoff failed. Not hypothetical on this path: PostMessage returns FALSE on a full thread
+// queue -- WM_USER messages count against the 10,000 limit, and a stalled serializer is exactly how
+// it fills -- and on a UIPI refusal.
+BOOL WINAPI
+StubPostFails(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) {
+  RecordPost(hWnd, Msg, wParam, lParam);
+  return FALSE;
 }
 } // namespace
 
 /*
-  PROBE CAPABILITY -- shared by the four tests below that inject real modifiers, and referenced by
-  name from each. They need an interactive input desktop (the hook ones also need keyboard messages
-  routed to a pumped, hooked queue), which a Session-0 CI service account lacks. Rather than
-  DISABLED_ forever, where the assumption would rot unchecked even on machines that could check it,
-  each probes for the capability with its own real mechanism -- no static OpenInputDesktop-style
-  proxy proves the round trip actually works from this process -- and skips when it is absent.
-  gtest 1.8.1 has no GTEST_SKIP(), so a skip is SUCCEED() plus a WARNING log, as elsewhere here.
+  #8064 PostKeyEventAndDecideEat, the low level hook's eat decision, exercised as production code
+  rather than mirrored: k32_lowlevelkeyboardhook.cpp is entirely inside #ifndef _WIN64 and the suite
+  cannot link it, so the decision lives in keybd_shift.cpp and the hook calls it (:288).
 
-  One is not quite its own mechanism: FreshThreadKeyboardStateReflectsLiveModifiers probes on the
-  calling thread and asserts on a spawned one. That holds because GetAsyncKeyState is desktop-global,
-  unlike GetKeyboardState/GetKeyState which read the calling thread's processed queue -- so seeing
-  the injected press here is sufficient evidence the fresh thread would see it too.
-
-  The cost of this design, which every reader of a CI log needs: a skip reports as PASSED with a log
-  line, not as a distinct SKIPPED status. Nothing that would have been asserted is asserted, so it is
-  not a false pass -- but the tally alone cannot tell the two apart.
-
-  The probe covers an ABSENT capability, not an intermittently disturbed one. Observed on 2026-08-27:
-  these tests went red together on one x64 run, passed in isolation immediately after, and the whole
-  suite passed on the next run -- another process disturbing the input queue or the hook round trip
-  is enough. From a CI log alone that is indistinguishable from a real regression, so triage a red
-  here by re-running the failures in isolation before believing them.
+  ::testing::Test rather than KEYBD_SHIFT, following IS_KEYMAN_INJECTED_KEY_EVENT above: the
+  function is pure and logs nothing, so it needs neither Globals_InitProcess nor an event buffer.
 */
+class POST_KEY_EVENT_AND_DECIDE_EAT : public ::testing::Test {
+public:
+  void
+  SetUp() {
+    RewindPostRecorder();
+  }
+
+protected:
+  static void
+  RewindPostRecorder() {
+    g_postCalls  = 0;
+    g_postHwnd   = NULL;
+    g_postMsg    = 0;
+    g_postWParam = 0;
+    g_postLParam = 0;
+  }
+
+  // A stand-in for the serializer's message-only window. The stubs record it and never dereference
+  // it, so this needs no window, no message queue and no interactive desktop.
+  static HWND
+  ServerWindow() {
+    return reinterpret_cast<HWND>(static_cast<ULONG_PTR>(0x8064));
+  }
+
+  // A Left Shift KEYUP as the hook hands it over, already converted by
+  // LLKHFFlagstoWMKeymanKeyEventFlags (k32_lowlevelkeyboardhook.cpp:83): scan code in the high word,
+  // KEYEVENTF_KEYUP in the low. A modifier KEYUP because that is the event whose loss re-asserts
+  // #8064 -- lose an output keystroke and the user retypes it; lose this one and Shift stays down.
+  static DWORD
+  LeftShiftKeyUpFlags() {
+    return (0x2A << 16) | KEYEVENTF_KEYUP;
+  }
+};
 
 /*
-  Measures what InitThread's GetKeyboardState seed leaves in the cache. It reads the calling
-  thread's processed queue, so on a thread that has never pumped input it looks like it should
-  return nothing. It returns live state:
+  #8064 FR-017 mutation 2's positive. The hook's return value decides whether the user's key event
+  survives at all -- returning 1 eats it, and nothing else will ever deliver it -- so the eat is only
+  safe once the handoff has actually succeeded. Eating on trust destroys a key event every time
+  PostMessage fails, and for a modifier KEYUP that is exactly how #8064 re-asserts: the OS stays
+  latched, the cache still says down, and the clear-only reconcile can never see a disagreement to
+  clear. Unserialized beats destroyed.
 
-    this thread : GetKeyboardState ok=1 byte=0x00, GetAsyncKeyState=0x8001
-    fresh thread: GetKeyboardState ok=1 byte=0x81, GetAsyncKeyState=0x8000
-
-  See PROBE CAPABILITY. If a future Windows stops seeding a fresh thread from live state,
-  InitThread's seed is a no-op again and a modifier held at launch is invisible to the cache until
-  the user's next press or release of it. That does not reopen #8064 -- ReconcileModifierCache only
-  ever clears -- but the cache's launch-time state is wrong until the first real event.
+  Turns red when: PostKeyEventAndDecideEat's success check is replaced so the event is eaten
+  unconditionally -- ignore pfnPost's result and return TRUE. The control in the second half is what
+  stops a hard-coded FALSE satisfying the first half instead.
 */
-TEST_F(KEYBD_SHIFT, FreshThreadKeyboardStateReflectsLiveModifiers) {
-  if (GetAsyncKeyState(VK_LSHIFT) < 0) {
-    GTEST_LOG_(WARNING) << "Left Shift already reads down; precondition unmet, not evaluated";
-    SUCCEED();
-    return;
-  }
+TEST_F(POST_KEY_EVENT_AND_DECIDE_EAT, AFailingPostPassesTheEventThroughInsteadOfEatingIt) {
+  EXPECT_FALSE(PostKeyEventAndDecideEat(ServerWindow(), VK_LSHIFT, LeftShiftKeyUpFlags(), StubPostFails))
+      << "the handoff failed, so eating this KEYUP would destroy it outright and leave Shift latched";
+  EXPECT_EQ(g_postCalls, 1) << "the post must actually have been attempted -- a FALSE arriving from the "
+                            << "NULL-window branch would pin nothing about the success check";
 
-  // Assert Left Shift for real, so there is something for the seed to find. This doubles as the
-  // capability probe below: if it is not observable here, nothing downstream can be measured.
-  keybd_event(VK_LSHIFT, 0, 0, 0);
-  Sleep(150);
+  // The control. Without it a hard-coded FALSE would satisfy the assertion above.
+  RewindPostRecorder();
 
-  const SHORT callerAsync = GetAsyncKeyState(VK_LSHIFT);
+  EXPECT_TRUE(PostKeyEventAndDecideEat(ServerWindow(), VK_LSHIFT, LeftShiftKeyUpFlags(), StubPostSucceeds))
+      << "a successful handoff must still eat: the serializer owns the event now and re-injects it";
+  EXPECT_EQ(g_postCalls, 1);
+}
 
-  if (callerAsync >= 0) {
-    // The environment cannot do what this test needs -- most likely no interactive input desktop
-    // (a Session-0 CI service account), possibly something else entirely. Either way, continuing
-    // would fail EXPECT_LT(r.asyncState, 0) below for a reason that has nothing to do with whether
-    // GetKeyboardState's seed behaviour has regressed, which is a false failure and worse than no
-    // coverage. Release defensively (harmless whether or not anything actually landed) and skip.
-    keybd_event(VK_LSHIFT, 0, KEYEVENTF_KEYUP, 0);
-    GTEST_LOG_(WARNING) << "SKIPPED: keybd_event's injected press was not observable via "
-                        << "GetAsyncKeyState in this process. This test needs an interactive input "
-                        << "desktop to inject and observe real keyboard state; see the test's own "
-                        << "comment for why a static desktop check is not used instead.";
-    SUCCEED();
-    return;
-  }
+/*
+  #8064 FR-026 / SC-006: a real divergence route, end to end, on the default CI target -- no stall,
+  no input injection, no interactive desktop, no timing. Both routes below run to completion in
+  microseconds and answer the same way on every machine.
 
-  BYTE callerState[256];
-  memset(callerState, 0xCC, sizeof(callerState));
-  const BOOL callerOk = GetKeyboardState(callerState);
+  Why these two and not 002's table. 002's launch-seed, NULL-window, destroyed-handoff and
+  pass-through routes are indistinguishable to the reconcile: they all reduce to a cache byte the
+  live reading does not support, which is the same two-line stub setup RECONCILE_MODIFIER_CACHE
+  already covers. What was not reachable until PostKeyEventAndDecideEat was extracted out of
+  k32_lowlevelkeyboardhook.cpp -- a file this suite cannot link, being wholly inside #ifndef _WIN64
+  -- is the moment divergence is *created* rather than repaired: the hook deciding the fate of an
+  event it could not hand off.
 
-  SeedProbeResult r;
-  memset(&r, 0, sizeof(r));
-  HANDLE hThread = CreateThread(NULL, 0, SeedProbeThread, &r, 0, NULL);
-  ASSERT_NE(hThread, (HANDLE)NULL);
-  WaitForSingleObject(hThread, INFINITE);
-  CloseHandle(hThread);
+  The two failures are not the same failure. A failing post announces itself. A destroyed or
+  not-yet-created serializer window does not: PostMessage to a NULL hwnd does not fail, it misroutes
+  the message to the calling thread's own queue and returns success, so a caller that trusted the
+  return value would eat an event that nothing will ever deliver, and would believe it had
+  serialized it. That is why the NULL is tested before the post is attempted rather than left to it.
 
-  // Release it again in the same run, whatever the measurement showed.
-  keybd_event(VK_LSHIFT, 0, KEYEVENTF_KEYUP, 0);
-  Sleep(150);
+  Turns red when: either FALSE branch is removed. Drop the NULL check and the first half eats an
+  event on the strength of a post that went nowhere; eat unconditionally and the second half eats
+  one whose post failed. Either mutation destroys the user's KEYUP, and a destroyed modifier KEYUP
+  is #8064 itself -- the OS stays latched, the cache still says down, and the clear-only reconcile
+  has no disagreement to find. The successful-post control at the end is what stops a function that
+  never eats from passing both halves.
+*/
+TEST_F(POST_KEY_EVENT_AND_DECIDE_EAT, NeitherHandoffFailureRouteEatsTheEvent) {
+  // Route 1 -- the destroyed handoff. No serializer window, so no post is attempted at all. The
+  // stub is the one that would have succeeded: the point is that its answer is never consulted.
+  EXPECT_FALSE(PostKeyEventAndDecideEat(NULL, VK_LSHIFT, LeftShiftKeyUpFlags(), StubPostSucceeds))
+      << "there is no serializer to hand off to, so this KEYUP must reach the OS unserialized";
+  EXPECT_EQ(g_postCalls, 0)
+      << "a post to a NULL hwnd does not fail -- it misroutes to this thread's own queue and reports "
+      << "success -- so it must not be attempted, and its answer must not be believed";
 
-  printf("SEED PROBE  this thread : GetKeyboardState ok=%d byte=0x%02X, GetAsyncKeyState=0x%04X\n",
-         (int)callerOk, (int)callerState[VK_LSHIFT], (unsigned short)callerAsync);
-  printf("SEED PROBE  fresh thread: GetKeyboardState ok=%d byte=0x%02X, GetAsyncKeyState=0x%04X\n",
-         (int)r.getKeyboardStateOk, (int)r.keyboardStateByte, (unsigned short)r.asyncState);
-  printf("SEED PROBE  after release: GetAsyncKeyState=0x%04X\n", (unsigned short)GetAsyncKeyState(VK_LSHIFT));
+  // Route 2 -- the handoff failure. The window is there, the post is made, and it fails.
+  RewindPostRecorder();
 
-  EXPECT_TRUE(r.getKeyboardStateOk) << "GetKeyboardState failed on the fresh thread";
-  EXPECT_LT(r.asyncState, 0) << "GetAsyncKeyState on the fresh thread did not see the held key; "
-                             << "the injection did not land and nothing was measured";
-  // The measured result, not the hypothesis this probe was written to confirm. If this ever fires,
-  // GetKeyboardState's behaviour for a queue-less thread has changed and the documentation this
-  // probe backs -- the README's seed paragraph and the InitThread comment -- must be re-measured.
-  EXPECT_NE(r.keyboardStateByte & 0x80, 0)
-      << "GetKeyboardState on a thread that has never pumped input reported Left Shift up. "
-      << "That was the original expectation and it is not what this machine does; if it is now "
-      << "true, the seed is a no-op after all and the seed documentation needs revisiting.";
+  EXPECT_FALSE(PostKeyEventAndDecideEat(ServerWindow(), VK_LSHIFT, LeftShiftKeyUpFlags(), StubPostFails))
+      << "the handoff failed, so this KEYUP must likewise pass through unserialized";
+  ASSERT_EQ(g_postCalls, 1) << "the route is only real if the post was attempted";
+  EXPECT_EQ(g_postHwnd, ServerWindow());
+  EXPECT_EQ(g_postMsg, (UINT)WM_KEYMAN_KEY_EVENT) << "the serializer reads the event off this message";
+  EXPECT_EQ(g_postWParam, (WPARAM)VK_LSHIFT) << "wParam is the virtual key";
+  EXPECT_EQ(g_postLParam, (LPARAM)LeftShiftKeyUpFlags()) << "lParam is the flags the caller already converted";
 
-  EXPECT_EQ(callerState[VK_LSHIFT] & 0x80, 0)
-      << "the calling thread's GetKeyboardState saw the injected key, so this run does not "
-      << "demonstrate the queue-dependence the fresh-thread reading is being compared against";
+  // And the route that is not a failure, so neither half above is satisfied by never eating.
+  RewindPostRecorder();
 
-  EXPECT_GE(GetAsyncKeyState(VK_LSHIFT), 0) << "the probe left Left Shift asserted machine-wide";
+  EXPECT_TRUE(PostKeyEventAndDecideEat(ServerWindow(), VK_LSHIFT, LeftShiftKeyUpFlags(), StubPostSucceeds))
+      << "the serializer accepted the event and will re-inject it, so this one is eaten";
 }
 
 namespace {
-// Injects one batch the way the restore half does: fillerCount inert events, then a KEYDOWN for
-// vk, in a single SendInput call, so vk's press is queued behind the filler exactly as a real
-// batch queues it behind the release half and the output keys.
+/*
+  #8064 FR-002 / FR-006 -- the diagnostic recorder the seam exists for.
+
+  SendDebugMessageFormat resolves to ETW (K32_DBG.CPP:189) and nothing in this process can read it
+  back, so a test that wanted to assert "the batch reported this" had no way to. Binding
+  PMODIFIERDIAGNOSTIC to this recorder is what makes FR-002 and FR-006 assertable with NO machine:
+  no interactive desktop, no injection, no timing, no desktop switch. That is the whole point of
+  the seam, and it is why these live on the default target rather than in
+  keybd_shift.interactive.tests.cpp.
+
+  A file-local recorder rather than a mock, for the same reason as StubGetAsyncKeyState above:
+  gmock is not linked into keyman32.tests.vcxproj.
+*/
+struct DiagnosticRecord {
+  ModifierDiagnosticCode code;
+  BYTE vk;
+};
+
+DiagnosticRecord g_diagnostics[16];
+int g_diagnosticCount = 0;
+
+void
+RecordDiagnostic(ModifierDiagnosticCode code, BYTE vk) {
+  if (g_diagnosticCount < _countof(g_diagnostics)) {
+    g_diagnostics[g_diagnosticCount].code = code;
+    g_diagnostics[g_diagnosticCount].vk   = vk;
+    g_diagnosticCount++;
+  }
+}
+
+int
+CountDiagnostics(ModifierDiagnosticCode code) {
+  int count = 0;
+  for (int i = 0; i < g_diagnosticCount; i++) {
+    if (g_diagnostics[i].code == code) {
+      count++;
+    }
+  }
+  return count;
+}
+
 bool
-InjectRestorePress(BYTE vk, int fillerCount) {
-  INPUT batch[MAX_KEYEVENT_INPUTS];
-  int m = 0;
-
-  memset(batch, 0, sizeof(batch));
-
-  // KEYUPs for unassigned function keys that are not down: queue depth without side effects.
-  for (int i = 0; i < fillerCount; i++, m++) {
-    batch[m].type       = INPUT_KEYBOARD;
-    batch[m].ki.wVk     = (WORD)(VK_F13 + (i % 8));
-    batch[m].ki.wScan   = SCAN_FLAG_KEYMAN_KEY_EVENT;
-    batch[m].ki.dwFlags = KEYEVENTF_KEYUP;
+HasDiagnostic(ModifierDiagnosticCode code, BYTE vk) {
+  for (int i = 0; i < g_diagnosticCount; i++) {
+    if (g_diagnostics[i].code == code && g_diagnostics[i].vk == vk) {
+      return true;
+    }
   }
-
-  batch[m].type     = INPUT_KEYBOARD;
-  batch[m].ki.wVk   = vk;
-  batch[m].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
-  m++;
-
-  return SendInput(m, batch, sizeof(INPUT)) == (UINT)m;
-}
-
-void
-ReleaseAndSettle(BYTE vk) {
-  keybd_event(vk, 0, KEYEVENTF_KEYUP, 0);
-  for (int i = 0; i < 200000 && GetAsyncKeyState(vk) < 0; i++) {
-    Sleep(0);
-  }
+  return false;
 }
 } // namespace
 
 /*
-  Can ReconcileModifierCache race a press its own previous batch injected? If the restore KEYDOWN
-  had not yet reached GetAsyncKeyState, the reconcile would clear a byte the user genuinely holds.
-  The race itself, not a proxy: production function, production reader, no delay after a SendInput
-  that queues the press behind filler -- tighter than any real batch sequence.
+  #8064 FR-002 / FR-006. A batch that cannot keep a hold must NAME it.
 
-  It does not happen. SendInput does not return until the press is visible (0x8001), at every batch
-  depth. Measured 0 races and 0 stale reads in 300 attempts at depths 1, 33 and 201, on Windows 11
-  Pro 26200, debug x86, with Keyman running, so its WH_KEYBOARD_LL hook was in the chain throughout.
-  The SendInput timings printed are an upper bound on a loaded machine, not the cost of the call.
+  FR-001 governs what the batch does, and it does not change here: absent a signal that says what
+  the user holds, the release and restore halves are untouched and some holds are still dropped.
+  Both live-state-only alternatives are refuted in the spec. What changes is that a dropped hold
+  stops being silent, so a field report has something to match instead of a user sentence.
 
-  An oracle, not just a measurement: it goes red if a future Windows returns from SendInput before
-  the state is visible. The consequence then is a modifier dropped for one batch, self-correcting on
-  the user's next physical press; the fix would be to skip the reconcile for a modifier this
-  process's own previous batch pressed, capped at one consecutive skip per VK.
-
-  Multi-second and timing-sensitive, unlike anything else in this file, and it covers something no
-  other test here can: every other test drives CaptureLiveModifierState and ReconcileModifierCache
-  through the stub reader, which cannot express a timing race at all. See PROBE CAPABILITY.
+  Every case here asserts the BEHAVIOUR is unchanged as well as that the report happened. A
+  diagnostic that quietly altered the batch would be a worse bug than the silence it replaced.
 */
-TEST_F(KEYBD_SHIFT, ReconcileDoesNotRaceItsOwnInjectedRestorePress) {
-  if (GetAsyncKeyState(VK_LSHIFT) < 0) {
-    GTEST_LOG_(WARNING) << "Left Shift already reads down; precondition unmet, not evaluated";
-    SUCCEED();
-    return;
+class MODIFIER_DIAGNOSTIC : public PREPARE_INJECTED_INPUT_BATCH {
+public:
+  void
+  SetUp() {
+    PREPARE_INJECTED_INPUT_BATCH::SetUp();
+    g_diagnosticCount = 0;
+    memset(g_diagnostics, 0, sizeof(g_diagnostics));
   }
 
-  // Capability probe: one trial of the exact mechanism the 300-iteration measurement below depends
-  // on, checked immediately, before committing to the rest. Not a static desktop check -- the same
-  // reasoning as FreshThreadKeyboardStateReflectsLiveModifiers's probe applies here too.
-  {
-    const bool injected = InjectRestorePress(VK_LSHIFT, 0);
-    const bool landed   = injected && GetAsyncKeyState(VK_LSHIFT) < 0;
-    ReleaseAndSettle(VK_LSHIFT); // harmless whether or not anything actually landed
+protected:
+  void
+  RunBatchReporting(BOOL feedIsConfigured = TRUE) {
+    restorePressedMask = kRestoreMaskUnwritten;
+    n                  = PrepareInjectedInputBatch(
+      inputs, kbd, &sharedData, StubGetAsyncKeyState, feedIsConfigured, &restorePressedMask, RecordDiagnostic);
+  }
+};
 
-    if (!landed) {
-      GTEST_LOG_(WARNING) << "SKIPPED: SendInput's injected press was not observable via "
-                          << "GetAsyncKeyState in this process. This test needs an interactive "
-                          << "input desktop to inject and observe real keyboard state.";
-      SUCCEED();
-      return;
+/*
+  FR-002. The OS holds Left Control, the cache does not claim it, so the release half releases it
+  and the restore half -- which reads the cache -- does not press it back. That is a hold this batch
+  DROPS, and it is the residue FR-001 accepts: a console window or the secure desktop, where the
+  cache feed never saw the KEYDOWN.
+
+  The batch is right to do this; releasing on the cache alone reopens 002/FR-001's silent text
+  destruction. What was wrong is that it happened without a word.
+*/
+TEST_F(MODIFIER_DIAGNOSTIC, ADroppedHoldIsNamedInTheDiagnostic) {
+  kbd[VK_LCONTROL]                 = 0;    // cache: never saw the KEYDOWN
+  g_liveModifierState[VK_LCONTROL] = 0x80; // OS: the user is holding it
+  AddOutputKey('A');
+
+  RunBatchReporting();
+
+  // The behaviour FR-001 pins, asserted first: the hold IS dropped, deliberately.
+  // do_keybd_event collapses VK_LCONTROL to VK_CONTROL, so the queued events name the generic VK
+  // while the cache and live arrays stay chiral.
+  EXPECT_EQ(Count(VK_CONTROL, true), 1) << "the release half must still release what the OS holds";
+  EXPECT_EQ(Count(VK_CONTROL, false), 0)
+      << "the restore half reads the cache, which does not claim it, so nothing presses it back -- "
+      << "this is the accepted drop, not a defect to fix here";
+
+  // And the report, which is what FR-002 adds.
+  EXPECT_EQ(CountDiagnostics(ReleasedWithoutCacheClaim), 1)
+      << "the batch dropped a hold and said nothing. That silence is FR-002's subject: a user "
+      << "reports a modifier that went dead and there is nothing in the log to match it against";
+  EXPECT_TRUE(HasDiagnostic(ReleasedWithoutCacheClaim, VK_LCONTROL))
+      << "the report must NAME the modifier -- 'a hold was dropped' does not let anyone correlate "
+      << "it with what the user was pressing";
+}
+
+/*
+  FR-002's negative, and the reason the code is not simply emitted on every release. A modifier the
+  cache DOES claim is released and pressed straight back, so no hold is lost and there is nothing
+  to report. Without this case the diagnostic could fire on every ordinary batch and mean nothing.
+*/
+TEST_F(MODIFIER_DIAGNOSTIC, AHoldTheCacheClaimsIsRestoredAndNotReported) {
+  kbd[VK_LSHIFT]                 = 0x80;
+  g_liveModifierState[VK_LSHIFT] = 0x80;
+  AddOutputKey('A');
+
+  RunBatchReporting();
+
+  ASSERT_EQ(Count(VK_SHIFT, true), 1) << "released by the release half";
+  ASSERT_EQ(Count(VK_SHIFT, false), 1) << "and pressed back by the restore half";
+  EXPECT_EQ(CountDiagnostics(ReleasedWithoutCacheClaim), 0)
+      << "nothing was lost, so a report here would be noise -- and noise is what stops anyone "
+      << "reading the ones that matter";
+}
+
+/*
+  FR-002 with the feed off. Both halves read the same kbd, so the condition cannot arise: whatever
+  the release half released, the restore half presses back. Asserted rather than assumed, because
+  the obvious implementation -- compare live against kbd unconditionally -- would report a drop on
+  every !feedIsConfigured batch that had any live modifier at all.
+*/
+TEST_F(MODIFIER_DIAGNOSTIC, WithTheFeedOffThereIsNoDropToReport) {
+  kbd[VK_LSHIFT]                   = 0;
+  g_liveModifierState[VK_LSHIFT]   = 0x80;
+  g_liveModifierState[VK_LCONTROL] = 0x80;
+  AddOutputKey('A');
+
+  RunBatchReporting(FALSE);
+
+  EXPECT_EQ(Count(VK_SHIFT, true), 0) << "the release set is kbd here, which claims nothing";
+  EXPECT_EQ(Count(VK_CONTROL, true), 0) << "nor Control, for the same reason";
+  EXPECT_EQ(CountDiagnostics(ReleasedWithoutCacheClaim), 0)
+      << "with the feed off the release half never releases what the cache does not claim, so "
+      << "there is no dropped hold and nothing to say about one";
+}
+
+/*
+  FR-006 / FR-007. All six managed modifiers read up live while the cache claims two held. The
+  reconcile clears both, the release half (live) releases nothing, the restore half (the now-empty
+  cache) presses nothing -- two holds gone at once, with cache and OS in perfect agreement
+  afterwards. This is the shape a desktop switch leaves: the user held Ctrl+Shift, went to the
+  secure desktop or a console, let go where the feed could not see it, and came back.
+
+  ReconcileModifierCache is structurally blind to it forever, because it tests for
+  cache-up-and-live-down and this state IS cache-up-and-live-down -- it is doing exactly its job.
+  So the only thing that can be added is that it says so.
+*/
+TEST_F(MODIFIER_DIAGNOSTIC, TwoHoldsLostAtOnceLookLikeADesktopSwitchAndAreReportedAsOne) {
+  kbd[VK_LSHIFT]   = 0x80; // cache: the user was holding both
+  kbd[VK_LCONTROL] = 0x80;
+  // and every live reading is up
+  AddOutputKey('A');
+
+  RunBatchReporting();
+
+  // FR-007: the reconcile MUST still run, and this guard causes no press that would not otherwise
+  // be emitted. Asserted before the report, because getting this wrong reopens #8064.
+  EXPECT_EQ(kbd[VK_LSHIFT], (BYTE)0) << "the reconcile must still clear -- suppressing it here is "
+                                     << "what an earlier draft did, and it reintroduced #8064";
+  EXPECT_EQ(kbd[VK_LCONTROL], (BYTE)0);
+  EXPECT_EQ(Count(VK_SHIFT, false), 0) << "and no modifier KEYDOWN may be manufactured";
+  EXPECT_EQ(Count(VK_CONTROL, false), 0);
+
+  EXPECT_EQ(CountDiagnostics(PossibleDesktopSwitch), 1)
+      << "two holds were lost in one batch with cache and OS agreeing afterwards, and nothing was "
+      << "reported. FR-006 exists because that state is invisible to every other mechanism here";
+  EXPECT_TRUE(HasDiagnostic(PossibleDesktopSwitch, 0))
+      << "once per batch with vk = 0, per contracts/modifier-state.md section 4: the condition is a "
+      << "property of the batch, and which keys were lost is already in ReconcileModifierCache's "
+      << "own per-VK clearing lines. A per-key form here would bury the batch-level signal";
+}
+
+/*
+  FR-006's threshold, and it is the load-bearing half of the requirement. EXACTLY ONE modifier held
+  at launch and released before the feed was live is the NORMAL launch-seed case 002's reconcile
+  exists to clear. Firing here would put a line in the log on an ordinary session, and a diagnostic
+  that cries wolf is one nobody reads when it matters.
+*/
+TEST_F(MODIFIER_DIAGNOSTIC, OneLostHoldIsTheLaunchSeedCaseAndIsNotReportedAsADesktopSwitch) {
+  kbd[VK_LSHIFT] = 0x80; // the launch seed caught it; the user let go before the feed was live
+  AddOutputKey('A');
+
+  RunBatchReporting();
+
+  ASSERT_EQ(kbd[VK_LSHIFT], (BYTE)0) << "the reconcile still clears it -- that is 002's whole route";
+  EXPECT_EQ(CountDiagnostics(PossibleDesktopSwitch), 0)
+      << "one cleared modifier is the launch-seed case, not a desktop switch. Two or more is the "
+      << "threshold precisely so this session does not get a warning it cannot act on";
+}
+
+/*
+  #8064 FR-015b / A9. What the caller has to know when SendInput sends fewer events than it was
+  given.
+
+  serialkeyeventserver.cpp checks `SendInput(...) == 0`, and its own comment concedes that
+  `!= m_nInputs` is the honest check. The excuse it gives -- "not a latch source, so left alone: the
+  restore KEYDOWNs are last, so truncation drops presses, never releases" -- is true about latching
+  and FALSE about the mask. The restore presses being last is precisely why a short send drops THEM,
+  and the mask handed to the verification pass then names presses that never reached the OS. That
+  pass corrects on cache-up-and-live-down; for a press that was never sent, live IS down, so it
+  releases a modifier on the strength of an event that does not exist.
+
+  The remedy has to be EXACT, not conservative. Clearing the whole mask on any short send would
+  suppress the correction for the presses that did land -- a second dropped hold traded for the
+  first. So the batch reports, per mask bit, the buffer index of the press that bit stands for, and
+  the caller clears exactly the bits at or past the send boundary.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, EachRestorePressIsLocatableInTheBufferSoAShortSendIsExact) {
+  kbd[VK_LSHIFT]                   = 0x80;
+  kbd[VK_LCONTROL]                 = 0x80;
+  g_liveModifierState[VK_LSHIFT]   = 0x80;
+  g_liveModifierState[VK_LCONTROL] = 0x80;
+  AddOutputKey('A');
+
+  RunBatch();
+
+  ASSERT_NE(restorePressedMask, kRestoreMaskUnwritten) << "the mask out-param was never written";
+  ASSERT_NE(restorePressedMask, (DWORD)0) << "this batch must restore something or it tests nothing";
+
+  for (int i = 0; i < KEYMAN_MODIFIER_VK_COUNT; i++) {
+    const bool bitSet = (restorePressedMask & (1u << i)) != 0;
+
+    ASSERT_NE(restoreEventIndex[i], kRestoreEventIndexUnwritten)
+        << "slot " << i << ": the index out-param was never written, so a caller facing a short "
+        << "send has no way to tell which of its restore presses actually went out. That is A9: "
+        << "the mask asserts presses the OS never received";
+
+    if (!bitSet) {
+      EXPECT_EQ(restoreEventIndex[i], -1)
+          << "slot " << i << ": no press for this bit, so its index must say so explicitly rather "
+          << "than hold a stale or plausible-looking buffer position";
+      continue;
+    }
+
+    ASSERT_GE(restoreEventIndex[i], 0) << "slot " << i << ": bit set, so there is a press to locate";
+    ASSERT_LT(restoreEventIndex[i], n) << "slot " << i << ": index past the end of the batch";
+
+    // The index must point at the press it claims to, or clearing by index corrects the wrong bit.
+    const INPUT &ev = inputs[restoreEventIndex[i]];
+    EXPECT_EQ(ev.ki.dwFlags & KEYEVENTF_KEYUP, (DWORD)0)
+        << "slot " << i << ": the index points at a KEYUP, not at a restore press";
+    EXPECT_EQ(ev.ki.wVk, (WORD)CollapsedVk(KeymanModifierVks[i]))
+        << "slot " << i << ": the index points at an event for a different key";
+  }
+
+  // And the property the whole mechanism exists for, stated the way the caller will use it. Two
+  // boundaries, because "exact" means both directions: at the first restore press EVERY set bit is
+  // identified as dropped, and one past the last one NONE is. A conservative
+  // clear-the-whole-mask-on-any-short-send passes the first and fails the second.
+  int firstPress = n, lastPress = -1, setBits = 0;
+  for (int i = 0; i < KEYMAN_MODIFIER_VK_COUNT; i++) {
+    if (!(restorePressedMask & (1u << i))) {
+      continue;
+    }
+    setBits++;
+    if (restoreEventIndex[i] < firstPress) {
+      firstPress = restoreEventIndex[i];
+    }
+    if (restoreEventIndex[i] > lastPress) {
+      lastPress = restoreEventIndex[i];
     }
   }
+  ASSERT_EQ(setBits, 2) << "Left Shift and Left Control were both restored";
 
-  LARGE_INTEGER freq;
-  QueryPerformanceFrequency(&freq);
+  EXPECT_EQ(DroppedBitCount(restorePressedMask, restoreEventIndex, firstPress), setBits)
+      << "a send that stopped at the first restore press delivered none of them, so every bit must "
+      << "be identified as dropped";
+  EXPECT_EQ(DroppedBitCount(restorePressedMask, restoreEventIndex, lastPress + 1), 0)
+      << "a send that delivered every restore press must clear no bit at all -- this is the half a "
+      << "conservative whole-mask clear gets wrong, and getting it wrong drops a second hold";
+}
 
-  // An empty batch, a typical one, and a nearly full one.
-  const int fillers[]  = { 0, 32, 200 };
-  const int kIterations = 100;
+/*
+  #8064 FR-014 / A8. The verification correction's prefix keystroke goes somewhere.
 
-  for (int f = 0; f < _countof(fillers); f++) {
-    int races = 0, staleReads = 0;
-    double sendUs = 0.0;
+  PrepareModifierVerificationCorrection emits through keybd_shift_release, and keybd_shift_release
+  sends a dummy prefix down/up pair before the first modifier KEYUP. Inside a batch that is exactly
+  right and must not change: the prefix sits between the keyboard's own output keys, and it exists
+  because an isolated Alt release opens the window menu.
 
-    for (int i = 0; i < kIterations; i++) {
-      LARGE_INTEGER t0, t1;
+  A verification correction is NOT inside a batch. It is a standalone SendInput, fired from a posted
+  message some time after the batch's own SendInput returned, into whatever has focus BY THEN. So
+  the prefix down/up pair lands in the user's document, or in a control that has its own idea of
+  what that key means. And the prefix VK is registry-overridable -- REGSZ_ZapVirtualKeyCode,
+  k32_globals.cpp:378 -- so it cannot be assumed to be unassigned on every machine.
 
-      Rewind();
-      kbd[VK_LSHIFT] = 0x80; // as a hook KEYDOWN left it, with the user still holding
+  The prefix exists for ONE reason: an isolated Alt release opens the window menu. A correction that
+  releases only Shift, or only Ctrl, needs no protection from that and should send no prefix. So the
+  rule is not "suppress the prefix" but "send it only when the correction set contains an Alt".
+*/
+TEST_F(PREPARE_MODIFIER_VERIFICATION_CORRECTION, AShiftOnlyCorrectionSendsNoPrefixKeystroke) {
+  kbd[VK_LSHIFT]                 = 0;
+  g_liveModifierState[VK_LSHIFT] = 0x80;
 
-      QueryPerformanceCounter(&t0);
-      ASSERT_TRUE(InjectRestorePress(VK_LSHIFT, fillers[f])) << "SendInput did not queue the batch";
-      QueryPerformanceCounter(&t1);
-      sendUs += (double)(t1.QuadPart - t0.QuadPart) * 1e6 / (double)freq.QuadPart;
+  RunCorrection(MaskBit(VK_LSHIFT));
 
-      // What the OS reports the instant SendInput returns, before the reconcile reads anything.
-      if (GetAsyncKeyState(VK_LSHIFT) >= 0) {
-        staleReads++;
-      }
+  ASSERT_EQ(Count(VK_SHIFT, true), 1) << "the correction itself must still happen";
 
-      // The production question, asked with no delay: does the reconcile clear a byte whose press
-      // is still in flight?
-      BYTE live[256];
-      CaptureLiveModifierState(live, GetAsyncKeyState);
-      if (ReconcileModifierCache(kbd, live)) {
-        races++;
-      }
+  EXPECT_EQ(Count(PREFIX_VK, false), 0)
+      << "a standalone correction that releases only Shift sent a prefix KEYDOWN into whatever has "
+      << "focus now. The prefix exists to stop an isolated ALT release opening the window menu; "
+      << "there is no Alt here, so this keystroke has no job and a destination nobody chose";
+  EXPECT_EQ(Count(PREFIX_VK, true), 0) << "and its KEYUP likewise";
+  EXPECT_EQ(n, 1) << "one KEYUP is the whole correction; anything more is stray input";
+}
 
-      ReleaseAndSettle(VK_LSHIFT);
-    }
+/*
+  FR-014's positive, and the reason the prefix is made conditional rather than removed. An Alt-family
+  VK in the correction set is the case the prefix was written for, so it must still be sent. Without
+  this case the fix could delete the prefix outright and nothing would notice until an Alt
+  correction popped a window menu in the field.
+*/
+TEST_F(PREPARE_MODIFIER_VERIFICATION_CORRECTION, AnAltCorrectionStillSendsThePrefixKeystroke) {
+  kbd[VK_LMENU]                 = 0;
+  g_liveModifierState[VK_LMENU] = 0x80;
 
-    printf("RACE PROBE  filler=%3d  races=%d/%d  staleReads=%d/%d  SendInput mean=%.0fus\n",
-           fillers[f], races, kIterations, staleReads, kIterations, sendUs / (double)kIterations);
+  RunCorrection(MaskBit(VK_LMENU));
 
-    EXPECT_EQ(staleReads, 0)
-        << "GetAsyncKeyState did not see the injected press by the time SendInput returned. "
-        << "SendInput is no longer synchronous with respect to the async key state, so the "
-        << "reconcile can now clear a modifier the user is holding. See this test's comment";
-    EXPECT_EQ(races, 0)
-        << "ReconcileModifierCache cleared a byte whose press its own batch had just injected. "
-        << "That modifier is now dropped, not latched. See this test's comment";
+  ASSERT_EQ(Count(VK_MENU, true), 1) << "the correction itself";
+  EXPECT_EQ(Count(PREFIX_VK, false), 1)
+      << "an isolated Alt release opens the window menu, which is precisely what the prefix is for. "
+      << "Suppressing it here would trade stray input for a visible menu";
+  EXPECT_EQ(Count(PREFIX_VK, true), 1);
+}
+
+/*
+  FR-014, the mixed set. Shift and Alt both need correcting, so the prefix is required -- the rule is
+  about whether ANY Alt is present, not about whether the set is Alt-only. Stated as its own case
+  because the obvious implementation, checking only the first VK in the set, gets this wrong: Shift
+  sorts before Alt in KeymanModifierVks.
+*/
+TEST_F(PREPARE_MODIFIER_VERIFICATION_CORRECTION, ACorrectionContainingAnyAltSendsThePrefixKeystroke) {
+  kbd[VK_LSHIFT]                = 0;
+  kbd[VK_RMENU]                 = 0;
+  g_liveModifierState[VK_LSHIFT] = 0x80;
+  g_liveModifierState[VK_RMENU]  = 0x80;
+
+  RunCorrection(MaskBit(VK_LSHIFT) | MaskBit(VK_RMENU));
+
+  ASSERT_EQ(Count(VK_SHIFT, true), 1);
+  ASSERT_EQ(Count(VK_MENU, true), 1);
+  EXPECT_EQ(Count(PREFIX_VK, false), 1)
+      << "an Alt is in the set, so the prefix is needed -- and it must be found wherever in the set "
+      << "the Alt sits, not only when the set begins with one";
+}
+
+/*
+  FR-014's boundary in the other direction, and the one that keeps the batch path honest. Inside
+  PrepareInjectedInputBatch the release half's prefix is UNCHANGED: it is not stray input there, it
+  is bracketed by the batch's own output keys, and removing it would reopen the window-menu problem
+  for every Alt+key rule. The parameter defaults to TRUE precisely so this path is untouched.
+*/
+TEST_F(PREPARE_INJECTED_INPUT_BATCH, TheBatchReleaseHalfStillSendsItsPrefixForAShiftOnlyRelease) {
+  kbd[VK_LSHIFT]                 = 0x80;
+  g_liveModifierState[VK_LSHIFT] = 0x80;
+  AddOutputKey('A');
+
+  RunBatch();
+
+  EXPECT_EQ(Count(PREFIX_VK, false), 2)
+      << "one prefix pair from the release half and one from the restore half. FR-014 changes the "
+      << "STANDALONE correction only; suppressing it here would be a behaviour change to every "
+      << "batch that touches a modifier";
+  EXPECT_EQ(Count(PREFIX_VK, true), 2);
+}
+/*
+  #8064 W5 / FR-101 ... FR-105 -- the user-held signal.
+
+  THE PROBLEM IT EXISTS FOR (A0). The modifier cache is fed only by Keyman's low level keyboard hook.
+  Wherever that hook does not see a KEYDOWN -- a console window, the secure desktop, the pass-through
+  paths -- the cache never learns that the user is holding a modifier. The batch's release half reads
+  live OS state and releases it; the restore half reads the cache and does not press it back. The
+  hold is dropped, and no amount of reconciling can recover it, because there is nothing in the cache
+  to reconcile.
+
+  THE SHAPE OF THE FIX, and why it is not "just read the OS". Live OS state cannot distinguish "the
+  user is holding it" from "we pressed it ourselves one message ago", so restoring from it
+  manufactures unmatched presses -- #8064 from a new direction (FR-102, and both live-state-only
+  alternatives are refuted in the spec). The signal is a THIRD input: what a source that is not
+  Keyman's own last said. It is fed from raw keyboard input, and it reports UNKNOWN rather than
+  stale.
+
+  THE RESTORE SET BECOMES `cache OR (held & ~unknown)`. Widened by a user-held observation only. The
+  release half is untouched and still reads live.
+
+  THE SHARPEST RISK IN THE WHOLE SPEC LIVES HERE: a stale shadow manufactures a press that nothing
+  can detect, because cache and OS then AGREE and ReconcileModifierCache tests for disagreement. That
+  is why FR-104a's per-key poisoning, FR-104b's displacement detection and FR-103a's signal-aware
+  verification pass are all three required, and why every case below asserts the *unknown* half as
+  well as the *held* half.
+*/
+class USER_HELD_SIGNAL : public PREPARE_INJECTED_INPUT_BATCH {
+public:
+  void
+  SetUp() {
+    PREPARE_INJECTED_INPUT_BATCH::SetUp();
+    memset(&userHeld, 0, sizeof(userHeld));
   }
 
-  EXPECT_GE(GetAsyncKeyState(VK_LSHIFT), 0) << "the probe left Left Shift asserted machine-wide";
+protected:
+  UserHeldModifierSignal userHeld;
+
+  void
+  RunBatchWithSignal() {
+    restorePressedMask = kRestoreMaskUnwritten;
+    for (int i = 0; i < KEYMAN_MODIFIER_VK_COUNT; i++) {
+      restoreEventIndex[i] = kRestoreEventIndexUnwritten;
+    }
+    n = PrepareInjectedInputBatch(
+      inputs, kbd, &sharedData, StubGetAsyncKeyState, TRUE, &restorePressedMask, NULL,
+      restoreEventIndex, &userHeld);
+  }
+};
+
+/*
+  FR-101, the whole point. The A0 window exactly: the OS reports Left Control held, the CACHE does
+  not claim it -- the hook never saw the KEYDOWN, because it happened in a console window -- and the
+  SIGNAL does, because raw input is not routed through that hook.
+
+  Today the restore half reads the cache alone, so this hold is dropped. With the signal it is not.
+*/
+TEST_F(USER_HELD_SIGNAL, AHoldOnlyTheSignalKnowsAboutIsRestored) {
+  kbd[VK_LCONTROL]                 = 0;    // the cache never saw it
+  g_liveModifierState[VK_LCONTROL] = 0x80; // the OS knows it is down
+  userHeld.held[VK_LCONTROL]       = 0x80; // and so does the signal, from raw input
+  userHeld.unknown[VK_LCONTROL]    = 0;    // and it can currently speak for this key
+  AddOutputKey('A');
+
+  RunBatchWithSignal();
+
+  EXPECT_EQ(Count(VK_CONTROL, true), 1)
+      << "the release half is unchanged: it still releases what the OS reports held";
+  EXPECT_EQ(Count(VK_CONTROL, false), 1)
+      << "the signal says the USER is holding Left Control, so the restore half must press it back. "
+      << "Without this the hold is dropped and the user's Ctrl goes dead mid-chord -- the A0 window, "
+      << "which no reconcile can recover because the cache has nothing in it to reconcile";
+}
+
+/*
+  FR-102, and it is the guard rail on the case above. The OS says held; NOTHING else does. That is
+  indistinguishable from "Keyman pressed it one message ago", so it must NOT be restored -- restoring
+  here is #8064 arriving from a new direction, and on hardware with no physical Right Ctrl the user
+  cannot clear it at all.
+
+  Green today and must stay green. It is the case that stops FR-101 being implemented as "restore
+  from live state", which is the refuted alternative.
+*/
+TEST_F(USER_HELD_SIGNAL, ALiveOnlyHoldIsStillNotRestored) {
+  kbd[VK_LCONTROL]                 = 0;
+  g_liveModifierState[VK_LCONTROL] = 0x80; // the OS says held
+  // and neither the cache nor the signal claims it
+  AddOutputKey('A');
+
+  RunBatchWithSignal();
+
+  EXPECT_EQ(Count(VK_CONTROL, true), 1) << "released, as the release half always has";
+  EXPECT_EQ(Count(VK_CONTROL, false), 0)
+      << "nothing that can tell a finger from an injection claims this key, so pressing it back "
+      << "would manufacture an unmatched KEYDOWN. FR-102: the set widens by a USER-HELD signal "
+      << "only, never by live OS state";
+}
+
+/*
+  FR-104, the unknown half, and the reason the signal is two arrays and not one. A key the signal
+  claims held but cannot currently SPEAK for is worth exactly nothing: the effective read is
+  `held & ~unknown`, everywhere, with no exceptions.
+
+  This is the UAC case in miniature -- hold Ctrl, release it on the secure desktop where the feed
+  cannot see it, come back -- and it is the one that manufactures a press if it is got wrong.
+*/
+TEST_F(USER_HELD_SIGNAL, APoisonedKeyIsNotRestoredEvenThoughTheSignalSaysHeld) {
+  kbd[VK_LCONTROL]                 = 0;
+  g_liveModifierState[VK_LCONTROL] = 0x80;
+  userHeld.held[VK_LCONTROL]       = 0x80; // the last thing the signal saw was a KEYDOWN
+  userHeld.unknown[VK_LCONTROL]    = 0x80; // but it cannot speak for this key now
+  AddOutputKey('A');
+
+  RunBatchWithSignal();
+
+  EXPECT_EQ(Count(VK_CONTROL, false), 0)
+      << "the signal's last observation is stale and it says so. Restoring on a stale 'held' is the "
+      << "sharpest risk in this design: it manufactures an unmatched press in the ONE state "
+      << "ReconcileModifierCache is structurally blind to, because cache and OS then agree";
+}
+
+/*
+  FR-101 with no signal at all. NULL means the cache alone -- FR-104's fallback, and the shape this
+  code has if US0 is struck. Asserted rather than assumed: every existing test in this file calls
+  the batch without a signal, so a fix that dereferenced the pointer unconditionally would take the
+  whole suite down, but one that treated NULL as "everything held" would not, and that is the
+  dangerous direction.
+*/
+TEST_F(USER_HELD_SIGNAL, NoSignalMeansTheCacheAloneAndNotAnEmptyOne) {
+  kbd[VK_LCONTROL]                 = 0;
+  g_liveModifierState[VK_LCONTROL] = 0x80;
+  AddOutputKey('A');
+
+  // deliberately the no-signal call
+  restorePressedMask = kRestoreMaskUnwritten;
+  n                  = PrepareInjectedInputBatch(
+    inputs, kbd, &sharedData, StubGetAsyncKeyState, TRUE, &restorePressedMask);
+
+  EXPECT_EQ(Count(VK_CONTROL, false), 0) << "no signal, so the cache alone decides the restore set";
+  EXPECT_EQ(Count(VK_CONTROL, true), 1) << "and the release half is untouched by any of this";
+}
+
+/*
+  FR-103. The mask has to cover the presses FR-101 added, or the verification pass cannot correct a
+  release that raced the batch -- and FR-101's presses are precisely the ones most likely to race,
+  since they are made on a signal about a key the user is actively holding.
+*/
+TEST_F(USER_HELD_SIGNAL, TheMaskCoversAPressMadeOnTheSignalAlone) {
+  kbd[VK_LCONTROL]                 = 0;
+  g_liveModifierState[VK_LCONTROL] = 0x80;
+  userHeld.held[VK_LCONTROL]       = 0x80;
+  AddOutputKey('A');
+
+  RunBatchWithSignal();
+
+  ASSERT_NE(restorePressedMask, kRestoreMaskUnwritten) << "the out-param was never written";
+
+  DWORD expected = 0;
+  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+    if (KeymanModifierVks[i] == VK_LCONTROL) {
+      expected = 1u << i;
+    }
+  }
+  ASSERT_NE(expected, (DWORD)0) << "VK_LCONTROL is not in KeymanModifierVks; the test is wrong";
+
+  EXPECT_EQ(restorePressedMask & expected, expected)
+      << "the restore half pressed Left Control on the signal's word, and the mask does not say so. "
+      << "The verification pass is scoped by this mask, so a press it omits can never be corrected";
+}
+
+/*
+  #8064 FR-105. The phantom case, UNCHANGED with the signal in place. This is the assertion that says
+  US0 did not reopen what 002 closed.
+
+  Two shapes, both of them #8064's own:
+
+    - the stale cache byte: the cache claims held, live says up, the signal claims nothing. The
+      reconcile clears it and nothing is pressed.
+    - the live-only hold: live says held, neither the cache nor the signal claims it. Released, and
+      NOT restored.
+
+  If either of these ever restores, #8064 is back, and on hardware with no physical Right Ctrl the
+  user cannot clear it.
+*/
+TEST_F(USER_HELD_SIGNAL, TheStaleCacheByteIsStillClearedAndNothingIsPressed) {
+  kbd[VK_LSHIFT] = 0x80; // the dropped-KEYUP residue: this is #8064's own state
+  // live says up, and the signal claims nothing
+  AddOutputKey('A');
+
+  RunBatchWithSignal();
+
+  EXPECT_EQ(kbd[VK_LSHIFT], (BYTE)0) << "the reconcile must still clear the stale byte";
+  EXPECT_EQ(Count(VK_SHIFT, false), 0)
+      << "an unmatched modifier KEYDOWN latches machine-wide once SendInput runs. That is #8064, "
+      << "and adding a third input must not create a new route to it";
+  EXPECT_EQ(Count(VK_SHIFT, true), 0) << "and nothing was held, so nothing needed releasing either";
+}
+
+/*
+  FR-105's other half, and the one the signal makes newly possible to get wrong: the signal claims a
+  key the live state does NOT report held. That is a signal that has gone stale without being
+  poisoned -- the user released the key and the release was not observed.
+
+  The restore half presses on `held & ~unknown` alone, deliberately: the signal is the authority on
+  what the USER holds, and live state cannot be used to second-guess it without reintroducing the
+  ambiguity the signal exists to escape. So this DOES press, and that is correct -- but the
+  verification pass is what catches it, which is why FR-103 and FR-103a are a pair. Asserted here so
+  the behaviour is a decision on record rather than an accident.
+*/
+TEST_F(USER_HELD_SIGNAL, ASignalClaimNotBackedByLiveStateStillPressesAndIsCoveredByTheMask) {
+  kbd[VK_LCONTROL]           = 0;
+  userHeld.held[VK_LCONTROL] = 0x80; // the signal's last observation was a KEYDOWN
+  // live says up: the user let go and the release was not observed
+  AddOutputKey('A');
+
+  RunBatchWithSignal();
+
+  EXPECT_EQ(Count(VK_CONTROL, false), 1)
+      << "the signal is the authority on what the user holds; second-guessing it with live state "
+      << "reintroduces the ambiguity it exists to escape";
+
+  DWORD bit = 0;
+  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+    if (KeymanModifierVks[i] == VK_LCONTROL) {
+      bit = 1u << i;
+    }
+  }
+  EXPECT_EQ(restorePressedMask & bit, bit)
+      << "so this press MUST be in the mask -- it is exactly the press the verification pass exists "
+      << "to correct, and a press the mask omits can never be corrected";
+}
+
+/*
+  #8064 FR-103 + FR-103a, ASSERTED TOGETHER. Testing them apart proves nothing: FR-103 widens the
+  mask so the pass can see FR-101's presses, and FR-103a stops the pass from immediately undoing
+  them. Either one alone is worse than neither.
+
+  The state below is the one every FR-101 restore creates inside the A0 window: the cache does not
+  claim the key (it never saw the KEYDOWN), and live reports it held (because the restore press just
+  landed). That is cache-up-and-live-down inverted -- exactly what the pass corrects on -- so without
+  FR-103a the pass releases the modifier one message after the batch pressed it, and US0 delivers
+  nothing at a cost of two injected events per batch.
+*/
+class VERIFICATION_WITH_SIGNAL : public PREPARE_MODIFIER_VERIFICATION_CORRECTION {
+public:
+  void
+  SetUp() {
+    PREPARE_MODIFIER_VERIFICATION_CORRECTION::SetUp();
+    memset(&userHeld, 0, sizeof(userHeld));
+  }
+
+protected:
+  UserHeldModifierSignal userHeld;
+
+  void
+  RunCorrectionWithSignal(DWORD restorePressedMask) {
+    n = PrepareModifierVerificationCorrection(inputs, kbd, restorePressedMask, StubGetAsyncKeyState, &userHeld);
+  }
+};
+
+TEST_F(VERIFICATION_WITH_SIGNAL, ThePassDoesNotUndoAPressItMadeOnTheSignalsWord) {
+  kbd[VK_LCONTROL]                 = 0;    // the cache never saw the KEYDOWN -- the A0 window
+  g_liveModifierState[VK_LCONTROL] = 0x80; // the restore press landed, so the OS holds it
+  userHeld.held[VK_LCONTROL]       = 0x80; // and the signal says the user is still holding it
+  userHeld.unknown[VK_LCONTROL]    = 0;
+
+  RunCorrectionWithSignal(MaskBit(VK_LCONTROL));
+
+  EXPECT_EQ(n, 0)
+      << "the pass corrected a press the batch had just made on the signal's word. This is the "
+      << "no-op FR-103a exists to prevent: widen the mask without making the pass signal-aware and "
+      << "US0 delivers nothing while still costing two injected events every batch";
+  EXPECT_EQ(Count(VK_CONTROL, true), 0) << "and no release may be emitted at all";
+}
+
+/*
+  FR-103a's other side, which is what stops it being implemented as "never correct anything". A
+  modifier the OS holds that NEITHER the cache NOR the signal claims is a genuine correction and must
+  still be made -- this is the pass's original job, and the signal must not disable it.
+*/
+TEST_F(VERIFICATION_WITH_SIGNAL, ThePassStillCorrectsWhatNeitherTheCacheNorTheSignalClaims) {
+  kbd[VK_LCONTROL]                 = 0;
+  g_liveModifierState[VK_LCONTROL] = 0x80;
+  // the signal claims nothing
+
+  RunCorrectionWithSignal(MaskBit(VK_LCONTROL));
+
+  EXPECT_EQ(Count(VK_CONTROL, true), 1)
+      << "nobody claims this hold, so the OS is holding a modifier no user is. Declining to correct "
+      << "it would leave the latch FR-103's pass was written to clear";
+}
+
+/*
+  FR-103a with a POISONED claim. The signal says held, but it also says it cannot currently speak for
+  the key -- so its claim carries no weight and the correction proceeds. Same effective read,
+  `held & ~unknown`, as the restore half: if these two halves ever disagree about the same key, one
+  presses and the other releases, every batch, forever.
+*/
+TEST_F(VERIFICATION_WITH_SIGNAL, APoisonedClaimDoesNotBlockACorrection) {
+  kbd[VK_LCONTROL]                 = 0;
+  g_liveModifierState[VK_LCONTROL] = 0x80;
+  userHeld.held[VK_LCONTROL]       = 0x80;
+  userHeld.unknown[VK_LCONTROL]    = 0x80; // stale, and it says so
+
+  RunCorrectionWithSignal(MaskBit(VK_LCONTROL));
+
+  EXPECT_EQ(Count(VK_CONTROL, true), 1)
+      << "a poisoned claim is worth nothing, on both sides of the batch. The restore half would not "
+      << "have pressed on this either, so the pass must not treat it as a press worth protecting";
 }
 
 namespace {
-struct HookObservation {
-  DWORD vkCode;
-  DWORD scanCode;
-  ULONG_PTR dwExtraInfo;
-  DWORD flags;
-};
-
-HookObservation g_observed[64];
-int g_observedCount = 0;
-HHOOK g_probeHook = NULL;
-
-LRESULT CALLBACK
-ProvenanceProbeHook(int nCode, WPARAM wParam, LPARAM lParam) {
-  if (nCode == HC_ACTION && g_observedCount < _countof(g_observed)) {
-    const KBDLLHOOKSTRUCT *hs = (const KBDLLHOOKSTRUCT *)lParam;
-    g_observed[g_observedCount].vkCode      = hs->vkCode;
-    g_observed[g_observedCount].scanCode    = hs->scanCode;
-    g_observed[g_observedCount].dwExtraInfo = hs->dwExtraInfo;
-    g_observed[g_observedCount].flags       = hs->flags;
-    g_observedCount++;
-  }
-  return CallNextHookEx(g_probeHook, nCode, wParam, lParam);
-}
-
-// Injects one modifier event the way do_keybd_event does, with an explicit dwExtraInfo.
-void
-InjectTaggedModifier(BYTE vk, BYTE scan, DWORD flags, ULONG_PTR extraInfo) {
-  INPUT input;
-
-  memset(&input, 0, sizeof(input));
-  input.type = INPUT_KEYBOARD;
-
-  // The same collapse do_keybd_event performs, including the Right Shift scan code rewrite.
-  switch (vk) {
-  case VK_RSHIFT:
-    scan = SCANCODE_RSHIFT;
-    /*fallthrough*/
-  case VK_LSHIFT:
-    input.ki.wVk = VK_SHIFT;
-    break;
-  default:
-    input.ki.wVk = vk;
-    break;
-  }
-
-  input.ki.wScan       = scan;
-  input.ki.dwFlags     = flags;
-  input.ki.dwExtraInfo = extraInfo;
-
-  SendInput(1, &input, sizeof(INPUT));
-}
-
-// WH_KEYBOARD_LL delivers through the installing thread's message queue.
-void
-PumpFor(DWORD ms) {
-  const DWORD until = GetTickCount() + ms;
-  MSG msg;
-  while (GetTickCount() < until) {
-    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-      TranslateMessage(&msg);
-      DispatchMessage(&msg);
-    }
-    Sleep(1);
-  }
-}
-
-// The first observation for vkCode with the given up/down direction, or NULL.
-const HookObservation *
-FindObservation(DWORD vkCode, bool isUp) {
-  for (int i = 0; i < g_observedCount; i++) {
-    if (g_observed[i].vkCode == vkCode && (((g_observed[i].flags & LLKHF_UP) != 0) == isUp)) {
-      return &g_observed[i];
-    }
-  }
-  return NULL;
-}
+// RAWKEYBOARD::Flags values. Defined here rather than pulled from a header so the test states the
+// wire format it is asserting about.
+const USHORT kRiKeyMake  = 0x0000; // RI_KEY_MAKE
+const USHORT kRiKeyBreak = 0x0001; // RI_KEY_BREAK
+const USHORT kRiKeyE0    = 0x0002; // RI_KEY_E0
 } // namespace
 
 /*
-  Measures whether dwExtraInfo survives SendInput to a low level keyboard hook, and compares it
-  against the scan code as a provenance signal -- i.e. whether the hook's modifier post can be gated
-  on provenance at all, as keyman64.h's scan-code TODO wants.
+  #8064 W5 / FR-100a, FR-104a -- UpdateUserHeldFromRawKeyboard.
 
-  Right Shift is the case that matters: do_keybd_event overwrites SCAN_FLAG_KEYMAN_KEY_EVENT with
-  SCANCODE_RSHIFT for it, so the scan code cannot identify an injected Right Shift, while
-  dwExtraInfo passes straight through untouched.
+  The two things this function has to get right, and both of them are the kind that fail silently:
 
-  See PROBE CAPABILITY; this test's requirement is the strictest, since a hook callback needs the
-  desktop to route keyboard messages to the installing thread's queue. If dwExtraInfo ever stopped
-  surviving, IsKeymanInjectedKeyEvent's second arm would always read 0 and Keyman's own Right Shift
-  wrap events would feed the cache again -- and TheGateCoversRightShiftThroughDwExtraInfo would not
-  notice, since it never round-trips the OS.
+  1. THE DISCRIMINATOR IS "NOT KEYMAN'S OWN", NEVER "NOT INJECTED". Genuine user input arrives
+     OS-injected from Remote Desktop and from the Keyman OSK. A filter on injection -- or on
+     hDevice -- drops those, so a hold made over RDP is one the restore half silently drops. The
+     function does not even take hDevice, so the refuted policy is not expressible.
+
+  2. POISON CLEARS ONLY ON A FRESH OBSERVATION OF THAT KEY, AND NEVER ON A TIMER. This is the UAC
+     case: hold Ctrl, walk onto the secure desktop, release it there where nothing can see it, come
+     back. Both FR-104 triggers have fired, so without per-key poisoning the signal reports a stale
+     "held", FR-101 restores it, and FR-103a agrees not to correct it -- an unmatched press that
+     nothing downstream can detect, because the cache and the OS then agree.
 */
-TEST_F(KEYBD_SHIFT, DwExtraInfoSurvivesSendInputWhereTheScanCodeDoesNot) {
-  if (GetAsyncKeyState(VK_LSHIFT) < 0 || GetAsyncKeyState(VK_RSHIFT) < 0) {
-    GTEST_LOG_(WARNING) << "a Shift key already reads down; precondition unmet, not evaluated";
-    SUCCEED();
-    return;
+class USER_HELD_FROM_RAW : public KEYBD_SHIFT {
+public:
+  void
+  SetUp() {
+    KEYBD_SHIFT::SetUp();
+    memset(&signal, 0, sizeof(signal));
   }
 
-  g_observedCount = 0;
-  g_probeHook     = SetWindowsHookEx(WH_KEYBOARD_LL, ProvenanceProbeHook, GetModuleHandle(NULL), 0);
-  ASSERT_NE(g_probeHook, (HHOOK)NULL) << "could not install the probe hook";
+protected:
+  UserHeldModifierSignal signal;
 
-  // Left Shift and Right Shift, down then up, all tagged as Keyman's own.
-  InjectTaggedModifier(VK_LSHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT);
-  InjectTaggedModifier(VK_LSHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT);
-  InjectTaggedModifier(VK_RSHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT);
-  InjectTaggedModifier(VK_RSHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT);
-
-  PumpFor(400);
-
-  UnhookWindowsHookEx(g_probeHook);
-  g_probeHook = NULL;
-
-  for (int i = 0; i < g_observedCount; i++) {
-    printf("PROVENANCE  vk=0x%02X scan=0x%02X extra=0x%08X flags=0x%02X (injected=%d extended=%d up=%d)\n",
-           (unsigned)g_observed[i].vkCode, (unsigned)g_observed[i].scanCode,
-           (unsigned)g_observed[i].dwExtraInfo, (unsigned)g_observed[i].flags,
-           (g_observed[i].flags & LLKHF_INJECTED) ? 1 : 0,
-           (g_observed[i].flags & LLKHF_EXTENDED) ? 1 : 0,
-           (g_observed[i].flags & LLKHF_UP) ? 1 : 0);
+  // The effective read, spelled out once: held & ~unknown. No consumer may read held alone.
+  bool
+  EffectivelyHeld(BYTE vk) const {
+    return (signal.held[vk] & 0x80) != 0 && (signal.unknown[vk] & 0x80) == 0;
   }
+};
 
-  if (g_observedCount == 0) {
-    // Not "the injection did not land": this desktop is not routing keyboard messages to a hooked,
-    // pumped queue. Both Shifts were sent down and up above regardless, so nothing is left
-    // asserted machine-wide.
-    GTEST_LOG_(WARNING) << "SKIPPED: the probe hook observed nothing. This test needs an "
-                        << "interactive input desktop that routes keyboard messages to a pumped, "
-                        << "hooked message queue; see the test's own comment for why this is "
-                        << "checked with the hook itself rather than a lighter proxy.";
-    SUCCEED();
-    return;
-  }
+TEST_F(USER_HELD_FROM_RAW, DerivesChiralityFromTheExtendedFlagAndTheMakeCode) {
+  // Control and Alt: RI_KEY_E0 is the only chirality signal.
+  UpdateUserHeldFromRawKeyboard(&signal, VK_CONTROL, 0x1D, kRiKeyMake, 0);
+  EXPECT_TRUE(EffectivelyHeld(VK_LCONTROL)) << "no E0 means left";
+  EXPECT_FALSE(EffectivelyHeld(VK_RCONTROL));
 
-  // Every observed event must carry the tag. This is the property the gate would rely on.
-  for (int i = 0; i < g_observedCount; i++) {
-    EXPECT_EQ(g_observed[i].dwExtraInfo, (ULONG_PTR)EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT)
-        << "dwExtraInfo did not survive SendInput for vk "
-        << Debug_VirtualKey((WORD)g_observed[i].vkCode)
-        << ", so it cannot be used as a provenance signal";
-  }
+  UpdateUserHeldFromRawKeyboard(&signal, VK_CONTROL, 0x1D, kRiKeyE0, 0);
+  EXPECT_TRUE(EffectivelyHeld(VK_RCONTROL)) << "E0 means right";
 
-  // And the scan code must NOT identify the injected Right Shift, which is the hole being closed.
-  // Both Shifts arrive as VK_SHIFT collapsed by do_keybd_event's mapping.
-  const HookObservation *shiftDown = FindObservation(VK_SHIFT, false);
-  if (shiftDown == NULL) {
-    shiftDown = FindObservation(VK_LSHIFT, false);
-  }
-  ASSERT_NE(shiftDown, (const HookObservation *)NULL) << "no Shift KEYDOWN was observed";
+  UpdateUserHeldFromRawKeyboard(&signal, VK_MENU, 0x38, kRiKeyE0, 0);
+  EXPECT_TRUE(EffectivelyHeld(VK_RMENU));
 
-  bool sawRightShiftScanCode = false;
-  for (int i = 0; i < g_observedCount; i++) {
-    if (g_observed[i].scanCode == SCANCODE_RSHIFT) {
-      sawRightShiftScanCode = true;
-      EXPECT_NE(g_observed[i].scanCode, (DWORD)SCAN_FLAG_KEYMAN_KEY_EVENT)
-          << "an injected Right Shift carried the Keyman scan flag after all, which would mean "
-          << "do_keybd_event no longer rewrites it";
+  // Shift: the make code alone, exactly as UpdateModifierCacheFromKeyEvent does it. A disagreement
+  // between the two would be silent, because both write a 256-byte array keyed by the chiral VK.
+  UpdateUserHeldFromRawKeyboard(&signal, VK_SHIFT, SCANCODE_RSHIFT, kRiKeyMake, 0);
+  EXPECT_TRUE(EffectivelyHeld(VK_RSHIFT)) << "the right-shift make code means right, with no E0";
+  EXPECT_FALSE(EffectivelyHeld(VK_LSHIFT));
+
+  UpdateUserHeldFromRawKeyboard(&signal, VK_SHIFT, 0x2A, kRiKeyMake, 0);
+  EXPECT_TRUE(EffectivelyHeld(VK_LSHIFT));
+}
+
+TEST_F(USER_HELD_FROM_RAW, ABreakFlagIsAReleaseAndNothingOutsideTheManagedSixIsWritten) {
+  UpdateUserHeldFromRawKeyboard(&signal, VK_SHIFT, 0x2A, kRiKeyMake, 0);
+  ASSERT_TRUE(EffectivelyHeld(VK_LSHIFT));
+
+  UpdateUserHeldFromRawKeyboard(&signal, VK_SHIFT, 0x2A, kRiKeyBreak, 0);
+  EXPECT_FALSE(EffectivelyHeld(VK_LSHIFT)) << "RI_KEY_BREAK is a KEYUP";
+
+  UpdateUserHeldFromRawKeyboard(&signal, 'A', 0x1E, kRiKeyMake, 0);
+  UpdateUserHeldFromRawKeyboard(&signal, VK_CAPITAL, 0x3A, kRiKeyMake, 0);
+  for (int i = 0; i < 256; i++) {
+    bool managed = false;
+    for (int k = 0; k < (int)_countof(KeymanModifierVks); k++) {
+      if (KeymanModifierVks[k] == i) {
+        managed = true;
+      }
+    }
+    if (!managed) {
+      EXPECT_EQ(signal.held[i], (BYTE)0) << "slot " << i << " is outside the managed six and was written";
     }
   }
-  EXPECT_TRUE(sawRightShiftScanCode)
-      << "no event carried SCANCODE_RSHIFT, so the Right Shift leg was not measured";
+}
 
-  EXPECT_GE(GetAsyncKeyState(VK_LSHIFT), 0) << "the probe left Left Shift asserted machine-wide";
-  EXPECT_GE(GetAsyncKeyState(VK_RSHIFT), 0) << "the probe left Right Shift asserted machine-wide";
+TEST_F(USER_HELD_FROM_RAW, KeymansOwnEventsAreIgnoredButRdpAndOskInputIsNot) {
+  // Keyman's own wrap event: ignored, because it says nothing about what the user is holding.
+  UpdateUserHeldFromRawKeyboard(&signal, VK_SHIFT, 0x2A, kRiKeyMake, EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP);
+  EXPECT_FALSE(EffectivelyHeld(VK_LSHIFT))
+      << "Keyman's own injected modifier reached the user-held signal. The signal would then be "
+      << "recording Keyman's own presses as evidence that the user is holding them, which is the "
+      << "circularity the whole design exists to avoid";
+
+  // Keyman's scan-flag form: likewise ignored.
+  UpdateUserHeldFromRawKeyboard(&signal, VK_SHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, kRiKeyMake, 0);
+  EXPECT_FALSE(EffectivelyHeld(VK_LSHIFT));
+
+  // Remote Desktop: OS-INJECTED, and genuinely the user. FR-100a.
+  UpdateUserHeldFromRawKeyboard(&signal, VK_CONTROL, 0x1D, kRiKeyMake, 0x4321DCBA);
+  EXPECT_TRUE(EffectivelyHeld(VK_LCONTROL))
+      << "a hold made over Remote Desktop was dropped. RDP input is OS-injected and it is the user; "
+      << "an injection-based or hDevice-based filter is refuted for exactly this reason";
+
+  // The OSK: also OS-injected, also the user.
+  UpdateUserHeldFromRawKeyboard(&signal, VK_MENU, 0x38, kRiKeyMake, 0);
+  EXPECT_TRUE(EffectivelyHeld(VK_LMENU));
 }
 
 /*
-  #8064 Live measurement: does GetAsyncKeyState(VK_LSHIFT) reflect a third party's
-  SendInput(wVk=VK_SHIFT, wScan=0), as GenericVkEventReconcilesAgainstTheChiralLiveReading assumes?
-  Reuses the probe-hook plumbing above so the observed vkCode is on record too -- "Windows
-  re-chiralises before the hook" and "GetAsyncKeyState reflects the chiral VK" are separate claims
-  argued from the same mechanism. See PROBE CAPABILITY. A pass confirms the mechanism on the machine
-  it ran on, not that no future Windows or other injector can violate it.
+  FR-104a, THE UAC CASE, EXPLICITLY. The whole point is what does NOT happen: no elapsed time, no
+  number of unrelated events, and no observation of a DIFFERENT key clears this key's poison. Only
+  an event for this key does.
 */
-TEST_F(KEYBD_SHIFT, GenericShiftSendInputReflectsInBothAsyncKeyStates) {
-  if (GetAsyncKeyState(VK_LSHIFT) < 0 || GetAsyncKeyState(VK_SHIFT) < 0) {
-    GTEST_LOG_(WARNING) << "Shift already reads down; precondition unmet, not evaluated";
-    SUCCEED();
-    return;
+TEST_F(USER_HELD_FROM_RAW, PoisonPersistsUntilAFreshObservationOfThatVeryKey) {
+  UpdateUserHeldFromRawKeyboard(&signal, VK_CONTROL, 0x1D, kRiKeyMake, 0);
+  ASSERT_TRUE(EffectivelyHeld(VK_LCONTROL)) << "the user pressed Left Control and we saw it";
+
+  // The secure desktop, or a session change: we can no longer speak for this key.
+  BYTE toPoison[1] = { VK_LCONTROL };
+  PoisonUserHeldKeys(&signal, toPoison, 1);
+
+  EXPECT_EQ(signal.held[VK_LCONTROL], (BYTE)0x80) << "poison suppresses the claim, it does not erase it";
+  EXPECT_FALSE(EffectivelyHeld(VK_LCONTROL))
+      << "the user may have released Left Control on the secure desktop, where nothing could see it. "
+      << "Reporting the stale 'held' here is what manufactures an unmatched press, and cache and OS "
+      << "would then AGREE -- the one state ReconcileModifierCache can never detect";
+
+  // Events for OTHER keys do not rehabilitate this one.
+  UpdateUserHeldFromRawKeyboard(&signal, VK_SHIFT, 0x2A, kRiKeyMake, 0);
+  UpdateUserHeldFromRawKeyboard(&signal, VK_MENU, 0x38, kRiKeyE0, 0);
+  EXPECT_FALSE(EffectivelyHeld(VK_LCONTROL)) << "poison is PER KEY; another key being observed proves nothing";
+  EXPECT_TRUE(EffectivelyHeld(VK_LSHIFT)) << "and those other keys are fine";
+
+  // Only an event for this key does, and either direction counts as an observation.
+  UpdateUserHeldFromRawKeyboard(&signal, VK_CONTROL, 0x1D, kRiKeyBreak, 0);
+  EXPECT_EQ(signal.unknown[VK_LCONTROL], (BYTE)0) << "a fresh observation clears the poison";
+  EXPECT_FALSE(EffectivelyHeld(VK_LCONTROL)) << "and it was a release, so the key is up";
+
+  UpdateUserHeldFromRawKeyboard(&signal, VK_CONTROL, 0x1D, kRiKeyMake, 0);
+  EXPECT_TRUE(EffectivelyHeld(VK_LCONTROL)) << "and it is back in service";
+}
+
+/*
+  FR-104b. A displaced raw-input registration means the feed has been silently redirected, with no
+  error surfaced anywhere. The signal has no standing to speak about ANY key, so every one is
+  poisoned -- not the ones we happen to think are held, all of them.
+*/
+TEST_F(USER_HELD_FROM_RAW, ADisplacedRegistrationPoisonsEveryKey) {
+  UpdateUserHeldFromRawKeyboard(&signal, VK_CONTROL, 0x1D, kRiKeyMake, 0);
+  UpdateUserHeldFromRawKeyboard(&signal, VK_SHIFT, 0x2A, kRiKeyMake, 0);
+  ASSERT_TRUE(EffectivelyHeld(VK_LCONTROL));
+  ASSERT_TRUE(EffectivelyHeld(VK_LSHIFT));
+
+  PoisonAllUserHeldKeys(&signal);
+
+  for (int i = 0; i < (int)_countof(KeymanModifierVks); i++) {
+    const BYTE vk = KeymanModifierVks[i];
+    EXPECT_EQ(signal.unknown[vk], (BYTE)0x80)
+        << "managed slot " << (int)vk << " was left speakable-for after the feed was displaced. "
+        << "Every key, not only the ones currently claimed: a redirected feed can no longer observe "
+        << "a press either, so a key that is up now may be held before anything notices";
+    EXPECT_FALSE(EffectivelyHeld(vk));
   }
-
-  g_observedCount = 0;
-  g_probeHook     = SetWindowsHookEx(WH_KEYBOARD_LL, ProvenanceProbeHook, GetModuleHandle(NULL), 0);
-  ASSERT_NE(g_probeHook, (HHOOK)NULL) << "could not install the probe hook";
-
-  // The audited scenario itself: a generic VK, scan 0, exactly as a third party might inject it --
-  // not through do_keybd_event, which never emits a generic VK_SHIFT with scan 0 in the first place.
-  INPUT input;
-  memset(&input, 0, sizeof(input));
-  input.type     = INPUT_KEYBOARD;
-  input.ki.wVk   = VK_SHIFT;
-  input.ki.wScan = 0;
-  SendInput(1, &input, sizeof(INPUT));
-
-  PumpFor(400);
-
-  UnhookWindowsHookEx(g_probeHook);
-  g_probeHook = NULL;
-
-  const SHORT genericAsync = GetAsyncKeyState(VK_SHIFT);
-  const SHORT leftAsync    = GetAsyncKeyState(VK_LSHIFT);
-  const SHORT rightAsync   = GetAsyncKeyState(VK_RSHIFT);
-
-  printf("GENERIC VK PROBE  GetAsyncKeyState VK_SHIFT=0x%04X VK_LSHIFT=0x%04X VK_RSHIFT=0x%04X\n",
-         (unsigned short)genericAsync, (unsigned short)leftAsync, (unsigned short)rightAsync);
-
-  for (int i = 0; i < g_observedCount; i++) {
-    printf("GENERIC VK PROBE  hook saw vk=0x%02X scan=0x%02X extra=0x%08X flags=0x%02X\n",
-           (unsigned)g_observed[i].vkCode, (unsigned)g_observed[i].scanCode,
-           (unsigned)g_observed[i].dwExtraInfo, (unsigned)g_observed[i].flags);
-  }
-
-  // Release for real before asserting anything, so a failed assertion below does not leave the key
-  // asserted machine-wide.
-  keybd_event(VK_LSHIFT, 0, KEYEVENTF_KEYUP, 0);
-  Sleep(150);
-
-  if (g_observedCount == 0) {
-    // The capability check, same reasoning as DwExtraInfoSurvivesSendInputWhereTheScanCodeDoesNot's:
-    // this desktop is not routing keyboard messages to a hooked, pumped message queue. Already
-    // released above, so nothing is left asserted machine-wide.
-    GTEST_LOG_(WARNING) << "SKIPPED: the probe hook observed nothing. This test needs an "
-                        << "interactive input desktop that routes keyboard messages to a pumped, "
-                        << "hooked message queue.";
-    SUCCEED();
-    return;
-  }
-
-  // The claim CaptureLiveModifierState's comment rests on: the hook sees a chiral vkCode, not the
-  // generic 0x10, because Windows resolved chirality from MapVirtualKey(scan 0) before delivery.
-  EXPECT_NE(g_observed[0].vkCode, (DWORD)VK_SHIFT)
-      << "the hook saw the generic VK_SHIFT undivided; Windows did not re-chiralise it, which is "
-      << "the premise CaptureLiveModifierState's comment rests on";
-
-  // The claim this test exists to add: that GetAsyncKeyState for the chiral VK the hook observed
-  // agrees with the generic reading, so a live-state reader that only checks the six chiral VKs is
-  // not blind to this injection.
-  EXPECT_LT(genericAsync, (SHORT)0) << "GetAsyncKeyState(VK_SHIFT) did not see the injection at all; "
-                                    << "nothing here was measured";
-  EXPECT_TRUE(leftAsync < 0 || rightAsync < 0)
-      << "GetAsyncKeyState(VK_SHIFT) reports the key held, but neither chiral VK does -- "
-      << "CaptureLiveModifierState would miss this, and ReconcileModifierCache could erase a "
-      << "correctly-set cache byte for it. See the hardening sketched in CaptureLiveModifierState's "
-      << "comment if this ever fires";
-
-  EXPECT_GE(GetAsyncKeyState(VK_LSHIFT), 0) << "the probe left Left Shift asserted machine-wide";
-  EXPECT_GE(GetAsyncKeyState(VK_RSHIFT), 0) << "the probe left Right Shift asserted machine-wide";
 }
