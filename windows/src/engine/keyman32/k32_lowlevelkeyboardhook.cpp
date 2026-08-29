@@ -199,9 +199,34 @@ LRESULT _kmnLowLevelKeyboardProc(
   // press latched the OS and the two now agree. This post is above the pass-through check at the
   // end of this function on purpose, so that modifier state keeps being tracked when no Keyman
   // keyboard is active; the provenance test therefore has to happen here as well.
-  if (isModifierKey(hs->vkCode) && flag_ShouldSerializeInput &&
-      !IsKeymanInjectedKeyEvent(hs->scanCode, hs->dwExtraInfo)) {
-    PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+  if (isModifierKey(hs->vkCode)) {
+    // #8064 Trace the cache-feed decision, not every keystroke: 348b5980 removed the old
+    // unconditional per-keystroke trace as noise once the issue was believed resolved, but
+    // specs/003-8064-debug-log-adequacy/spec.md (R-6) finds the posting-side modifier trace is
+    // one of the few signals that actually helps diagnose a stuck modifier. It comes back here
+    // scoped to modifier keys only, and records what the old message didn't: whether the event
+    // was filtered as Keyman's own, and whether the post actually reached the server.
+    BOOL isKeymanInjected = IsKeymanInjectedKeyEvent(hs->scanCode, hs->dwExtraInfo);
+    if (flag_ShouldSerializeInput && !isKeymanInjected) {
+      // This post is not an eat -- processing continues below regardless of whether it succeeds --
+      // so a failed feed here does not destroy input. It does mean the cache can fall out of sync
+      // with what actually happened, which is the class of bug #8064 is, so we still guard against
+      // a NULL server window (GetWindow() can be NULL during server startup/shutdown; PostMessage
+      // to NULL does not fail, it silently misroutes the message to this thread's own queue) and
+      // log the outcome so a stale cache has a cause on record instead of being unexplained later.
+      ISerialKeyEventServer *server = ISerialKeyEventServer::GetServer();
+      HWND hwndServer = server ? server->GetWindow() : NULL;
+      if (hwndServer == NULL) {
+        SendDebugMessageFormat("Modifier cache feed skipped, no serializer window [vkCode:%x isUp:%d]", hs->vkCode, isUp);
+      } else if (!PostMessage(hwndServer, WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs))) {
+        SendDebugMessageFormat("Modifier cache feed failed [vkCode:%x isUp:%d] with error %d", hs->vkCode, isUp, GetLastError());
+      } else {
+        SendDebugMessageFormat("Modifier cache feed posted [vkCode:%x isUp:%d]", hs->vkCode, isUp);
+      }
+    } else {
+      SendDebugMessageFormat("Modifier cache feed skipped [vkCode:%x isUp:%d flag_ShouldSerializeInput:%d isKeymanInjected:%d]",
+        hs->vkCode, isUp, flag_ShouldSerializeInput, isKeymanInjected);
+    }
   }
 
   if(IsLanguageSwitchWindowVisible()) {
@@ -258,8 +283,26 @@ LRESULT _kmnLowLevelKeyboardProc(
 
       HWND hwnd = gui.hwndFocus ? gui.hwndFocus : gui.hwndActive;
       if (!IsConsoleWindow(hwnd)) {
-        PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_KEY_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
-        return_SendDebugExit(1);
+        // #8064 Only eat this event (return 1, so CallNextHookEx below is never reached) once the
+        // handoff to the serializer has actually succeeded. Eating unconditionally and trusting
+        // PostMessage destroys the user's real key event whenever the handoff fails -- a NULL
+        // server window during startup/shutdown, a full posted-message queue, or a stalled client
+        // holding KeymanEngine_KeyMutex while ProcessQueuedKeyEvents waits INFINITE on it -- and
+        // for a modifier KEYUP that loss is exactly how #8064 re-asserts: the OS keeps the earlier
+        // re-injected KEYDOWN latched, the cache still says down, cache and OS agree, and the
+        // clear-only reconcile can never see it again. Falling through to CallNextHookEx instead
+        // lets the event through natively: an unserialized keystroke is a far smaller defect than
+        // a destroyed one.
+        ISerialKeyEventServer *server = ISerialKeyEventServer::GetServer();
+        HWND hwndServer = server ? server->GetWindow() : NULL;
+        if (hwndServer == NULL) {
+          SendDebugMessageFormat("Key event not serialized, no serializer window [vkCode:%x isUp:%d]", hs->vkCode, isUp);
+        } else if (!PostMessage(hwndServer, WM_KEYMAN_KEY_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs))) {
+          SendDebugMessageFormat("Failed to post key event, passing through unserialized [vkCode:%x isUp:%d] with error %d",
+            hs->vkCode, isUp, GetLastError());
+        } else {
+          return_SendDebugExit(1);
+        }
       }
       //else SendDebugMessageFormat("console window, not serializing"); // too noisy
     }
