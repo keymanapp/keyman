@@ -1,0 +1,71 @@
+=== GH-8064 after this branch - measured 2026-08-29 ===
+
+The fix half. Pairs with evidence/baseline-shipped-build.txt, which is the same
+harness, same command, same machine, same session, same keyboard, logging off in
+both. Only the engine differs.
+
+--- what was installed ---
+
+  keyman32.dll   4,211,712 bytes  v19.0.277.0   Win32/Debug
+                 built from fix/windows/8064-stuck-modifier @ 23d083563f
+  keyman64.dll   shipped 19.0.276 Release, untouched
+
+keyman64.dll is deliberately not swapped. serialkeyeventserver.cpp is #ifndef _WIN64,
+so the 64-bit engine cannot exhibit this defect and has nothing to fix. Replacing it
+would be pure risk for no measurement: keyman64.dll is injected into every hooked
+64-bit process on the desktop.
+
+--- command ---
+
+Identical to the baseline run:
+
+  host32.exe --fakefreeze <fakefreeze.exe> --probe 1x2x3x --iterations 5 --wait-for-rule 30
+
+--- run ---
+
+  --- iteration 1 of 5 ---
+      freeze active: yes
+      modifier released (inside the stall)
+      typed "1x2x3x" -> got "1=OK 2=OK 3=OK "  transformed: yes
+      [ok] no modifier held
+  --- iteration 2 of 5 ---   ... identical ...   [ok] no modifier held
+  --- iteration 3 of 5 ---   ... identical ...   [ok] no modifier held
+  --- iteration 4 of 5 ---   ... identical ...   [ok] no modifier held
+  --- iteration 5 of 5 ---   ... identical ...   [ok] no modifier held
+
+  iterations 5   freeze confirmed 5   text transformed 5   stuck 0
+  RESULT: PASS - batches were assembled and no modifier stuck in any iteration.
+
+--- the pair ---
+
+  before   Keyman 19.0.276 Release      freeze 5/5   transformed 5/5   stuck 5/5   FAIL
+  after    branch 23d083563f Debug      freeze 5/5   transformed 5/5   stuck 0/5   PASS
+
+--- confounds, stated rather than hidden ---
+
+1. BUILD CONFIGURATION. The control is Release, the treatment is Debug. Not closed.
+
+   The mechanism argues it is not material. The stall is a deliberate 5000 ms sleep
+   with the modifier released 1500 ms into it. A Debug-versus-Release speed difference
+   is microseconds and cannot decide whether a KEYUP lands inside a five second window.
+
+
+   Closing it properly needs a --release build of this branch. That is currently
+   blocked: `build.sh --release build:x86` fails in the `core` dependency with
+   "Could not find vsdevcmd.bat". Recorded as unclosed rather than argued away.
+
+2. VERSION. 19.0.276 against 19.0.277. The whole engine difference is 23 lines --
+   capsstate.cpp +18, capsstate.h +1, aiTIP.cpp +3, kmhook_getmessage.cpp +6/-5 -- the
+   Caps Lock resync from PR #16423. Everything else that moved between those two
+   versions is insthelp and documentation.
+
+--- what this pair does and does not show ---
+
+Shows: on an unmodified released engine the defect reproduces on every iteration, and
+with this branch's engine it reproduces on none, under preconditions verified live in
+each iteration rather than assumed.
+
+Does not show: anything about the on-screen keyboard, which reaches the same symptom by
+a different producer and is tracked separately as #16462. Nor anything about the two
+producers this branch leaves UNMITIGATED -- see TRIAGE.md before assuming a stuck
+modifier reported after this ships is a regression.
