@@ -23,6 +23,17 @@
 #include "kbd.h"
 
 /**
+  The modifier virtual keys Keyman manages. Every modifier loop iterates this table, and
+  KEYMAN_MODIFIER_VK_COUNT derives MAX_KEYEVENT_INPUTS_MODIFIERS, so adding one is a single edit.
+
+  Not the low level hook's accepted-VK set: that is nine VKs (isModifierKey, guarded by
+  IsModifierKeyAcceptsExactlyNineVks) which collapse into these six. Do not unify them.
+*/
+const BYTE KeymanModifierVks[KEYMAN_MODIFIER_VK_COUNT] = {
+  VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT
+};
+
+/**
   do_keybd_event adds a keyboard event into the keyboard event queue.
 
   Parameters: pInputs  array of INPUT structures which we will fill with our key events.
@@ -130,18 +141,17 @@ void keybd_sendprefix(LPINPUT pInputs, int *n)
                        the initial modifier state for later restoration by keybd_shift_reset
 */
 void keybd_shift_release(LPINPUT pInputs, int *n, LPBYTE const kbd) {
-  const BYTE modifiers[6] = { VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT };
   BOOL hasSentPrefix = FALSE;
 
   SendDebugEntry();
-  for (int i = 0; i < _countof(modifiers); i++) {
-    if (kbd[modifiers[i]] & 0x80) {
+  for (int i = 0; i < _countof(KeymanModifierVks); i++) {
+    if (kbd[KeymanModifierVks[i]] & 0x80) {
       if (!hasSentPrefix) {
         keybd_sendprefix(pInputs, n);
         hasSentPrefix = TRUE;
       }
-      SendDebugMessageFormat("sending keyup vkey=%s", Debug_VirtualKey(modifiers[i]));
-      do_keybd_event(pInputs, n, modifiers[i], SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
+      SendDebugMessageFormat("sending keyup vkey=%s", Debug_VirtualKey(KeymanModifierVks[i]));
+      do_keybd_event(pInputs, n, KeymanModifierVks[i], SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
     }
   }
   SendDebugExit();
@@ -159,14 +169,13 @@ void keybd_shift_release(LPINPUT pInputs, int *n, LPBYTE const kbd) {
                        keybd_shift_release
 */
 void keybd_shift_reset(LPINPUT pInputs, int *n, LPBYTE const kbd) {
-  const BYTE modifiers[6] = { VK_LMENU, VK_RMENU, VK_LCONTROL, VK_RCONTROL, VK_LSHIFT, VK_RSHIFT };
   BOOL needsPrefix = FALSE;
 
   SendDebugEntry();
-  for (int i = 0; i < _countof(modifiers); i++) {
-    if (kbd[modifiers[i]] & 0x80) {
-      SendDebugMessageFormat("sending keydown vkey=%s", Debug_VirtualKey(modifiers[i]));
-      do_keybd_event(pInputs, n, modifiers[i], SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
+  for (int i = 0; i < _countof(KeymanModifierVks); i++) {
+    if (kbd[KeymanModifierVks[i]] & 0x80) {
+      SendDebugMessageFormat("sending keydown vkey=%s", Debug_VirtualKey(KeymanModifierVks[i]));
+      do_keybd_event(pInputs, n, KeymanModifierVks[i], SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
       needsPrefix = TRUE;
     }
   }
@@ -200,3 +209,38 @@ void keybd_shift(LPINPUT pInputs, int *n, BOOL isReset, LPBYTE const kbd) {
   }
 }
 
+
+/**
+  PrepareInjectedInputBatch assembles one injected batch into pInputs and returns the event count:
+  release half, output keys, restore half.
+
+  Parameters: pInputs              at least MAX_KEYEVENT_INPUTS INPUT structures
+              kbd                  the modifier cache (256 bytes)
+              pSharedData          the output keys to wrap; nInputs is clamped here
+
+  A free function so the gtest project can reach it; serialkeyeventserver.cpp is #ifndef _WIN64.
+  The output-key copy stops MAX_KEYEVENT_INPUTS_MODIFIERS short of the end so the restore half
+  fits: the worst case fills the buffer exactly, so an off-by-one is a heap overrun. See #8064.
+*/
+int PrepareInjectedInputBatch(
+  LPINPUT pInputs,
+  LPBYTE const kbd,
+  const SerialKeyEventSharedData *pSharedData) {
+  DWORD nInputs = min(pSharedData->nInputs, MAX_KEYEVENT_INPUTS);
+  int n         = 0;
+
+  keybd_shift(pInputs, &n, FALSE, kbd);
+
+  for (DWORD i = 0; i < nInputs && n < MAX_KEYEVENT_INPUTS - MAX_KEYEVENT_INPUTS_MODIFIERS; i++, n++) {
+    pInputs[n].type           = INPUT_KEYBOARD;
+    pInputs[n].ki.wVk         = pSharedData->inputs[i].wVk;
+    pInputs[n].ki.wScan       = pSharedData->inputs[i].wScan;
+    pInputs[n].ki.dwFlags     = pSharedData->inputs[i].dwFlags;
+    pInputs[n].ki.time        = pSharedData->inputs[i].time;
+    pInputs[n].ki.dwExtraInfo = (ULONG_PTR)pSharedData->inputs[i].extraInfo;
+  }
+
+  keybd_shift(pInputs, &n, TRUE, kbd);
+
+  return n;
+}

@@ -248,6 +248,9 @@ private:
   BOOL InitThread() {
     m_pInputs = new INPUT[MAX_KEYEVENT_INPUTS];
 
+    // This thread has no input queue yet, so GetKeyboardState looks like it should return nothing;
+    // it returns live state. See DISABLED_FreshThreadKeyboardStateReflectsLiveModifiers. A modifier
+    // held at launch is captured here and goes stale if released before the hook feed starts.
     GetKeyboardState(m_ModifierKeyboardState);
 
     WNDCLASS wndClass = { 0 };
@@ -382,21 +385,9 @@ private:
     events from the shared buffer
   */
   void PrepareInjectedInput() {
-    DWORD nInputs = min(m_pSharedData->nInputs, MAX_KEYEVENT_INPUTS);
-
-    m_nInputs = 0;
-    keybd_shift(m_pInputs, &m_nInputs, FALSE, m_ModifierKeyboardState);
-
-    for (DWORD i = 0; i < nInputs && m_nInputs < MAX_KEYEVENT_INPUTS - MAX_KEYEVENT_INPUTS_MODIFIERS; i++, m_nInputs++) {
-      m_pInputs[m_nInputs].type = INPUT_KEYBOARD;
-      m_pInputs[m_nInputs].ki.wVk = m_pSharedData->inputs[i].wVk;
-      m_pInputs[m_nInputs].ki.wScan = m_pSharedData->inputs[i].wScan;
-      m_pInputs[m_nInputs].ki.dwFlags = m_pSharedData->inputs[i].dwFlags;
-      m_pInputs[m_nInputs].ki.time = m_pSharedData->inputs[i].time;
-      m_pInputs[m_nInputs].ki.dwExtraInfo = (ULONG_PTR)m_pSharedData->inputs[i].extraInfo;
-    }
-
-    keybd_shift(m_pInputs, &m_nInputs, TRUE, m_ModifierKeyboardState);
+    // In keybd_shift.cpp so the gtest project can reach it; this file is #ifndef _WIN64 and this is
+    // a private member, so nothing here is testable. See #8064.
+    m_nInputs = PrepareInjectedInputBatch(m_pInputs, m_ModifierKeyboardState, m_pSharedData);
   }
 
   /**

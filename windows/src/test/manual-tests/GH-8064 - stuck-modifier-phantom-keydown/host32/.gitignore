@@ -1,0 +1,6 @@
+host32.exe
+rawinput-probe.exe
+*.obj
+*.pdb
+*.ilk
+typematic-probe.exe
