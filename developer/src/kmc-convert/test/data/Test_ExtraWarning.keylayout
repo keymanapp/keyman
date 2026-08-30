@@ -1,0 +1,76 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE keyboard SYSTEM "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">
+<!--
+
+	Data generated Tue Apr  9 09:35:00 2024
+
+	 In rare cases a rule might not be written out therefore we need to inform the user:
+     usually we write the first occurance of an ambiguous C0/C1 rule and comment out the later
+        assuming that if several C0/C1 rules are ambiguous the user prefers to use the first C0/C1 rule
+     for C2/C3 rules we write the last occurance of an ambiguous rule and comment out the earlier
+        assuming that if a C0/C1 and a C2/C3 rule is ambiguous the user prefers to use the C2/C3 rule over the C0/C1 rule
+     if both happens, nothing would be written, therefore this messsage
+
+-->
+<!--Last edited by Ukelele version 396 on 2024-10-16 at 11:19 (CEST)-->
+<keyboard group="126" id="-15248" name="Test_ExtraWarning" maxout="2">
+	<layouts>
+		<layout first="0" last="0" mapSet="2a4" modifiers="19c"/>
+	</layouts>
+	<modifierMap id="19c" defaultIndex="0">
+		<keyMapSelect mapIndex="0">
+			<modifier keys=""/>
+			<modifier keys="rightShift rightControl"/>
+		</keyMapSelect>
+		<keyMapSelect mapIndex="1">
+			<modifier keys="shift rightOption "/>
+		</keyMapSelect>
+		<keyMapSelect mapIndex="2">
+			<modifier keys="caps"/>
+		</keyMapSelect>
+		<keyMapSelect mapIndex="3">
+			<modifier keys="anyOption"/>
+			<modifier keys="rightShift option"/>
+		</keyMapSelect>
+		<keyMapSelect mapIndex="4">
+			<modifier keys="shift  option"/>
+		</keyMapSelect>
+	</modifierMap>
+		<keyMapSet id="2a4">
+		<keyMap index="0">
+			<key code="4" action="a2"/>
+		</keyMap>
+		<keyMap index="1">
+			<key code="4" action="a1"/>
+		</keyMap>
+		<keyMap index="2">
+			<key code="4" output="H"/>
+		</keyMap>
+		<keyMap index="3">
+			<key code="4" action="a3"/>
+		</keyMap>
+		<keyMap index="4">
+			<key code="4" action="a0"/>
+		</keyMap>
+		</keyMapSet>
+		<actions>
+		<action id="a0">
+			<when state="none" output="̱"/>
+		</action>
+		<action id="a1">
+			<when state="none" output="H"/>
+			<when state="16" output="H̱"/>
+		</action>
+		<action id="a2">
+			<when state="12" output="ḧ"/>
+		</action>
+		<action id="a3">
+			<when state="none" next="16"/>
+		</action>
+		</actions>
+	<terminators>
+		<when state="1" output="`"/>
+	</terminators>
+</keyboard>
+
+
