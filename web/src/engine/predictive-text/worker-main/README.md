@@ -17,10 +17,12 @@ Build
 Run `build.sh`. This will also automatically install dependencies with `npm`.
 
 ```sh
-./build.sh
+./build.sh configure build
 ```
 
 ### Two-stage compilation process
+
+TODO: this is well and truly out of date...
 
 Since the primary LMLayer code runs within a [Web Worker][], `build.sh` compiles the
 LMLayer in two stages:
@@ -43,19 +45,7 @@ This will run both headless unit tests, and in-browser unit tests and integratio
 tests:
 
 ```sh
-./build.sh -test
+./build.sh test
 ```
 
-### Test-Driven Development
-
-I like to use [entr]() to automatically build and re-run the unit tests anytime I
-change a source code file. Here's the command I run in separate window:
-
-```sh
-git ls-files | entr -c ./build.sh -tdd
-```
-
-Importantly, `./build.sh -tdd` skips running the in-browser tests, and skips
-downloading/updating `npm` dependencies.
-
-[entr]: http://eradman.com/entrproject/
+### TODO: epic/user-dict
