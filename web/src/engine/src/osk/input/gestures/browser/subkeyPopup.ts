@@ -3,12 +3,12 @@ import { type KeyElement } from '../../../keyElement.js';
 import { OSKBaseKey } from '../../../keyboard-layout/oskBaseKey.js';
 import { VisualKeyboard } from '../../../visualKeyboard.js';
 
-import { ActiveSubKey, KeyDistribution, ActiveKeyBase } from 'keyman/engine/keyboard';
+import { ActiveSubKey, KeyDistribution } from 'keyman/engine/keyboard';
 import { DeviceSpec } from 'keyman/common/web-utils';
 import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource, RecognitionZoneSource } from 'keyman/engine/gesture-processor';
 import { GestureHandler } from '../gestureHandler.js';
 import { CorrectionLayout, CorrectionLayoutEntry } from '../../../correctionLayout.js';
-import { distributionFromDistanceMaps, keyTouchDistances } from '../../../corrections.js';
+import { CorrectionDistanceMap, distributionFromDistanceMaps, keyTouchDistances } from '../../../corrections.js';
 import { GestureParams } from '../specsForLayout.js';
 
 /**
@@ -99,7 +99,7 @@ export class SubkeyPopup implements GestureHandler {
         keyEvent.keyDistribution = this.currentStageKeyDistribution();
 
         keyEvent.inputBreadcrumb = this.source.trace();
-        vkbd.raiseKeyEvent(keyEvent, key);
+        vkbd.raiseKeyEvent(keyEvent, key.key.spec, key);
       }
     });
 
@@ -505,7 +505,10 @@ export class SubkeyPopup implements GestureHandler {
     mappedCoord.y = mappedCoord.y < 0 ? 0 : (mappedCoord.y > 1 ? 1: mappedCoord.y);
 
     const rawSqDistances = keyTouchDistances(mappedCoord, this.buildCorrectiveLayout());
-    const currentKeyDist = rawSqDistances.get(lastCoord.item.key.spec);
+    const currentKey = rawSqDistances.get(lastCoord.item.key.spec.elementID);
+    if(!currentKey) {
+      console.error(`Could not find and prioritize subkey in its fat-finger distribution`);
+    }
 
     /*
      * - how long has the subkey menu been visible?
@@ -533,18 +536,15 @@ export class SubkeyPopup implements GestureHandler {
     // We only want to add a single distance 'dimension' - we'll choose the one that affects
     // the interpreted distance the least.  (This matters for upflick-shortcutting in particular)
     const layerDistance = Math.min(timeDistance * timeDistance, pathDistance * pathDistance);
-    const baseKeyDistance = currentKeyDist + layerDistance;
+    const baseKeyDistance = (currentKey?.distance ?? 0) + layerDistance;
 
     // Include the base key as a corrective option.
-    const baseKeyMap = new Map<ActiveKeyBase, number>();
+    const baseKeyMap: CorrectionDistanceMap = new Map();
     const subkeyMatch = this.subkeys.find((entry) => entry.keyId == this.baseKey.keyId);
-    if(subkeyMatch) {
-      // Ensure that the base key's entry can be merged with that of its subkey.
-      // (Assuming that always makes sense.)
-      baseKeyMap.set(subkeyMatch.key.spec, baseKeyDistance);
-    } else {
-      baseKeyMap.set(this.baseKey.key.spec, baseKeyDistance);
-    }
+
+    // Ensure the corrective distribution includes the base key, if applicable.
+    const keySpecToMap = subkeyMatch ? subkeyMatch.key.spec : this.baseKey.key.spec;
+    baseKeyMap.set(keySpecToMap.elementID, {keySpec: keySpecToMap, distance: baseKeyDistance});
 
     return distributionFromDistanceMaps([rawSqDistances, baseKeyMap]);
   }
