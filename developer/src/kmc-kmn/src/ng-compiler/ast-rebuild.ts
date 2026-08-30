@@ -3,7 +3,7 @@
  *
  * Created by Dr Mark C. Sinclair on 2025-12-03
  *
- * KMC KMN Next Generation Parser (ASTStrategy)
+ * KMC KMN Next Generation Parser (ASTRebuild)
  */
 
 import { NodeType } from "./node-type.js";
@@ -12,14 +12,14 @@ import { ASTNode } from "./tree-construction.js";
 /**
  * An abstract strategy for rebuilding an AST
  */
-export abstract class ASTStrategy {
+export abstract class ASTRebuild {
   public abstract apply(node: ASTNode): ASTNode;
 }
 
 /**
- * An ASTStrategy that rebuilds the tree to be rooted at the given node
+ * Rebuilds the tree to be rooted at the given node
  */
-export class GivenNode extends ASTStrategy {
+export class GivenNode extends ASTRebuild {
   public constructor(
     /** the type of the node at which to root the tree */
     protected readonly nodeType: NodeType
@@ -45,9 +45,9 @@ export class GivenNode extends ASTStrategy {
 }
 
 /**
- * An ASTStrategy that rebuilds the tree as given parent and child nodes
+ * Rebuilds the tree as given parent and child nodes
  */
-export class StackedPair extends ASTStrategy {
+export class StackedPair extends ASTRebuild {
   public constructor(
     /** the type of the node at which to root the tree */
     protected readonly parentType: NodeType,
@@ -77,9 +77,9 @@ export class StackedPair extends ASTStrategy {
 }
 
 /**
- * An ASTStrategy that rebuilds the tree to be rooted at a new node
+ * Rebuilds the tree to be rooted at a new node
  */
-export class NewNode extends ASTStrategy {
+export class NewNode extends ASTRebuild {
   public constructor(
     /** the type of the new node at which to root the tree */
     protected readonly nodeType: NodeType
@@ -102,10 +102,10 @@ export class NewNode extends ASTStrategy {
 }
 
 /**
- * An ASTStrategy that adds either a single new node or builds a tree rooted
- * at a new node, depending on the number of children found (one or more)
+ * Adds either a single new node or builds a tree rooted at a new node,
+ * depending on the number of children found (one or more)
  */
-export class NewNodeOrTree extends ASTStrategy {
+export class NewNodeOrTree extends ASTRebuild {
   public constructor(
     /** the type of the new node at which to root the tree */
     protected readonly nodeType: NodeType
@@ -134,9 +134,9 @@ export class NewNodeOrTree extends ASTStrategy {
 }
 
 /**
- * An ASTStrategy that rebuilds the tree to be rooted at the first node found
+ * Rebuilds the tree to be rooted at the first node found
  */
-export class FirstNode extends ASTStrategy {
+export class FirstNode extends ASTRebuild {
   /**
    * Rebuilds the tree to be rooted at the first node found
    * or leaves the tree unchanged if there are no children
@@ -149,6 +149,35 @@ export class FirstNode extends ASTStrategy {
       const firstNode: ASTNode = node.removeFirstChild();
       firstNode.addChildren(node.removeChildren());
       node.addChild(firstNode);
+    }
+    return node;
+  };
+}
+
+/**
+ * Replaces the sole child node with a new node
+ * of given type but retaining the same Token
+ */
+export class ChangeNode extends ASTRebuild {
+  public constructor(
+    /** the new node type */
+    protected readonly nodeType: NodeType
+  ) {
+    super();
+  }
+
+  /**
+   * Replaces the sole child node with a new node
+   * of given type but retaining the same Token
+   *
+   * @param node the tree to be rebuilt
+   * @returns the rebuilt tree
+   */
+  public apply(node: ASTNode): ASTNode {
+    if (node.hasSoleChild()) {
+      const oldNode    = node.removeSoleChild();
+      const changeNode = new ASTNode(this.nodeType, oldNode.token);
+      node.addChild(changeNode);
     }
     return node;
   };
