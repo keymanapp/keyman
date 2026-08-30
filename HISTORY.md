@@ -1,5 +1,101 @@
 # Keyman Version History
 
+## 19.0.276 alpha 2026-08-28
+
+* fix(windows): add manifest to insthelper and set trustinfo to asInvoker (#16430)
+* fix(windows): resync caps lock state when Keyman keyboard is activated (#16423)
+
+## 19.0.275 alpha 2026-08-27
+
+* docs(mac): refresh build/setup docs and remove APPSTORECONNECT_PROVIDER (#16432)
+* chore(mac): update setup document (#16415)
+* change(web): enhance missing-stubs error (#16437)
+
+## 19.0.274 alpha 2026-08-24
+
+* maint(windows): move to vs2026 arm runner for GHA (#16418)
+* chore(web): skip guide-examples.tests.ts until race is fixed (#16427)
+
+## 19.0.273 alpha 2026-08-22
+
+* feat(linux): use display language for keyboard search (#16393)
+
+## 19.0.272 alpha 2026-08-21
+
+* chore(mac): put coreutils on path on mac and improve docs (#16409)
+* docs(mac): add XCode version requirement (#16408)
+* fix(developer): clean kmc-convert build.sh with new publish patterns (#16412)
+* feat(developer): kmc convert follow-up tasks (#16420)
+* docs(android): document autocorrect toggle within Android help (#16405)
+* docs(ios): document autocorrect toggle within iOS help (#16406)
+
+## 19.0.271 alpha 2026-08-20
+
+* feat(ios): pass current display language to keyboard download (#16401)
+* epic: kmc-convert (#12191)
+* chore(deps): bump multer from 2.1.1 to 2.2.0 (#16109)
+* fix(developer): tighten touch layout file structural validity checks (#16347)
+* chore(deps): bump ws from 8.20.1 to 8.21.0 (#16104)
+* chore(deps): bump ip-address from 10.2.0 to 10.4.0 (#16301)
+* chore(deps): bump ip-address from 10.2.0 to 10.5.0 in /developer/src/server/src/win32/trayicon/addon-src (#16302)
+* chore(deps): bump fast-uri from 3.1.2 to 3.1.5 (#16309)
+* chore: refresh package-lock.json after dependabot merges (#16410)
+
+## 19.0.270 alpha 2026-08-19
+
+* fix(windows): support .png format icon in tray icon (#16362)
+* fix(windows): handle font and package .zip format errors during package installation (#16363)
+* chore(deps-dev): bump form-data from 4.0.4 to 4.0.6 (#16103)
+* chore(deps-dev): bump js-yaml from 4.1.1 to 4.3.0 in /resources/build/pr-build-status (#16240)
+* epic: autocorrect (#12893)
+* change(android): enable autocorrect by default (#16403)
+
+## 19.0.269 alpha 2026-08-18
+
+* chore(deps): bump body-parser from 1.20.5 to 1.20.6 (#16275)
+* maint(android): update FV Android Target API to 36 (#16355)
+* fix(web): cancel gestures on relayouts and context resets (#16384)
+
+## 19.0.268 alpha 2026-08-17
+
+* feat(windows): pass UI language to keyboard download page (#16364)
+* fix(developer): mark touch layout file as modified after applying template (#16370)
+* chore(resources): update langtags to 2026-06-09, iso639-3 to current, language-subtag-registry to 2026-08-08, cleanup and add download scripts (#16371)
+* chore(common): disable strictNullChecks for TypeScript for now (#16387)
+
+## 19.0.267 alpha 2026-08-14
+
+* chore(common): add missing history (#16369)
+* chore(windows): remove junk files from kmshell (#16365)
+* fix(windows): release shift key on OSK when user releases physical right shift (#16361)
+* fix(web): adjust sourcemap linking pattern used for error reporting within mobile apps (#16368)
+* chore(android,ios): Update Crowdin strings for Spanish - Latin America (#16358)
+
+## 19.0.266 alpha 2026-08-13
+
+* chore(deps-dev): bump esbuild from 0.25.0 to 0.28.1 (#16095)
+* feat(web): add `keyman.versionInfo` API (#16351)
+* fix(web): cleanup `loaduserinterface` and `unloaduserinterface` events (#16353)
+* docs(web): deprecate unused and obsolete API endpoints and docs cleanup (#16354)
+* chore(common): cleanup and merge Preprocessor constants (#14360)
+
+## 19.0.265 alpha 2026-08-12
+
+* fix(core): make coherence check a debug assert (#16343)
+* feat(windows): honour Windows "metered connection" flag for downloading updates (#16099)
+
+## 19.0.264 alpha 2026-08-11
+
+* docs(android): update keyboardharness readme (#16220)
+* feat(android): design improvement for settings, add dark mode and tool menu (#15827)
+
+## 19.0.263 alpha 2026-08-10
+
+* chore(deps): bump tar from 7.5.11 to 7.5.22 in /developer/src/server/src/win32/trayicon/addon-src (#16282)
+* chore(deps): bump brace-expansion from 5.0.6 to 5.0.9 in /developer/src/server/src/win32/trayicon/addon-src (#16295)
+* refactor(web): improve naming of `_SetTargetDir` function (#16311)
+* docs(web): add language identifier to the code blocks of event docs (#16333)
+
 ## 19.0.262 alpha 2026-08-04
 
 * chore(web): fire `keyboardloaded` event only once per keyboard (#16297)

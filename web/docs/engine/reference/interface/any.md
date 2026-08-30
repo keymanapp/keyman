@@ -8,13 +8,13 @@ title: any (KA) (Deprecated)
 
 ## Syntax
 
-```c
+```js
 keyman.interface.any(index, ch, storeText);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KA(index, ch, storeText); // Shorthand
 ```
 
@@ -51,7 +51,7 @@ facilitates mapping the characters `'abcde'` to their respective entry in the ou
 
 In order to check if the character `'a'` has a match in the `keys` store above, the code
 
-```c
+```js
 keyman.interface.any(0, 'a', 'abcde')
 ```
 

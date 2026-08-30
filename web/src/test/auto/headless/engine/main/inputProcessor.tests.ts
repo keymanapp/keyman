@@ -12,7 +12,7 @@ import { DeviceSpec, KMWString } from 'keyman/common/web-utils';
 
 import { InputProcessor } from 'keyman/engine/main';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
-import { ActiveKey, DefaultOutputRules, JSKeyboard, KeyEvent, KeyEventSpec, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { DefaultOutputRules, JSKeyboard, KeyDistribution, KeyEvent, KeyEventSpec, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { PredictionContext } from 'keyman/engine/interfaces';
 import { DEFAULT_PROCESSOR_INIT_OPTIONS, NodeKeyboardLoader } from 'keyman/test/resources';
 import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
@@ -100,7 +100,7 @@ describe('InputProcessor', function() {
   });
 
   describe('efficiency tests', function() {
-    let testDistribution: {keySpec: ActiveKey, p: number}[] = [];
+    let testDistribution: KeyDistribution = [];
     let keyboardWithHarness: JSKeyboardInterface;
 
     let mainWebScriptURL = require.resolve('@keymanapp/lm-worker/worker-main.wrapped.js');
@@ -127,6 +127,7 @@ describe('InputProcessor', function() {
       for(let keySpec of layout) {
         testDistribution.push({
           keySpec,
+          elementID: keySpec.elementID,
           p: 1 / 26
         });
       }
