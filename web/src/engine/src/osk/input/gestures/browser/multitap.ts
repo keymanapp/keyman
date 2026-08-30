@@ -1,10 +1,10 @@
 import { type KeyElement } from '../../../keyElement.js';
 import { VisualKeyboard } from '../../../visualKeyboard.js';
 
-import { ActiveSubKey, ActiveKey, KeyDistribution, ActiveKeyBase } from 'keyman/engine/keyboard';
+import { ActiveSubKey, ActiveKey, KeyDistribution } from 'keyman/engine/keyboard';
 import { GestureSequence, GestureStageReport } from 'keyman/engine/gesture-processor';
 import { GestureHandler } from '../gestureHandler.js';
-import { distributionFromDistanceMaps } from '../../../corrections.js';
+import { CorrectionDistanceMap, distributionFromDistanceMaps } from '../../../corrections.js';
 import { Modipress } from './modipress.js';
 import { keySupportsModipress } from '../specsForLayout.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
@@ -125,12 +125,12 @@ export class Multitap implements GestureHandler {
         if(correctionKeyFilter(matchKey.key.spec)) {
           // Replace the key at the current location for the current layer key
           // with the multitap base key.
-          const p = baseDistances.get(matchKey.key.spec);
+          const p = baseDistances.get(matchKey.key.spec.elementID);
           if(p == null) {
             console.warn(`Could not find fat-finger probability for current layer's key:  current key = ${matchKey.key.spec.elementID}, current layer = ${vkbd.layerId}, keyboard = ${this.keyboardId}`);
           } else {
-            baseDistances.delete(matchKey.key.spec);
-            baseDistances.set(coord.item.key.spec, p);
+            baseDistances.delete(matchKey.key.spec.elementID);
+            baseDistances.set(coord.item.key.spec.elementID, p);
           }
         }
       }
@@ -148,7 +148,7 @@ export class Multitap implements GestureHandler {
       keyEvent.kNextLayer ||= this.originalLayer;
 
       keyEvent.inputBreadcrumb = this.sequence.trace();
-      vkbd.raiseKeyEvent(keyEvent, null);
+      vkbd.raiseKeyEvent(keyEvent, selection, null);
 
       // Now that the key has been processed, with a layer possibly changed as a result...
       if(tap.matchedId == 'modipress-multitap-start') {
@@ -177,7 +177,7 @@ export class Multitap implements GestureHandler {
      */
   }
 
-  currentStageKeyDistribution(baseDistances: Map<ActiveKeyBase, number>): KeyDistribution {
+  currentStageKeyDistribution(baseDistances: CorrectionDistanceMap): KeyDistribution {
     /* Concept:  use the base distance map - what if the tap was meant for elsewhere?
      * That said, given the base key's probability... modify that by a 'tap distance' metric,
      * where the probability of all taps in the multitap rota sum up to the base key's original
@@ -185,7 +185,7 @@ export class Multitap implements GestureHandler {
      */
 
     const baseDistribution = distributionFromDistanceMaps(baseDistances);
-    const keyIndex = baseDistribution.findIndex((entry) => entry.keySpec == this.baseKey.key.spec);
+    const keyIndex = baseDistribution.findIndex((entry) => entry.elementID == this.baseKey.key.spec.elementID);
 
     if(keyIndex == -1) { // also covers undefined, but does not include 0.
       // Modipress keys generally get left out of the key-correction calculations.
@@ -200,7 +200,7 @@ export class Multitap implements GestureHandler {
     const baseProb = baseDistribution.splice(keyIndex, 1)[0].p;
 
     let totalWeight = 0;
-    const multitapEntries: {keySpec: ActiveKeyBase, p: number}[] = [];
+    const multitapEntries: KeyDistribution = [];
     for(let i = 0; i < this.multitaps.length; i++) {
       const key = this.multitaps[i];
       // 'standard distance', no real modular effects needed.
@@ -218,6 +218,7 @@ export class Multitap implements GestureHandler {
       const keyWeight = 1.0 / ((1 + modularLinDist) * (1 + modularLinDist));
       totalWeight += keyWeight;
       multitapEntries.push({
+        elementID: key.elementID,
         keySpec: key,
         p: keyWeight
       });

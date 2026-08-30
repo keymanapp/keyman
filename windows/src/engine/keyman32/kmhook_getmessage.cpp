@@ -418,11 +418,7 @@ ProcessWMKeymanControl(WPARAM wParam, LPARAM lParam) {
 void GetCapsAndNumlockState() {   // I4793
   DWORD n = Globals::get_ShiftState();
 
-  if(GetKeyState(VK_NUMLOCK) & 1) *Globals::ShiftState() |= NUMLOCKFLAG;
-  else *Globals::ShiftState() &= ~NUMLOCKFLAG;
-
-  if(GetKeyState(VK_CAPITAL) & 1) *Globals::ShiftState() |= CAPITALFLAG;
-  else *Globals::ShiftState() &= ~CAPITALFLAG;
+  RefreshToggleState();
 
   if(GetKeyState(VK_SHIFT) < 0) *Globals::ShiftState() |= K_SHIFTFLAG;
   else *Globals::ShiftState() &= ~K_SHIFTFLAG;

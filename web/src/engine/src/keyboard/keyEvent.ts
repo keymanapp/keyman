@@ -10,12 +10,12 @@ import { type DeviceSpec } from "keyman/common/web-utils";
 
 import { Codes } from './codes.js';
 import { DefaultOutputRules } from "./defaultOutputRules.js";
-import { ActiveKeyBase } from './keyboards/activeLayout.js';
 import { type Keyboard } from "./keyboards/keyboard.js";
+import { ActiveKeyBase } from "./keyboards/activeLayout.js";
 
 // Represents a probability distribution over a keyboard's keys.
 // Defined here to avoid compilation issues.
-export type KeyDistribution = { keySpec: ActiveKeyBase, p: number }[];
+export type KeyDistribution = { elementID: string, keySpec: ActiveKeyBase, p: number }[];
 
 /**
  * A simple instance of the standard 'default rules' for keystroke processing from the
