@@ -4,4 +4,5 @@ export {
 } from "./common.js";
 export { QuoteBehavior } from "./quote-behavior.js";
 export { getLastPreCaretToken, Token, Tokenization, tokenize, wordbreak } from "./tokenization.js";
+export { Trie } from "./trie.js";
 export { TrieModel, TrieModelOptions } from "./trie-model.js";
