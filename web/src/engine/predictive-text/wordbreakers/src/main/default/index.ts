@@ -64,6 +64,16 @@ export function default_(text: string, options?: DefaultWordBreakerOptions): Lex
   return spans;
 }
 
+// Exposes `searchForProperty` for external use while associating it with this wordbreaker.
+const def = Object.assign(default_, {
+  /**
+   * This method returns enum values corresponding to the character type as perceived by the wordbreaking algorithm.
+   */
+  searchForProperty: searchForProperty
+});
+
+export default def;
+
 /**
  * A span that does not cut out the substring until it absolutely has to!
  */

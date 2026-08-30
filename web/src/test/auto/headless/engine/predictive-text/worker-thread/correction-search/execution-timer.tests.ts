@@ -1,9 +1,7 @@
 import { assert } from 'chai';
 import { useFakeTimers, type SinonFakeTimers } from 'sinon';
 
-import { correction } from '@keymanapp/lm-worker/test-index';
-import ExecutionBucket = correction.ExecutionBucket;
-import ExecutionTimer = correction.ExecutionTimer;
+import { ExecutionBucket, ExecutionTimer } from '@keymanapp/lm-worker/test-index'
 
 describe('ExecutionTimer', () => {
   let timeControl: SinonFakeTimers;
