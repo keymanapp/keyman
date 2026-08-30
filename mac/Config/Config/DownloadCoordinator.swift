@@ -4,7 +4,7 @@
  * Created by Shawn Schantz on 2026-08-21
  *
  * For coordination between WKWebview and SwiftUI views.
- * Implements WKNavigationDelegate and WKDownloadDelegate to trigger downloads
+ * Implements WKNavigationDelegate and WKDownloadDelegate to support downloads
  * of Keyman packages and publishes several fields to allow SwiftUI views to
  * - display download progress
  * - display errors that cause the download or package validation to fail
@@ -35,7 +35,12 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   var settings: SettingsContainer?
   private var progressObserver: NSKeyValueObservation?
   private var activeDownload: WKDownload?
-  
+
+  // Swift regex literals, introduced in macOS 13+ and using instead of NSRegularExpression
+  private static let regexInstall = /^http(s)?:\/\/keyman(-staging)?\.com(\.localhost)?\/keyboards\/install\/([^?\/]+)(\?(.+))?$/
+  private static let regexRoot    = /^http(s)?:\/\/keyman(-staging)?\.com(\.localhost)?\/keyboards([\/?].*)?$/
+  private static let regexGo      = /^http(s)?:\/\/keyman(-staging)?\.com(\.localhost)?\/go\/macos\/[^\/]+\/download-keyboards/
+
   public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
                       decisionHandler: @escaping @MainActor (WKNavigationActionPolicy) -> Void) {
     
@@ -44,21 +49,19 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
       return
     }
     Logger.download.info("received url: \(urlString, privacy: .public)")
-
-    // modern Swift regex literals (Requires macOS 13+ / iOS 16+)
-    let regexInstall = /^http(s)?:\/\/keyman(-staging)?\.com(\.localhost)?\/keyboards\/install\/([^?\/]+)(\?(.+))?$/
-    let regexRoot    = /^http(s)?:\/\/keyman(-staging)?\.com(\.localhost)?\/keyboards([\/?].*)?$/
-    let regexGo      = /^http(s)?:\/\/keyman(-staging)?\.com(\.localhost)?\/go\/macos\/[^\/]+\/download-keyboards/
     
     if navigationAction.shouldPerformDownload {
-      print("webView called decisionHandler for download")
+      Logger.download.info("webView called decisionHandler for download")
       decisionHandler(.download)
       return
     }
     
-    if let match = try? regexInstall.firstMatch(in: urlString) {
+    // if the url matches the install url pattern, then cancel the request,
+    // build the standard URLRequest for a package installation and send it
+    if let match = try? DownloadCoordinator.regexInstall.firstMatch(in: urlString) {
       decisionHandler(.cancel)
       
+      // get the package id (though it appears to be identifying a keyboard in the URL)
       let matchPackageId = String(match.4)
       if let downloadUrl = self.settings?.buildDownloadPackageUrl(for: matchPackageId) {
         Logger.download.info("package install, download url = \(downloadUrl.absoluteString, privacy: .public)")
@@ -67,15 +70,16 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
         
         DispatchQueue.main.async {
           webView.startDownload(using: newRequest) { download in
-            print("download initiated to \(newRequest.url?.absoluteString ?? "nil")")
+            Logger.download.info("download initiated to \(newRequest.url?.absoluteString ?? "nil", privacy: .public)")
             download.delegate = self
             self.setupDownloadTracking(download)
           }
         }
       }
     }
-    else if urlString.contains(regexRoot) || urlString.contains(regexGo) {
-      Logger.download.info("root or go url, .allow")
+    else if urlString.contains(DownloadCoordinator.regexRoot) ||
+              urlString.contains(DownloadCoordinator.regexGo) {
+      Logger.download.info("requested root or go url: load in webview")
 
       decisionHandler(.allow)
     }
@@ -140,10 +144,10 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   }
   
   public func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String, completionHandler: @escaping @MainActor @Sendable (URL?) -> Void) {
-    print("download initiated")
+    Logger.download.debug("download initiated")
     
     guard let keymanSettings = self.settings else {
-      print("tried to access settings before they were intialized in updateNSView")
+      Logger.download.error("tried to access settings before they were intialized")
       self.loadPackageFailed = true
       self.loadFailureMessage = InstallPackageError.internalError.localizedDescription
       completionHandler(nil)
@@ -155,7 +159,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     
     do {
       if let helper = try keymanSettings.initiateKmpFileDownload(kmpFilename: suggestedFilename) {
-        print("download suggested filename: \(suggestedFilename)")
+        Logger.download.info("download suggested filename: \(suggestedFilename), privacy: .public")
         self.loadFailureMessage = nil // Reset previous error
         self.loadPackageFailed = false
         
@@ -164,7 +168,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
         completionHandler(helper.temporaryKmpFileLocation)
       }
     } catch {
-      print("Could not initiate package download, error: \(error)")
+      Logger.download.error("could not initiate package download, error: \(String(describing: error), privacy: .public)")
       self.loadPackageFailed = true
       self.loadFailureMessage = error.localizedDescription
       completionHandler(nil)
@@ -176,7 +180,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     self.progressObserver = nil
     
     if let downloadDestination = installHelper?.temporaryKmpFileLocation {
-      print("Download of \(downloadDestination.path()) was successful.")
+      Logger.download.info("download of \(downloadDestination.path, privacy: .public) was successful.")
       if let settings {
         do {
           try settings.packageDownloadComplete(kmpFileUrl: downloadDestination)
@@ -191,7 +195,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   }
   
   public func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
-    print("Download failed with error: \(error.localizedDescription)")
+    Logger.download.error("download failed with error: \(String(describing: error), privacy: .public)")
     self.isDownloading = false
     self.progressObserver = nil
     self.loadPackageFailed = true
@@ -203,8 +207,8 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   }
   
   public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-    // The web process crashed. Reload the webview safely here.
-    print("WebKit process terminated unexpectedly: reloading content...")
+    // The web process crashed. Reload the webview safely.
+    Logger.download.error("webkit process terminated unexpectedly: reloading content")
     webView.reload()
   }
 }

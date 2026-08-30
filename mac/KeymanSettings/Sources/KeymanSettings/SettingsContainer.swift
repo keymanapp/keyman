@@ -104,13 +104,34 @@ public class SettingsContainer : ObservableObject {
   // not indicated in the Config app but this could change
   fileprivate var selectedKeyboard: String
   
-  private let keyboardSearchPrefix = "https://keyman.com/go/macos/14.0/download-keyboards/?version="
-  
+  private let keyboardSearchPrefix = "https://keyman.com/go/macos/14.0/download-keyboards"
+
   public var keyboardSearchUrl: URL {
-    let currentVersion = ConfigAppUtil.configAppVersion()
-    let searchString: String = keyboardSearchPrefix + currentVersion
-    let searchUrl = URL(string: searchString)!
+    var searchUrl = URL(string: keyboardSearchPrefix)!
+    
+    if let languageString = self.getPreferredLangauge() {
+      let languageQueryItem = URLQueryItem(name:"lang", value: languageString)
+      searchUrl.append(queryItems:[languageQueryItem])
+    }
+    print("full searchUrl: \(searchUrl.absoluteString)")
     return searchUrl
+  }
+  
+  /**
+   * returns the preferred language based on the user's preferences set in System Settings
+   */
+  private func getPreferredLangauge() -> String? {
+    // returns an array of language identifiers ordered by the user's preference
+    // this is independent of what the languages the app actually supports
+    let systemLanguages = Locale.preferredLanguages
+
+    var primaryLanguage: String?
+    if let language = systemLanguages.first {
+      primaryLanguage = language
+      print("primary system language: \(String(describing: primaryLanguage))")
+    }
+
+      return primaryLanguage
   }
   
   public init() {
@@ -209,7 +230,7 @@ public class SettingsContainer : ObservableObject {
    *  Build the URL necessary to download the specified package from the Keyman website
    */
   public func buildDownloadPackageUrl(for packageId: String) -> URL? {
-    let urlString = "https://keyman.com/go/package/download/\(packageId)?platform=macos&tier=\(ConfigAppUtil.configAppTier())"
+    let urlString = "https://keyman.com/go/package/download/\(packageId)?platform=macos&tier=\(ConfigAppUtil.appTier)"
     
     guard let downloadPackageUrl = URL(string: urlString) else {
       return nil
