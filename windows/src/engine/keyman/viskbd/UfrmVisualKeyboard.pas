@@ -621,6 +621,11 @@ procedure TfrmVisualKeyboard.FormDestroy(Sender: TObject);
 begin
   SaveSettings;
 
+  // #8064: FormClose alone is not enough. Release and FreeAndNil, which is how every path except
+  // the OSK's own X button dismisses it, run OnDestroy and never OnClose. Idempotent, so the
+  // X-button path reaching it twice is harmless.
+  ResetShiftStates;
+
   FreeAndNil(FOnScreenKeyboard);
   FreeAndNil(FCharacterMap);
   FreeAndNil(FEntryHelper);
