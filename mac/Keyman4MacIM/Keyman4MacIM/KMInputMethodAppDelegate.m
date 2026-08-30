@@ -28,6 +28,10 @@ NSString *processorType = @"Intel";
 NSString *processorType = @"Unknown";
 #endif
 
+// distributed notifications
+NSString *const kKeyboardsChanged = @"com.keyman.keyboards.changed";
+
+// in-app notifications
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
 @implementation NSString (VersionNumbers)
@@ -69,7 +73,7 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @synthesize keyboardsPath = _keyboardsPath;
 @synthesize kmxFileList = _kmxFileList;
 @synthesize selectedKeyboard = _selectedKeyboard;
-@synthesize activeKeyboards = _activeKeyboards;
+@synthesize enabledKeyboards = _enabledKeyboards;
 @synthesize contextBuffer = _contextBuffer;
 
 id _lastServerWithOSKShowing = nil;
@@ -125,8 +129,20 @@ id _lastServerWithOSKShowing = nil;
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodDeactivated:) name:kInputMethodDeactivatedNotification object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodChangedClient:) name:kInputMethodClientChangeNotification object:nil];
 
+  // register to receive notifications generated from Keyman Configuration App
+  [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardsChanged:) name:kKeyboardsChanged object:nil];
+
   // start Input Method lifecycle
   [KMInputMethodLifecycle.shared startLifecycle];
+}
+
+
+/**
+ * When packages have been installed, removed, enabled or disabled -- notification from the Keyman Configuration app
+ */
+- (void)handleKeyboardsChanged:(NSNotification *)notification {
+  os_log_debug([KMLogs configLog], "***KMInputMethodAppDelegate handleKeyboardsChanged");
+  [self reloadEnabledKeyboards];
 }
 
 /**
@@ -509,7 +525,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  */
 - (NSString *)keyboardsPath {
   if (_keyboardsPath == nil) {
-    _keyboardsPath = [KMDataRepository shared].keymanKeyboardsDirectory.path;
+    _keyboardsPath = [KMDataRepository shared].keyman19KeyboardsDirectory.path;
   }
   
   return _keyboardsPath;
@@ -666,62 +682,80 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   _selectedKeyboard = selectedKeyboard;
 }
 
-- (NSMutableArray *)activeKeyboards {
-  if (!_activeKeyboards) {
-    os_log_debug([KMLogs dataLog], "initializing activeKeyboards");
-    _activeKeyboards = [[KMSettingsRepository.shared readActiveKeyboards] mutableCopy];
+- (NSMutableArray *)enabledKeyboards {
+  if (!_enabledKeyboards) {
+    os_log_debug([KMLogs dataLog], "initializing enabledKeyboards");
+    _enabledKeyboards = [[KMSettingsRepository.shared readEnabledKeyboards] mutableCopy];
     
-    [KMSentryHelper addActiveKeyboardCountTag:_activeKeyboards.count];
+    [KMSentryHelper addEnabledKeyboardCountTag:_enabledKeyboards.count];
   }
 
-  return _activeKeyboards;
+  return _enabledKeyboards;
 }
 
-- (void)saveActiveKeyboards {
-  os_log_debug([KMLogs dataLog], "saveActiveKeyboards");
-  [KMSettingsRepository.shared writeActiveKeyboards:_activeKeyboards];
-  [self resetActiveKeyboards];
+/**
+ * Called when the enabled keyboards have been changed by the Keyman Config app.
+ * Reload the enabled keyboards from the UserDefaults
+ * Then update the Keyman menu
+ */
+- (void)reloadEnabledKeyboards {
+  os_log_debug([KMLogs configLog], "reloadEnabledKeyboards");
+  
+  // read the enabled keyboards from UserDefaults
+  _enabledKeyboards = [[KMSettingsRepository.shared readEnabledKeyboards] mutableCopy];
+  
+  // set Sentry tag for how many keyboards are enabled
+  [KMSentryHelper addEnabledKeyboardCountTag:_enabledKeyboards.count];
+  
+  // update the keyboard menu to reflect the updated list of enabled keyboards
   [self updateKeyboardMenuItems];
-  [KMSentryHelper addActiveKeyboardCountTag:self.activeKeyboards.count];
 }
 
-- (void)clearActiveKeyboards {
-  [KMSettingsRepository.shared clearActiveKeyboards];
+- (void)saveEnabledKeyboards {
+  os_log_debug([KMLogs dataLog], "saveEnabledKeyboards");
+  [KMSettingsRepository.shared writeEnabledKeyboards:_enabledKeyboards];
+  [self resetEnabledKeyboards];
+  [self updateKeyboardMenuItems];
+  [KMSentryHelper addEnabledKeyboardCountTag:self.enabledKeyboards.count];
+}
+
+- (void)clearEnabledKeyboards {
+  [KMSettingsRepository.shared clearEnabledKeyboards];
   [self updateKeyboardMenuItems];
 }
 
-- (void)addActiveKeyboard:(NSString *) partialPath {
-  if (![self.activeKeyboards containsObject:partialPath]) {
+- (void)addEnabledKeyboard:(NSString *) partialPath {
+  if (![self.enabledKeyboards containsObject:partialPath]) {
     os_log_debug([KMLogs keyboardLog], "addActiveKeyboard, adding '%{public}@' to list of active keyboards: ", partialPath);
-    [self.activeKeyboards addObject:partialPath];
+    [self.enabledKeyboards addObject:partialPath];
   }
 }
 
-- (void)resetActiveKeyboards {
+- (void)resetEnabledKeyboards {
   // Remove entries with missing files
   NSMutableArray *pathsToRemove = [[NSMutableArray alloc] initWithCapacity:0];
-  for (NSString *path in self.activeKeyboards) {
+  for (NSString *path in self.enabledKeyboards) {
     NSString *fullPath = [KMDataRepository.shared buildFullPath:path];
-    os_log_debug([KMLogs dataLog], "resetActiveKeyboards, checking fullPath: '%{public}@' for path: '%{public}@'", fullPath, path);
+    os_log_debug([KMLogs dataLog], "resetEnabledKeyboards, checking fullPath: '%{public}@' for path: '%{public}@'", fullPath, path);
     if (![[NSFileManager defaultManager] fileExistsAtPath:fullPath]) {
-      os_log_debug([KMLogs dataLog], "resetActiveKeyboards, need to remove non-existent path: %{public}@", fullPath);
+      os_log_debug([KMLogs dataLog], "resetEnabledKeyboards, need to remove non-existent path: %{public}@", fullPath);
       [pathsToRemove addObject:path];
     }
   }
   
   BOOL found = FALSE;
   if (pathsToRemove.count > 0) {
-    [self.activeKeyboards removeObjectsInArray:pathsToRemove];
+    [self.enabledKeyboards removeObjectsInArray:pathsToRemove];
     found = TRUE;
   }
   
   // Remove duplicate entries
   NSUInteger i = 0;
-  while(i < [self.activeKeyboards count]) {
-    NSString *item = self.activeKeyboards[i];
-    NSUInteger n = [self.activeKeyboards indexOfObject:item inRange: NSMakeRange(i+1, [self.activeKeyboards count]-i-1)];
+  while(i < [self.enabledKeyboards count]) {
+    NSString *item = self.enabledKeyboards[i];
+    NSUInteger n = [self.enabledKeyboards indexOfObject:item inRange: NSMakeRange(i+1, [self.enabledKeyboards count]-i-1)];
     if(n != NSNotFound) {
-      [self.activeKeyboards removeObjectAtIndex:n];
+      [self.enabledKeyboards removeObjectAtIndex:n];
       found = TRUE;
     } else {
       i++;
@@ -729,7 +763,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   }
   
   if (found) {
-    [KMSettingsRepository.shared writeActiveKeyboards:_activeKeyboards];
+    [KMSettingsRepository.shared writeEnabledKeyboards:_enabledKeyboards];
   }
 }
 
@@ -754,15 +788,30 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  * namely, the keyboard data on disk and the settings in UserDefaults
  */
 - (void)prepareStorage {
-  [KMDataRepository.shared createDataDirectoryIfNecessary];
-  
-  if ([KMSettingsRepository.shared dataMigrationNeeded]) {
-    [KMDataRepository.shared migrateData];
-    [KMSettingsRepository.shared convertSettingsForMigration];
+  SettingsState state = [KMSettingsRepository.shared determineSettingsState];
+
+  switch (state) {
+    case KeymanSettingsVersion17:
+      os_log_info([KMLogs dataLog], "prepareStorage, migration needed for Keyman 17 to current");
+      [KMDataRepository.shared createSharedDirectoriesIfNecessary];
+      [KMDataRepository.shared migrateDataFromKeyman17];
+      [KMSettingsRepository.shared migrateSettingsFromKeyman17];
+      break;
+    case KeymanSettingsVersion18:
+      os_log_info([KMLogs dataLog], "prepareStorage, migration needed for Keyman 18 to current");
+      [KMDataRepository.shared createSharedDirectoriesIfNecessary];
+      [KMDataRepository.shared migrateDataFromKeyman18];
+      [KMSettingsRepository.shared migrateSettingsFromKeyman18];
+      break;
+    case KeymanSettingsNotFound:
+      os_log_info([KMLogs dataLog], "prepareStorage, settings not found, create them");
+      [KMDataRepository.shared createSharedDirectoriesIfNecessary];
+      [KMSettingsRepository.shared createSharedSettingsIfNecessary];
+      break;
+    case KeymanSettingsVersionCurrent:
+      os_log_info([KMLogs dataLog], "prepareStorage: settings are current, no migration needed");
+      break;
   }
-  
-  [KMDataRepository.shared createKeyboardsDirectoryIfNecessary];
-  [KMSettingsRepository.shared setDataModelVersionIfNecessary];
 }
 
 - (void)setDefaultKeymanMenuItems {
@@ -790,11 +839,11 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (int)calculateNumberOfKeyboardMenuItems {
   os_log_debug([KMLogs uiLog], "calculateNumberOfKeyboardMenuItems, entered");
-  if (self.activeKeyboards.count == 0) {
+  if (self.enabledKeyboards.count == 0) {
     // if there are no active keyboards, then we will insert one placeholder menu item 'No Active Keyboards'
     return 1;
   } else {
-    return (int) self.activeKeyboards.count;
+    return (int) self.enabledKeyboards.count;
   }
 }
 
@@ -817,10 +866,10 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   NSString *keyboardMenuName = @"";
   int menuItemIndex = KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX;
   
-  os_log_debug([KMLogs configLog], "*** populateKeyboardMenuItems, number of active keyboards=%lu", self.activeKeyboards.count);
+  os_log_debug([KMLogs configLog], "*** populateKeyboardMenuItems, number of active keyboards=%lu", self.enabledKeyboards.count);
   
   // loop through the active keyboards list and add them to the menu
-  for (NSString *path in self.activeKeyboards) {
+  for (NSString *path in self.enabledKeyboards) {
     NSString *fullPath = [KMDataRepository.shared buildFullPath:path];
     os_log_debug([KMLogs dataLog], "addDynamicKeyboardMenuItems, path = '%{public}@', full path = '%{public}@'", path, fullPath);
     NSDictionary *infoDict = [KMXFile keyboardInfoFromKmxFile:fullPath];
@@ -843,7 +892,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [self.menu insertItem:item atIndex:menuItemIndex++];
   }
   
-  if (self.activeKeyboards.count == 0) {
+  if (self.enabledKeyboards.count == 0) {
     [self addKeyboardPlaceholderMenuItem];
   } else if (!didSetSelectedKeyboard) {
     [self setDefaultSelectedKeyboard];
@@ -875,7 +924,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 // defaults to the whatever keyboard happens to be first in the list
 - (void) setDefaultSelectedKeyboard {
   NSMenuItem* menuItem = [self.menu itemAtIndex:KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX];
-  NSString *keyboardName = [self.activeKeyboards objectAtIndex:0];
+  NSString *keyboardName = [self.enabledKeyboards objectAtIndex:0];
   [self setSelectedKeyboard:keyboardName inMenuItem:menuItem];
   [self setSelectedKeyboard:keyboardName];
   [self clearContextBuffer];
@@ -911,7 +960,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     }
   }
   
-  NSString *path = [self.activeKeyboards objectAtIndex:tag-KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG];
+  NSString *path = [self.enabledKeyboards objectAtIndex:tag-KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG];
   NSString *fullPath = [KMDataRepository.shared buildFullPath:path];
   os_log_debug([KMLogs dataLog], "setSelectedKeyboard, keyboardName = '%{public}@', full path = '%{public}@'", path, fullPath);
   
@@ -1461,9 +1510,9 @@ extern const CGKeyCode kProcessPendingBuffer;
   
   for (NSString *kmxFile in [self getKmxFilesAtPath:keyboardFolderPath]) {
     NSString *partialPath = [KMDataRepository.shared buildPartialPathFrom:folderName keyboardFile:[kmxFile lastPathComponent]];
-    [self addActiveKeyboard:partialPath];
+    [self addEnabledKeyboard:partialPath];
   }
-  [self saveActiveKeyboards];
+  [self saveEnabledKeyboards];
   
   return YES;
 }

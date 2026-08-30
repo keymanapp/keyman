@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "35B1C8B8-56CD-43D4-9EF1-29C4417C786A",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "KeymanSettingsTests",
+        "name" : "KeymanSettingsTests"
+      }
+    }
+  ],
+  "version" : 1
+}

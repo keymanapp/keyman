@@ -1,0 +1,176 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Shawn Schantz on 2025-12-19
+ *
+ * Value object for loading a package from kmp.json
+ *
+ */
+
+
+import Foundation
+
+let defaultHelpFilename = "welcome.htm"
+let defaultReadmeFilename = "readme.htm"
+
+public struct PackageSource: Identifiable, Decodable, Hashable, Equatable {
+  public var id = UUID()
+  let system: SystemInfo
+  let options: Options
+  let info: Info
+  let files: [PackageFile]?
+  let keyboards: [KeyboardSource]?
+  
+  // computed properties for convenience
+  var packageName: String {
+    return info.name.description
+  }
+  var packageVersion: String {
+    return info.version.description
+  }
+  var copyright: String? {
+    return info.copyright?.description
+  }
+  var readmeFilename: String? {
+    if let filename = options.readmeFile {
+      return filename
+    }
+    if let fileArray = self.files {
+      if fileArray.contains(where: { $0.name == defaultReadmeFilename }) {
+        return defaultReadmeFilename
+      }
+    }
+    return nil
+  }
+  var helpFilename: String? {
+    if let filename = options.welcomeFile { return filename }
+
+    if let fileArray = self.files {
+      if fileArray.contains(where: { $0.name == defaultHelpFilename }) {
+        return defaultHelpFilename
+      }
+    }
+    
+    return nil
+  }
+  var graphicFilename: String? {
+    return options.graphicFile
+  }
+  
+  enum CodingKeys: String, CodingKey {
+    case system
+    case options
+    case info
+    case files
+    case keyboards
+  }
+  
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    
+    self.info = try container.decode(Info.self, forKey: .info)
+    self.keyboards = try container.decodeIfPresent([KeyboardSource].self, forKey: .keyboards)
+    self.system = try container.decode(SystemInfo.self, forKey: .system)
+    self.options = try container.decode(Options.self, forKey: .options)
+    self.files = try container.decodeIfPresent([PackageFile].self, forKey: .files)
+    
+    if files?.isEmpty ?? true {
+      throw LoadPackageError.containsNoFiles
+    }
+
+    if keyboards?.isEmpty ?? true {
+      throw LoadPackageError.containsNoKeyboards
+    }
+  }
+  
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(id) // only combine the unique ID
+  }
+  
+  // Custom Equatable conformance (required by Hashable)
+  public static func == (lhs: PackageSource, rhs: PackageSource) -> Bool {
+    return lhs.id == rhs.id // only compare unique IDs
+  }
+}
+
+struct Info: Decodable {
+  let name: DescribedValue
+  let version: DescribedValue
+  let copyright: DescribedValue?
+  let author: Author?
+  let website: Website?
+  
+  enum CodingKeys: String, CodingKey {
+    case name
+    case copyright
+    case author
+    case version
+    case website
+  }
+}
+
+struct DescribedValue: Decodable {
+  let description: String
+  
+  enum CodingKeys: String, CodingKey {
+    case description
+  }
+}
+
+struct Author: Decodable {
+  let description: String?
+  let url: String?
+  
+  enum CodingKeys: String, CodingKey {
+    case description
+    case url
+  }
+}
+
+struct Website: Decodable {
+  let description: String?
+  let url: String?
+  
+  enum CodingKeys: String, CodingKey {
+    case description
+    case url
+  }
+}
+
+struct SystemInfo: Decodable {
+  let keymanDeveloperVersion: String?
+  let fileVersion: String
+  
+  enum CodingKeys: String, CodingKey {
+    case keymanDeveloperVersion
+    case fileVersion
+  }
+}
+
+struct Options: Decodable {
+  let readmeFile: String?
+  let graphicFile: String?
+  let licenseFile: String?
+  let welcomeFile: String?
+
+  enum CodingKeys: String, CodingKey {
+    case readmeFile
+    case graphicFile
+    case licenseFile
+    case welcomeFile
+  }
+}
+
+struct PackageFile: Decodable {
+  let name: String?
+  let description: String?
+  
+  enum CodingKeys: String, CodingKey {
+    case name
+    case description
+  }
+}
+
+
+
+
