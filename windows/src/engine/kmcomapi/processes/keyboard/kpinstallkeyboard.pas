@@ -64,7 +64,7 @@ type
     ikLegacyRegisterAndInstallProfiles);
 
   TKPInstallKeyboard = class(TKPBase)
-    procedure Execute(const FileName, PackageID: string; FInstallOptions: TKPInstallKeyboardOptions; Languages: TPackageKeyboardLanguageList; Force: Boolean);
+    procedure Execute(const FileName: string; const PackageID: string; FInstallOptions: TKPInstallKeyboardOptions; Languages: TPackageKeyboardLanguageList; Force: Boolean; BaseKeyboardID: Integer);
     procedure RegisterProfiles(const FileName, PackageID: string; FInstallOptions: TKPInstallKeyboardOptions; PackageLanguageMetadata: TPackageKeyboardLanguageList);
   private
     procedure LegacyRegisterAndInstallLanguageProfile(Langs: array of Integer;
@@ -112,7 +112,7 @@ uses
   utiltsf,
   keymanapi_TLB;
 
-procedure TKPInstallKeyboard.Execute(const FileName, PackageID: string; FInstallOptions: TKPInstallKeyboardOptions; Languages: TPackageKeyboardLanguageList; Force: Boolean);
+procedure TKPInstallKeyboard.Execute(const FileName: string; const PackageID: string; FInstallOptions: TKPInstallKeyboardOptions; Languages: TPackageKeyboardLanguageList; Force: Boolean; BaseKeyboardID: Integer);
 var
   ki: TKeyboardInfo;
   FDestPath: string;
@@ -125,7 +125,9 @@ var
   FExitCode: Integer;
   FKVKName: WideString;
   FCreatedIcon: Boolean;
-  BaseKeyboardID: Integer;
+  ElevatedBaseKeyboardID: Integer;
+  KeymanContext: TKeymanContext;
+  RecompileMnemonicKeyboard: TKPRecompileMnemonicKeyboard;
 begin
   KL.MethodEnter(Self, 'Execute', [FileName,PackageID,ikPartOfPackage in FInstallOptions ,Force]);
   try
@@ -246,14 +248,19 @@ begin
         KL.Log(FLogText);
       end;
 
-      // Recompile a mnemonic layout to the user's selected base layout
+      // Recompile a mnemonic layout to the user's selected base layout. If
+      // the baselayout has not been passed through (=0) then use the current
+      // process configured value which is likely the Admin user
       if ki.MnemonicLayout then   // I4169
       begin
-        with Context as TKeymanContext do
-          BaseKeyboardID := (Options as IKeymanOptions).Items['koBaseLayout'].Value;
-        with TKPRecompileMnemonicKeyboard.Create(Context) do
+        KeymanContext := Context as TKeymanContext;
+        ElevatedBaseKeyboardID := (KeymanContext.Options as IKeymanOptions).Items['koBaseLayout'].Value;
+        RecompileMnemonicKeyboard := TKPRecompileMnemonicKeyboard.Create(Context);
         try
-          Execute(FDestFileName, PackageID, BaseKeyboardID);
+          if (BaseKeyboardID = 0) then
+            RecompileMnemonicKeyboard.Execute(FDestFileName, PackageID, ElevatedBaseKeyboardID)
+          else
+            RecompileMnemonicKeyboard.Execute(FDestFileName, PackageID, BaseKeyboardID);
         finally
           RecompileMnemonicKeyboard.Free;
         end;

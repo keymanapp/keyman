@@ -1570,6 +1570,17 @@ type
   end;
 
 // *********************************************************************//
+// Interface: IKeymanKeyboardsInstalled3
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {B7D3A8F1-6C42-4E95-AB17-93F0C2D8E641}
+// *********************************************************************//
+  IKeymanKeyboardsInstalled3 = interface(IKeymanKeyboardsInstalled)
+    ['{B7D3A8F1-6C42-4E95-AB17-93F0C2D8E641}']
+    function Install3(const Filename: WideString; Force: WordBool; BasePackageID: Integer): IKeymanKeyboardInstalled; safecall;
+    procedure RefreshInstalledKeyboards; safecall;
+  end;
+
+// *********************************************************************//
 // Interface: IKeymanKeyboardInstalled2
 // Flags:     (4416) Dual OleAutomation Dispatchable
 // GUID:      {3086C85C-932A-4726-BF76-2D74DD133AC9}
@@ -1611,6 +1622,16 @@ type
   end;
 
 // *********************************************************************//
+// Interface: IKeymanPackagesInstalled3
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {3F8C2D71-94A6-4B0E-87D5-C1E3A9F62458}
+// *********************************************************************//
+  IKeymanPackagesInstalled3 = interface(IKeymanPackagesInstalled)
+    ['{3F8C2D71-94A6-4B0E-87D5-C1E3A9F62458}']
+    function Install3(const Filename: WideString; Force: WordBool; BasePackageID: Integer): IKeymanPackageInstalled; safecall;
+  end;
+
+// *********************************************************************//
 // DispIntf:  IKeymanPackagesInstalled2Disp
 // Flags:     (4416) Dual OleAutomation Dispatchable
 // GUID:      {F23B9848-2AEF-4A2B-BC3A-292E3A00D691}
@@ -1637,6 +1658,16 @@ type
   IKeymanKeyboardFile2 = interface(IKeymanKeyboardFile)
     ['{EDE4326B-51F4-42D5-8251-B20B71993EC8}']
     function Install2(Force: WordBool): IKeymanKeyboardInstalled; safecall;
+  end;
+
+// *********************************************************************//
+// Interface: IKeymanKeyboardFile3
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {EDE4326B-51F4-42D5-8251-B20B71993EC8}
+// *********************************************************************//
+  IKeymanKeyboardFile3 = interface(IKeymanKeyboardFile)
+    ['{8F4B2D91-6C37-4A05-BE82-1D9F7C53A6E4}']
+    function Install3(Force: WordBool; BaseKeyboardID: Integer): IKeymanKeyboardInstalled; safecall;
   end;
 
 // *********************************************************************//
@@ -1676,6 +1707,17 @@ type
     ['{9B43B6BC-C622-47EF-915E-6780CF53BAAA}']
     function Install2(Force: WordBool): IKeymanPackageInstalled; safecall;
   end;
+
+// *********************************************************************//
+// Interface: IKeymanPackageFile3
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {C27A6E4B-9D13-47F8-A052-6B8E31D4F9C7}
+// *********************************************************************//
+  IKeymanPackageFile3 = interface(IKeymanPackageFile)
+    ['{C27A6E4B-9D13-47F8-A052-6B8E31D4F9C7}']
+    function Install3(Force: WordBool; BaseKeyboardID: Integer): IKeymanPackageInstalled; safecall;
+  end;
+
 
 // *********************************************************************//
 // DispIntf:  IKeymanPackageFile2Disp
