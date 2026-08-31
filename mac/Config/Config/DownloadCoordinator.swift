@@ -50,12 +50,6 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     }
     Logger.download.info("received url: \(urlString, privacy: .public)")
     
-    if navigationAction.shouldPerformDownload {
-      Logger.download.info("webView called decisionHandler for download")
-      decisionHandler(.download)
-      return
-    }
-    
     // if the url matches the install url pattern, then cancel the request,
     // build the standard URLRequest for a package installation and send it
     if let match = try? DownloadCoordinator.regexInstall.firstMatch(in: urlString) {
@@ -143,7 +137,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     
     do {
       if let helper = try keymanSettings.initiateKmpFileDownload(kmpFilename: suggestedFilename) {
-        Logger.download.info("download suggested filename: \(suggestedFilename), privacy: .public")
+        Logger.download.info("download suggested filename: \(suggestedFilename, privacy: .public)")
         self.loadFailureMessage = nil // Reset previous error
         self.loadPackageFailed = false
         
