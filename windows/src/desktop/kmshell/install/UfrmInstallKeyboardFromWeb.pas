@@ -87,6 +87,7 @@ uses
   Keyman.Configuration.UI.InstallFile,
   Keyman.System.LocaleStrings,
   kmint,
+  KeymanOptionNames,
   MessageIdentifierConsts,
   Upload_Settings,
   utilfiletypes,
@@ -213,6 +214,7 @@ end;
 procedure TfrmInstallKeyboardFromWeb.DownloadAndInstallPackage(const PackageID, BCP47: string);
 var
   FTempDir: string;
+  BaseKeyboardID: Integer;
 begin
   FTempDir := IncludeTrailingPathDelimiter(CreateTempPath);  // I1679
   try
@@ -230,8 +232,8 @@ begin
     finally
       frmDownloadProgress.Free;
     end;
-
-    if TInstallFile.Execute(Self, FDownloadFilename, False, False, '', BCP47) then
+    BaseKeyboardID := kmcom.Options[KeymanOptionName(koBaseLayout)].Value;
+    if TInstallFile.Execute(Self, FDownloadFilename, False, False, '', BCP47, BaseKeyboardID) then
       ModalResult := mrOk;
 
   finally

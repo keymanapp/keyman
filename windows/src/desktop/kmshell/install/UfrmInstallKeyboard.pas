@@ -74,6 +74,7 @@ uses
   Vcl.StdCtrls,
 
   keymanapi_TLB,
+  KeymanOptionNames,
   UfrmKeymanBase,
   UfrmWebContainer;
 
@@ -102,7 +103,7 @@ type
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
   public
-    procedure InstallKeyboard(const ALogFile, BCP47Tag: string);
+    procedure InstallKeyboard(const ALogFile, BCP47Tag: string; BaseKeyboardID: Integer);
     property DefaultBCP47Tag: string read FDefaultBCP47Tag write SetDefaultBCP47Tag;
     property InstallFile: string read FInstallFile write SetInstallFile;
     property Silent: Boolean read FSilent write FSilent;
@@ -271,6 +272,7 @@ end;
 procedure TfrmInstallKeyboard.FireCommand(const command: WideString; params: TStringList);
 var
   BCP47Tag: string;
+  BaseKeyboardID :Integer;
 begin
   BCP47Tag := '';
   if (command = 'keyboard_install') and kmcom.SystemInfo.IsAdministrator then   // I4172
@@ -283,7 +285,8 @@ begin
         Manager.Title := 'Installing Keyboard';
         Manager.CanCancel := False;
         Manager.UpdateProgress('Installing Keyboard', 0, 0);
-        InstallKeyboard('', BCP47Tag);
+        BaseKeyboardID := kmcom.Options[KeymanOptionName(koBaseLayout)].Value;
+        InstallKeyboard('', BCP47Tag, BaseKeyboardID);
         Result := True;
       end
     );
@@ -299,6 +302,7 @@ begin
       var
         t: TTempFile;
         ExecParams: string;
+        BaseKeyboardString :string;
       begin
         KL.MethodEnter(Self, '"keyboard_install"', [params.Text]);
         try
@@ -306,8 +310,9 @@ begin
           Manager.CanCancel := False;
           Manager.UpdateProgress('Installing Keyboard', 0, 0);
           t := TTempFileManager.Get('.log');
+          BaseKeyboardString := IntToHex(kmcom.Options[KeymanOptionName(koBaseLayout)].Value, 8);
           try
-            ExecParams := '-log "'+t.Name+'" -s -i "'+FInstallFile+'='+BCP47Tag+'"'+
+            ExecParams := '-log "'+t.Name+'" -bkd "'+BaseKeyboardString+'" -s -i "'+FInstallFile+'='+BCP47Tag+'"'+
               ' -nowelcome '+TTIPMaintenance.GetUserDefaultLangParameterString;
             KL.Log('Calling elevated kmshell %s', [ExecParams]);
             if WaitForElevatedConfiguration(GetForegroundWindow, ExecParams) = 0 then
@@ -358,7 +363,7 @@ end;
  ------------------------------------------------------------------------------}
 
 // TODO: move this to TInstallFile
-procedure TfrmInstallKeyboard.InstallKeyboard(const ALogFile, BCP47Tag: string);
+procedure TfrmInstallKeyboard.InstallKeyboard(const ALogFile, BCP47Tag: string; BaseKeyboardID: Integer);
 var
   i: Integer;
   kbd: IKeymanKeyboardInstalled;
@@ -400,7 +405,7 @@ begin
         kbd := nil;
         kmcom.Keyboards.Apply;
         kmcom.Keyboards.Refresh;
-        FInstalledKeyboard := (FKeyboard as IKeymanKeyboardFile2).Install2(True);
+        FInstalledKeyboard := (FKeyboard as IKeymanKeyboardFile3).Install3(True, BaseKeyboardID);
         if not InstallTipForKeyboard(BCP47Tag) then
         begin
           // TODO can we return a failure code?
@@ -461,7 +466,7 @@ begin
         kmcom.Keyboards.Apply;
         kmcom.Keyboards.Refresh;  // I2169
 
-        (FPackage as IKeymanPackageFile2).Install2(True);
+        (FPackage as IKeymanPackageFile3).Install3(True, BaseKeyboardID);
 
         kmcom.Refresh;
 
