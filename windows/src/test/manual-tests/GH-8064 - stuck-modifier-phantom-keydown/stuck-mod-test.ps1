@@ -745,18 +745,119 @@ function Assert-Foreground {
 }
 
 # ---- keyman.exe control window + the freeze stimulus -----------------------
-$script:km = [IntPtr]::Zero
-$kp = (Get-Process keyman -ErrorAction SilentlyContinue | Select-Object -First 1).Id
-if ($kp) {
-  $cb = [Kp+EnumWindowsProc]{ param($h,$l)
-    $p=0; [void][Kp]::GetWindowThreadProcessId($h,[ref]$p)
-    if ($p -eq $kp) {
-      $sb=New-Object System.Text.StringBuilder 256; [void][Kp]::GetClassName($h,$sb,256)
-      if ($sb.ToString() -eq 'TApplication') { $script:km=$h; return $false }
-    }
-    return $true }
-  [void][Kp]::EnumWindows($cb,[IntPtr]::Zero)
+
+# Resolves keyman.exe's TApplication window into $script:km, which Freeze posts to.
+# A function rather than inline because Reset-KeymanEngine restarts keyman.exe at the top
+# of the run, which invalidates the handle -- posting the freeze to a dead HWND silently
+# does nothing and every trial would degenerate into a no-freeze control scoring CLEAN.
+function Resolve-KeymanControlWindow {
+  $script:km = [IntPtr]::Zero
+  $pid2 = (Get-Process keyman -ErrorAction SilentlyContinue | Select-Object -First 1).Id
+  if ($pid2) {
+    $cb = [Kp+EnumWindowsProc]{ param($h,$l)
+      $p=0; [void][Kp]::GetWindowThreadProcessId($h,[ref]$p)
+      if ($p -eq $pid2) {
+        $sb=New-Object System.Text.StringBuilder 256; [void][Kp]::GetClassName($h,$sb,256)
+        if ($sb.ToString() -eq 'TApplication') { $script:km=$h; return $false }
+      }
+      return $true }
+    [void][Kp]::EnumWindows($cb,[IntPtr]::Zero)
+  }
+  return $script:km
 }
+
+<#
+  Restarts keyman.exe so the modifier cache starts empty.
+
+  WHY THIS EXISTS, and why it is NOT part of the stimulus. The cache lives in
+  keyman.exe and the low level hook feeds it on EVERY key event, including while a
+  Microsoft keyboard is active -- k32_lowlevelkeyboardhook.cpp posts
+  WM_KEYMAN_MODIFIER_EVENT before its `!isKeymanKeyboardActive` pass-through, on
+  purpose. Nothing reconciles that cache until a batch is assembled, which only a
+  Keyman keyboard does. So the control arms' triggers charge the cache silently, and
+  the treatment arm arrives ALREADY WEDGED -- measured 2026-08-31: entry probe CLEAN,
+  one trigger each on English and MSKLC, then arm-confirm WEDGED before Keyman's own
+  trigger ran. The run then proves nothing about whether Keyman's trigger causes the
+  wedge, because there was nothing left to cause.
+
+  Restarting between the controls and the treatment removes that carry-over: a fresh
+  keyman.exe re-seeds the cache from live OS state via InitThread. It is logged loudly
+  so no reader mistakes it for part of the experiment.
+
+  The charge-carry itself is a real finding and is NOT hidden by this -- phase WEDGED
+  still shows the Microsoft arms suffering the wedge with no trigger applied to them.
+#>
+function Reset-KeymanEngine {
+  Say '  ---------------- RESET keyman.exe (not part of the stimulus) ----------------'
+  Say '    The control arms charge the modifier cache even though their own output stays'
+  Say '    clean. Without this reset the treatment arm arrives already wedged and its own'
+  Say '    trigger proves nothing. Restarting re-seeds the cache from live OS state.'
+
+  $proc = Get-Process keyman -ErrorAction SilentlyContinue | Select-Object -First 1
+  $exe  = $null
+  if ($proc) { try { $exe = $proc.Path } catch { } }
+  if (-not $exe) { $exe = 'C:\Program Files (x86)\Common Files\Keyman\Keyman Engine\keyman.exe' }
+
+  # NOT an early return: the manual path below does not need $exe at all, only the
+  # automatic restart does. Bailing here would deny the operator the chance to do it.
+  $canAutoStart = (Test-Path $exe)
+  if (-not $canAutoStart) {
+    Say ('    [INFO] keyman.exe not locatable at {0}; automatic restart unavailable.' -f $exe)
+  }
+
+  # keyman.exe runs at a higher integrity level than an ordinary shell -- same user, but
+  # its ExecutablePath and process handle read back empty, so Stop-Process gets Access
+  # Denied unless this script was started elevated. Measured on MLEELOQ, 2026-08-31.
+  # Rather than warn and carry on with a pre-wedged treatment arm, ask the operator, the
+  # same way phase 3 asks for a physical Left Shift double-tap.
+  $oldPid = (Get-Process keyman -ErrorAction SilentlyContinue | Select-Object -First 1).Id
+  $auto = $canAutoStart
+  if ($auto) {
+    try { Stop-Process -Name keyman -Force -ErrorAction Stop } catch { $auto = $false }
+  }
+
+  if ($auto) {
+    Start-Sleep -Seconds 2
+    Start-Process $exe | Out-Null
+    Start-Sleep -Seconds 5
+  } else {
+    Say '    [INFO] cannot stop keyman.exe from an unelevated shell (Access Denied).'
+    Say '    ACTION NEEDED: restart Keyman yourself now - exit it from the tray/Start menu'
+    Say '                   and start it again. Waiting up to 120s for a new process...'
+    $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    $newPid = $null
+    while ($sw.Elapsed.TotalSeconds -lt 120) {
+      Start-Sleep -Milliseconds 1500
+      $cur = (Get-Process keyman -ErrorAction SilentlyContinue | Select-Object -First 1).Id
+      if ($cur -and $cur -ne $oldPid) { $newPid = $cur; break }
+    }
+    if (-not $newPid) {
+      Say '    [WARN] Keyman was not restarted within 120s - NOT reset. The treatment arm may'
+      Say '           arrive already wedged, in which case its trigger proves nothing.'
+      return $false
+    }
+    Say ('    [OK] new keyman.exe observed (pid {0} -> {1}) after {2:N0}s' -f $oldPid, $newPid, $sw.Elapsed.TotalSeconds)
+    Start-Sleep -Seconds 3   # let it finish standing its hook and server up
+  }
+
+  if (-not (Get-Process keyman -ErrorAction SilentlyContinue)) {
+    Say '    [WARN] keyman.exe did not come back up. Later trials cannot be trusted.'
+    return $false
+  }
+  # MUST re-resolve: the old TApplication HWND died with the old process, and Freeze
+  # posting into a dead handle fails silently.
+  $h = Resolve-KeymanControlWindow
+  if ($h -eq [IntPtr]::Zero) {
+    Say '    [WARN] keyman.exe restarted but its control window was not found - the freeze'
+    Say '           stimulus cannot be posted, so every later trial would be a no-freeze control.'
+    return $false
+  }
+  Say ('    [OK] keyman.exe restarted, control window re-resolved to 0x{0:X}' -f $h.ToInt64())
+  Say '  -----------------------------------------------------------------------------'
+  return $true
+}
+
+[void](Resolve-KeymanControlWindow)
 $msg = [Kp]::RegisterWindowMessage('WM_KEYMAN_CONTROL')
 
 # ---- gate preflight -----------------------------------------------------
@@ -922,6 +1023,11 @@ function Tap-WinSpace {
 # Get-Fingerprint's own comment was written to preserve.
 function Confirm-KeymanArm {
   $d = Probe 'Deadkey'
+  # #8064: this probe answers "is the arm already wedged on entry?" and used to discard it,
+  # leaving the log unable to separate "arrived wedged" from "wedged during fingerprinting"
+  # a few seconds later. Recorded, not acted on -- WEDGED still confirms the arm, because a
+  # wedged Cameroon keyboard is still the Cameroon keyboard.
+  Say ('        arm-confirm deadkey -> {0,-9} {1}' -f $d.State, $d.Cp)
   return (($d.State -eq 'CLEAN') -or ($d.State -eq 'WEDGED'))
 }
 
@@ -1149,12 +1255,42 @@ try {
   # attributed: the 09:26 run reached the Keyman arm wedged and there was no way
   # to tell whether a trial did it, the arm switch did it, or it walked in that
   # way. Ascii, because it is the one oracle valid on every layout here.
-  $entry = Probe 'Ascii'
-  Say ("entry probe (Ascii, on whatever was active): {0} ({1}) mods={2}" -f $entry.State,$entry.Cp,$entry.Mods)
-  if ($entry.State -ne 'CLEAN') {
-    Say '[IMPORTANT] the machine was ALREADY NOT CLEAN before any trial ran. Every arm below inherits that.'
-    Add-GateInconclusive ("the machine was already not clean before any trial ran (entry probe {0}, {1}) - nothing measured after that can be attributed to this run" -f $entry.State, $entry.Cp)
+  # #8064: ONCE, here, before anything is measured -- never during a pass. The modifier
+  # cache lives in keyman.exe and survives between runs, so a previous run that ended
+  # wedged leaves this one starting dirty; that is what turned two earlier gate runs into
+  # INCONCLUSIVE with "arm 'Keyman' arrived ALREADY WEDGED". A restart re-seeds the cache
+  # from live OS state via InitThread.
+  #
+  # Deliberately NOT repeated between arms. Restarting mid-experiment is an intervention a
+  # reader is right to distrust, and it would erase the carry-over that phases WEDGED and
+  # CLEARED exist to show. If the treatment arm still arrives wedged after this, that is a
+  # RESULT -- the control arms charged the cache -- and not a setup failure to be tidied away.
+  [void](Reset-KeymanEngine)
+
+  # ENTRY CHECK. Restart above, then TYPE to confirm it actually worked, on the Keyman arm
+  # specifically -- that is the only arm whose cache can be wedged, and a probe on whatever
+  # happened to be active says nothing about it. A dirty start is a SETUP ERROR and stops the
+  # run: every earlier INCONCLUSIVE in this directory traces back to a run that began wedged
+  # and was allowed to continue anyway.
+  $ek = Switch-ToArm 'Keyman'
+  if ($ek.Arm -ne 'Keyman') {
+    Say ("[SETUP ERROR] could not switch to the Keyman arm for the entry check (saw {0})." -f $ek.Arm)
+    exit $script:SETUP_EXIT
   }
+  $entry = Probe 'Ascii'
+  Say ("entry probe (Ascii, on the Keyman arm): {0} ({1}) mods={2}" -f $entry.State,$entry.Cp,$entry.Mods)
+  if ($entry.State -ne 'CLEAN') {
+    Say ''
+    Say '[SETUP ERROR] Keyman is WEDGED before any trial ran, so nothing measured below could'
+    Say '              be attributed to this run. The restart did not clear it.'
+    Say ''
+    Say '  To clear it: exit Keyman completely, tap both Shift, Ctrl and Alt keys on the'
+    Say '  physical keyboard, start Keyman again, and type in Notepad to confirm you get'
+    Say '  lowercase text before re-running this script.'
+    Say ''
+    exit $script:SETUP_EXIT
+  }
+  Say '  entry check passed - Keyman is clean, starting the run.'
   Say ''
 
   # ---- switch-stress mode ------------------------------------------------

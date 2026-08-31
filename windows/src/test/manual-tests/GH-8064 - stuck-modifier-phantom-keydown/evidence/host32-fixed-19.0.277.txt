@@ -1,0 +1,49 @@
+=== GH-8064 host32, 5 iterations -- FIXED build, measured 2026-08-31 ===
+
+Same machine, same session, same operator as the stock half. One variable
+changed between the two: keyman32.dll.
+
+  stock:  keyman32.dll  1,239,488 bytes  v19.0.276.0  Release  (stock 19.0.276, per evidence/baseline-shipped-build.txt)
+  fixed:  keyman32.dll  4,197,376 bytes  v19.0.277.0  Debug    (branch build, written 2026-08-31 20:12:20)
+
+Pairs with evidence/baseline-shipped-build.txt.
+
+--- run ---
+
+=== GH-8064 self-driving reproduction ===
+modifier LSHIFT (vk 0xA0 scan 0x2A), freeze, 5 iteration(s), release at 1500 ms
+host: GH-8064 host32 [HKL=04092000]
+[OK] baseline clean
+Waiting up to 30 s for a Keyman keyboard whose rules fire on "1x2x3x".
+  Switch the keyboard for THIS window now (Win+Space, or the taskbar language button).
+  Probing every 2 s; the test starts by itself as soon as the probe transforms.
+[OK] rules are firing. GH-8064 host32 [HKL=04092000]
+[OK] keyman32.dll is loaded: the engine has attached to this process
+--- iteration 1 of 5 ---
+    freeze active: yes
+    modifier released (inside the stall)
+    typed "1x2x3x" -> got "1=OK 2=OK 3=OK "  transformed: yes
+    [ok] no modifier held
+--- iteration 2 of 5 ---
+    freeze active: yes
+    modifier released (inside the stall)
+    typed "1x2x3x" -> got "1=OK 2=OK 3=OK "  transformed: yes
+    [ok] no modifier held
+--- iteration 3 of 5 ---
+    freeze active: yes
+    modifier released (inside the stall)
+    typed "1x2x3x" -> got "1=OK 2=OK 3=OK "  transformed: yes
+    [ok] no modifier held
+--- iteration 4 of 5 ---
+    freeze active: yes
+    modifier released (inside the stall)
+    typed "1x2x3x" -> got "1=OK 2=OK 3=OK "  transformed: yes
+    [ok] no modifier held
+--- iteration 5 of 5 ---
+    freeze active: yes
+    modifier released (inside the stall)
+    typed "1x2x3x" -> got "1=OK 2=OK 3=OK "  transformed: yes
+    [ok] no modifier held
+=== summary ===
+iterations 5   freeze confirmed 5   text transformed 5   stuck 0
+RESULT: PASS - batches were assembled and no modifier stuck in any iteration.

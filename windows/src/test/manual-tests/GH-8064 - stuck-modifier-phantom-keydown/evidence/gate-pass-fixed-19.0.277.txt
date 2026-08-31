@@ -1,0 +1,278 @@
+=== GH-8064 regression gate (stuck-mod-test.ps1 -Gate) -- FIXED build, measured 2026-08-31 ===
+
+Same machine, same session, same operator as the stock half. One variable
+changed between the two: keyman32.dll.
+
+  stock:  keyman32.dll  1,239,488 bytes  v19.0.276.0  Release  (stock 19.0.276, per evidence/baseline-shipped-build.txt)
+  fixed:  keyman32.dll  4,197,376 bytes  v19.0.277.0  Debug    (branch build, written 2026-08-31 20:12:20)
+
+Verdict: PASS  (OVERALL line in the log)
+
+Pairs with evidence/gate-fail-stock-19.0.276.txt.
+
+--- run ---
+
+20:39:15.346 [gate] candidate set defaults to A,I - A is the no-freeze internal control and I is the only
+20:39:15.348        candidate that CONFIRMS the freeze is live before releasing the modifier. Pass -Only
+20:39:15.349        explicitly to widen it; unconfirmed-freeze trials then score INCONCLUSIVE, not PASS.
+20:39:15.351 ============== stuck-mod-test: three-arm controlled test ==============
+20:39:15.354 target=notepad hwnd=0x60B82  keyman ctrl=0x407DE  load=0  switch=Auto  repeat=3
+20:39:15.404 installed input methods: 0x04090409 -> English; 0xF0020409 -> en-substituted-layout-0xF002-REJECT; 0xF0C00436 -> MSKLC; 0x0409046A -> Keyman-Yoruba; 0xF001100C -> fr-CH; 0x04092000 -> Keyman
+20:39:15.412 arms  = English -> MSKLC -> Keyman
+20:39:15.415 order = controls first, treatment last (the Keyman wedge is persistent)
+20:39:15.416 log   = C:\Users\thoua\AppData\Local\Temp\gh8064-fixed\gate\stuck-mod-test-20260831-203914.txt
+20:39:15.417 
+20:39:15.441 startup keyboard: English (HKL=0x04090409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:39:15.447   ---------------- RESET keyman.exe (not part of the stimulus) ----------------
+20:39:15.449     The control arms charge the modifier cache even though their own output stays
+20:39:15.451     clean. Without this reset the treatment arm arrives already wedged and its own
+20:39:15.451     trigger proves nothing. Restarting re-seeds the cache from live OS state.
+20:39:15.507     [INFO] cannot stop keyman.exe from an unelevated shell (Access Denied).
+20:39:15.508     ACTION NEEDED: restart Keyman yourself now - exit it from the tray/Start menu
+20:39:15.510                    and start it again. Waiting up to 120s for a new process...
+20:39:27.689     [OK] new keyman.exe observed (pid 33340 -> 44084) after 12s
+20:39:30.740     [OK] keyman.exe restarted, control window re-resolved to 0x907D4
+20:39:30.741   -----------------------------------------------------------------------------
+20:39:31.659         Win+Space #1 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:39:32.526         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:39:33.392         Win+Space #3 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=37492 cls=RichEditD2DPT)
+20:39:34.281         Win+Space #4 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=37492 cls=RichEditD2DPT)
+20:39:35.146         Win+Space #5 -> Keyman (HKL=0x04092000 langid=0x2000 tid=37492 cls=RichEditD2DPT)
+20:39:38.776         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+20:39:38.778         deadkey confirms Cameroon QWERTY
+20:39:41.254 entry probe (Ascii, on the Keyman arm): CLEAN (U+0061 U+0062 U+0063) mods=none
+20:39:41.255   entry check passed - Keyman is clean, starting the run.
+20:39:41.256 
+20:39:41.258 ================ ARM: English ================
+20:39:41.261   any non-Dvorak English QWERTY - US, UK, Australian, Canadian, NZ, Irish ...
+20:39:42.120         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=37492 cls=RichEditD2DPT)
+20:39:42.990         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:39:42.992   confirmed: English (HKL=0x04090409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:39:51.500         fingerprint deadkey ';e'+RAlt+N -> OTHER     U+003B U+0065
+20:39:51.502         fingerprint ascii   'abc'       -> CLEAN     U+0061 U+0062 U+0063
+20:39:51.503         [NOTE] deadkey oracle does not apply on arm 'English' - it cannot produce U+0259. Recorded, not counted.
+20:39:51.509   oracles in play: Ascii
+20:39:53.982   baseline (Ascii): CLEAN 'abc' (U+0061 U+0062 U+0063) mods=none
+20:39:53.984 
+20:39:53.990   [gate] arm=English candidate=A trial 1 of 3; freeze=none; oracles=Ascii
+20:39:53.994   [gate]   action: bare LShift hold 1.5s + release (NO freeze - internal control)
+20:39:53.997   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:39:58.730   English p1 [A] Ascii     bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x0409 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:39:58.737   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:39:58.738   [gate]   running tally: PASS 1  FAIL 0  INCONCLUSIVE 0
+20:40:03.958   [gate] arm=English candidate=I trial 1 of 3; freeze=confirmed; oracles=Ascii
+20:40:03.961   [gate]   action: LShift held, freeze CONFIRMED ACTIVE, then release (primary)
+20:40:03.963   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:40:09.385   English p1 [I] Ascii     LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x0409 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:40:09.388   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:40:09.389   [gate]   running tally: PASS 2  FAIL 0  INCONCLUSIVE 0
+20:40:14.607   [gate] arm=English candidate=A trial 2 of 3; freeze=none; oracles=Ascii
+20:40:14.609   [gate]   action: bare LShift hold 1.5s + release (NO freeze - internal control)
+20:40:14.613   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:40:19.355   English p2 [A] Ascii     bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x0409 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:40:19.357   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:40:19.358   [gate]   running tally: PASS 3  FAIL 0  INCONCLUSIVE 0
+20:40:24.565   [gate] arm=English candidate=I trial 2 of 3; freeze=confirmed; oracles=Ascii
+20:40:24.566   [gate]   action: LShift held, freeze CONFIRMED ACTIVE, then release (primary)
+20:40:24.567   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:40:29.979   English p2 [I] Ascii     LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x0409 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:40:29.980   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:40:29.982   [gate]   running tally: PASS 4  FAIL 0  INCONCLUSIVE 0
+20:40:35.188   [gate] arm=English candidate=A trial 3 of 3; freeze=none; oracles=Ascii
+20:40:35.193   [gate]   action: bare LShift hold 1.5s + release (NO freeze - internal control)
+20:40:35.194   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:40:39.935   English p3 [A] Ascii     bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x0409 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:40:39.937   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:40:39.939   [gate]   running tally: PASS 5  FAIL 0  INCONCLUSIVE 0
+20:40:45.144   [gate] arm=English candidate=I trial 3 of 3; freeze=confirmed; oracles=Ascii
+20:40:45.145   [gate]   action: LShift held, freeze CONFIRMED ACTIVE, then release (primary)
+20:40:45.146   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:40:50.511   English p3 [I] Ascii     LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x0409 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:40:50.513   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:40:50.514   [gate]   running tally: PASS 6  FAIL 0  INCONCLUSIVE 0
+20:40:58.229   exit probe (Ascii): CLEAN (U+0061 U+0062 U+0063) mods=none
+20:40:58.232 
+20:40:58.233 ================ ARM: MSKLC ================
+20:40:58.235   Cameroon QWERTY 2017 - Microsoft MSKLC, a0000436 / CAMQ2017.dll, under af (OPTIONAL)
+20:40:59.099         Win+Space #1 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:40:59.962         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:41:00.833         Win+Space #3 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=37492 cls=RichEditD2DPT)
+20:41:01.703         Win+Space #4 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=37492 cls=RichEditD2DPT)
+20:41:01.705   confirmed: MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=37492 cls=RichEditD2DPT)
+20:41:08.039         fingerprint deadkey ';e'+RAlt+N -> CLEAN     U+0259 U+014B
+20:41:08.040         fingerprint ascii   'abc'       -> CLEAN     U+0061 U+0062 U+0063
+20:41:08.041   oracles in play: Ascii, Deadkey
+20:41:10.561   baseline (Ascii): CLEAN 'abc' (U+0061 U+0062 U+0063) mods=none
+20:41:10.563 
+20:41:10.565   [gate] arm=MSKLC candidate=A trial 1 of 3; freeze=none; oracles=Ascii,Deadkey
+20:41:10.566   [gate]   action: bare LShift hold 1.5s + release (NO freeze - internal control)
+20:41:10.568   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:41:10.569   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:41:15.311   MSKLC p1 [A] Ascii     bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x0436 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:41:15.313   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:41:18.864   MSKLC p1 [A] Deadkey   bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x0436 -> clean  (U+0259 U+014B) mods=none
+20:41:18.866   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:41:18.868   [gate]   running tally: PASS 8  FAIL 0  INCONCLUSIVE 0
+20:41:24.071   [gate] arm=MSKLC candidate=I trial 1 of 3; freeze=confirmed; oracles=Ascii,Deadkey
+20:41:24.073   [gate]   action: LShift held, freeze CONFIRMED ACTIVE, then release (primary)
+20:41:24.074   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:41:24.075   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:41:29.474   MSKLC p1 [I] Ascii     LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x0436 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:41:29.478   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:41:33.245   MSKLC p1 [I] Deadkey   LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x0436 -> clean  (U+0259 U+014B) mods=none
+20:41:33.247   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:41:33.248   [gate]   running tally: PASS 10  FAIL 0  INCONCLUSIVE 0
+20:41:38.466   [gate] arm=MSKLC candidate=A trial 2 of 3; freeze=none; oracles=Ascii,Deadkey
+20:41:38.468   [gate]   action: bare LShift hold 1.5s + release (NO freeze - internal control)
+20:41:38.470   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:41:38.472   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:41:43.199   MSKLC p2 [A] Ascii     bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x0436 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:41:43.200   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:41:46.819   MSKLC p2 [A] Deadkey   bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x0436 -> clean  (U+0259 U+014B) mods=none
+20:41:46.820   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:41:46.822   [gate]   running tally: PASS 12  FAIL 0  INCONCLUSIVE 0
+20:41:52.024   [gate] arm=MSKLC candidate=I trial 2 of 3; freeze=confirmed; oracles=Ascii,Deadkey
+20:41:52.025   [gate]   action: LShift held, freeze CONFIRMED ACTIVE, then release (primary)
+20:41:52.026   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:41:52.027   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:41:57.399   MSKLC p2 [I] Ascii     LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x0436 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:41:57.401   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:42:01.187   MSKLC p2 [I] Deadkey   LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x0436 -> clean  (U+0259 U+014B) mods=none
+20:42:01.188   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:42:01.189   [gate]   running tally: PASS 14  FAIL 0  INCONCLUSIVE 0
+20:42:06.399   [gate] arm=MSKLC candidate=A trial 3 of 3; freeze=none; oracles=Ascii,Deadkey
+20:42:06.401   [gate]   action: bare LShift hold 1.5s + release (NO freeze - internal control)
+20:42:06.402   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:42:06.403   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:42:11.115   MSKLC p3 [A] Ascii     bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x0436 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:42:11.117   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:42:14.788   MSKLC p3 [A] Deadkey   bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x0436 -> clean  (U+0259 U+014B) mods=none
+20:42:14.790   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:42:14.791   [gate]   running tally: PASS 16  FAIL 0  INCONCLUSIVE 0
+20:42:20.004   [gate] arm=MSKLC candidate=I trial 3 of 3; freeze=confirmed; oracles=Ascii,Deadkey
+20:42:20.005   [gate]   action: LShift held, freeze CONFIRMED ACTIVE, then release (primary)
+20:42:20.007   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:42:20.008   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:42:25.366   MSKLC p3 [I] Ascii     LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x0436 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:42:25.368   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:42:29.213   MSKLC p3 [I] Deadkey   LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x0436 -> clean  (U+0259 U+014B) mods=none
+20:42:29.215   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:42:29.216   [gate]   running tally: PASS 18  FAIL 0  INCONCLUSIVE 0
+20:42:36.923   exit probe (Ascii): CLEAN (U+0061 U+0062 U+0063) mods=none
+20:42:36.925 
+20:42:36.926 ================ ARM: Keyman ================
+20:42:36.927   Cameroon QWERTY - Keyman sil_cameroon_qwerty, TIP {25C4EE49-...} under aal-Latn-CM
+20:42:37.807         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=37492 cls=RichEditD2DPT)
+20:42:41.364         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+20:42:41.365         deadkey confirms Cameroon QWERTY
+20:42:41.367   confirmed: Keyman (HKL=0x04092000 langid=0x2000 tid=37492 cls=RichEditD2DPT)
+20:42:47.694         fingerprint deadkey ';e'+RAlt+N -> CLEAN     U+0259 U+014B
+20:42:47.695         fingerprint ascii   'abc'       -> CLEAN     U+0061 U+0062 U+0063
+20:42:47.696   oracles in play: Ascii, Deadkey
+20:42:50.180   baseline (Ascii): CLEAN 'abc' (U+0061 U+0062 U+0063) mods=none
+20:42:50.182 
+20:42:50.184   [gate] arm=Keyman candidate=A trial 1 of 3; freeze=none; oracles=Ascii,Deadkey
+20:42:50.185   [gate]   action: bare LShift hold 1.5s + release (NO freeze - internal control)
+20:42:50.186   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:42:50.187   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:42:54.877   Keyman p1 [A] Ascii     bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x2000 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:42:54.878   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:42:58.455   Keyman p1 [A] Deadkey   bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x2000 -> clean  (U+0259 U+014B) mods=none
+20:42:58.457   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:42:58.458   [gate]   running tally: PASS 20  FAIL 0  INCONCLUSIVE 0
+20:43:03.673   [gate] arm=Keyman candidate=I trial 1 of 3; freeze=confirmed; oracles=Ascii,Deadkey
+20:43:03.674   [gate]   action: LShift held, freeze CONFIRMED ACTIVE, then release (primary)
+20:43:03.676   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:43:03.677   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:43:09.084   Keyman p1 [I] Ascii     LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x2000 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:43:09.087   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:43:12.815   Keyman p1 [I] Deadkey   LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x2000 -> clean  (U+0259 U+014B) mods=none
+20:43:12.816   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:43:12.818   [gate]   running tally: PASS 22  FAIL 0  INCONCLUSIVE 0
+20:43:18.031   [gate] arm=Keyman candidate=A trial 2 of 3; freeze=none; oracles=Ascii,Deadkey
+20:43:18.033   [gate]   action: bare LShift hold 1.5s + release (NO freeze - internal control)
+20:43:18.034   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:43:18.035   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:43:22.747   Keyman p2 [A] Ascii     bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x2000 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:43:22.749   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:43:26.313   Keyman p2 [A] Deadkey   bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x2000 -> clean  (U+0259 U+014B) mods=none
+20:43:26.314   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:43:26.315   [gate]   running tally: PASS 24  FAIL 0  INCONCLUSIVE 0
+20:43:31.519   [gate] arm=Keyman candidate=I trial 2 of 3; freeze=confirmed; oracles=Ascii,Deadkey
+20:43:31.521   [gate]   action: LShift held, freeze CONFIRMED ACTIVE, then release (primary)
+20:43:31.522   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:43:31.523   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:43:36.880   Keyman p2 [I] Ascii     LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x2000 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:43:36.882   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:43:40.647   Keyman p2 [I] Deadkey   LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x2000 -> clean  (U+0259 U+014B) mods=none
+20:43:40.649   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:43:40.650   [gate]   running tally: PASS 26  FAIL 0  INCONCLUSIVE 0
+20:43:45.868   [gate] arm=Keyman candidate=A trial 3 of 3; freeze=none; oracles=Ascii,Deadkey
+20:43:45.870   [gate]   action: bare LShift hold 1.5s + release (NO freeze - internal control)
+20:43:45.871   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:43:45.872   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:43:50.596   Keyman p3 [A] Ascii     bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x2000 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:43:50.597   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:43:54.183   Keyman p3 [A] Deadkey   bare LShift hold 1.5s + release (NO freeze - internal control) langid=0x2000 -> clean  (U+0259 U+014B) mods=none
+20:43:54.185   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:43:54.186   [gate]   running tally: PASS 28  FAIL 0  INCONCLUSIVE 0
+20:43:59.390   [gate] arm=Keyman candidate=I trial 3 of 3; freeze=confirmed; oracles=Ascii,Deadkey
+20:43:59.391   [gate]   action: LShift held, freeze CONFIRMED ACTIVE, then release (primary)
+20:43:59.392   [gate]   expect Ascii 'abc' (U+0061 U+0062 U+0063); a wedge would read 'ABC' (U+0041 U+0042 U+0043)
+20:43:59.393   [gate]   expect Deadkey U+0259 U+014B (schwa + eng); a wedge would read U+0259 U+014A (schwa + CAPITAL eng), or U+003A U+0045 U+014A in the full form
+20:44:04.778   Keyman p3 [I] Ascii     LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x2000 -> clean  (U+0061 U+0062 U+0063) mods=none
+20:44:04.780   [gate]   Ascii observed U+0061 U+0062 U+0063 -> CLEAN; [PASS] clean - the arm did not wedge
+20:44:08.537   Keyman p3 [I] Deadkey   LShift held, freeze CONFIRMED ACTIVE, then release (primary) langid=0x2000 -> clean  (U+0259 U+014B) mods=none
+20:44:08.539   [gate]   Deadkey observed U+0259 U+014B -> CLEAN; [PASS] clean - the arm did not wedge
+20:44:08.539   [gate]   running tally: PASS 30  FAIL 0  INCONCLUSIVE 0
+20:44:16.242   exit probe (Ascii): CLEAN (U+0061 U+0062 U+0063) mods=none
+20:44:16.244 
+20:44:16.245 =========================== SUMMARY ===========================
+20:44:16.246 
+20:44:16.247 Fingerprints (what each keyboard actually produced):
+20:44:16.250   English deadkey=U+003B U+0065                ascii=U+0061 U+0062 U+0063 deadkeyOracle=not applicable
+20:44:16.253   MSKLC   deadkey=U+0259 U+014B                ascii=U+0061 U+0062 U+0063 deadkeyOracle=VALID
+20:44:16.255   Keyman  deadkey=U+0259 U+014B                ascii=U+0061 U+0062 U+0063 deadkeyOracle=VALID
+20:44:16.256 
+20:44:16.267 Trials: 30 recorded, 30 valid, 0 discarded
+20:44:16.268 
+20:44:16.269 Wedge rate by arm and candidate (valid trials only, Ascii oracle - the comparable one):
+20:44:16.275   candidate  English  MSKLC    Keyman   description
+20:44:16.308   A          0/3      0/3      0/3      bare LShift hold 1.5s + release (NO freeze - internal control)
+20:44:16.311   I          0/3      0/3      0/3      LShift held, freeze CONFIRMED ACTIVE, then release (primary)
+20:44:16.312 
+20:44:16.323 Same table, Deadkey oracle (Cameroon arms only - sharper, catches NO-OUTPUT too):
+20:44:16.330   candidate  MSKLC    Keyman   description
+20:44:16.345   A          0/3      0/3      bare LShift hold 1.5s + release (NO freeze - internal control)
+20:44:16.348   I          0/3      0/3      LShift held, freeze CONFIRMED ACTIVE, then release (primary)
+20:44:16.349 
+20:44:16.368 Arm totals (Ascii): English 0/6   MSKLC 0/6   Keyman 0/6
+20:44:16.370 
+20:44:16.380 VERDICT
+20:44:16.382   [NOT REPRODUCED] Keyman did not wedge in this run. Nothing is proven either way.
+20:44:16.384                    Try -LoadThreads 4..6 and a higher -Repeat; the trigger needs the
+20:44:16.385                    Keyman main thread starved at the wrong instant.
+20:44:16.387 
+20:44:16.399   internal control A (no freeze) on Keyman: 0/3 wedged - consistent with the freeze being the mechanism.
+20:44:16.402   [NOTE] English: exit probe CLEAN (U+0061 U+0062 U+0063)
+20:44:16.403   [NOTE] MSKLC: exit probe CLEAN (U+0061 U+0062 U+0063)
+20:44:16.405   [NOTE] Keyman: exit probe CLEAN (U+0061 U+0062 U+0063)
+20:44:16.420 
+20:44:16.422   csv  : C:\Users\thoua\AppData\Local\Temp\gh8064-fixed\gate\stuck-mod-test-20260831-203914.csv
+20:44:16.423   json : C:\Users\thoua\AppData\Local\Temp\gh8064-fixed\gate\stuck-mod-test-20260831-203914.json
+20:44:16.425   log  : C:\Users\thoua\AppData\Local\Temp\gh8064-fixed\gate\stuck-mod-test-20260831-203914.txt
+20:44:16.426 ===============================================================
+20:44:16.429 
+20:44:16.434 ===================== GH-8064 REGRESSION GATE =====================
+20:44:16.435   arms run      : English, MSKLC, Keyman
+20:44:16.446   candidates    : A,I
+20:44:16.448   trials scored : PASS 30   FAIL 0   INCONCLUSIVE 0
+20:44:16.449   decisive trials on the Keyman arm: 12
+20:44:16.450 
+20:44:16.451   OVERALL: PASS
+20:44:16.453            No arm wedged, and every precondition was confirmed. This is what a build
+20:44:16.455            carrying the GH-8064 fixes is expected to produce. A vanilla build is
+20:44:16.455            expected to FAIL here instead.
+20:44:16.458   exit code: 0
+20:44:16.458   log      : C:\Users\thoua\AppData\Local\Temp\gh8064-fixed\gate\stuck-mod-test-20260831-203914.txt
+20:44:16.460 ==================================================================

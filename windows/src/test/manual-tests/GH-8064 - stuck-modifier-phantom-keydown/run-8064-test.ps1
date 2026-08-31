@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Automates the GH-8064 stuck-modifier reproduction: hold a modifier, freeze Keyman so Windows
   silently uninstalls its low level keyboard hook, release the modifier while the hook is gone, then
@@ -12,16 +12,38 @@
   reads all nine modifier VKs, since do_keybd_event injects the side-agnostic VK.
 
   READ THIS BEFORE TRUSTING A PASS. An absent stuck modifier means nothing unless a batch was
-  actually assembled, which needs a 32-bit host with a Keyman keyboard SELECTED and a keystroke a
-  rule transforms. All three are verified here, and an unmet one reports INCONCLUSIVE, not PASS.
+  actually assembled, which needs a host with a Keyman keyboard SELECTED and a keystroke a rule
+  transforms. Both are verified here, and an unmet one reports INCONCLUSIVE, not PASS.
+
+  Host bitness is NOT a precondition. It was treated as one until 2026-08-31 -- see the host block
+  in the body for why that was wrong, and evidence/run-after-branch-2026-08-29.txt for the
+  correction. It is still reported on the result line, because no run of this script against a
+  64-bit host has been recorded yet.
 
   Simulates the user with SendInput, real scan codes and dwExtraInfo 0. That works only because the
   fix identifies Keyman's own events by scan code and dwExtraInfo, not by LLKHF_INJECTED.
 
 .PARAMETER HostApp
-  Path to a 32-bit application with a text input field. REQUIRED, and verified to be a WOW64 process
-  with a real window: on Windows 11 both notepad.exe and SysWOW64\notepad.exe resolve to the 64-bit
-  Notepad, whose engine compiles serialkeyeventserver.cpp out entirely.
+  Path to an application with a text input field. REQUIRED, and verified to present a real window --
+  without one this script cannot focus it and keystrokes would land wherever focus happens to be.
+
+  host32/ is the RECOMMENDED host and the one behind the recorded before/after pair: a plain Win32
+  window with a single Edit control, so it avoids the packaged-app stub and multi-threaded frame
+  window complications Windows 11 Notepad brings.
+
+  DO NOT use Windows 11 Notepad. Neither copy works as a host here: System32
+otepad.exe hands the
+  request to the packaged Notepad -- a separate, already-running process that owns the tabbed
+  window -- and then sits there with no window of its own, so this script aborts before measuring
+  anything. Measured 2026-08-31, see evidence/notepad64-stock-19.0.276.txt.
+
+  For a stock host, charmap.exe is the one that behaves: SysWOW64\charmap.exe for 32-bit,
+  System32\charmap.exe for 64-bit. Both present a real top-level window with an Edit control.
+  Run those from a 64-BIT shell: under a 32-bit PowerShell the file system redirector turns
+  System32 into SysWOW64 and you silently measure the 32-bit host twice. The bitness printed on
+  the result line is the one that was actually launched, so a saved run always says which it was.
+
+  Bitness is recorded, not enforced. See the host block in the body.
 
 .PARAMETER Iterations
   How many times to run the sequence. The defect depends on message ordering, so a single clean run
@@ -43,7 +65,10 @@
   pass the probe characters through; the run's evidential value drops accordingly.
 
 .EXAMPLE
-  ./run-8064-test.ps1 -HostApp 'C:\Path\To\A\32bit\editor.exe'
+  # An ordinary app with a text field. NOT host32.exe -- that is a separate harness
+  # which drives its own sequence; run it directly with --fakefreeze.
+  ./run-8064-test.ps1 -HostApp 'C:\Windows\SysWOW64\charmap.exe'   # 32-bit stock host
+  ./run-8064-test.ps1 -HostApp 'C:\Windows\System32\charmap.exe'    # 64-bit stock host
   ./run-8064-test.ps1 -HostApp ... -Control
   ./run-8064-test.ps1 -HostApp ... -Modifier RSHIFT -Iterations 10
 #>
@@ -88,7 +113,58 @@ Add-Type -Namespace GH8064 -Name Win32 -MemberDefinition @'
   [DllImport("user32.dll")] public static extern IntPtr SendMessage(IntPtr h, uint m, IntPtr wp, IntPtr lp);
   [DllImport("kernel32.dll", SetLastError=true)]
   public static extern bool IsWow64Process(IntPtr h, out bool wow);
+  [StructLayout(LayoutKind.Sequential)]
+  public struct RECT { public int left, top, right, bottom; }
+  [StructLayout(LayoutKind.Sequential)]
+  public struct GUITHREADINFO {
+    public uint cbSize; public uint flags;
+    public IntPtr hwndActive, hwndFocus, hwndCapture, hwndMenuOwner, hwndMoveSize, hwndCaret;
+    public RECT rcCaret;
+  }
+  [DllImport("user32.dll", SetLastError=true)]
+  public static extern bool GetGUIThreadInfo(uint tid, ref GUITHREADINFO gti);
 '@
+
+# Whether a Keyman keyboard is SELECTED cannot be read off the HKL -- see the precondition
+# block near the bottom for why -- so ask TSF directly. ITfInputProcessorProfiles::
+# GetActiveLanguageProfile answers for the CALLING thread, which under the Windows default
+# ("use the same input method for all app windows") is the system-wide selection; the host's
+# own thread is corroborated separately by its HKL langid.
+Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+namespace GH8064 {
+  public class TsfProfile {
+    public int Hr; public ushort LangId; public Guid Profile;
+    public bool Active { get { return Hr >= 0 && Profile != Guid.Empty; } }
+  }
+  [ComImport, Guid("1F02B6C5-7842-4EE6-8A0B-9A24183A95CA"),
+   InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+  public interface ITfInputProcessorProfiles {
+    // Vtable order matters and nothing before the last slot is ever called, so the
+    // unused entries are declared as bare placeholders to hold their positions.
+    void Register(); void Unregister(); void AddLanguageProfile(); void RemoveLanguageProfile();
+    void EnumInputProcessorInfo(); void GetDefaultLanguageProfile(); void SetDefaultLanguageProfile();
+    void ActivateLanguageProfile();
+    [PreserveSig] int GetActiveLanguageProfile([In] ref Guid rclsid, out ushort langid, out Guid guidProfile);
+  }
+  public static class Tsf {
+    public static TsfProfile ActiveProfileOf(string clsid) {
+      var o = (ITfInputProcessorProfiles)Activator.CreateInstance(
+        Type.GetTypeFromCLSID(new Guid("33C53A50-F456-4884-B049-85FD643ECFED")));  // CLSID_TF_InputProcessorProfiles
+      try {
+        Guid c = new Guid(clsid); ushort lang; Guid prof;
+        int hr = o.GetActiveLanguageProfile(ref c, out lang, out prof);
+        return new TsfProfile { Hr = hr, LangId = lang, Profile = prof };
+      } finally { Marshal.ReleaseComObject(o); }
+    }
+  }
+}
+'@
+
+# Keyman Engine Text Service, registered under TFCAT_TIP_KEYBOARD.
+# See windows/src/engine/inst/components.wxs:198 and windows/include/kmtip_guids.h.
+$KMTIP_CLSID = 'FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7'
 
 $INPUT_KEYBOARD  = 1
 $KEYEVENTF_KEYUP = 0x0002
@@ -194,6 +270,18 @@ function Get-WindowText {
   return $sb.ToString()
 }
 
+# The profile GUID alone does not say WHICH keyboard is selected, and "a Keyman keyboard is
+# active" is a weaker statement than "Cameroon QWERTY is active" when reading a saved run.
+# Best effort only: an unnamed profile is still a valid one.
+function Get-ProfileName {
+  param([string]$Clsid, [int]$LangId, [guid]$Profile)
+  try {
+    $k = 'HKLM:\SOFTWARE\Microsoft\CTF\TIP\{0}\LanguageProfile\0x{1:X8}\{{{2}}}' -f `
+      "{$Clsid}", $LangId, $Profile.ToString().ToUpper()
+    return (Get-ItemProperty -Path $k -ErrorAction Stop).Description
+  } catch { return $null }
+}
+
 Write-Host '=== GH-8064 automated reproduction ===' -ForegroundColor Cyan
 $abort = @()
 
@@ -227,10 +315,13 @@ if ($baseline.Count -gt 0) {
   else { Write-Host '[OK]   recovered; baseline clean' }
 } else { Write-Host '[OK]   baseline clean' }
 
-# --- the 32-bit host, verified rather than assumed ---
+# --- the host, with its bitness recorded rather than required ---
 $proc = $null
 $hostWnd = [IntPtr]::Zero
 $editWnd = [IntPtr]::Zero
+# Defined up front so the result line can print it on every path, including the ones that never
+# reach the bitness probe below.
+$hostBitness = 'unknown'
 if (-not (Test-Path $HostApp)) {
   $abort += "HostApp not found: $HostApp"
 } else {
@@ -239,17 +330,45 @@ if (-not (Test-Path $HostApp)) {
     Start-Sleep -Milliseconds 250
     try { $proc.Refresh(); $hostWnd = $proc.MainWindowHandle } catch { }
   }
+  # MainWindowHandle on an exited process yields $null, NOT [IntPtr]::Zero, and
+  # `$null -ne [IntPtr]::Zero` is TRUE -- so every downstream guard passes and the first
+  # P/Invoke dies with "Cannot convert null to type System.IntPtr" nineteen lines before
+  # the abort list would have reported the real problem. Normalise it here.
+  if ($null -eq $hostWnd) { $hostWnd = [IntPtr]::Zero }
+
   if ($proc.HasExited) {
-    $abort += "HostApp exited immediately; it is probably a launcher for a packaged app. Supply a real 32-bit executable."
+    $abort += "HostApp exited immediately. NOTE: host32.exe is NOT a passive host for this script -- it is a separate harness that drives its own sequence and requires --fakefreeze, so run it directly instead. This script needs an ordinary application with a text field."
   } elseif ($hostWnd -eq [IntPtr]::Zero) {
-    $abort += "HostApp never presented a window (MainWindowHandle stayed 0). Without a window this script cannot focus it, and keystrokes would go to whatever window has focus."
+    $abort += "HostApp never presented a window (MainWindowHandle stayed 0). Without a window this script cannot focus it, and keystrokes would go to whatever window has focus. On Windows 11 this is what a packaged app looks like from out here: System32
+otepad.exe hands the request to the packaged Notepad -- a SEPARATE, already-running process that owns the tabbed window -- and then stays alive with no window of its own. Adopting that window is not an option either, since the cleanup below would kill the user's Notepad with it. Use System32\charmap.exe for a 64-bit host, SysWOW64\charmap.exe for a 32-bit one, or host32/ (recommended)."
   } else {
+    # Host bitness is REPORTED, not required. It was a hard abort until 2026-08-31, on the
+    # reasoning that serialkeyeventserver.cpp being #ifndef _WIN64 makes a 64-bit host immune.
+    # That does not follow: the server, the hook and the cache live in 32-bit keyman.exe, but
+    # WH_KEYBOARD_LL is system-wide and serialkeyeventclient.cpp has no _WIN64 guard -- a 64-bit
+    # client reaches the same single server by unsuffixed global name through the memory-mapped
+    # file. stuck-mod-test.ps1 reproduces the wedge against 64-bit Notepad and has never had a
+    # bitness check. See evidence/run-after-branch-2026-08-29.txt, "correction".
+    #
+    # host32 remains the RECOMMENDED host: it is the one used for the recorded before/after pair,
+    # it drives the sequence itself, and it removes the packaged-app and multi-threaded-frame
+    # complications Windows 11 Notepad brings. A 64-bit run is not yet backed by a recorded
+    # measurement through THIS script, so it warns and records rather than passing silently.
     $isWow = $false
-    try { [void][GH8064.Win32]::IsWow64Process($proc.Handle, [ref]$isWow) } catch { }
-    if (-not $isWow) {
-      $abort += "HostApp is a 64-bit process. Its engine is keymanx64.dll, where serialkeyeventserver.cpp is compiled out, so the modifier cache under test does not exist in it."
-    } else {
+    $bitnessKnown = $true
+    try { [void][GH8064.Win32]::IsWow64Process($proc.Handle, [ref]$isWow) } catch { $bitnessKnown = $false }
+    if (-not $bitnessKnown) {
+      $hostBitness = 'unknown'
+      Write-Host ('[WARN] could not determine host bitness for {0}; recorded as unknown' -f $HostApp)
+    } elseif ($isWow) {
+      $hostBitness = '32-bit'
       Write-Host ('[OK]   32-bit host: {0} (pid {1}, hwnd 0x{2:X})' -f $HostApp, $proc.Id, [int64]$hostWnd)
+    } else {
+      $hostBitness = '64-bit'
+      Write-Host ('[WARN] 64-bit host: {0} (pid {1}, hwnd 0x{2:X})' -f $HostApp, $proc.Id, [int64]$hostWnd)
+      Write-Host '[WARN] The defect is not 32-bit-only, but no run of THIS script against a 64-bit'
+      Write-Host '[WARN] host has been recorded yet. Treat the result as a new measurement, not a'
+      Write-Host '[WARN] routine one, and save the output to evidence/. host32/ is the known-good host.'
     }
     $editWnd = Get-EditChild -Root $hostWnd
     if ($editWnd -eq [IntPtr]::Zero) {
@@ -268,15 +387,73 @@ if ($hostWnd -ne [IntPtr]::Zero) {
   if ($fg -ne $hostWnd) {
     $abort += ('Could not bring the host to the foreground (foreground is 0x{0:X}). Keystrokes would go elsewhere.' -f [int64]$fg)
   } else {
-    $tid = 0
-    [void][GH8064.Win32]::GetWindowThreadProcessId($hostWnd, [ref]$tid)
-    $hkl = [int64][GH8064.Win32]::GetKeyboardLayout([uint32]$tid)
-    # A TIP profile has a non-zero high word that is not a plain layout id. Keyman keyboards are
-    # TIPs, so a plain 0x0409xxxx style HKL means the base layout is selected and no rule can fire.
-    $isTip = ((($hkl -shr 16) -band 0xF000) -eq 0xF000)
-    Write-Host ('       host thread {0}, HKL 0x{1:X8}, TIP profile: {2}' -f $tid, $hkl, $isTip)
-    if (-not $isTip) {
-      $abort += 'The host has a plain keyboard layout selected, not a Keyman TIP. No rule will fire, no batch will be assembled, and a clean modifier state would prove nothing. Select a Keyman keyboard in the host window and re-run.'
+    # Resolve the thread that owns the FOCUS, not the top-level window. A multi-threaded
+    # frame keeps its edit control on a different thread and the input profile is per
+    # thread, so the frame's thread can report a different keyboard from the one the
+    # keystrokes will actually meet. stuck-mod-test.ps1 records the same correction under
+    # "THE HKL ORACLE, CORRECTED".
+    $focusWnd = $hostWnd
+    $gti = New-Object GH8064.Win32+GUITHREADINFO
+    $gti.cbSize = [uint32][System.Runtime.InteropServices.Marshal]::SizeOf($gti)
+    if ([GH8064.Win32]::GetGUIThreadInfo(0, [ref]$gti)) {
+      if ($gti.hwndFocus -ne [IntPtr]::Zero) { $focusWnd = $gti.hwndFocus }
+      elseif ($gti.hwndActive -ne [IntPtr]::Zero) { $focusWnd = $gti.hwndActive }
+    }
+
+    # GetWindowThreadProcessId RETURNS the thread id and writes the PROCESS id to its out
+    # parameter. Until 2026-08-31 this discarded the return value and read the out parameter
+    # as the thread id, so GetKeyboardLayout was handed a pid, answered 0 for a thread that
+    # does not exist, and every run of this script -- against any host, with any keyboard
+    # selected -- aborted with "plain keyboard layout selected". The giveaway in a saved run
+    # is "host thread N" printing the same N as the pid on the line above it. See
+    # evidence/charmap32-stock-19.0.276.txt for the run that exposed it.
+    $hostPid = 0
+    $tid = [GH8064.Win32]::GetWindowThreadProcessId($focusWnd, [ref]$hostPid)
+    # GetGUIThreadInfo(0) reports whatever is in the foreground, which is the host only because
+    # the check above just confirmed it. If it somehow is not, the HKL below would describe some
+    # other application, so fall back to the host's own window rather than measure a stranger.
+    if ($hostPid -ne $proc.Id) {
+      Write-Host ('[WARN] focus window 0x{0:X} belongs to pid {1}, not the host ({2}); reading the keyboard from the host window instead' -f `
+        [int64]$focusWnd, $hostPid, $proc.Id)
+      $focusWnd = $hostWnd
+      $tid = [GH8064.Win32]::GetWindowThreadProcessId($focusWnd, [ref]$hostPid)
+    }
+    $hkl = ([int64][GH8064.Win32]::GetKeyboardLayout([uint32]$tid)) -band 0xFFFFFFFFL
+    $hklLang = $hkl -band 0xFFFF
+
+    # The HKL cannot answer "is a Keyman keyboard selected", and the test that used to stand
+    # here -- high word 0xF000 -- does not mean what its comment claimed. 0xF0xx marks a
+    # SUBSTITUTED layout (US-Dvorak and friends), not a text service. A Keyman TIP presents
+    # as its base layout under a transient langid, 0x04092000 on this machine, whose high
+    # word is 0x0409; so the check was false for every Keyman keyboard that has ever existed
+    # and could only ever abort. A plain US layout preloaded under that same transient langid
+    # presents identically (Substitutes: 00002000 -> 00000409), which is why the langid alone
+    # cannot stand in for it either -- see the Resolve-Arm note in stuck-mod-test.ps1.
+    #
+    # TSF knows. GetActiveLanguageProfile against the Keyman Engine Text Service returns
+    # GUID_NULL when that service is not the active profile, and the profile's own GUID when
+    # it is. It answers for THIS thread, so the host's focused thread is corroborated by
+    # comparing langids.
+    $km = $null
+    try { $km = [GH8064.Tsf]::ActiveProfileOf($KMTIP_CLSID) }
+    catch {
+      Write-Host ('[WARN] could not ask TSF which profile is active ({0}).' -f $_.Exception.Message)
+      Write-Host '[WARN] The Keyman-selected precondition is unverified; the text-transform check at the'
+      Write-Host '[WARN] end is now the only thing standing between a real PASS and a meaningless one.'
+    }
+    Write-Host ('       host thread {0} (pid {1}), HKL 0x{2:X8}, langid 0x{3:X4}' -f $tid, $hostPid, $hkl, $hklLang)
+
+    if ($null -ne $km) {
+      if (-not $km.Active) {
+        $abort += ('No Keyman keyboard is the active input profile: TSF reports the Keyman Engine Text Service inactive (hr 0x{0:X8}). No rule will fire, no batch will be assembled, and a clean modifier state would prove nothing. Select a Keyman keyboard -- Win+Space, or the language button in the taskbar -- and re-run.' -f $km.Hr)
+      } else {
+        $name = Get-ProfileName -Clsid $KMTIP_CLSID -LangId $km.LangId -Profile $km.Profile
+        Write-Host ('[OK]   Keyman TIP active: {0} (profile {{{1}}}, langid 0x{2:X4})' -f `
+          $(if ($name) { $name } else { '<unnamed profile>' }), $km.Profile.ToString().ToUpper(), $km.LangId)
+        if ($hklLang -ne [int]$km.LangId) {
+          $abort += ('A Keyman keyboard is active for this script (langid 0x{0:X4}) but the host''s focused thread is on langid 0x{1:X4}, so the keystrokes would meet a different keyboard from the one measured. Windows is set to a per-window input method; select the Keyman keyboard in the HOST window and re-run.' -f $km.LangId, $hklLang)
+        }
+      }
     }
   }
 }
@@ -373,6 +550,9 @@ $xform  = @($results | Where-Object { $_.Transformed -eq $true })
 
 Write-Host ('iterations {0}   freeze confirmed {1}   text transformed {2}   stuck {3}' -f `
   $results.Count, $froze.Count, $xform.Count, $stuck.Count)
+# Recorded on the result line so a saved run states which bitness it measured. See the host block
+# above: bitness is reported, not required.
+Write-Host ('host {0}   {1}' -f $hostBitness, $HostApp)
 
 $final = Get-HeldModifiers
 if ($final.Count -gt 0) {

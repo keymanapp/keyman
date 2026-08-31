@@ -1,0 +1,98 @@
+=== GH-8064 keyman32 test-interactive:x86 -- FIXED build, 2026-08-31 ===
+
+  repo     D:\Github\_Projects\_KM\keyman
+  commit   cb869c4add docs(windows): record stock-build evidence, correct the 32-bit claim (#8064)
+  command  ./windows/src/engine/keyman32/build.sh --debug test-interactive:x86
+  exit     0
+
+Note this leg builds and runs the STATIC LIBRARY tests. It does not load the
+installed keyman32.dll, so the DLL provenance in the rig logs does not apply here.
+The x64 leg is not redundant: keyman32.tests links keybd_shift.cpp directly, so it
+exercises the fixed logic even though the shipped keyman64.dll never calls it.
+
+--- run ---
+
+[windows/src/engine/keyman32] build.sh parameters: <--debug test-interactive:x86>
+[windows/src/engine/keyman32] ## test-interactive:x86 starting...
+[common/include] dependency build, started by windows/src/engine/keyman32
+[common/include] build.sh parameters: <configure build --debug --deps --builder-dep-parent windows/src/engine/keyman32>
+[common/include] skipping configure, up-to-date
+[common/include] skipping build, up-to-date
+[core] dependency build, started by windows/src/engine/keyman32
+[core] build.sh parameters: <configure:win build:win --debug --deps --builder-dep-parent windows/src/engine/keyman32>
+[core] skipping configure:win, up-to-date
+[core] skipping build:win, up-to-date
+
+  keyman32.vcxproj -> D:\Github\_Projects\_KM\keyman\windows\src\engine\keyman32\lib\bin\Win32\Debug\keyman32.lib
+
+  pch.cpp
+  kmtip_guids.cpp
+  gtest_main.cpp
+  keybd_shift.interactive.tests.cpp
+  Generating Code...
+  keyman32.interactive.tests.vcxproj -> D:\Github\_Projects\_KM\keyman\windows\src\engine\keyman32\tests\bin\Win32\Debug\keyman32.interactive.tests.exe
+
+Running main() from gtest_main.cpp with memory leak detection
+[==========] Running 4 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 4 tests from KEYBD_SHIFT
+[ RUN      ] KEYBD_SHIFT.FreshThreadKeyboardStateReflectsLiveModifiers
+SEED PROBE  this thread : GetKeyboardState ok=1 byte=0x00, GetAsyncKeyState=0x8001
+SEED PROBE  fresh thread: GetKeyboardState ok=1 byte=0x81, GetAsyncKeyState=0x8000
+SEED PROBE  after release: GetAsyncKeyState=0x0000
+[       OK ] KEYBD_SHIFT.FreshThreadKeyboardStateReflectsLiveModifiers (315 ms)
+[ RUN      ] KEYBD_SHIFT.ReconcileDoesNotRaceItsOwnInjectedRestorePress
+RACE PROBE  filler=  0  1 trials, 0ms in this depth, settle spins max=57 at-limit=0
+RACE PROBE  filler=  0  10 trials, 47ms in this depth, settle spins max=71 at-limit=0
+RACE PROBE  filler=  0  20 trials, 79ms in this depth, settle spins max=71 at-limit=0
+RACE PROBE  filler=  0  30 trials, 110ms in this depth, settle spins max=71 at-limit=0
+RACE PROBE  filler=  0  40 trials, 157ms in this depth, settle spins max=86 at-limit=0
+RACE PROBE  filler=  0  50 trials, 188ms in this depth, settle spins max=86 at-limit=0
+RACE PROBE  filler=  0  60 trials, 219ms in this depth, settle spins max=86 at-limit=0
+RACE PROBE  filler=  0  70 trials, 266ms in this depth, settle spins max=86 at-limit=0
+RACE PROBE  filler=  0  80 trials, 297ms in this depth, settle spins max=86 at-limit=0
+RACE PROBE  filler=  0  90 trials, 329ms in this depth, settle spins max=86 at-limit=0
+RACE PROBE  filler=  0  100 trials, 375ms in this depth, settle spins max=86 at-limit=0
+RACE PROBE  filler=  0  races=0/100  staleReads=0/100  SendInput mean=1208us/call 1208us/event  settle spins max=86 at-limit=0/100
+RACE PROBE  filler= 32  1 trials, 47ms in this depth, settle spins max=62 at-limit=0
+RACE PROBE  filler= 32  10 trials, 500ms in this depth, settle spins max=74 at-limit=0
+RACE PROBE  filler= 32  20 trials, 1000ms in this depth, settle spins max=82 at-limit=0
+RACE PROBE  filler= 32  30 trials, 1500ms in this depth, settle spins max=82 at-limit=0
+RACE PROBE  filler= 32  40 trials, 2000ms in this depth, settle spins max=82 at-limit=0
+RACE PROBE  filler= 32  50 trials, 2485ms in this depth, settle spins max=82 at-limit=0
+RACE PROBE  filler= 32  60 trials, 2969ms in this depth, settle spins max=82 at-limit=0
+RACE PROBE  filler= 32  70 trials, 3438ms in this depth, settle spins max=82 at-limit=0
+RACE PROBE  filler= 32  80 trials, 3938ms in this depth, settle spins max=82 at-limit=0
+RACE PROBE  filler= 32  90 trials, 4407ms in this depth, settle spins max=82 at-limit=0
+RACE PROBE  filler= 32  100 trials, 4907ms in this depth, settle spins max=82 at-limit=0
+RACE PROBE  filler= 32  races=0/100  staleReads=0/100  SendInput mean=46756us/call 1417us/event  settle spins max=82 at-limit=0/100
+RACE PROBE  filler=200  1 trials, 281ms in this depth, settle spins max=33 at-limit=0
+RACE PROBE  filler=200  10 trials, 2843ms in this depth, settle spins max=51 at-limit=0
+RACE PROBE  filler=200  20 trials, 5718ms in this depth, settle spins max=51 at-limit=0
+RACE PROBE  filler=200  30 trials, 8625ms in this depth, settle spins max=57 at-limit=0
+RACE PROBE  filler=200  40 trials, 11625ms in this depth, settle spins max=57 at-limit=0
+RACE PROBE  filler=200  50 trials, 14640ms in this depth, settle spins max=57 at-limit=0
+RACE PROBE  filler=200  60 trials, 18156ms in this depth, settle spins max=68 at-limit=0
+RACE PROBE  filler=200  70 trials, 21750ms in this depth, settle spins max=72 at-limit=0
+RACE PROBE  filler=200  80 trials, 25000ms in this depth, settle spins max=72 at-limit=0
+RACE PROBE  filler=200  90 trials, 27859ms in this depth, settle spins max=74 at-limit=0
+RACE PROBE  filler=200  100 trials, 30937ms in this depth, settle spins max=74 at-limit=0
+RACE PROBE  filler=200  races=0/100  staleReads=0/100  SendInput mean=306758us/call 1526us/event  settle spins max=74 at-limit=0/100
+[       OK ] KEYBD_SHIFT.ReconcileDoesNotRaceItsOwnInjectedRestorePress (36227 ms)
+[ RUN      ] KEYBD_SHIFT.DwExtraInfoSurvivesSendInputWhereTheScanCodeDoesNot
+PROVENANCE  vk=0xA0 scan=0xFF extra=0x4B4D0000 flags=0x10 (injected=1 extended=0 up=0)
+PROVENANCE  vk=0xA0 scan=0xFF extra=0x4B4D0000 flags=0x90 (injected=1 extended=0 up=1)
+PROVENANCE  vk=0xA1 scan=0x36 extra=0x4B4D0000 flags=0x11 (injected=1 extended=1 up=0)
+PROVENANCE  vk=0xA1 scan=0x36 extra=0x4B4D0000 flags=0x91 (injected=1 extended=1 up=1)
+[       OK ] KEYBD_SHIFT.DwExtraInfoSurvivesSendInputWhereTheScanCodeDoesNot (423 ms)
+[ RUN      ] KEYBD_SHIFT.GenericShiftSendInputReflectsInBothAsyncKeyStates
+GENERIC VK PROBE  GetAsyncKeyState VK_SHIFT=0x8000 VK_LSHIFT=0x8001 VK_RSHIFT=0x0000
+GENERIC VK PROBE  hook saw vk=0xA0 scan=0x00 extra=0x00000000 flags=0x10
+GENERIC VK PROBE  hook saw vk=0xA0 scan=0x00 extra=0x4B4D0000 flags=0x10
+[       OK ] KEYBD_SHIFT.GenericShiftSendInputReflectsInBothAsyncKeyStates (575 ms)
+[----------] 4 tests from KEYBD_SHIFT (37541 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test case ran. (37543 ms total)
+[  PASSED  ] 4 tests.
+[windows/src/engine/keyman32] ## test-interactive:x86 completed successfully

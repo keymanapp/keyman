@@ -1,0 +1,91 @@
+=== GH-8064 A/B/A sweep (stuck-mod-test.ps1 -Sweep) -- FIXED build, measured 2026-08-31 ===
+
+Same machine, same session, same operator as the stock half. One variable
+changed between the two: keyman32.dll.
+
+  stock:  keyman32.dll  1,239,488 bytes  v19.0.276.0  Release  (stock 19.0.276, per evidence/baseline-shipped-build.txt)
+  fixed:  keyman32.dll  4,197,376 bytes  v19.0.277.0  Debug    (branch build, written 2026-08-31 20:12:20)
+
+Pairs with evidence/sweep-stock-19.0.276.txt.
+
+--- run ---
+
+20:52:54.087 ============== stuck-mod-test: three-arm controlled test ==============
+20:52:54.089 target=notepad hwnd=0x60B82  keyman ctrl=0x907D4  load=0  switch=Auto  repeat=3
+20:52:54.091 installed input methods: 0x04090409 -> English; 0xF0020409 -> en-substituted-layout-0xF002-REJECT; 0xF0C00436 -> MSKLC; 0x0409046A -> Keyman-Yoruba; 0xF001100C -> fr-CH; 0x04092000 -> Keyman
+20:52:54.094 arms  = English -> MSKLC -> Keyman
+20:52:54.095 order = controls first, treatment last (the Keyman wedge is persistent)
+20:52:54.097 log   = C:\Users\thoua\AppData\Local\Temp\gh8064-fixed\sweep\stuck-mod-test-20260831-205253.txt
+20:52:54.100 
+20:52:54.103 startup keyboard: English (HKL=0x04090409 langid=0x0409 tid=2992 cls=Notepad)
+20:52:54.105   ---------------- RESET keyman.exe (not part of the stimulus) ----------------
+20:52:54.106     The control arms charge the modifier cache even though their own output stays
+20:52:54.106     clean. Without this reset the treatment arm arrives already wedged and its own
+20:52:54.108     trigger proves nothing. Restarting re-seeds the cache from live OS state.
+20:52:54.142     [INFO] cannot stop keyman.exe from an unelevated shell (Access Denied).
+20:52:54.144     ACTION NEEDED: restart Keyman yourself now - exit it from the tray/Start menu
+20:52:54.147                    and start it again. Waiting up to 120s for a new process...
+20:53:06.329     [OK] new keyman.exe observed (pid 44084 -> 15780) after 12s
+20:53:09.362     [OK] keyman.exe restarted, control window re-resolved to 0x40C82
+20:53:09.362   -----------------------------------------------------------------------------
+20:53:16.884         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+20:53:19.364 entry probe (Ascii, on the Keyman arm): CLEAN (U+0061 U+0062 U+0063) mods=none
+20:53:19.365   entry check passed - Keyman is clean, starting the run.
+20:53:19.366 
+20:53:19.367 ================ SWEEP: trigger / observe-wedged / clear / observe-clean ================
+20:53:19.368   1 trigger(s) per keyboard in the TRIGGER phase; later phases apply NOTHING.
+20:53:19.369 
+20:53:19.370 ---- phase 1: TRIGGER (walk all three, trigger on each) ----
+20:53:20.794         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=37492 cls=RichEditD2DPT)
+20:53:21.664         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:53:31.539   [TRIGGER] English Ascii    1 trigger(s)   -> CLEAN     (U+0061 U+0062 U+0063) mods=none
+20:53:32.409         Win+Space #1 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:53:33.275         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:53:34.143         Win+Space #3 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=37492 cls=RichEditD2DPT)
+20:53:35.015         Win+Space #4 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=37492 cls=RichEditD2DPT)
+20:53:44.945   [TRIGGER] MSKLC   Ascii    1 trigger(s)   -> CLEAN     (U+0061 U+0062 U+0063) mods=none
+20:53:48.546   [TRIGGER] MSKLC   Deadkey  1 trigger(s)   -> CLEAN     (U+0259 U+014B) mods=none
+20:53:49.416         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=37492 cls=RichEditD2DPT)
+20:53:52.973         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+20:53:52.975         deadkey confirms Cameroon QWERTY
+20:54:02.886   [TRIGGER] Keyman  Ascii    1 trigger(s)   -> CLEAN     (U+0061 U+0062 U+0063) mods=none
+20:54:06.445   [TRIGGER] Keyman  Deadkey  1 trigger(s)   -> CLEAN     (U+0259 U+014B) mods=none
+20:54:06.460 
+20:54:06.462 ---- phase 2: SKIPPED - Keyman came back CLEAN after 1 trigger(s) per keyboard ----
+20:54:06.463      The bug was not triggered, so there is no wedged state to observe.
+20:54:06.464      Re-run with a higher -SweepTrials (the charge test needed 5 on MSKLC).
+20:54:06.466 
+20:54:06.467 ---- phase 3: CLEAR the wedge ----
+20:54:10.040         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+20:54:15.764   injected recovery (ClearMods + TapAllMods) -> CLEAN (U+0259 U+014B)
+20:54:15.766 
+20:54:15.767 ---- phase 4: CLEARED (walk all three again, applying NOTHING) ----
+20:54:16.629         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=37492 cls=RichEditD2DPT)
+20:54:17.500         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:54:19.969   [CLEARED] English Ascii    observe only   -> CLEAN     (U+0061 U+0062 U+0063) mods=none
+20:54:20.836         Win+Space #1 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:54:21.706         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=37492 cls=RichEditD2DPT)
+20:54:22.576         Win+Space #3 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=37492 cls=RichEditD2DPT)
+20:54:23.443         Win+Space #4 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=37492 cls=RichEditD2DPT)
+20:54:25.946   [CLEARED] MSKLC   Ascii    observe only   -> CLEAN     (U+0061 U+0062 U+0063) mods=none
+20:54:29.576   [CLEARED] MSKLC   Deadkey  observe only   -> CLEAN     (U+0259 U+014B) mods=none
+20:54:30.446         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=37492 cls=RichEditD2DPT)
+20:54:34.012         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+20:54:34.014         deadkey confirms Cameroon QWERTY
+20:54:36.485   [CLEARED] Keyman  Ascii    observe only   -> CLEAN     (U+0061 U+0062 U+0063) mods=none
+20:54:40.056   [CLEARED] Keyman  Deadkey  observe only   -> CLEAN     (U+0259 U+014B) mods=none
+20:54:40.058 
+20:54:40.059 SWEEP MATRIX
+20:54:40.060   arm     oracle   TRIGGER     WEDGED      CLEARED    
+20:54:40.062   English Ascii    CLEAN       -           CLEAN      
+20:54:40.064   MSKLC   Ascii    CLEAN       -           CLEAN      
+20:54:40.066   MSKLC   Deadkey  CLEAN       -           CLEAN      
+20:54:40.068   Keyman  Ascii    CLEAN       -           CLEAN      
+20:54:40.070   Keyman  Deadkey  CLEAN       -           CLEAN      
+20:54:40.072 
+20:54:40.074 SWEEP VERDICT
+20:54:40.091   [NOT TRIGGERED] one pass with 1 trigger(s) per keyboard did not wedge Keyman.
+20:54:40.092                   Raise -SweepTrials and re-run before drawing any conclusion.
+20:54:40.100   csv  : C:\Users\thoua\AppData\Local\Temp\gh8064-fixed\sweep\stuck-mod-test-20260831-205253.csv
+20:54:40.101   log  : C:\Users\thoua\AppData\Local\Temp\gh8064-fixed\sweep\stuck-mod-test-20260831-205253.txt
+20:54:40.102 ===============================================================

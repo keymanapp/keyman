@@ -1,0 +1,122 @@
+16:22:11.263 ============== stuck-mod-test: three-arm controlled test ==============
+16:22:11.266 target=notepad hwnd=0x13067C  keyman ctrl=0x0  load=0  switch=Auto  repeat=3
+16:22:11.268 [WARN] keyman.exe TApplication window not found - the freeze stimulus will be a NO-OP on every arm.
+16:22:11.270        Every result below would then be a no-freeze control. Fix this before quoting any of it.
+16:22:11.275 installed input methods: 0x04090409 -> English; 0xF0020409 -> en-substituted-layout-0xF002-REJECT; 0xF0C00436 -> MSKLC; 0x0409046A -> Keyman-Yoruba; 0xF001100C -> fr-CH; 0x04092000 -> Keyman
+16:22:11.390 arms  = English -> MSKLC -> Keyman
+16:22:11.392 order = controls first, treatment last (the Keyman wedge is persistent)
+16:22:11.393 log   = C:\Users\thoua\AppData\Local\Temp\stuck-mod-test\stuck-mod-test-20260831-162210.txt
+16:22:11.395 
+16:22:11.398 startup keyboard: English (HKL=0x04090409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:22:11.403   ---------------- RESET keyman.exe (not part of the stimulus) ----------------
+16:22:11.405     The control arms charge the modifier cache even though their own output stays
+16:22:11.406     clean. Without this reset the treatment arm arrives already wedged and its own
+16:22:11.407     trigger proves nothing. Restarting re-seeds the cache from live OS state.
+16:22:11.510     [INFO] cannot stop keyman.exe from an unelevated shell (Access Denied).
+16:22:11.511     ACTION NEEDED: restart Keyman yourself now - exit it from the tray/Start menu
+16:22:11.513                    and start it again. Waiting up to 120s for a new process...
+16:22:20.634     [OK] new keyman.exe observed (pid  -> 13812) after 9s
+16:22:23.681     [OK] keyman.exe restarted, control window re-resolved to 0xB20C56
+16:22:23.683   -----------------------------------------------------------------------------
+16:22:25.070         Win+Space #1 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:22:25.901         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:22:26.726         Win+Space #3 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=7972 cls=RichEditD2DPT)
+16:22:27.558         Win+Space #4 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=7972 cls=RichEditD2DPT)
+16:22:28.392         Win+Space #5 -> Keyman (HKL=0x04092000 langid=0x2000 tid=7972 cls=RichEditD2DPT)
+16:22:31.945         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:22:31.947         deadkey confirms Cameroon QWERTY
+16:22:34.333 entry probe (Ascii, on the Keyman arm): CLEAN (U+0061 U+0062 U+0063) mods=none
+16:22:34.335   entry check passed - Keyman is clean, starting the run.
+16:22:34.335 
+16:22:34.337 ================ SWEEP: trigger / observe-wedged / clear / observe-clean ================
+16:22:34.338   1 trigger(s) per keyboard in the TRIGGER phase; later phases apply NOTHING.
+16:22:34.338 
+16:22:34.340 ---- phase 1: TRIGGER (walk all three, trigger on each) ----
+16:22:35.167         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=7972 cls=RichEditD2DPT)
+16:22:35.993         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:22:45.810   [TRIGGER] English Ascii    1 trigger(s)   -> CLEAN     (U+0061 U+0062 U+0063) mods=none
+16:22:46.652         Win+Space #1 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:22:47.484         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:22:48.320         Win+Space #3 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=7972 cls=RichEditD2DPT)
+16:22:49.149         Win+Space #4 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=7972 cls=RichEditD2DPT)
+16:22:58.960   [TRIGGER] MSKLC   Ascii    1 trigger(s)   -> CLEAN     (U+0061 U+0062 U+0063) mods=none
+16:23:02.492   [TRIGGER] MSKLC   Deadkey  1 trigger(s)   -> CLEAN     (U+0259 U+014B) mods=none
+16:23:03.324         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=7972 cls=RichEditD2DPT)
+16:23:06.863         arm-confirm deadkey -> WEDGED    U+003A U+0045 U+014A
+16:23:06.865         deadkey confirms Cameroon QWERTY
+16:23:18.014   [TRIGGER] Keyman  Ascii    1 trigger(s)   -> WEDGED    (U+0041 U+0042 U+0043) mods=LShift
+16:23:21.551   [TRIGGER] Keyman  Deadkey  1 trigger(s)   -> WEDGED    (U+003A U+0045 U+014A) mods=LShift
+16:23:21.560 
+16:23:21.561 ---- phase 2: WEDGED (walk all three again, applying NOTHING) ----
+16:23:21.562      This is the Keyman-only claim in its sharpest form: same machine, same
+16:23:21.564      session, same moment. Do the Microsoft keyboards still type correctly?
+16:23:22.399         Win+Space #1 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=7972 cls=RichEditD2DPT)
+16:23:23.228         Win+Space #2 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=7972 cls=RichEditD2DPT)
+16:23:24.060         Win+Space #3 -> English (HKL=0x04090409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:23:26.459   [WEDGED ] English Ascii    observe only   -> CLEAN     (U+0061 U+0062 U+0063) mods=LShift
+16:23:27.287         Win+Space #1 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:23:28.118         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:23:28.949         Win+Space #3 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=7972 cls=RichEditD2DPT)
+16:23:29.775         Win+Space #4 -> Keyman (HKL=0x04092000 langid=0x2000 tid=7972 cls=RichEditD2DPT)
+16:23:30.600         Win+Space #5 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=7972 cls=RichEditD2DPT)
+16:23:33.013   [WEDGED ] MSKLC   Ascii    observe only   -> WEDGED    (U+0041 U+0042 U+0043) mods=LShift
+16:23:36.552   [WEDGED ] MSKLC   Deadkey  observe only   -> WEDGED    (U+003A U+0045 U+014A) mods=LShift
+16:23:37.383         Win+Space #1 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=7972 cls=RichEditD2DPT)
+16:23:38.212         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:23:39.039         Win+Space #3 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:23:39.871         Win+Space #4 -> English (HKL=0x04090409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:23:40.702         Win+Space #5 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=7972 cls=RichEditD2DPT)
+16:23:41.552         Win+Space #6 -> Keyman (HKL=0x04092000 langid=0x2000 tid=7972 cls=RichEditD2DPT)
+16:23:45.088         arm-confirm deadkey -> WEDGED    U+003A U+0045 U+014A
+16:23:45.090         deadkey confirms Cameroon QWERTY
+16:23:47.513   [WEDGED ] Keyman  Ascii    observe only   -> WEDGED    (U+0041 U+0042 U+0043) mods=LShift
+16:23:51.050   [WEDGED ] Keyman  Deadkey  observe only   -> WEDGED    (U+003A U+0045 U+014A) mods=LShift
+16:23:51.051 
+16:23:51.052 ---- phase 3: CLEAR the wedge ----
+16:23:54.582         arm-confirm deadkey -> WEDGED    U+003A U+0045 U+014A
+16:24:00.209   injected recovery (ClearMods + TapAllMods) -> CLEAN (U+0259 U+014B)
+16:24:00.211 
+16:24:00.213 ---- phase 4: CLEARED (walk all three again, applying NOTHING) ----
+16:24:01.038         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=7972 cls=RichEditD2DPT)
+16:24:01.864         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:24:04.310   [CLEARED] English Ascii    observe only   -> CLEAN     (U+0061 U+0062 U+0063) mods=none
+16:24:05.149         Win+Space #1 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:24:05.980         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=7972 cls=RichEditD2DPT)
+16:24:06.806         Win+Space #3 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=7972 cls=RichEditD2DPT)
+16:24:07.638         Win+Space #4 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=7972 cls=RichEditD2DPT)
+16:24:10.061   [CLEARED] MSKLC   Ascii    observe only   -> CLEAN     (U+0061 U+0062 U+0063) mods=none
+16:24:13.599   [CLEARED] MSKLC   Deadkey  observe only   -> CLEAN     (U+0259 U+014B) mods=none
+16:24:14.430         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=7972 cls=RichEditD2DPT)
+16:24:17.956         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:24:17.957         deadkey confirms Cameroon QWERTY
+16:24:20.388   [CLEARED] Keyman  Ascii    observe only   -> CLEAN     (U+0061 U+0062 U+0063) mods=none
+16:24:23.931   [CLEARED] Keyman  Deadkey  observe only   -> CLEAN     (U+0259 U+014B) mods=none
+16:24:23.933 
+16:24:23.934 SWEEP MATRIX
+16:24:23.935   arm     oracle   TRIGGER     WEDGED      CLEARED    
+16:24:23.937   English Ascii    CLEAN       CLEAN       CLEAN      
+16:24:23.938   MSKLC   Ascii    CLEAN       WEDGED      CLEAN      
+16:24:23.941   MSKLC   Deadkey  CLEAN       WEDGED      CLEAN      
+16:24:23.943   Keyman  Ascii    WEDGED      WEDGED      CLEAN      
+16:24:23.944   Keyman  Deadkey  WEDGED      WEDGED      CLEAN      
+16:24:23.945 
+16:24:23.946 SWEEP VERDICT
+16:24:23.972   [CAUSED BY KEYMAN ONLY] Under the identical trigger, English and MSKLC stayed CLEAN
+16:24:23.974       while Keyman wedged. Windows is not at fault.
+16:24:23.975       Nor is the layout: MSKLC runs the same layout and stayed clean.
+16:24:23.976 
+16:24:23.977   [BUT THE DAMAGE IS MACHINE-WIDE] Once wedged, the Microsoft keyboards are
+16:24:23.979       affected too, with NO trigger applied to them:
+16:24:23.981       MSKLC   Ascii    -> WEDGED (U+0041 U+0042 U+0043) mods=LShift
+16:24:23.982       MSKLC   Deadkey  -> WEDGED (U+003A U+0045 U+014A) mods=LShift
+16:24:23.984       They are not malfunctioning - they are correctly rendering a Shift that is
+16:24:23.985       genuinely held as far as Windows is concerned. GetAsyncKeyState agrees.
+16:24:23.985       Keyman synthesised it: keybd_shift_reset() emits a KEYDOWN for every
+16:24:23.986       modifier its cache believes is held, with no matching KEYUP.
+16:24:23.987       So: caused only via Keyman, suffered by everything.
+16:24:23.988 
+16:24:23.989   [RECOVERABLE] After clearing, all three keyboards are CLEAN again - a
+16:24:23.990       recoverable desync, not permanent damage.
+16:24:23.997   csv  : C:\Users\thoua\AppData\Local\Temp\stuck-mod-test\stuck-mod-test-20260831-162210.csv
+16:24:23.999   log  : C:\Users\thoua\AppData\Local\Temp\stuck-mod-test\stuck-mod-test-20260831-162210.txt
+16:24:24.000 ===============================================================

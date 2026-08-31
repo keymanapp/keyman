@@ -1,0 +1,135 @@
+16:54:28.293 ============== stuck-mod-test: three-arm controlled test ==============
+16:54:28.295 target=notepad hwnd=0xD03E0  keyman ctrl=0x670D0A  load=0  switch=Auto  repeat=3
+16:54:28.297 installed input methods: 0x04090409 -> English; 0xF0020409 -> en-substituted-layout-0xF002-REJECT; 0xF0C00436 -> MSKLC; 0x0409046A -> Keyman-Yoruba; 0xF001100C -> fr-CH; 0x04092000 -> Keyman
+16:54:28.298 arms  = English -> MSKLC -> Keyman
+16:54:28.299 order = controls first, treatment last (the Keyman wedge is persistent)
+16:54:28.300 log   = C:\Users\thoua\AppData\Local\Temp\stuck-mod-test\stuck-mod-test-20260831-165427.txt
+16:54:28.301 
+16:54:28.302 startup keyboard: Keyman (HKL=0x04092000 langid=0x2000 tid=45388 cls=RichEditD2DPT)
+16:54:28.303   ---------------- RESET keyman.exe (not part of the stimulus) ----------------
+16:54:28.304     The control arms charge the modifier cache even though their own output stays
+16:54:28.305     clean. Without this reset the treatment arm arrives already wedged and its own
+16:54:28.306     trigger proves nothing. Restarting re-seeds the cache from live OS state.
+16:54:28.333     [INFO] cannot stop keyman.exe from an unelevated shell (Access Denied).
+16:54:28.335     ACTION NEEDED: restart Keyman yourself now - exit it from the tray/Start menu
+16:54:28.335                    and start it again. Waiting up to 120s for a new process...
+16:54:41.946     [OK] new keyman.exe observed (pid 38140 -> 45512) after 14s
+16:54:44.971     [OK] keyman.exe restarted, control window re-resolved to 0x140DCA
+16:54:44.973   -----------------------------------------------------------------------------
+16:54:48.502         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:54:50.934 entry probe (Ascii, on the Keyman arm): CLEAN (U+0061 U+0062 U+0063) mods=none
+16:54:50.935   entry check passed - Keyman is clean, starting the run.
+16:54:50.937 
+16:54:50.938 ================ SWITCH-STRESS MODE ================
+16:54:50.939   No freeze is EVER posted in this mode. The only stimulus is switching keyboards.
+16:54:50.941   If Keyman wedges here, the switch is a trigger in its own right.
+16:54:50.941   Switching away to the MSKLC arm.
+16:54:50.943 
+16:54:51.778         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=45388 cls=RichEditD2DPT)
+16:54:52.605         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:54:53.436         Win+Space #3 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:54:54.276         Win+Space #4 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:54:55.102         Win+Space #5 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=45388 cls=RichEditD2DPT)
+16:54:55.931         Win+Space #6 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=45388 cls=RichEditD2DPT)
+16:54:56.763         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=45388 cls=RichEditD2DPT)
+16:55:00.304         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:55:00.306         deadkey confirms Cameroon QWERTY
+16:55:03.831   cycle 1   back on Keyman -> CLEAN     (U+0259 U+014B) mods=none
+16:55:05.290         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=45388 cls=RichEditD2DPT)
+16:55:06.117         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:06.947         Win+Space #3 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:07.780         Win+Space #4 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:08.616         Win+Space #5 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=45388 cls=RichEditD2DPT)
+16:55:09.445         Win+Space #6 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=45388 cls=RichEditD2DPT)
+16:55:10.275         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=45388 cls=RichEditD2DPT)
+16:55:13.804         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:55:13.805         deadkey confirms Cameroon QWERTY
+16:55:17.333   cycle 2   back on Keyman -> CLEAN     (U+0259 U+014B) mods=none
+16:55:18.787         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=45388 cls=RichEditD2DPT)
+16:55:19.621         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:20.463         Win+Space #3 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:21.291         Win+Space #4 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:22.116         Win+Space #5 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=45388 cls=RichEditD2DPT)
+16:55:22.946         Win+Space #6 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=45388 cls=RichEditD2DPT)
+16:55:23.872         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=45388 cls=RichEditD2DPT)
+16:55:27.414         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:55:27.415         deadkey confirms Cameroon QWERTY
+16:55:30.945   cycle 3   back on Keyman -> CLEAN     (U+0259 U+014B) mods=none
+16:55:32.398         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=45388 cls=RichEditD2DPT)
+16:55:33.224         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:34.054         Win+Space #3 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:34.882         Win+Space #4 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:35.707         Win+Space #5 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=45388 cls=RichEditD2DPT)
+16:55:36.536         Win+Space #6 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=45388 cls=RichEditD2DPT)
+16:55:37.366         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=45388 cls=RichEditD2DPT)
+16:55:40.898         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:55:40.900         deadkey confirms Cameroon QWERTY
+16:55:44.425   cycle 4   back on Keyman -> CLEAN     (U+0259 U+014B) mods=none
+16:55:45.880         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=45388 cls=RichEditD2DPT)
+16:55:46.706         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:47.545         Win+Space #3 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:48.382         Win+Space #4 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:55:49.208         Win+Space #5 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=45388 cls=RichEditD2DPT)
+16:55:50.039         Win+Space #6 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=45388 cls=RichEditD2DPT)
+16:55:50.871         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=45388 cls=RichEditD2DPT)
+16:55:54.412         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:55:54.414         deadkey confirms Cameroon QWERTY
+16:55:57.946   cycle 5   back on Keyman -> CLEAN     (U+0259 U+014B) mods=none
+16:55:59.400         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=45388 cls=RichEditD2DPT)
+16:56:00.223         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:01.054         Win+Space #3 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:01.885         Win+Space #4 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:02.710         Win+Space #5 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=45388 cls=RichEditD2DPT)
+16:56:03.542         Win+Space #6 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=45388 cls=RichEditD2DPT)
+16:56:04.372         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=45388 cls=RichEditD2DPT)
+16:56:07.910         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:56:07.912         deadkey confirms Cameroon QWERTY
+16:56:11.446   cycle 6   back on Keyman -> CLEAN     (U+0259 U+014B) mods=none
+16:56:12.899         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=45388 cls=RichEditD2DPT)
+16:56:13.724         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:14.553         Win+Space #3 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:15.384         Win+Space #4 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:16.210         Win+Space #5 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=45388 cls=RichEditD2DPT)
+16:56:17.040         Win+Space #6 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=45388 cls=RichEditD2DPT)
+16:56:17.872         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=45388 cls=RichEditD2DPT)
+16:56:21.412         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:56:21.413         deadkey confirms Cameroon QWERTY
+16:56:24.941   cycle 7   back on Keyman -> CLEAN     (U+0259 U+014B) mods=none
+16:56:26.398         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=45388 cls=RichEditD2DPT)
+16:56:27.226         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:28.055         Win+Space #3 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:28.884         Win+Space #4 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:29.710         Win+Space #5 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=45388 cls=RichEditD2DPT)
+16:56:30.540         Win+Space #6 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=45388 cls=RichEditD2DPT)
+16:56:31.370         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=45388 cls=RichEditD2DPT)
+16:56:34.894         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:56:34.896         deadkey confirms Cameroon QWERTY
+16:56:38.425   cycle 8   back on Keyman -> CLEAN     (U+0259 U+014B) mods=none
+16:56:39.882         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=45388 cls=RichEditD2DPT)
+16:56:40.706         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:41.536         Win+Space #3 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:42.365         Win+Space #4 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:43.191         Win+Space #5 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=45388 cls=RichEditD2DPT)
+16:56:44.028         Win+Space #6 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=45388 cls=RichEditD2DPT)
+16:56:44.859         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=45388 cls=RichEditD2DPT)
+16:56:48.398         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:56:48.400         deadkey confirms Cameroon QWERTY
+16:56:53.945   cycle 9   back on Keyman -> CLEAN     (U+0259 U+014B) mods=none
+16:56:55.948         Win+Space #1 -> Keyman-Yoruba (HKL=0x0409046A langid=0x046A tid=45388 cls=RichEditD2DPT)
+16:56:56.774         Win+Space #2 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:57.606         Win+Space #3 -> en-substituted-layout-0xF002-REJECT (HKL=0xFFFFFFFFF0020409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:58.447         Win+Space #4 -> English (HKL=0x04090409 langid=0x0409 tid=45388 cls=RichEditD2DPT)
+16:56:59.272         Win+Space #5 -> fr-CH (HKL=0xFFFFFFFFF001100C langid=0x100C tid=45388 cls=RichEditD2DPT)
+16:57:00.099         Win+Space #6 -> MSKLC (HKL=0xFFFFFFFFF0C00436 langid=0x0436 tid=45388 cls=RichEditD2DPT)
+16:57:00.927         Win+Space #1 -> Keyman (HKL=0x04092000 langid=0x2000 tid=45388 cls=RichEditD2DPT)
+16:57:04.456         arm-confirm deadkey -> CLEAN     U+0259 U+014B
+16:57:04.457         deadkey confirms Cameroon QWERTY
+16:57:07.990   cycle 10  back on Keyman -> CLEAN     (U+0259 U+014B) mods=none
+16:57:08.618 
+16:57:08.620 SWITCH-STRESS RESULT
+16:57:08.621   10 switch cycles, no wedge. The switch alone is NOT sufficient.
+16:57:08.621   That leaves the freeze trials on the Microsoft arms as the thing that wedged Keyman,
+16:57:08.623   which would mean Keyman tracks modifier state even when its own keyboard is inactive.
+16:57:08.630   csv  : C:\Users\thoua\AppData\Local\Temp\stuck-mod-test\stuck-mod-test-20260831-165427.csv
+16:57:08.631   log  : C:\Users\thoua\AppData\Local\Temp\stuck-mod-test\stuck-mod-test-20260831-165427.txt
+16:57:08.631 ===============================================================

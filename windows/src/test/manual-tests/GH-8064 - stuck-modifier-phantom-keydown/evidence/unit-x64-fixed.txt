@@ -1,0 +1,333 @@
+=== GH-8064 keyman32 test:x64 -- FIXED build, 2026-08-31 ===
+
+  repo     D:\Github\_Projects\_KM\keyman
+  commit   cb869c4add docs(windows): record stock-build evidence, correct the 32-bit claim (#8064)
+  command  ./windows/src/engine/keyman32/build.sh --debug test:x64
+  exit     0
+
+Note this leg builds and runs the STATIC LIBRARY tests. It does not load the
+installed keyman32.dll, so the DLL provenance in the rig logs does not apply here.
+The x64 leg is not redundant: keyman32.tests links keybd_shift.cpp directly, so it
+exercises the fixed logic even though the shipped keyman64.dll never calls it.
+
+--- run ---
+
+[windows/src/engine/keyman32] build.sh parameters: <--debug test:x64>
+[windows/src/engine/keyman32] ## test:x64 starting...
+[common/include] dependency build, started by windows/src/engine/keyman32
+[common/include] build.sh parameters: <configure build --debug --deps --builder-dep-parent windows/src/engine/keyman32>
+[common/include] skipping configure, up-to-date
+[common/include] skipping build, up-to-date
+[core] dependency build, started by windows/src/engine/keyman32
+[core] build.sh parameters: <configure:win build:win --debug --deps --builder-dep-parent windows/src/engine/keyman32>
+[core] skipping configure:win, up-to-date
+[core] skipping build:win, up-to-date
+
+  pch.cpp
+  kmtip_guids.cpp
+  CoreEnvironment.cpp
+  keynames.cpp
+  registry.cpp
+  unicode.cpp
+  xstring.cpp
+  DebugEventTrace.cpp
+  K32_DBG.CPP
+  K32_load.cpp
+  LowLevelHookWatchDog.cpp
+  RightAltEmulationCheck.cpp
+  SharedBuffers.cpp
+  VKScanCodes.cpp
+  appcontext.cpp
+  aiTIP.cpp
+  aiWin2000Unicode.cpp
+  appint.cpp
+  calldll.cpp
+  capsstate.cpp
+  glossary.cpp
+  Generating Code...
+  Compiling...
+  hookutils.cpp
+  hotkeys.cpp
+  k32_globals.cpp
+  k32_lowlevelkeyboardhook.cpp
+  k32_tsf.cpp
+  k32_visualkeyboardinterface.cpp
+  keybd_shift.cpp
+  keyboardoptions.cpp
+  keyman32.cpp
+  keystate.cpp
+  kmhook_callwndproc.cpp
+  kmhook_getmessage.cpp
+  kmhook_keyboard.cpp
+  kmprocess.cpp
+  kmprocessactions.cpp
+  preservedkeymap.cpp
+  security.cpp
+  selectkeyboard.cpp
+  serialkeyeventclient.cpp
+  serialkeyeventserver.cpp
+  Generating Code...
+  Compiling...
+  syskbd.cpp
+  versioninfo.cpp
+  Generating Code...
+  keyman32.vcxproj -> D:\Github\_Projects\_KM\keyman\windows\src\engine\keyman32\lib\bin\x64\Debug\keyman64.lib
+
+  pch.cpp
+  kmtip_guids.cpp
+  appint.tests.cpp
+  gtest_main.cpp
+  keybd_shift.tests.cpp
+  keyboardoptions.tests.cpp
+  kmprocessactions.tests.cpp
+  Generating Code...
+  keyman32.tests.vcxproj -> D:\Github\_Projects\_KM\keyman\windows\src\engine\keyman32\tests\bin\x64\Debug\keyman32.tests.exe
+
+Running main() from gtest_main.cpp with memory leak detection
+[==========] Running 95 tests from 16 test cases.
+[----------] Global test environment set-up.
+[----------] 5 tests from AppContext
+[ RUN      ] AppContext.Get_Max_buff
+[       OK ] AppContext.Get_Max_buff (0 ms)
+[ RUN      ] AppContext.Get_small_buff
+[       OK ] AppContext.Get_small_buff (0 ms)
+[ RUN      ] AppContext.Get_split_surrogate
+[       OK ] AppContext.Get_split_surrogate (0 ms)
+[ RUN      ] AppContext.BufMax_LastChar
+[       OK ] AppContext.BufMax_LastChar (0 ms)
+[ RUN      ] AppContext.AppContext_Delete
+[       OK ] AppContext.AppContext_Delete (0 ms)
+[----------] 5 tests from AppContext (0 ms total)
+
+[----------] 1 test from KEYBOARDOPTIONS
+[ RUN      ] KEYBOARDOPTIONS.SetupCoreEnvironment
+[       OK ] KEYBOARDOPTIONS.SetupCoreEnvironment (1 ms)
+[----------] 1 test from KEYBOARDOPTIONS (1 ms total)
+
+[----------] 1 test from KMPROCESSACTIONS
+[ RUN      ] KMPROCESSACTIONS.processUnicodeChartest
+[       OK ] KMPROCESSACTIONS.processUnicodeChartest (0 ms)
+[----------] 1 test from KMPROCESSACTIONS (0 ms total)
+
+[----------] 5 tests from KEYBD_SHIFT
+[ RUN      ] KEYBD_SHIFT.ResetRepressesFromCache
+[       OK ] KEYBD_SHIFT.ResetRepressesFromCache (0 ms)
+[ RUN      ] KEYBD_SHIFT.ReleaseEmitsPrefixThenKeyups
+[       OK ] KEYBD_SHIFT.ReleaseEmitsPrefixThenKeyups (0 ms)
+[ RUN      ] KEYBD_SHIFT.RightControlCollapsesToExtendedControl
+[       OK ] KEYBD_SHIFT.RightControlCollapsesToExtendedControl (0 ms)
+[ RUN      ] KEYBD_SHIFT.RightShiftCollapsesToShiftWithRightScanCode
+[       OK ] KEYBD_SHIFT.RightShiftCollapsesToShiftWithRightScanCode (0 ms)
+[ RUN      ] KEYBD_SHIFT.ModifierEventCountNeverExceedsReserve
+[       OK ] KEYBD_SHIFT.ModifierEventCountNeverExceedsReserve (0 ms)
+[----------] 5 tests from KEYBD_SHIFT (1 ms total)
+
+[----------] 5 tests from CAPTURE_LIVE_MODIFIER_STATE
+[ RUN      ] CAPTURE_LIVE_MODIFIER_STATE.SetsAByteForEachModifierTheOsHolds
+[       OK ] CAPTURE_LIVE_MODIFIER_STATE.SetsAByteForEachModifierTheOsHolds (0 ms)
+[ RUN      ] CAPTURE_LIVE_MODIFIER_STATE.OnlyTheSignBitCountsAsHeld
+[       OK ] CAPTURE_LIVE_MODIFIER_STATE.OnlyTheSignBitCountsAsHeld (0 ms)
+[ RUN      ] CAPTURE_LIVE_MODIFIER_STATE.ZeroesTheWholeArrayFirst
+[       OK ] CAPTURE_LIVE_MODIFIER_STATE.ZeroesTheWholeArrayFirst (0 ms)
+[ RUN      ] CAPTURE_LIVE_MODIFIER_STATE.SetsNoByteOutsideTheManagedSet
+[       OK ] CAPTURE_LIVE_MODIFIER_STATE.SetsNoByteOutsideTheManagedSet (0 ms)
+[ RUN      ] CAPTURE_LIVE_MODIFIER_STATE.TakesExactlyOneReadingPerManagedModifier
+[       OK ] CAPTURE_LIVE_MODIFIER_STATE.TakesExactlyOneReadingPerManagedModifier (0 ms)
+[----------] 5 tests from CAPTURE_LIVE_MODIFIER_STATE (0 ms total)
+
+[----------] 9 tests from RECONCILE_MODIFIER_CACHE
+[ RUN      ] RECONCILE_MODIFIER_CACHE.ClearsCachedModifierTheOsReportsUp
+[       OK ] RECONCILE_MODIFIER_CACHE.ClearsCachedModifierTheOsReportsUp (0 ms)
+[ RUN      ] RECONCILE_MODIFIER_CACHE.KeepsCachedModifierTheOsReportsDown
+[       OK ] RECONCILE_MODIFIER_CACHE.KeepsCachedModifierTheOsReportsDown (0 ms)
+[ RUN      ] RECONCILE_MODIFIER_CACHE.NeverSetsAModifierTheCacheDoesNotHold
+[       OK ] RECONCILE_MODIFIER_CACHE.NeverSetsAModifierTheCacheDoesNotHold (0 ms)
+[ RUN      ] RECONCILE_MODIFIER_CACHE.ClearsAllSixSlots
+[       OK ] RECONCILE_MODIFIER_CACHE.ClearsAllSixSlots (0 ms)
+[ RUN      ] RECONCILE_MODIFIER_CACHE.LeavesNonModifierBytesAlone
+[       OK ] RECONCILE_MODIFIER_CACHE.LeavesNonModifierBytesAlone (0 ms)
+[ RUN      ] RECONCILE_MODIFIER_CACHE.ReconcileThenResetPressesNothing
+[       OK ] RECONCILE_MODIFIER_CACHE.ReconcileThenResetPressesNothing (0 ms)
+[ RUN      ] RECONCILE_MODIFIER_CACHE.ReconcileLeavesTheCacheASubsetOfLiveState
+[       OK ] RECONCILE_MODIFIER_CACHE.ReconcileLeavesTheCacheASubsetOfLiveState (0 ms)
+[ RUN      ] RECONCILE_MODIFIER_CACHE.ZeroesTheWholeArrayFirst
+[       OK ] RECONCILE_MODIFIER_CACHE.ZeroesTheWholeArrayFirst (0 ms)
+[ RUN      ] RECONCILE_MODIFIER_CACHE.ModifierEventCountNeverExceedsReserveForTheUnion
+[       OK ] RECONCILE_MODIFIER_CACHE.ModifierEventCountNeverExceedsReserveForTheUnion (0 ms)
+[----------] 9 tests from RECONCILE_MODIFIER_CACHE (1 ms total)
+
+[----------] 21 tests from PREPARE_INJECTED_INPUT_BATCH
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.StaleCachedModifierYieldsNoKeydownInTheBatch
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.StaleCachedModifierYieldsNoKeydownInTheBatch (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.StaleRightControlYieldsNoExtendedKeydownInTheBatch
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.StaleRightControlYieldsNoExtendedKeydownInTheBatch (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.NoStaleSlotProducesAKeydownInTheBatch
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.NoStaleSlotProducesAKeydownInTheBatch (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.EventOrderIsReleaseThenOutputThenRestore
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.EventOrderIsReleaseThenOutputThenRestore (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.NeverWritesPastTheBufferWhenTheSharedBufferOverflows
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.NeverWritesPastTheBufferWhenTheSharedBufferOverflows (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.WorstCaseBatchFillsTheBufferToItsLastSlotAndNotOneFurther
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.WorstCaseBatchFillsTheBufferToItsLastSlotAndNotOneFurther (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.OsHeldModifierIsReleasedBeforeTheOutputKeys
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.OsHeldModifierIsReleasedBeforeTheOutputKeys (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.OsHeldModifierIsNotRestoredAfterTheOutputKeys
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.OsHeldModifierIsNotRestoredAfterTheOutputKeys (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.AgreementCasesAreUnchanged
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.AgreementCasesAreUnchanged (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.BatchTakesOneLiveReadingPerManagedModifier
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.BatchTakesOneLiveReadingPerManagedModifier (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.EveryWrapEventIsIdentifiableAsKeymanInjected
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.EveryWrapEventIsIdentifiableAsKeymanInjected (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.RestorePressedMaskIsZeroWhenNothingIsRestored
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.RestorePressedMaskIsZeroWhenNothingIsRestored (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.RestorePressedMaskNamesExactlyTheVkTheRestoreHalfPressed
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.RestorePressedMaskNamesExactlyTheVkTheRestoreHalfPressed (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.RestorePressedMaskCoversAllSixWhenAllAreRestored
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.RestorePressedMaskCoversAllSixWhenAllAreRestored (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.RestorePressedMaskExcludesAModifierTheReconcileCleared
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.RestorePressedMaskExcludesAModifierTheReconcileCleared (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.RestorePressedMaskExcludesAModifierReleasedOnlyOnTheOssWord
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.RestorePressedMaskExcludesAModifierReleasedOnlyOnTheOssWord (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.CacheNotFedLeavesALiveHeldModifierUntouched
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.CacheNotFedLeavesALiveHeldModifierUntouched (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.CacheNotFedStillReleasesAndRestoresWhatTheCacheAloneHolds
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.CacheNotFedStillReleasesAndRestoresWhatTheCacheAloneHolds (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.CacheNotFedStillReconciles
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.CacheNotFedStillReconciles (0 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.EachRestorePressIsLocatableInTheBufferSoAShortSendIsExact
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.EachRestorePressIsLocatableInTheBufferSoAShortSendIsExact (1 ms)
+[ RUN      ] PREPARE_INJECTED_INPUT_BATCH.TheBatchReleaseHalfStillSendsItsPrefixForAShiftOnlyRelease
+[       OK ] PREPARE_INJECTED_INPUT_BATCH.TheBatchReleaseHalfStillSendsItsPrefixForAShiftOnlyRelease (0 ms)
+[----------] 21 tests from PREPARE_INJECTED_INPUT_BATCH (3 ms total)
+
+[----------] 12 tests from PREPARE_MODIFIER_VERIFICATION_CORRECTION
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.CorrectsAModifierTheOsHoldsThatTheCacheSaysNobodyHolds
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.CorrectsAModifierTheOsHoldsThatTheCacheSaysNobodyHolds (0 ms)
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.DoesNotTouchAVkOutsideTheRestorePressedMask
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.DoesNotTouchAVkOutsideTheRestorePressedMask (0 ms)
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.DoesNotCorrectWhenTheCacheStillReportsItHeld
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.DoesNotCorrectWhenTheCacheStillReportsItHeld (0 ms)
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.DoesNotCorrectWhenTheOsAlsoReportsItUp
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.DoesNotCorrectWhenTheOsAlsoReportsItUp (0 ms)
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.CorrectsRightControlAsExtendedControl
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.CorrectsRightControlAsExtendedControl (0 ms)
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.UsesThePrefixProtectionForAnIsolatedAltCorrection
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.UsesThePrefixProtectionForAnIsolatedAltCorrection (0 ms)
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.TheCorrectionIsIdentifiableAsKeymanInjected
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.TheCorrectionIsIdentifiableAsKeymanInjected (0 ms)
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.TheRightShiftCorrectionIsIdentifiableThroughDwExtraInfoAlone
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.TheRightShiftCorrectionIsIdentifiableThroughDwExtraInfoAlone (0 ms)
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.CorrectsEveryManagedVkInTurn
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.CorrectsEveryManagedVkInTurn (0 ms)
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.AShiftOnlyCorrectionSendsNoPrefixKeystroke
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.AShiftOnlyCorrectionSendsNoPrefixKeystroke (0 ms)
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.AnAltCorrectionStillSendsThePrefixKeystroke
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.AnAltCorrectionStillSendsThePrefixKeystroke (0 ms)
+[ RUN      ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.ACorrectionContainingAnyAltSendsThePrefixKeystroke
+[       OK ] PREPARE_MODIFIER_VERIFICATION_CORRECTION.ACorrectionContainingAnyAltSendsThePrefixKeystroke (0 ms)
+[----------] 12 tests from PREPARE_MODIFIER_VERIFICATION_CORRECTION (1 ms total)
+
+[----------] 4 tests from DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER
+[ RUN      ] DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER.KeymanOwnRestorePressOutlivesTheUsersRealRelease
+[       OK ] DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER.KeymanOwnRestorePressOutlivesTheUsersRealRelease (1 ms)
+[ RUN      ] DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER.TheUsersReleaseArrivingLastLeavesTheCacheCorrect
+[       OK ] DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER.TheUsersReleaseArrivingLastLeavesTheCacheCorrect (0 ms)
+[ RUN      ] DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER.ABalancedBatchLeavesTheCacheUnchanged
+[       OK ] DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER.ABalancedBatchLeavesTheCacheUnchanged (0 ms)
+[ RUN      ] DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER.TheStaleByteSurvivesTheReconcileBecauseTheOsAgrees
+[       OK ] DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER.TheStaleByteSurvivesTheReconcileBecauseTheOsAgrees (0 ms)
+[----------] 4 tests from DEFECT_CHARACTERISATION_MODIFIER_CACHE_EVENT_ORDER (1 ms total)
+
+[----------] 4 tests from MODIFIER_CACHE_EVENT_ORDER
+[ RUN      ] MODIFIER_CACHE_EVENT_ORDER.TheGateLeavesTheCacheFollowingTheUserAlone
+[       OK ] MODIFIER_CACHE_EVENT_ORDER.TheGateLeavesTheCacheFollowingTheUserAlone (0 ms)
+[ RUN      ] MODIFIER_CACHE_EVENT_ORDER.TheGateCoversRightShiftThroughDwExtraInfo
+[       OK ] MODIFIER_CACHE_EVENT_ORDER.TheGateCoversRightShiftThroughDwExtraInfo (0 ms)
+[ RUN      ] MODIFIER_CACHE_EVENT_ORDER.GenericVkEventReconcilesAgainstTheChiralLiveReading
+[       OK ] MODIFIER_CACHE_EVENT_ORDER.GenericVkEventReconcilesAgainstTheChiralLiveReading (0 ms)
+[ RUN      ] MODIFIER_CACHE_EVENT_ORDER.ExtendedBitChiralisesControlAndAltIntoTheSlotTheLiveReadingUses
+[       OK ] MODIFIER_CACHE_EVENT_ORDER.ExtendedBitChiralisesControlAndAltIntoTheSlotTheLiveReadingUses (0 ms)
+[----------] 4 tests from MODIFIER_CACHE_EVENT_ORDER (0 ms total)
+
+[----------] 6 tests from IS_KEYMAN_INJECTED_KEY_EVENT
+[ RUN      ] IS_KEYMAN_INJECTED_KEY_EVENT.TheScanFlagAloneIsEnough
+[       OK ] IS_KEYMAN_INJECTED_KEY_EVENT.TheScanFlagAloneIsEnough (0 ms)
+[ RUN      ] IS_KEYMAN_INJECTED_KEY_EVENT.TheWrapTagAloneIsEnough
+[       OK ] IS_KEYMAN_INJECTED_KEY_EVENT.TheWrapTagAloneIsEnough (0 ms)
+[ RUN      ] IS_KEYMAN_INJECTED_KEY_EVENT.PhysicalKeystrokesAreNotKeymans
+[       OK ] IS_KEYMAN_INJECTED_KEY_EVENT.PhysicalKeystrokesAreNotKeymans (0 ms)
+[ RUN      ] IS_KEYMAN_INJECTED_KEY_EVENT.RemoteDesktopInputIsNotKeymans
+[       OK ] IS_KEYMAN_INJECTED_KEY_EVENT.RemoteDesktopInputIsNotKeymans (0 ms)
+[ RUN      ] IS_KEYMAN_INJECTED_KEY_EVENT.TheOnScreenKeyboardIsNotKeymans
+[       OK ] IS_KEYMAN_INJECTED_KEY_EVENT.TheOnScreenKeyboardIsNotKeymans (0 ms)
+[ RUN      ] IS_KEYMAN_INJECTED_KEY_EVENT.ReInjectedUserKeystrokesAreNotKeymans
+[       OK ] IS_KEYMAN_INJECTED_KEY_EVENT.ReInjectedUserKeystrokesAreNotKeymans (0 ms)
+[----------] 6 tests from IS_KEYMAN_INJECTED_KEY_EVENT (1 ms total)
+
+[----------] 2 tests from POST_KEY_EVENT_AND_DECIDE_EAT
+[ RUN      ] POST_KEY_EVENT_AND_DECIDE_EAT.AFailingPostPassesTheEventThroughInsteadOfEatingIt
+[       OK ] POST_KEY_EVENT_AND_DECIDE_EAT.AFailingPostPassesTheEventThroughInsteadOfEatingIt (0 ms)
+[ RUN      ] POST_KEY_EVENT_AND_DECIDE_EAT.NeitherHandoffFailureRouteEatsTheEvent
+[       OK ] POST_KEY_EVENT_AND_DECIDE_EAT.NeitherHandoffFailureRouteEatsTheEvent (0 ms)
+[----------] 2 tests from POST_KEY_EVENT_AND_DECIDE_EAT (0 ms total)
+
+[----------] 5 tests from MODIFIER_DIAGNOSTIC
+[ RUN      ] MODIFIER_DIAGNOSTIC.ADroppedHoldIsNamedInTheDiagnostic
+[       OK ] MODIFIER_DIAGNOSTIC.ADroppedHoldIsNamedInTheDiagnostic (0 ms)
+[ RUN      ] MODIFIER_DIAGNOSTIC.AHoldTheCacheClaimsIsRestoredAndNotReported
+[       OK ] MODIFIER_DIAGNOSTIC.AHoldTheCacheClaimsIsRestoredAndNotReported (0 ms)
+[ RUN      ] MODIFIER_DIAGNOSTIC.WithTheFeedOffThereIsNoDropToReport
+[       OK ] MODIFIER_DIAGNOSTIC.WithTheFeedOffThereIsNoDropToReport (0 ms)
+[ RUN      ] MODIFIER_DIAGNOSTIC.TwoHoldsLostAtOnceLookLikeADesktopSwitchAndAreReportedAsOne
+[       OK ] MODIFIER_DIAGNOSTIC.TwoHoldsLostAtOnceLookLikeADesktopSwitchAndAreReportedAsOne (0 ms)
+[ RUN      ] MODIFIER_DIAGNOSTIC.OneLostHoldIsTheLaunchSeedCaseAndIsNotReportedAsADesktopSwitch
+[       OK ] MODIFIER_DIAGNOSTIC.OneLostHoldIsTheLaunchSeedCaseAndIsNotReportedAsADesktopSwitch (0 ms)
+[----------] 5 tests from MODIFIER_DIAGNOSTIC (4 ms total)
+
+[----------] 7 tests from USER_HELD_SIGNAL
+[ RUN      ] USER_HELD_SIGNAL.AHoldOnlyTheSignalKnowsAboutIsRestored
+[       OK ] USER_HELD_SIGNAL.AHoldOnlyTheSignalKnowsAboutIsRestored (0 ms)
+[ RUN      ] USER_HELD_SIGNAL.ALiveOnlyHoldIsStillNotRestored
+[       OK ] USER_HELD_SIGNAL.ALiveOnlyHoldIsStillNotRestored (0 ms)
+[ RUN      ] USER_HELD_SIGNAL.APoisonedKeyIsNotRestoredEvenThoughTheSignalSaysHeld
+[       OK ] USER_HELD_SIGNAL.APoisonedKeyIsNotRestoredEvenThoughTheSignalSaysHeld (0 ms)
+[ RUN      ] USER_HELD_SIGNAL.NoSignalMeansTheCacheAloneAndNotAnEmptyOne
+[       OK ] USER_HELD_SIGNAL.NoSignalMeansTheCacheAloneAndNotAnEmptyOne (0 ms)
+[ RUN      ] USER_HELD_SIGNAL.TheMaskCoversAPressMadeOnTheSignalAlone
+[       OK ] USER_HELD_SIGNAL.TheMaskCoversAPressMadeOnTheSignalAlone (0 ms)
+[ RUN      ] USER_HELD_SIGNAL.TheStaleCacheByteIsStillClearedAndNothingIsPressed
+[       OK ] USER_HELD_SIGNAL.TheStaleCacheByteIsStillClearedAndNothingIsPressed (0 ms)
+[ RUN      ] USER_HELD_SIGNAL.ASignalClaimNotBackedByLiveStateStillPressesAndIsCoveredByTheMask
+[       OK ] USER_HELD_SIGNAL.ASignalClaimNotBackedByLiveStateStillPressesAndIsCoveredByTheMask (0 ms)
+[----------] 7 tests from USER_HELD_SIGNAL (1 ms total)
+
+[----------] 3 tests from VERIFICATION_WITH_SIGNAL
+[ RUN      ] VERIFICATION_WITH_SIGNAL.ThePassDoesNotUndoAPressItMadeOnTheSignalsWord
+[       OK ] VERIFICATION_WITH_SIGNAL.ThePassDoesNotUndoAPressItMadeOnTheSignalsWord (0 ms)
+[ RUN      ] VERIFICATION_WITH_SIGNAL.ThePassStillCorrectsWhatNeitherTheCacheNorTheSignalClaims
+[       OK ] VERIFICATION_WITH_SIGNAL.ThePassStillCorrectsWhatNeitherTheCacheNorTheSignalClaims (0 ms)
+[ RUN      ] VERIFICATION_WITH_SIGNAL.APoisonedClaimDoesNotBlockACorrection
+[       OK ] VERIFICATION_WITH_SIGNAL.APoisonedClaimDoesNotBlockACorrection (0 ms)
+[----------] 3 tests from VERIFICATION_WITH_SIGNAL (0 ms total)
+
+[----------] 5 tests from USER_HELD_FROM_RAW
+[ RUN      ] USER_HELD_FROM_RAW.DerivesChiralityFromTheExtendedFlagAndTheMakeCode
+[       OK ] USER_HELD_FROM_RAW.DerivesChiralityFromTheExtendedFlagAndTheMakeCode (0 ms)
+[ RUN      ] USER_HELD_FROM_RAW.ABreakFlagIsAReleaseAndNothingOutsideTheManagedSixIsWritten
+[       OK ] USER_HELD_FROM_RAW.ABreakFlagIsAReleaseAndNothingOutsideTheManagedSixIsWritten (0 ms)
+[ RUN      ] USER_HELD_FROM_RAW.KeymansOwnEventsAreIgnoredButRdpAndOskInputIsNot
+[       OK ] USER_HELD_FROM_RAW.KeymansOwnEventsAreIgnoredButRdpAndOskInputIsNot (0 ms)
+[ RUN      ] USER_HELD_FROM_RAW.PoisonPersistsUntilAFreshObservationOfThatVeryKey
+[       OK ] USER_HELD_FROM_RAW.PoisonPersistsUntilAFreshObservationOfThatVeryKey (0 ms)
+[ RUN      ] USER_HELD_FROM_RAW.ADisplacedRegistrationPoisonsEveryKey
+[       OK ] USER_HELD_FROM_RAW.ADisplacedRegistrationPoisonsEveryKey (0 ms)
+[----------] 5 tests from USER_HELD_FROM_RAW (1 ms total)
+
+[----------] Global test environment tear-down
+[==========] 95 tests from 16 test cases ran. (16 ms total)
+[  PASSED  ] 95 tests.
+
+  YOU HAVE 1 DISABLED TEST
+
+[windows/src/engine/keyman32] ## test:x64 completed successfully

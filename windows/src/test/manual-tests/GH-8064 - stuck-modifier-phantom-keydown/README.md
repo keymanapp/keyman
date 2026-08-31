@@ -81,8 +81,9 @@ clean.
   window sits on a thread pinned to its original input locale while the focused
   edit control tracks the real one.
 - `Flag_ShouldSerializeInput` not disabled (it defaults to on).
-- A 32-bit host application. `serialkeyeventserver.cpp` is `#ifndef _WIN64`, so
-  the cache being tested exists only in the 32-bit engine.
+- A host application with a text field. Bitness is **not** a precondition -- see
+  "Host bitness" below. `host32/` is the recommended host; `stuck-mod-test.ps1`
+  uses 64-bit Notepad and reproduces the defect there.
 - Notepad open. Nothing more elaborate is needed, and nothing that holds real
   data should be used. See Hazards.
 
@@ -107,14 +108,50 @@ clean.
 modifier, posts the freeze, releases inside the stall, types a probe string, reads
 the oracle, and clears any modifier it left asserted.
 
-It requires `-HostApp`, a path to a **32-bit** application with a text field, and
-verifies that rather than assuming it. There is no default, because on Windows 11
-both `notepad.exe` and `SysWOW64\notepad.exe` report `IsWow64Process` false: they
-resolve to the 64-bit packaged Notepad, whose engine is `keymanx64.dll`, where
-`serialkeyeventserver.cpp` is compiled out and the cache under test does not
-exist.
+It requires `-HostApp`, a path to an application with a text field, and verifies
+that it presents a real window rather than assuming it. There is no default,
+because on Windows 11 both `notepad.exe` and the `SysWOW64` copy resolve to the
+same 64-bit packaged Notepad, whose top-level frame brings complications of its
+own (see the input-locale note under Preconditions).
 
-`host32/` supplies one. It is a minimal 32-bit window with a single Edit control,
+### Host bitness
+
+Until 2026-08-31 this harness *required* a 32-bit host and aborted on anything
+else, on the reasoning that `serialkeyeventserver.cpp` being `#ifndef _WIN64`
+makes a 64-bit host immune. That does not follow, and the requirement has been
+downgraded to a reported value.
+
+The server, the low level keyboard hook and the modifier cache are indeed compiled
+only into the 32-bit engine and run in 32-bit `keyman.exe`. But `WH_KEYBOARD_LL`
+is system-wide, and `serialkeyeventclient.cpp` carries no `_WIN64` guard: a 64-bit
+client reaches that same single server by unsuffixed global name through a
+memory-mapped file (`GLOBAL_FILE_MAPPING_NAME`, `serialkeyeventcommon.h:59`). One
+server per session, serving both bitnesses. `stuck-mod-test.ps1` demonstrates the
+consequence -- it wedges 64-bit Windows 11 Notepad and has never had a bitness
+check.
+
+`host32/` remains the recommended host, because it is the one behind the recorded
+before/after pair in `evidence/` and it removes Notepad's packaged-app and
+frame-window complications. A 64-bit run through *this* script is not yet backed
+by a recorded measurement, so the script warns and asks you to save the output.
+
+### host32 is a separate harness, not a host for this script
+
+`host32.exe` **requires** `--fakefreeze PATH` and exits without it (`host32.cpp:598`).
+It drives the whole sequence itself -- hold, freeze, release, type, read the oracle --
+and is what produced the recorded pair in `evidence/`. Passing it to
+`run-8064-test.ps1` cannot work: it exits immediately and the script has nothing to
+type into. Run it directly instead:
+
+```
+./host32/host32.exe --fakefreeze <fakefreeze.exe> --probe 1x2x3x --iterations 5 --wait-for-rule 30
+```
+
+`run-8064-test.ps1` wants an ordinary passive application with an Edit control.
+`C:\Windows\SysWOW64\charmap.exe` is one that ships with Windows and is 32-bit at
+runtime; most stock alternatives are not (see Host bitness above).
+
+`host32/` itself is a minimal 32-bit window with a single Edit control,
 a fixed class and title, and it publishes its active keyboard layout in that title
 because `GetKeyboardLayout(idThread)` returns 0 for a thread in another process
 and the harness cannot otherwise tell which layout is selected. Build it with the
@@ -134,16 +171,17 @@ in the host's thread stays 0 and `SendInput` keystrokes go nowhere, because
 its own window has focus by construction, the same way a person pressing keys
 does.
 
-The harness reports **INCONCLUSIVE** rather than PASS unless it confirms all four
-of: the freeze took effect, the host is a verified 32-bit process it actually
-brought to the foreground, a Keyman TIP is selected in that host, and Keyman
-transformed the probe text. A precondition that is merely plausible produces a
+The harness reports **INCONCLUSIVE** rather than PASS unless it confirms all three
+of: the freeze took effect, a Keyman TIP is selected in a host it actually brought
+to the foreground, and Keyman transformed the probe text. Host bitness is reported
+on the result line but is not one of them. A precondition that is merely plausible produces a
 false PASS, and a false PASS on this defect is worse than no test.
 
 ```
-./run-8064-test.ps1 -HostApp <32-bit editor> -Control    # harness sanity check
-./run-8064-test.ps1 -HostApp <32-bit editor>
-./run-8064-test.ps1 -HostApp <32-bit editor> -Modifier RSHIFT
+# An ordinary app with a text field -- NOT host32.exe, see below.
+./run-8064-test.ps1 -HostApp <editor.exe> -Control    # harness sanity check
+./run-8064-test.ps1 -HostApp <editor.exe>
+./run-8064-test.ps1 -HostApp <editor.exe> -Modifier RSHIFT
 ```
 
 `-Modifier RSHIFT` is the interesting case: Right Shift is the one modifier whose
@@ -154,7 +192,7 @@ false PASS, and a false PASS on this defect is worse than no test.
 
 1. Start `keyboard_ll_identifier`. Press and release Left Shift once and confirm a
    matched KEYDOWN/KEYUP pair appears.
-2. Focus the 32-bit host and type a few characters. Confirm the Keyman keyboard is
+2. Focus the host and type a few characters. Confirm the Keyman keyboard is
    producing its own output, not the base layout's.
 3. **Press and hold Left Shift.**
 4. With Shift still held, run `fakefreeze.exe`. It prints `Sleeping 5 seconds...`.
