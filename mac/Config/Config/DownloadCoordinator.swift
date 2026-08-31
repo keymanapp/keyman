@@ -83,22 +83,6 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
 
       decisionHandler(.allow)
     }
-    else if urlString.hasPrefix("keyman:") {
-      if urlString.hasPrefix("keyman:link?url=") {
-        Logger.download.info("starts with 'keyman' and 'keyman:link?url' open external url -> .cancel")
-
-        decisionHandler(.cancel)
-        
-        let targetUrlString = String(urlString.dropFirst("keyman:link?url=".count))
-        if let targetUrl = URL(string: targetUrlString) {
-          NSWorkspace.shared.open(targetUrl)
-        }
-      } else {
-        Logger.download.info("starts with 'keyman' but not 'keyman:link?url' open external url -> .download")
-
-        decisionHandler(.download)
-      }
-    }
     else {
       Logger.download.info("default case, open in external browser")
 

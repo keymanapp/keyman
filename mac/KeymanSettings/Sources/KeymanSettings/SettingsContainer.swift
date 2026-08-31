@@ -108,7 +108,10 @@ public class SettingsContainer : ObservableObject {
 
   public var keyboardSearchUrl: URL {
     var searchUrl = URL(string: keyboardSearchPrefix)!
-    
+ 
+    let versionQueryItem = URLQueryItem(name:"version", value: ConfigAppUtil.configAppVersion())
+    searchUrl.append(queryItems:[versionQueryItem])
+
     if let languageString = self.getPreferredLangauge() {
       let languageQueryItem = URLQueryItem(name:"lang", value: languageString)
       searchUrl.append(queryItems:[languageQueryItem])
