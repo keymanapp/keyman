@@ -1,3 +1,8 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Setup URL routes for Keyman Developer Server
+ */
 import * as express from 'express';
 import * as ws from 'ws';
 import * as multer from 'multer';
@@ -16,6 +21,7 @@ import { standardPaths } from './standardPaths.js';
 import chalk from 'chalk';
 import { shutdown } from './shutdown.js';
 import { getOption } from './options.js';
+import { serverSitePath } from './environment.js';
 
 export default function setupRoutes(app: express.Express, upload: multer.Multer, wsServer: ws.WebSocketServer, environment: Environment ) {
 
@@ -51,7 +57,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
 
   /* All routes */
 
-  app.use('/', express.static('build/src/site'));
+  app.use('/', express.static(serverSitePath()));
 
   app.post('/upload', localhostOnly, upload.single('file'), (req, res, next) => {
     const name = req.file.originalname;
