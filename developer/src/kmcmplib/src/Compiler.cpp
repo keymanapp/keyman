@@ -2079,7 +2079,7 @@ int LineTokenType(PKMX_WCHAR *str)
   switch (towupper(*p))
   {
   case 'C':
-    if (iswspace(*(p + 1))) return T_COMMENT;
+    if (iswspace(*(p + 1)) || *(p + 1) == 0) return T_COMMENT;
     break;
   case 0:
     return T_BLANK;
