@@ -15,7 +15,7 @@ title: Keyman for iPhone and iPad 19.0 Help
 
 
 ## [Using Keyman for iPhone and iPad](basic/)
-* [Using the Banner on the Keyboard](basic/using-the-banner)
+* [Predictive-Text Settings and the Banner](basic/using-the-banner)
 * [Switching Between Keyboards](basic/switching-between-keyboards)
 * [Using a Keyboard](basic/keyboard-usage)
 * [Keyboard Gestures](context/gestures)
