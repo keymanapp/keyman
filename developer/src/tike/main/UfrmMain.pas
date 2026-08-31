@@ -406,6 +406,8 @@ type
 
     procedure RefreshProjectMRU;
     procedure mnuWindowSelectClick(Sender: TObject);
+    procedure MakeToolWindowsTopMost(TopMost: Boolean);
+    function ActivateHook(var Message: TMessage): Boolean;
 
   protected
     procedure WndProc(var Message: TMessage); override;
@@ -546,11 +548,25 @@ begin
 end;
 
 
+function TfrmKeymanDeveloper.ActivateHook(var Message: TMessage): Boolean;
+begin
+  // We process WM_ACTIVATEAPP here because App.OnActivate is posted after the
+  // activation has happened, whereas here we can capture it in the activation/
+  // deactivation process.
+  if Message.Msg = WM_ACTIVATEAPP then
+  begin
+    MakeToolWindowsTopMost(Message.wParam <> 0);
+  end;
+  Result := False;
+end;
+
 procedure TfrmKeymanDeveloper.FormCreate(Sender: TObject);
 var
   newProject: TProjectUI;
 begin
   inherited;
+
+  Application.HookMainWindow(ActivateHook);
 
   FFilesToOpen := TStringList.Create;
 
@@ -755,6 +771,7 @@ begin
 
   FreeAndNil(FCharMapSettings);
   Application.OnActivate := nil;
+  Application.UnhookMainWindow(ActivateHook);
 
   FreeGlobalProjectUI;
   FreeAndNil(FChildWindows);
@@ -935,6 +952,27 @@ begin
     end;
     FControlDown := state;
   end;
+end;
+
+procedure TfrmKeymanDeveloper.MakeToolWindowsTopMost(TopMost: Boolean);
+var
+  hwTarget: THandle;
+
+  procedure MakeTopmost(Form: TForm);
+  begin
+    // If exists and is not docked
+    if Assigned(Form) and ((GetWindowLong(Form.Handle, GWL_STYLE) and WS_CHILD) = 0) then
+      SetWindowPos(Form.Handle, hwTarget, 0, 0, 0, 0, SWP_NOSIZE or SWP_NOMOVE or SWP_NOREDRAW or SWP_NOACTIVATE or SWP_NOSENDCHANGING)
+  end;
+begin
+  if TopMost
+    then hwTarget := HWND_TOPMOST
+    else hwTarget := Application.Handle;
+
+  MakeTopmost(frmMessages);
+  MakeTopmost(frmCharacterMapDock);
+  MakeTopmost(frmCharacterIdentifier);
+  MakeTopmost(frmHelp);
 end;
 
 procedure TfrmKeymanDeveloper.AppOnActivate(Sender: TObject);
