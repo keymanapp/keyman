@@ -144,7 +144,7 @@ type
     procedure editorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     cefFonts: TframeCEFHost;
-    wm_keyman_control, wm_keyman_refresh: UINT;
+    wm_keyman_control: UINT;
     FUpdating: Boolean;
     FCheckFontsThread: TCheckFontsThread;
     FCheckFontKeyboards: TCheckFontKeyboards;
@@ -248,7 +248,6 @@ procedure TfrmTextEditor.TntFormCreate(Sender: TObject);
 begin
   inherited;
   wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
-  wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
 
   HelpTopic := 'context/text-editor';
   Caption := MsgFromId(SKTextEditorCaption);
@@ -724,7 +723,7 @@ end;
 procedure TfrmTextEditor.ApplicationEvents1Message(var Msg: tagMSG;
   var Handled: Boolean);
 begin
-  if (Msg.message = wm_keyman_refresh) and (Msg.wParam = KR_REFRESH) then
+  if (Msg.message = wm_keyman_control) and (Msg.wParam = KMC_REFRESH) then
   begin
     StartCheckFontsThread;
   end;

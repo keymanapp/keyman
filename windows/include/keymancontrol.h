@@ -67,6 +67,11 @@
 #define KMC_LANGUAGEHOTKEY  20
 //TOUCH  #define KMC_CONTEXT 19  // 9.0.450.0
 
+// Cross-architecture comms
+#define KMC_REGISTER_HOST_WINDOW_X64      23
+#define KMC_REGISTER_HOST_WINDOW_ARM64    24
+
 #define RWM_KEYMAN_CONTROL "WM_KEYMAN_CONTROL"
+#define RWM_KEYMAN_CONTROL_W L"WM_KEYMAN_CONTROL"
 
 #define khLanguageSwitch  8

@@ -63,6 +63,8 @@ const
   WHR_INIT_FAILURE   = 1;  // 19.0 - hook failed to (re)install
   WHR_UNINIT_FAILURE = 2;  // 19.0 - hook failed to uninstall
 
+  KMC_REGISTER_HOST_WINDOW_X64   = 23;
+  KMC_REGISTER_HOST_WINDOW_ARM64 = 24;
 
   PC_UPDATE = 0;
   PC_UPDATE_LANGUAGESWITCH = 1;

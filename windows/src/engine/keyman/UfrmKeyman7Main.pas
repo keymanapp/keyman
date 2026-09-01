@@ -351,6 +351,7 @@ var
   wm_keyman_globalswitch, wm_keyman_globalswitch_process, wm_keyman_control, wm_keyman_control_internal, wm_test_keyman_functioning: Cardinal;
 
   FEnableCrashTest: Boolean = False;
+  wm_keyman_refresh: Cardinal;
 
 const
   KMC_StartProduct = 0;
@@ -697,6 +698,10 @@ begin
 end;
 
 function TfrmKeyman7Main.AppMessage(var Message: TMessage): Boolean;
+var
+  hwndTextEditor: THandle;
+const
+  KR_PRE_REFRESH = 1;
 begin
   if Message.Msg = WM_ACTIVATEAPP then
   begin
@@ -727,6 +732,19 @@ begin
         FLastHKL := Message.lParam;
     end;
     Result := True;
+  end
+  else if Message.Msg = wm_keyman_refresh then
+  begin
+    if Message.WParam = KR_PRE_REFRESH then
+    begin
+      // The text editor needs a special prod for keyboard changes
+      hwndTextEditor := FindWindow('TfrmTextEditor', nil);
+      if hwndTextEditor <> 0 then
+      begin
+        PostMessage(hwndTextEditor, wm_keyman_control, KMC_REFRESH, 0);
+      end;
+    end;
+    Result := False;
   end
   else if Message.Msg = wm_keyman_control then
   begin
@@ -2119,6 +2137,7 @@ initialization
   wm_keyman_globalswitch_process := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH_PROCESS');
   wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
   wm_keyman_control_internal := RegisterWindowMessage('WM_KEYMAN_CONTROL_INTERNAL');   // I3933
+  wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
 
   ChangeWindowMessageFilter(wm_keyman_control, MSGFLT_ADD);
   ChangeWindowMessageFilter(wm_keyman_globalswitch, MSGFLT_ADD);
