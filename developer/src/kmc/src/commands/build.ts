@@ -195,7 +195,7 @@ async function build(filename: string, outfileSpec: OutFileSpecification, parent
 
       let base = path.basename(filename);
       if(base.endsWith(builder.sourceExtension)) {
-        base = base.substring(base.length - builder.sourceExtension.length) + builder.compiledExtension;
+        base = base.substring(0, base.length - builder.sourceExtension.length) + builder.compiledExtension;
       }
       outfile = path.join(outfile, base);
     }

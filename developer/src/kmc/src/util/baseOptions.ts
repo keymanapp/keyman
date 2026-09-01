@@ -51,7 +51,7 @@ export class BaseOptions {
 
 export class BuildBaseOptions extends BaseOptions {
   public static addOutFile(program: Command) {
-    return program.option('-o, --out-file <filename>', 'Override default folder and/or filename for the output file; terminate with '+path.delimiter+' for folder')
+    return program.option('-o, --out-file <filename>', 'Override default folder and/or filename for the output file; terminate with '+path.sep+' for folder')
   }
 
   public static addAll(program: Command) {
