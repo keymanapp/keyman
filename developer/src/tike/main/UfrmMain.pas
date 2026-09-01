@@ -171,8 +171,6 @@ type
     ToolButton2: TToolButton;
     ToolButton3: TToolButton;
     ToolButton4: TToolButton;
-    ToolButton5: TToolButton;
-    ToolButton6: TToolButton;
     ToolButton7: TToolButton;
     ToolButton8: TToolButton;
     ToolButton9: TToolButton;
@@ -202,12 +200,8 @@ type
     N5: TMenuItem;
     Close1: TMenuItem;
     N6: TMenuItem;
-    PageSetup1: TMenuItem;
-    PrintPreview1: TMenuItem;
-    Print1: TMenuItem;
     N8: TMenuItem;
     Exit1: TMenuItem;
-    N9: TMenuItem;
     mnuFileRecent: TMenuItem;
     Undo1: TMenuItem;
     Redo1: TMenuItem;
