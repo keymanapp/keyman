@@ -1,0 +1,13 @@
+{
+  "reporter": ["text", "text-summary"],
+  "reports-dir": "build/coverage",
+  "src": [
+    "src/**"
+  ],
+  "include": [
+    "src/**"
+  ],
+  "exclude": [
+    "src/ttfmeta/**"
+  ]
+}

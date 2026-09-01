@@ -16,6 +16,7 @@
   ],
   "references": [
       { "path": "../" },
+      { "path": "../../../../../../common/tools/hextobin" },
       { "path": "../../test-helpers/" },
     ]
 }

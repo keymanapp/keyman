@@ -1,0 +1,9 @@
+c Description: Verifies that kmcmplib can compile a keyboard
+c without a version statement, that either picks up targetVersion,
+c or uses the keyboard's features to determine minimum version.
+
+store(&NAME) 'unversioned'
+
+begin unicode > use(main)
+
+group(main) using keys

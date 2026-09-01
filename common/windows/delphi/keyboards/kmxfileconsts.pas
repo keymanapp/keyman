@@ -99,9 +99,10 @@ const
   VERSION_150 = $00000F00;
   VERSION_160 = $00001000;
   VERSION_170 = $00001100;
+  VERSION_190 = $00001300;
 
   VERSION_MIN	= VERSION_50;
-  VERSION_MAX	= VERSION_170;
+  VERSION_MAX	= VERSION_190;
 
   VERSION_MASK_MINOR = $00FF;
   VERSION_MASK_MAJOR = $FF00;
@@ -216,7 +217,9 @@ const
   TSS_NEWLAYER = 42;
   TSS_OLDLAYER = 43;
 
-  TSS__MAX = 43;
+  TSS_DISPLAYMAP = 44;
+
+  TSS__MAX = 44;
 
 type
   TSystemStore = (ssNone = 0, ssBitmap = 1, ssCopyright = 2, ssHotkey = 3, ssLanguage = 4, ssLayout = 5, ssMessage = 6,
