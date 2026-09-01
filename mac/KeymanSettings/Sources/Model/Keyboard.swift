@@ -10,6 +10,7 @@
 
 import Foundation
 import AppKit
+import OSLog
 
 public class Keyboard: Identifiable, Hashable, Equatable {
   
@@ -86,7 +87,7 @@ public class Keyboard: Identifiable, Hashable, Equatable {
   public func validateKmxFile(in packageDirectory: URL) throws {
     let kmxFilePath = self.deriveKmxFileUrl(from: packageDirectory).path
     if !FileManager.default.fileExists(atPath: kmxFilePath) {
-      print("** error: could not find kmx file \(kmxFilePath)")
+      Logger.data.error("error: could not find kmx file \(kmxFilePath, privacy: .public)")
       throw LoadPackageError.missingKmxFile
     }
   }

@@ -14,8 +14,9 @@
 
 import Foundation
 import KeymanSettings
+import OSLog
 
-public enum InstallationPhase {
+public enum InstallationPhase: String {
   case inputMethodMissing
   case inputMethodOutdated
   case evaluatingInstallation
@@ -37,7 +38,7 @@ public enum InstallationPhase {
   }
 }
 
-enum InstallationStateCondition {
+enum InstallationStateCondition: String {
   case stale
   case new
   case inProgress
@@ -112,8 +113,8 @@ public class InstallationCheck {
       // the input method is valid, examine the installation state recorded on disk
       //
       let installationStateCondition = InstallationCheck.evaluateInstallationState(state: installState, for: keymanVersion);
-      print("installationStateCondition: \(installationStateCondition)")
-      
+      Logger.app.log("installationStateCondition: \(installationStateCondition.rawValue, privacy: .public)")
+
       switch installationStateCondition {
       case .inProgress:
         self.installationState = installState     // resume with the existing installation
@@ -181,7 +182,7 @@ public class InstallationCheck {
    * for testing purposes, by specifying `kTestConfigVersion` in config app's standard UserDefaults
    */
   static func isVersionCurrent(inputMethodVersion: String, configurationVersion: String) -> Bool {
-    print("isVersionCurrent, comparing input method version: \(inputMethodVersion) and config app version: \(configurationVersion)")
+    Logger.app.log("isVersionCurrent, comparing input method version: \(inputMethodVersion, privacy: .public) and config app version: \(configurationVersion, privacy: .public)")
     return inputMethodVersion == configurationVersion
   }
   
@@ -190,7 +191,8 @@ public class InstallationCheck {
    * checks the current state of Accessibility permissions
    */
   func registerObservers() {
-    print("InstallationCheck registerObservers")
+    Logger.app.debug("InstallationCheck registerObservers")
+
     DistributedNotificationCenter.default().addObserver(
       self,
       selector: #selector(self.handleAccessibilityResponse(_:)),
@@ -206,11 +208,12 @@ public class InstallationCheck {
   @objc func handleAccessibilityResponse(_ notification: Notification) {
     var installCompleted = false
     
-    print("handleAccessibilityResponse")
     // Extract message from the notification if available
     if let message = notification.object as? String {
       let permissionGranted = self.processAccessibilityResponse(with: message)
       
+      Logger.app.debug("handleAccessibilityResponse, message: \(message, privacy: .public)")
+
       if let state = self.installationState {
         installCompleted = state.isComplete
       }
@@ -231,7 +234,7 @@ public class InstallationCheck {
         }
       }
     } else {
-      print("accessibilityStateResponse received but did not include message")
+      Logger.app.debug("handleAccessibilityResponse, received but did not include message")
     }
   }
   
@@ -244,8 +247,8 @@ public class InstallationCheck {
       .minute(.twoDigits)
       .second(.twoDigits)
       .secondFraction(.fractional(3))
-    print("processAccessibilityResponse received message: \(message), time: \(Date().formatted(timeStyle))")
-    
+    Logger.app.debug("processAccessibilityResponse received message: \(message, privacy: .public), time: \(Date().formatted(timeStyle), privacy: .public)")
+
     // if the message indicates that access was granted, then return true
     return !message.isEmpty && message == kAccessibilityPermissionGrantedMessage
   }
@@ -313,8 +316,9 @@ public class InstallationCheck {
    * Creates a InstallationState object describing a new installation
    */
   func createNewInstallationState(with neededTasks: Set<InstallationTask>) -> InstallationState {
-    print("completeNewInstallationEvaluation: created new installation state")
-    var fullTaskList = neededTasks
+    Logger.app.debug("completeNewInstallationEvaluation: created new installation state")
+
+                     var fullTaskList = neededTasks
     
     // add prepareNewInstall InstallationTask
     fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .prepareNewInstall))
@@ -331,10 +335,10 @@ public class InstallationCheck {
   func checkForRepair(accessibilityPermissionGranted: Bool) {
     // check whether the installation requires repair
     if let state = self.createRepairInstallationState(accessibilityPermissionGranted: accessibilityPermissionGranted) {
-      print("checkForRepair completed: repair is required")
+      Logger.app.log("checkForRepair completed: repair is required")
       self.applyRepairedInstallationState(state: state)
     } else {
-      print("checkForRepair completed: no repair needed")
+      Logger.app.log("checkForRepair completed: no repair needed")
     }
   }
 

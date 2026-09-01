@@ -9,6 +9,7 @@
  */
 
 import Foundation
+import OSLog
 
 /**
  * Three directory trees are represented by the following properties, one in active use
@@ -52,7 +53,7 @@ public struct KeymanPaths {
       do {
         try fileManager.createDirectory(at: fontsDirectory, withIntermediateDirectories: true, attributes: nil)
       } catch {
-        print("error: could not create fonts directory: \(error.localizedDescription)")
+        Logger.setup.error("error: could not create fonts directory: \(error as NSError, privacy: .public)")
       }
     }
 
@@ -107,23 +108,21 @@ public struct KeymanPaths {
     self.keyman19PackagesDirectory = KeymanPaths.buildKeyman19PackagesUrl(container: containerDir)
     self.keyman19TempDirectory = KeymanPaths.buildKeyman19TempUrl(container: containerDir)
     
-    //self.logPaths()
+    self.logPaths()
   }
   
-  /*
-   fileprivate func logPaths() {
-   ConfigLogger.shared.testLogger.debug("documents: \(self.keyman17DocumentsDirectory!.absoluteString)")
-   ConfigLogger.shared.testLogger.debug("keyman 17 packages: \(self.keyman17PackagesDirectory!.absoluteString)")
-   
-   ConfigLogger.shared.testLogger.debug("support directory: \(self.keyman18SupportDirectory!.absoluteString)")
-   ConfigLogger.shared.testLogger.debug("support keyman directory: \(self.keyman18DataDirectory!.absoluteString)")
-   ConfigLogger.shared.testLogger.debug("keyman 18 packages: \(self.keyman18PackagesDirectory!.absoluteString)")
-   
-   ConfigLogger.shared.testLogger.debug("container: \(self.keyman19ContainerDirectory!.absoluteString)")
-   ConfigLogger.shared.testLogger.debug("preferences: \(self.keyman19PreferencesDirectory!.absoluteString)")
-   ConfigLogger.shared.testLogger.debug("keyman 19 packages: \(self.keyman19PackagesDirectory!.absoluteString)")
-   }
-   */
+  fileprivate func logPaths() {
+    Logger.setup.debug("documents: \(self.keyman17DocumentsDirectory!.absoluteString)")
+    Logger.setup.debug("keyman 17 packages: \(self.keyman17PackagesDirectory!.absoluteString)")
+    
+    Logger.setup.debug("support directory: \(self.keyman18SupportDirectory!.absoluteString)")
+    Logger.setup.debug("support keyman directory: \(self.keyman18DataDirectory!.absoluteString)")
+    Logger.setup.debug("keyman 18 packages: \(self.keyman18PackagesDirectory!.absoluteString)")
+    
+    Logger.setup.debug("container: \(self.keyman19ContainerDirectory.absoluteString)")
+    Logger.setup.debug("preferences: \(self.keyman19PreferencesDirectory.absoluteString)")
+    Logger.setup.debug("keyman 19 packages: \(self.keyman19PackagesDirectory.absoluteString)")
+  }
   
   /**
    * build the URL to specified file in the Input Methods directory
@@ -142,8 +141,7 @@ public struct KeymanPaths {
       inputMethodUrl = inputMethodDirectoryUrl.appendingPathComponent(fileName, isDirectory: false)
       return inputMethodUrl
     } catch {
-      //      ConfigLogger.shared.testLogger.debug("\(error)")
-      print("\(error)")
+      Logger.setup.error("buildInputMethodPathUrl error: \(error as NSError, privacy: .public)")
       return nil
     }
   }
@@ -156,6 +154,7 @@ public struct KeymanPaths {
       let executableName = inputMethodUrl.deletingPathExtension().lastPathComponent
       return inputMethodUrl.appendingPathComponent("Contents/MacOS/\(executableName)")
     } else {
+      Logger.setup.error("buildInputMethodExecutableUrl error: could not build input method executable directory")
       return nil
     }
   }
@@ -175,7 +174,7 @@ public struct KeymanPaths {
       )
       return documentsDirectoryUrl
     } catch {
-      print("\(error)")
+      Logger.setup.error("buildDocumentsUrl error: \(error as NSError, privacy: .public)")
       return nil
     }
   }
@@ -187,7 +186,7 @@ public struct KeymanPaths {
     if let keyman17PackagesDirectory = documents?.appendingPathComponent(preKeyman19PackagesDirectoryName, isDirectory: true) {
       return keyman17PackagesDirectory
     } else {
-      print("could not build keyman17 packages directory")
+      Logger.setup.error("buildKeyman17PackagesUrl error: could not build keyman17 packages directory")
       return nil
     }
   }
@@ -208,7 +207,7 @@ public struct KeymanPaths {
       
       return supportDirectoryUrl
     } catch {
-      print("\(error)")
+      Logger.setup.error("buildSupportDirectory error: \(error as NSError, privacy: .public)")
       return nil
     }
   }

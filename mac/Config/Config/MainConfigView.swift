@@ -8,6 +8,7 @@
 
 import SwiftUI
 import KeymanSettings
+import OSLog
 
 struct MainConfigView: View {
   
@@ -96,7 +97,8 @@ struct MainConfigView: View {
         ) {
           Button("Delete", role: .destructive) {
             if let uuid = idToDelete {
-              print("deleting package.id: \(uuid)")
+              Logger.app.info("deleting package.id: \(uuid)")
+
               // use multiple expanded states?
               //expandedStates.removeValue(forKey: uuid)
               
@@ -156,13 +158,13 @@ struct MainConfigView: View {
             packageInstallHelper = nil
 
             if accepted {
-              print("installing validated package: \(helper.packageName ?? "unknown package")")
+              Logger.app.info("installing validated package: \(helper.packageName ?? "unknown package", privacy: .public)")
               do {
                 try settings.installPackage()
               } catch {
                 self.alertMessage = error.localizedDescription
                 self.isShowingDropKmpAlert = true
-                print("failed to install package: \(helper.packageName ?? "unknown package") with error: \(error.localizedDescription)")
+                Logger.app.error("failed to install package: \(helper.packageName ?? "unknown package", privacy: .public), error: \(error as NSError, privacy: .public)")
               }
             } else {
               settings.userCanceledPackageInstallation()

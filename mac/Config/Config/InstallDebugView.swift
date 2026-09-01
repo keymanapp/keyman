@@ -62,10 +62,7 @@ struct InstallDebugView: View {
           _ = installation.validateUserHasRestarted()
         }
         Button("Set Displayed Complete") {
-          let beforeDisplayed = installation.getHasDisplayedInstallationComplete()
           installation.setHasDisplayedInstallationComplete()
-          let afterDisplayed = installation.getHasDisplayedInstallationComplete()
-          print("hasDisplayedInstallComplete = \(beforeDisplayed) -> \(afterDisplayed)")
         }
         Button("debug") {
           installation.debug()
@@ -75,9 +72,6 @@ struct InstallDebugView: View {
         }
         Button("Kill Keyman") {
           _ = installation.killKeymanInputMethod()
-        }
-        Button("Uninstall") {
-          installation.uninstall()
         }
         Spacer()
       }

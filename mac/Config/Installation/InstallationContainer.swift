@@ -9,6 +9,7 @@
 import SwiftUI
 import Combine
 import KeymanSettings
+import OSLog
 
 // in-app notifications sent
 public extension Notification.Name {
@@ -40,10 +41,12 @@ public class InstallationContainer : ObservableObject {
     // create the settings repository, gaining access to the app group UserDefaults
     do {
       defaultsRepo = try DefaultsRepository(suiteName: InputMethodUtil.groupId)
-      print("Found group container")
+      Logger.app.log("found group container")
     } catch UserDefaultsError.unknownSuite {
+      Logger.app.error("group container not found: \(UserDefaultsError.unknownSuite)")
       fatalError("Group container not found.")
     } catch {
+      Logger.app.error("unable to access settings in group container: \(error as NSError, privacy: .public)")
       fatalError("Unable to access settings in group container.")
     }
     
@@ -70,7 +73,8 @@ public class InstallationContainer : ObservableObject {
    * register observers to learn of results of InstallationState evaluation
    */
   func registerObservers() {
-    print("InstallationContainer registerObservers")
+    Logger.app.debug("InstallationContainer registerObservers")
+    
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(self.handleStartNewInstallation(_:)),
@@ -101,7 +105,8 @@ public class InstallationContainer : ObservableObject {
    * called when `NSNotification.Name.startNewInstallation` is received
    */
   @objc func handleStartNewInstallation(_ notification: Notification) {
-    print("handleStartNewInstallation received")
+    Logger.app.debug("handleStartNewInstallation received")
+
     // the evaluation is done
     self.installationCheck.isEvaluatingNewInstallation = false
   }
@@ -110,7 +115,7 @@ public class InstallationContainer : ObservableObject {
    * called when `NSNotification.Name.startInstallationRepair` is received
    */
   @objc func handleStartInstallationRepair(_ notification: Notification) {
-    print("handleStartInstallationRepair received")
+    Logger.app.debug("handleStartInstallationRepair received")
     
     // notify observers
     NotificationCenter.default.post(name: .installationRepairStarted, object: nil, userInfo: nil)
@@ -180,7 +185,7 @@ public class InstallationContainer : ObservableObject {
   public func currentTask() -> InstallationTask? {
     guard let state = self.installationState else { return nil }
     guard self.installationPhase.hasTasks else {
-      print("the installation phase \(self.installationPhase) has no tasks");
+      Logger.app.error("the installation phase \(self.installationPhase.rawValue, privacy: .public) has no tasks")
       return nil
     }
 
@@ -211,7 +216,7 @@ public class InstallationContainer : ObservableObject {
   func executeTask(_ task: InstallationTask) {
     guard self.installationState != nil else { return }
     guard self.installationPhase.hasTasks else {
-      print("the installation phase \(self.installationPhase) has no tasks");
+      Logger.app.error("executeTask: the installation phase \(self.installationPhase.rawValue) has no tasks")
       return
     }
 
@@ -247,7 +252,7 @@ public class InstallationContainer : ObservableObject {
    * the property in InstallationCheck with the new reference.
    */
   public func updateTaskAsCompleted(taskType: InstallationTaskType) {
-    print("executeTask: \(taskType.rawValue) completed")
+    Logger.app.debug("executeTask: \(taskType.rawValue, privacy: .public) completed")
     if let existingState = self.installationState {
       let updatedState = InstallationState.createCopyWithCompletedTask(from: existingState, with: taskType)
       self.installationCheck.installationState = updatedState
@@ -269,8 +274,8 @@ public class InstallationContainer : ObservableObject {
    */
   public func migrateData() -> Bool {
     let success = self.inputMethodUtil.invokeKeymanInputMethodMigration()
-    print("migration suceeded: \(success)")
-    
+    Logger.app.debug("migration suceeded: \(success)")
+
     // check whether
     if success {
       NotificationCenter.default.post(name: .dataMigrated, object: nil)
@@ -348,10 +353,10 @@ public class InstallationContainer : ObservableObject {
     if let timeRestartRequested = state.dateRestartRequested {
       if let mostRecentStartupTime = self.getMostRecentRestartTime() {
         hasRestarted = mostRecentStartupTime > timeRestartRequested
-        print("mostRecentStartupTime: \(mostRecentStartupTime), timeRestartRequested: \(timeRestartRequested)")
+        Logger.app.debug("mostRecentStartupTime: \(mostRecentStartupTime), timeRestartRequested: \(timeRestartRequested)")
       }
     }
-    print("validateRestarted: \(hasRestarted)")
+    Logger.app.debug("validateRestarted: \(hasRestarted)")
     return hasRestarted
   }
   
@@ -386,7 +391,7 @@ public class InstallationContainer : ObservableObject {
     let enabled = inputMethodUtil.isKeymanInputMethodEnabled()
     let running = inputMethodUtil.isKeymanInputMethodRunning()
 
-    print("Keyman status, version: \(version), enabled: \(enabled), running: \(running), permissionGranted: \(permissionString)")
+    Logger.app.debug("Keyman status, version: \(version, privacy: .private), enabled: \(enabled), running: \(running), permissionGranted: \(permissionString)")
   }
 
   /**
@@ -394,7 +399,7 @@ public class InstallationContainer : ObservableObject {
    */
   public func registerKeymanInputMethod() -> Bool {
     let success = self.inputMethodUtil.registerKeymanInputMethod()
-    print("registerKeymanInputMethod suceeded: \(success)")
+    Logger.app.debug("registerKeymanInputMethod suceeded: \(success)")
     
     return success
   }
@@ -404,8 +409,8 @@ public class InstallationContainer : ObservableObject {
    */
   public func selectKeymanInputMethod() -> Bool {
     let success = self.inputMethodUtil.selectKeymanInputMethod()
-    print("selectKeymanInputMethod suceeded: \(success)")
-    
+    Logger.app.debug("selectKeymanInputMethod suceeded: \(success)")
+
     return success
   }
   
@@ -426,7 +431,7 @@ public class InstallationContainer : ObservableObject {
       success = self.inputMethodUtil.enableKeymanInputMethod()
     }
     
-    print("enableKeymanInputMethod suceeded: \(success)")
+    Logger.app.debug("enableKeymanInputMethod suceeded: \(success)")
     return success
   }
   
@@ -445,8 +450,8 @@ public class InstallationContainer : ObservableObject {
     var requested = false
   
     requested = self.inputMethodUtil.invokeKeymanInputMethodRequestAccess()
-    print("requestAccessibility called, requested: \(requested)")
-    
+    Logger.app.debug("requestAccessibility called, requested: \(requested)")
+
     return requested
   }
 
@@ -462,13 +467,5 @@ public class InstallationContainer : ObservableObject {
    */
   public func disableKeymanInputMethod() -> Bool {
     return self.inputMethodUtil.disableKeymanInputMethod()
-  }
-  
-  /**
-   * uninstall the Keyman Input Method
-   * not functional with default security settings!
-   */
-  public func uninstall() {
-    self.inputMethodUtil.uninstallKeyman()
   }
 }

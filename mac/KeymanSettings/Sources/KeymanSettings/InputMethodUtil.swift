@@ -10,6 +10,7 @@
 import Foundation
 import Carbon.HIToolbox
 import AppKit
+import OSLog
 
 public enum KeymanVersionCheckError: Error {
   case inputMethodNotFound
@@ -51,7 +52,7 @@ public class InputMethodUtil {
    */
   public func keymanInputMethodExists()  -> Bool {
     guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
-      print("Keyman input method not found, failed to create input method url")
+      Logger.setup.log("Keyman input method not found, failed to create input method url")
       return false
     }
     
@@ -117,13 +118,13 @@ public class InputMethodUtil {
   
   /**
    * uninstalls the Keyman input method
-   * note: not useful to expose to users as default security systems prevent us from deleting the app
+   * note: commenting out for now as default security settings prevent us from deleting the app
    */
-  public func uninstallKeyman() {
-    _ = self.killKeymanInputMethod()
-    _ = self.disableKeymanInputMethod()
-    self.deleteKeyman()
-  }
+//  public func uninstallKeyman() {
+//    _ = self.killKeymanInputMethod()
+//    _ = self.disableKeymanInputMethod()
+//    self.deleteKeyman()
+//  }
   
   /**
    * Returns version number string for the specifed app located at `~/Library/Input Methods`
@@ -144,7 +145,7 @@ public class InputMethodUtil {
     guard let appVersionString = infoDictionary["CFBundleShortVersionString"] as? String else {
       throw KeymanVersionCheckError.versionNotFound
     }
-    
+
     return appVersionString
   }
   
@@ -167,15 +168,13 @@ public class InputMethodUtil {
   }
   
   public func invokeKeymanInputMethodMigration() -> Bool {
-    print("invokeKeymanInputMethodMigration()")
+    Logger.setup.log("invokeKeymanInputMethodMigration()")
     return self.invokeKeymanInputMethodAsSubProcess(argument: kMigrateCommand) == 0
   }
   
   public func invokeKeymanInputMethodRequestAccess() -> Bool {
     var success = false
     do {
-      print("invokeKeymanInputMethodRequestAccess()")
-
       // because we are launching Keyman with a specific command line argument
       // for this request, we must kill it first
       _ = self.killKeymanInputMethod()
@@ -183,7 +182,7 @@ public class InputMethodUtil {
       try self.launchKeymanInputMethodAsSeparateProcess(argument: kAccessCommand)
       success = true
     } catch {
-      print("error requesting access: \(error)")
+      Logger.setup.error("error requesting Accessibility from input method: \(error as NSError, privacy: .public)")
     }
     
     return success
@@ -197,8 +196,8 @@ public class InputMethodUtil {
    * It contains a message with a value of `granted` or `not-granted`
    */
   func invokeKeymanInputMethodCheckAccess() throws {
-    print("invokeKeymanInputMethodCheckAccess()")
-    
+    Logger.setup.info("invokeKeymanInputMethodCheckAccess()")
+
     // because we are launching Keyman with a specific command line argument
     // for this request, we must kill it first
     _ = self.killKeymanInputMethod()
@@ -214,13 +213,12 @@ public class InputMethodUtil {
     let process = Process()
     if let executableUrl = self.pathUtil.buildInputMethodExecutableUrl(fileName: self.keymanInputMethodApplicationName) {
       process.executableURL = executableUrl
-      print("invoking Keyman at: \(String(describing: process.executableURL))")
+      Logger.setup.info("invoking Keyman at: \(String(describing: process.executableURL), privacy: .public)")
       process.arguments = [argument]
     }
     
     var currentEnv = ProcessInfo.processInfo.environment
-    print("current env: \(String(describing: currentEnv))")
-    
+
     currentEnv["__CFBundleIdentifier"] = InputMethodUtil.keymanBundleId // set bundle ID to that of the Keyman input method
     process.environment = currentEnv
     
@@ -229,10 +227,9 @@ public class InputMethodUtil {
       process.waitUntilExit() // wait for it to finish
       result = Int(process.terminationStatus)
     } catch {
-      print("Failed to run process: \(error)")
+      Logger.setup.error("Failed to run process: \(error as NSError, privacy: .public)")
     }
     
-    print("invokeKeymanInputMethod() result: \(result)")
     return result
   }
   
@@ -246,16 +243,13 @@ public class InputMethodUtil {
     }
     
     guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
-      print("launchKeymanInputMethodAsSeparateProcess, failed to create input method url")
+      Logger.setup.error("launchKeymanInputMethodAsSeparateProcess, failed to create input method url")
       throw KeymanInvocationError.inputMethodNotFound
     }
     
     NSWorkspace.shared.openApplication(at: inputMethodUrl, configuration: openConfig) { (app, error) in
       if let error = error {
-        print("Could not launch Keyman input method at \(inputMethodUrl), due to error: \(error.localizedDescription), code: \(error._code)")
-        Thread.callStackSymbols.forEach { symbol in
-            print(symbol)
-        }
+        Logger.setup.error("Could not launch Keyman input method at \(inputMethodUrl), due to error: \(error as NSError, privacy: .public)")
       }
     }
   }
@@ -268,7 +262,7 @@ public class InputMethodUtil {
     do {
       try self.invokeKeymanInputMethodCheckAccess()
     } catch {
-      print("invoking Keyman failed: \(error.localizedDescription)")
+      Logger.setup.error("invoking Keyman failed: \(error as NSError, privacy: .public)")
     }
     
     let timeStyle = Date.FormatStyle()
@@ -276,7 +270,7 @@ public class InputMethodUtil {
       .minute(.twoDigits)
       .second(.twoDigits)
       .secondFraction(.fractional(3))
-    print("doAsyncAccessibilityCheck, listening across process boundaries, time: \(Date().formatted(timeStyle))")
+    Logger.setup.log("doAsyncAccessibilityCheck, listening across process boundaries, time: \(Date().formatted(timeStyle))")
   }
   
   /**
@@ -287,11 +281,11 @@ public class InputMethodUtil {
     let runningApps = NSRunningApplication.runningApplications(withBundleIdentifier: bundleId)
     var didTerminate = false
     
-    print("Running app count for \(bundleId) = \(runningApps.count)")
+    Logger.setup.debug("Running app count for \(bundleId, privacy: .public) = \(runningApps.count)")
     if let runningApp = runningApps.first {
       let processId = runningApp.processIdentifier
       didTerminate = runningApp.terminate()
-      print("process \(processId) for \(bundleId) was terminated: \(didTerminate)")
+      Logger.setup.log("process \(processId) for \(bundleId, privacy: .public) was terminated: \(didTerminate)")
     }
     
     return didTerminate
@@ -314,8 +308,8 @@ public class InputMethodUtil {
     let inputSourceList = TISCreateInputSourceList(properties as CFDictionary, true)
     guard let sources = inputSourceList?.takeRetainedValue() as? [TISInputSource],
           let targetSource = sources.first else {
-      print("Error: Could not find the specified input source.")
-      return(nil)
+      Logger.setup.error("Could not find the specified input source with bundleID: \(bundleId, privacy: .public)")
+     return(nil)
     }
     
     return targetSource
@@ -333,42 +327,17 @@ public class InputMethodUtil {
         // Bridge the CFTypeRef to an Unmanaged<AnyObject> and then to a Swift String
         if let inputMethodEnabled = Unmanaged<AnyObject>.fromOpaque(cfType).takeUnretainedValue() as? Bool {
           enabled = inputMethodEnabled
-          print("is enabled: \(enabled)")
+          Logger.setup.info("isInputMethodEnabled: \(enabled)")
         } else {
-          print("could not read retrieved enabled property for bundleId: \(bundleId)")
+          Logger.setup.error("Could not read retrieved enabled property for bundleId: \(bundleId, privacy: .public)")
         }
       } else {
-        print("Failed to get enabled property for bundleId: \(bundleId)")
+        Logger.setup.error("Failed to get enabled property for bundleId: \(bundleId, privacy: .public)")
       }
     } else {
-      print("Failed to get input source for bundleId: \(bundleId)")
+      Logger.setup.error("Failed to get input source for bundleId: \(bundleId, privacy: .public)")
     }
     return enabled
-  }
-  
-  /**
-   * returns true if the input method with the specified bundleId is capable of being enabled
-   */
-  func isInputMethodEnableCapable(bundleId: String) -> Bool {
-    var enableCapable = false
-    
-    if let inputSource = self.getInputSource(bundleId: bundleId) {
-      let enableCapableValue = TISGetInputSourceProperty(inputSource, kTISPropertyInputSourceIsEnableCapable)
-      if let cfType = enableCapableValue {
-        // Bridge the CFTypeRef to an Unmanaged<AnyObject> and then to a Swift String
-        if let capable = Unmanaged<AnyObject>.fromOpaque(cfType).takeUnretainedValue() as? Bool {
-          enableCapable = capable
-          print("is enable capable: \(enableCapable)")
-        } else {
-          print("could not read retrieved enable capable property for bundleId: \(bundleId)")
-        }
-      } else {
-        print("Failed to get enable capable property for bundleId: \(bundleId)")
-      }
-    } else {
-      print("Failed to get input source for bundleId: \(bundleId)")
-    }
-    return enableCapable
   }
   
   /**
@@ -379,7 +348,7 @@ public class InputMethodUtil {
     var success = false
     
     guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
-      print("registerInputMethod, failed to create input method url")
+      Logger.setup.error("registerInputMethod, failed to create input method url for bundleId: \(bundleId, privacy: .public)")
       return false
     }
     let cfUrl = inputMethodUrl as CFURL
@@ -388,9 +357,9 @@ public class InputMethodUtil {
     success = result == noErr
     
     if (success) {
-      print("registerInputMethod for bundle ID '\(bundleId)': success")
+      Logger.setup.log("registerInputMethod for bundle ID '\(bundleId, privacy: .public)': success")
     } else {
-      print("registerInputMethod for bundle ID '\(bundleId)' failed, result = \(result)")
+      Logger.setup.error("registerInputMethod for bundle ID '\(bundleId, privacy: .public)' failed, result = \(result)")
     }
     
     return success
@@ -405,9 +374,9 @@ public class InputMethodUtil {
       let result = TISEnableInputSource(inputSource)
       success = result == noErr
       if (success) {
-        print("enableInputMethod for bundle ID '\(bundleId)': success")
+        Logger.setup.log("enableInputMethod for bundle ID '\(bundleId, privacy: .public)': success")
       } else {
-        print("enableInputMethod for bundle ID '\(bundleId)' failed, result = \(result)")
+        Logger.setup.error("enableInputMethod for bundle ID '\(bundleId, privacy: .public)' failed, result = \(result)")
       }
     }
     return success
@@ -422,27 +391,31 @@ public class InputMethodUtil {
       let result = TISDisableInputSource(inputSource)
       success = result == noErr
       if (success) {
-        print("disableInputMethod for bundle ID '\(bundleId)': success")
+        Logger.setup.log("disableInputMethod for bundle ID '\(bundleId, privacy: .public)': success")
       } else {
-        print("disableInputMethod for bundle ID '\(bundleId)' failed, result = \(result)")
+        Logger.setup.error("disableInputMethod for bundle ID '\(bundleId, privacy: .public)' failed, result = \(result)")
       }
     }
     return success
   }
   
-  func deleteKeyman() {
-    let fileManager = FileManager.default
-    if let keymanFile = self.pathUtil.buildInputMethodPathUrl(fileName: keymanInputMethodApplicationName) {
-      do {
-        try fileManager.removeItem(at: keymanFile)
-        print("Successfully deleted Keyman.app")
-      } catch {
-        print("Error deleting Keyman.app: \(error)")
-      }
-    } else {
-      print("Keyman.app not found")
-    }
-  }
+  /**
+   * deletes the Keyman input method
+   * note: commenting out for now as default security settings prevent us from deleting the app
+   */
+//  func deleteKeyman() {
+//    let fileManager = FileManager.default
+//    if let keymanFile = self.pathUtil.buildInputMethodPathUrl(fileName: keymanInputMethodApplicationName) {
+//      do {
+//        try fileManager.removeItem(at: keymanFile)
+//        print("Successfully deleted Keyman.app")
+//      } catch {
+//        print("Error deleting Keyman.app: \(error)")
+//      }
+//    } else {
+//      print("Keyman.app not found")
+//    }
+//  }
   
   /**
    * select the input source with the specified input source id and return true if successful
@@ -454,16 +427,16 @@ public class InputMethodUtil {
     let inputSourceList = TISCreateInputSourceList(properties as CFDictionary, false)
     guard let sources = inputSourceList?.takeRetainedValue() as? [TISInputSource],
           let targetSource = sources.first else {
-      print("Error: Could not find the input source '\(inputSourceId)'.")
+      Logger.setup.error("Error: Could not find the input source '\(inputSourceId, privacy: .public)'.")
       return false
     }
     
     let result = TISSelectInputSource(targetSource)
     if result != noErr {
-      print("Error selecting input source '\(inputSourceId)': \(result)")
-      return false
+      Logger.setup.error("Error selecting input source '\(inputSourceId, privacy: .public)'.")
+     return false
     } else {
-      print("Successfully selected input source '\(inputSourceId)'.")
+      Logger.setup.log("Successfully selected input source '\(inputSourceId, privacy: .public)'.")
       return true
     }
   }

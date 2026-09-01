@@ -48,7 +48,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
       decisionHandler(.cancel)
       return
     }
-    Logger.download.info("received url: \(urlString, privacy: .public)")
+    Logger.download.log("received url: \(urlString, privacy: .public)")
     
     // if the url matches the install url pattern, then cancel the request,
     // build the standard URLRequest for a package installation and send it
@@ -146,7 +146,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
         completionHandler(helper.temporaryKmpFileLocation)
       }
     } catch {
-      Logger.download.error("could not initiate package download, error: \(String(describing: error), privacy: .public)")
+      Logger.download.error("could not initiate package download, error: \(error as NSError, privacy: .public)")
       self.loadPackageFailed = true
       self.loadFailureMessage = error.localizedDescription
       completionHandler(nil)
@@ -173,7 +173,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   }
   
   public func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
-    Logger.download.error("download failed with error: \(String(describing: error), privacy: .public)")
+    Logger.download.error("download failed with error: \(error as NSError, privacy: .public)")
     self.isDownloading = false
     self.progressObserver = nil
     self.loadPackageFailed = true

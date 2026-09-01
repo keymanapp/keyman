@@ -11,7 +11,8 @@ import OSLog
 
 extension Logger {
   private static let settingsSubsystem = "com.keyman.settings"
-  static let settings = Logger(subsystem: settingsSubsystem, category: "settings")
+  static let setup = Logger(subsystem: settingsSubsystem, category: "setup")
+  static let data = Logger(subsystem: settingsSubsystem, category: "data")
 }
 
 public struct ConfigAppUtil {

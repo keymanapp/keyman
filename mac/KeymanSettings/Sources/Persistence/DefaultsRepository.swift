@@ -152,22 +152,6 @@ public class DefaultsRepository: DefaultsRepo {
   }
   
   /**
-   * for debugging: prints UserDefaults values to the console
-   * with app group UserDefaults, there is no way to view from the command line
-   * (unlike standard application-level UserDefaults)
-   */
-  public func logDefaults() {
-    print("UserDefaults:")
-    print("\(kSelectedKeyboardKey): \(self.readSelectedKeyboard())")
-    print("\(kDataModelVersionKey): \(self.readDataModelVersion())")
-    print("\(kForceSentryErrorKey): \(self.readForceSentryError())")
-    print("\(kShowOskOnActivateKey): \(self.readShowOskOnActivate())")
-    print("\(kEnabledKeyboardsKey): \(self.readEnabledKeyboards())")
-    print("\(kPersistedOptionsKey): \(self.readPersistedOptions())")
-    print("\(kInstallationState): \(self.readInstallationState()?.description ?? "nil")")
-  }
-  
-  /**
    * for debugging: clear all the entries for the app group UserDefaults
    * unlike standard application-level UserDefaults, there is no way to view from the command line
    */

@@ -49,12 +49,6 @@ class DefaultsRepoStub: DefaultsRepo {
   }
   
   
-  func logDefaults() {
-    print("UserDefaults:")
-    print("\("KMSelectedKeyboardsKey"): \(self.readSelectedKeyboard())")
-    print("\("KMEnabledKeyboardsKey"): \(self.readEnabledKeyboards())")
-  }
-  
   func clearDefaults() {
     selectedKeyboard = ""
     enabledKeyboards = []

@@ -12,6 +12,7 @@ import AppKit
 import Cocoa
 import CoreImage
 import CoreImage.CIFilterBuiltins
+import OSLog
 
 public class KeymanPackage: Identifiable, Hashable, Equatable {
   static let defaultImage: NSImage? = {
@@ -19,7 +20,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     if let imageUrl = Bundle.module.url(forResource: "SideImage", withExtension: "bmp") {
         image = NSImage(contentsOf: imageUrl)
     } else {
-        print("Error: Could not find SideImage.bmp in the module bundle.")
+      Logger.setup.error("error: could not find SideImage.bmp in the module bundle")
     }
     return image
   }()
@@ -231,7 +232,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     if comparisonResult == .orderedAscending {
       // keyman version is too old
       meetsRequiredVersion = false
-      print("for package '\(self.packageName)' keyman version \(keymanVersion) is older than required version \(minimumKeymanVersion)")
+      Logger.data.log("validateKeymanVersionForPackage for package: '\(self.packageName, privacy: .public)' keyman version \(keymanVersion, privacy: .public) is older than required version \(minimumKeymanVersion, privacy: .public)")
     } else {
       meetsRequiredVersion = true
     }

@@ -24,6 +24,7 @@
 import Foundation
 import Combine
 import ZIPFoundation
+import OSLog
 
 public enum InstallPackageError: LocalizedError {
   case packageInstallationAlreadyInProgress
@@ -116,7 +117,7 @@ public class SettingsContainer : ObservableObject {
       let languageQueryItem = URLQueryItem(name:"lang", value: languageString)
       searchUrl.append(queryItems:[languageQueryItem])
     }
-    print("full searchUrl: \(searchUrl.absoluteString)")
+    Logger.setup.info("full searchUrl: \(searchUrl.absoluteString, privacy: .public)")
     return searchUrl
   }
   
@@ -131,7 +132,7 @@ public class SettingsContainer : ObservableObject {
     var primaryLanguage: String?
     if let language = systemLanguages.first {
       primaryLanguage = language
-      print("primary system language: \(String(describing: primaryLanguage))")
+      Logger.setup.info("primary system language: \(language, privacy: .public)")
     }
 
       return primaryLanguage
@@ -146,20 +147,24 @@ public class SettingsContainer : ObservableObject {
     // create the package repository, gaining access to the app group container directory
     do {
       try self.packageRepository = PackageRepository()
-      print("Found documents group container")
+      Logger.data.log("Found documents group container")
     } catch KeymanPathError.groupContainerNotFound {
+      Logger.data.error("Document group container not found")
       fatalError("Document group container not found.")
     } catch {
+      Logger.data.error("Unable to access documents in group container, error \(error as NSError, privacy: .public)")
       fatalError("Unable to access documents in group container.")
     }
 
     // create the settings repository, gaining access to the app group UserDefaults
     do {
       try self.defaultsRepository = DefaultsRepository(suiteName: InputMethodUtil.groupId)
-      print("Found defaults group container")
+      Logger.data.log("Found defaults group container")
     } catch UserDefaultsError.unknownSuite {
+      Logger.data.error("Defaults group container not found")
       fatalError("Defaults group container not found.")
     } catch {
+      Logger.data.error("Unable to access defaults in group container, error \(error as NSError, privacy: .public)")
       fatalError("Unable to access defaults in group container: \(error.localizedDescription).")
     }
 
@@ -246,7 +251,7 @@ public class SettingsContainer : ObservableObject {
    * Called when user chooses to cancel downgrade of package
    */
   public func userCanceledPackageInstallation() {
-    print("user cancelled package installation")
+    Logger.data.log("User cancelled package installation")
     self.packageInstall?.cleanupFailedInstallation()
   
     self.packageInstall = nil
@@ -256,7 +261,7 @@ public class SettingsContainer : ObservableObject {
    * Called when user chooses to cancel downgrade of package
    */
   public func packageInstallationFailed() {
-    print("packageInstallationFailed")
+    Logger.data.log("Package installation failed")
     self.packageInstall?.cleanupFailedInstallation()
   
     self.packageInstall = nil
@@ -284,7 +289,7 @@ public class SettingsContainer : ObservableObject {
    */
   public func findInstalledPackage(with id: UUID) -> KeymanPackage? {
     guard let package = self.installedPackages.first(where: { $0.id == id }) else {
-      print ("Error: could not find package with UUID: \(id)")
+      Logger.setup.error("error: could not find package with UUID: \(id)")
       return nil
     }
     
@@ -297,8 +302,6 @@ public class SettingsContainer : ObservableObject {
   public func removeInstalledPackage(with id: UUID) {
     if let package = findInstalledPackage(with: id) {
       self.removeInstalledPackage(package: package)
-    } else {
-      print("could not find package with id: \(id)")
     }
   }
 
@@ -329,7 +332,7 @@ public class SettingsContainer : ObservableObject {
    */
   public func isKeyboardEnabled(packageId: UUID, keyboardKey: String) -> Bool {
     guard let package = self.findInstalledPackage(with: packageId) else {
-      print ("Could not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey)")
+      Logger.setup.error("isKeyboardEnabled, not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey, privacy: .public)")
       return false
     }
     
@@ -342,11 +345,11 @@ public class SettingsContainer : ObservableObject {
    */
   public func setKeyboardEnabled(packageId: UUID, keyboardKey: String, enabled: Bool) {
     guard let package = self.findInstalledPackage(with: packageId) else {
-      print ("Could not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey)")
+      Logger.setup.error("setKeyboardEnabled, could not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey, privacy: .public)")
       return
     }
     
-    print ("setKeyboardEnabled for \(keyboardKey) setting to \(enabled)")
+    Logger.setup.info("setKeyboardEnabled for \(keyboardKey, privacy: .public) setting to \(enabled)")
     package.enableKeyboard(keyboardKey: keyboardKey, enabled: enabled)
     
     // update persisted state in UserDefaults enabledKeyboards array
@@ -410,9 +413,9 @@ public class SettingsContainer : ObservableObject {
     let enabledKeyboardKeys = self.defaultsRepository.readEnabledKeyboards()
     
     if (enabledKeyboardKeys.isSubset(of: installedKeyboardKeys)) {
-      print("only installed keyboards are listed as enabled: no need to update defaults")
+      Logger.setup.info("only installed keyboards are listed as enabled: no need to update defaults")
     } else {
-      print("enabled keyboards list contains uninstalled keyboards: align with enabled keyboards list")
+      Logger.setup.info("enabled keyboards list contains uninstalled keyboards: align with enabled keyboards list")
       let installedEnabledKeyboardKeys = enabledKeyboardKeys.intersection(installedKeyboardKeys)
       self.defaultsRepository.writeEnabledKeyboards(enabledKeyboardsArray: Array(installedEnabledKeyboardKeys))
     }
@@ -472,7 +475,7 @@ public class SettingsContainer : ObservableObject {
    * Delegates to the PackageInstallHelper instance to decide whether the package should be installed.
    */
   public func packageDownloadComplete(kmpFileUrl: URL) throws {
-    print ("packageDownloadComplete \(kmpFileUrl)")
+    Logger.setup.info("packageDownloadComplete \(kmpFileUrl, privacy: .public)")
 
     do {
       try self.packageInstall?.prepareToInstall(for: kmpFileUrl)
@@ -505,7 +508,7 @@ public class SettingsContainer : ObservableObject {
         self.installedPackages[index] = package
         self.addEnabledKeyboards(for: package)
       } else {
-        print("Error: package '\(package.packageName)' not found for replacement")
+        Logger.setup.error("Error: package '\(package.packageName, privacy: .public)' not found for replacement")
       }
     }
   }
