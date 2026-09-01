@@ -69,6 +69,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateKeyboard(GUID *profile) 
   if(!_td) return FALSE;
 
   RefreshThreadKeyboardsIfRequired();
+  RefreshToggleState();
 
   if(profile != NULL) {
     for(int i = 0; i < _td->nKeyboards; i++) {

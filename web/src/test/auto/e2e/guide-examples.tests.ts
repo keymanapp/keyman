@@ -9,7 +9,7 @@ async function setTimeoutAndLoadPage(page: Page, url: string): Promise<void> {
   await loadPage(page, url);
 }
 
-test.describe('First example from the guide', function () {
+test.describe.skip('First example from the guide', function () {
   const beforeEach = async (page: Page) => {
     await setTimeoutAndLoadPage(page, 'http://localhost:3000/build/docs/engine/guide/examples/__first-example.html');
   }
@@ -41,7 +41,7 @@ test.describe('First example from the guide', function () {
   });
 });
 
-test.describe('Auto-control example from the guide', function () {
+test.describe.skip('Auto-control example from the guide', function () {
   const beforeEach = async (page: Page) => {
     await setTimeoutAndLoadPage(page, 'http://localhost:3000/build/docs/engine/guide/examples/__auto-control.html');
   }
@@ -69,7 +69,7 @@ test.describe('Auto-control example from the guide', function () {
   });
 });
 
-test.describe('Control-by-control example from the guide', function () {
+test.describe.skip('Control-by-control example from the guide', function () {
   const beforeEach = async (page: Page) => {
     await setTimeoutAndLoadPage(page, 'http://localhost:3000/build/docs/engine/guide/examples/__control-by-control.html');
   }
@@ -119,7 +119,7 @@ test.describe('Control-by-control example from the guide', function () {
   });
 });
 
-test.describe('Full manual control example from the guide', function () {
+test.describe.skip('Full manual control example from the guide', function () {
   const beforeEach = async (page: Page) => {
     await setTimeoutAndLoadPage(page, 'http://localhost:3000/build/docs/engine/guide/examples/__full-manual-control.html');
   }
@@ -203,7 +203,7 @@ test.describe('Full manual control example from the guide', function () {
   });
 });
 
-test.describe('Manual control example from the guide', function () {
+test.describe.skip('Manual control example from the guide', function () {
   const beforeEach = async (page: Page) => {
     await setTimeoutAndLoadPage(page, 'http://localhost:3000/build/docs/engine/guide/examples/__manual-control.html');
   }

@@ -68,7 +68,7 @@
 void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam);
 void ProcessWMKeymanControl(WPARAM wParam, LPARAM lParam);
 void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam);
-void GetCapsAndNumlockState();
+void RefreshModifierState();
 
 /*
 BOOL SysTabCtrl(HWND hwnd)
@@ -354,7 +354,7 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
       if(IsFocusedThread())
       {
         if(_td->app) _td->app->ResetQueue();
-        GetCapsAndNumlockState();
+        RefreshModifierState();
         UpdateActiveWindows();
       }
     }
@@ -413,20 +413,19 @@ ProcessWMKeymanControl(WPARAM wParam, LPARAM lParam) {
 #endif
 }
 
-/*
-  GetCapsAndNumlockState:
+/**
+ * Refresh Keyman's internal keyboard modifier and toggle state according
+ * to the Windows current keyboard state (not async state). The state may
+ * have been reset while Keyman was not aware of it. This is used only when
+ * focus changes. Note that the global values are per-architecture, so
+ * these may track separately.
+ *
+ * @see ProcessModifierChange()
+ */
+void RefreshModifierState() {   // I4793
+  DWORD previousShiftState = Globals::get_ShiftState();
 
-  Updates the global caps and numlock state when a window is focused, because it
-  may have been reset while Keyman was not aware of it
-*/
-void GetCapsAndNumlockState() {   // I4793
-  DWORD n = Globals::get_ShiftState();
-
-  if(GetKeyState(VK_NUMLOCK) & 1) *Globals::ShiftState() |= NUMLOCKFLAG;
-  else *Globals::ShiftState() &= ~NUMLOCKFLAG;
-
-  if(GetKeyState(VK_CAPITAL) & 1) *Globals::ShiftState() |= CAPITALFLAG;
-  else *Globals::ShiftState() &= ~CAPITALFLAG;
+  RefreshToggleState();
 
   if(GetKeyState(VK_SHIFT) < 0) *Globals::ShiftState() |= K_SHIFTFLAG;
   else *Globals::ShiftState() &= ~K_SHIFTFLAG;
@@ -443,18 +442,19 @@ void GetCapsAndNumlockState() {   // I4793
   if(GetKeyState(VK_RMENU) < 0) *Globals::ShiftState() |= RALTFLAG;
   else *Globals::ShiftState() &= ~RALTFLAG;
 
-  SendDebugMessageFormat("Enter: %x Exit: %x", n, Globals::get_ShiftState());
+  SendDebugMessageFormat("Enter: %x Exit: %x", previousShiftState, Globals::get_ShiftState());
 }
 
-/*
-  Update the Keyman shift state based on the key event. This has to be
-  done from both the GetMessage hook and the TSF methods, because we don't
-  consistently receive modifier events in some applications (e.g. ALT in Firefox)
-  via TSF, and we don't receive the notifications via the GetMessage hook when
-  in UWP apps (#4369).
-
-  TODO: test whether we still need the GetMessage hook for reading modifier state.
-*/
+/**
+ * Update the Keyman shift state based on the key event. This has to be done
+ * from both the GetMessage hook and the TSF methods, because we don't
+ * consistently receive modifier events in some applications (e.g. ALT in
+ * Firefox) via TSF, and we don't receive the notifications via the GetMessage
+ * hook when in UWP apps (#4369).
+ *
+ * TODO: test whether we still need the GetMessage hook for reading modifier
+ * state.
+ */
 void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended) {   // I4793
   UINT flag = 0;
 
