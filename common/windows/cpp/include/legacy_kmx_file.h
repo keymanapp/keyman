@@ -75,8 +75,9 @@
 #define VERSION_150 0x00000F00
 #define VERSION_160 0x00001000
 #define VERSION_170 0x00001100
+#define VERSION_190 0x00001300
 #define VERSION_MIN	VERSION_50
-#define VERSION_MAX	VERSION_170
+#define VERSION_MAX	VERSION_190
 
 /*
  Special flag for WM_CHAR/WM_KEY???/WM_SYSKEY???: says that key has been
@@ -257,7 +258,7 @@
 //#define CODE_EXTENDEDEND	0x0B  deprecated
 #define CODE_SWITCH			0x0C
 #define CODE_KEY			0x0D
-#define	CODE_CLEARCONTEXT	0x0E
+#define	CODE_CLEARCONTEXT	0x0E		// deprecated in 19.0
 #define CODE_CALL			0x0F
 // UC_SENTINEL_EXTENDEDEND  0x10
 #define CODE_CONTEXTEX		0x11

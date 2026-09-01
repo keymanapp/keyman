@@ -1155,6 +1155,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     else if (u16ncmp(p, u"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
     else if (u16ncmp(p, u"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
     else if (u16ncmp(p, u"17.0", 4) == 0)  fk->version = VERSION_170; // Flicks and gestures
+    else if (u16ncmp(p, u"19.0", 4) == 0)  fk->version = VERSION_190; // Deprecations - fix, clearcontext
 
     else {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidVersion);
@@ -1605,7 +1606,7 @@ const KMX_BOOL CODE__IS_TEXTUAL[] = {
   -1,     // CODE_EXTENDEDEND         0x0B (unused)
   FALSE,  // CODE_SWITCH              0x0C
   -1,     // CODE_KEY                 0x0D (never used)
-  FALSE,  // CODE_CLEARCONTEXT        0x0E
+  FALSE,  // CODE_CLEARCONTEXT        0x0E (deprecated in 19.0)
   FALSE,  // CODE_CALL                0x0F // may trigger text effects but indirectly
   -1,     // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
   TRUE,   // CODE_CONTEXTEX           0x11
@@ -2399,6 +2400,10 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else if (u16nicmp(p, u"clearcontext", 12) == 0)
       {
+        // deprecated in 19.0
+        if(fk->version >= VERSION_190) {
+          ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedStatement, {"clearcontext", "19.0"});  // I3438
+        }
         p += 12;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_CLEARCONTEXT;
@@ -2722,6 +2727,10 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 15:
       if (u16nicmp(p, u"fix", 3) == 0)
       {
+        if(fk->version >= VERSION_190) {
+          // deprecated in 19.0
+          ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedStatement, {"fix", "19.0"});  // I3438
+        }
         p += 3;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_CLEARCONTEXT;

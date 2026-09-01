@@ -273,6 +273,7 @@ PWCHAR ExtString(PWCHAR str)
 				p = wcscat2(q, BUFSIZE, L"key<deprecated> ");
 				break;
 			case CODE_CLEARCONTEXT:
+				// deprecated in 19.0
 				p = wcscat2(q, BUFSIZE, L"clearcontext ");
 				break;
 			case CODE_CALL:

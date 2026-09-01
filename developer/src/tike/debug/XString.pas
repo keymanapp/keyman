@@ -1,18 +1,18 @@
 (*
   Name:             XString
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      14 Jun 2008
 
   Modified Date:    13 Dec 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Jun 2008 - mcdurdin - I1365 - Add CODE_NOTANY support
                     13 Dec 2012 - mcdurdin - I3661 - V9.0 - XString unit needs updating to support 8 and 9 stores
 *)
@@ -150,7 +150,7 @@ begin
 		CODE_USE:			     Result := 1;
 		CODE_DEADKEY:		   Result := 1;
 		CODE_EXTENDED:		 Result := 3;
-		CODE_CLEARCONTEXT: Result := 1;
+		CODE_CLEARCONTEXT: Result := 1; // deprecated in 19.0
 		CODE_CALL:			   Result := 1;
 		CODE_CONTEXTEX:	   Result := 1;
     CODE_NOTANY:       Result := 1;
@@ -198,7 +198,7 @@ begin
       CODE_EXTENDED:      Result := FormatVirtualKey(Ord(FString[Index+2]), Ord(FString[Index+3]));
       CODE_SWITCH:        Result := '??switch';
       CODE_KEY:           Result := '??key';
-      CODE_CLEARCONTEXT:  Result := 'clearcontext';
+      CODE_CLEARCONTEXT:  Result := 'clearcontext'; // deprecated in 19.0
       CODE_CALL:          Result := 'call(func)';
       CODE_CONTEXTEX:     Result := Format('context(%d)', [Ord(FString[Index+2])]);
       CODE_NOTANY:        begin storeindex := Ord(FString[Index+2])-1; Result := Format('notany(%s)', [Fkbd.Stores[storeindex].Name]); end;
@@ -300,7 +300,7 @@ var
   storeindex: Integer;
 begin
   Element.Name := IntFormatChar(pos, Options + [xfoQuoteChar], storeindex);
-  
+
   Element.StoreIndex := storeindex;
   if storeindex > -1
     then Element.Store := Fkbd.Stores[storeindex].AString
@@ -340,7 +340,7 @@ function TXString.SubString(StartIndex, Len: Integer): WideString;
 var
   i, p, n1, n2: Integer;
 begin
-  n2 := -1; n1 := 0;                    
+  n2 := -1; n1 := 0;
   i := 1; p := 1;
   while (i <= Length(FString)) and (n2 < 0) do
   begin

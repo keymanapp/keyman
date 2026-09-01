@@ -248,7 +248,7 @@ export function incxstr(p: string, x: number): number {
     case KMX.KMXFile.CODE_CONTEXTEX: x += 2; break;
     case KMX.KMXFile.CODE_NOTANY:   x += 2; break;
 
-    case KMX.KMXFile.CODE_CLEARCONTEXT: x += 2; break;
+    case KMX.KMXFile.CODE_CLEARCONTEXT: x += 2; break;  // deprecated in 19.0
     case KMX.KMXFile.CODE_IFOPT:    x += 4; break;
     case KMX.KMXFile.CODE_IFSYSTEMSTORE: x += 4; break;
     case KMX.KMXFile.CODE_SETOPT:   x += 3; break;

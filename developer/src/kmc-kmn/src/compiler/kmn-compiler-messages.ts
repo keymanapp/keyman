@@ -825,6 +825,12 @@ export class KmnCompilerMessages {
     square brackets, control characters, or Unicode non-characters.`
   );
 
+  static WARN_DeprecatedStatement                             = SevWarn | 0x0BB;
+  static Warn_DeprecatedStatement                             = (o: KmcmpLibMessageParameters) => m(
+    this.WARN_DeprecatedStatement,
+    `The statement '${def(o.p?.[0])}' has been deprecated in Keyman ${def(o.p?.[1])}`,
+  );
+
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
   static Fatal_BufferOverflow                                 = () => m(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
 
