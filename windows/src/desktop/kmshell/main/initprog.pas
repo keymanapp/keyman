@@ -264,7 +264,7 @@ begin
       else if s = '-bd' then FMode := fmBackgroundDownload
       else if s = '-an' then FMode := fmApplyInstallNow
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
-      else if s = 'bkd' then begin Inc(i); FBaseKeyboard := ParamStr(i); end
+      else if s = 'bkd' then begin Inc(i); FBaseKeyboard := StrToInt('$' + ParamStr(i)); end
       else if s = '-mcompilekbds' then
       begin
         FMode := fmMCompileKbds;

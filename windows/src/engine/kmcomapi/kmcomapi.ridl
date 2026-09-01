@@ -6,7 +6,7 @@
 // However, when applying changes via the Editor this file will be regenerated
 // and comments or formatting changes will be lost.
 // ************************************************************************ //
-// File generated on 16/09/2021 6:54:45 PM (- $Rev: 12980 $, 32940875).
+// File generated on 31/08/2026 5:28:15 PM (- $Rev: 12980 $, 11059984).
 
 [
   uuid(F16E2A9A-DA46-4EA3-BFF3-BA46B480C961),
@@ -981,60 +981,6 @@ library keymanapi
   };
 
   [
-    uuid(8F4B2D91-6C37-4A05-BE82-1D9F7C53A6E4),
-    version(19.0),
-    helpstring("http://help.keyman.com/developer/engine/desktop/19.0/api/IKeymanKeyboardFile3"),
-    dual,
-    oleautomation
-  ]
-  interface IKeymanKeyboardFile3: IKeymanKeyboardFile
-  {
-    [id(0x00000121)]
-    HRESULT _stdcall Install3([in] VARIANT_BOOL Force, [in] long BaseKeyboardID, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
-  };
-
-  [
-    uuid(C27A6E4B-9D13-47F8-A052-6B8E31D4F9C7),
-    version(19.0),
-    helpstring("http://help.keyman.com/developer/engine/desktop/19.0/api/IKeymanPackageFile3"),
-    dual,
-    oleautomation
-  ]
-
-  interface IKeymanPackageFile3: IKeymanPackageFile
-  {
-    [id(0x00000124)]
-    HRESULT _stdcall Install3([in] VARIANT_BOOL Force, [in] long BaseKeyboardID, [out, retval] IKeymanPackageFile** Package);
-  };
-
-
-	[
-    uuid(B7D3A8F1-6C42-4E95-AB17-93F0C2D8E641),
-    version(19.0),
-    helpstring("https://help.keyman.com/developer/engine/windows/19.0/api/IKeymanKeyboardInstalled2\3"),
-    dual,
-    oleautomation
-  ]
-  interface IKeymanKeyboardsInstalled3: IKeymanKeyboardsInstalled
-  {
-    [id(0x00000122)]
-    HRESULT _stdcall Install3([in] BSTR Filename, [in] VARIANT_BOOL Force, [in] long BaseKeyboardID, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
-  };
-
-  [
-    uuid(3F8C2D71-94A6-4B0E-87D5-C1E3A9F62458),
-    version(19.0),
-    helpstring("http://help.keyman.com/developer/engine/desktop/19.0/api/IKeymanPackagesInstalled3"),
-    dual,
-    oleautomation
-  ]
-  interface IKeymanPackagesInstalled3: IKeymanPackagesInstalled
-  {
-    [id(0x00000123)]
-    HRESULT _stdcall Install3([in] BSTR Filename, [in] VARIANT_BOOL Force, [in] long BaseKeyboardID, [out, retval] IKeymanPackageInstalled** PackageResult);
-  };
-
-  [
     uuid(9B43B6BC-C622-47EF-915E-6780CF53BAAA),
     version(14.0),
     helpstring("https://help.keyman.com/developer/engine/desktop/14.0/api/IKeymanPackageFile2"),
@@ -1077,6 +1023,58 @@ library keymanapi
   {
     [id(0x00000259)]
     HRESULT _stdcall Add([in] BSTR BCP47Tag, [out, retval] IKeymanKeyboardLanguageInstalled** Result);
+  };
+
+  [
+    uuid(8F4B2D91-6C37-4A05-BE82-1D9F7C53A6E4),
+    version(19.0),
+    helpstring("http://help.keyman.com/developer/engine/desktop/19.0/api/IKeymanKeyboardFile3"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardFile3: IKeymanKeyboardFile
+  {
+    [id(0x00000121)]
+    HRESULT _stdcall Install3([in] VARIANT_BOOL Force, [in] long BaseKeyboardID, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
+  };
+
+  [
+    uuid(C27A6E4B-9D13-47F8-A052-6B8E31D4F9C7),
+    version(19.0),
+    helpstring("http://help.keyman.com/developer/engine/desktop/19.0/api/IKeymanPackageFile3"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanPackageFile3: IKeymanPackageFile
+  {
+    [id(0x00000124)]
+    HRESULT _stdcall Install3([in] VARIANT_BOOL Force, [in] long BaseKeyboardID, [out, retval] IKeymanPackageFile** Package);
+  };
+
+  [
+    uuid(B7D3A8F1-6C42-4E95-AB17-93F0C2D8E641),
+    version(19.0),
+    helpstring("https://help.keyman.com/developer/engine/windows/19.0/api/IKeymanKeyboardInstalled2\x03"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanKeyboardsInstalled3: IKeymanKeyboardsInstalled
+  {
+    [id(0x00000122)]
+    HRESULT _stdcall Install3([in] BSTR Filename, [in] VARIANT_BOOL Force, [in] long BaseKeyboardID, [out, retval] IKeymanKeyboardInstalled** KeyboardResult);
+  };
+
+  [
+    uuid(3F8C2D71-94A6-4B0E-87D5-C1E3A9F62458),
+    version(19.0),
+    helpstring("http://help.keyman.com/developer/engine/desktop/19.0/api/IKeymanPackagesInstalled3"),
+    dual,
+    oleautomation
+  ]
+  interface IKeymanPackagesInstalled3: IKeymanPackagesInstalled
+  {
+    [id(0x00000123)]
+    HRESULT _stdcall Install3([in] BSTR Filename, [in] VARIANT_BOOL Force, [in] long BaseKeyboardID, [out, retval] IKeymanPackageInstalled** PackageResult);
   };
 
   [
