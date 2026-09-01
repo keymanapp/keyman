@@ -478,10 +478,18 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
   <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Instalar la actualización ahora requerirá reiniciar su equipo antes de poder usar Keyman de nuevo. ¿Actualizar ahora?</string>
-  <!-- Context: Configuration Dialog - Update on boot pop up -->
+  <!-- Context: Configuration Dialog - Update tab pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 19.0.146 -->
+  <string name="S_Update_Download_Required" comment="Update tab pop up - informs user update must be downloaded before installing">The update has not yet been downloaded. Keyman Configuration will close, and it will be downloaded in the background before continuing installation.</string>
+  <!-- Context: Configuration Dialog - Update on pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
   <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">Se ha descargado una actualización de Keyman y ya se puede instalar.</string>
+  <!-- Context: Configuration Dialog - Update on pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 19.0.146 -->
+  <string name="S_Metered_Warning" comment="Update warning - inform user about being on a metered connection">You\'re on a metered connection. Downloading now may incur data charges.</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -944,7 +952,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">La información de depuración de Keyman se almacenará en un archivo log llamado %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (donde # es un número). Debes salir de Keyman antes de intentar eliminar este archivo.\n\n\ADVERTENCIA: este archivo puede crecer muy rápidamente. Habilitar la depuración puede ralentizar su sistema y sólo deberías hacerlo si te lo aconseja el soporte técnico.\n\nADVERTENCIA DE PRIVACIDAD: ten en cuenta que el archivo log de depuración registra todas las teclas que escribes. Sólo debes activar el log de depuración durante una sesión de depuración o diagnóstico.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug information will be stored in a log file called %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (where # is a number). You should exit Keyman before attempting to delete this file.\n\n\WARNING: This file can grow large very quickly.  Enabling debugging may slow down your system and should only be done if advised by technical support.\n\nPRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
