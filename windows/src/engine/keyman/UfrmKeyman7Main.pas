@@ -221,8 +221,6 @@ type
     FLangSwitchRefreshWatcher: TThread;
     FLastFocus: THandle;
     FLastActive: THandle;
-    //FLastKeymanID: Integer;
-    FLastHKL: Integer;
     FLangSwitchManager: TLangSwitchManager;   // I3933
     FGlobalKeyboardChangeManager: TGlobalKeyboardChangeManager;   // I4271
     FActiveHKL: Integer;
@@ -348,7 +346,7 @@ var
   frmKeyman7Main: TfrmKeyman7Main;
   hProgramMutex: THandle;
 
-  wm_keyman_globalswitch, wm_keyman_globalswitch_process, wm_keyman_control, wm_keyman_control_internal, wm_test_keyman_functioning: Cardinal;
+  wm_keyman_control, wm_keyman_control_internal, wm_test_keyman_functioning: Cardinal;
 
   FEnableCrashTest: Boolean = False;
   wm_keyman_refresh: Cardinal;
@@ -510,9 +508,6 @@ begin
   frmKeymanMenu := TfrmKeymanMenu.Create(Self);
 
   FLangSwitchManager := TLangSwitchManager.Create;   // I3933
-
-  //FLastKeymanID := -1;
-  FLastHKL := GetKeyboardLayout(0);
 
   try
     GetDebugManager(Handle);
@@ -722,17 +717,6 @@ begin
       frmVisualKeyboard.Dispatch(Message);
     Result := False;
   end
-  else if Message.Msg = wm_keyman_globalswitch then
-  begin
-    TDebugLogClient.Instance.WriteMessage('wm_keyman_globalswitch for Application Handle: %x %x', [Message.wParam, Message.lParam]);
-
-    case Message.wParam of
-      skHKL,      // A windows language has been selected so select the most appropriate Keyman keyboard
-      skSelectHKL: // Select the requested Windows language (and therefore the most appropriate Keyman keyboard)
-        FLastHKL := Message.lParam;
-    end;
-    Result := True;
-  end
   else if Message.Msg = wm_keyman_refresh then
   begin
     if Message.WParam = KR_PRE_REFRESH then
@@ -797,10 +781,6 @@ begin
   Result := 0;
 
   case Command of
-    KMC_GETLASTHKL:
-      begin
-        Result := FLastHKL;
-      end;
 
     KMC_SETFOCUSINFO:
       begin
@@ -817,10 +797,6 @@ begin
         if LParam <> 0
           then ShowVisualKeyboard
           else HideVisualKeyboard;
-      end;
-    KMC_GETLOADED:
-      begin
-        if IsProductLoaded then Result := 1 else Result := 0;
       end;
     KMC_REFRESH:
       begin
@@ -2133,14 +2109,10 @@ end;
 
 initialization
   wm_test_keyman_functioning := RegisterWindowMessage('wm_test_keyman_functioning');
-  wm_keyman_globalswitch := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH');
-  wm_keyman_globalswitch_process := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH_PROCESS');
   wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
   wm_keyman_control_internal := RegisterWindowMessage('WM_KEYMAN_CONTROL_INTERNAL');   // I3933
   wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
 
   ChangeWindowMessageFilter(wm_keyman_control, MSGFLT_ADD);
-  ChangeWindowMessageFilter(wm_keyman_globalswitch, MSGFLT_ADD);
-  ChangeWindowMessageFilter(wm_keyman_globalswitch_process, MSGFLT_ADD);
   ChangeWindowMessageFilter(wm_keyman_control_internal, MSGFLT_ADD);   // I3933
 end.
