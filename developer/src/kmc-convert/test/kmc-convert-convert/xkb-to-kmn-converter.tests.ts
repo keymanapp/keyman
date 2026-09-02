@@ -20,13 +20,10 @@ describe('XkbToKmnConverter', function () {
     compilerTestCallbacks.clear();
   });
 
-  describe('Xkb-kmn: RunSpecialTestFiles', function () {
+  describe('Xkb-kmn: Run from XKB file', function () {
     const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      [makePathToFixture('../data/tests-xkb-kmn/de-simple')],
-      [makePathToFixture('../data/tests-xkb-kmn/de-simple(basic)')],
-      [makePathToFixture('../data/tests-xkb-kmn/de-complex')],
-      [makePathToFixture('../data/tests-xkb-kmn/de-complex(deadtilde)')],
+      [makePathToFixture('../data/tests-xkb-kmn/XKB_complete.xkb')],                      //basic checked OK
     ].forEach(function (files) {
       it(files + " should give no errors ", async function () {
         sut.run(files[0]);
@@ -35,135 +32,233 @@ describe('XkbToKmnConverter', function () {
     });
   });
 
-/*
-  describe('Xkb-kmn: getModifier ', function () {
-    const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    [
-      ['ONE_LEVEL', ['']],
-      ['FOUR_LEVEL_PLUS_LOCK', ["", "SHIFT", "RALT", "SHIFT RALT", "LOCK"]],
-      ['EIGHT_LEVEL', ["", "SHIFT", "ALT", "SHIFT ALT", "X", "X SHIFT", "X ALT", "X SHIFT ALT"]],
-      ['', null],
-      ['unknownLevel', null],
-      [99, null],
-      [null, null],
-      [undefined, null],
+  /* describe('findLevel', function () {
+     const result=''
+     [
+ ['ONE_LEVEL'],['ONE_LEVEL']
+ 
+    //   ['<KP01>{symbols[Group1]=[,quotedbl]}]','ONE_LEVEL'],                      //basic checked OK
+     ].forEach(function (values[0][0]) {
+       it(values[0][0]v + " should give no errors ", async function () {
+         result=this.findLevel(values[0][0]);
+         assert.equal(result,values[0][1]);
+       });
+     });
+   });*/
 
-    ].forEach(function (values) {
-      it(("getModifier(" + values[0] + ")").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
-        const result = sut.getModifier(values[0] as string);
-        assert.deepStrictEqual((result), (values[1]));
+
+  describe('XKB findLevel ', function () {
+
+    const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+    const testCases: [string, (string | number)[], string][] = [
+
+      ['<KP01>', ['2'], 'ONE_LEVEL'],
+      ['<AE01>', ['2'], 'ONE_LEVEL'],
+      ['<KP01>', ['KP_5'], 'ONE_LEVEL'],
+      ['<AE01>', ['KP_5'], 'ONE_LEVEL'],
+
+      ['<AE01>', ['C', 'E'], 'TWO_LEVEL'],
+      ['<AE01>', ['C', 'KP_5'], 'TWO_LEVEL'],
+
+      ['<KP01>', ['2', 'q'], 'KEYPAD'],
+      ['<KP01>', ['2', 'KP_5'], 'KEYPAD'],
+
+      ['<AE01>', ['2', 'q', 'at', 'KP_5'], 'FOUR_LEVEL'],
+      ['<KP02>', ['KP_5', 'KP_5', 'C', 'E'], 'FOUR_LEVEL_KEYPAD'],
+
+      ['<AE01>', ['A', 'KP_5', 'a', 'at'], 'FOUR_LEVEL'],
+      ['<KP01>', ['A', 'KP_5', 'a', 'at'], 'FOUR_LEVEL_KEYPAD'],
+      ['<AE01>', ['A', 'a', 'KP_5', 'at'], 'FOUR_LEVEL_ALPHABETIC'],
+      ['<AE01>', ['a', 'A', 'KP_5', 'at'], 'FOUR_LEVEL_ALPHABETIC'],
+      ['<AE01>', ['a', 'a', 'KP_5', 'at'], 'FOUR_LEVEL'],
+      ['<AE01>', ['A', 'b', 'KP_5', 'at'], 'FOUR_LEVEL'],
+      ['<KP01>', ['2', 'q', 'at', '8'], 'FOUR_LEVEL'],
+      ['<KP01>', ['2', 'at', 'b', 'c'], 'FOUR_LEVEL'],
+
+      ['<KP01>', ['A', 'B', 'C', 'D', 'E'], 'FIVE_LEVEL'],
+      ['<KP01>', ['KP_5', 'KP_5', 'C', 'D', 'E'], 'FIVE_LEVEL'],
+      ['<AE01>', ['KP_5', 'KP_5', 'C', 'D', 'E'], 'FIVE_LEVEL'],
+
+      ['<KP02>', ['KP_5', 'KP_5', 'KP_5', 'KP_5', 'C', 'E'], 'EIGHT_LEVEL'],
+      ['<KP02>', ['A', 'a', 'KP_5', 'KP_5', 'C', 'E'], 'EIGHT_LEVEL'],
+      ['<AE01>', ['KP_5', 'KP_5', 'KP_5', 'KP_5', 'C', 'E'], 'EIGHT_LEVEL'],
+
+      ['<KP01>', ['C', 'E'], 'KEYPAD'],
+      ['<KP01>', ['S', 'KP_5'], 'KEYPAD'],
+      ['<AE01>', ['S', 'KP_5'], 'TWO_LEVEL'],
+      ['<KP01>', ['KP_5', 'KP_5'], 'KEYPAD'],
+      ['<AE01>', ['KP_5', 'KP_5'], 'TWO_LEVEL'],
+      ['<KP01>', ['c', 'D'], 'KEYPAD'],
+      ['<KP01>', ['ß', 'ẞ'], 'ALPHABETIC'],
+
+      ['<KP01>', ['ß', 'ẞ', 'ß', 'ẞ'], 'FOUR_LEVEL_ALPHABETIC'],
+    ];
+    testCases.forEach(function (values) {
+      it(("findLevel(" + values[0] + values[1]).padEnd(0, " ") + " should return " + "'" + values[2] + "'", async function () {
+        const result = sut.unitTestEndpoints.findLevel(values[0], values[1].map(String));
+        assert.equal(result, (values[2]));
       });
     });
   });
 
-  describe('Xkb-kmn: get_Keyname ', function () {
-    const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    [
-      ['<AD04>,r,R,paragraph,registered', '<AD04>'],
-      ['<AE11>,type,Group1,="FOUR_LEVEL_PLUS_LOCK",symbols[Group1]=[ssharp,question,backslash,questiondown,B;', '<AE11>'],
-      ['key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};', null],
-      ['unknown', null],
-      ['', null],
-      [null, null],
-      [undefined, null],
-    ].forEach(function (values) {
-      it(("get_Keyname(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
-        const result = sut.get_Keyname(values[0] as string);
-        assert.deepStrictEqual((result), (values[1]));
-      });
-    });
-  });
 
-  describe('Xkb-kmn: getOutput ', function () {
-    const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    [
-      ['<AD04>,r,R,paragraph,registered', 'r,R,paragraph,registered'],
-      ['<AE11>,type,Group1,="FOUR_LEVEL_PLUS_LOCK",symbols,Group1,=,ssharp,question,backslash,questiondown,B', 'ssharp,question,backslash,questiondown,B'],
-      ['key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};', undefined],
-      ['unknown', null],
-      ['', null],
-      [null, null],
-      [undefined, null],
-    ].forEach(function (values) {
-      it(("getOutput(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
-        const result = sut.getOutput(values[0] as string);
-        assert.deepStrictEqual((result), (values[1]));
-      });
-    });
-  });
 
-  describe('Xkb-kmn: getKeytype ', function () {
-    const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
-    [
-      ['<AD04>,r,R,paragraph,registered', 'DEFAULT_LEVEL'],
-      ['<AE11>,type,Group1,="FOUR_LEVEL_PLUS_LOCK",symbols[Group1]=[ssharp,question,backslash,questiondown,B;', 'FOUR_LEVEL_PLUS_LOCK'],
-      ['key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};', 'DEFAULT_LEVEL'],
-      ['unknown', 'DEFAULT_LEVEL'],
-      ['', 'DEFAULT_LEVEL'],
-      [null, null],
-      [undefined, null],
-    ].forEach(function (values) {
-      it(("getKeytype(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
-        const result = sut.getKeytype(values[0] as string, 'DEFAULT_LEVEL');
-        assert.deepStrictEqual((result), (values[1]));
-      });
-    });
-  });
 
-  describe('Xkb-kmn: get_KMVirtKC_from_keyname ', function () {
+  /*describe('Xkb-kmn: RunSpecialTestFiles', function () {
     const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
     [
-      ['<AD04>', 'K_R'],
-      ['<TLDE>', 'K_BKQUOTE'],
-      ['<TXXE>', ''],
-      ['', 'K_4'],
-      [null, null],
-      [undefined, null],
-    ].forEach(function (values) {
-      it(("get_KMVirtKC_from_keyname(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
-        const result = sut.get_KMVirtKC_from_keyname(values[0] as string);
-        assert.deepStrictEqual((result), (values[1]));
+      [makePathToFixture('../data/tests-xkb-kmn/de-complex')],                      //basic checked OK
+      [makePathToFixture('../data/tests-xkb-kmn/de-complex(basic)')],               //basic checked OK
+      // [makePathToFixture('../data/tests-xkb-kmn/de-complex(deadacute)')],           //not avail in file  checked OK
+      [makePathToFixture('../data/tests-xkb-kmn/de-complex(deadtilde)')],
+      // [makePathToFixture('../data/tests-xkb-kmn/de-complex(deadgraveacute)')],      //not avail in file  checked OK
+      [makePathToFixture('../data/tests-xkb-kmn/de-complex-rec')],                  //basic
+      [makePathToFixture('../data/tests-xkb-kmn/de-complex-rec(basic)')],           //basic
+      [makePathToFixture('../data/tests-xkb-kmn/de-complex-rec(deadacute)')],
+      [makePathToFixture('../data/tests-xkb-kmn/de-complex-rec(deadtilde)')],
+      // [makePathToFixture('../data/tests-xkb-kmn/de-complex-rec(deadgraveacute)')],  //not avail in file  checked OK
+      [makePathToFixture('../data/tests-xkb-kmn/de-simple')],                       //basic checked OK
+      [makePathToFixture('../data/tests-xkb-kmn/de-simple(basic)')],                //basic checked OK
+      [makePathToFixture('../data/tests-xkb-kmn/de-simple-rec')],                   //basic checked OK
+      [makePathToFixture('../data/tests-xkb-kmn/de-simple-rec(basic)')],            //basic checked OK
+      //[makePathToFixture('../data/tests-xkb-kmn/de-complex-reeeeeec(deadacute)')],
+    ].forEach(function (files) {
+      it(files + " should give no errors ", async function () {
+        sut.run(files[0]);
+        assert.isTrue(compilerTestCallbacks.messages.length === 0);
       });
     });
   });*/
 
-//......................................................................................................
-//......................................................................................................
-//......................................................................................................
-//......................................................................................................
-//......................................................................................................
-//......................................................................................................
-  
-/*
-    describe('findParagraph ', function () {
-      // Todo 
-       ['variant', 'all definition text'], 
-       ['unexisting vriant', ''], 
-       ['null, null], 
-       ['', ''], 
+  /*
+    describe('Xkb-kmn: getModifier ', function () {
       const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
       [
-        ['', ''],
+        ['ONE_LEVEL', ['']],
+        ['FOUR_LEVEL_PLUS_LOCK', ["", "SHIFT", "RALT", "SHIFT RALT", "LOCK"]],
+        ['EIGHT_LEVEL', ["", "SHIFT", "ALT", "SHIFT ALT", "X", "X SHIFT", "X ALT", "X SHIFT ALT"]],
+        ['', null],
+        ['unknownLevel', null],
+        [99, null],
+        [null, null],
+        [undefined, null],
+  
       ].forEach(function (values) {
-        it(("findParagraph(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
-          const result = sut.findParagraph(values[0] as string);
-          assert.equal(result, values[1]);
+        it(("getModifier(" + values[0] + ")").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
+          const result = sut.getModifier(values[0] as string);
+          assert.deepStrictEqual((result), (values[1]));
         });
       });
     });
   
-  
-    describe('createCompleteLines ', function () {
+    describe('Xkb-kmn: get_Keyname ', function () {
       const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
       [
-        ['', ''],
+        ['<AD04>,r,R,paragraph,registered', '<AD04>'],
+        ['<AE11>,type,Group1,="FOUR_LEVEL_PLUS_LOCK",symbols[Group1]=[ssharp,question,backslash,questiondown,B;', '<AE11>'],
+        ['key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};', null],
+        ['unknown', null],
+        ['', null],
+        [null, null],
+        [undefined, null],
       ].forEach(function (values) {
-        it(("findPacreateCompleteLinesragraph(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
-          const result = sut.createCompleteLines(values[0] as string);
-          assert.equal(result, values[1]);
+        it(("get_Keyname(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
+          const result = sut.get_Keyname(values[0] as string);
+          assert.deepStrictEqual((result), (values[1]));
+        });
+      });
+    });
+  
+    describe('Xkb-kmn: getOutput ', function () {
+      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+      [
+        ['<AD04>,r,R,paragraph,registered', 'r,R,paragraph,registered'],
+        ['<AE11>,type,Group1,="FOUR_LEVEL_PLUS_LOCK",symbols,Group1,=,ssharp,question,backslash,questiondown,B', 'ssharp,question,backslash,questiondown,B'],
+        ['key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};', undefined],
+        ['unknown', null],
+        ['', null],
+        [null, null],
+        [undefined, null],
+      ].forEach(function (values) {
+        it(("getOutput(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
+          const result = sut.getOutput(values[0] as string);
+          assert.deepStrictEqual((result), (values[1]));
+        });
+      });
+    });
+  
+    describe('Xkb-kmn: getKeytype ', function () {
+      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+      [
+        ['<AD04>,r,R,paragraph,registered', 'DEFAULT_LEVEL'],
+        ['<AE11>,type,Group1,="FOUR_LEVEL_PLUS_LOCK",symbols[Group1]=[ssharp,question,backslash,questiondown,B;', 'FOUR_LEVEL_PLUS_LOCK'],
+        ['key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};', 'DEFAULT_LEVEL'],
+        ['unknown', 'DEFAULT_LEVEL'],
+        ['', 'DEFAULT_LEVEL'],
+        [null, null],
+        [undefined, null],
+      ].forEach(function (values) {
+        it(("getKeytype(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
+          const result = sut.getKeytype(values[0] as string, 'DEFAULT_LEVEL');
+          assert.deepStrictEqual((result), (values[1]));
+        });
+      });
+    });
+  
+    describe('Xkb-kmn: get_KMVirtKC_from_keyname ', function () {
+      const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+      [
+        ['<AD04>', 'K_R'],
+        ['<TLDE>', 'K_BKQUOTE'],
+        ['<TXXE>', ''],
+        ['', 'K_4'],
+        [null, null],
+        [undefined, null],
+      ].forEach(function (values) {
+        it(("get_KMVirtKC_from_keyname(" + values[0] + ")").padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
+          const result = sut.get_KMVirtKC_from_keyname(values[0] as string);
+          assert.deepStrictEqual((result), (values[1]));
         });
       });
     });*/
+
+  //......................................................................................................
+  //......................................................................................................
+  //......................................................................................................
+  //......................................................................................................
+  //......................................................................................................
+  //......................................................................................................
+
+  /*
+      describe('findParagraph ', function () {
+        // Todo 
+         ['variant', 'all definition text'], 
+         ['unexisting vriant', ''], 
+         ['null, null], 
+         ['', ''], 
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        [
+          ['', ''],
+        ].forEach(function (values) {
+          it(("findParagraph(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
+            const result = sut.findParagraph(values[0] as string);
+            assert.equal(result, values[1]);
+          });
+        });
+      });
+    
+    
+      describe('createCompleteLines ', function () {
+        const sut = new XkbToKmnConverter(compilerTestCallbacks, compilerTestOptions);
+        [
+          ['', ''],
+        ].forEach(function (values) {
+          it(("findPacreateCompleteLinesragraph(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
+            const result = sut.createCompleteLines(values[0] as string);
+            assert.equal(result, values[1]);
+          });
+        });
+      });*/
 
 
   describe('get_KMVirtKC_from_keyname ', function () {
@@ -172,19 +267,19 @@ describe('XkbToKmnConverter', function () {
       ['<AC01>', 'K_A'],
       ['<AB02>', 'K_X'],
       ['<TLDE>', 'K_BKQUOTE'],
-      ['AC01>', ''],
-      ['<AC01', ''],
-      ['<A1>', ''],
-      ['<xx>', ''],
-      ['<AC99>', ''],
-      ['<AC999999>', ''],
-      ['', ''],
-      [17, ''],
-      [null, ''],
-      [undefined, ''],
+      ['AC01>', null],
+      ['<AC01', null],
+      ['<A1>', null],
+      ['<xx>', null],
+      ['<AC99>', null],
+      ['<AC999999>', null],
+      ['', null],
+      [17, null],
+      [null, null],
+      [undefined, null],
     ].forEach(function (values) {
       it(("get_KMVirtKC_from_keyname(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
-        const result = sut.get_KMVirtKC_from_keyname(values[0] as string);
+        const result = sut.unitTestEndpoints.get_KMVirtKC_from_keyname(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
@@ -195,24 +290,32 @@ describe('XkbToKmnConverter', function () {
     [
       ['a', 'a'],
       ['7', '7'],
-      ['ampersand', '&'],
-      ['NoSymbol', ''],
-      [null, ''],
-      [undefined, ''],
-      // ['😎', '😎'],
-      ['ሴ', 'ሴ'],
-      ['blabla', '******* keysym name not found!blabla'],
-      ['17', '******* keysym name not found!17'],
-      ['&#x61;', '******* keysym name not found!&#x61;'],
-      ['0x1234', '******* keysym name not found!  -  with 0x :0x1234'],
-      ['U2345', '******* keysym name not found!  -  with Uxxxx :U2345'],
-      ['ampersand', '&'],
-      ['ampersand', '&'],
-      ['ampersand', '&'],
-      ['ampersand', '&'],
+      ['U068', 'h'],
+      ['U0067', 'g'],
+      ['U0167', 'ŧ'],
+      ['U1067', 'ၧ'],
+      ['U2345', '⍅'],
+      ['U1234', 'ሴ'],
+      ['U1F600', '😀'],
+      ['0x1001234', 'ሴ'],
+      ['THORN', 'Þ'],
+      ['Thorn', 'Þ'],
+      ['apostrophe', "'"],
+      ['quoteright', "'"],
+
+      ['😎', '"😎" not found!'],
+      ['ሴ', '"ሴ" not found!'],
+      ['U+17', '"U+17" not found!'],
+      ['&#x61;', '"&#x61;" not found!'],
+      ['&#61;', '"&#61;" not found!'],
+      ['Ethiopic Syllable See', '"Ethiopic Syllable See" not found!'],
+      ['NoSymbol', '"NoSymbol" not found!'],
+      ['blabla', '"blabla" not found!'],
+      [null, '"null" not found!'],
+      [undefined, '"undefined" not found!'],
     ].forEach(function (values) {
       it(("get_Output_FromOutputname(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
-        const result = sut.get_Output_FromOutputname(values[0] as string);
+        const result = sut.unitTestEndpoints.keysymNameToChar(values[0] as string);
         assert.equal(result, values[1]);
       });
     });

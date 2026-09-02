@@ -3,69 +3,38 @@
  *
  * Created by S. Schmitt on 2025-05-12
  *
- * Convert macOS/Ukelele .keylayout files to Keyman .kmn
+ * Convert Linux xkb files to Keyman .kmn
  *
  */
 
+/*TODO-kmc-convert: process things like :
 
-
-/*
-  ToDo kmc-convert (list):
   - check for correct function comments
   - function names
-  - any
   - return types
   - squiggles
   - remove comments
   - remove unused functions
   - add warning/errormessages
   - add .filter(Boolean)[0]; to split()
-
-
-=========================================================
-key <AE11> {type[Group1]="FOUR_LEVEL_PLUS_LOCK",
-symbols[Group1]= [ssharp, question, backslash, questiondown, 0x1001E9E ]};
------>     "FOUR_LEVEL_PLUS_LOCK"
-   ======================================================
-   use split(/type\[.*\]=(.*?),symbols/);
-=========================================================
-
-
-=========================================================
-key <AE11> {type[Group1]="FOUR_LEVEL_PLUS_LOCK",
-symbols[Group1]= [ssharp, question, backslash, questiondown, 0x1001E9E ]};
------>     "ssharp, question, backslash, questiondown, 0x1001E9E "
-   ======================================================
-use  split(/symbols\[.*\]\s*=(.*?)\[/)
-=========================================================
-
-
-=========================================================
-key.type[Group1] = "EIGHT_LEVEL";
------>     "EIGHT_LEVEL"
-   ======================================================
-use split(/key.type\[.*\]=(.*?)/);
-=========================================================
-
-
-=========================================================
- key <AE01>	{ [
------>     "<AE01>"
-   ======================================================
-use split(/key.type\[.*\]=(.*?)/);
-    split(/key\s*(<A.*?>)\s*\{\s*\[/);
-    split(/key(<A.*?>)\{\[/);
-=========================================================
-
-
-
+  - look through regex and consolidate ( can I use fewer regexes; recycle for multiple use?)
+  - put the following in another module( as it is used in other conversions as well)
+      keylayoutKmnConverter.isAcceptableKeymanModifier
+      keylayoutKmnConverter.checkIfCapsIsUsed
+      static readonly SKIP_COMMENTED_LINES = false;
+      static readonly MAX_CTRL_CHARACTER = 0x20; 
+      static readonly MAX_KEY_IDENTIFIER = 49;
+      export class Rule {}
 */
 
+import * as path from 'node:path';
 import { CompilerCallbacks, CompilerOptions, KeymanCompilerResult } from "@keymanapp/developer-utils";
 import { KmnFileWriter } from './../kmc-convert-write/kmn-file-writer.js';
 import { XkbFileReader } from './../kmc-convert-read/xkb-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
 import { ConverterArtifacts, ConverterToKmnArtifacts } from "../converter-artifacts.js";
+import * as keysym from '@electron-wm/keysym';
+
 
 export interface ConverterResult extends KeymanCompilerResult {
   /**
@@ -83,56 +52,103 @@ export interface ConverterToKmnResult extends ConverterResult {
   artifacts: ConverterToKmnArtifacts;
 };
 
+// TODO-kmc-convert do we need modifierList somewhere?
+/**
+ * Interface for modifier data read from the xkb_types section of the xkb file.
+ * It contains a list of all used modifiers (modifierList), and a mapping of
+ * level name vs modifier combinations.
+ */
+export interface KeyType {
+  /**
+   * modifier keys used (e.g. Shift+Lock+Control+LevelThree )
+   */
+  modifierList: string;
+  /**
+   * a mapping between levelName (e.g. "level1") and modifier combination ( e.g. single  ["Shift"] or multiple ["Shift", "Shift+LevelThree"])
+   */
+  maps: {
+    levelName: string;
+    modifierCombination: string[];
+  }[];
+}
+
+/**
+ * Interface for all data read from a xkb file. Also contains all rules processed from input data.
+ * Data will be used for writing to a .kmn file (e.g. filename, modifier combinations, rules)
+ */
 export interface ProcessedData {
   /**
-  * Interface for all data read from a .keylayout file. Also contains all rules processed from input data.
-  * Data will be used for writing to a .kmn file (e.g. filename, modifier combinations, rules)
-  */
-  keylayoutFilename: string;
-  kmnFilename: string;
-  modifiers: string[][];
-  rules: Rule[];
-};
-export interface Data_xkb {
+   * the inputfilename
+   */
+  in_filename: string;
   /**
-  * Interface for all data read from a .keylayout file. Also contains all rules processed from input data.
-  * Data will be used for writing to a .kmn file (e.g. filename, modifier combinations, rules)
-  */
-  xkb_keyname: string;
-  xkb_keytype: string;
-  xkb_modifiers: string[];
-  xkb_output: string[];
+   * the outputfilename
+   */
+  out_filename: string;
+  /**
+   * the array of modifier combinations
+   */
+  modifiers: string[][];
+  /**
+   * the rules computed while running convert()
+   */
+  rules: Rule[];
 };
 
 /**
+  * Interface for all data read from a xkb file. It contains all rules processed from input data.
+  * Data will be used for writing to the output file (e.g. filename, modifier combinations, rules)
+  */
+export interface Data_xkb {
+
+  /**
+   *  a key name like <AE01> ( = K_1)
+   */
+  xkb_keyname: string;
+  /**
+   * a type defining different modifier combinations e.g. 'FOUR_LEVEL'.
+   */
+  xkb_keytype: string;
+  /**
+   * a map for level to modifiers (level1=Base, Level2=Shift,... Levels correspond to the columns in the symbols block)
+   */
+  xkb_behaviours: KeyType['maps'];
+  /**
+   * a list of output characters per level (e.g.[1,exclam,onesuperior,exclamdown])
+   */
+  xkb_output: string[];
+};
+
+// TODO-kmc-convert can we have a centralized Rule instead in each conversion module ?
+/**
    * @brief class for all storing a rule containing data for key, deadkey, previous deadkey, output)
+   * in this conversion (xkb-kmn) we don`t use C2 and C3 rules for now. This may change when we implement deadkeys
  */
 export class Rule {
   constructor(
-    public readonly ruleType: string,             /* C0, C1, C2, C3, or C4 */
+    public readonly ruleType: string,               /* C0, C1, C2, C3, or C4 */
 
-    public readonly modifierPrevDeadkey: string, /* first key used by C3 rules*/
+    public readonly modifierPrevDeadkey: string,    /* first key used by C3 rules*/
     public readonly prevDeadkey: string,
     public idPrevDeadkey: number,
     public uniquePrevDeadkey: number,
 
-    public readonly modifierDeadkey: string,      /* second key used by C2,C3 rules*/
+    public readonly modifierDeadkey: string,        /* second key used by C2,C3 rules*/
     public readonly deadkey: string,
     public idDeadkey: number,
     public uniqueDeadkey: number,
 
-    public readonly modifierKey: string,          /* third key used by C0,C1,C2,C3,C4 rules*/
+    public readonly modifierKey: string,            /* third key used by C0,C1,C2,C3,C4 rules*/
     public readonly key: string,
-    public readonly output: Uint8Array,            /* output used by C0,C1,C2,C3,C4 rules*/
+    public readonly output: Uint8Array,             /* output used by C0,C1,C2,C3,C4 rules*/
   ) { }
-
 }
 
 export class XkbToKmnConverter {
   static readonly INPUT_FILE_EXTENSION = '.xkb';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
   static readonly SKIP_COMMENTED_LINES = false;
-  static readonly MAX_CTRL_CHARACTER = 0x20;                      // the hightest control character we print out as a Unicode CodePoint (U+0020)
+  static readonly MAX_CTRL_CHARACTER = 0x20;                      // the highest control character we print out as a Unicode CodePoint (U+0020)
   static readonly MAX_KEY_IDENTIFIER = 49;                        // We only use key Nr 0 (A) -> key Nr 49 (Space)
 
   private options: CompilerOptions;
@@ -142,26 +158,20 @@ export class XkbToKmnConverter {
   };
 
   /**
-   * @brief  ToDo check description
    * @brief member function to run read/convert/write
-   * @param  inputFilename the ukelele .keylayout-file to be converted
+   * @param  inputFilename the xkb file to be converted
    * @param  outputFilename the resulting keyman .kmn-file
-   * @return null on success
+   * @return ConverterToKmnResult on success, null otherwise
    */
-  async run(inputFilename_withVariant: string, outputFilename?: string): Promise<ConverterToKmnResult | null> {
-
-    const variant_name = inputFilename_withVariant.substring(inputFilename_withVariant.indexOf('(') + 1, inputFilename_withVariant.indexOf(')'));
-
-    let inputFilename = inputFilename_withVariant;
-    if (variant_name)
-      inputFilename = inputFilename_withVariant.substring(0, inputFilename_withVariant.indexOf('('));
-
+  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult | null> {
 
     if (!inputFilename) {
-      this.callbacks.reportMessage(ConverterMessages.Error_FileNotFound({ inputFilename }));
-      return null;
+      throw new Error('Input filename is required');
     }
 
+    console.log("          I am in run() and start reading... ", inputFilename);
+
+    //----------------then read and add all used layouts into xkb_data ( e.g. latin(basic), latin(4),de,de(deadtilde))
     const XkbReader = new XkbFileReader(this.callbacks/*, this.options*/);
 
     const binaryData = this.callbacks.loadFile(inputFilename);
@@ -171,269 +181,142 @@ export class XkbToKmnConverter {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ inputFilename: inputFilename }));
       return null;
     }
+    // remove whitespace
+    const cleaned_data = xkb_data
+      .replace(/\s+/g, '');
 
-    const processedData = await this.convert(xkb_data, inputFilename_withVariant, outputFilename);
+    if (!cleaned_data) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ inputFilename: inputFilename }));
+      return null;
+    }
+
+    try {
+      if (!XkbReader.validate(cleaned_data, inputFilename)) {
+        return null;
+      }
+    } catch (e: any) {
+      this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({ errorText: e.toString() }));
+      return null;
+    }
+
+    // careful: group=0 => 'Group1',  group=1 => 'Group2',...
+    const processedData = await this.convert(cleaned_data, inputFilename, outputFilename, 0);
     const kmnFileWriter = new KmnFileWriter(this.callbacks, this.options);
 
-    // ToDo-kmc-convert remove writeToFile
-    kmnFileWriter.writeToFile(processedData as ProcessedData);
+    // TODO-kmc-convert: needed or already checked in convert?
+    if (!processedData) {
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToConvert({ inputFilename: inputFilename }));
+      return null;
+    }
+
+    // TODO-kmc-convert remove writeToFile
+    kmnFileWriter.writeToFile(processedData);
 
     // write to object/ConverterToKmnResult
-    const outputKmn = kmnFileWriter.write(processedData as ProcessedData);
+    const outputKmn = processedData ? kmnFileWriter.write(processedData) : null;
+
+    if (!processedData || !outputKmn) {
+      return null;
+    }
+
     const result: ConverterToKmnResult = {
       artifacts: {
-        kmn: { data: outputKmn, filename: processedData.kmnFilename }
+        kmn: { data: outputKmn, filename: processedData.out_filename }
       }
     };
     return result;
   }
 
+  /**
+   * read used groups from XKB file. XKB data contains up to 4 Groups.
+   * @param cleaned_data XKB data, with whitespaces removed
+   * @returns an array of names of created layouts (e.g. English, Franch,...)
+   */
+  private getLayouts(cleaned_data: string): string[] {
+    // capt. group for languages (e.g. 'German')
+    const regexp_name = /name\[group[1-4]]="([^"]+)"/g;
+    return Array.from(cleaned_data.matchAll(regexp_name), match => match[1]
+    );
+  }
 
-  private convert(xkb_data: string, inputfilename: string, outputFilename?: string): ProcessedData | null {
+
+  /**
+   * member function to convert input data (in XKB format) into Keyman kmn format
+   * @param xkb_data contents of the XKB file
+   * @param inputfilename name of the XKB file that has been read
+   * @param outputFilename name of the kmn file that will be written
+   * @param group an XKB file may contain up to 4 layouts (Group1-4). This is to specify which layout will be converted (default:Group1=0)
+   * @returns an ProcessedData objcet containing all keyman rules created from the XKB file
+   */
+  private convert(xkb_data: string, inputfilename: string, outputFilename?: string, group: number = 0): ProcessedData | null {
 
     if (!xkb_data) {
       return null;
     }
-
     // dataObject for all relevant data
     const dataObject: ProcessedData = {
-      keylayoutFilename: '',
-      kmnFilename: '',
+      in_filename: '',
+      out_filename: '',
       modifiers: [],
       rules: []
     };
 
-    const start_brack = inputfilename.indexOf('(');
-    const end_brack = inputfilename.indexOf(')');
-    const variant_name = inputfilename.substring(start_brack + 1, end_brack);
-    const inputfilenameUntilBracket = inputfilename.substring(0, start_brack);
+    // find up to 4 names of used layouts (e.g. 'German')
+    const layoutGroupNames = this.getLayouts(xkb_data);
 
-    dataObject.keylayoutFilename = inputfilename;
-    if (start_brack >= 0) {
-      dataObject.keylayoutFilename = inputfilenameUntilBracket;
-    }
+    // fill dataObject with filenames. If no output file name is specified, create it
+    dataObject.in_filename = inputfilename;
 
-    // fill dataObject with filenames, behaviors and (initialized) rules
-    if (!outputFilename) {
-      if (variant_name)
-        dataObject.kmnFilename = dataObject.keylayoutFilename + "_" + variant_name + '.kmn';
-      else
-        dataObject.kmnFilename = dataObject.keylayoutFilename + '.kmn';
-    }
+    if (!outputFilename)
+      dataObject.out_filename = path.join(path.dirname(inputfilename), (layoutGroupNames[group] + XkbToKmnConverter.OUTPUT_FILE_EXTENSION));
     else
-      dataObject.kmnFilename = outputFilename;
-
+      dataObject.out_filename = outputFilename;
+    // TODO-kmc-convert use this.callbacks.reportMessage somewhere
     // fill rules into 'rules' of dataObject
-    const out = this.createRuleData(dataObject, xkb_data);
-    return out;
-  }
-
-  /**
-    // ToDo-kmc-convert edit this function
-    // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
-    // ++++ load xkb and return paragraph between xkb_symbols block x and xkb_symbols y
-    * @brief  ToDo check description
-    * @brief member function to find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
-    * @param  xkbData: an string containing the contents of the xkb file
-    * @return the paragraph of the xkb ffr the specified data
-    */
-  public findParagraph(xkbData_in: string, dataObject: ProcessedData): string {
-
-    // Todo-kmc-convert: recursive look through other definition files if they are included (e.g.  include "de(basic)")
-    // Todo-kmc-convert: create paragraphname  from inputfilename
-    // ToDo-kmc-convert remove this-it`s neccessary as we could not process the include (include "de(basic)")
-    const xkbData = xkbData_in.replace(/include \"/g, '\/\/include \"');
-    const start_vari = dataObject.kmnFilename.lastIndexOf('_');
-    const end_vari = dataObject.kmnFilename.indexOf('.');
-    let variant_name = '';
-    if ((start_vari !== -1) && (end_vari !== -1))
-      variant_name = dataObject.kmnFilename.substring(start_vari + 1, end_vari);
-
-
-    let paragraph_name = '';
-    // Todo find default keyword (default xkb_symbols "basic") and use this
-    if (variant_name)
-      paragraph_name = variant_name;
-    else {
-      paragraph_name = xkbData_in.split(/default xkb_symbols\s*\"(.*?)\"\s\{/)[1];
+    const out = this.createRuleData(dataObject, xkb_data, group);
+    if (!out) {
+      return null;
     }
-
-    // remove all comments, remove whitespace, split into block for each xkb_symbol definition
-    const noComments = xkbData.replace(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g, '');
-    const noCommentsNoWhitespace = noComments.replaceAll(/[\s,]+/g, ',').slice(0, -1);
-    const xkb_symbols_blocks = noCommentsNoWhitespace.split("xkb_symbols");
-
-    // find paragraphname in xkb_symbols, clean data and return appropriate paragraph
-    for (let i = 0; i < xkb_symbols_blocks.length; i++) {
-      if (xkb_symbols_blocks[i].indexOf(paragraph_name) >= 0) {
-        // text after 'xkb_symbols "xxxx" {'  until '};,};'
-        // ToDo-kmc-convert find better solution
-        const start_paragraph = xkb_symbols_blocks[i].indexOf('{');
-        const end_paragraph = xkb_symbols_blocks[i].indexOf('};,};');
-        const paragraph = xkb_symbols_blocks[i].substring(start_paragraph + 2, end_paragraph);
-        return paragraph.replaceAll(/[{[,}\]]+/g, ',');
-      }
-    }
-    return '';
-  }
-
-  public getModifier(typename: string): string[] | null {
-
-    // ToDo-kmc-convert read levels from file
-    // ToDo-kmc-convert use case
-
-    if (typename === "ONE_LEVEL") {
-      return [""];
-    }
-
-    if (typename === "FOUR_LEVEL_PLUS_LOCK") {
-      return ["", "SHIFT", "RALT", "SHIFT RALT", "LOCK"];
-    }
-
-    if (typename === "EIGHT_LEVEL") {
-      return ["", "SHIFT", "ALT", "SHIFT ALT", "X", "X SHIFT", "X ALT", "X SHIFT ALT"];
-    }
-
-    if (typename === "DEFAULT_LEVEL") {
-      return ["", "SHIFT", "ALT", "SHIFT ALT"];
-    }
-    return null;
-  }
-
-  public get_Keyname(line: string): string {
-    if (line.indexOf('<A') >= 0) {
-      return line.split((/(\<A.*?>)/)).filter(Boolean)[0];
-    }
-    return '';
-  }
-
-  public getOutput(line: string): string {
-    let out: string = '';
-
-    // e.g. if  key <AE11> {type[Group1]="FOUR_LEVEL_PLUS_LOCK",  symbols[Group1]=[ssharp, question, backslash, questiondown, 0x1001E9E ]};
-    if (line.indexOf('symbols') >= 0) {
-      out = line.split(/symbols.*(.*?)=,/).filter(Boolean)[1];
-    }
-
-    // e.g. if key.type[Group1] = "ONE_LEVEL";
-    else if (line.indexOf('key.type') >= 0) {
-      out = '';
-    }
-
-    // nornal
-    else if (line.indexOf('<A') >= 0) {
-      const out1arr = line.split(/<A[A-E][0-9]{2}>,/);
-      out = out1arr[1];
-    }
-
     return out;
   }
 
 
-
-  public getKeytype(data_key: string, default_type: string): string {
-
-    // kmc-konvert-better solution
-    const pos_type = data_key.indexOf('type');
-    if (pos_type >= 0) {
-      const first_quote = data_key.indexOf('"');
-      const longstring = data_key.substring(first_quote + 1);
-      const last_qoute = longstring.indexOf('"');
-      const shortstring = longstring.substring(0, last_qoute);
-      return shortstring;
-    }
-    return default_type;
-  }
-
-  public filldata_paragraph(xkbData: string, dataObject: ProcessedData, data_paragraph_arr: Data_xkb[]): Data_xkb[] {
-
-    // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
-    // then copy all rows starting with "key <" to a 1D-Vector
-
-    // find appropriate parapraph
-    const paragraph = this.findParagraph(xkbData, dataObject);
-    if (!paragraph)
-      console.log('ToDo-kmc-convert add Err-msg findParagraph');
-
-    const lineArray = [];
-
-    // each rule and type in a seperate line
-    const lines = paragraph.split('key');
-
-    for (let i = 0; i < lines.length; i++) {
-      lineArray.push(lines[i].replaceAll(/[\s{[,;}\]]+/g, ',').slice(1, -1));
-    }
-
-    let default_key_type: string = 'DEFAULT_LEVEL';
-
-    for (let i = 0; i < lineArray.length; i++) {
-
-      // get Data for key_type e.g. "FOUR_LEVEL"
-      const key_type = this.getKeytype(lineArray[i], default_key_type);
-      default_key_type = key_type;
-
-      // get Data modifier Data of keytype e.g. ["","shift","Caps"]
-      const modi_Data = this.getModifier(key_type);
-
-      // get name of key e.g. '<AE01>'
-      const keyname = this.get_Keyname(lineArray[i]);
-
-      // get output e.g. '1,exclam,onesuperior,exclamdown'
-      const out = this.getOutput(lineArray[i]);
-      const output_elements = out.split(',');
-
-      const singleData_paragraph: Data_xkb = {
-        xkb_keyname: keyname as string,
-        xkb_keytype: default_key_type,
-        xkb_modifiers: modi_Data as string[],
-        xkb_output: output_elements,
-      };
-
-      if (keyname) {
-        data_paragraph_arr.push(singleData_paragraph);
-      }
-    }
-    return data_paragraph_arr;
-  }
-
-
   /**
-    * @brief  ToDo check description
-   * @brief* @brief  ToDo check description
-   * @brief member function to read the rules contained in a json object and add array of Rules[] to an ProcessedData
-    * @param  dataUkelele: an object containing the name of the in/output file, an array of behaviors and an (empty) array of Rules
-    * @param  jsonObj: json Object containing all da
-    * ta read from a keylayout file
-    * @return an object containing the name of the input file, an array of behaviors and a populated array of Rules[]
-    */
-  public createRuleData(dataObject: ProcessedData, xkb_data: string): ProcessedData {
+   * @param dataObject an object to be filled containing the name of the in/output file,
+   * an array of behaviors and an array of Rules
+   * @param xkb_data a string containing the read and cleaned data from the xkb file
+   * @param group use one group (0-3). if not specified use group0
+   * @returns an object containing the name of the input file, an array of behaviors and a populated array of Rules[]
+   */
+  private createRuleData(dataObject: ProcessedData, xkb_data: string, group: number = 0): ProcessedData {
 
-    // create an array of modifier combinations and store in dataObject
-    // ToDo-kmc-convert edit function (hard coded at present)
-
-
-
-    //....................... extract complete lines to array .......................
-    //....................... e.g.  '<AE01>,1,exclam,onesuperior,exclamdown', .......
-    //...............................................................................
-
-    const data_paragraph_arr: Data_xkb[] = [];
-
-    // Todo-kmc-convert check data_paragraph_arr vs dataObject
-    this.filldata_paragraph(xkb_data, dataObject, data_paragraph_arr);
-
-    // Todo-kmc-convert check nr(modi)= nr(output)
+    // create an array of modifier combinations(behaviours) and store in dataObject
+    const dataSet = this.collectData(xkb_data, group);
+    if (!dataSet) {
+      return null;
+    }
 
     //....................... create a Rule and save to ruleObj .......................
     //.................................................................................
     //.................................................................................
     const rules: Rule[] = [];
 
-    for (let i = 0; i < data_paragraph_arr.length; i++) {
+    for (let i = 0; i < dataSet?.length; i++) {
 
-      for (let j = 0; j < data_paragraph_arr[i].xkb_modifiers.length; j++) {
+      for (let j = 0; j < dataSet[i]?.xkb_behaviours?.length; j++) {
 
-        const ruleObj = new Rule(
+        for (let k = 0; k < (dataSet[i]?.xkb_behaviours?.[j]?.modifierCombination?.length ?? 0); k++) {
+
+          // e.g.  '<AE04>' -> 'K_4',
+          const keyName = this.get_KMVirtKC_from_keyname(dataSet[i]?.xkb_keyname ?? '');
+          if (!keyName)
+            continue;
+
+          const output = (dataSet[i]?.xkb_output[j]) ?? '';
+          if ((!output) || output.includes('NoSymbol'))
+            continue;
+
+          const ruleObj = new Rule(
                   /*   ruleType */                "C0",
 
                   /*   modifierPrevDeadkey*/      "",
@@ -445,540 +328,483 @@ export class XkbToKmnConverter {
                   /*   deadkey */                 "",
                   /*   dk for C2*/                0,
                   /*   unique B */                0,
-                  /*   modifierKey*/              data_paragraph_arr[i].xkb_modifiers[j],
-                  /*   key */                     this.get_KMVirtKC_from_keyname(data_paragraph_arr[i].xkb_keyname),
-                  /*   output */                  new TextEncoder().encode(this.get_Output_FromOutputname(data_paragraph_arr[i].xkb_output[j]))
-        );
-        rules.push(ruleObj);
+
+                  /*   modifierKey*/              dataSet[i]?.xkb_behaviours?.[j]?.modifierCombination?.[k] ?? '',
+                  /*   key */                     keyName,
+                  /*   output */                  new TextEncoder().encode(output)
+          );
+          rules.push(ruleObj);
+        }
       }
     }
     dataObject.rules = rules;
-    return this.reviewRuleInputData(dataObject);
-  }
-
-  /**
-   * @brief  ToDo check description
-   * @brief convert the key name obtained from symbol file to the matching keyname e.g. name of key <AC01> --> 'K_A'
-   * @param  key_name as stated in the symbol file
-   * @return  the equivalent keyman virtual keycode
-  */
-  public get_KMVirtKC_from_keyname(key_name: string): string {
-    let out = '';
-
-    if (key_name == "<TLDE>")
-      out = 'K_BKQUOTE';
-    else if (key_name == "<AE01>")
-      out = 'K_1';
-    else if (key_name == "<AE02>")
-      out = 'K_2';
-    else if (key_name == "<AE03>")
-      out = 'K_3';
-    else if (key_name == "<AE04>")
-      out = 'K_4';
-    else if (key_name == "<AE05>")
-      out = 'K_5';
-    else if (key_name == "<AE06>")
-      out = 'K_6';
-    else if (key_name == "<AE07>")
-      out = 'K_7';
-    else if (key_name == "<AE08>")
-      out = 'K_8';
-    else if (key_name == "<AE09>")
-      out = 'K_9';
-    else if (key_name == "<AE10>")
-      out = 'K_0';
-    else if (key_name == "<AE11>")
-      out = 'K_HYPHEN';
-    else if (key_name == "<AE12>")
-      out = 'K_EQUAL';
-    else if (key_name == "<AD01>")
-      out = 'K_Q';
-    else if (key_name == "<AD02>")
-      out = 'K_W';
-    else if (key_name == "<AD03>")
-      out = 'K_E';
-    else if (key_name == "<AD04>")
-      out = 'K_R';
-    else if (key_name == "<AD05>")
-      out = 'K_T';
-    else if (key_name == "<AD06>")
-      out = 'K_Y';
-    else if (key_name == "<AD07>")
-      out = 'K_U';
-    else if (key_name == "<AD08>")
-      out = 'K_I';
-    else if (key_name == "<AD09>")
-      out = 'K_O';
-    else if (key_name == "<AD10>")
-      out = 'K_P';
-    else if (key_name == "<AD11>")
-      out = 'K_LBRKT';
-    else if (key_name == "<AD12>")
-      out = 'K_RBRKT';
-
-    else if (key_name == "<AC01>")
-      out = 'K_A';
-    else if (key_name == "<AC02>")
-      out = 'K_S';
-    else if (key_name == "<AC03>")
-      out = 'K_D';
-    else if (key_name == "<AC04>")
-      out = 'K_F';
-    else if (key_name == "<AC05>")
-      out = 'K_G';
-    else if (key_name == "<AC06>")
-      out = 'K_H';
-    else if (key_name == "<AC07>")
-      out = 'K_J';
-    else if (key_name == "<AC08>")
-      out = 'K_K';
-    else if (key_name == "<AC09>")
-      out = 'K_L';
-    else if (key_name == "<AC10>")
-      out = 'K_COLON';
-    else if (key_name == "<AC11>")
-      out = 'K_QUOTE';
-
-    else if (key_name == "<AB01>")
-      out = 'K_Z';
-    else if (key_name == "<AB02>")
-      out = 'K_X';
-    else if (key_name == "<AB03>")
-      out = 'K_C';
-    else if (key_name == "<AB04>")
-      out = 'K_V';
-    else if (key_name == "<AB05>")
-      out = 'K_B';
-    else if (key_name == "<AB06>")
-      out = 'K_N';
-    else if (key_name == "<AB07>")
-      out = 'K_M';
-    else if (key_name == "<AB08>")
-      out = 'K_COMMA';
-    else if (key_name == "<AB09>")
-      out = 'K_PERIOD';
-    else if (key_name == "<AB10>")
-      out = 'K_SLASH';
-    else if (key_name == "<BKSL>")
-      out = 'K_BKSLASH';
-    else if (key_name == "<LSGT>")
-      out = 'K_RIGHTSHIFT';
-    else if (key_name == "<SPCE>")
-      out = 'K_SPACE';
-
-    return String(out);
+    return dataObject;
   }
 
 
-  /**
-   * @brief  ToDo check description
-   * @brief convert a keyval name to an output character
-             more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
-   * @param  outchar the name of the output
-   * @return the input character if input is a character,an empty string if "NoSymbol" is found,
-   * the output character if found in map, a Warning if not
+  /** create an object which reads the LEVEL definition (e.g. for TWO_LEVEL) and returns an object with
+   * shiftstates per level ( e.g. level2 is achieved by pressing Shift or Lock ['Shift', 'Lock'])
+   * @param types_definition the complete type definition block read from the XKB file
+   * @param level_name the name of a level e.g. TWO_LEVEL
+   * @returns an object containing an array of [level, modifier combination] for a specific level_name
+   * e.g. [level1, [Base]],  [level2, ['Shift', 'Lock'], [level5, ['Lock', 'Shift+Lock+Control']]
    */
-  public get_Output_FromOutputname(outchar: string): string {
+  private getModifier_object(types_definition: string, level_name: string): KeyType | null {
 
-    if ((!outchar) || (outchar === "NoSymbol"))
-      return ('');
-    // it is already a character
-    if (outchar.length === 1)
-      return (outchar);
+    const level1 = [];
+    const level2 = [];
+    const level3 = [];
+    const level4 = [];
+    const level5 = [];
+    const level6 = [];
+    const level7 = [];
+    const level8 = [];
 
-    if (outchar.slice(0, 2) === "0x") {
-      console.log("        ToDo-kmc-convert keysym name starting with 0x not found!");
-      return ('******* keysym name not found!  -  with 0x :' + outchar);
+    const modifierObject: KeyType = { modifierList: '', maps: [] };
+
+    // Characters allowed for level definitions: Uppercase letters A-Z, numbers 0-9, and the
+    // underscore _ or plus sign + . A level might thus be called 'CTRL+ALT' therefore escape the +.
+    const escapedLevelName = level_name.replace(/[+]/g, '\\$&');
+
+    const regex_variant = new RegExp(`"(${escapedLevelName})"\\{([^}]*)\\}`);
+    const input = regex_variant.exec(types_definition);
+
+    // TODO-kmc-convert: regex at 1 place public static
+    // get data into array while splitting at '='
+    // ( e.g. in level_name[Level2]= "Shift")
+    const regex = /([^={}]+)=([^;]+);/g;
+
+    if (input) {
+      /* put into 2D array of [key, value] pairs */
+      const matches = input[0]?.match(regex) || [];
+      const result = matches
+        .map(item => {
+          if (item.includes('=')) {
+            return item.split('=');
+          }
+          return null;
+        }).filter(Boolean);
+
+      // copy data from array in modifier object
+
+      // convert to km modifiers; level 1 is always 'Base'
+      level1.push(this.convertModifier('Base'));
+
+      // start with i = 1 because the first assignment is always a list of modifiers
+      // (e.g.modifiers= Shift+Control+Alt+LevelThree;)
+      for (let i = 1; i < result.length; i++) {
+
+        // get the modifier from a line e.g. 'map[Shift]= Level2;' -> 'Shift' then copy into variable levelX
+        const XKBmodifier = result[i][0].substring(4, (result[i][0].length - 1));
+
+        switch (result[i]?.[1]) {
+          case 'Level2;':
+            level2.push(this.convertModifier(XKBmodifier));
+            break;
+          case 'Level3;':
+            level3.push(this.convertModifier(XKBmodifier));
+            break;
+          case 'Level4;':
+            level4.push(this.convertModifier(XKBmodifier));
+            break;
+          case 'Level5;':
+            level5.push(this.convertModifier(XKBmodifier));
+            break;
+          case 'Level6;':
+            level6.push(this.convertModifier(XKBmodifier));
+            break;
+          case 'Level7;':
+            level7.push(this.convertModifier(XKBmodifier));
+            break;
+          case 'Level8;':
+            level8.push(this.convertModifier(XKBmodifier));
+            break;
+          default: break;
+        }
+      }
     }
+    else
+      return null;
 
-    const m_uni = /^U([0-9a-f]{1,6})$/i.exec(outchar);
-    if (m_uni) {
-      console.log("        ToDo-kmc-convert keysym name starting with Uxxxx not found!");
-      return ('******* keysym name not found!  -  with Uxxxx :' + outchar);
-    }
+    // fill into out object e.g. { modifierCombination: ['SHIFT', 'SHIFT RALT'], levelName: 'level5' }
+    modifierObject.maps.push({ modifierCombination: [...level1], levelName: 'level1' });
+    modifierObject.maps.push({ modifierCombination: [...level2], levelName: 'level2' });
+    modifierObject.maps.push({ modifierCombination: [...level3], levelName: 'level3' });
+    modifierObject.maps.push({ modifierCombination: [...level4], levelName: 'level4' });
+    modifierObject.maps.push({ modifierCombination: [...level5], levelName: 'level5' });
+    modifierObject.maps.push({ modifierCombination: [...level6], levelName: 'level6' });
+    modifierObject.maps.push({ modifierCombination: [...level7], levelName: 'level7' });
+    modifierObject.maps.push({ modifierCombination: [...level8], levelName: 'level8' });
 
-    // ToDo-kmc-convert  find a function to lookup values
-    const key_values = new Map();
-    key_values.set("ampersand", 38);
-    key_values.set("apostrophe", 39);
-    key_values.set("asciicircum", 136);
-    key_values.set("asciitilde", 126);
-    key_values.set("asterisk", 42);
-    key_values.set("at", 64);
-    key_values.set("backslash", 92);
-    key_values.set("BackSpace", 65288);
-    key_values.set("bar", 124);
-    key_values.set("braceleft", 123);
-    key_values.set("braceright", 125);
-    key_values.set("bracketleft", 91);
-    key_values.set("bracketright", 93);
-    key_values.set("colon", 58);
-    key_values.set("comma", 44);
-    key_values.set("diaeresis", 168);
-    key_values.set("dollar", 36);
-    key_values.set("equal", 61);
-    key_values.set("exclam", 33);
-    key_values.set("grave", 96);
-    key_values.set("greater", 62);
-    key_values.set("less", 60);
-    key_values.set("minus", 45);
-    key_values.set("numbersign", 35);
-    key_values.set("parenleft", 40);
-    key_values.set("parenright", 41);
-    key_values.set("percent", 37);
-    key_values.set("period", 46);
-    key_values.set("plus", 43);
-    key_values.set("question", 63);
-    key_values.set("quotedbl", 34);
-    key_values.set("semicolon", 59);
-    key_values.set("slash", 47);
-    key_values.set("space", 32);
-    key_values.set("ssharp", 223);
-    key_values.set("underscore", 95);
-    key_values.set("nobreakspace", 160);
-    key_values.set("exclamdown", 161);
-    key_values.set("cent", 162);
-    key_values.set("sterling", 163);
-    key_values.set("currency", 164);
-    key_values.set("yen", 165);
-    key_values.set("brokenbar", 166);
-    key_values.set("section", 167);
-    key_values.set("copyright", 169);
-    key_values.set("ordfeminine", 170);
-    key_values.set("guillemotleft", 171);
-    key_values.set("notsign", 172);
-    key_values.set("hyphen", 173);
-    key_values.set("registered", 174);
-    key_values.set("macron", 175);
-    key_values.set("degree", 176);
-    key_values.set("plusminus", 177);
-    key_values.set("twosuperior", 178);
-    key_values.set("threesuperior", 179);
-    key_values.set("acute", 180);
-    key_values.set("mu", 181);
-    key_values.set("paragraph", 182);
-    key_values.set("periodcentered", 183);
-    key_values.set("cedilla", 184);
-    key_values.set("onesuperior", 185);
-    key_values.set("masculine", 186);
-    key_values.set("guillemotright", 187);
-    key_values.set("onequarter", 188);
-    key_values.set("onehalf", 189);
-    key_values.set("threequarters", 190);
-    key_values.set("questiondown", 191);
-    key_values.set("Agrave", 192);
-    key_values.set("Aacute", 193);
-    key_values.set("Acircumflex", 194);
-    key_values.set("Atilde", 195);
-    key_values.set("Adiaeresis", 196);
-    key_values.set("Aring", 197);
-    key_values.set("AE", 198);
-    key_values.set("Ccedilla", 199);
-    key_values.set("Egrave", 200);
-    key_values.set("Eacute", 201);
-    key_values.set("Ecircumflex", 202);
-    key_values.set("Ediaeresis", 203);
-    key_values.set("Igrave", 204);
-    key_values.set("Iacute", 205);
-    key_values.set("Icircumflex", 206);
-    key_values.set("Idiaeresis", 207);
-    key_values.set("ETH", 208);
-    key_values.set("Ntilde", 209);
-    key_values.set("Ograve", 210);
-    key_values.set("Oacute", 211);
-    key_values.set("Ocircumflex", 212);
-    key_values.set("Otilde", 213);
-    key_values.set("Odiaeresis", 214);
-    key_values.set("multiply", 215);
-    key_values.set("Oslash", 216);
-    key_values.set("Ugrave", 217);
-    key_values.set("Uacute", 218);
-    key_values.set("Ucircumflex", 219);
-    key_values.set("Udiaeresis", 220);
-    key_values.set("Yacute", 221);
-    key_values.set("THORN", 222);
-    key_values.set("agrave", 224);
-    key_values.set("aacute", 225);
-    key_values.set("acircumflex", 226);
-    key_values.set("atilde", 227);
-    key_values.set("adiaeresis", 228);
-    key_values.set("aring", 229);
-    key_values.set("ae", 230);
-    key_values.set("ccedilla", 231);
-    key_values.set("egrave", 232);
-    key_values.set("eacute", 233);
-    key_values.set("ecircumflex", 234);
-    key_values.set("ediaeresis", 235);
-    key_values.set("igrave", 236);
-    key_values.set("iacute", 237);
-    key_values.set("icircumflex", 238);
-    key_values.set("idiaeresis", 239);
-    key_values.set("eth", 240);
-    key_values.set("ntilde", 241);
-    key_values.set("ograve", 242);
-    key_values.set("oacute", 243);
-    key_values.set("ocircumflex", 244);
-    key_values.set("otilde", 245);
-    key_values.set("odiaeresis", 246);
-    key_values.set("division", 247);
-    key_values.set("oslash", 248);
-    key_values.set("ugrave", 249);
-    key_values.set("uacute", 250);
-    key_values.set("ucircumflex", 251);
-    key_values.set("udiaeresis", 252);
-    key_values.set("yacute", 253);
-    key_values.set("thorn", 254);
-    key_values.set("ydiaeresis", 255);
-    key_values.set("Aogonek", 417);
-    key_values.set("breve", 418);
-    key_values.set("Lstroke", 419);
-    key_values.set("Lcaron", 421);
-    key_values.set("Sacute", 422);
-    key_values.set("Scaron", 425);
-    key_values.set("Scedilla", 426);
-    key_values.set("Tcaron", 427);
-    key_values.set("Zacute", 428);
-    key_values.set("Zcaron", 430);
-    key_values.set("Zabovedot", 431);
-    key_values.set("aogonek", 433);
-    key_values.set("ogonek", 434);
-    key_values.set("lstroke", 435);
-    key_values.set("lcaron", 437);
-    key_values.set("sacute", 438);
-    key_values.set("caron", 439);
-    key_values.set("scaron", 441);
-    key_values.set("scedilla", 442);
-    key_values.set("tcaron", 443);
-    key_values.set("zacute", 444);
-    key_values.set("doubleacute", 445);
-    key_values.set("zcaron", 446);
-    key_values.set("zabovedot", 447);
-    key_values.set("Racute", 448);
-    key_values.set("Abreve", 451);
-    key_values.set("Lacute", 453);
-    key_values.set("Cacute", 454);
-    key_values.set("Ccaron", 456);
-    key_values.set("Eogonek", 458);
-    key_values.set("Ecaron", 460);
-    key_values.set("Dcaron", 463);
-    key_values.set("Dstroke", 464);
-    key_values.set("Nacute", 465);
-    key_values.set("Ncaron", 466);
-    key_values.set("Odoubleacute", 469);
-    key_values.set("Rcaron", 472);
-    key_values.set("Uring", 473);
-    key_values.set("Udoubleacute", 475);
-    key_values.set("Tcedilla", 478);
-    key_values.set("racute", 480);
-    key_values.set("abreve", 483);
-    key_values.set("lacute", 485);
-    key_values.set("cacute", 486);
-    key_values.set("ccaron", 488);
-    key_values.set("eogonek", 490);
-    key_values.set("ecaron", 492);
-    key_values.set("dcaron", 495);
-    key_values.set("dstroke", 496);
-    key_values.set("nacute", 497);
-    key_values.set("ncaron", 498);
-    key_values.set("odoubleacute", 501);
-    key_values.set("rcaron", 504);
-    key_values.set("uring", 505);
-    key_values.set("udoubleacute", 507);
-    key_values.set("tcedilla", 510);
-    key_values.set("abovedot", 511);
-    key_values.set("Hstroke", 673);
-    key_values.set("Hcircumflex", 678);
-    key_values.set("Iabovedot", 681);
-    key_values.set("Gbreve", 683);
-    key_values.set("Jcircumflex", 684);
-    key_values.set("hstroke", 689);
-    key_values.set("hcircumflex", 694);
-    key_values.set("idotless", 697);
-    key_values.set("gbreve", 699);
-    key_values.set("jcircumflex", 700);
-    key_values.set("Cabovedot", 709);
-    key_values.set("Ccircumflex", 710);
-    key_values.set("Gabovedot", 725);
-    key_values.set("Gcircumflex", 728);
-    key_values.set("Ubreve", 733);
-    key_values.set("Scircumflex", 734);
-    key_values.set("cabovedot", 741);
-    key_values.set("ccircumflex", 742);
-    key_values.set("gabovedot", 757);
-    key_values.set("gcircumflex", 760);
-    key_values.set("ubreve", 765);
-    key_values.set("scircumflex", 766);
-    key_values.set("kra", 930);
-    key_values.set("Rcedilla", 931);
-    key_values.set("Itilde", 933);
-    key_values.set("Lcedilla", 934);
-    key_values.set("Emacron", 938);
-    key_values.set("Gcedilla", 939);
-    key_values.set("Tslash", 940);
-    key_values.set("rcedilla", 947);
-    key_values.set("itilde", 949);
-    key_values.set("lcedilla", 950);
-    key_values.set("emacron", 954);
-    key_values.set("gcedilla", 955);
-    key_values.set("tslash", 956);
-    key_values.set("ENG", 957);
-    key_values.set("eng", 959);
-    key_values.set("Amacron", 960);
-    key_values.set("Iogonek", 967);
-    key_values.set("Eabovedot", 972);
-    key_values.set("Imacron", 975);
-    key_values.set("Ncedilla", 977);
-    key_values.set("Omacron", 978);
-    key_values.set("Kcedilla", 979);
-    key_values.set("Uogonek", 985);
-    key_values.set("Utilde", 989);
-    key_values.set("Umacron", 990);
-    key_values.set("amacron", 992);
-    key_values.set("iogonek", 999);
-    key_values.set("eabovedot", 1004);
-    key_values.set("imacron", 1007);
-    key_values.set("ncedilla", 1009);
-    key_values.set("omacron", 1010);
-    key_values.set("kcedilla", 1011);
-    key_values.set("uogonek", 1017);
-    key_values.set("utilde", 1021);
-    key_values.set("umacron", 1022);
-    key_values.set("overline", 1150);
-    key_values.set("dead_abovedot", 729);
-    key_values.set("dead_abovering", 730);
-    key_values.set("dead_acute", 180);
-    key_values.set("dead_breve", 728);
-    key_values.set("dead_caron", 711);
-    key_values.set("dead_cedilla", 184);
-    key_values.set("dead_circumflex", 94);
-    key_values.set("dead_diaeresis", 168);
-    key_values.set("dead_doubleacute", 733);
-    key_values.set("dead_grave", 96);
-    key_values.set("dead_ogonek", 731);
-    key_values.set("dead_perispomeni", 126);
-    key_values.set("dead_tilde", 126);
-    key_values.set("acute accent", 0xB4);
+    return modifierObject;
+  }
 
-    const result = key_values.get(outchar);
+  // ------------------------- TODO-kmc-convert check use of caps -----------
+  // as in kl-kmn there is a need to check if caps is used in the file. 
+  // if so a rule without modifier will use NCAPS
+  // see checkIfCapsIsUsed and isAcceptableKeymanModifier
 
-    if (!result) {
-      console.log("        ToDo-kmc-convert keysymname not found!");
-      return ('******* keysym name not found!' + outchar);
-    }
-    // Todo-kmc-convert better names
-    const codePoint_u = parseInt(result, 10);
-    const outconv = String.fromCodePoint(codePoint_u);
-    return outconv;
+  /**
+   * converts a modifier in XKB format into Keyman format (e.g. Lock -> CAPS)
+   * @param mod_XKB the modifier in XKB format
+   * @returns the modifier in Keyman format
+   */
+  private convertModifier(mod_XKB: string): string {
+
+    // ------------------------- TODO-kmc-convert check LevelThree -----------
+    // in XKB layout files there is a block     xkb_compatibility "(unnamed)" {...}
+    // which defines LevelThree and LevelFive. Implement this. 
+    // LevelThree is not always RALT.
+    // And what about LevelFive ???   
+
+
+    /* TODO-kmc-convert XKB uses Alt_R and Alt_L but no ALT what to do in Keyman?*/
+    // TODO-kmc-convert NCAPS <-> '' does not yet work
+    return mod_XKB
+      .replaceAll('+', ' ')
+      .replaceAll('Shift_L', 'LSHIFT')
+      .replaceAll('Shift_R', 'RSHIFT')
+      .replaceAll('Shift', 'SHIFT')
+      .replaceAll('Control_L', 'LCTRL')
+      .replaceAll('Control_R', 'RCTRL')
+      .replaceAll('Control', 'CTRL')
+      .replaceAll('Lock', 'CAPS')
+      //.replaceAll('Base', 'NCAPS') //TODO-kmc-convert which of the 2?
+      .replaceAll('Base', '')
+      .replaceAll('LevelThree', 'RALT')
+      .replaceAll('Alt_R', 'RALT')
+      .replaceAll('Alt_L', 'LALT');
+    // .replaceAll('LevelFive', '???'); //TODO-kmc-convert  equivalent?
   }
 
   /**
-    * @brief  ToDo check description
-   * @brief member function to review data in array of rules of dataUkelele: remove duplicate rules and mark first occurance of a rule in rules
-    * @param  dataUkelele: an object containing the name of the in/output file, an array of behaviors and an array of Rules
-    * @return an object containing the name of the input file, an array of behaviors and the revised array of Rule[]
-    */
-  public reviewRuleInputData(dataUkelele: ProcessedData): ProcessedData {
+   * Function to create a level. If no level is defined explicitly a level will be creatad from the output
+   * and the key name. e.g if there is only one output character => level = ONE_LEVEL;
+   * if there are 2 characters and the key name starts with <KP (meaning a keypad key) =>  level = KEYPAD
+   * (even if keyman does not use Keypad keys they still need to be used in order to get correct level)
+   * @param key the name of the key for which a type is calculated
+   * @param outputCharacters the output characters to find a level from
+   * @returns a level in case of success or null
+   */
+  private findLevel(key: string, outputCharacters: string[]): string | null {
 
-    // check for duplicate C2 and C3 rules in rules (e.g. [NCAPS RALT K_8]  >  dk(C12) ): create a separate array of unique rules,
-    // then compare to rules and mark first occurrence  of a rule in rules
+    /* The rules:
+      1. ONE_LEVEL (1 symbol)
+      2. ALPHABETIC (2 symbols, uppercase/lowercase pair)
+      3. KEYPAD (2 symbols, includes a keypad key)
+      4. TWO_LEVEL (2 symbols, generic fallback)
+      5. FOUR_LEVEL_ALPHABETIC (3-4 symbols, starts with an alphabetic pair)
+      6. FOUR_LEVEL_KEYPAD (3-4 symbols, includes keypad keys)
+      7. FOUR_LEVEL (3-4 symbols, generic fallback)
+      8. FIVE_LEVEL (Exactly 5 symbols)
+      9. EIGHT_LEVEL (6 to 8 symbols) */
 
-    let uniqueCountDkB = 0;
-    const uniqueTextRules: string[][] = [];
+    const char1 = this.keysymNameToChar(outputCharacters[0]);
+    const char2 = this.keysymNameToChar(outputCharacters[1]);
+    const len1 = outputCharacters.length === 1;
+    const len2 = outputCharacters.length === 2;
+    const len3_4 = (outputCharacters.length === 3 || outputCharacters.length === 4);
+    const len5 = (outputCharacters.length === 5);
+    const len6_8 = (outputCharacters.length >= 6 && outputCharacters.length <= 8);
 
-    const rules: Rule[] = dataUkelele.rules;
+    // 'a' <-> 'A'
+    const upperLowerPair = !!(char1 && char2 && char1 !== char2 && (
+      char1.toUpperCase() === char2.toUpperCase() ||
+      char1.toLowerCase() === char2.toLowerCase()
+    ));
 
-    //------------------------------------ C2: dk ----------------------------------
-    // first rule is always unique
-    rules[0].uniqueDeadkey = uniqueCountDkB;
-    rules[0].idDeadkey = uniqueCountDkB;
-    uniqueCountDkB++;
+    // e.g. KP_5
+    const isKeypadOutput = (outputCharacters[0]?.startsWith("KP_") || outputCharacters[1]?.startsWith("KP_"));
 
-    for (let i = 0; i < rules.length; i++) {
+    //e.g. <KP8>
+    const isKeypadKey = key.startsWith('<KP');
 
+    if (len1)
+      return 'ONE_LEVEL';
 
-      if (((rules[i].modifierDeadkey !== undefined) && (rules[i].modifierDeadkey !== ""))
-        && ((rules[i].deadkey !== undefined) && (rules[i].deadkey !== ""))) {
-        let IsFirstUsedHereDk: boolean = true;
+    else if ((len2) && (upperLowerPair))
+      return 'ALPHABETIC';
 
-        // check if not used before
-        for (let j = 0; j < i; j++) {
-          if ((rules[i].modifierDeadkey === rules[j].modifierDeadkey)
-            && (rules[i].deadkey === rules[j].deadkey)) {
-            IsFirstUsedHereDk = IsFirstUsedHereDk && false;
-          }
-        }
+    else if (len2 && isKeypadKey)
+      return 'KEYPAD';
 
-        if (IsFirstUsedHereDk) {
-          rules[i].uniqueDeadkey = uniqueCountDkB;
-          uniqueTextRules.push([
-            rules[i].modifierDeadkey,
-            rules[i].deadkey,
-            String(uniqueCountDkB)]);
-          uniqueCountDkB++;
-        }
-      }
-    }
+    else if (len2)
+      return 'TWO_LEVEL';
 
-    //----------------------------------- C3: prev-dk ----------------------------------
-    let uniqueCountDkA = 0;
+    else if (len3_4 && upperLowerPair)
+      return 'FOUR_LEVEL_ALPHABETIC';
 
-    // first rule is always unique
-    rules[0].uniquePrevDeadkey = uniqueCountDkA;
-    uniqueCountDkA++;
+    else if (len3_4 && isKeypadOutput && isKeypadKey)
+      return 'FOUR_LEVEL_KEYPAD';
 
-    for (let i = 0; i < rules.length; i++) {
-      if ((rules[i].modifierPrevDeadkey !== "") && (rules[i].prevDeadkey !== "")) {
-        let isFirstUsedHerePrevDk: boolean = true;
+    else if (len3_4)
+      return 'FOUR_LEVEL';
 
-        // check if not used before
-        for (let j = 0; j < i; j++) {
-          if ((rules[i].modifierPrevDeadkey === rules[j].modifierPrevDeadkey)
-            && (rules[i].prevDeadkey === rules[j].prevDeadkey)) {
-            isFirstUsedHerePrevDk = isFirstUsedHerePrevDk && false;
-          }
-        }
+    else if (len5)
+      return 'FIVE_LEVEL';
 
-        // check if first part of C3 rule contains a rule that is already defined in C2
-        if (isFirstUsedHerePrevDk) {
-          rules[i].uniquePrevDeadkey = uniqueCountDkA;
-          uniqueCountDkA++;
-          for (let k = 0; k < uniqueTextRules.length; k++) {
-            if ((uniqueTextRules[k][0] === rules[i].modifierDeadkey) && (uniqueTextRules[k][1] === rules[i].deadkey)) {
-              rules[i].uniqueDeadkey = Number(uniqueTextRules[k][2]);
-            }
-          }
-        }
+    else if (len6_8)
+      return 'EIGHT_LEVEL';
 
-        if (isFirstUsedHerePrevDk) {
-          rules[i].uniqueDeadkey = uniqueCountDkB;
-          uniqueTextRules.push([
-            rules[i].modifierPrevDeadkey,
-            rules[i].prevDeadkey,
-            String(uniqueCountDkB)
-          ]);
-          uniqueCountDkB++;
-        }
-      }
-    }
-
-    // loop through rules and mark first occurence each rule of uniqueTextRules
-    for (let i = 0; i < rules.length; i++) {
-      for (let j = 0; j < uniqueTextRules.length; j++) {
-        if ((rules[i].modifierPrevDeadkey === uniqueTextRules[j][0]) && (rules[i].prevDeadkey === uniqueTextRules[j][1])) {
-          rules[i].idPrevDeadkey = Number(uniqueTextRules[j][2]);
-        }
-        if ((rules[i].modifierDeadkey === uniqueTextRules[j][0]) && (rules[i].deadkey === uniqueTextRules[j][1])) {
-          rules[i].idDeadkey = Number(uniqueTextRules[j][2]);
-        }
-      }
-    }
-    dataUkelele.rules = rules;
-    return dataUkelele;
+    else
+      return null;
   }
 
+  /**
+   * replace symbol names with characters (e.g. 1,exclam,onesuperior,exclamdown -> 1,!,¹,¡ )
+   * @param symbolsList string containing list of names of characters
+   * @returns string containing list of characters
+   */
+  private replaceNamesWithCharacter(symbolsList: string): string {
+    const symbolsArray = symbolsList.split(',');
+    let replacedSymbolsList: string = '';
+
+    for (let i = 0; i < symbolsArray.length; i++) {
+      replacedSymbolsList += this.keysymNameToChar(symbolsArray[i]) + ',';
+    }
+    return replacedSymbolsList.slice(0, -1);
+  }
+
+  /**
+   * get a set of output characters and implicitly find level type from it.
+   * @param array_key the key for which the level will be generated
+   * @param array_type the type that will be generated
+   * @param array_sym the output characters to generate a level from
+   * @returns an enhanced array_type with all levels filled or null in case of failure
+   */
+  private completeType(array_key: RegExpExecArray[], array_type: RegExpExecArray[], array_sym: RegExpExecArray[]): RegExpExecArray[] | null {
+
+    if ((!array_key) || (!array_type) || (!array_sym))
+      return null;
+
+    // first add missing elements into array_type so every level has matching symbol line
+    for (let i = 0; i < array_sym.length; i++) {
+      const idStr = (i + 1).toString();
+      if (!array_type.some((subArray: RegExpExecArray) => subArray[2] === idStr)) {
+        array_type.splice(i, 0, ['', 'group' + idStr, idStr, ''] as unknown as RegExpExecArray);
+      }
+    }
+
+    if (array_sym.length !== array_type.length)
+      return null;
+
+    // create level and replace add
+    for (let i = 0; i < array_sym.length; i++) {
+      if (array_type[i]?.[3] === '') {
+        array_type[i][3] = this.findLevel(array_key[0]?.[0] ?? '', array_sym[i][3].split(',') ?? []);
+        array_type[i][0] += 'type[group' + array_type[i][2] + ']="' + array_type[i][3] + '"';
+      }
+    }
+
+    return array_type as unknown as RegExpExecArray[];
+  }
+
+  /**
+   * create an object of data containing keyname, level name, modifiers and output
+   * @param xkbData data read from an xkb file
+   * @param group one of the 4 possible layouts (the first if not specified)
+   * @returns an array of line data each element containing an object of keyname, level name, modifiers and output
+   */
+  private collectData(xkbData: string, group = 0): Data_xkb[] {
+    const dataAllKeys: Data_xkb[] = [];
+
+    // capturing group for blocks starting with xkb_types (=definition of Level types)
+    // and xkb_symbols (=definition ofoutput symbols)
+    const regexp_block_all = /(xkb_types.*)(xkb_symbols.*)/gm;
+
+    // capturing group for key names (e.g '<AB01>')
+    const regexp_key = /(<[A-Z0-9]{4}>)/gm;
+
+    // capturing groups for group and LEVEL (e.g. group1 and 'LOCAL_EIGHT_LEVEL')
+    const regexp_typ = /type\[(group([1234]))\]="([^"]*)"/gm;
+
+    // capturing groups for group and symbols (e.g. Group1 and 'a,A')
+    const regexp_sym = /symbols\[(Group([1234]))\]=\[([^\]]*)\]/gm;
+
+    // seperate into Blocks starting with 'xkb_types' and 'xkb_symbols'
+    const block_all = [...xkbData.matchAll(regexp_block_all)];
+    const block_types = block_all[0]?.[1];
+    const block_symbols = block_all[0]?.[2];
+
+    // in the symbols block: split each key definition into a seperate line
+    // e.g. 'key <AE02>{type[group2]="FOUR_LEVEL",symbols[Group2]=[2,quotedbl,at,oneeighth]};'
+    const lineArray = block_symbols.split('key');
+
+    for (let i = 1; i < lineArray.length; i++) {
+
+      // collect all key, type, symbols from each line into seperate array
+      // array_key e.g. '<AE01>'
+      const array_key = [...lineArray[i].matchAll(regexp_key)];
+      // array_typ e.g. 'FOUR_LEVEL'
+      const array_typ = [...lineArray[i].matchAll(regexp_typ)];
+      // array_sym e.g.' 1,exclam,onesuperior,exclamdown'
+      const array_sym = [...lineArray[i].matchAll(regexp_sym)];
+
+      // TODO-kmc-convert is there more to check e.g. if there is an imcomplete line???
+      // if a definition is available lengths are always >=1; if not: skip
+      if ((array_key.length === 0) || (array_sym.length === 0))
+        continue;
+
+      // if not all types are defined explicitly -> add a type generated from output data and add
+      if (array_typ.length !== array_sym.length) {
+        const completedType = this.completeType(array_key, array_typ, array_sym);
+        if (!completedType)
+          continue;
+      }
+
+      //e.g. '2,at' -> '2,@'
+      if (array_sym?.[group])
+        array_sym[group][3] = this.replaceNamesWithCharacter(array_sym[group][3]);
+      else
+        continue;
+
+      // get name of key e.g. '<AE01>'
+      const keyname = array_key[0]?.[1] ?? '';
+
+      // get key_type e.g. 'FOUR_LEVEL'
+      const level_type = array_typ[group]?.[3] ?? '';
+
+      // get modifiers of this keytype e.g. 'Base','Shift' from TWO_LEVEL
+      const modi_Data = this.getModifier_object(block_types, level_type ?? '');
+
+      // get output e.g. '1,exclam'
+      const output_elements = array_sym[group]?.[3]?.split(',') ?? ['', '', '', ''];
+
+      if (keyname && level_type && modi_Data && output_elements) {
+        dataAllKeys.push({
+          xkb_keyname: keyname as string,
+          xkb_keytype: level_type,
+          xkb_behaviours: modi_Data.maps,
+          xkb_output: output_elements,
+        });
+      }
+    }
+    return dataAllKeys;
+  }
+
+  /**
+   * @brief map the key name obtained to the matching Keyman keyname (e.g. <AC01> --> 'K_A')
+   * @param  key_name used in the XKB file
+   * @return the equivalent keyman Keyname
+  */
+  private get_KMVirtKC_from_keyname(key_name: string): string {
+
+    const keyMap: Record<string, string> = {
+      "<TLDE>": 'K_BKQUOTE',  /* 0*/
+      "<AE01>": 'K_1',
+      "<AE02>": 'K_2',
+      "<AE03>": 'K_3',
+      "<AE04>": 'K_4',
+      "<AE05>": 'K_5',
+      "<AE06>": 'K_6',
+      "<AE07>": 'K_7',
+      "<AE08>": 'K_8',
+      "<AE09>": 'K_9',
+      "<AE10>": 'K_0',        /* 10*/
+      "<AE11>": 'K_HYPHEN',
+      "<AE12>": 'K_EQUAL',
+      "<AD01>": 'K_Q',
+      "<AD02>": 'K_W',
+      "<AD03>": 'K_E',
+      "<AD04>": 'K_R',
+      "<AD05>": 'K_T',
+      "<AD06>": 'K_Y',
+      "<AD07>": 'K_U',
+      "<AD08>": 'K_I',        /* 20*/
+      "<AD09>": 'K_O',
+      "<AD10>": 'K_P',
+      "<AD11>": 'K_LBRKT',
+      "<AD12>": 'K_RBRKT',
+
+      "<AC01>": 'K_A',
+      "<AC02>": 'K_S',
+      "<AC03>": 'K_D',
+      "<AC04>": 'K_F',
+      "<AC05>": 'K_G',
+      "<AC06>": 'K_H',        /* 30*/
+      "<AC07>": 'K_J',
+      "<AC08>": 'K_K',
+      "<AC09>": 'K_L',
+      "<AC10>": 'K_COLON',
+      "<AC11>": 'K_QUOTE',
+
+      "<AB01>": 'K_Z',
+      "<AB02>": 'K_X',
+      "<AB03>": 'K_C',
+      "<AB04>": 'K_V',
+      "<AB05>": 'K_B',        /* 40*/
+      "<AB06>": 'K_N',
+      "<AB07>": 'K_M',
+      "<AB08>": 'K_COMMA',
+      "<AB09>": 'K_PERIOD',
+      "<AB10>": 'K_SLASH',
+      "<BKSL>": 'K_BKSLASH',
+      "<LSGT>": 'K_oE2', /*TODO-kmc-convert K_RIGHTSHIFT correct? No: some other key?I think K_oE2*/
+      "<SPCE>": 'K_SPACE',
+    };
+
+    return keyMap[key_name] ?? null;
+  }
+
+  /**
+   * finds the character associated with a keysym`s name (A -> A, oneeighths-> ⅛, 0x1001E9E ->ẞ,  U1E6D->ṭ)
+   * @param name  keysym`s name
+   * @returns the character or null if invalid
+   */
+
+  private keysymNameToChar(name: string): string | null {
+
+    if (name === 'ssharp' || name === 'ß')
+      return 'ß';
+    if (name === 'U1E9E' || name === 'ẞ')
+      return 'ẞ';
+
+    //0x1001E9E
+    //TODO-kmc-convert: all regex at one place as public static
+    const rgex_0x = /\b0x([0-9A-Fa-f]{7,8})\b/;
+    const match_0x = rgex_0x.exec(name);
+
+    //U1E6D
+    const rgex_U = /\bU([0-9A-Fa-f]{1,6}\b)/;
+    const match_U = rgex_U.exec(name);
+
+    if (match_0x && match_0x[0]) {
+      if ((Number(match_0x[0]) >= 0x01000100) && (Number(match_0x[0]) <= 0x0110FFFF)) {
+        return String.fromCodePoint(Number(match_0x[0]) - 0x01000000);
+      }
+    }
+    else if (match_U && match_U[1]) {
+      return String.fromCodePoint(Number("0x" + match_U[0].substring(1)));;
+    }
+    else {
+      const record = keysym.records.find(r => r.names.includes(name));
+      if (record && record.unicode) {
+        return String.fromCodePoint(record.unicode);
+      }
+      return ('"' + name + '" not found!');
+
+    }
+    return null;
+  }
+
+  // TODO-kmc-convert put all functions here that are needed for unit tests
+  // and make them private.
+  // Then create a public unitTestEndpoints object that exposes
+  // the functions needed for unit tests.
   /** @internal */
-  public convertBound = {
+  public unitTestEndpoints = {
+    getLayouts: this.getLayouts.bind(this),
     convert: this.convert.bind(this),
+    createRuleData: this.createRuleData.bind(this),
+    getModifier_object: this.getModifier_object.bind(this),
+    convertModifier: this.convertModifier.bind(this),
+    findLevel: this.findLevel.bind(this),
+    replaceNamesWithCharacter: this.replaceNamesWithCharacter.bind(this),
+    completeType: this.completeType.bind(this),
+    collectData: this.collectData.bind(this),
+    get_KMVirtKC_from_keyname: this.get_KMVirtKC_from_keyname.bind(this),
+    keysymNameToChar: this.keysymNameToChar.bind(this),
+
   };
 }
 

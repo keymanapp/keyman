@@ -4,80 +4,381 @@
  * Created by S. Schmitt on 2025-05-12
  *
  * Write Keyman .kmn files from an in-memory representation generated
- *
+ * note: for now we focus on a conversion where data is stored in an array  - later an AST will be used
+ * (further reading:  developer\docs\internal\kmc-convert\keylayout-to-kmn\index.md)
  */
 
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KeylayoutToKmnConverter, ProcessedData, Rule } from './../kmc-convert-convert/keylayout-to-kmn-converter.js';
-import { ConverterMessages } from '../converter-messages.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { util } from '@keymanapp/common-types';
 
-export interface messageCharacter {
+
+
+// TODO-kmc-convert do we need modifierList somewhere?
+/**
+ * Interface for modifier data read from the xkb_types section of the xkb file.
+ * It contains a list of all used modifiers (modifierList), and a mapping of
+ * level name vs modifier combinations.
+ */
+export interface KeyType {
+  /**
+   * modifier keys used (e.g. Shift+Lock+Control+LevelThree )
+   */
+  modifierList: string;
+  /**
+   * a mapping between levelName (e.g. "level1") and modifier combination ( e.g. single  ["Shift"] or multiple ["Shift", "Shift+LevelThree"])
+   */
+  maps: {
+    levelName: string;
+    modifierCombination: string[];
+  }[];
+}
+
+
+
+
+/**
+ * @brief member function to write a character as Unicode Character or Unicode Codepoint depending on the character that is to be written
+ * @param ctr : string - the character to be written
+ * @param msg a msg from a previous step to which another message my be concatenated
+ * @returns  an object containing the Unicode representation of the control character along with a message.
+ * character may be a control character will be written as unicode (U+0004),
+ *                  a non-control character will be written as itself ( 'A', '1', '፩', '😎')
+ *                  null in case of an empty string or null or undefined input
+ */
+
+/**
+ * Interface for character along with a possible message
+ */
+interface MessageCharacter {
+  /**
+   * a warning message concerningthe character (e.g. 'specified string might not be a valid html entity')
+   */
   message: string;
+  /**
+   * the Unicode representation of the character
+   * or a control character written as unicode (U+0004),
+   * or a non-control character written as itself ( 'A', '1', '፩', '😎')
+   * or null in case of an empty string or null or undefined input
+   */
   character: string;
 };
+
+/**
+ * Interface containing all data for writing a rule along with a warning:
+ * key, modifier and output, a type and an array of warnings as well as an extra warning
+ */
+interface RuleReview {
+  /**
+   * a rule may exist of up to 3 parts. Each part may have an assocuiated warning text
+   */
+  warningMessages: string[];
+  /**
+   *in rare cases an extra warning will be written valid for all parts
+   */
+  extraWarning: string;
+  /**
+   * while reviewing several warning types may be found
+   */
+  type: 'RuleReview' | 'UnavailableModifier' | 'UnavailableSuperiorRule' |
+  'DuplicateRule' | 'AmbiguousRule' | 'WarningTextSet';
+  /**
+   * a type associated with an comparison e.g. unav_C0_C1 for a comparison C0<->C1 for unavailableModifier
+   */
+  compare_type: string;
+  /**
+   * marker to detect whether compare to an earlier or later rule
+   */
+  isEarlier: boolean;
+  /**
+   * an array of deadkey id where dk_id[0] is associated with prev_dk; dk_id[1] is associated with dk
+   */
+  dk_id: [number, number];
+  /**
+   * an array of deadkey id where dk_prefix[0] is associated with prev_dk_prefix; dk_prefix[1] is associated with dk_prefix
+   */
+  dk_prefix: [string, string];
+  /**
+   * modifiers and keys associated with previous deadkey, deadkey or key
+   */
+  prevDk_modifier: string;
+  prevDk_key: string;
+  Dk_modifier: string;
+  Dk_key: string;
+  modifier: string;
+  key: string;
+  /**
+   * the output of a riule
+   */
+  output: string;
+};
+
+/**
+ * Interface to hold data while converting an input string containng a character in hex, dec or named html entitiy format
+ */
+interface ReplacedOutputString {
+  /**
+   * input: substring of the original string that is currently being processed
+   */
+  input: string | undefined;
+  /**
+   * replaced_character: the character that was replaced
+   */
+  replaced_character: string | undefined;
+  /**
+   * replaced_string: the string that contains all processed characters
+   */
+  replaced_string: string | undefined;
+  /**
+   * rest_string: the remaining string after the replaced portion
+   */
+  rest_string: string;
+  /**
+   * carryOver: if we need '&' as carry over
+   */
+  carryOver: string;
+};
+
+export class UnicodeCharacterConversion {
+
+  // U+ followed by 1.-6. hex digits (U+1234;)
+  public static re_uni = /^U\+([0-9a-f]{1,6})$/i;
+
+  // &#x followed by 1.-6. hex digits (&#x1234;)
+  public static re_hex = /^&#x([0-9a-f]{1,6});$/i;
+
+  // &# followed by 1.-7. decimal digits (&#4660;)
+  public static re_dec = /^&#([0-9]{1,7});$/;
+
+  // &#x followed by 1.-6. hex digits or &# followed by 1.-7. decimal digits
+  private static re_hexdec = /^&#(?:x[0-9a-f]{1,6}|[0-9]{1,7});/i;
+
+  /**
+    * @brief  function to convert a (character or) numeric html character reference to a character
+    *         if input is a valid single character or Codepoint like 'c','ä', 'ሴ', 'ẘ', '😎',  the same character or Codepoint is returned (e.g. 'c' -> 'c', '😎' -> '😎')
+    *         if input is a valid numeric html character reference in hex or decimal, the corresponding character (e.g. &#x1F60E; -> 😎)
+    * @param  inputString the string or stringvalue that will converted
+    * @return the input character/numeric html character reference if input is a valid character
+    *         a converted character if input is a numeric html character reference in hex or decimal,
+    *         or undefined if input is null or undefined, half a surrogate pair, or not recognized
+  */
+  public static convert_htmlToCharacter(inputString: string): string | undefined {
+
+    const m_hex = UnicodeCharacterConversion.re_hex.exec(inputString);
+    const m_dec = UnicodeCharacterConversion.re_dec.exec(inputString);
+
+    // valid '&#x...'
+    if (m_hex) {
+      const codePoint_h = parseInt(m_hex[1], 16);
+      // Reject surrogates and invalid codepoints
+      if (!(util.isValidUnicode(codePoint_h))) {
+        return undefined;
+      }
+      return String.fromCodePoint(codePoint_h);
+    }
+
+    // valid '&#...'
+    else if (m_dec) {
+      const codePoint_d = parseInt(m_dec[1], 10);
+      // Reject surrogates and invalid codepoints
+      if (!(util.isValidUnicode(codePoint_d))) {
+        return undefined;
+      }
+      return String.fromCodePoint(codePoint_d);
+    }
+    return inputString;
+  }
+
+  /**
+    * @brief  recursive function to unescape all occuring &gt; &lt; &amp; &quot; &apos
+    * @param  inputString the string that will unescaped
+    * @return the input unescaped string or
+    *         undefined if input is null or undefined
+  */
+  public static unescape_string(inputString: string): string | undefined {
+
+    if (inputString === null || inputString === undefined)
+      return undefined;
+
+    const unescaped = inputString
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, "\"")
+      .replace(/&apos;/g, "'")
+      .replace(/&amp;/g, "&");
+
+    if ((unescaped === inputString))
+      return unescaped;
+    return this.unescape_string(unescaped);
+  }
+
+  /**
+    * @brief  recursive function to read a string 'step' by 'step' and return an object containing the 
+    * input string, replaced_character, replaced_string, rest_string and a carryOver.
+    * A 'step' is either a character or a hex, dec or named html entitiy.
+    * @param  inputString an object containing all data that will be read and converted:
+    *  - input the inputstring; replaced by rest_tring after each iteration until no characters/entities are left to convert
+    *  - replaced_character: the first character of the input string or the converted html entity
+    *  - replaced_string: a concatination of all replaced characters
+    *  - rest_string: the input string with the first character or html entity chopped off
+    *  - carryOver: a '&' in case a non html named specification of '&' is used in the input string ( e.g. '&#x0026;gt;' -> &gt; )    * 
+    * @return an ReplacedOutputString containing all data
+    *         undefined if input is null or undefined
+    */
+  public static processXmlValue(inputString: ReplacedOutputString): ReplacedOutputString {
+
+    if ((inputString.input === null) || (inputString.input === undefined)) {
+      inputString.replaced_character = undefined;
+      inputString.replaced_string = undefined;
+      inputString.rest_string = '';
+      return inputString;
+    }
+
+    let returnChar;
+    inputString.carryOver = '';
+    inputString.input = this.unescape_string(inputString.input) ?? '';
+
+    const m_hexdec = UnicodeCharacterConversion.re_hexdec.exec(inputString.input);
+
+    // if the (remaining) input string starts with a hex or dec html entity ( &#x...; or &#...;) we need to convert this part to a character
+    if (m_hexdec) {
+      returnChar = this.convert_htmlToCharacter(m_hexdec[0] as string);
+      const to_be_replaced = m_hexdec[0] as string;
+      const replace_len = [...to_be_replaced].length;
+
+      // Use of a carry over happens for example when the input string is '&#x0026;gt;' which should result in '&gt;' and then '>'  (without the carry over we would get 'gt;' and then 'gt' which is wrong)
+      // if we use a carryOver('&') we need to keep the '&' in inputString.rest_string and do not copy it into inputString.replaced_character
+      returnChar === '&' ? inputString.carryOver = '&' : inputString.carryOver = '';
+
+      if (inputString.carryOver === '&')
+        inputString.rest_string = inputString.carryOver + inputString.input.substring(replace_len);
+      else {
+        inputString.rest_string = inputString.input.substring(replace_len);
+        inputString.replaced_character = returnChar;
+
+        // create a string; if if one character of the string converts to 'undefined' we set the whole string to 'undefined'
+        if (inputString.replaced_character === undefined) {
+          inputString.replaced_string = undefined;
+        }
+        else if (inputString.replaced_string !== undefined) {
+          inputString.replaced_string = inputString.replaced_string + inputString.replaced_character;
+        }
+      }
+      // use the rest of the string after the replaced portion and use carryOver if available
+      inputString.input = inputString.carryOver + inputString.input.substring(replace_len);
+    }
+    // for all other characters we just copy the first character and remove it from inputString.input
+    else {
+      const to_be_replaced = inputString.input[0] ?? '';
+      const replace_len = [...to_be_replaced].length;
+
+      inputString.rest_string = inputString.input.substring(replace_len);
+      if (inputString.replaced_string !== undefined) {
+        inputString.replaced_string += to_be_replaced;
+      }
+      // use the rest of the string after the replaced portion
+      inputString.input = inputString.input.substring(replace_len);
+    }
+
+    if (inputString.rest_string.length === 0) {
+      return inputString;
+    }
+    return this.processXmlValue(inputString);
+  }
+};
+
+/**
+ * Interface extended from RuleReview for UnavailableModifier type
+ */
+interface UnavailableModifier extends RuleReview {
+  type: 'UnavailableModifier';
+};
+
+/**
+ * Interface extended from RuleReview for UnavailableSuperiorRule type
+ */
+interface UnavailableSuperiorRule extends RuleReview {
+  type: 'UnavailableSuperiorRule';
+};
+
+/**
+ * Interface extended from RuleReview for DuplicateRules type
+ */
+interface DuplicateRules extends RuleReview {
+  type: 'DuplicateRule';
+};
+
+/**
+ * Interface extended from RuleReview for AmbiguousRules type
+ */
+interface AmbiguousRules extends RuleReview {
+  type: 'AmbiguousRule';
+};
+
+/**
+ * Interface extended from RuleReview for WarningTextSet type
+ */
+interface WarningTextSet extends RuleReview {
+  type: 'WarningTextSet';
+};
+
 
 export class KmnFileWriter {
 
   constructor(private callbacks: CompilerCallbacks, private options: CompilerOptions) { };
+  /**
+   * @brief  member function to write data from object to a Uint8Array
+   * @param  convertedData the array holding all keyboard data
+   * @return a Uint8Array holding data
+   */
 
   // TODO-kmc-convert remove
-  public writeToFile(dataUkelele: ProcessedData): boolean | null {
+  public writeToFile(convertedData: ProcessedData): boolean {
 
     let data: string = "\n";
 
     // add top part of kmn file: STORES
-    data += this.writeKmnFileHeader(dataUkelele);
+    data += this.writeKmnFileHeader(convertedData);
 
     // add bottom part of kmn file: RULES
-    data += this.writeDataRules(dataUkelele);
+    data += this.writeDataRules(convertedData);
 
-    try {
-      this.callbacks.fs.writeFileSync(dataUkelele.kmnFilename, new TextEncoder().encode(data));
-      return true;
-    } catch (err: any) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename: dataUkelele.kmnFilename, errorText: err }));
-      return false;
-    }
+    this.callbacks.fs.writeFileSync(convertedData.out_filename, new TextEncoder().encode(data));
+    return true;
   }
-  /**
-   * @brief  member function to write data from object to a Uint8Array
-   * @param  dataUkelele the array holding all keyboard data
-   * @return a Uint8Array holding data
-   */
-  public write(dataUkelele: ProcessedData): Uint8Array|null {
+
+  public write(convertedData: ProcessedData): Uint8Array {
     let data: string = "\n";
 
     // top part of kmn file: STORES
-    const dataStores = this.writeKmnFileHeader(dataUkelele);
+    const dataStores = this.writeKmnFileHeader(convertedData);
 
     // bottom part of kmn file: RULES
-    const dataRules = this.writeDataRules(dataUkelele);
+    const dataRules = this.writeDataRules(convertedData);
 
     if (dataRules)
       data += dataStores + dataRules;
 
-    try {
-      return new TextEncoder().encode(data);
-    } catch (err:any) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToWrite({ outputFilename: dataUkelele.kmnFilename, errorText: err }));
-      return null;
-    }
+    return new TextEncoder().encode(data);
   }
 
   /**
    * @brief  member function to create data for the header (stores) that will be printed to the resulting kmn file
-   * @param  dataUkelele an object containing all data read from a .keylayout file
+   * @param  convertedData an object containing all data read from an input file (e.g. .keylayout, .xkb)
    * @return string -  all stores to be printed
    */
-  public writeKmnFileHeader(dataUkelele: ProcessedData): string {
+  private writeKmnFileHeader(convertedData: ProcessedData | null): string {
+    if (!convertedData) {
+      return "";
+    }
 
     let data: string = "";
 
     data += "c ..................................................................................................................\n";
     data += "c ..................................................................................................................\n";
     data += "c Keyman keyboard generated by kmn-convert version: " + KEYMAN_VERSION.VERSION + "\n";
-    data += "c from Ukelele file: " + dataUkelele.keylayoutFilename + "\n";
+    data += "c from file: " + (convertedData?.in_filename ?? '') + "\n";
     data += "c ..................................................................................................................\n";
     data += "c ..................................................................................................................\n";
     data += "\n";
@@ -94,11 +395,13 @@ export class KmnFileWriter {
 
   /**
    * @brief  member function to create data from rules that will be printed to the resulting kmn file
-   * @param  dataUkelele an object containing all data read from a .keylayout file
+   * @param  convertedData an object containing all data read from an input file (e.g. .keylayout, .xkb)
    * @return string -  all rules to be printed
    */
-  public writeDataRules(dataUkelele: ProcessedData): string {
-
+  private writeDataRules(convertedData: ProcessedData | null): string {
+    if (!convertedData) {
+      return "";
+    }
     const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
     let data: string = "";
 
@@ -106,8 +409,8 @@ export class KmnFileWriter {
     // during the process of creating Rule[], duplicate rules might occur
     // (e.g. when in a keylayout file the same modifiers occur in several behaviors thus producing the same rules).
     // This is to filter out those duplicate Rule objects
-    const uniqueDataRules: Rule[] = dataUkelele.rules.filter((curr) => {
-      return (!(curr.output.length === 0 || curr.output === undefined)
+    const uniqueDataRules: Rule[] = (convertedData?.rules ?? []).filter((curr) => {
+      return (!(curr.output === undefined)
         && (curr.key !== "")
         && ((curr.ruleType === "C0")
           || (curr.ruleType === "C1")
@@ -115,6 +418,7 @@ export class KmnFileWriter {
           || (curr.ruleType === "C3" && (curr.deadkey !== "") && (curr.prevDeadkey !== "")))
       );
     }).reduce((unique, o) => {
+
       if (!unique.some((obj: Rule) =>
         new TextDecoder().decode(obj.output) === new TextDecoder().decode(o.output)
 
@@ -131,7 +435,7 @@ export class KmnFileWriter {
         unique.push(o);
       }
       return unique;
-    }, []);
+    }, [] as Rule[]);
 
     //................................................ C0 C1 ................................................................
 
@@ -147,9 +451,10 @@ export class KmnFileWriter {
             break;
           }
         }
-
+        // TODO-kmc-convert check key 48
         // skip keyNr 48 (K_TAB) and 36 (K_ENTER)
-        if ((keyNr === 48) || (keyNr === 36)) {
+        //if ((keyNr === 48) || (keyNr === 36)) {
+        if ((keyNr === 36)) {
           continue;
         }
 
@@ -157,21 +462,16 @@ export class KmnFileWriter {
         if ((k > 1) && (uniqueDataRules[k - 1].key !== uniqueDataRules[k].key) && (uniqueDataRules[k - 1].ruleType === uniqueDataRules[k].ruleType)) {
           data += '\n';
         }
-
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        let versionOutputCharacter;
-        const warnText = this.reviewRules(uniqueDataRules, k);
-
+        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
-        // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
-        // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
-        if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        let versionOutputCharacter;
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+          warnText[2] = (characterMessage.message === '') ? characterMessage.message : characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -181,7 +481,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
-            warningTextToWrite = warnText[2];
+            warningTextToWrite = warnText[2] + 'here: ';
           }
 
           if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -194,12 +494,24 @@ export class KmnFileWriter {
                 + '\"\n';
             }
             else {
-              data += warningTextToWrite
-                + "+ ["
-                + (uniqueDataRules[k].modifierKey + ' ' + uniqueDataRules[k].key).trim()
-                + `]  >  \'`
-                + versionOutputCharacter
-                + '\'\n';
+              // surround all output characters with '' (e.g. + [K_A]  >  'A')
+              // but don`t for U+xxxx in control character message (e.g.  c Use of a control character + [K_A]  >  U+0011 )
+              if (warningTextToWrite.indexOf("control character") === -1) {
+                data += warningTextToWrite
+                  + "+ ["
+                  + (uniqueDataRules[k].modifierKey + ' ' + uniqueDataRules[k].key).trim()
+                  + `]  >  \'`
+                  + versionOutputCharacter
+                  + '\'\n';
+              }
+              else {
+                data += warningTextToWrite
+                  + "+ ["
+                  + (uniqueDataRules[k].modifierKey + ' ' + uniqueDataRules[k].key).trim()
+                  + `]  >  `
+                  + versionOutputCharacter
+                  + '\n';
+              }
             }
           }
         }
@@ -210,21 +522,16 @@ export class KmnFileWriter {
     for (let k = 0; k < uniqueDataRules.length; k++) {
 
       if (uniqueDataRules[k].ruleType === "C2") {
-
         // use of Unicode Character vs Unicode Codepoint;
         // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        let versionOutputCharacter;
-        const warnText = this.reviewRules(uniqueDataRules, k);
-
+        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
-        // const outputUnicodeCharacter = util.convertToUnicodeCharacter(outputCharacter);
-        // const outputUnicodeCodePoint = util.convertToUnicodeCodePoint(outputCharacter);
 
-        if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        let versionOutputCharacter;
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+          warnText[2] = (characterMessage.message === '') ? characterMessage.message : characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -234,7 +541,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
-            warningTextToWrite = warnText[1];
+            warningTextToWrite = warnText[1] + 'here: ';
           }
 
           if (!((warnText[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -250,7 +557,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
-            warningTextToWrite = warnText[2];
+            warningTextToWrite = warnText[2] + 'here: ';
           }
 
           if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -265,17 +572,28 @@ export class KmnFileWriter {
                 + '\"\n';
             }
             else {
-              data += warningTextToWrite
-                + "dk(A"
-                + (String(uniqueDataRules[k].idDeadkey) + ") + ["
-                  + uniqueDataRules[k].modifierKey).trim()
-                + " "
-                + uniqueDataRules[k].key + "]  >  \'"
-                + versionOutputCharacter
-                + "\'\n";
+              // surround all output characters with '' (e.g. + [K_A]  >  'A')
+              // but don`t for U+xxxx in control character message (e.g.  c Use of a control character + [K_A]  >  U+0011 )
+              if (warningTextToWrite.indexOf("control character") === -1) {
+                data += warningTextToWrite
+                  + "dk(A"
+                  + (String(uniqueDataRules[k].idDeadkey) + ") + ["
+                    + uniqueDataRules[k].modifierKey).trim()
+                  + " "
+                  + uniqueDataRules[k].key + "]  >  \'"
+                  + versionOutputCharacter
+                  + "\'\n";
+              } else {
+                data += warningTextToWrite
+                  + "dk(A"
+                  + (String(uniqueDataRules[k].idDeadkey) + ") + ["
+                    + uniqueDataRules[k].modifierKey).trim()
+                  + " "
+                  + uniqueDataRules[k].key + "]  >  "
+                  + versionOutputCharacter
+                  + "\n";
+              }
             }
-
-
           }
           data += "\n";
         }
@@ -288,17 +606,16 @@ export class KmnFileWriter {
       if (uniqueDataRules[k].ruleType === "C3") {
 
         // use of Unicode Character vs Unicode Codepoint;
-        // If it`s a ctrl character we print out the Unicode Codepoint else we print out the Unicode Character
-        let versionOutputCharacter;
-
-        const warnText = this.reviewRules(uniqueDataRules, k);
+        // we always print out the Unicode Character  (A, W̊, 😎, ... ).
+        // But if it`s a ctrl character we print out the Unicode Codepoint  (U+0007, ...)
+        const warnText = this.reviewRules(uniqueDataRules, k).warningMessages;
         const outputCharacter = new TextDecoder().decode(uniqueDataRules[k].output);
-        // TODO-kmc-convert: after merge of PR 14569 use functions from util instead of the ones in this class
 
-        if ((outputCharacter !== undefined) || (outputCharacter !== "")) {
-          const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        let versionOutputCharacter;
+        const characterMessage = this.writeCharacterOrUnicode(outputCharacter, warnText[2]);
+        if (characterMessage !== null) {
           versionOutputCharacter = characterMessage.character;
-          warnText[2] = characterMessage.message;
+          warnText[2] = (characterMessage.message === '') ? characterMessage.message : characterMessage.message;
         }
 
         // add a warning in front of rules in case unavailable modifiers or ambiguous rules are used
@@ -309,7 +626,7 @@ export class KmnFileWriter {
           let warningTextToWrite = "";
 
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[0].length > 0)) {
-            warningTextToWrite = warnText[0];
+            warningTextToWrite = warnText[0] + 'here: ';
           }
 
           if (!((warnText[0].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -326,7 +643,7 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[1].length > 0)) {
-            warningTextToWrite = warnText[1];
+            warningTextToWrite = warnText[1] + 'here: ';
           }
 
           if (!((warnText[1].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
@@ -345,22 +662,35 @@ export class KmnFileWriter {
 
           let warningTextToWrite = "";
           if (!KeylayoutToKmnConverter.SKIP_COMMENTED_LINES && (warnText[2].length > 0)) {
-            warningTextToWrite = warnText[2];
+            warningTextToWrite = warnText[2] + 'here: ';
           }
 
           if (!((warnText[2].length > 0) && KeylayoutToKmnConverter.SKIP_COMMENTED_LINES)) {
-            data += warningTextToWrite + "dk(B"
-              + (String(uniqueDataRules[k].idDeadkey)
-                + ") + ["
-                + uniqueDataRules[k].modifierKey).trim()
-              + " "
-              + uniqueDataRules[k].key
-              + "]  >  \'"
-              + versionOutputCharacter
-              + "\'\n";
+            // surround all output characters with '' (e.g. + [K_A]  >  'A')
+            // but don`t for U+xxxx in control character message (e.g.  c Use of a control character + [K_A]  >  U+0011 )
+            if (warningTextToWrite.indexOf("control character") === -1) {
+              data += warningTextToWrite + "dk(B"
+                + (String(uniqueDataRules[k].idDeadkey)
+                  + ") + ["
+                  + uniqueDataRules[k].modifierKey).trim()
+                + " "
+                + uniqueDataRules[k].key
+                + "]  >  \'"
+                + versionOutputCharacter
+                + "\'\n";
+            } else {
+              data += warningTextToWrite + "dk(B"
+                + (String(uniqueDataRules[k].idDeadkey)
+                  + ") + ["
+                  + uniqueDataRules[k].modifierKey).trim()
+                + " "
+                + uniqueDataRules[k].key
+                + "]  >  "
+                + versionOutputCharacter
+                + "\n";
+            }
           }
         }
-
         if ((warnText[0].indexOf("duplicate") < 0) || (warnText[1].indexOf("duplicate") < 0) || (warnText[2].indexOf("duplicate") < 0)) {
           data += "\n";
         }
@@ -370,66 +700,292 @@ export class KmnFileWriter {
   }
 
   /**
+   * @brief  take a child object of RuleReview and return the appropriate warning message array
+   * @param  inObj : an object containing filtered data for a specified comparison
+   * @param  posWarning : index specifying to which element of the warning message array a warning message will be added:
+   * outMsg[0]: Warning for part 1 of a rule (e.g. modifier_prev_dk + key_prev_dk > prev_dk)
+   * outMsg[1]: Warning for part 2 of a rule (e.g. (prev_dk +) modifier_dk + key_dk > dk)
+   * outMsg[2]: Warning for part 3 of a rule (e.g. (dk +) modifier+key > output)
+   * see here on parts of a rule:
+   * https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.16sx096j6jmy
+   * @return outMsg the warning message array for all parts
+   */
+  private createWarningText(inObj: RuleReview, posWarning: number = 2): string[] {
+
+    const outMsg = [...inObj.warningMessages];
+
+    if (inObj.compare_type === 'unav_C0_C1') {
+      outMsg[posWarning] = 'unavailable modifier ';
+    }
+
+    if (inObj.compare_type === 'unav_C2') {
+      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
+      if (inObj.Dk_modifier) {
+        outMsg[1] = 'unavailable modifier ';
+        outMsg[2] = 'unavailable superior rule ( ['
+          + inObj.Dk_modifier + ' '
+          + inObj.Dk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[1]
+          + inObj.dk_id[1]
+          + ') ) ';
+      }
+
+      if (inObj.modifier) {
+        outMsg[2] = 'unavailable modifier ';
+      }
+    }
+
+    if (inObj.compare_type === 'unav_C3') {
+
+      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
+      if (inObj.prevDk_modifier) {
+        outMsg[0] = 'unavailable modifier ';
+        outMsg[1] = 'unavailable superior rule ( ['
+          + inObj.prevDk_modifier + ' '
+          + inObj.prevDk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
+          + ') ) ';
+
+        outMsg[2] =
+          'unavailable superior rule ['
+          + inObj.prevDk_modifier + ' '
+          + inObj.prevDk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
+          + ')  '
+
+          + 'unavailable superior rule ['
+          + inObj.prevDk_modifier + ' '
+          + inObj.prevDk_key
+          + '+'
+
+          + inObj.Dk_modifier + ' '
+          + inObj.Dk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[1]
+          + inObj.dk_id[1]
+          + ')  ';
+
+      }
+
+      // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
+      if (inObj.Dk_modifier) {
+
+        const mod_OK = new KeylayoutToKmnConverter(this.callbacks, this.options).isAcceptableKeymanModifier(inObj.Dk_modifier);
+
+        if ((outMsg[1].lastIndexOf('unavailable modifier') < 0))
+          outMsg[1] += (!mod_OK) ? 'unavailable modifier ' : '';
+
+        outMsg[2] = 'unavailable superior rule ( ['
+          + inObj.prevDk_modifier + ' '
+          + inObj.prevDk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
+          + ') ) ';
+
+        outMsg[2] = outMsg[2]
+          + (!mod_OK ? 'unavailable superior rule ( ' : '')
+          + 'dk('
+          + inObj.dk_prefix[0]
+          + inObj.dk_id[0]
+          + ')  + ['
+          + inObj.Dk_modifier + ' '
+          + inObj.Dk_key
+          + ']  >  dk('
+          + inObj.dk_prefix[1]
+          + inObj.dk_id[1]
+          + ') '
+          + (!mod_OK ? ') ' : '');
+      }
+
+      if (inObj.modifier) {
+        outMsg[2] = 'unavailable modifier ';
+      }
+    }
+
+    if (inObj.compare_type === 'amb_1_1' || inObj.compare_type === 'dup_1_1') {
+
+      outMsg[posWarning] = inObj.warningMessages[posWarning]
+        + ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
+        + (inObj.isEarlier ? 'earlier' : 'later')
+        + ': [' + inObj.modifier + ' ' + inObj.key + ']  >  \''
+        + inObj.output + '\' ';
+    }
+
+
+    if (inObj.compare_type === 'amb_2_2' || inObj.compare_type === 'dup_2_2'
+      || inObj.compare_type === 'amb_2_1'
+      || inObj.compare_type === 'amb_2_4') {
+
+      const textsegment = (
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
+        + (inObj.isEarlier ? 'earlier' : 'later')
+        + ': [' + inObj.Dk_modifier + ' ' + inObj.Dk_key + ']  >  dk('
+        + inObj.dk_prefix[1] + inObj.dk_id[1] + ') ');
+
+      if (outMsg[posWarning].indexOf(textsegment) === -1)
+        outMsg[posWarning] += textsegment;
+    }
+
+
+    if (inObj.compare_type === 'amb_4_4' || inObj.compare_type === 'dup_4_4'
+      || inObj.compare_type === 'amb_4_1'
+      || inObj.compare_type === 'amb_4_2') {
+
+      const textsegment = (
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
+        + (inObj.isEarlier ? 'earlier' : 'later')
+        + ': [' + inObj.prevDk_modifier + ' ' + inObj.prevDk_key + ']  >  dk('
+        + inObj.dk_prefix[0] + inObj.dk_id[0] + ') ');
+
+      if (outMsg[posWarning].indexOf(textsegment) === -1)
+        outMsg[posWarning] += textsegment;
+    }
+
+
+    if (inObj.compare_type === 'amb_5_5' || inObj.compare_type === 'dup_5_5') {
+
+      const textsegment = (
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
+        + (inObj.isEarlier ? 'earlier' : 'later')
+        + ': dk(' + inObj.dk_prefix[0] + inObj.dk_id[0] + ") + ["
+        + inObj.Dk_modifier + " " + inObj.Dk_key + "]  >  "
+        + 'dk(' + inObj.dk_prefix[1] + inObj.dk_id[1] + ") ");
+
+      if (outMsg[1].indexOf(textsegment) === -1)
+        outMsg[1] += textsegment;
+    }
+
+
+    if (inObj.compare_type === 'amb_6_3' || inObj.compare_type === 'dup_6_3'
+      || inObj.compare_type === 'amb_3_3' || inObj.compare_type === 'dup_3_3'
+      || inObj.compare_type === 'amb_6_6' || inObj.compare_type === 'dup_6_6') {
+
+      const textsegment = (
+        ((inObj.type === 'AmbiguousRule') ? 'ambiguous ' : 'duplicate ') + 'rule '
+        + (inObj.isEarlier ? 'earlier' : 'later')
+        + ': dk(' + inObj.dk_prefix[1] + inObj.dk_id[1] + ") + ["
+        + inObj.modifier + " " + inObj.key + "]  >  \'"
+        + inObj.output + "\' ");
+
+      if (outMsg[posWarning].indexOf(textsegment) === -1)
+        outMsg[posWarning] += textsegment;
+    }
+
+    return outMsg;
+  }
+
+  /**
    * @brief  member function to review rules for acceptable modifiers, duplicate or ambiguous rules and return an array containing possible warnings.
    *         Keyman can not handle duplicate rules so we need to make sure a rule is written only once by either omitting a duplicate rule or commenting out an ambiguous rule.
    *         Omitting rules and definition of comparisons e.g. 1-1, 2-4, 6-6
    *         see https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.pcz8rjyrl5ug
+   *         or /docs/internal/kmc-convert/keylayout-to-kmn/index.md
    * @param  rule : Rule[] - an array of all rules
    * @param  index the index of a rule in Rule[]
    * @return a string[] containing possible warnings for a rule
    */
-  public reviewRules(rule: Rule[], index: number): string[] {
+  private reviewRules(rule: Rule[], index: number): RuleReview {
+
+    const unavailableModiWarnings = {
+      type: 'UnavailableModifier',
+      warningMessages: ['', '', ''],
+      output: '',
+    } as UnavailableModifier;
+
+    const unavailableSuperiWarnings = {
+      type: 'UnavailableSuperiorRule',
+      warningMessages: ['', '', ''],
+      output: '',
+    } as UnavailableSuperiorRule;
+
+    const duplicateWarnings = {
+      type: 'DuplicateRule',
+      warningMessages: ['', '', ''],
+      output: '',
+    } as DuplicateRules;
+
+    const ambiguousWarnings = {
+      type: 'AmbiguousRule',
+      warningMessages: ['', '', ''],
+      output: '',
+    } as AmbiguousRules;
+
+    const resultWarningTextSet = {
+      warningMessages: ['', '', ''],
+    } as WarningTextSet;
 
     const keylayoutKmnConverter = new KeylayoutToKmnConverter(this.callbacks, this.options);
-    const warningText: string[] = Array(3).fill("");
+
+    // ------------------------- TODO-kmc-convert check unavailable output -----------
+    // in XKB layout files there is some output that doesn`t exist in XKB.
+    // e.g. in XKB there is 'oslash' but no 'Oslash' ('Oslash' might be used in layout files like in 'de' - no idea why???)
+    // XKB uses 'Ooblique' instead.
+    // at the moment kmn output is    + [SHIFT RALT K_O]  >  'Oslash not found!'
+    // but needs to be sth. like c WARNING: output character name not found + [SHIFT RALT K_O]  >  'Oslash not found!'
 
     // ------------------------- check unavailable modifiers -------------------------
 
     if ((rule[index].ruleType === "C0") || (rule[index].ruleType === "C1")) {
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
-        warningText[2] = "unavailable modifier : ";
+        unavailableModiWarnings.compare_type = 'unav_C0_C1';
+        unavailableModiWarnings.warningMessages = this.createWarningText(unavailableModiWarnings);
       }
     }
+
 
     else if (rule[index].ruleType === "C2") {
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
-        warningText[1] = "unavailable modifier : ";
-        warningText[2] = "unavailable superior rule ( ["
-          + rule[index].modifierDeadkey + " "
-          + rule[index].deadkey
-          + "]  >  dk(A"
-          + rule[index].idDeadkey
-          + ") ) : ";
+        unavailableSuperiWarnings.compare_type = 'unav_C2';
+        unavailableSuperiWarnings.dk_prefix = ['C', 'A'];
+        unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
+        unavailableSuperiWarnings.Dk_modifier = rule[index].modifierDeadkey;
+        unavailableSuperiWarnings.Dk_key = rule[index].deadkey;
+        unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings);
       }
+
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
-        warningText[2] = "unavailable modifier : ";
+        unavailableModiWarnings.compare_type = 'unav_C2';
+        unavailableModiWarnings.modifier = rule[index].modifierKey;
+        unavailableModiWarnings.key = rule[index].key;
+        unavailableModiWarnings.warningMessages = this.createWarningText(unavailableModiWarnings);
       }
     }
 
-    else if (rule[index].ruleType === "C3") {
 
+    else if (rule[index].ruleType === "C3") {
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierPrevDeadkey)) {
-        warningText[0] = "unavailable modifier : ";
-        warningText[1] = "unavailable superior rule ( ["
-          + rule[index].modifierPrevDeadkey + " "
-          + rule[index].prevDeadkey
-          + "]  >  dk(A"
-          + rule[index].idPrevDeadkey
-          + ") ) : ";
+        unavailableSuperiWarnings.compare_type = 'unav_C3';
+        unavailableSuperiWarnings.dk_prefix = ['A', 'B'];
+        unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
+        unavailableSuperiWarnings.prevDk_modifier = rule[index].modifierPrevDeadkey;
+        unavailableSuperiWarnings.prevDk_key = rule[index].prevDeadkey;
+        unavailableSuperiWarnings.Dk_modifier = rule[index].modifierDeadkey;
+        unavailableSuperiWarnings.Dk_key = rule[index].deadkey;
+        unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings, 2);
       }
 
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
-        warningText[1] = "unavailable modifier : ";
-        warningText[2] = "unavailable superior rule ( ["
-          + rule[index].modifierDeadkey + " "
-          + rule[index].deadkey
-          + "]  >  dk(B"
-          + rule[index].idDeadkey
-          + ") ) : ";
+        unavailableSuperiWarnings.compare_type = 'unav_C3';
+        unavailableSuperiWarnings.prevDk_modifier = rule[index].modifierPrevDeadkey;
+        unavailableSuperiWarnings.prevDk_key = rule[index].prevDeadkey;
+        unavailableSuperiWarnings.dk_prefix = ['A', 'B'];
+        unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
+        unavailableSuperiWarnings.Dk_modifier = rule[index].modifierDeadkey;
+        unavailableSuperiWarnings.Dk_key = rule[index].deadkey;
+        unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings, 2);
       }
 
       if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
-        warningText[2] = "unavailable modifier : ";
+        unavailableModiWarnings.compare_type = 'unav_C3';
+        unavailableModiWarnings.modifier = rule[index].modifierKey;
+        unavailableModiWarnings.key = rule[index].key;
+        unavailableModiWarnings.warningMessages = this.createWarningText(unavailableModiWarnings, 2);
       }
     }
 
@@ -477,49 +1033,52 @@ export class KmnFileWriter {
       );
 
       if (amb_4_1.length > 0) {
-        warningText[2] = warningText[2]
-          + ("ambiguous rule: later: ["
-            + amb_4_1[0].modifierPrevDeadkey
-            + " "
-            + amb_4_1[0].prevDeadkey
-            + "]  >  dk(C"
-            + amb_2_1[0].idDeadkey
-            + ") ");
+        ambiguousWarnings.compare_type = 'amb_4_1';
+        ambiguousWarnings.isEarlier = false;
+        ambiguousWarnings.dk_prefix = ['C', 'A'];
+        ambiguousWarnings.dk_id = [amb_4_1[0].idPrevDeadkey, amb_4_1[0].idDeadkey];
+        ambiguousWarnings.prevDk_modifier = amb_4_1[0].modifierPrevDeadkey;
+        ambiguousWarnings.prevDk_key = amb_4_1[0].prevDeadkey;
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 2);
+
       }
 
       if (amb_2_1.length > 0) {
-        warningText[2] = warningText[2]
-          + ("ambiguous rule: later: ["
-            + amb_2_1[0].modifierDeadkey
-            + " "
-            + amb_2_1[0].deadkey
-            + "]  >  dk(A"
-            + amb_2_1[0].idDeadkey
-            + ") ");
+        ambiguousWarnings.compare_type = 'amb_2_1';
+        ambiguousWarnings.isEarlier = false;
+        ambiguousWarnings.dk_prefix = ['', 'A'];
+        ambiguousWarnings.dk_id = [amb_2_1[0].idPrevDeadkey, amb_2_1[0].idDeadkey];
+        ambiguousWarnings.Dk_modifier = amb_2_1[0].modifierDeadkey;
+        ambiguousWarnings.Dk_key = amb_2_1[0].deadkey;
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 2);
       }
 
       if (amb_1_1.length > 0) {
-        warningText[2] = warningText[2]
-          + ("ambiguous rule: earlier: ["
-            + amb_1_1[0].modifierKey
-            + " "
-            + amb_1_1[0].key
-            + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output)).character
-            + "\' ");
+        ambiguousWarnings.compare_type = 'amb_1_1';
+        ambiguousWarnings.isEarlier = true;
+        ambiguousWarnings.modifier = amb_1_1[0].modifierKey;
+        ambiguousWarnings.key = amb_1_1[0].key;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_1_1[0].output));
+        if (outputCharacter !== null) {
+          ambiguousWarnings.output = outputCharacter.character;
+        }
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 2);
+
       }
 
       if (dup_1_1.length > 0) {
-        warningText[2] = warningText[2]
-          + ("duplicate rule: earlier: ["
-            + dup_1_1[0].modifierKey
-            + " "
-            + dup_1_1[0].key
-            + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output)).character
-            + "\' ");
+        duplicateWarnings.compare_type = 'dup_1_1';
+        duplicateWarnings.isEarlier = true;
+        duplicateWarnings.modifier = dup_1_1[0].modifierKey;
+        duplicateWarnings.key = dup_1_1[0].key;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_1_1[0].output));
+        if (outputCharacter !== null) {
+          duplicateWarnings.output = outputCharacter.character;
+        }
+        duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 2);
       }
     }
+
 
     if (rule[index].ruleType === "C2") {
 
@@ -571,64 +1130,65 @@ export class KmnFileWriter {
       );
 
       if (amb_2_2.length > 0) {
-        warningText[1] = warningText[1]
-          + ("ambiguous rule: earlier: ["
-            + amb_2_2[0].modifierDeadkey
-            + " "
-            + amb_2_2[0].deadkey
-            + "]  >  dk(C"
-            + amb_2_2[0].idDeadkey
-            + ") ");
+        ambiguousWarnings.compare_type = 'amb_2_2';
+        ambiguousWarnings.isEarlier = true;
+        ambiguousWarnings.dk_prefix = ['', 'C'];
+        ambiguousWarnings.dk_id = [amb_2_2[0].idPrevDeadkey, amb_2_2[0].idDeadkey];
+        ambiguousWarnings.Dk_modifier = amb_2_2[0].modifierDeadkey;
+        ambiguousWarnings.Dk_key = amb_2_2[0].deadkey;
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 1);
       }
 
       if (dup_2_2.length > 0) {
-        warningText[1] = warningText[1]
-          + ("duplicate rule: earlier: ["
-            + dup_2_2[0].modifierDeadkey
-            + " "
-            + dup_2_2[0].deadkey
-            + "]  >  dk(C"
-            + dup_2_2[0].idDeadkey
-            + ") ");
+        duplicateWarnings.compare_type = 'dup_2_2';
+        duplicateWarnings.isEarlier = true;
+        duplicateWarnings.dk_prefix = ['', 'C'];
+        duplicateWarnings.dk_id = [dup_2_2[0].idPrevDeadkey, dup_2_2[0].idDeadkey];
+        duplicateWarnings.Dk_modifier = dup_2_2[0].modifierDeadkey;
+        duplicateWarnings.Dk_key = dup_2_2[0].deadkey;
+        duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 1);
       }
 
       if (amb_3_3.length > 0) {
-        warningText[2] = warningText[2]
-          + ("ambiguous rule: earlier: dk(A"
-            + amb_3_3[0].idDeadkey
-            + ") + ["
-            + amb_3_3[0].modifierKey
-            + " "
-            + amb_3_3[0].key
-            + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output)).character
-            + "\' ");
+        ambiguousWarnings.compare_type = 'amb_3_3';
+        ambiguousWarnings.isEarlier = true;
+        ambiguousWarnings.dk_prefix = ['', 'A'];
+        ambiguousWarnings.dk_id = [amb_3_3[0].idPrevDeadkey, amb_3_3[0].idDeadkey];
+        ambiguousWarnings.modifier = amb_3_3[0].modifierKey;
+        ambiguousWarnings.key = amb_3_3[0].key;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_3_3[0].output));
+        if (outputCharacter !== null) {
+          ambiguousWarnings.output = outputCharacter.character;
+        }
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 2);
+
       }
 
       if (dup_3_3.length > 0) {
-        warningText[2] = warningText[2]
-          + ("duplicate rule: earlier: dk(A"
-            + dup_3_3[0].idDeadkey
-            + ") + ["
-            + dup_3_3[0].modifierKey
-            + " "
-            + dup_3_3[0].key
-            + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output)).character
-            + "\' ");
+        duplicateWarnings.compare_type = 'dup_3_3';
+        duplicateWarnings.isEarlier = true;
+        duplicateWarnings.dk_id = [dup_3_3[0].idPrevDeadkey, dup_3_3[0].idDeadkey];
+        duplicateWarnings.dk_prefix = ['', 'A'];
+        duplicateWarnings.modifier = dup_3_3[0].modifierKey;
+        duplicateWarnings.key = dup_3_3[0].key;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_3_3[0].output));
+        if (outputCharacter !== null) {
+          duplicateWarnings.output = outputCharacter.character;
+        }
+        duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 2);
       }
 
       if (amb_4_2.length > 0) {
-        warningText[0] = warningText[0]
-          + ("ambiguous rule: later: ["
-            + amb_4_2[0].modifierPrevDeadkey
-            + " "
-            + amb_4_2[0].prevDeadkey
-            + "]  >  dk(C"
-            + amb_4_2[0].idPrevDeadkey
-            + ") ");
+        ambiguousWarnings.compare_type = 'amb_4_2';
+        ambiguousWarnings.isEarlier = false;
+        ambiguousWarnings.dk_prefix = ['C', ''];
+        ambiguousWarnings.dk_id = [amb_4_2[0].idPrevDeadkey, amb_4_2[0].idDeadkey];
+        ambiguousWarnings.prevDk_modifier = amb_4_2[0].modifierPrevDeadkey;
+        ambiguousWarnings.prevDk_key = amb_4_2[0].prevDeadkey;
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 0);
       }
     }
+
 
     if (rule[index].ruleType === "C3") {
 
@@ -712,127 +1272,122 @@ export class KmnFileWriter {
       );
 
       // 6-6 dk(C11) + [SHIFT CAPS K_A]  >  'Ã'  <-> dk(C11) + [SHIFT CAPS K_A]  >  'Ã'
-      const dup_6_6 =
-        rule.filter((curr, idx) =>
-          (curr.ruleType === "C3")
-          && curr.idDeadkey === rule[index].idDeadkey
-          && curr.modifierKey === rule[index].modifierKey
-          && curr.key === rule[index].key
-          && (new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output))
-          && idx < index
-        );
+      const dup_6_6 = rule.filter((curr, idx) =>
+        (curr.ruleType === "C3")
+        && curr.idDeadkey === rule[index].idDeadkey
+        && curr.modifierKey === rule[index].modifierKey
+        && curr.key === rule[index].key
+        && (new TextDecoder().decode(curr.output) === new TextDecoder().decode(rule[index].output))
+        && idx < index
+      );
 
       if (amb_2_4.length > 0) {
-        warningText[0] = warningText[0]
-          + ("ambiguous rule: earlier: ["
-            + amb_2_4[0].modifierDeadkey
-            + " "
-            + amb_2_4[0].deadkey
-            + "]  >  dk(A"
-            + amb_2_4[0].idDeadkey
-            + ") ");
+        ambiguousWarnings.compare_type = 'amb_2_4';
+        ambiguousWarnings.isEarlier = true;
+        ambiguousWarnings.dk_prefix = ['', 'A'];
+        ambiguousWarnings.dk_id = [amb_2_4[0].idPrevDeadkey, amb_2_4[0].idDeadkey];
+        ambiguousWarnings.Dk_modifier = amb_2_4[0].modifierDeadkey;
+        ambiguousWarnings.Dk_key = amb_2_4[0].deadkey;
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 0);
       }
 
       if (amb_6_3.length > 0) {
-        warningText[1] = warningText[1]
-          + ("ambiguous rule: earlier: dk(C"
-            + amb_6_3[0].idDeadkey
-            + ") + ["
-            + amb_6_3[0].modifierKey
-            + " "
-            + amb_6_3[0].key
-            + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output)).character
-            + "\' ");
+        ambiguousWarnings.compare_type = 'amb_6_3';
+        ambiguousWarnings.isEarlier = true;
+        ambiguousWarnings.dk_prefix = ['', 'C'];
+        ambiguousWarnings.dk_id = [amb_6_3[0].idPrevDeadkey, amb_6_3[0].idDeadkey];
+        ambiguousWarnings.modifier = amb_6_3[0].modifierKey;
+        ambiguousWarnings.key = amb_6_3[0].key;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_3[0].output));
+        if (outputCharacter !== null) {
+          ambiguousWarnings.output = outputCharacter.character;
+        }
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 1);
       }
 
       if (dup_6_3.length > 0) {
-        warningText[1] = warningText[1]
-          + ("duplicate rule: earlier: dk(C"
-            + dup_6_3[0].idDeadkey
-            + ") + ["
-            + dup_6_3[0].modifierKey
-            + " "
-            + dup_6_3[0].key
-            + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output)).character
-            + "\' ");
+        duplicateWarnings.compare_type = 'dup_6_3';
+        duplicateWarnings.isEarlier = true;
+        duplicateWarnings.dk_prefix = ['', 'C'];
+        duplicateWarnings.dk_id = [dup_6_3[0].idPrevDeadkey, dup_6_3[0].idDeadkey];
+        duplicateWarnings.modifier = dup_6_3[0].modifierKey;
+        duplicateWarnings.key = dup_6_3[0].key;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_3[0].output));
+        if (outputCharacter !== null) {
+          duplicateWarnings.output = outputCharacter.character;
+        }
+        duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 1);
       }
 
       if (amb_4_4.length > 0) {
-        warningText[0] = warningText[0]
-          + ("ambiguous rule: earlier: ["
-            + amb_4_4[0].modifierPrevDeadkey
-            + " "
-            + amb_4_4[0].prevDeadkey
-            + "]  >  dk(C"
-            + amb_4_4[0].idPrevDeadkey
-            + ") ");
+        ambiguousWarnings.compare_type = 'amb_4_4';
+        ambiguousWarnings.isEarlier = true;
+        ambiguousWarnings.dk_prefix = ['C', ''];
+        ambiguousWarnings.dk_id = [amb_4_4[0].idPrevDeadkey, amb_4_4[0].idDeadkey];
+        ambiguousWarnings.prevDk_modifier = amb_4_4[0].modifierPrevDeadkey;
+        ambiguousWarnings.prevDk_key = amb_4_4[0].prevDeadkey;
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 0);
       }
 
       if (dup_4_4.length > 0) {
-        warningText[0] = warningText[0]
-          + ("duplicate rule: earlier: ["
-            + dup_4_4[0].modifierPrevDeadkey
-            + " "
-            + dup_4_4[0].prevDeadkey
-            + "]  >  dk(C"
-            + dup_4_4[0].idPrevDeadkey
-            + ") ");
+        duplicateWarnings.compare_type = 'dup_4_4';
+        duplicateWarnings.isEarlier = true;
+        duplicateWarnings.dk_prefix = ['C', ''];
+        duplicateWarnings.dk_id = [dup_4_4[0].idPrevDeadkey, dup_4_4[0].idDeadkey];
+        duplicateWarnings.prevDk_modifier = dup_4_4[0].modifierPrevDeadkey;
+        duplicateWarnings.prevDk_key = dup_4_4[0].prevDeadkey;
+        duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 0);
       }
 
       if (amb_5_5.length > 0) {
-        warningText[1] = warningText[1]
-          + ("ambiguous rule: earlier: dk(B"
-            + amb_5_5[0].idPrevDeadkey
-            + ") + ["
-            + amb_5_5[0].modifierDeadkey
-            + " "
-            + amb_5_5[0].deadkey
-            + "]  >  dk(B"
-            + amb_5_5[0].idDeadkey
-            + ") ");
+        ambiguousWarnings.compare_type = 'amb_5_5';
+        ambiguousWarnings.isEarlier = true;
+        ambiguousWarnings.dk_prefix = ['C', 'B'];
+        ambiguousWarnings.dk_id = [amb_5_5[0].idPrevDeadkey, amb_5_5[0].idDeadkey];
+        ambiguousWarnings.Dk_modifier = amb_5_5[0].modifierDeadkey;
+        ambiguousWarnings.Dk_key = amb_5_5[0].deadkey;
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings);
       }
 
       if (dup_5_5.length > 0) {
-        warningText[1] = warningText[1]
-          + ("duplicate rule: earlier: dk(B"
-            + dup_5_5[0].idPrevDeadkey
-            + ") + ["
-            + dup_5_5[0].modifierDeadkey
-            + " "
-            + dup_5_5[0].deadkey
-            + "]  >  dk(B"
-            + dup_5_5[0].idDeadkey
-            + ") ");
+        duplicateWarnings.compare_type = 'dup_5_5';
+        duplicateWarnings.isEarlier = true;
+        duplicateWarnings.dk_prefix = ['C', 'B'];
+        duplicateWarnings.dk_id = [dup_5_5[0].idPrevDeadkey, dup_5_5[0].idDeadkey];
+        duplicateWarnings.Dk_modifier = rule[index].modifierDeadkey;
+        duplicateWarnings.Dk_key = rule[index].deadkey;
+        duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 1);
       }
 
       if (amb_6_6.length > 0) {
-        warningText[2] = warningText[2]
-          + ("ambiguous rule: earlier: dk(B"
-            + amb_6_6[0].idDeadkey
-            + ") + ["
-            + amb_6_6[0].modifierKey
-            + " "
-            + amb_6_6[0].key
-            + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output)).character
-            + "\' ");
+        ambiguousWarnings.compare_type = 'amb_6_6';
+        ambiguousWarnings.isEarlier = true;
+        ambiguousWarnings.dk_prefix = ['', 'B'];
+        ambiguousWarnings.dk_id = [amb_6_6[0].idPrevDeadkey, amb_6_6[0].idDeadkey];
+        ambiguousWarnings.modifier = amb_6_6[0].modifierKey;
+        ambiguousWarnings.key = amb_6_6[0].key;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(amb_6_6[0].output));
+        if (outputCharacter !== null) {
+          ambiguousWarnings.output = outputCharacter.character;
+        }
+        ambiguousWarnings.warningMessages = this.createWarningText(ambiguousWarnings, 2);
       }
 
       if (dup_6_6.length > 0) {
-        warningText[2] = warningText[2]
-          + ("duplicate rule: earlier: dk(B"
-            + dup_6_6[0].idDeadkey
-            + ") + ["
-            + dup_6_6[0].modifierKey
-            + " "
-            + dup_6_6[0].key
-            + "]  >  \'"
-            + this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output)).character
-            + "\' ");
+        duplicateWarnings.compare_type = 'dup_6_6';
+        duplicateWarnings.isEarlier = true;
+        duplicateWarnings.dk_prefix = ['', 'B'];
+        duplicateWarnings.dk_id = [dup_6_6[0].idPrevDeadkey, dup_6_6[0].idDeadkey];
+        duplicateWarnings.modifier = dup_6_6[0].modifierKey;
+        duplicateWarnings.key = dup_6_6[0].key;
+        const outputCharacter = this.writeCharacterOrUnicode(new TextDecoder().decode(dup_6_6[0].output));
+        if (outputCharacter !== null) {
+          duplicateWarnings.output = outputCharacter.character;
+        }
+        duplicateWarnings.warningMessages = this.createWarningText(duplicateWarnings, 2);
       }
     }
+
     // In rare cases a rule might not be written out therefore we need to inform the user:
     // usually we write the first occurance of an ambiguous C0/C1 rule and comment out the later
     //    assuming that if several C0/C1 rules are ambiguous the user prefers to use the first C0/C1 rule
@@ -840,257 +1395,132 @@ export class KmnFileWriter {
     //    assuming that if a C0/C1 and a C2/C3 rule is ambiguous the user prefers to use the C2/C3 rule over the C0/C1 rule
     // if both happens, nothing would be written, therefore this messsage
 
-    const extraWarning = "PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN !  ";
+    const extraWarning = "PLEASE CHECK THE FOLLOWING RULE AS IT WILL NOT BE WRITTEN ! ";
 
-    if (warningText[0] !== "") {
-      warningText[0] = "c WARNING: " + warningText[0] + "here: ";
-
-      if ((warningText[0].indexOf("earlier:") > 0) && (warningText[0].indexOf("later:") > 0)) {
-        warningText[0] = warningText[0] + extraWarning;
-      }
-    }
-    if (warningText[1] !== "") {
-      warningText[1] = "c WARNING: " + warningText[1] + "here: ";
-
-      if ((warningText[1].indexOf("earlier:") > 0) && (warningText[1].indexOf("later:") > 0)) {
-        warningText[1] = warningText[1] + extraWarning;
+    for (let i = 0; i < 3; i++) {
+      if (ambiguousWarnings.warningMessages[i] !== "") {
+        if ((ambiguousWarnings.warningMessages[i].indexOf("earlier") > -1) && (ambiguousWarnings.warningMessages[i].indexOf("later") > -1)) {
+          ambiguousWarnings.warningMessages[i] = ambiguousWarnings.warningMessages[i] + extraWarning;
+        }
       }
     }
 
-    if (warningText[2] !== "") {
-      warningText[2] = "c WARNING: " + warningText[2] + "here: ";
+    for (let i = 0; i < 3; i++) {
+      const completeWarning =
+        unavailableSuperiWarnings.warningMessages[i]
+        + unavailableModiWarnings.warningMessages[i]
+        + duplicateWarnings.warningMessages[i]
+        + ambiguousWarnings.warningMessages[i];
 
-      if ((warningText[2].indexOf("earlier:") > 0) && (warningText[2].indexOf("later:") > 0)) {
-        warningText[2] = warningText[2] + extraWarning;
-      }
+      completeWarning ? (resultWarningTextSet.warningMessages[i] = "c WARNING: " + completeWarning) : resultWarningTextSet.warningMessages[i] = '';
+
     }
-    return warningText;
+
+    return resultWarningTextSet;
   }
 
   /**
-  * @brief  member function to write a character as Unicode Character or Unicode Codepoint depending on the character that is to be written
-  * @param  ctr : string - the character to be written
-  * @return a string containing the Unicode representation of the control character.
-  *         A control character will be written as unicode (U+0004),
-  *         a non-control character will be written as itself ( 'A', '1', '፩', '😎')
-  *         null in case of an empty string or null or undefined input
-  */
-  public writeCharacterOrUnicode(ctr: string, msg: string = ""): messageCharacter {
+   * @brief member function to write a character as Unicode Character or Unicode Codepoint depending on the character that is to be written
+   * @param ctr : string - the character to be written
+   * @param msg a msg from a previous step to which another message my be concatenated
+   * @returns  an object containing the Unicode representation of the control character along with a message.
+   * character may be a control character will be written as unicode (U+0004),
+   *                  a non-control character will be written as itself ( 'A', '1', '፩', '😎')
+   *                  null in case of an empty string or null or undefined input
+   */
+  private writeCharacterOrUnicode(ctr: string, msg: string = ""): MessageCharacter | null {
 
-    if ((ctr === null) || (ctr === undefined) || (ctr.length === 0)) {
+    if ((ctr === null) || (ctr === undefined)) {
       return null;
     }
 
+    let msg_control = '';
+    let msg_entity = '';
     let versionOutputCharacter;
-    const out: messageCharacter = {
+    const out: MessageCharacter = {
       message: msg,
       character: ctr
     };
 
-    const m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(ctr);
-    const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(ctr);
-    const m_dec = /^&#([0-9]{1,7});$/.exec(ctr);
+    const m_uni = UnicodeCharacterConversion.re_uni.exec(ctr);
+    const m_hex = UnicodeCharacterConversion.re_hex.exec(ctr);
+    const m_dec = UnicodeCharacterConversion.re_dec.exec(ctr);
 
     // find the value of output character which may be specified in unicode, html hex or html dec format ( e.g. U+1234 -> 1234; &#x1234; -> 1234; &#4660; -> 1234)
-    const ctr_val = ((m_uni || m_hex || m_dec) ?
-      m_uni ? parseInt(m_uni[1], 16) : m_hex ? parseInt(m_hex[1], 16) : parseInt(m_dec[1], 10) : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
+    const ctr_val = (
+      m_uni
+        ? parseInt(m_uni[1], 16)
+        : m_hex
+          ? parseInt(m_hex[1], 16)
+          : m_dec
+            ? parseInt(m_dec[1], 10)
+            : KeylayoutToKmnConverter.MAX_CTRL_CHARACTER
     );
 
-    // for control charactersin 'U+...', '&#x...' or '&#...' format as well as in "" format
+    if (ctr.length === 0) {
+      msg_entity = "empty output or unsupported numerical html entity ";
+    }
+
+    // for control characters in 'U+...', '&#x...' or '&#...' format
     if ((ctr_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) || (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER)) {
 
       // for control characters in 'U+...', '&#x...'  or '&#...' format
       if (ctr_val < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
         versionOutputCharacter = "U+" + ctr_val.toString(16).toUpperCase().padStart(4, '0');
       }
-      // for control characters in "" format
+      // for other control characters
       if (ctr.charCodeAt(0) < KeylayoutToKmnConverter.MAX_CTRL_CHARACTER) {
         versionOutputCharacter = "U+" + ctr.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0');
       }
       if (versionOutputCharacter)
         out.character = versionOutputCharacter;
 
-      // add a warning message
-      if (msg == "") {
-        out.message = "c WARNING: use of a control character ";
-      }
-      else {
-        out.message = msg + "; Use of a control character ";
-      }
+      msg_control = "Use of a control character ";
     }
     else {
-      out.character = this.convertToUnicodeCharacter(ctr);;
+      const xmlOutputData: ReplacedOutputString = {
+        input: ctr as string,
+        replaced_character: '',
+        replaced_string: '',
+        rest_string: ctr as string,
+        carryOver: ''
+      };
+      out.character = (UnicodeCharacterConversion.processXmlValue(xmlOutputData)).replaced_string ?? "";
+
+      // msg if a possibly invalid html will be written e.g. &commat; &gt &123 &abc &#x1234
+      if ((out.character.indexOf('&') > -1) && (out.character.length > 1)) {
+        msg_entity = msg_entity + "specified string might not be a valid html entity ";
+      }
+      if ((out.character.indexOf('U+') > -1) && (out.character.length > 2)) {
+        msg_entity = msg_entity + "invalid Unicode code point used ";
+      }
     }
+
+    // add a warning message
+    if (msg !== "") {
+      msg = msg + msg_control + msg_entity;
+    }
+
+    // add a warning message with 'c WARNING' in front
+    if ((msg === "") && (msg_entity !== "" || msg_control !== "")) {
+      msg = "c WARNING: " + msg_entity + msg_control;
+    }
+    out.message = msg;
+
     return out;
   }
 
-  // TODO: move to util in PR 14569
-  /**
-   * @brief  function to convert a numeric character reference or a unicode value to a unicode character e.g. &#x63 -> c;  U+1F60E -> 😎
-   * @param  inputString the value that will converted
-   * @return a unicode character like 'c', 'ሴ', '😎' or undefined if inputString is not recognized
-   */
-  public convertToUnicodeCharacter_old(inputString: string): string {
-
-
-    // null, undefined will later be refused for conversion
-    if (inputString == null || inputString == undefined) {
-      return undefined;
-    }
-
-    //  U+ followed by 1.-6. hex digits will later be used for conversion
-    const m_uni = /^U\+([0-9a-f]{1,6})$/i.exec(inputString);
-
-    // invalid U+ ( U+ followed by anything) will later be refused for conversion
-    const m_uni_inv = /^(U\+)+(.?)+$/i.exec(inputString);
-
-    // &#x followed by 1.-6. hex digits will later be used for conversion
-    const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(inputString);
-
-    // &# followed by 1.-6. decimal digits will later be used for conversion
-    const m_dec = /^&#([0-9]{1,7});$/.exec(inputString);
-
-    // & followed by gt, lt, quot, amp, apos will later be used for conversion
-    const m_nam = /^&(gt|lt|quot|amp|apos);$/i.exec(inputString);
-
-    //  &# followed by anything will later be refused for conversion
-    const m_html_inv = /^(&#)+(.?)+$/i.exec(inputString);
-
-    // one or more characters except starting with U+ or & will later be used for conversion
-    const m_chr = /^(?!U\+|&).+$/i.exec(inputString);
-
-    // '&', '&#','&#x', or 'U+' with or without ; will later be refused for conversion
-    const m_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+|(U\+)+;?)$|^$/i.exec(inputString);
-
-    // valid 'U+xxxx'
-    if (m_uni) {
-      const codePoint_u = parseInt(m_uni[1], 16);
-      // Reject surrogates and invalid codepoints
-      if ((codePoint_u >= 0xD800 && codePoint_u <= 0xDFFF) || codePoint_u > 0x10FFFF) {
-        return undefined;
-      }
-      return String.fromCodePoint(codePoint_u);
-    }
-
-    // invalid 'U+xxxx'
-    else if (m_uni_inv) {
-      return undefined;
-    }
-
-    // valid '&#x...'
-    else if (m_hex) {
-      const codePoint_h = parseInt(m_hex[1], 16);
-      // Reject surrogates and invalid codepoints
-      if ((codePoint_h >= 0xD800 && codePoint_h <= 0xDFFF) || codePoint_h > 0x10FFFF) {
-        return undefined;
-      }
-      return String.fromCodePoint(codePoint_h);
-    }
-    // valid '&#...'
-    else if (m_dec) {
-      const codePoint_d = parseInt(m_dec[1], 10);
-      // Reject surrogates and invalid codepoints
-      if ((codePoint_d >= 0xD800 && codePoint_d <= 0xDFFF) || codePoint_d > 0x10FFFF) {
-        return undefined;
-      }
-      return String.fromCodePoint(codePoint_d);
-    }
-    // valid '&gt', '&lt',..
-    else if (m_nam) {
-      switch (m_nam[1].toLowerCase()) {
-        case 'gt': return '>';
-        case 'lt': return '<';
-        case 'quot': return '"';
-        case 'amp': return '&';
-        case 'apos': return "'";
-        default: return undefined;
-      }
-    }
-    // invalid  '&...'
-    else if (m_html_inv) {
-      return undefined;
-    }
-
-    // single 'U+', '&', ''
-    else if (m_chr_inv) {
-      return inputString;
-    }
-
-    // if no matches so far, check for one or more characters ('a','ab', 'ẘ','😎', '😎😎',  )
-    else if (m_chr) {
-      return inputString;
-    }
-    return undefined;
-  }
-  public convertToUnicodeCharacter(inputString: string): string {
-
-
-    // null, undefined will later be refused for conversion
-    if (inputString == null || inputString == undefined) {
-      return undefined;
-    }
-
-    // &#x followed by 1.-6. hex digits will later be used for conversion
-    const m_hex = /^&#x([0-9a-f]{1,6});$/i.exec(inputString);
-
-    // &# followed by 1.-6. decimal digits will later be used for conversion
-    const m_dec = /^&#([0-9]{1,7});$/.exec(inputString);
-
-    // & followed by gt, lt, quot, amp, apos will later be used for conversion
-    const m_nam = /^&(gt|lt|quot|amp|apos);$/i.exec(inputString);
-
-    //  &# followed by anything will later be refused for conversion
-    const m_html_inv = /^(&#)+(.?)+$/i.exec(inputString);
-
-    // one or more characters except starting with & will later be used for conversion
-    const m_chr = /^(?!&).+$/i.exec(inputString);
-
-    // '&', '&#','&#x' with or without ; will later be refused for conversion
-    const m_chr_inv = /^((&;?)+|(&#;?)+|(&#x;?)+;?)$|^$/i.exec(inputString);
-
-    // valid '&#x...'
-    if (m_hex) {
-      const codePoint_h = parseInt(m_hex[1], 16);
-      // Reject surrogates and invalid codepoints
-      if ((codePoint_h >= 0xD800 && codePoint_h <= 0xDFFF) || codePoint_h > 0x10FFFF) {
-        return undefined;
-      }
-      return String.fromCodePoint(codePoint_h);
-    }
-    // valid '&#...'
-    else if (m_dec) {
-      const codePoint_d = parseInt(m_dec[1], 10);
-      // Reject surrogates and invalid codepoints
-      if ((codePoint_d >= 0xD800 && codePoint_d <= 0xDFFF) || codePoint_d > 0x10FFFF) {
-        return undefined;
-      }
-      return String.fromCodePoint(codePoint_d);
-    }
-    // valid '&gt', '&lt',..
-    else if (m_nam) {
-      switch (m_nam[1].toLowerCase()) {
-        case 'gt': return '>';
-        case 'lt': return '<';
-        case 'quot': return '"';
-        case 'amp': return '&';
-        case 'apos': return "'";
-        default: return undefined;
-      }
-    }
-    // invalid  '&...'
-    else if (m_html_inv) {
-      return undefined;
-    }
-
-    // single '&', ''
-    else if (m_chr_inv) {
-      return inputString;
-    }
-
-    // if no matches so far, check for one or more characters ('a','ab', 'ẘ','😎', '😎😎',  )
-    else if (m_chr) {
-      return inputString;
-    }
-    return undefined;
-  }
+  // TODO-kmc-convert put all functions here that are needed for unit tests
+  // and make them private.
+  // Then create a public unitTestEndpoints object that exposes
+  // the functions needed for unit tests.
+  /** @internal */
+  public unitTestEndpoints = {
+    writeKmnFileHeader: this.writeKmnFileHeader.bind(this),
+    writeDataRules: this.writeDataRules.bind(this),
+    createWarningText: this.createWarningText.bind(this),
+    reviewRules: this.reviewRules.bind(this),
+    writeCharacterOrUnicode: this.writeCharacterOrUnicode.bind(this),
+  };
 }
+

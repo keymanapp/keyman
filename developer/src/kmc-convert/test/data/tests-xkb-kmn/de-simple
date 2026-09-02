@@ -4,7 +4,7 @@
 default xkb_symbols "basic" {
 
     key <AE01>	{ [         1,     exclam,  onesuperior,   exclamdown ]	}; 
-	key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};
+    key <AE02>	{ [         2,   quotedbl,  twosuperior,    oneeighth ]	};
     key <AE03>	{ [         3,    section, threesuperior,    sterling ]	};
     key <AE04>	{ [         4,     dollar,   onequarter,     currency ]	};
     key <AE05>	{ [         5,    percent,      onehalf, threeeighths ]	};

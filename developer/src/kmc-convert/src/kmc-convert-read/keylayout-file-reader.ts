@@ -24,7 +24,7 @@ export class KeylayoutFileReader {
    * @param  keyMapSelect the keyMapSelect element to find in keyMapSet
    * @return true if the keyMapSet element is found, false if not
    */
-  public findMapIndexinKeymap(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMapSelect: KL_KeyMapSelect): boolean {
+  private findMapIndexinKeymap(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMapSelect: KL_KeyMapSelect): boolean {
     for (const keyMapSet of jsonObj.keyboard.keyMapSet) {
       for (const keyMap of keyMapSet.keyMap) {
         if (keyMap['index'] === keyMapSelect.mapIndex) {
@@ -41,7 +41,7 @@ export class KeylayoutFileReader {
    * @param  keyMap the keyMap element to find in modifierMap
    * @return true if the keyMap element is found, false if not
    */
-  public findIndexinKeymapSelect(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMap: KL_KeyMap): boolean {
+  private findIndexinKeymapSelect(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMap: KL_KeyMap): boolean {
     for (const modifierMap of jsonObj.keyboard.modifierMap) {
       for (const keyMapSelect of modifierMap.keyMapSelect) {
         if (keyMapSelect['mapIndex'] === keyMap.index) {
@@ -59,7 +59,7 @@ export class KeylayoutFileReader {
    * @param  jsonObj the read keylayout data to be checked
    * @return true if all keyMapSelect elements have a corresponding keyMap element, false if not
    */
-  public checkForCorrespondingElements(jsonObj: Keylayout.KeylayoutXMLSourceFile): boolean {
+  private checkForCorrespondingElements(jsonObj: Keylayout.KeylayoutXMLSourceFile): boolean {
     let available = true;
 
     // check if all keyMapSelect elements have a corresponding keyMap element in the .keylayout file
@@ -104,7 +104,7 @@ export class KeylayoutFileReader {
    * @param  source the object to be changed
    * @return object that contain only boxed arrays
    */
-  public boxArray(source: any) {
+  private boxArray(source: any) {
 
     boxXmlArray(source, 'modifierMap');
 
@@ -162,7 +162,7 @@ export class KeylayoutFileReader {
       return jsonObj;
     }
     catch (err) {
-      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead());
+      this.callbacks.reportMessage(ConverterMessages.Error_UnableToRead({ errorText: (err as Error).message }));
       return null;
     }
   }

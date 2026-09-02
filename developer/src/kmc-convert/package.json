@@ -29,8 +29,9 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/developer-utils": "*",
+    "@electron-wm/keysym": "^0.0.6",
     "@keymanapp/common-types": "*",
+    "@keymanapp/developer-utils": "*",
     "@keymanapp/keyman-version": "*"
   },
   "devDependencies": {

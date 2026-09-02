@@ -8,6 +8,7 @@ default xkb_symbols "basic" {
     key <AE03>	{ [         3,    section, threesuperior,    sterling ]	};
     key <AE04>	{ [         4,     dollar,   onequarter,     currency ]	};
 
+    //key <AE11> {[ssharp, question, backslash, questiondown ]};
     key <AE11> {type[Group1]="FOUR_LEVEL_PLUS_LOCK",  symbols[Group1]=
                   [ssharp, question, backslash, questiondown, 0x1001E9E ]};
     key <AE12>	{ [dead_acute, dead_grave, dead_cedilla,  dead_ogonek ]	};
