@@ -41,7 +41,7 @@ uses
   System.UITypes,
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, Menus, ToolWin, ComCtrls, ImgList, ErrorControlledRegistry,
-  RegistryKeys, UfrmMDIChild, MenuImgList, Printers,
+  RegistryKeys, UfrmMDIChild, MenuImgList,
   UfrmKeyTest,
 
   Keyman.Developer.System.Project.ProjectFile, UfrmMDIEditor,
@@ -54,11 +54,9 @@ type
   TUPCOptions = set of (upcSetError, upcClearError, upcSetBreakPoint, upcClearBreakPoint,
     upcSetExecutionPoint, upcClearExecutionPoint);
 
-  TfrmEditor = class(TfrmTikeEditor, IKMDPrintActions {TODO:, IKMDPrintPreviewActions})
+  TfrmEditor = class(TfrmTikeEditor)
     lstImages: TMenuImgList;
     dlgFonts: TFontDialog;
-    dlgPrint: TPrintDialog;
-    dlgPrintSetup: TPrinterSetupDialog;
     dlgFind: TFindDialog;
     dlgReplace: TReplaceDialog;
     lstImagesDisabled: TImageList;
@@ -73,10 +71,6 @@ type
     procedure SetTextFileFormat(const Value: TTextFileFormat);
     procedure UpdateEditorFormat;
 
-    { IKMDPrintActions }
-    function PrintFile: Boolean;
-    { IKMDPrintPreviewActions }
-    //TODO: function PrintPreview: Boolean;
     procedure EditorChanged(Sender: TObject);
     function GetEditorFormat: TEditorFormat;
     function GetTextFileFormat: TTextFileFormat;
@@ -298,11 +292,6 @@ begin
   frmKeymanDeveloper.cbTextFileFormat.ItemIndex := Ord(TextFileFormat);
 
   Modified := False;
-end;
-
-function TfrmEditor.PrintFile: Boolean;
-begin
-  Result := FEditorFrame.PrintFile(FileName);
 end;
 
 {-------------------------------------------------------------------------------

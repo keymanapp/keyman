@@ -896,22 +896,36 @@ end;
 procedure TfrmCharacterMapNew.gridMouseWheelDown(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
+  Handled := True;
   if ssCtrl in Shift then
   begin
-    Handled := True;
+    // Zoom
     if tbSize.Position < tbSize.Max then
       tbSize.Position := tbSize.Position + tbSize.PageSize;
+  end
+  else
+  begin
+    // Scroll
+    if grid.TopRow < grid.RowCount - grid.VisibleRowCount then
+      grid.TopRow := grid.TopRow + 1;
   end;
 end;
 
 procedure TfrmCharacterMapNew.gridMouseWheelUp(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
+  Handled := True;
   if ssCtrl in Shift then
   begin
-    Handled := True;
+    // Zoom
     if tbSize.Position > tbSize.Min then
       tbSize.Position := tbSize.Position - tbSize.PageSize;
+  end
+  else
+  begin
+    // Scroll
+    if grid.TopRow > 0 then
+      grid.TopRow := grid.TopRow - 1;
   end;
 end;
 

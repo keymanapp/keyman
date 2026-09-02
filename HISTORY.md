@@ -1,5 +1,28 @@
 # Keyman Version History
 
+## 19.0.277 alpha 2026-09-01
+
+* fix(developer): handle comment without trailing whitespace (#16479)
+* fix(developer): improve scroll wheel behavior in Character Map (#16474)
+* fix(developer): call 'Show Console' twice to make the console actually show on first use (#16483)
+* fix(developer): use path not dependent on pwd for starting Server (#16476)
+* chore(developer): remove duplicated versioning information from Server (#16478)
+* fix(developer): handle leading delimiters correctly in `u16tok()` (#16446)
+* chore(android): upload webview source map during android and ios build (#16449)
+* refactor(windows): rename `GetCapsAndNumlockState()` to `RefreshModifierState()` (#16444)
+* chore(developer): strip out defunct printing support (#16480)
+* fix(developer): make tool windows non-topmost when TIKE is deactivated (#16482)
+* fix(windows): simplify keyboard refresh and make it more on-demand (#16435)
+* refactor(windows): cleanup unused wm_keyman_control values (#16439)
+* maint(windows): remove `koSwitchLanguageForAllApplications`, `koAutoSwitchOSKPages`, osVista, osWin7, osWin8, cleanup (#16443)
+* change(developer): deprecate `fix`, `clearcontext`, bump max .kmx version to 19.0 (#16445)
+* fix(developer): add missing message parameters and cleanup kmc-kmn messages further (#16493)
+
+## 19.0.276 alpha 2026-08-28
+
+* fix(windows): add manifest to insthelper and set trustinfo to asInvoker (#16430)
+* fix(windows): resync caps lock state when Keyman keyboard is activated (#16423)
+
 ## 19.0.275 alpha 2026-08-27
 
 * docs(mac): refresh build/setup docs and remove APPSTORECONNECT_PROVIDER (#16432)

@@ -95,6 +95,12 @@ BOOL isKeymanKeyboardActive = FALSE;
 static DWORD dwTlsIndex = TLS_OUT_OF_INDEXES;
 static CRITICAL_SECTION csGlobals;
 
+// In order that every thread starts off needing a refresh, we set the starting
+// refresh tag to 1, but the thread-level refresh tag will be 0 (initialized by
+// `LocalAlloc(LPTR)`)
+#define INITIAL_GLOBAL_REFRESH_TAG  1
+#define INITIAL_THREAD_REFRESH_TAG  0
+
 PKEYMAN64THREADDATA Globals_InitThread()
 {
   EnterCriticalSection(&csGlobals);
@@ -269,9 +275,13 @@ static wchar_t
 __declspec(align(8)) static UINT
   f_vk_prefix = 0;
 
-#ifndef _WIN64
 __declspec(align(8)) static LONG
-  f_RefreshTag = 0;
+  f_RefreshTag = INITIAL_GLOBAL_REFRESH_TAG;
+
+#ifndef _WIN64
+__declspec(align(8)) static HWND
+  f_hwndHostX64 = 0,
+  f_hwndHostARM64 = 0;
 #endif
 
 static BOOL
@@ -310,8 +320,15 @@ DWORD *Globals::InitialisingThread()  { return &f_InitialisingThread; }   // I43
 
 DWORD *Globals::ShiftState()          { return &f_ShiftState;         }
 
-#ifndef _WIN64
 LONG *Globals::RefreshTag()           { return &f_RefreshTag;         }
+LONG Globals::get_RefreshTag()        { return f_RefreshTag;          }
+
+#ifndef _WIN64
+HWND Globals::get_hwndHostX64()       { return f_hwndHostX64;         }
+HWND *Globals::hwndHostX64()          { return &f_hwndHostX64;        }
+
+HWND Globals::get_hwndHostARM64()     { return f_hwndHostARM64;       }
+HWND *Globals::hwndHostARM64()        { return &f_hwndHostARM64;      }
 #endif
 
 HHOOK Globals::get_hhookCallWndProc()   { return f_hhookCallWndProc;   }
@@ -436,8 +453,10 @@ BOOL Globals::ResetControllers()  // I3092
   f_FSingleThread = FALSE;
   f_hwndIM = 0;
 	f_hwndIMAlways = 0;
+  f_RefreshTag = INITIAL_GLOBAL_REFRESH_TAG;
 #ifndef _WIN64
-  f_RefreshTag = 0;
+  f_hwndHostX64 = NULL;
+  f_hwndHostARM64 = NULL;
 #endif
 
   Globals::Unlock();

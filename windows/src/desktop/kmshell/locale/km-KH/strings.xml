@@ -343,10 +343,6 @@
   <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">បង្ហាញ \"ក្ដារចុចលើអេក្រង់\" ជា​និច្ច នៅពេល​បាន​ជ្រើសរើស​ក្ដារចុច Keyman</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">ប្ដូរ​ទៅ \"ក្ដារចុច​លើអេក្រង់/ជំនួយ\" ដែល​ពាក់ព័ន្ធ​ដោយ​ស្វ័យប្រវត្តិ នៅពេល​ក្ដារចុច​ណាមួយត្រូវ​បាន​ជ្រើសរើស​</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">ការប្រមូល​ព័ត៌មានសម្រាប់​ដោះស្រាយ​បញ្ហា</string>
   <!-- Context: Configuration Dialog - Options tab -->

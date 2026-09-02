@@ -8,7 +8,7 @@
   </keys>
 
   <layers formId="us">
-    <layer modifiers="none" id="base">
+    <layer modifiers="none">
       <row keys="caret umlaut" />
       <row keys="q w e r t y" />
       <row keys="a" />

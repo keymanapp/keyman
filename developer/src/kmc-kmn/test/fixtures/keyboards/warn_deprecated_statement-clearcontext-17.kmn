@@ -1,0 +1,8 @@
+store(&NAME) 'warn_deprecated_statement-clearcontext-17'
+store(&VERSION) '17.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ 'x' > clearcontext

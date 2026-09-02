@@ -287,10 +287,6 @@ inherited frameTextEditor: TframeTextEditor
     Left = 450
     Top = 30
   end
-  object dlgPrintSetup: TPrinterSetupDialog
-    Left = 526
-    Top = 30
-  end
   object lstImagesDisabled: TImageList
     Left = 618
     Top = 26
