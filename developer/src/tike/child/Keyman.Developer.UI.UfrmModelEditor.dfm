@@ -418,12 +418,12 @@ inherited frmModelEditor: TfrmModelEditor
             OnClick = lbDebugHostsClick
           end
           object cmdSendURLsToEmail: TButton
-            Left = 127
+            Left = 253
             Top = 286
             Width = 109
             Height = 25
             Caption = 'Send to &email...'
-            TabOrder = 6
+            TabOrder = 7
             OnClick = cmdSendURLsToEmailClick
           end
           object editTestKeyboard: TEdit
@@ -444,12 +444,12 @@ inherited frmModelEditor: TfrmModelEditor
             OnClick = cmdBrowseTestKeyboardClick
           end
           object cmdCopyDebuggerLink: TButton
-            Left = 242
+            Left = 127
             Top = 286
             Width = 109
             Height = 25
             Caption = 'Copy &link'
-            TabOrder = 7
+            TabOrder = 6
             OnClick = cmdCopyDebuggerLinkClick
           end
           object cmdConfigureWebDebugger: TButton
