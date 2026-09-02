@@ -183,6 +183,7 @@ public class InputMethodUtil {
       success = true
     } catch {
       Logger.setup.error("error requesting Accessibility from input method: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("error requesting Accessibility from input method: \(error as NSError)", category: .setup)
     }
     
     return success
@@ -197,7 +198,7 @@ public class InputMethodUtil {
    */
   func invokeKeymanInputMethodCheckAccess() throws {
     Logger.setup.info("invokeKeymanInputMethodCheckAccess()")
-
+    LogUtil.infoBreadcrumb("invokeKeymanInputMethodCheckAccess()", category: .setup)
     // because we are launching Keyman with a specific command line argument
     // for this request, we must kill it first
     _ = self.killKeymanInputMethod()
@@ -214,6 +215,7 @@ public class InputMethodUtil {
     if let executableUrl = self.pathUtil.buildInputMethodExecutableUrl(fileName: self.keymanInputMethodApplicationName) {
       process.executableURL = executableUrl
       Logger.setup.info("invoking Keyman at: \(String(describing: process.executableURL), privacy: .public)")
+      LogUtil.infoBreadcrumb("invoking Keyman at: \(String(describing: process.executableURL))", category: .setup)
       process.arguments = [argument]
     }
     
@@ -228,6 +230,7 @@ public class InputMethodUtil {
       result = Int(process.terminationStatus)
     } catch {
       Logger.setup.error("Failed to run process: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("Failed to run process: \(error as NSError)", category: .setup)
     }
     
     return result
@@ -244,12 +247,14 @@ public class InputMethodUtil {
     
     guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
       Logger.setup.error("launchKeymanInputMethodAsSeparateProcess, failed to create input method url")
+      LogUtil.errorBreadcrumb("launchKeymanInputMethodAsSeparateProcess, failed to create input method url", category: .setup)
       throw KeymanInvocationError.inputMethodNotFound
     }
     
     NSWorkspace.shared.openApplication(at: inputMethodUrl, configuration: openConfig) { (app, error) in
       if let error = error {
         Logger.setup.error("Could not launch Keyman input method at \(inputMethodUrl), due to error: \(error as NSError, privacy: .public)")
+        LogUtil.errorBreadcrumb("Could not launch Keyman input method at \(inputMethodUrl), due to error: \(error as NSError)", category: .setup)
       }
     }
   }
@@ -263,6 +268,7 @@ public class InputMethodUtil {
       try self.invokeKeymanInputMethodCheckAccess()
     } catch {
       Logger.setup.error("invoking Keyman failed: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("invoking Keyman failed: \(error as NSError)", category: .setup)
     }
     
     let timeStyle = Date.FormatStyle()
@@ -309,6 +315,7 @@ public class InputMethodUtil {
     guard let sources = inputSourceList?.takeRetainedValue() as? [TISInputSource],
           let targetSource = sources.first else {
       Logger.setup.error("Could not find the specified input source with bundleID: \(bundleId, privacy: .public)")
+      LogUtil.errorBreadcrumb("Could not find the specified input source with bundleID: \(bundleId)", category: .setup)
      return(nil)
     }
     
@@ -328,14 +335,17 @@ public class InputMethodUtil {
         if let inputMethodEnabled = Unmanaged<AnyObject>.fromOpaque(cfType).takeUnretainedValue() as? Bool {
           enabled = inputMethodEnabled
           Logger.setup.info("isInputMethodEnabled: \(enabled)")
+          LogUtil.infoBreadcrumb("isInputMethodEnabled: \(enabled)", category: .setup)
         } else {
           Logger.setup.error("Could not read retrieved enabled property for bundleId: \(bundleId, privacy: .public)")
+          LogUtil.errorBreadcrumb("Could not read retrieved enabled property for bundleId: \(bundleId)", category: .setup)
         }
       } else {
         Logger.setup.error("Failed to get enabled property for bundleId: \(bundleId, privacy: .public)")
       }
     } else {
       Logger.setup.error("Failed to get input source for bundleId: \(bundleId, privacy: .public)")
+      LogUtil.errorBreadcrumb("Failed to get input source for bundleId: \(bundleId)", category: .setup)
     }
     return enabled
   }
@@ -349,6 +359,7 @@ public class InputMethodUtil {
     
     guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
       Logger.setup.error("registerInputMethod, failed to create input method url for bundleId: \(bundleId, privacy: .public)")
+      LogUtil.errorBreadcrumb("registerInputMethod, failed to create input method url for bundleId: \(bundleId)", category: .setup)
       return false
     }
     let cfUrl = inputMethodUrl as CFURL
@@ -360,6 +371,7 @@ public class InputMethodUtil {
       Logger.setup.log("registerInputMethod for bundle ID '\(bundleId, privacy: .public)': success")
     } else {
       Logger.setup.error("registerInputMethod for bundle ID '\(bundleId, privacy: .public)' failed, result = \(result)")
+      LogUtil.errorBreadcrumb("registerInputMethod for bundle ID '\(bundleId)' failed, result = \(result)", category: .setup)
     }
     
     return success
@@ -377,6 +389,7 @@ public class InputMethodUtil {
         Logger.setup.log("enableInputMethod for bundle ID '\(bundleId, privacy: .public)': success")
       } else {
         Logger.setup.error("enableInputMethod for bundle ID '\(bundleId, privacy: .public)' failed, result = \(result)")
+        LogUtil.errorBreadcrumb("enableInputMethod for bundle ID '\(bundleId)' failed, result = \(result)", category: .setup)
       }
     }
     return success
@@ -394,6 +407,7 @@ public class InputMethodUtil {
         Logger.setup.log("disableInputMethod for bundle ID '\(bundleId, privacy: .public)': success")
       } else {
         Logger.setup.error("disableInputMethod for bundle ID '\(bundleId, privacy: .public)' failed, result = \(result)")
+        LogUtil.errorBreadcrumb("disableInputMethod for bundle ID '\(bundleId)' failed, result = \(result)", category: .setup)
       }
     }
     return success
@@ -428,12 +442,14 @@ public class InputMethodUtil {
     guard let sources = inputSourceList?.takeRetainedValue() as? [TISInputSource],
           let targetSource = sources.first else {
       Logger.setup.error("Error: Could not find the input source '\(inputSourceId, privacy: .public)'.")
+      LogUtil.errorBreadcrumb("Error: Could not find the input source '\(inputSourceId)", category: .setup)
       return false
     }
     
     let result = TISSelectInputSource(targetSource)
     if result != noErr {
       Logger.setup.error("Error selecting input source '\(inputSourceId, privacy: .public)'.")
+      LogUtil.errorBreadcrumb("Error selecting input source '\(inputSourceId)", category: .setup)
      return false
     } else {
       Logger.setup.log("Successfully selected input source '\(inputSourceId, privacy: .public)'.")

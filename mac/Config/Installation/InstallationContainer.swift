@@ -186,6 +186,7 @@ public class InstallationContainer : ObservableObject {
     guard let state = self.installationState else { return nil }
     guard self.installationPhase.hasTasks else {
       Logger.app.error("the installation phase \(self.installationPhase.rawValue, privacy: .public) has no tasks")
+      LogUtil.errorBreadcrumb("the installation phase \(self.installationPhase.rawValue) has no tasks", category: .app)
       return nil
     }
 
@@ -217,6 +218,7 @@ public class InstallationContainer : ObservableObject {
     guard self.installationState != nil else { return }
     guard self.installationPhase.hasTasks else {
       Logger.app.error("executeTask: the installation phase \(self.installationPhase.rawValue) has no tasks")
+      LogUtil.errorBreadcrumb("executeTask: the installation phase \(self.installationPhase.rawValue) has no tasks", category: .app)
       return
     }
 

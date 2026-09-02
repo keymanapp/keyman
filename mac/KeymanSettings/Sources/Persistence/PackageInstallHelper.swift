@@ -105,6 +105,7 @@ public class PackageInstallHelper: Identifiable {
     } catch {
       self.cleanupFailedInstallation()
       Logger.data.error("package installation failed for \(kmpFileUrl) with error: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("package installation failed for \(kmpFileUrl) with error: \(error as NSError)", category: .data)
       throw error
     }
   }
@@ -114,6 +115,7 @@ public class PackageInstallHelper: Identifiable {
    */
   public func installPackage() throws {
     Logger.data.info ("installPackage \(self.packageToInstall?.packageName ?? "unknown package", privacy: .public)")
+    LogUtil.infoBreadcrumb("installPackage \(self.packageToInstall?.packageName ?? "unknown package")", category: .data)
 
     // prepareToInstall will always set this
     guard let installationType = self.packageInstallationType else {
@@ -147,12 +149,15 @@ public class PackageInstallHelper: Identifiable {
       
       if comparisonResult == .orderedAscending {
         Logger.data.info("package downgrade: new version is older than existing version")
+        LogUtil.infoBreadcrumb("package downgrade: new version is older than existing version", category: .data)
         installationType =  PackageInstallationType.replaceNewerPackage(newPackage.packageName, existingVersion, newVersion)
       } else if comparisonResult == .orderedDescending {
         Logger.data.info("package upgrade: new version is newer than existing version")
+        LogUtil.infoBreadcrumb("package upgrade: new version is newer than existing version", category: .data)
         installationType = PackageInstallationType.replaceOlderPackage(newPackage.packageName, existingVersion, newVersion)
       } else {
         Logger.data.info("new and existing package versions are identical")
+        LogUtil.infoBreadcrumb("new and existing package versions are identical", category: .data)
         installationType = PackageInstallationType.replaceSameVersionPackage(newPackage.packageName)
       }
     }
@@ -189,6 +194,7 @@ public class PackageInstallHelper: Identifiable {
         // if a font fails to install, log error and continue
         guard self.validateFont(at: fontUrl) else {
           Logger.data.error("error: the font \(fontUrl.lastPathComponent, privacy: .public) is not valid")
+          LogUtil.errorBreadcrumb("error: the font \(fontUrl.lastPathComponent) is not valid", category: .data)
           continue
         }
         do {
@@ -196,6 +202,7 @@ public class PackageInstallHelper: Identifiable {
           try self.registerFontWithSystem(at: fontUrl)
         } catch {
           Logger.data.error("error: the font \(fontUrl.lastPathComponent, privacy: .public) could not be installed with error: \(error as NSError, privacy: .public)")
+          LogUtil.errorBreadcrumb("error: the font \(fontUrl.lastPathComponent) could not be installed with error: \(error as NSError)", category: .data)
         }
       }
     }
@@ -222,12 +229,14 @@ public class PackageInstallHelper: Identifiable {
     
     // remove the font from the fonts directory just in case it is an old one
     if fileManager.fileExists(atPath: fontDestinationUrl.path) {
-      Logger.data.info("removed existing font: \(fontDestinationUrl.lastPathComponent)")
+      Logger.data.info("removed existing font: \(fontDestinationUrl.lastPathComponent, privacy: .public)")
+      LogUtil.infoBreadcrumb("removed existing font: \(fontDestinationUrl.lastPathComponent)", category: .data)
       try? fileManager.removeItem(at: fontDestinationUrl)
     }
     
     try fileManager.copyItem(at: fontUrl, to: fontDestinationUrl)
-    Logger.data.info("added font: \(fontDestinationUrl.lastPathComponent)")
+    Logger.data.info("added font: \(fontDestinationUrl.lastPathComponent, privacy: .public)")
+    LogUtil.infoBreadcrumb("added font: \(fontDestinationUrl.lastPathComponent)", category: .data)
   }
 
   /**
@@ -254,12 +263,14 @@ public class PackageInstallHelper: Identifiable {
           // code 105 = kCTFontManagerErrorAlreadyRegistered
           // It is safe to ignore because the font is
           if errorCode == 105 {
-            Logger.data.info("font \(fontUrl.lastPathComponent) is already registered)")
+            Logger.data.info("font \(fontUrl.lastPathComponent) is already registered")
+            LogUtil.infoBreadcrumb("font \(fontUrl.lastPathComponent) is already registered", category: .data)
             continue
           }
 
           // if it's any other error, capture it to throw later
           Logger.data.error("registerFontWithSystem failed for \(fontUrl.lastPathComponent), error: \(cfError as CFError, privacy: .public)")
+          LogUtil.errorBreadcrumb("registerFontWithSystem failed for \(fontUrl.lastPathComponent), error: \(cfError as CFError)", category: .data)
           registrationError = InstallPackageError.fontRegistrationError
         }
 
@@ -303,6 +314,7 @@ public class PackageInstallHelper: Identifiable {
         try self.deleteDownloadedKmpFile()
       } catch {
         Logger.data.error("installNewPackage failed to delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent, privacy: .public), error: \(error as NSError, privacy: .public)")
+        LogUtil.errorBreadcrumb("installNewPackage failed to delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent), error: \(error as NSError)", category: .data)
       }
     }
 
@@ -320,6 +332,7 @@ public class PackageInstallHelper: Identifiable {
         try self.deleteDownloadedKmpFile()
       } catch {
         Logger.data.error("replaceExistingPackageWithNewPackage failed to delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent, privacy: .public), error: \(error as NSError, privacy: .public)")
+        LogUtil.errorBreadcrumb("replaceExistingPackageWithNewPackage failed to delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent), error: \(error as NSError)", category: .data)
       }
     }
     try self.movePackageFromTemporaryToInstalled()
@@ -336,12 +349,14 @@ public class PackageInstallHelper: Identifiable {
         try self.deleteDownloadedKmpFile()
       } catch {
         Logger.data.error("cleanupFailedInstallation did not delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent, privacy: .public), error: \(error as NSError, privacy: .public)")
+        LogUtil.errorBreadcrumb("cleanupFailedInstallation did not delete downloaded .kmp file: \(self.temporaryKmpFileLocation.lastPathComponent), error: \(error as NSError)", category: .data)
       }
     }
     do {
       try self.deleteUnzippedPackage()
     } catch {
       Logger.data.error("cleanupFailedInstallation did not delete downloaded package: \(self.temporaryKmpFileLocation.lastPathComponent, privacy: .public), error: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("cleanupFailedInstallation did not delete downloaded package: \(self.temporaryKmpFileLocation.lastPathComponent), error as NSError)", category: .data)
     }
   }
   

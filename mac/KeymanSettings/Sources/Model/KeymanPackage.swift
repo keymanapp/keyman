@@ -21,6 +21,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
         image = NSImage(contentsOf: imageUrl)
     } else {
       Logger.setup.error("error: could not find SideImage.bmp in the module bundle")
+      LogUtil.errorBreadcrumb("error: could not find SideImage.bmp in the module bundle", category: .setup)
     }
     return image
   }()

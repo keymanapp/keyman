@@ -25,6 +25,7 @@ import Foundation
 import Combine
 import ZIPFoundation
 import OSLog
+import Sentry
 
 public enum InstallPackageError: LocalizedError {
   case packageInstallationAlreadyInProgress
@@ -118,6 +119,7 @@ public class SettingsContainer : ObservableObject {
       searchUrl.append(queryItems:[languageQueryItem])
     }
     Logger.setup.info("full searchUrl: \(searchUrl.absoluteString, privacy: .public)")
+    LogUtil.infoBreadcrumb("full searchUrl: \(searchUrl.absoluteString)", category: .setup)
     return searchUrl
   }
   
@@ -133,6 +135,7 @@ public class SettingsContainer : ObservableObject {
     if let language = systemLanguages.first {
       primaryLanguage = language
       Logger.setup.info("primary system language: \(language, privacy: .public)")
+      LogUtil.infoBreadcrumb("primary system language: \(language)", category: .setup)
     }
 
       return primaryLanguage
@@ -150,6 +153,7 @@ public class SettingsContainer : ObservableObject {
       Logger.data.log("Found documents group container")
     } catch KeymanPathError.groupContainerNotFound {
       Logger.data.error("Document group container not found")
+      let message = "Document group container not found."
       fatalError("Document group container not found.")
     } catch {
       Logger.data.error("Unable to access documents in group container, error \(error as NSError, privacy: .public)")
@@ -290,6 +294,7 @@ public class SettingsContainer : ObservableObject {
   public func findInstalledPackage(with id: UUID) -> KeymanPackage? {
     guard let package = self.installedPackages.first(where: { $0.id == id }) else {
       Logger.setup.error("error: could not find package with UUID: \(id)")
+      LogUtil.errorBreadcrumb("error: could not find package with UUID: \(id)", category: .setup)
       return nil
     }
     
@@ -333,6 +338,7 @@ public class SettingsContainer : ObservableObject {
   public func isKeyboardEnabled(packageId: UUID, keyboardKey: String) -> Bool {
     guard let package = self.findInstalledPackage(with: packageId) else {
       Logger.setup.error("isKeyboardEnabled, not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey, privacy: .public)")
+      LogUtil.errorBreadcrumb("isKeyboardEnabled, not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey)", category: .setup)
       return false
     }
     
@@ -346,10 +352,12 @@ public class SettingsContainer : ObservableObject {
   public func setKeyboardEnabled(packageId: UUID, keyboardKey: String, enabled: Bool) {
     guard let package = self.findInstalledPackage(with: packageId) else {
       Logger.setup.error("setKeyboardEnabled, could not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey, privacy: .public)")
+      LogUtil.errorBreadcrumb("setKeyboardEnabled, could not read keyboard state for package: \(packageId) and keyboard: \(keyboardKey)", category: .setup)
       return
     }
     
     Logger.setup.info("setKeyboardEnabled for \(keyboardKey, privacy: .public) setting to \(enabled)")
+    LogUtil.infoBreadcrumb("setKeyboardEnabled for \(keyboardKey)", category: .setup)
     package.enableKeyboard(keyboardKey: keyboardKey, enabled: enabled)
     
     // update persisted state in UserDefaults enabledKeyboards array
@@ -476,6 +484,7 @@ public class SettingsContainer : ObservableObject {
    */
   public func packageDownloadComplete(kmpFileUrl: URL) throws {
     Logger.setup.info("packageDownloadComplete \(kmpFileUrl, privacy: .public)")
+    LogUtil.infoBreadcrumb("packageDownloadComplete \(kmpFileUrl)", category: .setup)
 
     do {
       try self.packageInstall?.prepareToInstall(for: kmpFileUrl)
@@ -509,6 +518,7 @@ public class SettingsContainer : ObservableObject {
         self.addEnabledKeyboards(for: package)
       } else {
         Logger.setup.error("Error: package '\(package.packageName, privacy: .public)' not found for replacement")
+        LogUtil.errorBreadcrumb("Error: package '\(package.packageName)' not found for replacement", category: .setup)
       }
     }
   }

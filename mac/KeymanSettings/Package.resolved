@@ -1,6 +1,15 @@
 {
-  "originHash" : "6a08f242f30fc84e86db579a4645b0b4cb13779957938c0ed895c98c0838d707",
+  "originHash" : "04c07e57c9c1c1c0bfd7062e1f880a134d063796215b35b16cdebf4fc3b4c0a9",
   "pins" : [
+    {
+      "identity" : "sentry-cocoa",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/getsentry/sentry-cocoa",
+      "state" : {
+        "revision" : "a00a9784fff7193cbb0f9fae509fec8107e07744",
+        "version" : "9.26.1"
+      }
+    },
     {
       "identity" : "zipfoundation",
       "kind" : "remoteSourceControl",

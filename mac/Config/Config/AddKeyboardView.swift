@@ -77,10 +77,12 @@ struct AddKeyboardView: View {
         PackageConfirmationView(installHelper: helper) { accepted in
           if accepted {
             Logger.download.info("installing validated package: \(helper.packageName ?? "unknown package", privacy: .public)")
+            LogUtil.infoBreadcrumb("installing validated package: \(helper.packageName ?? "unknown package")", category: .download)
             do {
               try settings.installPackage()
             } catch {
               Logger.download.error("failed to install package: \(helper.packageName ?? "unknown package") with error: \(error as NSError, privacy: .public)")
+              LogUtil.errorBreadcrumb("failed to install package: \(helper.packageName ?? "unknown package") with error: \(error as NSError)", category: .download)
             }
           } else {
             settings.userCanceledPackageInstallation()

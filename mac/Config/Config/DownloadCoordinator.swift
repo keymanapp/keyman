@@ -59,12 +59,14 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
       let matchPackageId = String(match.4)
       if let downloadUrl = self.settings?.buildDownloadPackageUrl(for: matchPackageId) {
         Logger.download.info("package install, download url = \(downloadUrl.absoluteString, privacy: .public)")
-        
+        LogUtil.infoBreadcrumb("package install, download url = \(downloadUrl.absoluteString)", category: .download)
+
         let newRequest = URLRequest(url: downloadUrl)
         
         DispatchQueue.main.async {
           webView.startDownload(using: newRequest) { download in
             Logger.download.info("download initiated to \(newRequest.url?.absoluteString ?? "nil", privacy: .public)")
+            LogUtil.infoBreadcrumb("download initiated to \(newRequest.url?.absoluteString ?? "nil")", category: .download)
             download.delegate = self
             self.setupDownloadTracking(download)
           }
@@ -74,11 +76,13 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     else if urlString.contains(DownloadCoordinator.regexRoot) ||
               urlString.contains(DownloadCoordinator.regexGo) {
       Logger.download.info("requested root or go url: load in webview")
+      LogUtil.infoBreadcrumb("requested root or go url: load in webview", category: .download)
 
       decisionHandler(.allow)
     }
     else {
       Logger.download.info("default case, open in external browser")
+      LogUtil.infoBreadcrumb("default case, open in external browser", category: .download)
 
       decisionHandler(.cancel)
       if let targetUrl = URL(string: urlString) {
@@ -126,6 +130,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     
     guard let keymanSettings = self.settings else {
       Logger.download.error("tried to access settings before they were intialized")
+      LogUtil.errorBreadcrumb("tried to access settings before they were intialized", category: .download)
       self.loadPackageFailed = true
       self.loadFailureMessage = InstallPackageError.internalError.localizedDescription
       completionHandler(nil)
@@ -138,6 +143,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     do {
       if let helper = try keymanSettings.initiateKmpFileDownload(kmpFilename: suggestedFilename) {
         Logger.download.info("download suggested filename: \(suggestedFilename, privacy: .public)")
+        LogUtil.infoBreadcrumb("download suggested filename: \(suggestedFilename)", category: .download)
         self.loadFailureMessage = nil // Reset previous error
         self.loadPackageFailed = false
         
@@ -147,6 +153,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
       }
     } catch {
       Logger.download.error("could not initiate package download, error: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("could not initiate package download, error: \(error as NSError)", category: .download)
       self.loadPackageFailed = true
       self.loadFailureMessage = error.localizedDescription
       completionHandler(nil)
@@ -159,6 +166,8 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     
     if let downloadDestination = installHelper?.temporaryKmpFileLocation {
       Logger.download.info("download of \(downloadDestination.path, privacy: .public) was successful.")
+      LogUtil.infoBreadcrumb("download of \(downloadDestination.path) was successful.", category: .download)
+
       if let settings {
         do {
           try settings.packageDownloadComplete(kmpFileUrl: downloadDestination)
@@ -174,6 +183,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   
   public func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
     Logger.download.error("download failed with error: \(error as NSError, privacy: .public)")
+    LogUtil.errorBreadcrumb("download failed with error: \(error as NSError)", category: .download)
     self.isDownloading = false
     self.progressObserver = nil
     self.loadPackageFailed = true
@@ -187,6 +197,7 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
   public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
     // The web process crashed. Reload the webview safely.
     Logger.download.error("webkit process terminated unexpectedly: reloading content")
+    LogUtil.errorBreadcrumb("webkit process terminated unexpectedly: reloading content", category: .download)
     webView.reload()
   }
 }

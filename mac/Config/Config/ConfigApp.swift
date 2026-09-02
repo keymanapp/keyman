@@ -9,6 +9,7 @@
 import SwiftUI
 import KeymanSettings
 import OSLog
+import Sentry
 
 extension Logger {
   private static let configSubsystem = ConfigAppUtil.configBundleId
@@ -24,6 +25,26 @@ struct ConfigApp: App {
   
   init() {
     Logger.app.log("Starting Keyman Configuration, version: \(ConfigAppUtil.versionWithTag), versionWithTag: \(ConfigAppUtil.versionWithTag)")
+  /*
+   from AppDelegate
+   [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
+     options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@o1005580.ingest.sentry.io/5983522";
+     options.releaseName = releaseName;
+     options.environment = keymanVersionInfo.sentryEnvironment;
+   }];
+
+   */
+    let sentryDsnUrl = "https://960f8b8e574c46e3be385d60ce8e1fea@o1005580.ingest.sentry.io/5983522"
+
+    // Initialize Sentry only once here
+    SentrySDK.start { options in
+      options.dsn = sentryDsnUrl
+      options.releaseName = ConfigAppUtil.versionGitTag
+      options.environment = ConfigAppUtil.sentryEnvironment
+      
+      options.debug = true // Turn off in production
+      options.tracesSampleRate = 1.0 // Adjust tracking rate for production
+    }
   }
 
   var body: some Scene {

@@ -54,6 +54,7 @@ public struct KeymanPaths {
         try fileManager.createDirectory(at: fontsDirectory, withIntermediateDirectories: true, attributes: nil)
       } catch {
         Logger.setup.error("error: could not create fonts directory: \(error as NSError, privacy: .public)")
+        LogUtil.errorBreadcrumb("error: could not create fonts directory: \(error as NSError)", category: .setup)
       }
     }
 
@@ -142,6 +143,7 @@ public struct KeymanPaths {
       return inputMethodUrl
     } catch {
       Logger.setup.error("buildInputMethodPathUrl error: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("buildInputMethodPathUrl error: \(error as NSError)", category: .setup)
       return nil
     }
   }
@@ -155,6 +157,7 @@ public struct KeymanPaths {
       return inputMethodUrl.appendingPathComponent("Contents/MacOS/\(executableName)")
     } else {
       Logger.setup.error("buildInputMethodExecutableUrl error: could not build input method executable directory")
+      LogUtil.errorBreadcrumb("buildInputMethodExecutableUrl error: could not build input method executable directory", category: .setup)
       return nil
     }
   }
@@ -175,6 +178,7 @@ public struct KeymanPaths {
       return documentsDirectoryUrl
     } catch {
       Logger.setup.error("buildDocumentsUrl error: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("buildDocumentsUrl error: \(error as NSError)", category: .setup)
       return nil
     }
   }
@@ -187,6 +191,7 @@ public struct KeymanPaths {
       return keyman17PackagesDirectory
     } else {
       Logger.setup.error("buildKeyman17PackagesUrl error: could not build keyman17 packages directory")
+      LogUtil.errorBreadcrumb("buildKeyman17PackagesUrl error: could not build keyman17 packages directory", category: .setup)
       return nil
     }
   }
@@ -208,6 +213,7 @@ public struct KeymanPaths {
       return supportDirectoryUrl
     } catch {
       Logger.setup.error("buildSupportDirectory error: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("buildSupportDirectory error: \(error as NSError)", category: .setup)
       return nil
     }
   }
