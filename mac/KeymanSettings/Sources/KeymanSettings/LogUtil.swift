@@ -8,6 +8,31 @@
 
 import Sentry
 
+import Foundation
+
+/**
+ * Extend URL to add function that cleans path strings, removing the home directory from the path.
+ */
+extension URL {
+  /**
+   * If the path contains the user's home, replace it with ~ as the home directory name
+   * may contain the user's name and should not be written to the logs.
+   */
+  public func cleanUrlPath() -> String {
+    guard self.isFileURL else { return self.absoluteString }
+    
+    let unescapedPath = self.path(percentEncoded: false)
+    let homeDirectory = NSHomeDirectory()
+    
+    if unescapedPath.hasPrefix(homeDirectory) {
+      let relativeComponent = unescapedPath.dropFirst(homeDirectory.count)
+      return "~\(relativeComponent)"
+    }
+    
+    return unescapedPath
+  }
+}
+
 public struct LogUtil {
   public enum LogCategory: String {
     case setup  // related to start of app and installation

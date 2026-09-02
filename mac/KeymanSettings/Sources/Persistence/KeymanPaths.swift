@@ -49,7 +49,7 @@ public struct KeymanPaths {
     
     // if for some reason it doesn't exist, create it
     let fileManager = FileManager.default
-    if !fileManager.fileExists(atPath: fontsDirectory.path) {
+    if !fileManager.fileExists(atPath: fontsDirectory.path(percentEncoded: false)) {
       do {
         try fileManager.createDirectory(at: fontsDirectory, withIntermediateDirectories: true, attributes: nil)
       } catch {
@@ -113,16 +113,16 @@ public struct KeymanPaths {
   }
   
   fileprivate func logPaths() {
-    Logger.setup.debug("documents: \(self.keyman17DocumentsDirectory!.absoluteString)")
-    Logger.setup.debug("keyman 17 packages: \(self.keyman17PackagesDirectory!.absoluteString)")
+    Logger.setup.debug("documents: \(self.keyman17DocumentsDirectory!.cleanUrlPath())")
+    Logger.setup.debug("keyman 17 packages: \(self.keyman17PackagesDirectory!.cleanUrlPath())")
     
-    Logger.setup.debug("support directory: \(self.keyman18SupportDirectory!.absoluteString)")
-    Logger.setup.debug("support keyman directory: \(self.keyman18DataDirectory!.absoluteString)")
-    Logger.setup.debug("keyman 18 packages: \(self.keyman18PackagesDirectory!.absoluteString)")
+    Logger.setup.debug("support directory: \(self.keyman18SupportDirectory!.cleanUrlPath())")
+    Logger.setup.debug("support keyman directory: \(self.keyman18DataDirectory!.cleanUrlPath())")
+    Logger.setup.debug("keyman 18 packages: \(self.keyman18PackagesDirectory!.cleanUrlPath())")
     
-    Logger.setup.debug("container: \(self.keyman19ContainerDirectory.absoluteString)")
-    Logger.setup.debug("preferences: \(self.keyman19PreferencesDirectory.absoluteString)")
-    Logger.setup.debug("keyman 19 packages: \(self.keyman19PackagesDirectory.absoluteString)")
+    Logger.setup.debug("container: \(self.keyman19ContainerDirectory.cleanUrlPath())")
+    Logger.setup.debug("preferences: \(self.keyman19PreferencesDirectory.cleanUrlPath())")
+    Logger.setup.debug("keyman 19 packages: \(self.keyman19PackagesDirectory.cleanUrlPath())")
   }
   
   /**

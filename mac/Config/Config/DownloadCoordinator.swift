@@ -58,15 +58,15 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
       // get the package id (though it appears to be identifying a keyboard in the URL)
       let matchPackageId = String(match.4)
       if let downloadUrl = self.settings?.buildDownloadPackageUrl(for: matchPackageId) {
-        Logger.download.info("package install, download url = \(downloadUrl.absoluteString, privacy: .public)")
-        LogUtil.infoBreadcrumb("package install, download url = \(downloadUrl.absoluteString)", category: .download)
+        Logger.download.info("package install, download url = \(downloadUrl.cleanUrlPath(), privacy: .public)")
+        LogUtil.infoBreadcrumb("package install, download url = \(downloadUrl.cleanUrlPath())", category: .download)
 
         let newRequest = URLRequest(url: downloadUrl)
         
         DispatchQueue.main.async {
           webView.startDownload(using: newRequest) { download in
-            Logger.download.info("download initiated to \(newRequest.url?.absoluteString ?? "nil", privacy: .public)")
-            LogUtil.infoBreadcrumb("download initiated to \(newRequest.url?.absoluteString ?? "nil")", category: .download)
+            Logger.download.info("download initiated to \(newRequest.url?.cleanUrlPath() ?? "nil", privacy: .public)")
+            LogUtil.infoBreadcrumb("download initiated to \(newRequest.url?.cleanUrlPath() ?? "nil")", category: .download)
             download.delegate = self
             self.setupDownloadTracking(download)
           }
@@ -165,8 +165,8 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     self.progressObserver = nil
     
     if let downloadDestination = installHelper?.temporaryKmpFileLocation {
-      Logger.download.info("download of \(downloadDestination.path, privacy: .public) was successful.")
-      LogUtil.infoBreadcrumb("download of \(downloadDestination.path) was successful.", category: .download)
+      Logger.download.info("download of \(downloadDestination.cleanUrlPath(), privacy: .public) was successful.")
+      LogUtil.infoBreadcrumb("download of \(downloadDestination.cleanUrlPath()) was successful.", category: .download)
 
       if let settings {
         do {

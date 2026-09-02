@@ -153,7 +153,6 @@ public class SettingsContainer : ObservableObject {
       Logger.data.log("Found documents group container")
     } catch KeymanPathError.groupContainerNotFound {
       Logger.data.error("Document group container not found")
-      let message = "Document group container not found."
       fatalError("Document group container not found.")
     } catch {
       Logger.data.error("Unable to access documents in group container, error \(error as NSError, privacy: .public)")
@@ -483,8 +482,8 @@ public class SettingsContainer : ObservableObject {
    * Delegates to the PackageInstallHelper instance to decide whether the package should be installed.
    */
   public func packageDownloadComplete(kmpFileUrl: URL) throws {
-    Logger.setup.info("packageDownloadComplete \(kmpFileUrl, privacy: .public)")
-    LogUtil.infoBreadcrumb("packageDownloadComplete \(kmpFileUrl)", category: .setup)
+    Logger.setup.info("packageDownloadComplete \(kmpFileUrl.cleanUrlPath(), privacy: .public)")
+    LogUtil.infoBreadcrumb("packageDownloadComplete \(kmpFileUrl.cleanUrlPath())", category: .setup)
 
     do {
       try self.packageInstall?.prepareToInstall(for: kmpFileUrl)

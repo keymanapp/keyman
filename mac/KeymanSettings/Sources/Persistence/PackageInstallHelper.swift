@@ -70,7 +70,7 @@ public class PackageInstallHelper: Identifiable {
    * Indicates that a package has been downloaded and can be prepared for installation
    */
   public func packageDownloadComplete(for kmpFileUrl: URL) throws {
-    Logger.data.log("packageDownloadComplete \(kmpFileUrl.path, privacy: .public)")
+    Logger.data.log("packageDownloadComplete \(kmpFileUrl.cleanUrlPath(), privacy: .public)")
 
     try self.prepareToInstall(for: kmpFileUrl)
   }
@@ -80,7 +80,7 @@ public class PackageInstallHelper: Identifiable {
    *
    */
   public func prepareToInstall(for kmpFileUrl: URL) throws {
-    Logger.data.log("prepareToInstall \(kmpFileUrl.path, privacy: .public)")
+    Logger.data.log("prepareToInstall \(kmpFileUrl.cleanUrlPath(), privacy: .public)")
 
     do {
       // unzip to the temp directory
@@ -104,8 +104,8 @@ public class PackageInstallHelper: Identifiable {
       self.packageInstallationType = self.determinePackageInstallationType(newPackage: package)
     } catch {
       self.cleanupFailedInstallation()
-      Logger.data.error("package installation failed for \(kmpFileUrl) with error: \(error as NSError, privacy: .public)")
-      LogUtil.errorBreadcrumb("package installation failed for \(kmpFileUrl) with error: \(error as NSError)", category: .data)
+      Logger.data.error("package installation failed for \(kmpFileUrl.cleanUrlPath(), privacy: .public) with error: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("package installation failed for \(kmpFileUrl.cleanUrlPath()) with error: \(error as NSError)", category: .data)
       throw error
     }
   }
@@ -185,7 +185,7 @@ public class PackageInstallHelper: Identifiable {
         includingPropertiesForKeys: [.isDirectoryKey],
         options: [.skipsHiddenFiles]) }
     catch {
-      Logger.data.error("error: unable to get contents of package fonts directory at \(installLocation.path, privacy: .public) with error: \(error as NSError, privacy: .public)")
+      Logger.data.error("error: unable to get contents of package fonts directory at \(installLocation.cleanUrlPath(), privacy: .public) with error: \(error as NSError, privacy: .public)")
     }
     
     for fontUrl in fileUrls {
@@ -228,7 +228,7 @@ public class PackageInstallHelper: Identifiable {
     let fileManager = FileManager.default
     
     // remove the font from the fonts directory just in case it is an old one
-    if fileManager.fileExists(atPath: fontDestinationUrl.path) {
+    if fileManager.fileExists(atPath: fontDestinationUrl.path(percentEncoded: false)) {
       Logger.data.info("removed existing font: \(fontDestinationUrl.lastPathComponent, privacy: .public)")
       LogUtil.infoBreadcrumb("removed existing font: \(fontDestinationUrl.lastPathComponent)", category: .data)
       try? fileManager.removeItem(at: fontDestinationUrl)

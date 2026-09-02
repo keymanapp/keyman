@@ -56,7 +56,7 @@ public class InputMethodUtil {
       return false
     }
     
-    return FileManager.default.fileExists(atPath: inputMethodUrl.path)
+    return FileManager.default.fileExists(atPath: inputMethodUrl.path(percentEncoded: false))
   }
   
   /**
@@ -214,8 +214,8 @@ public class InputMethodUtil {
     let process = Process()
     if let executableUrl = self.pathUtil.buildInputMethodExecutableUrl(fileName: self.keymanInputMethodApplicationName) {
       process.executableURL = executableUrl
-      Logger.setup.info("invoking Keyman at: \(String(describing: process.executableURL), privacy: .public)")
-      LogUtil.infoBreadcrumb("invoking Keyman at: \(String(describing: process.executableURL))", category: .setup)
+      Logger.setup.info("invoking Keyman at: \(String(describing: process.executableURL?.cleanUrlPath()), privacy: .public)")
+      LogUtil.infoBreadcrumb("invoking Keyman at: \(String(describing: process.executableURL?.cleanUrlPath()))", category: .setup)
       process.arguments = [argument]
     }
     
@@ -253,8 +253,8 @@ public class InputMethodUtil {
     
     NSWorkspace.shared.openApplication(at: inputMethodUrl, configuration: openConfig) { (app, error) in
       if let error = error {
-        Logger.setup.error("Could not launch Keyman input method at \(inputMethodUrl), due to error: \(error as NSError, privacy: .public)")
-        LogUtil.errorBreadcrumb("Could not launch Keyman input method at \(inputMethodUrl), due to error: \(error as NSError)", category: .setup)
+        Logger.setup.error("Could not launch Keyman input method at \(inputMethodUrl.cleanUrlPath()), due to error: \(error as NSError, privacy: .public)")
+        LogUtil.errorBreadcrumb("Could not launch Keyman input method at \(inputMethodUrl.cleanUrlPath()), due to error: \(error as NSError)", category: .setup)
       }
     }
   }
