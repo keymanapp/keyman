@@ -21,7 +21,7 @@ type
 function ConfigureBaseKeyboard(out BaseKeyboardID: Integer): Boolean;
 function SetBaseKeyboard(WindowHandle: THandle; BaseKeyboardID: Integer): Boolean;
 function MCompileBaseKeyboard(const BaseKeyboardIDText: string): Boolean;
-function CompileForBaseKeyboard(BaseKeyboardID: Integer): Boolean;
+procedure CompileForBaseKeyboard(BaseKeyboardID: Integer);
 
 implementation
 
@@ -84,7 +84,9 @@ begin
   if not TryStrToInt('$' + BaseKeyboardIDText, BaseKeyboardID) or
     not kmcom.SystemInfo.IsAdministrator then
     Exit;
-  Result := CompileForBaseKeyboard(BaseKeyboardID);
+  CompileForBaseKeyboard(BaseKeyboardID);
+  // TODO: sort out whether we need todo return a result
+  Result := True;
 end;
 
 function BaseKeyboardNeedsMCompile(BaseKeyboardID: Integer): Boolean;
@@ -108,29 +110,24 @@ begin
 end;
 
 function SetBaseKeyboard(WindowHandle: THandle; BaseKeyboardID: Integer): Boolean;
-var
-  MCompileResult: Boolean;
 begin
-  MCompileResult := True;
   Result := False;
   if BaseKeyboardNeedsMCompile(BaseKeyboardID) then
   begin
     if not kmcom.SystemInfo.IsAdministrator then
       begin
-        MCompileResult := WaitForElevatedConfiguration(WindowHandle, '-mcompilekbds ' + IntToHex(BaseKeyboardID, 8)) = 0;
+        WaitForElevatedConfiguration(WindowHandle, '-mcompilekbds ' + IntToHex(BaseKeyboardID, 8));
       end
     else
-      MCompileResult := CompileForBaseKeyboard(BaseKeyboardID);
+      CompileForBaseKeyboard(BaseKeyboardID);
   end;
-  if not MCompileResult then
-    Exit;
 
   kmcom.Options['koBaseLayout'].Value := BaseKeyboardID;
   kmcom.Options.Apply;
   Result := True;
 end;
 
-function CompileForBaseKeyboard(BaseKeyboardID: Integer): Boolean;
+procedure CompileForBaseKeyboard(BaseKeyboardID: Integer);
 var
   i: Integer;
   kbd: IKeymanKeyboardInstalled;
