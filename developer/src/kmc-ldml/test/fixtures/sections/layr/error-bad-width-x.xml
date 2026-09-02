@@ -12,7 +12,7 @@
       <row keys="one two three" />
     </layer>
   </layers>
-  <layers formId="touch" minDeviceWidth="x">
+  <layers formId="touch" minDeviceWidth="x"> <!-- not a number -->
     <layer id="base">
       <row keys="one" />
       <row keys="two" />

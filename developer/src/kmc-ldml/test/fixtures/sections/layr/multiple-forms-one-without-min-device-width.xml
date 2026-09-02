@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="und" conformsTo="45">
-  <info name="layr-error-custom-form"/>
+  <info name="layr-multiple-forms-one-without-min-device-width"/>
   <keys>
     <key id="one" output="1" />
     <key id="two" output="2" />
@@ -12,14 +12,14 @@
       <row keys="one two three" />
     </layer>
   </layers>
-  <layers formId="touch" minDeviceWidth="6">
+  <layers formId="touch"> <!-- okay: only one form without minDeviceWidth -->
     <layer id="base">
       <row keys="one" />
       <row keys="two" />
       <row keys="three" />
     </layer>
   </layers>
-  <layers formId="touch" minDeviceWidth="1024"> <!-- max width 999mm -->
+  <layers formId="touch" minDeviceWidth="120">
     <layer id="base">
       <row keys="one" />
       <row keys="two" />

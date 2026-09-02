@@ -19,7 +19,7 @@
       <row keys="three" />
     </layer>
   </layers>
-  <layers formId="touch" minDeviceWidth="0"> <!-- dup -->
+  <layers formId="touch" minDeviceWidth="0"> <!-- width 0 not permitted -->
     <layer id="base">
       <row keys="one" />
       <row keys="two" />

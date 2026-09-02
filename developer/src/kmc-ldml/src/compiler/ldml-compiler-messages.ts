@@ -277,7 +277,7 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_InvalidLayerWidth = SevError | 0x002D;
-  static Error_InvalidLayerWidth = (o: { minDeviceWidth: number }, compileContext?: ObjectWithCompileContext) => mx(
+  static Error_InvalidLayerWidth = (o: { minDeviceWidth: number | string }, compileContext?: ObjectWithCompileContext) => mx(
     this.ERROR_InvalidLayerWidth, compileContext,
     `Invalid Layers minDeviceWidth=${def(o.minDeviceWidth)}`,
     `Width must be between 1-999 (millimeters), inclusive.` // sync with layr_max_minDeviceWidth / layr_max_maxDeviceWidth (from spec)
@@ -326,6 +326,14 @@ export class LdmlCompilerMessages {
     Touch layers must have an \`id\` attribute, but should not have a \`modifiers\`
     attribute, and conversely, hardware layers must have a \`modifiers\` attribute
     and should not have an \`id\` attribute.
+  `);
+
+  static HINT_MultipleTouchFormsWithoutMinDeviceWidth = SevHint | 0x0035;
+  static Hint_MultipleTouchFormsWithoutMinDeviceWidth = (compileContext?: ObjectWithCompileContext) => mx(
+    this.HINT_MultipleTouchFormsWithoutMinDeviceWidth, compileContext,
+    `When multiple touch forms are present, 'minDeviceWidth' is required to differentiate them`, `
+    Touch forms are differentiated by their minimum device width, so when there is
+    more than one, at most one form may omit the \`minDeviceWidth\` attribute.
   `);
 
   //
