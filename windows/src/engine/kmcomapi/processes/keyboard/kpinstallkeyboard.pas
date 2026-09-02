@@ -262,7 +262,7 @@ begin
           else
             RecompileMnemonicKeyboard.Execute(FDestFileName, PackageID, BaseKeyboardID);
         finally
-          Free;
+          RecompileMnemonicKeyboard.Free;
         end;
       end;
     finally
