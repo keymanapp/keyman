@@ -9,8 +9,8 @@
     <key id="ess" output="s\u{0307}\u{0323}" /> <!-- not NFD-->
   </keys>
 
-  <layers formId="us" minDeviceWidth="123">
-    <layer id="zz">
+  <layers formId="us">
+    <layer modifiers="none">
       <row keys="ess" />
     </layer>
   </layers>

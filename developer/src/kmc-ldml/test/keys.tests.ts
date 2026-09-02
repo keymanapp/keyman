@@ -452,7 +452,7 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({ row: 1, hardware: 'us', modifiers: 'none' }, withOffset(785) as LDMLKeyboard.LKRow));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({ row: 1, hardware: 'us', modifiers: 'none' }, withOffset(792) as LDMLKeyboard.LKRow));
   });
 
   it('should reject layouts with undefined keys', async function() {
@@ -460,7 +460,7 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}, withOffset(271) as LDMLKeyboard.LKRow));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'none', row: 1}, withOffset(278) as LDMLKeyboard.LKRow));
   });
   it('should reject layouts with invalid keys', async function() {
     const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks, keysDependencies) as Keys;

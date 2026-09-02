@@ -18,16 +18,16 @@
   </keys>
 
   <layers formId="us">
-    <layer id="base" modifiers="none">
+    <layer modifiers="none">
       <row keys="hmaqtugha that" /> <!-- number row -->
     </layer>
-    <layer id="shift" modifiers="shift">
+    <layer modifiers="shift">
       <row keys="seven eee" /> <!-- number row -->
     </layer>
-    <layer id="control" modifiers="ctrl">
+    <layer modifiers="ctrl">
       <row keys="that gap" /> <!-- number row -->
     </layer>
-    <layer id="catchall" modifiers="other">
+    <layer modifiers="other">
       <row keys="eee gap" /> <!-- number row -->
     </layer>
   </layers>

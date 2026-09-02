@@ -27,6 +27,7 @@ export class LayrCompiler extends SectionCompiler {
       if (formId === 'touch') {
         touchLayers++;
         totalLayerCount += layers.layer?.length;
+        // TODO-LDML: CLDR-19754 spec does not require minDeviceWidth, but if multiple touch forms then it would be important for differentiation
         const { minDeviceWidth } = layers;
         if (!minDeviceWidth ||
           minDeviceWidth < constants.layr_min_minDeviceWidth ||
@@ -40,6 +41,17 @@ export class LayrCompiler extends SectionCompiler {
         } else {
           deviceWidths.add(minDeviceWidth);
         }
+        // For touch layers, id attr must exist, and modifiers attribute should not
+        layers.layer.forEach(layer => {
+          if(typeof layer.id === 'undefined') {
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_TouchLayerRequiresId({minDeviceWidth}, layer));
+            valid = false;
+          }
+          if(typeof layer.modifiers !== 'undefined') {
+            this.callbacks.reportMessage(LdmlCompilerMessages.Hint_TouchLayerHasModifiers({minDeviceWidth, id: layer.id}, layer));
+          }
+          totalLayerCount++;
+        });
       } else {
         // hardware
         hardwareLayers++;
@@ -47,15 +59,22 @@ export class LayrCompiler extends SectionCompiler {
           valid = false;
           this.callbacks.reportMessage(LdmlCompilerMessages.Error_ExcessHardware({formId}, layers));
         }
+        layers.layer.forEach(layer => {
+          const { modifiers } = layer;
+          if(typeof modifiers === 'undefined' || modifiers == '') {
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_HardwareLayerRequiresModifiers({ formId }, layer));
+            valid = false;
+          }
+          else if (!validModifier(modifiers)) {
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidModifier({ modifiers }, layer));
+            valid = false;
+          }
+          if(typeof layer.id !== 'undefined') {
+            this.callbacks.reportMessage(LdmlCompilerMessages.Hint_HardwareLayerHasId({formId, id: layer.id}, layer));
+          }
+          totalLayerCount++;
+        });
       }
-      layers.layer.forEach((layer) => {
-        const { modifiers } = layer;
-        totalLayerCount++;
-        if (!validModifier(modifiers)) {
-          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidModifier({ modifiers }, layer));
-          valid = false;
-        }
-      });
     });
     if (totalLayerCount === 0) { // TODO-LDML: does not validate touch layers yet
       // no layers seen anywhere

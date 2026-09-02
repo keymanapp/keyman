@@ -9,7 +9,7 @@ import Keys = KMXPlus.Keys;
 import KeysKeys = KMXPlus.KeysKeys;
 import ListItem = KMXPlus.ListItem;
 import KeysFlicks = KMXPlus.KeysFlicks;
-import { allUsedKeyIdsInFlick, allUsedKeyIdsInKey, allUsedKeyIdsInLayers, calculateUniqueKeys, hashFlicks, hashKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
+import { allUsedKeyIdsInFlick, allUsedKeyIdsInKey, allUsedKeyIdsInLayers, calculateUniqueKeys, hashFlicks, hashKeys, translateLayerAttrToModifier } from '../util/util.js';
 import { SubstitutionUse, Substitutions } from './substitution-tracker.js';
 
 /** reserved name for the special gap key. space is not allowed in key ids. */
@@ -457,12 +457,6 @@ export class KeysCompiler extends SectionCompiler {
     let valid = true;
 
     const { modifiers } = layer;
-    if (!validModifier(modifiers)) {
-      this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidModifier({ modifiers }, layer)
-      );
-      valid = false;
-    }
 
     if (layer.row.length > keymap.length) {
       this.callbacks.reportMessage(
@@ -480,7 +474,7 @@ export class KeysCompiler extends SectionCompiler {
           LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({
             row: y + 1,
             hardware: layers.formId,
-            modifiers: modifiers || 'none',
+            modifiers,
           }, row)
         );
         valid = false;
@@ -497,7 +491,7 @@ export class KeysCompiler extends SectionCompiler {
               keyId: key,
               col: x + 1,
               row: y + 1,
-              layer: layer.id,
+              layer: layer.id ?? layer.modifiers, // just to give a useful reference point in the error message
               form: "hardware",
             }, row)
           );

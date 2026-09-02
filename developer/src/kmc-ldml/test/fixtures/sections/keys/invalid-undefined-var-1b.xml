@@ -9,7 +9,7 @@
   </keys>
 
   <layers formId="us">
-    <layer id="base">
+    <layer modifiers="none">
       <row keys="7" />
     </layer>
   </layers>

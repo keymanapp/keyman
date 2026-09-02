@@ -41,7 +41,7 @@ describe('layr', function () {
         assert.ok(row0);
         assert.equal(row0.keys.length, 2);
 
-        assert.equal(layer0.id.value, 'base');
+        assert.equal(layer0.id.value, '');
         assert.equal(layer0.mod, constants.keys_mod_none);
         assert.equal(row0.keys[0]?.value, 'grave');
       },
@@ -58,7 +58,7 @@ describe('layr', function () {
         assert.equal(listHardware.layers.length, 2);
         const hardware0 = listHardware.layers[0];
         assert.ok(hardware0);
-        assert.equal(hardware0.id.value, 'base');
+        assert.equal(hardware0.id.value, '');
         assert.equal(hardware0.mod, constants.keys_mod_none);
         const hardware0row0 = hardware0.rows[0];
         assert.ok(hardware0row0);
@@ -67,7 +67,7 @@ describe('layr', function () {
         const hardware1 = listHardware.layers[1];
         assert.ok(hardware1);
         assert.equal(hardware1.rows.length, 1);
-        assert.equal(hardware1.id.value, 'shift');
+        assert.equal(hardware1.id.value, '');
         assert.equal(hardware1.mod, constants.keys_mod_shift);
         const hardware1row0 = hardware1.rows[0];
         assert.ok(hardware1row0);
@@ -130,7 +130,7 @@ describe('layr', function () {
         ]));
         assert.sameDeepMembers(bymod, [
           // flatten the layers for comparison, assume a single key
-          ['base', constants.keys_mod_none, 'a'],
+          ['', constants.keys_mod_none, 'a'],
           ['', constants.keys_mod_altR, 'c'],
           ['', constants.keys_mod_ctrl | constants.keys_mod_shift, 'c'],
         ]);
@@ -157,7 +157,7 @@ describe('layr', function () {
         const layer0 = list0.layers[0];
         assert.ok(layer0);
         assert.equal(layer0.rows.length, 2);
-        assert.equal(layer0.id.value, 'base');
+        assert.equal(layer0.id.value, '');
         assert.equal(layer0.mod, constants.keys_mod_none);
         for(const row of layer0.rows) {
           assert.ok(row);
@@ -180,5 +180,29 @@ describe('layr', function () {
         LdmlCompilerMessages.Error_InvalidLayerWidth({ minDeviceWidth }),
       ]
     })),
+    {
+      subpath: 'sections/layr/error-touch-layer-requires-id.xml',
+      errors: [
+        LdmlCompilerMessages.Error_TouchLayerRequiresId({ minDeviceWidth: 120}),
+      ]
+    },
+    {
+      subpath: 'sections/layr/error-hardware-layer-requires-modifiers.xml',
+      errors: [
+        LdmlCompilerMessages.Error_HardwareLayerRequiresModifiers({ formId: 'us' }),
+      ]
+    },
+    {
+      subpath: 'sections/layr/hint-touch-layer-has-modifiers.xml',
+      warnings: [ // hints grouped under warnings
+        LdmlCompilerMessages.Hint_TouchLayerHasModifiers({id: 'base', minDeviceWidth: 120}),
+      ]
+    },
+    {
+      subpath: 'sections/layr/hint-hardware-layer-has-id.xml',
+      warnings: [ // hints grouped under warnings
+        LdmlCompilerMessages.Hint_HardwareLayerHasId({formId: 'iso', id: 'base'}),
+      ]
+    },
   ]);
 });
