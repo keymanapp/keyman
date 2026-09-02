@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.278 alpha 2026-09-02
+
+* feat(developer): support output folder and `--continue-on-error` (#16453)
+* fix(developer): validate the number of hardware layers only in Layr compiler (#16455)
+* fix(developer): validate id and modifiers attributes in Layr compiler (#16456)
+* fix(developer): disable Copy Link in Model Editor if no link to copy (#16475)
+* fix(developer): open context help when F1 pressed in Project window (#16481)
+* chore(web): update file headers (#16497)
+
 ## 19.0.277 alpha 2026-09-01
 
 * fix(developer): handle comment without trailing whitespace (#16479)
