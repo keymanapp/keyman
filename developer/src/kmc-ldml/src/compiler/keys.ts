@@ -225,13 +225,9 @@ export class KeysCompiler extends SectionCompiler {
     // Finally, kmap
     // Use LayerMap + keys to generate compiled keys for hardware
     const hardwareLayers = this.hardwareLayers();
-    /* c8 ignore next 3 */
-    if (hardwareLayers.length > 1) {
-      // validation should have already caught this
-      throw Error(
-        `Internal error: Expected 0 or 1 hardware layer, not ${hardwareLayers.length}`
-      );
-    } else if (hardwareLayers.length === 1) {
+    if (hardwareLayers.length >= 1) {
+      // Only 1 hardware layer is supported; however, `LayrCompiler` will report
+      // on this error, so we can just process the first one here
       const theLayers = hardwareLayers[0];
       const { formId } = theLayers;
       for (const layer of theLayers.layer) {
