@@ -168,17 +168,6 @@ export class PageIntegrationHandlers {
     }
   }
 
-  /**
-   * Function     _WindowUnload
-   * Scope        Private
-   * Description  Remove handlers before detaching KMW window
-   */
-  private _WindowUnload: () => void = () => {
-    // Future note:  should restrict this to anything for the corresponding document if on a
-    // child iframe, not the whole engine.
-    this.engine.shutdown();
-  }
-
   private attachHandlers() {
     const eventTracker = this.domEventTracker;
     const device = this.engine.config.hostDevice;
@@ -203,7 +192,6 @@ export class PageIntegrationHandlers {
     }
 
     eventTracker.attachDOMEvent(window, 'load',   this._WindowLoad,  false);
-    eventTracker.attachDOMEvent(window, 'unload', this._WindowUnload,false);
 
     eventTracker.attachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
   }
@@ -230,7 +218,6 @@ export class PageIntegrationHandlers {
     }
 
     eventTracker.detachDOMEvent(window, 'load',   this._WindowLoad,  false);
-    eventTracker.detachDOMEvent(window, 'unload', this._WindowUnload,false);
 
     eventTracker.detachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
   }
