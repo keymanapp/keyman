@@ -531,8 +531,9 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
 
       this.engineConfig.alertHost?.wait(); // clear the wait message box, either way.
 
-      const message = (err as Error)?.message ||
-                      `Sorry, the '${keyboardId}' keyboard for '${languageCode}' is not currently available.`;
+      
+      const message = 
+                      `Activation of '${keyboardId}' keyboard failed: ${(err as Error)?.message ?? err?.toString() ?? 'unknown error'}`;
 
       if(err instanceof KeyboardScriptError) {
         // We get signaled about error log messages if the site is connected to our Sentry error reporting

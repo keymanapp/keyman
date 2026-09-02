@@ -368,7 +368,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
 
         const keyboardPromise = this.keyboardCache.fetchKeyboard(requestedStub.KI);
         const timeoutPromise = new Promise<Keyboard>((resolve, reject) => {
-          const timeoutMsg = `The download of the '${requestedStub.name}' keyboard for '${requestedStub.langName}' timed out.`;
+          const timeoutMsg = `Download of ${requestedStub.KI} for language ${requestedStub.langId} timed out.`;
           window.setTimeout(() => reject(new Error(timeoutMsg)), ContextManagerBase.TIMEOUT_THRESHOLD);
         });
 
