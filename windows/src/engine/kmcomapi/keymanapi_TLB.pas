@@ -1873,7 +1873,7 @@ type
 // *********************************************************************//
   IKeymanPackageFile3 = interface(IKeymanPackageFile)
     ['{C27A6E4B-9D13-47F8-A052-6B8E31D4F9C7}']
-    function Install3(Force: WordBool; BaseKeyboardID: Integer): IKeymanPackageFile; safecall;
+    function Install3(Force: WordBool; BaseKeyboardID: Integer): IKeymanPackageInstalled; safecall;
   end;
 
 // *********************************************************************//
@@ -1883,7 +1883,7 @@ type
 // *********************************************************************//
   IKeymanPackageFile3Disp = dispinterface
     ['{C27A6E4B-9D13-47F8-A052-6B8E31D4F9C7}']
-    function Install3(Force: WordBool; BaseKeyboardID: Integer): IKeymanPackageFile; dispid 292;
+    function Install3(Force: WordBool; BaseKeyboardID: Integer): IKeymanPackageInstalled; dispid 292;
     procedure Install(Force: WordBool); dispid 256;
     property Author: WideString readonly dispid 1;
     property AuthorEmail: WideString readonly dispid 2;
