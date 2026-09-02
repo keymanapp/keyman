@@ -11,6 +11,7 @@ $(function() {
   this.uniqId = 1;
 
   this.lastPresentations = {...this.defaultPresentations};
+  this.lastLayers = {};
 
   this.getPresentation = function () {
     return $('#selPlatformPresentation').val();
@@ -502,7 +503,7 @@ $(function() {
     }
 
     builder.prepareLayers();
-    builder.selectLayer(0);
+    builder.selectLayer(builder.lastLayers[builder.lastPlatform] ?? 0);
   }
 
   this.selectLayer = function (val) {
@@ -1086,6 +1087,7 @@ $(function() {
       layer: builder.lastLayerIndex,
       presentation: $('#selPlatformPresentation').val(),
       lastPresentations: builder.lastPresentations,
+      lastLayers: builder.lastLayers,
     };
 
     var key = builder.selectedKey();
@@ -1126,6 +1128,7 @@ $(function() {
           }
 
           builder.lastPresentations = {...(data.lastPresentations ?? this.defaultPresentations)};
+          builder.lastLayers = {...(data.lastLayers ?? {})};
 
           let selection = builder.saveSelection();
           builder.prepareLayer();
