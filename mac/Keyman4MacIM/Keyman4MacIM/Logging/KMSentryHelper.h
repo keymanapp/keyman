@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)addClientAppIdTag:(NSString *)value;
 + (void)addKeyboardTag:(NSString *)value;
 + (void)addHasAccessibilityTag:(BOOL)value;
-+ (void)addActiveKeyboardCountTag:(NSUInteger)value;
++ (void)addEnabledKeyboardCountTag:(NSUInteger)value;
 + (void)addInfoBreadCrumb:(NSString *)category message:(NSString *)messageText;
 + (void)addDebugBreadCrumb:(NSString *)category message:(NSString *)messageText;
 + (void)addUserBreadCrumb:(NSString *)category message:(NSString *)messageText;
