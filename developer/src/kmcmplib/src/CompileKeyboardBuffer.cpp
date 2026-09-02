@@ -5,7 +5,7 @@
 #include "DeprecationChecks.h"
 #include "versioning.h"
 #include "CompileKeyboardBuffer.h"
-#include "../../../../common/windows/cpp/include/keymanversion.h"
+#include "../../../../common/include/keymanversion.h"
 
 namespace kmcmp {
   void CopyExtraData(PFILE_KEYBOARD fk);

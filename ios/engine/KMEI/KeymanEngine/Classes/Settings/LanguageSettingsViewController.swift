@@ -18,8 +18,11 @@ class LanguageSettingsViewController: UITableViewController {
 
   private var doPredictionsSwitch: UISwitch?
   private var doCorrectionsSwitch: UISwitch?
+  private var doAutocorrectionsSwitch: UISwitch?
   private var doCorrectionsLabel: UILabel?
+  private var doAutocorrectionsLabel: UILabel?
   private var correctionsCell: UITableViewCell?
+  private var autocorrectionsCell: UITableViewCell?
 
   public init(_ inLanguage: Language) {
     language = inLanguage
@@ -87,17 +90,8 @@ class LanguageSettingsViewController: UITableViewController {
     return switchFrame
   }
   
-  @objc
-  func predictionSwitchValueChanged(source: UISwitch) {
-    let value = source.isOn;
+  func refreshModelIfNeeded() {
     let userDefaults = Storage.active.userDefaults
-    userDefaults.set(predictSetting: value, forLanguageID: self.language.id)
-
-    // Reactively set the corrections switch interactivity state.
-    self.doCorrectionsSwitch?.isHidden = !value
-    self.doCorrectionsLabel?.isEnabled = value
-    self.correctionsCell?.isUserInteractionEnabled = value
-    
     if let lm = Manager.shared.preferredLexicalModel(userDefaults, forLanguage: self.language.id) {
       if Manager.shared.currentKeyboardID?.languageID == self.language.id {
         // re-register the model - that'll enact the settings.
@@ -111,23 +105,63 @@ class LanguageSettingsViewController: UITableViewController {
     }
   }
   
+  func refreshSwitchVisibility() {
+    let userDefaults = Storage.active.userDefaults
+    
+    let mayPredict = userDefaults.predictSettingForLanguage(languageID: self.language.id)
+    self.doCorrectionsSwitch?.isHidden = !mayPredict
+    self.doCorrectionsLabel?.isEnabled = mayPredict
+    self.correctionsCell?.isUserInteractionEnabled = mayPredict
+    
+    let mayCorrect = userDefaults.correctSettingForLanguage(languageID: self.language.id)
+    self.doAutocorrectionsSwitch?.isHidden = !(mayPredict && mayCorrect)
+    self.doAutocorrectionsLabel?.isEnabled = mayPredict && mayCorrect
+    self.autocorrectionsCell?.isUserInteractionEnabled = mayPredict && mayCorrect
+  }
+  
+  @objc
+  func predictionSwitchValueChanged(source: UISwitch) {
+    let value = source.isOn;
+    let userDefaults = Storage.active.userDefaults
+    userDefaults.set(predictSetting: value, forLanguageID: self.language.id)
+
+    refreshSwitchVisibility()
+    refreshModelIfNeeded()
+  }
+  
   @objc
   func correctionSwitchValueChanged(source: UISwitch) {
     let value = source.isOn;
     let userDefaults = Storage.active.userDefaults
     userDefaults.set(correctSetting: value, forLanguageID: self.language.id)
     
-    if let lm = Manager.shared.preferredLexicalModel(userDefaults, forLanguage: self.language.id) {
-      if Manager.shared.currentKeyboardID?.languageID == self.language.id {
-        // re-register the model - that'll enact the settings.
-        _ = Manager.shared.registerLexicalModel(lm)
-      }
-      // Based on how Manager chooses the model in setKeyboard.
-    } else if let lm = userDefaults.userLexicalModels?.first(where: { $0.languageID == self.language.id }) {
-      if Manager.shared.currentKeyboardID?.languageID == self.language.id {
-        _ = Manager.shared.registerLexicalModel(lm)
-      }
-    }
+    refreshSwitchVisibility()
+    refreshModelIfNeeded()
+  }
+  
+  @objc
+  func autocorrectionSwitchValueChanged(source: UISwitch) {
+    let value = source.isOn;
+    let userDefaults = Storage.active.userDefaults
+    userDefaults.set(autocorrectSetting: value, forLanguageID: self.language.id)
+    
+    refreshModelIfNeeded()
+  }
+  
+  func addSwitchToTableCell(_ toggle: UISwitch, cell: UITableViewCell, isOn: Bool, selector: Selector) {
+    cell.accessoryType = .none
+    toggle.translatesAutoresizingMaskIntoConstraints = false
+    
+    let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: toggle.frame.size)
+    toggle.frame = switchFrame
+    
+    toggle.isOn = isOn
+    toggle.addTarget(self, action: selector, for: .valueChanged)
+    cell.addSubview(toggle)
+    cell.contentView.isUserInteractionEnabled = false
+
+    toggle.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+    toggle.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
   }
 
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -143,40 +177,38 @@ class LanguageSettingsViewController: UITableViewController {
     let cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
     if 1 == indexPath.section {
         if 0 == indexPath.row {
-          cell.accessoryType = .none
           doPredictionsSwitch = UISwitch()
-          doPredictionsSwitch!.translatesAutoresizingMaskIntoConstraints = false
           
-          let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doPredictionsSwitch!.frame.size)
-          doPredictionsSwitch!.frame = switchFrame
-          
-          doPredictionsSwitch!.isOn = userDefaults.predictSettingForLanguage(languageID: self.language.id)
-          doPredictionsSwitch!.addTarget(self, action: #selector(self.predictionSwitchValueChanged), for: .valueChanged)
-          cell.addSubview(doPredictionsSwitch!)
-          cell.contentView.isUserInteractionEnabled = false
-
-          doPredictionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-          doPredictionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+          self.addSwitchToTableCell(
+            doPredictionsSwitch!,
+            cell: cell,
+            isOn: userDefaults.predictSettingForLanguage(languageID: self.language.id),
+            selector: #selector(self.predictionSwitchValueChanged)
+          )
         } else if 1 == indexPath.row {
           correctionsCell = cell
-          cell.accessoryType = .none
           doCorrectionsSwitch = UISwitch()
-          doCorrectionsSwitch!.translatesAutoresizingMaskIntoConstraints = false
           
-          let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: doCorrectionsSwitch!.frame.size)
-          doCorrectionsSwitch!.frame = switchFrame
+          self.addSwitchToTableCell(
+            doCorrectionsSwitch!,
+            cell: cell,
+            isOn: userDefaults.correctSettingForLanguage(languageID: self.language.id),
+            selector: #selector(self.correctionSwitchValueChanged)
+          )
+
+          refreshSwitchVisibility()
+        } else if 2 == indexPath.row {
+          autocorrectionsCell = cell
+          doAutocorrectionsSwitch = UISwitch()
           
-          doCorrectionsSwitch!.isOn = userDefaults.correctSettingForLanguage(languageID: self.language.id)
-          doCorrectionsSwitch!.addTarget(self, action: #selector(self.correctionSwitchValueChanged), for: .valueChanged)
-          cell.addSubview(doCorrectionsSwitch!)
-          cell.contentView.isUserInteractionEnabled = false
+          self.addSwitchToTableCell(
+            doAutocorrectionsSwitch!,
+            cell: cell,
+            isOn: userDefaults.autocorrectSettingForLanguage(languageID: self.language.id),
+            selector: #selector(self.autocorrectionSwitchValueChanged)
+          )
 
-          doCorrectionsSwitch!.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-          doCorrectionsSwitch!.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-
-          // Disable interactivity if the prediction toggle is set to 'off'.
-          doCorrectionsSwitch!.isHidden = !userDefaults.predictSettingForLanguage(languageID: self.language.id)
-          cell.isUserInteractionEnabled = userDefaults.predictSettingForLanguage(languageID: self.language.id)
+          refreshSwitchVisibility()
         } else { // rows 3 and 4
           cell.accessoryType = .disclosureIndicator
       }
@@ -245,6 +277,10 @@ class LanguageSettingsViewController: UITableViewController {
           cell.textLabel?.text = NSLocalizedString("menu-langsettings-toggle-correct", bundle: engineBundle, comment: "")
           cell.textLabel?.isEnabled = !(doCorrectionsSwitch?.isHidden ?? false)
         case 2:
+          doAutocorrectionsLabel = cell.textLabel
+          cell.textLabel?.text = NSLocalizedString("menu-langsettings-toggle-autocorrect", bundle: engineBundle, comment: "")
+          cell.textLabel?.isEnabled = !(doAutocorrectionsSwitch?.isHidden ?? false)
+        case 3:
           cell.textLabel?.text = NSLocalizedString("menu-langsettings-label-lexical-models", bundle: engineBundle, comment: "")
           cell.accessoryType = .disclosureIndicator
           let modelCt = language.lexicalModels?.count ?? 0
@@ -332,8 +368,8 @@ class LanguageSettingsViewController: UITableViewController {
       showKeyboardInfoView(kb: (language.keyboards?[safe: indexPath.row])!)
     case 1:
       switch indexPath.row  {
-        // case 0, 1:  the toggles - but a general 'click' not on the toggle itself.
-        case 2:
+        // case 0, 1, 2:  the toggles - but a general 'click' not on the toggle itself.
+        case 3:
           showLexicalModelsView()
         default:
           break

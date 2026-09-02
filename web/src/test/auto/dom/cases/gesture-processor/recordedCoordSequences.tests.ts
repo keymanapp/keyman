@@ -1,7 +1,7 @@
 import { assert, expect } from 'chai';
 import sinon from 'sinon';
 
-import type { GestureDebugSource, InputSample, SerializedGestureSource } from '@keymanapp/gesture-recognizer';
+import type { GestureDebugSource, InputSample, SerializedGestureSource } from 'keyman/engine/gesture-processor';
 
 import {
   HostFixtureLayoutController,

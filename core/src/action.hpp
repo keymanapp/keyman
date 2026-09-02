@@ -39,5 +39,9 @@ namespace core
     unsigned int code_points_to_delete
   );
 
+  km_core_actions clone_actions_object(
+    km_core_actions const &src
+  );
+
 } // namespace core
 } // namespace km

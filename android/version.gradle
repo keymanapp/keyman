@@ -88,6 +88,16 @@ def getVersionGitTag = { ->
         return "release@$KEYMAN_VERSION_NAME"
     }
 }
+
+def getVersionForFilename = { ->
+    String env_version_for_filename = System.getenv("KEYMAN_VERSION_FOR_FILENAME")
+    if(env_version_for_filename != null) {
+        return env_version_for_filename
+    }
+    // Building probably from IDE
+    return "$KEYMAN_VERSION_NAME"
+}
+
 ext {
     KEYMAN_VERSION_CODE=getVersionCode()
     KEYMAN_VERSION_MD=getVersionMD()
@@ -95,6 +105,7 @@ ext {
     KEYMAN_VERSION_ENVIRONMENT=getVersionEnvironment()
     KEYMAN_VERSION_TAG=System.getenv("KEYMAN_VERSION_TAG")
     KEYMAN_VERSION_GIT_TAG=getVersionGitTag()
+    KEYMAN_VERSION_FOR_FILENAME=getVersionForFilename()
 }
 
 //println "version.gradle: KEYMAN_VERSION_TAG: " + KEYMAN_VERSION_TAG

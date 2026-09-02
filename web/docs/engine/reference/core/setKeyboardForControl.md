@@ -8,7 +8,7 @@ Associate control with independent keyboard settings initialized to a specific k
 
 ## Syntax
 
-```c
+```js
 keyman.setDefaultKeyboardForControl(Pelem, keyboard, languageCode);
 ```
 

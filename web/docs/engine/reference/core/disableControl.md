@@ -8,7 +8,7 @@ Disables KeymanWeb input handling for the specified control.
 
 ## Syntax
 
-```c
+```js
 keyman.disableControl(Pelem)
 ```
 

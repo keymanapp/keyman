@@ -21,7 +21,6 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.os.Bundle;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
@@ -71,13 +70,13 @@ public class KeymanSettingsInstallActivity extends BaseActivity {
     final String noIcon = "0";
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.install_from_keyman_dot_com));
-    String icon = String.valueOf(R.drawable.ic_content_add);
+    String icon = String.valueOf(R.drawable.ic_content_add_mode);
     hashMap.put(iconKey, icon);
     installOptionList.add(hashMap);
 
     hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.install_from_local_file));
-    icon = String.valueOf(R.drawable.ic_folder_open);
+    icon = String.valueOf(R.drawable.ic_folder_open_mode);
     hashMap.put(iconKey, icon);
     hashMap.put(isEnabledKey, "true");
     installOptionList.add(hashMap);
@@ -95,7 +94,7 @@ public class KeymanSettingsInstallActivity extends BaseActivity {
     hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.add_languages_to_installed_keyboard));
     hashMap.put(subtitleKey, getString(R.string.add_language_subtext));
-    icon = String.valueOf(R.drawable.ic_content_add);
+    icon = String.valueOf(R.drawable.ic_content_add_mode);
     hashMap.put(iconKey, icon);
     hashMap.put(isEnabledKey, "true");
     installOptionList.add(hashMap);

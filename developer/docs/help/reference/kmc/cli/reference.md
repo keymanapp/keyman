@@ -198,6 +198,13 @@ The following parameters are available:
   project (which can also be controlled at a project level with the
   `skipMetadataFiles` option). This option is only valid for compiling projects.
 
+`--publish-only`
+
+: Skip building component files within a project, and only run the validation
+  step. Must be combined with `--for-publishing` in order to have an effect.
+  This option is only valid for compiling projects, and is mostly intended for
+  use by the IDE. Will fail if build artifacts for components are not present.
+
 ### Examples
 
 ```shell

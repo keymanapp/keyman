@@ -85,7 +85,7 @@ export class PageIntegrationHandlers {
    **/
   private pageFocusHandler: (e: FocusEvent) => boolean = () => {
     if(!this.focusAssistant.maintainingFocus && this.engine.osk?.vkbd) {
-      this.engine.contextManager.deactivateCurrentTarget();
+      this.engine.contextManager.deactivateCurrentTextStore();
       this.engine.contextManager.resetContext();
     }
     return false;
@@ -138,7 +138,7 @@ export class PageIntegrationHandlers {
   private touchMoveActivationHandler: (e: TouchEvent) => boolean = (e) => {
     if(this.deactivateOnScroll) {  // Android / Chrone case.
       this.focusAssistant.focusing = false;
-      this.engine.contextManager.deactivateCurrentTarget();
+      this.engine.contextManager.deactivateCurrentTextStore();
     }
 
     const y = e.touches[0].screenY;
@@ -153,7 +153,7 @@ export class PageIntegrationHandlers {
     // Should not hide OSK if simply closing the language menu (30/4/15)
     // or if the focusing timer (focusAssistant.setFocusTimer) is still active.
     if(this.deactivateOnRelease && !this.engine.touchLanguageMenu && !this.focusAssistant.focusing) {
-      this.engine.contextManager.deactivateCurrentTarget();
+      this.engine.contextManager.deactivateCurrentTextStore();
     }
     this.deactivateOnRelease=false;
     return false;

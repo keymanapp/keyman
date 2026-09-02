@@ -8,7 +8,7 @@ Generates a style sheet element for use in adding or overriding default On-Scree
 
 ## Syntax
 
-```c
+```js
 keyman.util.addStyleSheet(sheet)
 ```
 

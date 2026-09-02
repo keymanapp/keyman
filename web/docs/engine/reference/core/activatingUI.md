@@ -8,7 +8,7 @@ Sets an internal flag to notify KeymanWeb of change in UI activation state.
 
 ## Syntax
 
-```c
+```js
 keyman.activatingUI(state);
 ```
 

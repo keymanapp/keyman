@@ -8,7 +8,7 @@ Get details of currently installed keyboards.
 
 ## Syntax
 
-```c
+```js
 keyman.getKeyboards()
 ```
 
@@ -25,5 +25,5 @@ None.
 
 See [keyman.getKeyboard()](getKeyboard) for detail on the returned keyboard specification objects.
 
-## See also 
+## See also
 - [keyman.addKeyboards()](addKeyboards)

@@ -94,14 +94,16 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
 
   /** @type {import('@web/test-runner').Reporter} */
   const reporter = {
-    start({config, sessions}) {
+    start({ config, sessions }) {
+      logger = config.logger;
+      logger.log('Initializing Web Test Runner TeamCity Reporter');
+
       rootDir = config.rootDir;
 
       for(const session of sessions.all()) {
         testDefMap.set(buildSessionName(session), new Map());
       }
 
-      logger = config.logger;
       logger.log(`##teamcity[blockOpened name='${e(name)}']`);
     },
     stop(args) {

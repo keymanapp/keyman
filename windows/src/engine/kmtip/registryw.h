@@ -21,7 +21,7 @@
 
 #include <windows.h>
 
-#include "../../../../common/windows/cpp/include/keymanversion.h"
+#include "../../../../common/include/keymanversion.h"
 
 #ifdef _WIN64
 

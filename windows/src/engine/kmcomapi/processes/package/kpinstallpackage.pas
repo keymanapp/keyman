@@ -163,177 +163,188 @@ begin
       inf := nil;
       FZip := TZipFile.Create;
       try
-        FZip.Open(FileName, TZipMode.zmRead);
-
-        InfFile := '';
-
-        for i := 0 to FZip.FileCount - 1 do
-        begin
-          FZip.Extract(i, buf, False);
-          if LowerCase(FZip.Filename[i]) = PackageFile_KMPInf then
-            InfFile := FZip.Filename[i]
-          else if LowerCase(FZip.Filename[i]) = PackageFile_KMPJSON then
-            JsonFile := FZip.Filename[i];
-        end;
-
-        if (InfFile = '') and (JsonFile = '') then
-          Error(KMN_E_PackageInstall_UnableToFindInfFile);
-
-        inf := TKMPInfFile.Create;
-        if JsonFile <> '' then
-        begin
-          inf.FileName := FTempOutPath + JsonFile;
-          inf.LoadJson;
-        end
-        else
-        begin
-          inf.FileName := FTempOutPath + InfFile;
-          inf.LoadIni;
-        end;
-
-        inf.CheckFiles(FTempOutPath);
-
-        { Check keyboards to install are valid }
-
-        SetLength(ki, inf.Files.Count);
-        for i := 0 to inf.Files.Count - 1 do
-        begin
-          if inf.Files[i].FileType = ftKeymanFile then
-          begin
-            try
-              GetKeyboardInfo(FTempOutPath + inf.Files[i].FileName, False, ki[i]);
-            except
-              on E:EKMXError do
-                ErrorFmt(KMN_E_Install_InvalidFile, VarArrayOf([ExtractFileName(FileName), E.Message]));
-            end;
-          end;
-        end;
-
-        { Install registry entries }
-
-        PackageName := GetShortPackageName(FileName);
-        dest := GetPackageInstallPath(FileName) + '\';
-
-        if PackageInstalled(PackageName, FInstByAdmin) and not (ipForce in Options) then
-          Error(KMN_E_PackageInstall_PackageAlreadyInstalled);
-
-        with TRegistryErrorControlled.Create do  // I2890
         try
-          RootKey := HKEY_LOCAL_MACHINE;
-
-          if not OpenKey(SRegKey_InstalledPackages_LM+'\'+PackageName, True) then  // I2890
-            RaiseLastRegistryError;
-
-          WriteString(SRegValue_PackageFile, dest + PackageFile_KMPInf);
-          WriteString(SRegValue_PackageDescription, inf.Info.Desc[PackageInfoEntryTypeNames[pietName]]);
-        finally
-          Free;
-        end;
-
-        { Copy files }
-
-        ForceDirectories(ExtractFileDir(dest));
-
-        for i := 0 to inf.Files.Count - 1 do
-        begin
-          FSrcFileName := inf.Files[i].FileName;
-
-          if not CopyFileCleanAttr(PChar(FTempOutPath + FSrcFileName), PChar(dest + FSrcFileName), False) then   // I4574
+          FZip.Open(FileName, TZipMode.zmRead);
+        except
+          on E:EZipException do
           begin
-            FErrorValue := GetLastError;
-            if inf.Files[i].FileType = ftFont
-              then WarnFmt(KMN_E_PackageInstall_UnableToCopyFile, VarArrayOf([FTempOutPath + inf.Files[i].FileName + ' ['+SysErrorMessage(FErrorValue)+']', dest + inf.Files[i].FileName]))
-              else ErrorFmt(KMN_E_PackageInstall_UnableToCopyFile, VarArrayOf([FTempOutPath + inf.Files[i].FileName + ' ['+SysErrorMessage(FErrorValue)+']', dest + inf.Files[i].FileName]));
+            ErrorFmt(KMN_E_Install_InvalidFile, VarArrayOf([ExtractFileName(FileName), E.Message, 0]));
+            raise;
           end;
         end;
 
-        { Install the keyboards, packages and fonts }
+        try
+          InfFile := '';
 
-        for i := 0 to inf.Files.Count - 1 do
-        begin
-          case inf.Files[i].FileType of
-            ftKeymanFile:
-              InstallKeyboard(dest + inf.Files[i].FileName);
-
-            ftPackageFile:
-              with TKPInstallPackage.Create(Context) do
-              try
-                Execute(dest + inf.Files[i].FileName, Options);
-              finally
-                Free;
-              end;
-          end;
-        end;
-
-        { Install the visual keyboards -- must be after keyboard installs }
-
-        for i := 0 to inf.Files.Count - 1 do
-        begin
-          if inf.Files[i].FileType = ftVisualKeyboard then
+          for i := 0 to FZip.FileCount - 1 do
           begin
-            try
-              with TKPInstallVisualKeyboard.Create(Context) do
-              try
-                // TODO: we should probably try and do this by the keyboard install instead so
-                // that we can deprecate the associatedKeyboard field in .kvk
-                Execute(FTempOutPath + inf.Files[i].FileName, '');
-              finally
-                Free;
-              end;
-            except
-              on E:EOleException do
-                WarnFmt(KMN_W_InstallPackage_KVK_Error, VarArrayOf([PackageName, inf.Files[i].FileName, E.Message]));
-            end;
+            FZip.Extract(i, buf, False);
+            if LowerCase(FZip.Filename[i]) = PackageFile_KMPInf then
+              InfFile := FZip.Filename[i]
+            else if LowerCase(FZip.Filename[i]) = PackageFile_KMPJSON then
+              JsonFile := FZip.Filename[i];
           end;
-        end;
 
-        { Install start menu items }
+          if (InfFile = '') and (JsonFile = '') then
+            Error(KMN_E_PackageInstall_UnableToFindInfFile);
 
-        with TKPInstallPackageStartMenu.Create(inf, PackageName, dest) do   // I4324
-        try
-          Execute(True, '');
-        finally
-          Free;
-        end;
+          inf := TKMPInfFile.Create;
+          if JsonFile <> '' then
+          begin
+            inf.FileName := FTempOutPath + JsonFile;
+            inf.LoadJson;
+          end
+          else
+          begin
+            inf.FileName := FTempOutPath + InfFile;
+            inf.LoadIni;
+          end;
 
-        { Install fonts }
+          inf.CheckFiles(FTempOutPath);
 
-        with TIniFile.Create(dest + 'fonts.inf') do
-        try
+          { Check keyboards to install are valid }
+
+          SetLength(ki, inf.Files.Count);
           for i := 0 to inf.Files.Count - 1 do
-            if inf.Files[i].FileType = ftFont then
-              with TKPInstallFont.Create(Context) do
+          begin
+            if inf.Files[i].FileType = ftKeymanFile then
+            begin
               try
-                if not Execute(dest + inf.Files[i].FileName)
-                  then WriteString('UninstallFonts', inf.Files[i].FileName, 'False')
-                  else WriteString('UninstallFonts', inf.Files[i].FileName, 'True');
-              finally
-                Free;
+                GetKeyboardInfo(FTempOutPath + inf.Files[i].FileName, False, ki[i]);
+              except
+                on E:EKMXError do
+                  ErrorFmt(KMN_E_Install_InvalidFile, VarArrayOf([ExtractFileName(FileName), E.Message]));
               end;
-          UpdateFile;
+            end;
+          end;
+
+          { Install registry entries }
+
+          PackageName := GetShortPackageName(FileName);
+          dest := GetPackageInstallPath(FileName) + '\';
+
+          if PackageInstalled(PackageName, FInstByAdmin) and not (ipForce in Options) then
+            Error(KMN_E_PackageInstall_PackageAlreadyInstalled);
+
+          with TRegistryErrorControlled.Create do  // I2890
+          try
+            RootKey := HKEY_LOCAL_MACHINE;
+
+            if not OpenKey(SRegKey_InstalledPackages_LM+'\'+PackageName, True) then  // I2890
+              RaiseLastRegistryError;
+
+            WriteString(SRegValue_PackageFile, dest + PackageFile_KMPInf);
+            WriteString(SRegValue_PackageDescription, inf.Info.Desc[PackageInfoEntryTypeNames[pietName]]);
+          finally
+            Free;
+          end;
+
+          { Copy files }
+
+          ForceDirectories(ExtractFileDir(dest));
+
+          for i := 0 to inf.Files.Count - 1 do
+          begin
+            FSrcFileName := inf.Files[i].FileName;
+
+            if not CopyFileCleanAttr(PChar(FTempOutPath + FSrcFileName), PChar(dest + FSrcFileName), False) then   // I4574
+            begin
+              FErrorValue := GetLastError;
+              if inf.Files[i].FileType = ftFont
+                then WarnFmt(KMN_E_PackageInstall_UnableToCopyFile, VarArrayOf([FTempOutPath + inf.Files[i].FileName + ' ['+SysErrorMessage(FErrorValue)+']', dest + inf.Files[i].FileName]))
+                else ErrorFmt(KMN_E_PackageInstall_UnableToCopyFile, VarArrayOf([FTempOutPath + inf.Files[i].FileName + ' ['+SysErrorMessage(FErrorValue)+']', dest + inf.Files[i].FileName]));
+            end;
+          end;
+
+          { Install the keyboards, packages and fonts }
+
+          for i := 0 to inf.Files.Count - 1 do
+          begin
+            case inf.Files[i].FileType of
+              ftKeymanFile:
+                InstallKeyboard(dest + inf.Files[i].FileName);
+
+              ftPackageFile:
+                with TKPInstallPackage.Create(Context) do
+                try
+                  Execute(dest + inf.Files[i].FileName, Options);
+                finally
+                  Free;
+                end;
+            end;
+          end;
+
+          { Install the visual keyboards -- must be after keyboard installs }
+
+          for i := 0 to inf.Files.Count - 1 do
+          begin
+            if inf.Files[i].FileType = ftVisualKeyboard then
+            begin
+              try
+                with TKPInstallVisualKeyboard.Create(Context) do
+                try
+                  // TODO: we should probably try and do this by the keyboard install instead so
+                  // that we can deprecate the associatedKeyboard field in .kvk
+                  Execute(FTempOutPath + inf.Files[i].FileName, '');
+                finally
+                  Free;
+                end;
+              except
+                on E:EOleException do
+                  WarnFmt(KMN_W_InstallPackage_KVK_Error, VarArrayOf([PackageName, inf.Files[i].FileName, E.Message]));
+              end;
+            end;
+          end;
+
+          { Install start menu items }
+
+          with TKPInstallPackageStartMenu.Create(inf, PackageName, dest) do   // I4324
+          try
+            Execute(True, '');
+          finally
+            Free;
+          end;
+
+          { Install fonts }
+
+          with TIniFile.Create(dest + 'fonts.inf') do
+          try
+            for i := 0 to inf.Files.Count - 1 do
+              if inf.Files[i].FileType = ftFont then
+                with TKPInstallFont.Create(Context) do
+                try
+                  if not Execute(dest + inf.Files[i].FileName)
+                    then WriteString('UninstallFonts', inf.Files[i].FileName, 'False')
+                    else WriteString('UninstallFonts', inf.Files[i].FileName, 'True');
+                finally
+                  Free;
+                end;
+            UpdateFile;
+          finally
+            Free;
+          end;
+
+          PostMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
+
+          { Run the commandline, if set }
+
+          prog := Trim(inf.Options.ExecuteProgram);
+          if prog <> '' then
+          begin
+            prog := StringReplace(prog, '$keyman', ExtractFileDir(GetKeymanInstallPath), [rfIgnoreCase, rfReplaceAll]);
+            if not ExecuteProgram(prog, PChar(ExtractFileDir(dest)), errmsg) then
+              WarnFmt(KMN_W_InstallPackage_CannotRunExternalProgram, VarArrayOf([prog, errmsg]));
+          end;
+
+          { Complete }
         finally
-          Free;
+          for i := 0 to FZip.FileCount - 1 do
+            DeleteFileCleanAttr(FTempOutPath + FZip.FileName[i]);   // I4574
+          inf.Free;
         end;
-
-        PostMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
-
-        { Run the commandline, if set }
-
-        prog := Trim(inf.Options.ExecuteProgram);
-        if prog <> '' then
-        begin
-          prog := StringReplace(prog, '$keyman', ExtractFileDir(GetKeymanInstallPath), [rfIgnoreCase, rfReplaceAll]);
-          if not ExecuteProgram(prog, PChar(ExtractFileDir(dest)), errmsg) then
-            WarnFmt(KMN_W_InstallPackage_CannotRunExternalProgram, VarArrayOf([prog, errmsg]));
-        end;
-
-        { Complete }
       finally
-        for i := 0 to FZip.FileCount - 1 do
-          DeleteFileCleanAttr(FTempOutPath + FZip.FileName[i]);   // I4574
-        RemoveDir(Copy(FTempOutPath, 1, Length(FTempOutPath)-1));
         FZip.Free;
-        inf.Free;
+        RemoveDir(Copy(FTempOutPath, 1, Length(FTempOutPath)-1));
       end;
     finally
       Context.Control.AutoApply := FAutoApply;

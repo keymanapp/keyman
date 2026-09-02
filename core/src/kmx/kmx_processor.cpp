@@ -6,7 +6,6 @@
 using namespace km::core;
 using namespace kmx;
 
-
 static KMX_BOOL ContextItemsFromAppContext(KMX_WCHAR *buf, km_core_context_item** outPtr)
 {
   assert(buf);

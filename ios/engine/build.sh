@@ -12,7 +12,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad." \
   "@/web/src/app/webview        build" \
-  "@/web/src/engine/sentry-manager  build" \
+  "@/common/web/sentry-manager  build" \
   "clean" \
   "configure" \
   "build" \
@@ -102,11 +102,12 @@ function update_bundle ( ) {
   KMW_PRODUCT="$KEYMAN_ROOT/web/build/app/webview/$CONFIG"
   KMW_RESOURCES="$KEYMAN_ROOT/web/build/app/resources"
 
-  #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
+  # Copy relevant KeymanWeb resources; this list is also in Storage.swift
+  cp "$KMW_RESOURCES/osk/globe-hint.css"        "$BUNDLE_PATH/globe-hint.css"
   cp "$KMW_RESOURCES/osk/kmwosk.css"            "$BUNDLE_PATH/kmwosk.css"
   cp "$KMW_RESOURCES/osk/keymanweb-osk.ttf"     "$BUNDLE_PATH/keymanweb-osk.ttf"
   cp "$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
-  cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
+  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
 }
 
 # First things first - update our dependencies.

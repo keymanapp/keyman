@@ -61,15 +61,11 @@ function _make_release_source_tarball() {
   ./scripts/reconf.sh
   PKG_CONFIG_PATH="${KEYMAN_ROOT}/core/build/arch/release/meson-private" ./scripts/dist.sh
   mv dist/*.tar.xz "upload/${KEYMAN_VERSION}/"
-  builder_echo heading "Make source for packaging"
-  PKG_CONFIG_PATH="${KEYMAN_ROOT}/core/build/arch/release/meson-private" ./scripts/dist.sh origdist
-  mv "dist/keyman_${KEYMAN_VERSION}.orig.tar.xz" "dist/keyman_${KEYMAN_VERSION}.pkg.tar.xz"
-  mv dist/*.tar.xz "upload/${KEYMAN_VERSION}/"
   (
     cd "upload/${KEYMAN_VERSION}"
     sha256sum ./*.tar.xz > SHA256SUMS
-    builder_echo end "make source tarball" success "Make source tarball"
   )
+  builder_echo end "make source tarball" success "Make source tarball"
 }
 
 function _sign_source_tarball() {
@@ -100,7 +96,6 @@ function _publish_to_downloads() {
   chmod a+r  "${UPLOAD_DIR}"/*
 
   write_download_info "${UPLOAD_DIR}" "keyman-${KEYMAN_VERSION}.tar.xz" "Keyman for Linux source tarball" tar.xz linux
-  write_download_info "${UPLOAD_DIR}" "keyman_${KEYMAN_VERSION}.pkg.tar.xz" "Keyman for Linux source for packaging" tar.xz linux
   tc_rsync_upload "${UPLOAD_DIR}" "linux/${KEYMAN_TIER}"
 
   builder_echo end "publish to downloads" success "Publish to downloads.keyman.com"
@@ -112,7 +107,7 @@ function _publish_to_launchpad() {
   git reset --hard
 
   /usr/lib/gnupg/gpg-preset-passphrase --passphrase "${GPGKEYPW}" --preset "${GPGKEYGRIP}"
-  UPLOAD=yes "${KEYMAN_ROOT}/linux/scripts/launchpad.sh"
+  "${KEYMAN_ROOT}/linux/scripts/launchpad.sh" --upload
   /usr/lib/gnupg/gpg-preset-passphrase --forget "${GPGKEYGRIP}" || true
 
   builder_echo end "upload to launchpad" success "Upload to launchpad"

@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <sstream>
 #include <memory>
+#include <cstring>
 
 
 #include "action.hpp"
@@ -102,6 +103,10 @@ bool km::core::action_item_list_to_actions_object(
         break;
       case KM_CORE_IT_PERSIST_OPT:
       {
+        assert(action_items->option != nullptr);
+        if(action_items->option == nullptr) {
+           return false;
+        }
         // TODO: lowpri: replace existing item if already present in options vector?
         km::core::option opt(static_cast<km_core_option_scope>(action_items->option->scope),
           action_items->option->key,
@@ -182,4 +187,35 @@ bool km::core::state::set_actions(
   }
 
   return true;
+}
+using namespace km::core;
+
+namespace {
+
+km_core_usv * duplicate_km_core_usv(const km_core_usv *src) {
+  if (!src) {
+    return nullptr;
+  }
+  size_t len = 0;
+  while (src[len]) {
+    ++len;
+  }
+  km_core_usv *result = new km_core_usv[len + 1];
+  std::copy(src, src + len + 1, result);
+  return result;
+}
+
+} // namespace
+
+km_core_actions km::core::clone_actions_object(km_core_actions const &src) {
+  km_core_actions result;
+  memset(&result, 0, sizeof(result));
+  result.code_points_to_delete = src.code_points_to_delete;
+  result.do_alert = src.do_alert;
+  result.emit_keystroke = src.emit_keystroke;
+  result.new_caps_lock_state = src.new_caps_lock_state;
+  result.deleted_context = duplicate_km_core_usv(src.deleted_context);
+  result.output = duplicate_km_core_usv(src.output);
+  result.persist_options = clone_options(src.persist_options);
+  return result;
 }

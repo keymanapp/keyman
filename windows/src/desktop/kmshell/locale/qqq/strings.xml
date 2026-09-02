@@ -234,7 +234,6 @@ Create a user interface translation for Keyman Desktop at http://www.tavultesoft
   <string name="SKUILanguageName" comment="_LanguageInfo/FormatString: User interface language name in the UI language (introduced 7.0.230.0)">[!!Ěńġľĭŝħ!!]</string>
   <string name="SKUILanguageNameWithEnglish" comment="_LanguageInfo/FormatString: UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language) (introduced 7.0.230.0)">[!!Ēŋġļıŝĥ!!]</string>
   <string name="SKLanguageCode" comment="_LanguageInfo/FormatString: The language code for the current translation (introduced 7.0.230.0)">[!!ȇƞ!!]</string>
-  <string name="SKDefaultLanguageCode" comment="_LanguageInfo/FormatString: The default language code for this product.  This should be the language that the product is created in. For Keyman Desktop (all editions) this must stay 'en', for all translations. (introduced 7.0.230.0)">[!!ēŋ!!]</string>
   <string name="SKShortApplicationTitle" comment="Formatted Messages/FormatString: Product name (introduced 7.0.230.0)">Keyman</string>
   <string name="SKDialogSelectLanguage" comment="UI Language Dialog/FormatString: Select UI dialog title (introduced 7.0.230.0)">[!!Šȅľęċţ Ūşěŕ Įƞţȇŕƒâċė Łâŉĝũàğě!!]</string>
   <string name="SKUILanguageHelp" comment="UI Language Dialog/FormatString: UI dialog - instructions (introduced 7.0.244.0)">[!!Ĉĥőŏśė ťħȇ łåŉġųăğę ţħäŧ ŷőū ŵâņţ ďĩşƿŀáƴȇď ĭŋ ţħĕ !!]Keyman[!! ĩņťěŕƒāčē.!!]</string>

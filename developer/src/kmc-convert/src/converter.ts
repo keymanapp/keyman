@@ -7,20 +7,11 @@ import {
   CompilerCallbacks,
   CompilerOptions,
   defaultCompilerOptions,
-  KeymanCompiler,
-  KeymanCompilerResult,
+  KeymanCompiler
 } from "@keymanapp/developer-utils";
 import { ConverterClassFactory } from './converter-class-factory.js';
-import { ConverterArtifacts } from "./converter-artifacts.js";
+import { ConverterArtifacts, ConverterResult } from "./main.js";
 import { ConverterMessages } from "./converter-messages.js";
-
-export interface ConverterResult extends KeymanCompilerResult {
-  /**
-   * Internal in-memory build artifacts from a successful compilation. Caller
-   * can write these to disk with {@link Converter.write}
-   */
-  artifacts: ConverterArtifacts;
-};
 
 /**
  * @public
@@ -64,13 +55,12 @@ export class Converter implements KeymanCompiler {
     };
 
     if (!inputFilename) {
-      this.callbacks.reportMessage(ConverterMessages.Error_InputFilenameIsRequired());
-      return null;
+      throw new Error('Input filename is required');
     }
 
-    const ConverterClass = ConverterClassFactory.find(inputFilename, outputFilename);
+    const ConverterClass = ConverterClassFactory.find(inputFilename, outputFilename ?? '.kmn');
     if (!ConverterClass) {
-      this.callbacks.reportMessage(ConverterMessages.Error_NoConverterFound({ inputFilename, outputFilename }));
+      this.callbacks.reportMessage(ConverterMessages.Error_NoConverterFound({ inputFilename, outputFilename: outputFilename ?? '' }));
       return null;
     }
 

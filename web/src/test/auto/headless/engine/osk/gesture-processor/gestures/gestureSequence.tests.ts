@@ -2,12 +2,19 @@ import { assert } from 'chai'
 import sinon from 'sinon';
 import * as PromiseStatusModule from 'promise-status-async';
 
-import { GestureModelDefs, buildGestureMatchInspector, gestures } from '@keymanapp/gesture-recognizer';
-import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
+import { GestureModelDefs, buildGestureMatchInspector, gestures } from 'keyman/engine/gesture-processor';
 
 import { HeadlessInputEngine, TouchpathTurtle } from '#gesture-tools';
-import { assertingPromiseStatus as promiseStatus } from '#test-resources/assertingPromiseStatus.js';
-import { assertGestureSequence, SequenceAssertion } from "#test-resources/sequenceAssertions.js";
+import { ManagedPromise, timedPromise } from 'keyman/common/web-utils';
+
+import { assertingPromiseStatus as promiseStatus, assertGestureSequence, SequenceAssertion } from 'keyman/test/resources';
+
+import {
+  LongpressModel,
+  MultitapModel,
+  SimpleTapModel,
+  SubkeySelectModel
+} from './isolatedGestureSpecs.js';
 
 const { matchers } = gestures;
 
@@ -19,15 +26,6 @@ type MatcherSelection<Type> = gestures.matchers.MatcherSelection<Type>;
 
 const getGestureModelSet = gestures.specs.getGestureModelSet;
 const modelSetForAction = gestures.matchers.modelSetForAction;
-
-
-
-import {
-  LongpressModel,
-  MultitapModel,
-  SimpleTapModel,
-  SubkeySelectModel
-} from './isolatedGestureSpecs.js';
 
 const TestGestureModelDefinitions: GestureModelDefs<string> = {
   gestures: [

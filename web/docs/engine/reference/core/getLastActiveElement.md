@@ -8,7 +8,7 @@ Return the last element activated before input was moved to KeymanWeb.
 
 ## Syntax
 
-```c
+```js
 keyman.getLastActiveElement();
 ```
 
@@ -21,6 +21,7 @@ None.
 `Element`
 :   The last element activated before KeymanWeb activated.
 
-## Description
+## See also
 
-...
+* [`keyman.interface.getLastActiveTextStore()`](../interface/getLastActiveTextStore)
+

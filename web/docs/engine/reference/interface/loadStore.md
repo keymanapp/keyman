@@ -8,13 +8,13 @@ Load an option [`store`](/developer/language/guide/stores) value from a cookie o
 
 ## Syntax
 
-```c
+```js
 keyman.interface.loadStore(kbdName, storeName, value);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KLOAD(kbdName, storeName, value); // Shorthand
 ```
 

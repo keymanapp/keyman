@@ -29,7 +29,9 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/developer-utils": "*"
+    "@keymanapp/developer-utils": "*",
+    "@keymanapp/common-types": "*",
+    "@keymanapp/keyman-version": "*"
   },
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",

@@ -3,6 +3,7 @@
 import logging
 import os
 import urllib.parse
+from keyman_config.keyman_locales import find_locales
 
 import gi
 
@@ -30,7 +31,7 @@ class DownloadKmpWindow(Gtk.Dialog):
         self.webview = WebKit2.WebView()
         self.webview.connect("decide-policy", self._keyman_policy)
         self.webview.connect("load-changed", self._update_back_button)
-        url = KeymanComUrl + "/go/linux/" + __releaseversion__ + "/download-keyboards"
+        url = KeymanComUrl + "/go/linux/" + __releaseversion__ + "/download-keyboards" + "?lang=" + self._get_current_locale()
         self.webview.load_uri(url)
         s.add(self.webview)
 
@@ -55,6 +56,12 @@ class DownloadKmpWindow(Gtk.Dialog):
 
         self.resize(800, 450)
         self.show_all()
+
+    def _get_current_locale(self):
+        loc = find_locales()[0]
+        if loc == "C": 
+            loc = "en"
+        return loc.replace('_','-')
 
     def _update_back_button(self, webview, load_event):
         self.back_button.set_sensitive(webview.can_go_back())

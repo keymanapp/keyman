@@ -31,7 +31,8 @@ $(function() {
   $('#btnDelLayer').click(function () {
     if ($('#selLayer option').length == 1) return;
     builder.saveUndo();
-    KVKL[builder.lastPlatform].layer.splice(builder.lastLayerIndex, 1);
+    const deletedLayer = KVKL[builder.lastPlatform].layer.splice(builder.lastLayerIndex, 1)[0];
+    updateNextLayerReferences(KVKL[builder.lastPlatform], deletedLayer.id, '');
     builder.selectPlatform();
     builder.generate(false,true);
   });
@@ -45,29 +46,8 @@ $(function() {
   // Layer dialogs
   //
 
-  function submitLayerProperties() {
-    var newLayerName = $('#layerName').val();
-    if (!newLayerName.match(/^[a-zA-Z0-9_-]+$/)) {
-      alert('Layer name must contain only alphanumerics, underscore and hyphen.');
-      return false;
-    }
-    for(var i = 0; i < KVKL[builder.lastPlatform].layer.length; i++) {
-      if(i != builder.lastLayerIndex && KVKL[builder.lastPlatform].layer[i].id == newLayerName) {
-        alert('Layer name must not already be in use for the current platform.');
-        return false;
-      }
-    }
-
-    builder.saveUndo();
-    builder.generate();
-
-    var platform = KVKL[builder.lastPlatform];
-    var oldLayerName = platform.layer[builder.lastLayerIndex].id;
-
-    let fixup = function(key) {
-      if (key.layer == oldLayerName) {
-        key.layer = newLayerName;
-      }
+  function updateNextLayerReferences(platform, oldLayerName, newLayerName) {
+    const fixup = function(key) {
       if (key.nextlayer == oldLayerName) {
         key.nextlayer = newLayerName;
       }
@@ -94,6 +74,28 @@ $(function() {
         });
       }
     });
+  }
+
+  function submitLayerProperties() {
+    const newLayerName = $('#layerName').val();
+    if (!newLayerName.match(/^[a-zA-Z0-9_-]+$/)) {
+      alert('Layer name must contain only alphanumerics, underscore and hyphen.');
+      return false;
+    }
+    for(let i = 0; i < KVKL[builder.lastPlatform].layer.length; i++) {
+      if(i != builder.lastLayerIndex && KVKL[builder.lastPlatform].layer[i].id == newLayerName) {
+        alert('Layer name must not already be in use for the current platform.');
+        return false;
+      }
+    }
+
+    builder.saveUndo();
+    builder.generate();
+
+    const platform = KVKL[builder.lastPlatform];
+    const oldLayerName = platform.layer[builder.lastLayerIndex].id;
+
+    updateNextLayerReferences(platform, oldLayerName, newLayerName);
 
     platform.layer[builder.lastLayerIndex].id = newLayerName;
     builder.prepareLayers();

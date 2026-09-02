@@ -179,7 +179,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\vkeys.h" />
+    <ClInclude Include="$(KEYMAN_ROOT)\common\include\vkeys.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\delphi\ext\sentry\sentry.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keymansentry.h" />
     <ClInclude Include="pch.h" />
@@ -192,7 +192,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
-    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\vkeys.cpp" />
+    <ClCompile Include="$(KEYMAN_ROOT)\common\cpp\vkeys.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="kmanalyze.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

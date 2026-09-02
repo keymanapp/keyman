@@ -2,13 +2,12 @@
   "extends": "../../../../../tsconfig.base.json",
 
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "../build/obj",
     "tsBuildInfoFile": "../build/obj/tsconfig.tsbuildinfo",
-    "rootDir": "./"
+    "rootDir": "./",
   },
   "references": [
-    { "path": "../../../common/web-utils" },
+    { "path": "../../../../common/web-utils" },
     { "path": "../../../../../../common/web/types"},
     { "path": "../../types"}
   ],

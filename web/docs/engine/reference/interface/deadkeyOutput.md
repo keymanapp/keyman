@@ -8,13 +8,13 @@ Deadkey output: Associates the [`deadkey`](/developer/language/reference/deadkey
 
 ## Syntax
 
-```c
+```js
 keyman.interface.deadkeyOutput(nd, Pelem, dk);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KDO(nd, Pelem, dk); // Shorthand
 ```
 
@@ -56,7 +56,7 @@ dk(backquote) + "a" > "à"
 
 The Developer compiler then generates a unique id for the deadkey state - say, `0`, and upon detecting input of the `` '`' `` character with the [`keyman.interface.deadkeyMatch()`](deadkeyMatch) function, compiles the deadkey generation to
 
-```c
+```js
 keyman.interface.deadkeyOutput(0, Pelem, 0);
 ```
 

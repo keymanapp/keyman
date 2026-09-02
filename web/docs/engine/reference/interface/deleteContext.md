@@ -8,13 +8,13 @@ Context deletion - removes the specified number of deadkeys and characters from 
 
 ## Syntax
 
-```c
+```js
 keyman.interface.deleteContext(dn, Pelem);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KDC(n, Pelem); // Shorthand
 ```
 
@@ -47,7 +47,7 @@ c Lots of keyboard rules...
 
 would have a rule output as follows:
 
-```c
+```js
 // Context is length four (three characters + one deadkey), so we delete all four.
 keyman.interface.deleteContext(4, element);
 ```

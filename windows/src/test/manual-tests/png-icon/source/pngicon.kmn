@@ -1,0 +1,12 @@
+﻿c pngicon generated from template at 2026-08-13 11:08:13
+c with name "pngicon"
+store(&VERSION) '10.0'
+store(&NAME) 'pngicon'
+store(&COPYRIGHT) 'Copyright ©'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'windows'
+store(&BITMAP) 'pngicon.ico'
+
+begin Unicode > use(main)
+
+group(main) using keys

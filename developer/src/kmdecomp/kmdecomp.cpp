@@ -21,7 +21,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "../../../common/windows/cpp/include/keymansentry.h"
-#include "../../../common/windows/cpp/include/keymanversion.h"
+#include "../../../common/include/keymanversion.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_file.h"
 

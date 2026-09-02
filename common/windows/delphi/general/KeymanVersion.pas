@@ -30,6 +30,17 @@ const
   TIER_STABLE = 'stable';
 
 const
+  ENVIRONMENT_TEST = 'test';
+  ENVIRONMENT_LOCAL = 'local';
+  ENVIRONMENT_ALPHA = 'alpha';
+  ENVIRONMENT_BETA = 'beta';
+  ENVIRONMENT_STABLE = 'stable';
+
+const
+  SKeymanVersion190 = '19.0';
+  SKeymanVersion180 = '18.0';
+  SKeymanVersion170 = '17.0';
+  SKeymanVersion160 = '16.0';
   SKeymanVersion150 = '15.0';
   SKeymanVersion140 = '14.0';
   SKeymanVersion130 = '13.0';

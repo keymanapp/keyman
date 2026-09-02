@@ -16,7 +16,7 @@ import Foundation
  */
 public enum KeymanHosts {
   /**
-   * Used to enable '.local' variants of the endpoints for use in local development testing.
+   * Used to enable '.localhost' variants of the endpoints for use in local development testing.
    */
   internal static let useLocal = false
 
@@ -24,7 +24,7 @@ public enum KeymanHosts {
   // save for use in automated testing.
   internal static func getApiSiteURL(forTier: Version.Tier, useLocal: Bool) -> URL {
     if useLocal {
-      return URL.init(string: "http://api.keyman.com.local")!
+      return URL.init(string: "http://api.keyman.com.localhost")!
     } else {
       switch forTier {
         case .alpha:
@@ -48,7 +48,7 @@ public enum KeymanHosts {
   // save for use in automated testing.
   internal static func getHelpSiteURL(forTier: Version.Tier, useLocal: Bool) -> URL {
     if useLocal {
-      return URL.init(string: "http://help.keyman.com.local")!
+      return URL.init(string: "http://help.keyman.com.localhost")!
     } else {
       switch forTier {
         case .alpha:
@@ -72,7 +72,7 @@ public enum KeymanHosts {
   // save for use in automated testing.
   internal static func getMainSiteURL(forTier: Version.Tier, useLocal: Bool) -> URL {
     if useLocal {
-      return URL.init(string: "http://keyman.com.local")!
+      return URL.init(string: "http://keyman.com.localhost")!
     } else {
       switch forTier {
         case .alpha:

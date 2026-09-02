@@ -1,0 +1,13 @@
+{
+  "extends": "../../../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": [ "dom", "es6" ],
+    "outDir": "../../../../../build/tools/testing/gesture-processor/unit-test-resources/obj",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../../../../build/tools/testing/gesture-processor/unit-test-resources/tsconfig.tsbuildinfo",
+  },
+  "references": [
+    { "path": "../../../../engine/" }
+  ],
+  "include": ["./src/**/*.ts"]
+}

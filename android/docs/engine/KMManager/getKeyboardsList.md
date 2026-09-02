@@ -26,33 +26,6 @@ otherwise.
 
 Use this method to get details of all keyboard's in keyboards menu.
 
-  
-
-------------------------------------------------------------------------
-
-## Syntax (Deprecated)
-
-``` javascript
-KMManager.getKeyboardsList(Context context)
-```
-
-### Parameters
-
-`context`
-:   The context.
-
-### Returns
-
-(Deprecated) Returns keyboards list as
-`ArrayList<HashMap<String key, String value>>` if it exists, `null`
-otherwise.
-
-## Description
-
-Use this method to get details of all keyboard's in keyboards menu.
-
-  
-
 ------------------------------------------------------------------------
 
 ## Examples

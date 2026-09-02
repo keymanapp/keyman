@@ -1,14 +1,14 @@
 ---
 title: osk.hide Event
 ---
-  
+
 ## Summary
 
 Called when the OSK is hidden.
 
 ## Syntax
 
-```
+```js
 keyman.osk.addEventListener('hide', function(param) {
   ...
 });
@@ -28,6 +28,6 @@ keyman.osk.addEventListener('hide', function(param) {
     not. Your event handler should return `true` aside from exceptional
     circumstances.
 
-## Description
+## See also
 
-...
+* [`show` event](show)

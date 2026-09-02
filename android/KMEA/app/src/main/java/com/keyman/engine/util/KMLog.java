@@ -24,16 +24,11 @@ import io.sentry.SentryLevel;
 public final class KMLog {
   private static final String TAG = "KMLog";
 
-  private static final String KEYBOARD_TAG = "keyboardId";
-  private static final String KEYBOARD_COUNT_TAG = "installedKeyboardCount";
-  private static final String MODEL_TAG = "modelId";
-  private static final String LANGCODE_TAG = "languageCode";
-
-  // Some of the methods used to generate debug logging information can, themselves,
-  // trigger errors that can also trigger the same logging.  We must not get
-  // caught in an infinite loop / stack-overflow; this field helps us avoid states
-  // that would otherwise cause error-looping, etc.
-  private static boolean isLogging = false;
+  private static final String KEYBOARD_TAG = "keyman.keyboardId";
+  private static final String KEYBOARD_COUNT_TAG = "keyman.installedKeyboardCount";
+  private static final String MODEL_TAG = "keyman.modelId";
+  private static final String LANGCODE_TAG = "keyman.languageCode";
+  private static final String DEBUG_LOGGING_ERROR_TAG = "keyman.debugLoggingError";
 
   private static void tagDebugInfo() {
     String kbdId = "";
@@ -57,13 +52,16 @@ public final class KMLog {
         }
       }
     } catch (Exception ex) {
-      String msg = ex.getMessage() == null ? "" : ex.getMessage();
-      Sentry.setExtra("debugLoggingError", msg);
+      Sentry.setTag(DEBUG_LOGGING_ERROR_TAG,  ex.getMessage() == null ? "" : ex.getMessage());
     }
-    Sentry.setExtra(KEYBOARD_TAG, kbdId);
-    Sentry.setExtra(KEYBOARD_COUNT_TAG, "" + kbdCount);
-    Sentry.setExtra(LANGCODE_TAG, lngCode);
-    Sentry.setExtra(MODEL_TAG, modelId);
+    Sentry.setTag(KEYBOARD_TAG, kbdId);
+    Sentry.setTag(KEYBOARD_COUNT_TAG, "" + kbdCount);
+    Sentry.setTag(LANGCODE_TAG, lngCode);
+    Sentry.setTag(MODEL_TAG, modelId);
+  }
+
+  private static boolean canLogToSentry() {
+    return DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled();
   }
 
   /**
@@ -72,19 +70,20 @@ public final class KMLog {
    * @param msg String of the info message
    */
   public static void LogInfo(String tag, String msg) {
-    if(isLogging) {
+    if (msg == null || msg.isEmpty()) {
       return;
     }
-    isLogging = true;
-    if (msg != null && !msg.isEmpty()) {
-      Log.i(tag, msg);
 
-      if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
-        tagDebugInfo();
-        Sentry.captureMessage(msg, SentryLevel.INFO);
-      }
+    Log.i(tag, msg);
+
+    if (!canLogToSentry()) {
+      return;
     }
-    isLogging = false;
+
+    Sentry.withScope(scope -> {
+      tagDebugInfo();
+      Sentry.captureMessage(msg, SentryLevel.INFO);
+    });
   }
 
   /**
@@ -98,15 +97,9 @@ public final class KMLog {
       return;
     }
 
-    if(isLogging) {
-      return;
-    }
-    isLogging = true;
-
     Log.i(tag, msg);
 
-    if (!DependencyUtil.libraryExists(LibraryType.SENTRY) || !Sentry.isEnabled()) {
-      isLogging = false;
+    if (!canLogToSentry()) {
       return;
     }
 
@@ -114,27 +107,30 @@ public final class KMLog {
     crumb.setMessage(msg);
     crumb.setLevel(SentryLevel.INFO);
 
-    if(addStackTrace) {
-      StackTraceElement[] rawTrace = Thread.currentThread().getStackTrace();
+    try {
+      if(addStackTrace) {
+        StackTraceElement[] rawTrace = Thread.currentThread().getStackTrace();
 
-      // The call that gets us the stack-trace above... shows up in the
-      // stack trace, so we'll skip the first few (redundant) entries.
-      int skipCount = 3;
+        // The call that gets us the stack-trace above... shows up in the
+        // stack trace, so we'll skip the first few (redundant) entries.
+        int skipCount = 3;
 
-      // Sentry does limit the size of messages... so let's just
-      // keep 10 entries and call it a day.
-      int limit = Math.min(rawTrace.length, 10 + skipCount);
-      if(rawTrace.length > skipCount) {
-        String[] trace = new String[limit - skipCount];
-        for (int i = skipCount; i < limit; i++) {
-          trace[i-skipCount] = rawTrace[i].toString();
+        // Sentry does limit the size of messages... so let's just
+        // keep 10 entries and call it a day.
+        if(rawTrace.length > skipCount) {
+          int limit = Math.min(rawTrace.length, 10 + skipCount);
+          String[] trace = new String[limit - skipCount];
+          for (int i = skipCount; i < limit; i++) {
+            trace[i-skipCount] = rawTrace[i].toString();
+          }
+          crumb.setData("stacktrace", trace);
         }
-        crumb.setData("stacktrace", trace);
       }
+    } catch (Exception e) {
+      Sentry.captureException(e);
     }
-    tagDebugInfo();
+
     Sentry.addBreadcrumb(crumb);
-    isLogging = false;
   }
 
   /**
@@ -143,23 +139,32 @@ public final class KMLog {
    * @param msg String of the error message
    */
   public static void LogError(String tag, String msg) {
-    if(isLogging) {
+    if (msg == null || msg.isEmpty()) {
       return;
     }
-    isLogging = true;
-    if (msg != null && !msg.isEmpty()) {
-      Log.e(tag, msg);
 
+    Log.e(tag, msg);
+
+    try {
+      // On alpha and beta tiers, we pop an error toast so testers can be aware
+      // of the error
       if (KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME) != KMManager.Tier.STABLE) {
         BaseActivity.makeToast(null, msg, Toast.LENGTH_LONG);
       }
-
-      if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
-        tagDebugInfo();
-        Sentry.captureMessage(msg, SentryLevel.ERROR);
+    } catch(Exception e) {
+      if(canLogToSentry()) {
+        Sentry.captureException(e);
       }
     }
-    isLogging = false;
+
+    if (!canLogToSentry()) {
+      return;
+    }
+
+    Sentry.withScope(scope -> {
+      tagDebugInfo();
+      Sentry.captureMessage(msg, SentryLevel.ERROR);
+    });
   }
 
   /**
@@ -169,28 +174,7 @@ public final class KMLog {
    * @param e Throwable exception
    */
   public static void LogException(String tag, String msg, Throwable e) {
-    if(isLogging) {
-      return;
-    }
-    isLogging = true;
-    String errorMsg = "";
-    if (msg != null && !msg.isEmpty()) {
-      errorMsg = msg + "\n" + e;
-    } else if (e != null) {
-      errorMsg = e.getMessage();
-    }
-    Log.e(tag, errorMsg, e);
-
-    if (KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME) != KMManager.Tier.STABLE) {
-      BaseActivity.makeToast(null, errorMsg, Toast.LENGTH_LONG);
-    }
-
-    if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
-      tagDebugInfo();
-      Sentry.addBreadcrumb(errorMsg);
-      Sentry.captureException(e);
-    }
-    isLogging = false;
+    KMLog.LogExceptionWithData(tag, msg, null, null, e);
   }
 
   /**
@@ -203,25 +187,48 @@ public final class KMLog {
    */
   public static void LogExceptionWithData(String tag, String msg,
                                           String objName, Object obj, Throwable e) {
-    if(isLogging) {
+    String errorMsg = "";
+    try {
+      if (msg != null && !msg.isEmpty()) {
+        errorMsg = msg + "\n" + e;
+      } else if (e != null) {
+        errorMsg = e.toString();
+      }
+
+      // On alpha and beta tiers, we pop an error toast so testers can be aware
+      // of the exception
+      if (KMManager.getTier(BuildConfig.KEYMAN_ENGINE_VERSION_NAME) != KMManager.Tier.STABLE) {
+        BaseActivity.makeToast(null, errorMsg, Toast.LENGTH_LONG);
+      }
+    } catch (Exception innerE) {
+      if (canLogToSentry()) {
+        Sentry.captureException(innerE);
+      }
+    }
+
+    Log.e(tag, errorMsg);
+
+    if (!canLogToSentry()) {
       return;
     }
-    isLogging = true;
-    if (obj != null && DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+
+    Sentry.addBreadcrumb(errorMsg);
+    Sentry.withScope(scope -> {
       tagDebugInfo();
-      String objStr = null;
       try {
-        objStr = obj.toString();
-        Sentry.setExtra(objName, objStr);
-      } catch (Exception innerE) {
-        LogException(TAG, "Sentry.setExtra failed for " + objName, innerE);
+        if(obj != null && objName != null) {
+          Sentry.setExtra(objName, obj.toString());
+        }
+      } catch(Exception innerE) {
+        Sentry.captureException(innerE);
       }
-      // Report the original exception
-      LogException(tag, msg, e);
-      // And remove the exception-specific tagged data, lest it also be
-      // tracked on subsequent errors not associated with the current call.
-      Sentry.removeExtra(objName);
-    }
-    isLogging = false;
+      Sentry.captureException(e);
+
+      if(obj != null && objName != null) {
+        // And remove the exception-specific tagged data, lest it also be
+        // tracked on subsequent errors not associated with the current call.
+        Sentry.removeExtra(objName);
+      }
+    });
   }
 }

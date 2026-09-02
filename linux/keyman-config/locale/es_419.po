@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: keyman\n"
 "Report-Msgid-Bugs-To: <support@keyman.com>\n"
-"POT-Creation-Date: 2020-08-19 19:17+0200\n"
-"PO-Revision-Date: 2023-06-19 17:25\n"
+"POT-Creation-Date: 2025-12-18 09:43+0700\n"
+"PO-Revision-Date: 2026-08-12 14:15\n"
 "Last-Translator: \n"
 "Language-Team: Spanish, Latin America\n"
 "Language: es_419\n"
@@ -17,316 +17,425 @@ msgstr ""
 "X-Crowdin-File: /master/linux/keyman-config.pot\n"
 "X-Crowdin-File-ID: 504\n"
 
-#: keyman_config/__init__.py:68
-msgid "Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting."
-msgstr "Ni sentry-sdk ni raven están disponibles. No se habilita la notificación de errores de Sentry."
-
-#: keyman_config/downloadkeyboard.py:23
+#: keyman_config/downloadkeyboard.py:24
 msgid "Download Keyman keyboards"
 msgstr "Descargar teclados de Keyman"
 
-#: keyman_config/downloadkeyboard.py:37 keyman_config/keyboard_details.py:49
-#: keyman_config/keyboard_details.py:340 keyman_config/view_installed.py:205
+#: keyman_config/downloadkeyboard.py:42
+msgid "_Back"
+msgstr ""
+
+#: keyman_config/downloadkeyboard.py:43
+msgid "Back to search"
+msgstr ""
+
+#: keyman_config/downloadkeyboard.py:48 keyman_config/keyboard_details.py:103
+#: keyman_config/keyboard_details.py:186 keyman_config/view_installed.py:174
 msgid "_Close"
 msgstr "Ce_rrar"
 
-#: keyman_config/install_kmp.py:99
+#: keyman_config/downloadkeyboard.py:49
+msgid "Close dialog"
+msgstr "Cerrar diálogo"
+
+#: keyman_config/downloadkeyboard.py:76
+msgid "Downloading kmp file failed"
+msgstr "Error al descargar el archivo kmp"
+
+#: keyman_config/downloadkeyboard.py:79
+msgid "Downloading keyboard file failed"
+msgstr "Error al descargar el archivo de teclado"
+
+#: keyman_config/get_kmp.py:34
+msgid "System"
+msgstr "Sistema"
+
+#: keyman_config/get_kmp.py:36
+msgid "Shared"
+msgstr "Compartido"
+
+#: keyman_config/get_kmp.py:38
+msgid "User"
+msgstr "Usuario"
+
+#: keyman_config/get_kmp.py:39
+msgid "Unknown"
+msgstr "Desconocido"
+
+#: keyman_config/install_kmp.py:87
 msgid "You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman"
 msgstr "No tienes permisos para instalar los archivos de teclado en el área compartida /usr/local/share/keyman"
 
-#: keyman_config/install_kmp.py:103
+#: keyman_config/install_kmp.py:91
 msgid "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman"
 msgstr "No tienes permisos para instalar la documentación en el área compartida de documentación /usr/local/share/doc/keyman"
 
-#: keyman_config/install_kmp.py:107
+#: keyman_config/install_kmp.py:95
 msgid "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts"
 msgstr "No tienes permisos para instalar los archivos de fuentes en el área compartida de fuentes /usr/local/share/fonts"
 
-#: keyman_config/install_kmp.py:179
+#: keyman_config/install_kmp.py:113
 #, python-brace-format
-msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {package}"
-msgstr "install_kmp.py: error: no se encontró ningún kmp.json o kmp.inf en {package}"
+msgid "File {kmpfile} doesn't exist"
+msgstr "El archivo {kmpfile} no existe"
 
-#: keyman_config/install_kmp.py:246
+#: keyman_config/install_kmp.py:132
 #, python-brace-format
-msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {packageFile}"
-msgstr "install_kmp.py: error: no se encontró ningún kmp.json o kmp.inf en {packageFile}"
+msgid "No kmp.json or kmp.inf found in {packageFile}"
+msgstr ""
 
-#: keyman_config/install_window.py:54
+#: keyman_config/install_kmp.py:159
+#, python-brace-format
+msgid "{packageFile} requires Keyman {keymanVersion} or higher"
+msgstr ""
+
+#: keyman_config/install_kmp.py:307
+msgid "Please use fcitx5-configtool to add the keyboard to the desired group"
+msgstr ""
+
+#: keyman_config/install_window.py:62
 #, python-brace-format
 msgid "Installing keyboard/package {keyboardid}"
 msgstr "Instalando teclado/paquete {keyboardid}"
 
-#: keyman_config/install_window.py:72 keyman_config/install_window.py:93
-msgid "Keyboard is installed already"
-msgstr "El teclado ya está instalado"
-
-#: keyman_config/install_window.py:74
-#, python-brace-format
-msgid "The {name} keyboard is already installed at version {version}. Do you want to uninstall then reinstall it?"
-msgstr "El teclado {name} ya está instalado en la versión {version}. ¿Deseas desinstalarlo y luego reinstalarlo?"
-
 #: keyman_config/install_window.py:95
+msgid "Details"
+msgstr "Detalles"
+
+#: keyman_config/install_window.py:98
+msgid "README"
+msgstr "LÉAME"
+
+#: keyman_config/install_window.py:125
+#, python-brace-format
+msgid "The file '{kmpfile}' is not a Keyman keyboard package!"
+msgstr ""
+
+#. i18n: The words in braces (e.g. `{name}`) are placeholders. Don't translate them!
+#: keyman_config/install_window.py:141
 #, python-brace-format
 msgid "The {name} keyboard is already installed with a newer version {installedversion}. Do you want to uninstall it and install the older version {version}?"
 msgstr "El teclado {name} ya está instalado en una versión más nueva {installedversion}. ¿Deseas desinstalarlo e instalar la versión más vieja {version}?"
 
-#: keyman_config/install_window.py:128
-msgid "Keyboard layouts:   "
-msgstr "Distribuciones de teclado:   "
+#: keyman_config/install_window.py:161
+msgid "Keyboard is installed already"
+msgstr "El teclado ya está instalado"
 
-#: keyman_config/install_window.py:147
-msgid "Fonts:   "
-msgstr "Fuentes:   "
-
-#: keyman_config/install_window.py:167 keyman_config/keyboard_details.py:96
-msgid "Package version:   "
-msgstr "Versión del paquete:   "
-
-#: keyman_config/install_window.py:179
-msgid "Author:   "
-msgstr "Autor:   "
-
-#: keyman_config/install_window.py:197
-msgid "Website:   "
-msgstr "Página web:   "
-
-#: keyman_config/install_window.py:211
-msgid "Copyright:   "
-msgstr "Derechos de autor:   "
-
-#: keyman_config/install_window.py:245
-msgid "Details"
-msgstr "Detalles"
-
-#: keyman_config/install_window.py:248
-msgid "README"
-msgstr "LÉAME"
-
-#: keyman_config/install_window.py:256 keyman_config/view_installed.py:200
+#: keyman_config/install_window.py:170
 msgid "_Install"
 msgstr "_Instalar"
 
-#: keyman_config/install_window.py:260
+#: keyman_config/install_window.py:174
 msgid "_Cancel"
 msgstr "_Cancelar"
 
-#: keyman_config/install_window.py:305
+#: keyman_config/install_window.py:230
+msgid "Keyboard layouts:   "
+msgstr "Distribuciones de teclado:   "
+
+#: keyman_config/install_window.py:250
+msgid "Fonts:   "
+msgstr "Fuentes:   "
+
+#: keyman_config/install_window.py:272 keyman_config/keyboard_details.py:81
+msgid "Package version:   "
+msgstr "Versión del paquete:   "
+
+#: keyman_config/install_window.py:288
+msgid "Author:   "
+msgstr "Autor:   "
+
+#: keyman_config/install_window.py:306
+msgid "Website:   "
+msgstr "Página web:   "
+
+#: keyman_config/install_window.py:321
+msgid "Copyright:   "
+msgstr "Derechos de autor:   "
+
+#: keyman_config/install_window.py:384
 #, python-brace-format
 msgid "Keyboard {name} installed"
 msgstr "Teclado {name} instalado"
 
-#: keyman_config/install_window.py:310 keyman_config/install_window.py:315
+#: keyman_config/install_window.py:397 keyman_config/install_window.py:402
 #, python-brace-format
 msgid "Keyboard {name} could not be installed."
 msgstr "No se pudo instalar el teclado {name}."
 
-#: keyman_config/install_window.py:311
+#: keyman_config/install_window.py:398
 msgid "Error Message:"
 msgstr "Mensajes de error:"
 
-#: keyman_config/install_window.py:316
+#: keyman_config/install_window.py:403
 msgid "Warning Message:"
 msgstr "Mensaje de advertencia:"
 
-#: keyman_config/keyboard_details.py:37
+#: keyman_config/keyboard_details.py:44
 #, python-brace-format
 msgid "{name} keyboard"
 msgstr "Teclado {name}"
 
-#: keyman_config/keyboard_details.py:53
+#: keyman_config/keyboard_details.py:77
+msgid "Package name:   "
+msgstr "Nombre del paquete:   "
+
+#: keyman_config/keyboard_details.py:79
+msgid "Package id:   "
+msgstr "Nombre del paquete:   "
+
+#: keyman_config/keyboard_details.py:84
+msgid "Package description:   "
+msgstr "Descripción del paquete:   "
+
+#: keyman_config/keyboard_details.py:87
+msgid "Package author:   "
+msgstr "Autor del paquete:   "
+
+#: keyman_config/keyboard_details.py:90
+msgid "Package copyright:   "
+msgstr "Derechos de autor del paquete:   "
+
+#: keyman_config/keyboard_details.py:131
+msgid "Keyboard filename:   "
+msgstr "Nombre de archivo del teclado:   "
+
+#: keyman_config/keyboard_details.py:139
+msgid "Keyboard name:   "
+msgstr "Nombre del teclado:   "
+
+#: keyman_config/keyboard_details.py:140
+msgid "Keyboard id:   "
+msgstr "Nombre del teclado:   "
+
+#: keyman_config/keyboard_details.py:141
+msgid "Keyboard version:   "
+msgstr "Versión del teclado:   "
+
+#: keyman_config/keyboard_details.py:143
+msgid "Keyboard author:   "
+msgstr "Autor del teclado:   "
+
+#: keyman_config/keyboard_details.py:146
+msgid "Keyboard license:   "
+msgstr "Licencia del teclado:   "
+
+#: keyman_config/keyboard_details.py:148
+msgid "Keyboard description:   "
+msgstr "Descripción del teclado:   "
+
+#: keyman_config/keyboard_details.py:191
 msgid "ERROR: Keyboard metadata is damaged.\n"
 "Please \"Uninstall\" and then \"Install\" the keyboard."
 msgstr "ERROR: Los metadatos del teclado están dañados.\n"
 "Por favor \"Desinstalar\" y luego \"Instalar\" el teclado."
 
-#: keyman_config/keyboard_details.py:74
-msgid "Package name:   "
-msgstr "Nombre del paquete:   "
-
-#: keyman_config/keyboard_details.py:85
-msgid "Package id:   "
-msgstr "Nombre del paquete:   "
-
-#: keyman_config/keyboard_details.py:108
-msgid "Package description:   "
-msgstr "Descripción del paquete:   "
-
-#: keyman_config/keyboard_details.py:121
-msgid "Package author:   "
-msgstr "Autor del paquete:   "
-
-#: keyman_config/keyboard_details.py:133
-msgid "Package copyright:   "
-msgstr "Derechos de autor del paquete:   "
-
-#: keyman_config/keyboard_details.py:174
-msgid "Keyboard filename:   "
-msgstr "Nombre de archivo del teclado:   "
-
-#: keyman_config/keyboard_details.py:187
-msgid "Keyboard name:   "
-msgstr "Nombre del teclado:   "
-
-#: keyman_config/keyboard_details.py:198
-msgid "Keyboard id:   "
-msgstr "Nombre del teclado:   "
-
-#: keyman_config/keyboard_details.py:209
-msgid "Keyboard version:   "
-msgstr "Versión del teclado:   "
-
-#: keyman_config/keyboard_details.py:221
-msgid "Keyboard author:   "
-msgstr "Autor del teclado:   "
-
-#: keyman_config/keyboard_details.py:232
-msgid "Keyboard license:   "
-msgstr "Licencia del teclado:   "
-
-#: keyman_config/keyboard_details.py:243
-msgid "Keyboard description:   "
-msgstr "Descripción del teclado:   "
-
-#: keyman_config/keyboard_details.py:334
+#: keyman_config/keyboard_details.py:220
 #, python-brace-format
 msgid "Scan this code to load this keyboard\n"
 "on another device or <a href='{uri}'>share online</a>"
 msgstr "Escanea este código para cargar este teclado\n"
 "en otro dispositivo o <a href='{uri}'>compártelo en línea</a>"
 
-#: keyman_config/options.py:24
-#, python-brace-format
-msgid "{packageId} Settings"
-msgstr "Configuración de {packageId}"
-
-#: keyman_config/view_installed.py:30
-msgid "Keyman Configuration"
-msgstr "Configuración de Keyman"
-
-#: keyman_config/view_installed.py:60
-msgid "Choose a kmp file..."
-msgstr "Elige un archivo kmp..."
-
-#. i18n: file type in file selection dialog
-#: keyman_config/view_installed.py:65
-msgid "KMP files"
-msgstr "Archivos KMP"
-
 #. i18n: column header in table displaying installed keyboards
-#: keyman_config/view_installed.py:141
+#: keyman_config/keyboard_layouts_widget.py:37
 msgid "Icon"
 msgstr "Ícono"
 
 #. i18n: column header in table displaying installed keyboards
-#: keyman_config/view_installed.py:145
+#: keyman_config/keyboard_layouts_widget.py:41
 msgid "Name"
 msgstr "Nombre"
 
 #. i18n: column header in table displaying installed keyboards
-#: keyman_config/view_installed.py:148
+#: keyman_config/keyboard_layouts_widget.py:44
 msgid "Version"
 msgstr "Versión"
 
-#: keyman_config/view_installed.py:161
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/keyboard_layouts_widget.py:47
+msgid "Area"
+msgstr ""
+
+#: keyman_config/keyboard_layouts_widget.py:65
 msgid "_Uninstall"
 msgstr "De_sinstalar"
 
-#: keyman_config/view_installed.py:162 keyman_config/view_installed.py:304
+#: keyman_config/keyboard_layouts_widget.py:66 keyman_config/keyboard_layouts_widget.py:125
 msgid "Uninstall keyboard"
 msgstr "Desinstalar teclado"
 
-#: keyman_config/view_installed.py:167
+#: keyman_config/keyboard_layouts_widget.py:71
 msgid "_About"
 msgstr "So_bre"
 
-#: keyman_config/view_installed.py:168 keyman_config/view_installed.py:306
+#: keyman_config/keyboard_layouts_widget.py:72 keyman_config/keyboard_layouts_widget.py:127
 msgid "About keyboard"
 msgstr "Sobre el teclado"
 
-#: keyman_config/view_installed.py:173
+#: keyman_config/keyboard_layouts_widget.py:77
 msgid "_Help"
 msgstr "A_yuda"
 
-#: keyman_config/view_installed.py:174 keyman_config/view_installed.py:305
+#: keyman_config/keyboard_layouts_widget.py:78 keyman_config/keyboard_layouts_widget.py:126
 msgid "Help for keyboard"
 msgstr "Ayuda para el teclado"
 
-#: keyman_config/view_installed.py:179
+#: keyman_config/keyboard_layouts_widget.py:83
 msgid "_Options"
 msgstr "_Opciones"
 
-#: keyman_config/view_installed.py:180 keyman_config/view_installed.py:307
+#: keyman_config/keyboard_layouts_widget.py:84 keyman_config/keyboard_layouts_widget.py:128
 msgid "Settings for keyboard"
 msgstr "Configuración del teclado"
 
-#: keyman_config/view_installed.py:190
-msgid "_Refresh"
-msgstr "Ac_tualizar"
-
-#: keyman_config/view_installed.py:191
-msgid "Refresh keyboard list"
-msgstr "Actualizar lista de teclados"
-
-#: keyman_config/view_installed.py:195
-msgid "_Download"
-msgstr "_Descargar"
-
-#: keyman_config/view_installed.py:196
-msgid "Download and install a keyboard from the Keyman website"
-msgstr "Descargar e instalar un teclado desde la página web de Keyman"
-
-#: keyman_config/view_installed.py:201
-msgid "Install a keyboard from a file"
-msgstr "Instalar un teclado desde un archivo"
-
-#: keyman_config/view_installed.py:206
-msgid "Close window"
-msgstr "Cerrar ventana"
-
-#: keyman_config/view_installed.py:278
+#: keyman_config/keyboard_layouts_widget.py:97
 #, python-brace-format
 msgid "Uninstall keyboard {package}"
 msgstr "Desinstalar teclado {package}"
 
-#: keyman_config/view_installed.py:280
+#: keyman_config/keyboard_layouts_widget.py:99
 #, python-brace-format
 msgid "Help for keyboard {package}"
 msgstr "Ayuda para el teclado {package}"
 
-#: keyman_config/view_installed.py:282
+#: keyman_config/keyboard_layouts_widget.py:101
 #, python-brace-format
 msgid "About keyboard {package}"
 msgstr "Sobre el teclado {package}"
 
-#: keyman_config/view_installed.py:284
+#: keyman_config/keyboard_layouts_widget.py:103
 #, python-brace-format
 msgid "Settings for keyboard {package}"
 msgstr "Configuración del teclado {package}"
 
-#: keyman_config/view_installed.py:349
+#: keyman_config/keyboard_layouts_widget.py:141
 msgid "Uninstall keyboard package?"
 msgstr "¿Desinstalar paquete del teclado?"
 
-#: keyman_config/view_installed.py:351
+#: keyman_config/keyboard_layouts_widget.py:142
 #, python-brace-format
-msgid "Are you sure that you want to uninstall the {keyboard} keyboard and its fonts?"
-msgstr "¿Estás seguro de que deseas desinstalar el teclado {keyboard} y sus fuentes?"
+msgid "Are you sure that you want to uninstall the {keyboard} keyboard?"
+msgstr ""
 
-#: keyman_config/welcome.py:22
+#: keyman_config/keyboard_layouts_widget.py:149
+msgid "The following fonts will also be uninstalled:\n"
+msgstr ""
+
+#: keyman_config/keyboard_layouts_widget.py:160
+msgid "Uninstalling keyboard failed.\n\n"
+"Error message: "
+msgstr ""
+
+#: keyman_config/keyboard_options_view.py:26
+#, python-brace-format
+msgid "{packageId} Settings"
+msgstr "Configuración de {packageId}"
+
+#: keyman_config/options_widget.py:16
+msgid "General"
+msgstr "General"
+
+#: keyman_config/options_widget.py:24
+msgid "Automatically report errors to keyman.com"
+msgstr "Reportar errores a keyman.com automáticamente"
+
+#: keyman_config/options_widget.py:39
+msgid "Simulate AltGr with Ctrl + Alt"
+msgstr ""
+
+#: keyman_config/sentry_handling.py:55 keyman_config/sentry_handling.py:58
+msgid "Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting."
+msgstr "Ni sentry-sdk ni raven están disponibles. No se habilita los informes de errores de Sentry."
+
+#: keyman_config/uninstall_kmp.py:85
+#, python-format
+msgid "You do not have permission to uninstall the files in %s. You need to run this with `sudo`."
+msgstr ""
+
+#: keyman_config/uninstall_kmp.py:136
+msgid "Please use fcitx5-configtool to remove the keyboard from the group"
+msgstr ""
+
+#: keyman_config/view_installed.py:38
+msgid "Keyman Configuration"
+msgstr "Configuración de Keyman"
+
+#: keyman_config/view_installed.py:69
+msgid "Choose a kmp file..."
+msgstr "Elige un archivo kmp..."
+
+#. i18n: file type in file selection dialog
+#: keyman_config/view_installed.py:74
+msgid "KMP files"
+msgstr "Archivos KMP"
+
+#: keyman_config/view_installed.py:107
+msgid "ibus-daemon is not running. Try to start ibus-daemon now?"
+msgstr ""
+
+#: keyman_config/view_installed.py:109
+msgid "If you just recently installed Keyman you might have to reboot or logout and login again."
+msgstr ""
+
+#: keyman_config/view_installed.py:117
+msgid "Unable to start ibus-daemon. Please reboot or logout and login again."
+msgstr ""
+
+#: keyman_config/view_installed.py:151
+msgid "Keyboard Layouts"
+msgstr "Distribuciones de teclado"
+
+#: keyman_config/view_installed.py:152
+msgid "Options"
+msgstr "Opciones"
+
+#: keyman_config/view_installed.py:159
+msgid "_Install keyboard..."
+msgstr ""
+
+#: keyman_config/view_installed.py:160
+msgid "Install a keyboard from a file"
+msgstr "Instalar un teclado desde un archivo"
+
+#: keyman_config/view_installed.py:164
+msgid "_Download keyboard..."
+msgstr ""
+
+#: keyman_config/view_installed.py:165
+msgid "Download and install a keyboard from the Keyman website"
+msgstr "Descargar e instalar un teclado desde la página web de Keyman"
+
+#: keyman_config/view_installed.py:169
+msgid "_Refresh"
+msgstr "Ac_tualizar"
+
+#: keyman_config/view_installed.py:170
+msgid "Refresh keyboard list"
+msgstr "Actualizar lista de teclados"
+
+#: keyman_config/view_installed.py:175
+msgid "Close window"
+msgstr "Cerrar ventana"
+
+#: keyman_config/welcome.py:25
 #, python-brace-format
 msgid "{name} installed"
 msgstr "{name} instalado"
 
-#: keyman_config/welcome.py:40
+#: keyman_config/welcome.py:43
 msgid "Open in _Web browser"
 msgstr "Abrir en navegador _web"
 
-#: keyman_config/welcome.py:42
+#: keyman_config/welcome.py:45
 msgid "Open in the default web browser to do things like printing"
 msgstr "Abrir en el navegador web predeterminado para hacer cosas como imprimir"
 
-#: keyman_config/welcome.py:45
+#: keyman_config/welcome.py:48
 msgid "_OK"
 msgstr "_Aceptar"
+
+#: km-config:53
+msgid "Missing requirements. Please install python3-fonttools."
+msgstr "Requisitos faltantes. Por favor, instale python3-fonttools."
 

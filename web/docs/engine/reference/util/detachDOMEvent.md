@@ -8,7 +8,7 @@ Detach DOM event handler from element to prevent memory leaks.
 
 ## Syntax
 
-```c
+```js
 keyman.util.detachDOMEvent();
 ```
 

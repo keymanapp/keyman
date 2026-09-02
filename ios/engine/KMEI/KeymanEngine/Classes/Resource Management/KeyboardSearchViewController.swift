@@ -79,7 +79,12 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
     // API endpoint only supports major.minor, will break if `.build` is also present
     baseURL.appendPathComponent(Version.current.majorMinor.description)
     baseURL.appendPathComponent("download-keyboards")
-
+    if #available(iOS 16.0, *) {
+      var langQueryItem = URLQueryItem(name:"lang", value:Bundle.main.preferredLocalizations[0])
+      baseURL.append(queryItems:[langQueryItem])
+    } else {
+      // We won't pass the localization on earlier versions of iOS
+    }
     return baseURL
   }
 
@@ -113,6 +118,10 @@ public class KeyboardSearchViewController: UIViewController, WKNavigationDelegat
     config.defaultWebpagePreferences = pref
 
     let webView = WKWebView.init(frame: CGRect.zero, configuration: config)
+    // For debugging:
+    // if #available(iOS 16.4, *) {
+    //   webView.isInspectable = true
+    // }
     webView.navigationDelegate = self
     if let languageCode = languageCode {
       let baseURL = KeyboardSearchViewController.ENDPOINT_ROOT

@@ -1,16 +1,18 @@
-﻿/*(C) Copyright 2021 SIL International. All Rights Reserved. Details: keymanweb.com*/
-function loadKeyboards() {
-    // Uses an older type of keyboard stub definition.
-    var KWK={
-        "devanagari_inscript":{KN:"Devanagari (INSCRIPT)", KLC:"hi", KL:"Hindi"},
-        "european2":{KN:"EuroLatin2", KLC:"en", KL:"English"},
-        "hebrew":{KN:"Hebrew", KLC:"he", KL:"Hebrew"},
-        "korean_korda":{KN:"Korean (KORDA) - 30 Day Evaluation", KLC:"ko", KL:"Korean"},
-        "korean_morse":{KN:"Korean (Morse) - 30 Day Evaluation", KLC:"ko", KL:"Korean"},
-        "laokeys":{KN:"Lao (Phonetic)", KLC:"lo", KL:"Lao"}
-    };
+﻿/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+async function loadKeyboards() {
+  const keyboardList = [
+    { id: 'devanagari_inscript', name: 'Devanagari (INSCRIPT)', languages: { id: 'hi', name: 'Hindi' }, filename: './js/devanagari_inscript.js' },
+    { id: 'european2', name: 'EuroLatin2', languages: { id: 'en', name: 'English' }, filename: './js/european2.js' },
+    { id: 'hebrew', name: 'Hebrew', languages: { id: 'he', name: 'Hebrew' }, filename: './js/hebrew.js' },
+    { id: 'korean_korda', name: 'Korean (KORDA)', languages: { id: 'ko', name: 'Korean' }, filename: './js/korean_korda.js' },
+    { id: 'korean_morse', name: 'Korean (Morse)', languages: { id: 'ko', name: 'Korean' }, filename: './js/korean_morse.js' },
+    // using a KeyboardStub would allow to customize e.g. which font the keyboard uses
+    { KF: "./js/laokeys.js", KI: "Keyboard_laokeys", KN: "Lao (Phonetic)", KL: "Lao", KLC: "lo" }
+  ];
 
-    for(var n in KWK) {
-        KeymanWeb.registerStub({KF:"./js/" + n+".js", KI:"Keyboard_"+n, KN:KWK[n].KN, KL:KWK[n].KL, KLC:KWK[n].KLC});
-    }
+  return keyman.addKeyboards(keyboardList).catch(function(err) {
+    console.error('keyman.addKeyboards failed with '+errToString(err)+' for '+JSON.stringify(keyboardList));
+  });
 }

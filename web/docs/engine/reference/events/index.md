@@ -7,8 +7,8 @@ interface to control the appearance and behavior of user interface
 elements. Standard event-processing requires all arguments to be passed
 as an array (object) with named member variables.
 
-Two components of Keyman Engine for Web specify events: 
-* `keyman` object -- the main component
+Two components of Keyman Engine for Web specify events:
+* `keyman` object -- the core component
 * `keyman.osk` object -- the on-screen keyboard component
 
 Object events are handled in user code by passing the handler entry to
@@ -59,7 +59,7 @@ the object, using *addEventListener()*.
 For example, to define a user function to handle the KeymanWeb
 `keyboardchange` event, include:
 
-``` typescript
+```js
 keyman.addEventListener('keyboardchange',
   function(p)
   {
@@ -100,7 +100,7 @@ keyman.addEventListener('keyboardchange',
 For example, to add an event handler that modifies the user interface when the on-screen
 keyboard is displayed:
 
-``` typescript
+```js
 keyman.osk.addEventListener('show',
   function(p)
   {

@@ -80,8 +80,6 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">Ἀπαιτεῖται βιβλιοθήκη FileProvider γιὰ νὰ δεῖτε ἀρχεῖο βοηθείας: %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">Μοιραῖο σφάλμα πληκτρολογίου στὸ %1$s:%2$s γιὰ τὴν %3$s γλῶσσα. Φορτώνεται προεπιλεγμένο πληκτρολόγιο.</string>
-    <!-- Context: Fatal keyboard error.  -->
-    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">Σφάλμα στὸ πληκτρολόγιο %1$s:%2$s γιὰ τὴν γλῶσσα \"%3$s\".</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Ἀναζήτηση σχετικοῦ λεξικοῦ πρὸς μεταφόρτωσιν</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">Ἀδυναμία συνδέσεως μὲ τὸν διακομιστὴ Keyman γιὰ τὴν εὕρεση σχετικοῦ λεξικοῦ πρὸς μεταφόρτωσιν</string>

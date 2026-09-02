@@ -23,7 +23,7 @@ protected:
 
 TEST_F(KmCoreKeyboardApiTests, LoadFromBlob) {
   // Setup
-  km::core::path kmxfile = km::core::path(test_dir / "kmx/k_020___deadkeys_and_backspace.kmx");
+  km::core::path kmxfile = km::core::path(test_dir / "kmx/k_0302___deadkeys_and_backspace.kmx");
 
   std::vector<uint8_t> data = km::tests::load_kmx_file(kmxfile.native());
   ASSERT_GT(data.size(), (size_t)0);

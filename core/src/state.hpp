@@ -10,6 +10,7 @@
 
 #include <cassert>
 #include <vector>
+#include <deque>
 
 #include "keyman_core.h"
 
@@ -27,7 +28,7 @@ using action = km_core_action_item;
 
 class actions : public std::vector<action>
 {
-  std::vector<option> _option_items_stack;
+  std::deque<option> _option_items_stack;
 
   template<km_core_action_type V>
   void _push_vkey(km_core_virtual_key);
@@ -35,6 +36,10 @@ class actions : public std::vector<action>
 public:
   template<typename... Args>
   actions(Args&&... args);
+  actions(actions const &other);
+  // If the operator is needed in the future, it shall be implemented.
+  // Currently blocking accidental use of it for now.
+  actions &operator=(actions const &) = delete;
 
   void push_character(km_core_usv usv);
   void push_marker(uint32_t marker);
@@ -135,7 +140,7 @@ protected:
 public:
     state(core::abstract_processor & kb, km_core_option_item const *env);
 
-    state(state const &) = default;
+    state(state const &other);
     state(state const &&) = delete;
 
     ~state();

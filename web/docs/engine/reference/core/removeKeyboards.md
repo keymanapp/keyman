@@ -8,7 +8,7 @@ Removes keyboards (by ID) from KeymanWeb.
 
 ## Syntax
 
-```c
+```js
 keyman.removeKeyboards(id[, id2, ...])
 ```
 

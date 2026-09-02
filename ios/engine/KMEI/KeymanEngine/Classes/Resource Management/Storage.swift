@@ -246,6 +246,10 @@ extension Storage {
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
+                     resourceName: "globe-hint.css",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
+    try Storage.copy(from: bundle,
                      resourceName: "keymanweb-osk.ttf",
                      dstDir: baseDir,
                      excludeFromBackup: true)

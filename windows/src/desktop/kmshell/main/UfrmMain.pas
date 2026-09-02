@@ -190,6 +190,7 @@ uses
   Keyman.System.KeymanSentryClient,
   Keyman.System.UpdateStateMachine,
   OptionsXMLRenderer,
+  Keyman.Configuration.Util.NetworkConnection,
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
   Keyman.Configuration.UI.InstallFile,
@@ -817,12 +818,55 @@ var
   ShellPath : string;
   FResult, InstallNow: Boolean;
   frmStartInstallNow: TfrmStartInstall;
+  IsMetered, DownloadRequired, RestartRequired: Boolean;
+  InstallCase: TInstallCase;
+  BUpdateSM: TUpdateStateMachine;
 begin
   InstallNow := True;
-  // Confirm User is ok that this will require a reset
-  if HasKeymanRun then
+  IsMetered := TNetworkConnection.IsMetered;
+  RestartRequired := HasKeymanRun;
+
+  BUpdateSM := TUpdateStateMachine.Create(False);
+  try
+    DownloadRequired := BUpdateSM.IsDownloadRequired;
+  finally
+    BUpdateSM.Free;
+  end;
+
+  // If a restart is required (HasKeymanRun == True)
+  // OR it is a Metered connection warn the user and allow
+  // them to cancel their request to Install Now.
+  // Untill TODO: #13711 is implemented also let the user know
+  // that the update will be downloaded in the background.
+  // before the install starts. Once #13711 change the message
+  // to just be a download is required.
+  // Otherwise start installing with out pop-up warnings.
+  InstallCase := TInstallCase.icNone;
+  if DownloadRequired and RestartRequired and IsMetered then
   begin
-    frmStartInstallNow := TfrmStartInstall.Create(nil, true);
+    InstallCase := TInstallCase.icDownloadRestartMetered;
+  end
+  else if DownloadRequired and RestartRequired and not IsMetered then
+  begin
+    InstallCase := TInstallCase.icDownloadRestart;
+  end
+  else if DownloadRequired and not RestartRequired and not IsMetered then
+  begin
+    InstallCase := TInstallCase.icDownload;
+  end
+  else if DownloadRequired and not RestartRequired and IsMetered then
+  begin
+     InstallCase := TInstallCase.icDownloadMetered;
+  end
+  else if not DownloadRequired and RestartRequired and not IsMetered then
+  begin
+     InstallCase := TInstallCase.icRestart;
+  end;
+
+  // Render dialog if conditions require it
+  if InstallCase <> TInstallCase.icNone then
+  begin
+    frmStartInstallNow := TfrmStartInstall.Create(nil, InstallCase);
     try
       if frmStartInstallNow.ShowModal = mrOk then
         InstallNow := True
@@ -833,18 +877,23 @@ begin
     end;
   end;
 
-  if InstallNow = True then
+  // Process installation execution execution path
+  if InstallNow then
   begin
     ShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
     FResult := TUtilExecute.Shell(0, ShellPath, '', '-an');
     if not FResult then
+    begin
       TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
-        'TrmfMain: Shell Execute Update_ApplyNow Failed')
+        'TrmfMain: Shell Execute Update_ApplyNow Failed');
+    end
     else
-      ModalResult := mrAbort;
+    begin
       // If a splash screen is currently open when "Install Now" is executed,
       // setting mrAbort ensures the splash screen is closed on the
       // return of "Keyman Configuration".
+      ModalResult := mrAbort;
+    end;
   end;
 end;
 

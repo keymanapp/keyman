@@ -175,7 +175,7 @@ git pull origin "${DEPLOY_BRANCH}"
 
 builder_heading "Building source package"
 cd "${WORKTREE_DIR}/linux"
-DIST=unstable DEBREVISION=${REVISION} scripts/debian.sh
+scripts/debian.sh --dist unstable --debrevision "${REVISION}"
 cd debianpackage/
 builder_heading "Signing source package"
 debsign -k"${DEBKEYID}" --re-sign ./*.changes

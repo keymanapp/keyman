@@ -20,7 +20,6 @@ Provides read-only information about a keyboard.
 typedef struct {
   km_core_cp const * version_string;
   km_core_cp const * id;
-  km_core_path_name  folder_path;
   km_core_option_item const * default_options;
 } km_core_keyboard_attrs;
 
@@ -32,9 +31,6 @@ typedef struct {
 
 `id`
 : Keyman keyboard ID string.
-
-`folder_path`
-: Path to the unpacked folder containing the keyboard and associated resources.
 
 `default_options`
 : Set of default values for any options included in the keyboard.

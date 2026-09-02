@@ -33,7 +33,7 @@
 
 #include "pch.h"
 #include "kmtip.h"
-#include "../../../../common/windows/cpp/include/vkeys.h"
+#include "../../../../common/include/vkeys.h"
 
 //#define _DEBUG_LOGKEY
 
@@ -279,14 +279,14 @@ HRESULT CKMTipTextService::_PreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr)   //
     hr = pKeystrokeMgr->PreserveKey(_tfClientId, _PreservedKeys[i].guid, &_PreservedKeys[i].key, NULL, 0);
     if (hr != S_OK) {
       if(_PreservedKeys[i].key.uVKey < 256)
-        SendDebugMessageFormat(L"Failed to preserve key %d: %s %x, %x", i, VKeyNames[_PreservedKeys[i].key.uVKey], _PreservedKeys[i].key.uModifiers, hr);
+        SendDebugMessageFormat(L"Failed to preserve key %d: %hs %x, %x", i, VKeyNames[_PreservedKeys[i].key.uVKey], _PreservedKeys[i].key.uModifiers, hr);
       else
         SendDebugMessageFormat(L"Failed to preserve key %d: %x %x, %x", i, _PreservedKeys[i].key.uVKey, _PreservedKeys[i].key.uModifiers, hr);
     }
 #ifdef _DEBUG_LOGKEY
     else {
       if (_PreservedKeys[i].key.uVKey < 256)
-        SendDebugMessageFormat(L"Preserved key %d: %s %x, %x", i, VKeyNames[_PreservedKeys[i].key.uVKey], _PreservedKeys[i].key.uModifiers, hr);
+        SendDebugMessageFormat(L"Preserved key %d: %hs %x, %x", i, VKeyNames[_PreservedKeys[i].key.uVKey], _PreservedKeys[i].key.uModifiers, hr);
       else
         SendDebugMessageFormat(L"Preserved key %d: %x %x, %x", i, _PreservedKeys[i].key.uVKey, _PreservedKeys[i].key.uModifiers, hr);
     }

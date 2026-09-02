@@ -35,6 +35,7 @@ uses
   Keyman.Configuration.UI.KeymanProtocolHandler,
   Keyman.Configuration.UI.MitigationForWin10_1803,
   kmint,
+  Keyman.System.KeymanSentryClient,
   UfrmHTML,
   UfrmInstallKeyboard;
 
@@ -149,24 +150,25 @@ var
   IsPackage: Boolean;
   BCP47Tag: string;
 begin
-  Result := False;
   FPackage := nil;
   FKeyboard := nil;
 
   for i := 0 to FileNames.Count - 1 do
   begin
+    FilenameBCP47 := Filenames[i].Split(['=']);
+    Filename := FilenameBCP47[0];
+
     try
+      kmcom.Errors.Clear;
       kmcom.Keyboards.Refresh;
       kmcom.Keyboards.Apply;
 
-      FilenameBCP47 := Filenames[i].Split(['=']);
-      Filename := FilenameBCP47[0];
       IsPackage := AnsiSameText(ExtractFileExt(FileName), '.kmp');
       if not FileExists(FileName) then
       begin
         if not ASilent then
           ShowMessage('File: ' + Filename + ' location not available to Admin User');
-        Exit;
+        Exit(False);
       end;
       if IsPackage then
       begin
@@ -189,13 +191,33 @@ begin
     except
       on E:EOleException do
       begin
-        if kmcom.Errors.Count = 0 then Raise;
-        if not ASilent then
-          for j := 0 to kmcom.Errors.Count - 1 do
+        if kmcom.Errors.Count = 0 then
+        begin
+          // An unknown error has occurred in kmcomapi, so we need to abort
+          // because state is unknown; this will be reported through the normal
+          // exception handling mechanism by re-raising
+          raise;
+        end;
+
+        for j := 0 to kmcom.Errors.Count - 1 do
+        begin
+          TKeymanSentryClient.ReportMessage('TInstallFile was unable to install "'+FilenameBCP47[0]+'"; error: '+kmcom.Errors[j].Description, True);
+          if not ASilent then
             ShowMessage(kmcom.Errors[j].Description);
-        Exit;
+        end;
+
+        kmcom.Errors.Clear;
+        Exit(False);
       end;
     end;
+
+    for j := 0 to kmcom.Errors.Count - 1 do
+    begin
+      TKeymanSentryClient.ReportMessage('TInstallFile encountered a recoverable error when installing "'+FilenameBCP47[0]+'"; error: '+kmcom.Errors[j].Description, True);
+      if not ASilent then
+        ShowMessage(kmcom.Errors[j].Description);
+    end;
+    kmcom.Errors.Clear;
 
     FPackage := nil;
     FKeyboard := nil;

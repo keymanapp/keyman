@@ -8,13 +8,13 @@ Save an option [`store`](/developer/language/guide/stores) value to a cookie for
 
 ## Syntax
 
-```c
+```js
 keyman.interface.saveStore(storeName, value);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KSAVE(storeName, value); // Shorthand
 ```
 

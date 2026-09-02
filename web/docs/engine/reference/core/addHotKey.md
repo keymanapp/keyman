@@ -8,7 +8,7 @@ Add hot key handler to array of document-level hotkeys triggered by key-up event
 
 ## Syntax
 
-```c
+```js
 keyman.addHotKey(keyCode, shiftState, handler);
 ```
 

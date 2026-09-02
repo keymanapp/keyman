@@ -933,21 +933,21 @@ declare namespace Osk {
 }
 export { Osk }
 
-// @public (undocumented)
+// @public
 function parseMapping(mapping: any): PuaMap;
 
-// @public (undocumented)
+// @public
 type PuaMap = {
     [index: string]: string;
 };
 
-// @public (undocumented)
+// @public
 function remapTouchLayout(source: TouchLayout.TouchLayoutFile, map: PuaMap): boolean;
 
-// @public (undocumented)
+// @public
 function remapVisualKeyboard(vk: VisualKeyboard.VisualKeyboard, map: PuaMap): boolean;
 
-// @public (undocumented)
+// @public
 interface StringRef {
     // (undocumented)
     str: string;
@@ -955,7 +955,7 @@ interface StringRef {
     usages: StringRefUsage[];
 }
 
-// @public (undocumented)
+// @public
 interface StringRefUsage {
     // (undocumented)
     count: number;

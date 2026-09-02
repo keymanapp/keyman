@@ -8,13 +8,13 @@ Keystroke matching: Returns `true` if the event matches the rule's shift mask an
 
 ## Syntax
 
-```c
+```js
 keyman.interface.keyMatch(e, shiftCode, keyCode);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KKM(e, shiftCode, keyCode); // Shorthand
 ```
 
@@ -47,7 +47,7 @@ This is a core element of keyboard input management within KeymanWeb, typically 
 
 a keyboard would check that the triggering keystroke (`"'"`) matches by using
 
-```keyman
+```js
 keyman.interface.keyMatch(e, 0, 39)
 ```
 

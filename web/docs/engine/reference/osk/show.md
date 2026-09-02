@@ -8,7 +8,7 @@ Display, hide or toggle OSK visibility.
 
 ## Syntax
 
-```c
+```js
 keyman.osk.show(mode);
 ```
 

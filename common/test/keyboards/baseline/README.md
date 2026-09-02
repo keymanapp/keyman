@@ -4,11 +4,13 @@ This folder contains a set of keyboards that are used by multiple projects to
 verify behaviour, both for compilation, and for runtime tests.
 
 The following projects are known to use these keyboards:
+
 * core -- .kmn files only, compiled with kmc during tests
 * developer/kmcmplib -- .kmn files, compiled for tests, and .kmx as reference
 * linux -- .kmn files for test steps only, .kmx files
+* web -- .kmn files for test steps, .kmx and .js files
 
-The .kmx files were built with kmcomp, not kmc, in order to ensure that
+The .kmx and .js files were built with kmcomp, not kmc, in order to ensure that
 developer/kmcmplib gets a valid baseline reference.
 
 Once kmc is stable, it is possible that we will be able to use the kmc npm
@@ -16,9 +18,34 @@ module to build .kmx for all projects that need them.
 
 ## Build parameters
 
-Keyboards were built with debug information and no compiler version embedded,
-with kmcomp 16.0.138:
+The keyboards can be built with:
 
-```bat
-for %d in (*.kmn) do kmcomp -no-compiler-version -d %d
+```bash
+./build.sh build
 ```
+
+This builds the keyboards with debug information and no compiler version
+embedded.
+
+## Grouping of the test fixtures
+
+Fixtures that test similar functionality are roughly grouped together.
+There is some overlap between different groups, so this was done
+mainly by test name.
+
+| Name     | Test group                               |
+|----------|------------------------------------------|
+| k_00xx_* | Tests that didn't fit in any other group |
+| k_01xx_* | Basic rules                              |
+| k_02xx_* | RALT                                     |
+| k_03xx_* | deadkeys                                 |
+| k_04xx_* | Using multiple groups                    |
+| k_05xx_* | Options                                  |
+| k_06xx_* | System stores                            |
+| k_07xx_* | Caps related tests                       |
+| k_08xx_* | Context related                          |
+
+## Description of file format
+
+See [README.md](/core/tests/unit/kmx/README.md) in core for a description
+of the file format.

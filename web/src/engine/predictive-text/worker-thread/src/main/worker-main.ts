@@ -20,7 +20,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import LMLayerWorker from './index.js';
+import { LMLayerWorker } from './index.js';
 
 // Let LMLayerWorker be available both in the browser and in Node.
 if (typeof self !== 'undefined' && 'postMessage' in self && 'importScripts' in self) {

@@ -28,34 +28,6 @@ Use this method to get details of the currently selected keyboard.
 Details include package ID, keyboard ID, language ID, keyboard name,
 language name and fonts.
 
-  
-
-------------------------------------------------------------------------
-
-## Syntax (Deprecated)
-
-``` javascript
-KMManager.getCurrentKeyboardInfo(Context context)
-```
-
-### Parameters
-
-`context`
-:   The context.
-
-### Returns
-
-(Deprecated) Returns an information dictionary of the current keyboard
-with keys and values defined as `HashMap<String key, String value>`.
-
-## Description
-
-Use this method to get details of the currently selected keyboard.
-Details include keyboard ID, language ID, keyboard name, language name
-and fonts.
-
-  
-
 ------------------------------------------------------------------------
 
 ## Examples

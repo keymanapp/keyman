@@ -1,7 +1,7 @@
 
 import { assert } from 'chai';
 
-import { deepCopy } from "@keymanapp/web-utils";
+import { deepCopy } from "keyman/common/web-utils";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { models, predictFromCorrections, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
@@ -172,7 +172,6 @@ describe('predictFromCorrections', () => {
     assert.sameOrderedMembers(predictions.map((entry) => entry.prediction.sample.displayAs), ["it's", "its"]);
     assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions.map((entry) => {
       entry = deepCopy(entry);
-      entry.transformId = 314159;
       return entry;
     }));
 

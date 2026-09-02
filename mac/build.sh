@@ -87,9 +87,8 @@ UPLOAD_SENTRY=false
 # Import local environment variables for build
 #
 # /mac/localenv.sh can be used to define CERTIFICATE_ID,
-# APPSTORECONNECT_PROVIDER, APPSTORECONNECT_USERNAME,
-# APPSTORECONNECT_PASSWORD, DEVELOPMENT_TEAM variables;
-# see /mac/README.md for details.
+# APPSTORECONNECT_USERNAME, APPSTORECONNECT_PASSWORD, DEVELOPMENT_TEAM
+# variables; see /mac/README.md for details.
 #
 if [[ -f "$THIS_SCRIPT_PATH/localenv.sh" ]]; then
     . "$THIS_SCRIPT_PATH/localenv.sh"
@@ -110,7 +109,7 @@ execBuildCommand() {
     eval "$cmnd" || ret_code=$?
     set -e
 
-    mac_print_xcode_build_script_logs
+    mac_print_xcode_build_script_logs $ret_code
 
     if [ $ret_code != 0 ]; then
         builder_die "Build of $component failed! Error: [$ret_code] when executing command: '$cmnd'"
@@ -223,7 +222,7 @@ do_notarize() {
       builder_die "Notarization and signed executable is required for deployment, even locally. Specify CERTIFICATE_ID environment variable for custom certificate."
     fi
 
-    if [ -z "${APPSTORECONNECT_PROVIDER+x}" ] || [ -z "${APPSTORECONNECT_USERNAME+x}" ] || [ -z "${APPSTORECONNECT_PASSWORD+x}" ]; then
+    if [ -z "${APPSTORECONNECT_USERNAME+x}" ] || [ -z "${APPSTORECONNECT_PASSWORD+x}" ]; then
       builder_die "Appstoreconnect Apple ID credentials must be configured in environment. See README.md for details."
     fi
 

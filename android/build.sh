@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Keyman is copyright (C) SIL Global. MIT License.
 #
 # Build Keyman Engine for Android, Keyman for Android, OEM FirstVoices Android app,
 # Samples: KMsample1 and KMSample2, Test - KeyboardHarness
@@ -50,11 +51,6 @@ builder_describe \
 
 builder_parse "$@"
 
-function do_clean() {
-  builder_heading "Cleanup /android/upload"
-  rm -rf "${KEYMAN_ROOT}/android/upload"
-}
-
 function do_test_help() {
   check-markdown  "${KEYMAN_ROOT}/android/docs/help"
   check-markdown  "${KEYMAN_ROOT}/android/docs/engine"
@@ -62,7 +58,6 @@ function do_test_help() {
 
 function archive_artifacts() {
   local UPLOAD_PATH KEYMAN_ENGINE_ANDROID_ZIP KEYMAN_APK FIRSTVOICES_APK
-  local KEYMAN_FULLY_VERSIONED_APK FIRSTVOICES_FULLY_VERSIONED_APK
 
   UPLOAD_PATH="${KEYMAN_ROOT}/android/upload/${KEYMAN_VERSION}"
   KEYMAN_ENGINE_ANDROID_ZIP="keyman-engine-android-${KEYMAN_VERSION}.zip"
@@ -124,12 +119,13 @@ android_set_java_home
 # This script also responsible for cleaning up /android/upload
 builder_run_child_actions clean
 
-builder_run_action        clean     do_clean
+builder_run_action        clean        rm -rf "${KEYMAN_ROOT}/android/upload"
 
 builder_run_child_actions configure build test
 
-builder_run_action        test:help  do_test_help
+builder_run_action        test:help    do_test_help
 
+# TODO: merge publish-* and archive to publish action?
 builder_run_child_actions publish-symbols publish-play-store
 
-builder_run_action        archive    archive_artifacts
+builder_run_action        archive      archive_artifacts

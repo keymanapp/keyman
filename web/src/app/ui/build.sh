@@ -14,8 +14,8 @@ SUBPROJECT_NAME=app/ui
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's desktop form-factor keyboard selection modules." \
-  "@/web/src/app/browser build" \
-  "@/web/src/tools/building/sourcemap-root" \
+  "@/web/src/app/browser                    build" \
+  "@/web/src/tools/building/sourcemap-root  build" \
   "clean" \
   "configure" \
   "build" \
@@ -48,16 +48,16 @@ compile_and_copy() {
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/ui"
 
   types=(button float toggle toolbar)
-  for type in ${types[@]}
+  for type in "${types[@]}"
   do
     filename="kmwui${type}"
-    node "${LIB_BUNDLER}"    "${BUILD_ROOT}/obj/$filename.js" \
-      --out                  "${BUILD_ROOT}/debug/$filename.js" \
-      --sourceRoot           "@keymanapp/keyman/web/build/app/ui/debug"
+    node_es_bundle "${BUILD_ROOT}/obj/$filename.js" \
+      --out        "${BUILD_ROOT}/debug/$filename.js" \
+      --sourceRoot "@keymanapp/keyman/web/build/app/ui/debug"
 
-    node "${LIB_BUNDLER}"    "${BUILD_ROOT}/obj/$filename.js" \
-      --out                  "${BUILD_ROOT}/release/$filename.js" \
-      --sourceRoot           "@keymanapp/keyman/web/build/app/ui/release" \
+    node_es_bundle "${BUILD_ROOT}/obj/$filename.js" \
+      --out        "${BUILD_ROOT}/release/$filename.js" \
+      --sourceRoot "@keymanapp/keyman/web/build/app/ui/release" \
       --minify
   done
 

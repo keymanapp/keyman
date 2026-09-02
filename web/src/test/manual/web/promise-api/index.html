@@ -6,12 +6,6 @@
     <!-- Set the viewport width to match phone and tablet device widths -->
     <meta name="viewport" content="width=device-width,user-scalable=no" />
 
-    <!-- Allow KeymanWeb to be saved to the iPhone home screen -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-
-    <!-- Enable IE9 Standards mode -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
     <title>KeymanWeb Testing Page - Promise API when Adding Keyboards</title>
 
     <!-- Your page CSS -->
@@ -45,12 +39,10 @@
       // Thank you to https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
       const alertType = (new URLSearchParams(window.location.search)).get("useAlerts") != "false";
 
-      var kmw=window.keyman;
-
-      // Test adding keyboards before kmw.init get deferred
+      // Test adding keyboards before keyman.init get deferred
       addKeyboards('french','@he');
 
-      kmw.init({
+      keyman.init({
         attachType: 'auto',
         useAlerts: alertType
       }).then(function() {

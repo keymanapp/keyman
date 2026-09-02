@@ -1,11 +1,11 @@
-import { type OutputTarget } from 'keyman/engine/element-wrappers';
+import { type AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 import { FloatingOSKView } from 'keyman/engine/osk';
-import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/main';
+import { KeyboardInterfaceBase } from 'keyman/engine/main';
 
-import ContextManager from './contextManager.js';
+import { ContextManager }  from './contextManager.js';
 import { KeymanEngine } from './keymanEngine.js';
 
-export default class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
+export class KeyboardInterface extends KeyboardInterfaceBase<ContextManager> {
   constructor(
     _jsGlobal: any,
     engine: KeymanEngine,
@@ -26,23 +26,27 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
     this.engine.contextManager.focusAssistant._IgnoreNextSelChange = 1;
   }
 
-  /**
-   * Legacy entry points (non-standard names)- included only to allow existing IME keyboards to continue to be used
-   */
-  getLastActiveElement(): OutputTarget<any> {
-    return this.engine.contextManager.lastActiveTarget;
+  getLastActiveTextStore(): AbstractElementTextStore<any> {
+    return this.engine.contextManager.lastActiveTextStore;
   }
 
-  focusLastActiveElement(): void {
-    this.engine.contextManager.restoreLastActiveTarget();
+  focusLastActiveTextStore(): void {
+    this.engine.contextManager.restoreLastActiveTextStore();
   }
 
   //The following entry points are defined but should not normally be used in a keyboard, as OSK display is no longer determined by the keyboard
+
+  /**
+   * @deprecated
+   */
   hideHelp(): void {
     const osk = this.engine.osk;
     osk.startHide(true);
   }
 
+  /**
+   * @deprecated
+   */
   showHelp(Px: number, Py: number): void {
     const osk = this.engine.osk;
 
@@ -53,6 +57,9 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
     }
   }
 
+  /**
+   * @deprecated
+   */
   showPinnedHelp(): void {
     const osk = this.engine.osk;
 
@@ -74,13 +81,6 @@ export default class KeyboardInterface extends KeyboardInterfaceBase<ContextMana
     // pinned position.
     osk.present();
   }
-
-  // Also needed for some legacy CJK keyboards.
-  readonly GetLastActiveElement = this.getLastActiveElement;
-  readonly FocusLastActiveElement = this.focusLastActiveElement;
-  readonly HideHelp = this.hideHelp;
-  readonly ShowHelp = this.showHelp;
-  readonly ShowPinnedHelp = this.showPinnedHelp;
 }
 
 (function() {

@@ -8,7 +8,7 @@ Removes a user-defined event handler.
 
 ## Syntax
 
-```c
+```js
 keyman.removeEventListener(event, func);
 ```
 

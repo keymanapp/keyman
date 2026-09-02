@@ -109,7 +109,7 @@ hamburger menu in the Keyman app.
 **Web**: copy khmer_angkor.js to your website, then [load it with KeymanWeb][load-keymanweb-keyboard]:
 
 ```js
-keyman.addKeyboards({
+await keyman.addKeyboards({
   id:'khmer_angkor',        // The keyboard's unique identification code.
   name:'Khmer Angkor',      // The keyboard's user-readable name.
   language:{

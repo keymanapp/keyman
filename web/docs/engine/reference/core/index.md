@@ -1,20 +1,8 @@
 ---
-title: Core Module
+title: `keyman` - Core Module
 ---
 
 The KeymanWeb core module is exposed to the developer as `window.keyman`.
-
-[`build` Property](build)
-: The release build of KeymanWeb.
-
-
-[`version` Property](version)
-: The version of KeymanWeb.
-
-
-[`initialized` Property](initialized)
-: Keymanweb core module initialization state.
-
 
 [`activatingUI` Function](activatingUI)
 : Set an internal flag to notify KeymanWeb of change in UI activation state.
@@ -38,6 +26,10 @@ The KeymanWeb core module is exposed to the developer as `window.keyman`.
 
 [`attachToControl` Function](attachToControl)
 : Attach KeymanWeb to HTML element (or IFrame).
+
+
+[`build` Property](build) (deprecated)
+: The patch component for the current version of KeymanWeb.
 
 
 [ `BuildVisualKeyboard` Function](BuildVisualKeyboard)
@@ -93,8 +85,16 @@ The KeymanWeb core module is exposed to the developer as `window.keyman`.
 : Get the KeymanWeb user interface activation state.
 
 
+[`helpURL` Property](helpURL) (deprecated)
+: URL for keyboard help site.
+
+
 [`init` Function](init)
 : Sets license key, selects user interface, and other KeymanWeb Options.
+
+
+[`initialized` Property](initialized)
+: Keymanweb core module initialization state.
 
 
 [`isChiral` Function](isChiral)
@@ -131,3 +131,11 @@ The KeymanWeb core module is exposed to the developer as `window.keyman`.
 
 [`setKeyboardForControl` Function](setKeyboardForControl)
 : Associate control with independent keyboard settings initialized to a specific keyboard.
+
+
+[`version` Property](version) (deprecated)
+: The major and minor components of the version of KeymanWeb.
+
+
+[`versionInfo` Property](versionInfo)
+: Full version info for KeymanWeb.

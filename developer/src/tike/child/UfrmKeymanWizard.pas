@@ -3336,7 +3336,7 @@ begin
     begin
       frameTouchLayout.SaveToString;
       frameTouchLayout.TemplateFileName := TemplateFileName;
-      frameTouchLayout.Load('', True, False);   // I4034
+      frameTouchLayout.ApplyTemplate;
       Self.Modified := True;
     end;
   finally

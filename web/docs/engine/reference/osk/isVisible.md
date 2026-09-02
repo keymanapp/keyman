@@ -8,7 +8,7 @@ Return the actual visibility of the On-Screen Keyboard.
 
 ## Syntax
 
-```c
+```js
 keyman.osk.isVisible();
 ```
 

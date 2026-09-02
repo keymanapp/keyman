@@ -2,7 +2,10 @@
 
 set -eu
 
-# Avoid timing reports in unit tests
+
+# Avoid timing reports and internal debugging in unit tests. These conflict with
+# the printing of outputs and cause tests to fail.
+export _builder_debug_internal=false
 export _builder_timings=false
 
 ## START STANDARD BUILD SCRIPT INCLUDE

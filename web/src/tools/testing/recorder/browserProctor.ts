@@ -2,9 +2,9 @@
 // Only BrowserDriver.ts and its prerequisites are needed during actual integrated unit testing.
 /// <reference path="scribe.ts" />
 
-import { type DeviceSpec } from "@keymanapp/web-utils";
+import { type DeviceSpec } from "keyman/common/web-utils";
 
-import { type OutputTarget } from "keyman/engine/js-processor";
+import { type TextStore } from "keyman/engine/keyboard";
 
 import { type KeymanEngine } from 'keyman/app/browser';
 
@@ -81,7 +81,7 @@ export class BrowserProctor extends Proctor {
 
   // Execution of a test sequence depends on the testing environment; this handles
   // the browser-specific aspects.
-  async simulateSequence(sequence: TestSequence<any>, outputTarget?: OutputTarget): Promise<string> {
+  async simulateSequence(sequence: TestSequence<any>, textStore?: TextStore): Promise<string> {
     const driver = new BrowserDriver(this.target);
 
     // For the version 10.0 spec

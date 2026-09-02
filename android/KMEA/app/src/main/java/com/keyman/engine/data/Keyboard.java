@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2020 SIL International. All rights reserved.
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
  */
 package com.keyman.engine.data;
 
@@ -15,6 +15,7 @@ import com.keyman.engine.util.BCP47;
 import com.keyman.engine.util.FileUtils;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.WebViewUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +49,7 @@ public class Keyboard extends LanguageResource implements Serializable {
    */
   public Keyboard(JSONObject installedObj) {
     this.fromJSON(installedObj);
+    logIfLegacyKeyboard();
   }
 
   /**
@@ -78,6 +80,8 @@ public class Keyboard extends LanguageResource implements Serializable {
 
       this.helpLink = keyboardJSON.optString(KMManager.KMKey_CustomHelpLink,
         KMString.format(HELP_URL_FORMATSTR, HELP_URL_HOST, this.resourceID, this.version));
+
+      logIfLegacyKeyboard();
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Keyboard exception parsing JSON: ", e);
     }
@@ -95,6 +99,8 @@ public class Keyboard extends LanguageResource implements Serializable {
     this.isNewKeyboard = isNewKeyboard;
     this.font = (font != null) ? font : "";
     this.oskFont = (oskFont != null) ? oskFont : "";
+
+    logIfLegacyKeyboard();
   }
 
   public Keyboard(Keyboard k) {
@@ -105,6 +111,12 @@ public class Keyboard extends LanguageResource implements Serializable {
     this.font = k.getFont();
     this.oskFont = k.getOSKFont();
     this.displayName = k.getDisplayName();
+  }
+
+  private void logIfLegacyKeyboard() {
+    if (this.packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      KMLog.LogInfo(TAG, "Constructing legacy keyboard: " + this.resourceID);
+    }
   }
 
   public String getKeyboardID() { return getResourceID(); }
@@ -173,24 +185,24 @@ public class Keyboard extends LanguageResource implements Serializable {
     return o;
   }
 
-  private String getKeyboardRoot(Context context) {
-    String keyboardRoot = context.getDir("data", Context.MODE_PRIVATE).toString() +
-      File.separator;
-
-    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      return keyboardRoot + KMManager.KMDefault_UndefinedPackageID + File.separator;
-    } else {
-      return keyboardRoot + KMManager.KMDefault_AssetPackages + File.separator + packageID + File.separator;
-    }
+  private String getDataRoot() {
+    return WebViewUtils.buildAssetUrl("");
   }
 
-  public String getKeyboardPath(Context context) {
+  private String getPackageRoot() {
+    if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
+      return getDataRoot() + KMManager.KMDefault_UndefinedPackageID + "/";
+    }
+    return getDataRoot() + KMManager.KMDefault_AssetPackages + "/" + packageID + "/";
+  }
+
+  private String getKeyboardUrl() {
     String keyboardID = this.getKeyboardID();
     String keyboardVersion = this.getVersion();
     if (packageID.equals(KMManager.KMDefault_UndefinedPackageID)) {
-      return getKeyboardRoot(context) + keyboardID + "-" + keyboardVersion + ".js";
+      return getPackageRoot() + keyboardID + "-" + keyboardVersion + ".js";
     } else {
-      return getKeyboardRoot(context) + keyboardID + ".js";
+      return getPackageRoot() + keyboardID + ".js";
     }
   }
 
@@ -202,17 +214,17 @@ public class Keyboard extends LanguageResource implements Serializable {
       stubObj.put("KI", "Keyboard_" + this.getKeyboardID());
       stubObj.put("KLC", this.getLanguageID());
       stubObj.put("KL", this.getLanguageName());
-      stubObj.put("KF", this.getKeyboardPath(context));
+      stubObj.put("KF", this.getKeyboardUrl());
       stubObj.put("KP", this.getPackageID());
 
       String displayFont = this.getFont();
       if(displayFont != null) {
-        stubObj.put("KFont", this.buildDisplayFontObject(displayFont, context));
+        stubObj.put("KFont", this.buildDisplayFontObject(displayFont));
       }
 
       String oskFont = this.getOSKFont();
       if(oskFont != null) {
-        stubObj.put("KOskFont", this.buildDisplayFontObject(oskFont, context));
+        stubObj.put("KOskFont", this.buildDisplayFontObject(oskFont));
       }
 
       String displayName = this.getDisplayName();
@@ -228,34 +240,33 @@ public class Keyboard extends LanguageResource implements Serializable {
   }
 
   /**
-   * Take a font JSON object and adjust to pass to JS
-   * 1. Replace "source" keys for "files" keys
-   * 2. Create full font paths for .ttf or .svg
-   * @param font String font JSON object as a string
-   * @return JSONObject of modified font information with full paths. If font is invalid, return `null`
+   * Create a JSON object consisting of the font family and the font
+   * file URL.
+   *
+   * @param font  A string containing the font filename
+   * @return JSONObject of modified font information with full URL. If font
+   *         is invalid, return `null`.
    */
-  private JSONObject buildDisplayFontObject(String font, Context context) {
+  private JSONObject buildDisplayFontObject(String font) {
     if(font == null || font.equals("")) {
       return null;
     }
 
-    String keyboardRoot = this.getKeyboardRoot(context);
+    String fontRoot = KMManager.isDefaultFont(font) ? this.getDataRoot() : this.getPackageRoot();
 
     try {
       if (FileUtils.hasFontExtension(font)) {
         JSONObject jfont = new JSONObject();
         jfont.put(KMManager.KMKey_FontFamily, font.substring(0, font.length() - 4));
         JSONArray jfiles = new JSONArray();
-        jfiles.put(keyboardRoot + font);
+        jfiles.put(fontRoot + font);
         jfont.put(KMManager.KMKey_FontFiles, jfiles);
         return jfont;
-      } else {
-        return null;
       }
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Failed to make font for '"+font+"'", e);
-      return null;
     }
+    return null;
   }
 
   /**

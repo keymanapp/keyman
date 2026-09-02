@@ -1,0 +1,11 @@
+store(&NAME) 'RTL Keyboard'
+
+store(&version) '10.0'
+store(&KMW_RTL) '1'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [K_A] > 'ش'
++ [K_B] > 'ال'

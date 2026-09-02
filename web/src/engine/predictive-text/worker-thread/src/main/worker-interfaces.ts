@@ -36,7 +36,7 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import type ModelCompositor from './model-compositor.js';
+import { type ModelCompositor } from './model-compositor.js';
 import { Token } from '@keymanapp/models-templates';
 
 /**
@@ -207,6 +207,12 @@ export interface RevertMessage {
    * corresponding Suggestion.
    */
   context: Context;
+
+  /**
+   * Indicates if only the appended transform should be reverted, and not the base component
+   * of the previously-applied suggestion.
+   */
+  appendedOnly?: boolean;
 }
 
 export interface ResetContextMessage {
@@ -216,6 +222,11 @@ export interface ResetContextMessage {
    * The new context to be used as a base for future context mutations and predictions.
    */
   context: Context;
+
+  /**
+   * The state ID associated with the context for unique cross-thread identification.
+   */
+  stateId: number;
 }
 
 /**

@@ -8,7 +8,7 @@ Adds an event listener for user-handling of KeymanWeb events.
 
 ## Syntax
 
-```c
+```js
 keyman.addEventListener(event, func);
 ```
 
@@ -39,7 +39,7 @@ return true to allow other event handling to be processed normally.
 
 ## Example
 
-```c
+```js
 keyman.addEventListener('focus', function(e) {
   console.log("Now handling input for control " + e.target "!");
 });

@@ -8,7 +8,7 @@ Get the internal name of the currently active keyboard.
 
 ## Syntax
 
-```c
+```js
 keyman.getActiveKeyboard()
 ```
 

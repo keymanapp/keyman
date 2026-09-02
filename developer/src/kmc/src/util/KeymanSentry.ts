@@ -23,7 +23,7 @@ export class KeymanSentry {
       return true;
     }
 
-    return getOption('automatically report errors', true);
+    return getOption('automatically report errors');
   }
 
   static init(options?: SentryNodeOptions) {

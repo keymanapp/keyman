@@ -1,0 +1,101 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import fs from 'node:fs';
+import https from 'node:https';
+import vm from 'node:vm';
+
+import { ManagedPromise } from 'keyman/common/web-utils';
+import {
+  CloudQueryEngine,
+  CloudQueryResult,
+  CloudRequesterInterface
+} from 'keyman/engine/keyboard-storage';
+
+export class NodeCloudRequester implements CloudRequesterInterface {
+  private static QUERY_SEED = 1;
+  private readonly fileLocal: boolean;
+
+  private registerMain: (x: CloudQueryResult) => void;
+
+  constructor(fileLocal: boolean = false) {
+    this.fileLocal = fileLocal;
+  }
+
+  link(engine: CloudQueryEngine) {
+    this.registerMain = engine.registerFromCloud;
+  }
+
+  request<T>(query: string) {
+    if(!this.registerMain) {
+      throw new Error("Invalid state:  must be linked with a CloudQueryEngine instance.");
+    }
+
+    const promise = new ManagedPromise<T>();
+
+    // Set callback timer
+    const timeoutObj = setTimeout(() => {
+      promise.reject(new Error('The Cloud API request timed out.'));
+    }, 10000);
+
+    const queryId = NodeCloudRequester.QUERY_SEED++;
+
+    const tFlag='&timerid='+ queryId;
+    const fullRef = query + tFlag;
+
+    const _this = this;
+
+    const finalize = (fetchedContents: string) => {
+      clearTimeout(timeoutObj);
+
+      // Run that script!  Unlike in the DOM, the script isn't auto-run
+      // by the fetching process.
+      vm.runInNewContext(fetchedContents, {
+        keyman: {
+          register: _this.registerMain
+        }
+      });
+
+      if(!promise.isResolved) {
+        promise.reject(new Error('The Cloud API failed to find an appropriate keyboard.'));
+      }
+    }
+
+    if(this.fileLocal) {
+      // ignore the `timerid` part here.
+      fs.readFile(query, (err, data) => {
+        if(err) {
+          promise.reject(err);
+        } else {
+          finalize(data.toString());
+        }
+      });
+    } else {
+      // Reference: https://www.twilio.com/blog/2017/08/http-requests-in-node-js.html
+      https.get(fullRef, (response) => {
+        let responseScript = '';
+
+        response.on('data', (chunk) => {
+          responseScript += chunk;
+        });
+
+        response.on('end', () => {
+          finalize(responseScript);
+        });
+      }).on('error', (err) => {
+        clearTimeout(timeoutObj);
+
+        promise.reject(err);
+      });
+    }
+
+    promise.finally(() => {
+      clearTimeout(timeoutObj);
+    });
+
+    return {
+      promise: promise,
+      queryId: queryId
+    };
+  }
+}

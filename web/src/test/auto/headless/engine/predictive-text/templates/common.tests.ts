@@ -22,8 +22,7 @@ describe('Common utility functions', function() {
 
       let final = {
         insert: 'applebanana',
-        deleteLeft: 0,
-        deleteRight: 0
+        deleteLeft: 0
       };
 
       let mergedTransform = models.buildMergedTransform(apple, banana);
@@ -43,8 +42,7 @@ describe('Common utility functions', function() {
 
       let final = {
         insert: 'applebanana',
-        deleteLeft: 2,
-        deleteRight: 0
+        deleteLeft: 2
       };
 
       let mergedTransform = models.buildMergedTransform(apple, banana);
@@ -64,8 +62,7 @@ describe('Common utility functions', function() {
 
       let final = {
         insert: 'bananapple',  // the 'apple' transform removes the final 'a' from 'banana'.
-        deleteLeft: 0,
-        deleteRight: 0
+        deleteLeft: 0
       };
 
       let mergedTransform = models.buildMergedTransform(banana, apple);
@@ -85,8 +82,7 @@ describe('Common utility functions', function() {
 
       let final = {
         insert: 'bananapple',  // the 'apple' transform removes the final 'a' from 'banana'.
-        deleteLeft: 2,
-        deleteRight: 0
+        deleteLeft: 2
       };
 
       let mergedTransform = models.buildMergedTransform(banana, apple);
@@ -195,7 +191,6 @@ describe('Common utility functions', function() {
           deleteLeft: 0,
           id: 0
         },
-        transformId: 0,
         displayAs: 'hello'
       };
 
@@ -209,7 +204,6 @@ describe('Common utility functions', function() {
           deleteLeft: 0,
           id: 0
         },
-        transformId: 0,
         displayAs: 'hello',
         p: 0
       };
@@ -224,7 +218,6 @@ describe('Common utility functions', function() {
           deleteLeft: 0,
           id: 0
         },
-        transformId: 0,
         displayAs: 'hello',
         p: 0.5
       };
@@ -232,14 +225,13 @@ describe('Common utility functions', function() {
       assert.deepEqual(models.transformToSuggestion(suggestion.transform, 0.5), suggestion);
     });
 
-    it('properly handles the transformId', function() {
+    it('properly handles the transition ID', function() {
       let suggestion = {
         transform: {
           insert: 'hello',
           deleteLeft: 0,
           id: 3
         },
-        transformId: 3, // Ensures there isn't a separate ID seed in use.
         displayAs: 'hello'
       };
 

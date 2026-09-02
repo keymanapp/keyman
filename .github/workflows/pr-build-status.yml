@@ -80,6 +80,10 @@ jobs:
                   summary += addStatus(o, 'check', status.context, status.state);
                 } else if(status.context == 'Ubuntu Packaging') {
                   summary += addStatus(o, 'build', status.context, status.state);
+                } else if(status.context == 'Linux source verification') {
+                  // Ignore Linux source verification -- we won't block automerge
+                  // for this at this point
+                  summary += addLog(`Skipping ${status.context}`);
                 } else if(status.context == 'npm pack/publish') {
                   summary += addStatus(o, 'build', status.context, status.state);
                 } else if(status.context == 'Keyman Core - ARM64 test') {

@@ -8,7 +8,7 @@ Get the absolute y-coordinate of an element.
 
 ## Syntax
 
-```c
+```js
 keyman.util.getAbsoluteY(Pelem);
 ```
 
@@ -25,6 +25,6 @@ keyman.util.getAbsoluteY(Pelem);
 
 ## Description
 
-See also: 
+See also:
 - [`keyman.util.getAbsolute()`](getAbsolute)
 - [`keyman.util.getAbsoluteX()`](getAbsoluteX)

@@ -24,6 +24,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/ci/ci-publish.inc.sh"
 . "$KEYMAN_ROOT/resources/build/ci/npm-packages.inc.sh"
 . "$KEYMAN_ROOT/resources/build/minimum-versions.inc.sh"
+. "$KEYMAN_ROOT/resources/locate_emscripten.inc.sh"
 
 builder_describe \
   "Publish @keymanapp packages to NPM" \
@@ -107,17 +108,10 @@ function install_emscripten() {
 
   local EMSDK_TEMP
   EMSDK_TEMP=$(mktemp -d)
-  pushd "${EMSDK_TEMP}"
-  git clone https://github.com/emscripten-core/emsdk.git
-  cd emsdk
-  ./emsdk install "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
-  ./emsdk activate "${KEYMAN_MIN_VERSION_EMSCRIPTEN}"
-  cd upstream/emscripten
-  npm install
-  echo "EMSCRIPTEN_BASE=$(pwd)" >> $GITHUB_ENV
-  EMSCRIPTEN_BASE="$(pwd)"
+  install_emscripten_into "${EMSDK_TEMP}"
+  EMSCRIPTEN_BASE="${EMSDK_TEMP}/upstream/emscripten"
   export EMSCRIPTEN_BASE
-  popd
+  echo "EMSCRIPTEN_BASE=${EMSCRIPTEN_BASE}" >> "${GITHUB_ENV}"
 }
 
 function install_meson() {

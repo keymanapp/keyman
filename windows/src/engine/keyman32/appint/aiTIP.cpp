@@ -67,6 +67,9 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPIsKeymanRunning() {
 extern "C" __declspec(dllexport) BOOL WINAPI TIPActivateKeyboard(GUID *profile) {   // I3581
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
+
+  RefreshToggleState();
+
   if(profile != NULL) {
     for(int i = 0; i < _td->nKeyboards; i++) {
       for(int j = 0; j < _td->lpKeyboards[i].nProfiles; j++) {

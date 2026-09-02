@@ -75,6 +75,7 @@ export class BuildModelInfo extends BuildActivity {
       kpsFilename: project.resolveInputFilePath(kps),
       lastCommitDate,
       forPublishing: !!options.forPublishing,
+      publishOnly: !!options.publishOnly,
     };
 
     // Note: should we always ignore the passed-in output filename for .model_info?

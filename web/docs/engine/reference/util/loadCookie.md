@@ -8,7 +8,7 @@ Get a document cookie, or an array of all document cookies.
 
 ## Syntax
 
-```c
+```js
 keyman.util.loadCookie(cn);
 ```
 
@@ -20,9 +20,9 @@ keyman.util.loadCookie(cn);
 
 ### Return Value
 
-`Object`
+`Array`
 :   An array of names and strings or an array of variables and values.
 
-## Description
+## See also
 
-...
+* [`keyman.util.saveCookie()`](saveCookie)

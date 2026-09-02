@@ -1,3 +1,9 @@
+keyman (18.0.249-1) UNRELEASED; urgency=medium
+
+  * Add procps dependency (closes: 1136515)
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 18 May 2026 18:06:49 +0200
+
 keyman (18.0.248-1) unstable; urgency=medium
 
   * New upstream release.

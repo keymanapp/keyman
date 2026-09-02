@@ -8,7 +8,7 @@ Set absolute position and size of desktop OSK window, limited to screen.
 
 ## Syntax
 
-```c
+```js
 keyman.osk.setPos(pt)
 ```
 

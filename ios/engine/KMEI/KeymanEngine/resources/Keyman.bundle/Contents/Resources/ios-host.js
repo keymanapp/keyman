@@ -326,11 +326,12 @@ function toHex(theString) {
     return hexString.substr(0, hexString.length-1);
 }
 
-function enableSuggestions(model, mayPredict, mayCorrect) {
-    // Set the options first so that KMW's ModelManager can properly handle model enablement states
+function enableSuggestions(model, mayPredict, mayCorrect, mayAutocorrect) {
+    // Set the options first so that KMW's ModelCache can properly handle model enablement states
     // the moment we actually register the new model.
     keyman.core.languageProcessor.mayPredict = mayPredict;
     keyman.core.languageProcessor.mayCorrect = mayCorrect;
+    keyman.core.languageProcessor.mayAutoCorrect = mayAutocorrect;
 
     keyman.addModel(model);
 }
