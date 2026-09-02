@@ -75,6 +75,12 @@ function archive_apps() {
           -archivePath "${KEYMAN_BUILD_PATH}/Config.xcarchive" \
           ARCHS=\"arm64 x86_64\" \
           ONLY_ACTIVE_ARCH=NO \
+          SENTRY_ENVIRONMENT="$KEYMAN_VERSION_ENVIRONMENT" \
+          TIER="$KEYMAN_TIER" \
+          VERSION_TAG="$KEYMAN_VERSION_TAG" \
+          VERSION_WITH_TAG="$KEYMAN_VERSION_WITH_TAG" \
+          VERSION_GIT_TAG="$KEYMAN_VERSION_GIT_TAG" \
+          VERSION_RELEASE="$KEYMAN_VERSION_RELEASE" \
           PRODUCT_VERSION=$KEYMAN_VERSION
 }
 

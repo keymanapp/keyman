@@ -8,6 +8,14 @@
 
 import SwiftUI
 import KeymanSettings
+import OSLog
+
+extension Logger {
+  private static let configSubsystem = ConfigAppUtil.configBundleId
+  static let package = Logger(subsystem: configSubsystem, category: "package")
+  static let download   = Logger(subsystem: configSubsystem, category: "download")
+  static let ui   = Logger(subsystem: configSubsystem, category: "ui")
+}
 
 @main
 struct ConfigApp: App {
@@ -15,6 +23,10 @@ struct ConfigApp: App {
   @StateObject var installation = InstallationContainer()
   @Environment(\.openWindow) private var openWindow
   
+  init() {
+      print("tier: \(ConfigAppUtil.appTier)")
+  }
+
   var body: some Scene {
     Window("Configuration", id: "main-config") {
       MainConfigView()
