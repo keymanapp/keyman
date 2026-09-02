@@ -56,14 +56,16 @@ struct MainConfigView: View {
   var body: some View {
     TabView (selection: $selectedTab) {
       VStack {
-        // uncomment to force sentry error (must disable 'Debug executable' in scheme to test)
-//          Button("Capture Sentry Error") {
-//            let testError = NSError(domain: "SentryTest", code: 404, userInfo: [NSLocalizedDescriptionKey: "Testing Sentry from Keyman Config on Mac"])
-//            SentrySDK.capture(error: testError)
-//          }
-//          .padding()
-//          .buttonStyle(.borderedProminent)
-//          .tint(.red)
+        // uncomment this Button to force sentry error (must edit scheme and disable 'Debug executable' to test)
+        /*
+          Button("Capture Sentry Error") {
+            let testError = NSError(domain: "SentryTest", code: 404, userInfo: [NSLocalizedDescriptionKey: "Testing Sentry from Keyman Config on Mac"])
+            SentrySDK.capture(error: testError)
+          }
+          .padding()
+          .buttonStyle(.borderedProminent)
+          .tint(.red)
+         */
        // the add keyboard button
         LabelButtonView(
           action: { isShowingAddKeyboardSheet = true },
