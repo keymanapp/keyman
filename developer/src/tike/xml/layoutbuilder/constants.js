@@ -631,6 +631,8 @@ $(function() {
     "desktop": { "x": 640, "y": 300, "name": "Desktop" },
   };
 
+  this.defaultPresentations = { "tablet": "tablet-ipad-landscape", "phone": "phone-iphone5-landscape", "desktop": "desktop" };
+
   this.keyMargin = 15;
 
   // from kmwosk.js:

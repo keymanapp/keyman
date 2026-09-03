@@ -174,6 +174,7 @@ $(function() {
   });
 
   $('#selLayer').change(function () {
+    builder.lastLayers[builder.lastPlatform] = $('#selLayer').val();
     if (builder.lastPlatform) builder.generate(false,false);
     let selection = builder.saveSelection();
     builder.selectLayer();
