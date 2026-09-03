@@ -1,0 +1,19 @@
+{
+  "extends": "../../../../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "outDir": "build/src/",
+    "rootDir": "src/",
+    "allowJs": true,
+    "preserveConstEnums": true,
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.js",
+  ],
+  "exclude": [
+    "src/ext/*",
+  ],
+  "references": [
+  ]
+}
