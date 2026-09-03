@@ -211,7 +211,7 @@ begin
   if doc.StartsWith('/app/source/toucheditor/lib/') and (Pos('..', doc) = 0) then
   begin
     Delete(doc, 1, Length('/app/source/toucheditor/lib/'));
-    RespondFile(GetLayoutBuilderPath + 'src/' + doc, AContext, ARequestInfo, AResponseInfo);
+    RespondFile(GetLayoutBuilderPath + 'build/' + doc, AContext, ARequestInfo, AResponseInfo);
   end
   else
     Respond404(AContext, ARequestInfo, AResponseInfo)

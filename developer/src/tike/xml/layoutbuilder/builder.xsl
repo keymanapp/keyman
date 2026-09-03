@@ -14,25 +14,28 @@
   <script src="/app/lib/sentry/init.js"><xsl:text> </xsl:text></script>
   <title>On Screen Keyboard Builder</title>
   <link rel="stylesheet" type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>ext/jquery-ui/jquery-ui.css</xsl:attribute></link>
-  <link rel='stylesheet' type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder.css</xsl:attribute></link>
+  <link rel='stylesheet' type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>assets/stylesheets/builder.css</xsl:attribute></link>
   <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>ext/jquery-1.10.2.js</xsl:attribute></script>
   <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>ext/jquery-ui/jquery-ui.js</xsl:attribute></script>
   <script>
     var KVKL = <xsl:value-of select='/TouchLayoutBuilder/LayoutJS' />;
     window.builder = {};
   </script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>constants.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>undo.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>prepare-key.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>subkeys.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>view-controls.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>platform-controls.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>layer-controls.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder-charmap.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>drag-drop.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>cleanup.js</xsl:attribute></script>
-  <script>initBuilder();</script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/constants.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/builder.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/undo.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/prepare-key.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/subkeys.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/view-controls.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/platform-controls.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/layer-controls.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/builder-charmap.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/drag-drop.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/cleanup.js</xsl:attribute></script>
+  <script type="module">
+    import { initBuilder } from "./toucheditor/lib/src/builder.js";
+    initBuilder();
+  </script>
 </head>
 <body class='text-controls-in-toolbar'>
   <div id='toolbar'>

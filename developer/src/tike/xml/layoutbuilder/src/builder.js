@@ -1145,7 +1145,7 @@ $(function() {
 
 }.bind(builder));
 
-function initBuilder() {
+export function initBuilder() {
   $(function() {
     builder.cleanupKVKL();
     builder.prepareKeyCapTypes();

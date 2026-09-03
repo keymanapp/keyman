@@ -9,6 +9,7 @@ builder_describe "Build Keyman Developer IDE" \
   @/common/include \
   @/core:x86 \
   @/common/windows/delphi \
+  :project :touch-layout-editor \
   clean configure build test publish install edit
 
 builder_parse "$@"
@@ -30,7 +31,6 @@ function do_configure() {
 
   mkdir -p "$DEVELOPER_PROGRAM"
   cp "$KEYMAN_ROOT/common/schemas/kps/kps.xsd" "$DEVELOPER_PROGRAM"
-  cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$DEVELOPER_ROOT/src/tike/xml/layoutbuilder/src/assets/fonts/keymanweb-osk.ttf"
   run_in_vs_env rc icons.rc
 }
 
@@ -58,10 +58,26 @@ function do_monaco_copy() {
 KEYMANCORE_DLL=keymancore-2.dll
 KEYMANCORE_PDB=keymancore-2.pdb
 
+function do_build_touch_layout_editor() {
+  # TODO: this could be a configure step but leaving it here while changes are in flux
+  cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$DEVELOPER_ROOT/src/tike/xml/layoutbuilder/src/assets/fonts/keymanweb-osk.ttf"
+  # TODO: do_configure_touch_layout_editor
+  rm -rf xml/layoutbuilder/build/assets/
+  rm -rf xml/layoutbuilder/build/ext/
+  mkdir -p xml/layoutbuilder/build/assets/
+  mkdir -p xml/layoutbuilder/build/ext/
+  cp -R xml/layoutbuilder/src/assets/* xml/layoutbuilder/build/assets/
+  cp -R xml/layoutbuilder/src/ext/* xml/layoutbuilder/build/ext/
+  tsc --build xml/layoutbuilder
+}
+
 function do_build() {
   create-developer-output-folders
   build_version.res
   build_manifest.res
+
+  # todo: make this an internal dependency
+  do_build_touch_layout_editor
 
   rm -rf "$DEVELOPER_PROGRAM/xml"
   mkdir -p "$DEVELOPER_PROGRAM/xml"
@@ -104,13 +120,14 @@ function do_install() {
   cp "$DEVELOPER_PROGRAM/$KEYMANCORE_DLL" "$INSTALLPATH_KEYMANDEVELOPER/$KEYMANCORE_DLL"
 }
 
-builder_run_action clean:project        clean_windows_project_files
-builder_run_action configure:project    do_configure
-builder_run_action build:project        do_build
-# builder_run_action test:project         do_test
-builder_run_action publish:project      do_publish
-builder_run_action install:project      do_install
-builder_run_action edit:project         start tike.dproj
+builder_run_action clean:project               clean_windows_project_files
+builder_run_action configure:project           do_configure
+builder_run_action build:project               do_build
+builder_run_action build:touch-layout-editor   do_build_touch_layout_editor
+# builder_run_action test:project              do_test
+builder_run_action publish:project             do_publish
+builder_run_action install:project             do_install
+builder_run_action edit:project                start tike.dproj
 
 # Note: generating monaco installer:
 # @echo *******************************************************************************************
