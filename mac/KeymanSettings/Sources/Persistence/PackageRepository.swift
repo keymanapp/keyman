@@ -86,7 +86,7 @@ public enum LoadPackageError: LocalizedError {
     case .missingKmxFile:
       let resource = LocalizedStringResource(
         "keyboard.missing.kmx.file",
-        defaultValue: "A keyboard in the package has no corresponding KMX file.",
+        defaultValue: "A keyboard in the package has no corresponding .KMX file.",
         bundle: packageBundle)
       return String(localized: resource)
     case .insufficientKeymanVersion(let packageName, let requiredKeymanVersion, let actualKeymanVersion):

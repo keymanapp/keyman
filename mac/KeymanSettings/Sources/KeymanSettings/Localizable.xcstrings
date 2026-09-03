@@ -128,7 +128,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "A keyboard in the package has no corresponding KMX file."
+            "value" : "A keyboard in the package has no corresponding .KMX file."
           }
         }
       }
