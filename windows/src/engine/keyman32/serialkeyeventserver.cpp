@@ -153,6 +153,17 @@ private:
   // TRUE once we have registered; checked against GetRegisteredRawInputDevices on the loop's
   // existing wake, and every key is poisoned on a mismatch.
   BOOL m_rawInputRegistered;
+
+  // #8064 FR-104. TRUE only once WTSRegisterSessionNotification has actually SUCCEEDED for m_hwnd.
+  // Tracked rather than re-derived at teardown, because by then there is nothing left to derive it
+  // from: the registration is keyed on a window handle that CleanupThread has already cleared, and
+  // neither g_hWtsApi being loaded nor g_pWtsUnregisterSession being bound says anything about
+  // whether a registration exists -- BindSessionNotificationApi succeeding and the registration
+  // itself succeeding are two different outcomes, and the second is the one teardown must not guess
+  // at. Unregistering a window that was never registered is the failure this flag exists to
+  // prevent.
+  BOOL m_sessionNotificationRegistered;
+
   SerialKeyEventSharedData *m_pSharedData;
 
   //////////////////////////////////////////////////////
@@ -181,7 +192,8 @@ public:
     // signal contributes nothing until it has actually observed something.
     memset(&m_userHeld, 0, sizeof(m_userHeld));
     PoisonAllUserHeldKeys(&m_userHeld);
-    m_rawInputRegistered = FALSE;
+    m_rawInputRegistered            = FALSE;
+    m_sessionNotificationRegistered = FALSE;
 
     // We create the file mapping and global data on the main thread but release it on the
     // local thread. This ensures that these objects are available for other processes to
@@ -415,6 +427,10 @@ private:
         "#8064 session notifications unavailable; a session change will not poison the user-held "
         "signal, so it is poisoned now and stays that way for keys it does not re-observe");
       PoisonAllUserHeldKeys(&m_userHeld);
+    } else {
+      // Recorded here and nowhere else: this is the only point at which a registration is known to
+      // exist, and CleanupThread has no way to re-establish it. See m_sessionNotificationRegistered.
+      m_sessionNotificationRegistered = TRUE;
     }
 
     return TRUE;
@@ -429,6 +445,26 @@ private:
     m_hwnd = NULL;
     MemoryBarrier();
 
+    // #8064 FR-104. BEFORE DestroyWindow, and on the SAVED handle.
+    //
+    // Both of those are corrections, not preferences. This ran after DestroyWindow and tested
+    // `m_hwnd != NULL`, three lines below the assignment that had just made m_hwnd NULL for the
+    // rest of the function -- so the guard could never pass, the unregister never happened, and had
+    // the guard somehow passed it would have handed the API the NULL rather than the window that
+    // was actually registered. A registration keyed on a destroyed window is not something the
+    // caller can clean up later: the handle is the only key there is.
+    //
+    // Ordered before DestroyWindow because WTSUnRegisterSessionNotification is documented to be
+    // called while the window still exists. The raw input registration needs no such treatment and
+    // is deliberately not here -- it is torn down with the window, which is why only this one was
+    // ever explicit.
+    if (m_sessionNotificationRegistered && g_pWtsUnregisterSession != NULL) {
+      if (!g_pWtsUnregisterSession(hwnd)) {
+        DebugLastError("WTSUnRegisterSessionNotification");
+      }
+      m_sessionNotificationRegistered = FALSE;
+    }
+
     if (!DestroyWindow(hwnd)) {
       DebugLastError("DestroyWindow");
     }
@@ -442,12 +478,8 @@ private:
       m_pInputs = NULL;
     }
 
-    // #8064 W5. Raw input registration is torn down with the window; the session notification is
-    // not, so it is unregistered explicitly.
-    if (m_hwnd != NULL && g_pWtsUnregisterSession != NULL) {
-      g_pWtsUnregisterSession(m_hwnd);
-    }
-
+    // The session notification is unregistered at the top of this function, while its window still
+    // exists; see the comment there.
     if (g_hWtsApi != NULL) {
       FreeLibrary(g_hWtsApi);
       g_hWtsApi               = NULL;
