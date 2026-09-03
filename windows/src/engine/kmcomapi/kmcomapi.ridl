@@ -1048,7 +1048,7 @@ library keymanapi
   interface IKeymanPackageFile3: IKeymanPackageFile
   {
     [id(0x00000124)]
-    HRESULT _stdcall Install3([in] VARIANT_BOOL Force, [in] long BaseKeyboardID, [out, retval] IKeymanPackageInstalled** PackageResult);
+    HRESULT _stdcall Install3([in] VARIANT_BOOL Force, [in] long BaseKeyboardID, [out, retval] IKeymanPackageFile** Package);
   };
 
   [
