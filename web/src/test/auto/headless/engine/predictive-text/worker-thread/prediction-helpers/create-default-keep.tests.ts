@@ -12,7 +12,12 @@ import { assert } from 'chai';
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
-import { CorrectionPredictionTuple, createDefaultKeep, models, SuggestionSimilarity } from "@keymanapp/lm-worker/test-index";
+import {
+  CorrectionPredictionTuple,
+  createDefaultKeep,
+  models,
+  SuggestionSimilarity
+} from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -126,7 +131,7 @@ describe('produceKeep', () => {
         p: 1
       },
       totalProb: 1,
-      matchLevel: SuggestionSimilarity.exact
+      metadata: { matchLevel: SuggestionSimilarity.exact, preservationTransform: null }
     };
 
     const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);
