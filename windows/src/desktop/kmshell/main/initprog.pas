@@ -115,6 +115,7 @@ uses
   GetOsVersion,
   help,
   HTMLHelpViewer,
+  Keyman.Configuration.Settings.BaseKeyboard,
   Keyman.Configuration.UI.InstallFile,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.System.UImportOlderVersionKeyboards11To13,

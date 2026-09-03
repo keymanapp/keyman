@@ -183,7 +183,8 @@ uses
   Keyman.System.DownloadUpdate in 'main\Keyman.System.DownloadUpdate.pas',
   Keyman.System.ExecutionHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas',
   Keyman.Configuration.UI.UfrmStartInstall in 'main\Keyman.Configuration.UI.UfrmStartInstall.pas' {frmStartInstall},
-  Keyman.Configuration.Util.NetworkConnection in 'util\Keyman.Configuration.Util.NetworkConnection.pas';
+  Keyman.Configuration.Util.NetworkConnection in 'util\Keyman.Configuration.Util.NetworkConnection.pas',
+  Keyman.Configuration.Settings.BaseKeyboard in 'settings\Keyman.Configuration.Settings.BaseKeyboard.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
