@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 19.0.279 alpha 2026-09-03
+
+* chore(web): tweak error message (#16495)
+* change(web): stage construction of CorrectionPredictionTuple instances (#16429)
+* change(web): narrow the range of suggestions examined to determine autocompletion (#16436)
+* fix(web): remove deprecated `onunload` handler (#16504)
+* docs(developer): add comment to test fixtures to clarify expectations (#16505)
+* fix(developer): hide keyboard uninstall confirmation (#16506)
+* fix(developer): remember presentation and layer when switching platforms in touch layout editor (#16509)
+* fix(developer): ensure JSON regenerated after undo in touch layout editor (#16516)
+* fix(developer): improve validation of minDeviceWidth to match spec (#16501)
+* chore(developer): improve kmc-ldml test messages (#16502)
+* chore(web): add const for cookie name (#16519)
+* refactor(web): clarify scope of PageContextAttachment functions (#16521)
+
 ## 19.0.278 alpha 2026-09-02
 
 * feat(developer): support output folder and `--continue-on-error` (#16453)
