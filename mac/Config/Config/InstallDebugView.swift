@@ -3,7 +3,9 @@
  *
  * Created by Shawn Schantz on 2026-02-26
  *
- * Main view used for configuring Keyman
+ * Test view used for configuring Keyman
+ * Not included in ConfigApp.swift, but can be added temporarily for testing purposes
+ * All text and labels are marked verbatim, so that they do not get extracted for localization
  */
 
 import SwiftUI
@@ -18,7 +20,7 @@ struct InstallDebugView: View {
         Image(systemName: "gear")
           .imageScale(.large)
           .foregroundColor(.accentColor)
-        Text("Current task = \(taskText)")
+        Text(verbatim: "Current task = \(taskText)")
           .onAppear() {
             if let installTask = installation.currentTask() {
               taskText = installTask.taskType.rawValue
@@ -26,52 +28,78 @@ struct InstallDebugView: View {
           }
       }
       HStack {
-        Button("Next...") {
+        Button {
           installation.executeCurrentInstallationTask()
           if let installTask = installation.currentTask() {
             taskText = installTask.taskType.rawValue
           }
+        } label: {
+          Text(verbatim: "Next...")
         }
         .disabled(installation.isInstallationComplete())
-        Button("Migrate Data") {
+        Button {
           _ = installation.migrateData()
+        } label: {
+          Text(verbatim: "Migrate Data")
         }
-        Button("Register Keyman") {
+        Button {
           _ = installation.registerKeymanInputMethod()
+        } label: {
+          Text(verbatim: "Register Keyman")
         }
-        Button("Enable Keyman") {
+        Button {
           _ = installation.enableKeymanInputMethod()
+        } label: {
+          Text(verbatim: "Enable Keyman")
         }
-        Button("Select Keyman") {
+        Button {
           _ = installation.selectKeymanInputMethod()
+        } label: {
+          Text(verbatim: "Select Keyman")
         }
-        Button("Check Permission") {
+        Button {
           installation.checkAccessibilityPermissionGranted()
+        } label: {
+          Text(verbatim: "Check Permission")
         }
-        Button("Request Permission") {
+        Button {
           _ = installation.requestAccessibility()
+        } label: {
+          Text(verbatim: "Request Permission")
         }
         Spacer()
       }
       .padding()
       HStack {
-        Button("Request Restart") {
+        Button {
           _ = installation.notifyUserPromptedToRestart()
+        } label: {
+          Text(verbatim: "Request Restart")
         }
-        Button("Check Restart") {
+        Button {
           _ = installation.validateUserHasRestarted()
+        } label: {
+          Text(verbatim: "Check Restart")
         }
-        Button("Set Displayed Complete") {
+        Button {
           installation.setHasDisplayedInstallationComplete()
+        } label: {
+          Text(verbatim: "Set Displayed Complete")
         }
-        Button("debug") {
+        Button {
           installation.debug()
+        } label: {
+          Text(verbatim: "debug")
         }
-        Button("Disable Keyman") {
+        Button {
           _ = installation.disableKeymanInputMethod()
+        } label: {
+          Text(verbatim: "Disable Keyman")
         }
-        Button("Kill Keyman") {
+        Button {
           _ = installation.killKeymanInputMethod()
+        } label: {
+          Text(verbatim: "Kill Keyman")
         }
         Spacer()
       }

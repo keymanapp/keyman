@@ -12,7 +12,7 @@ public struct IconButtonView: View {
   let action: () -> Void
   let systemImage: String
   let font: Font
-  let helpText: String
+  let helpText: LocalizedStringKey
   
   public var body: some View {
 
@@ -32,7 +32,7 @@ public struct IconButtonView: View {
 // the view for buttons with a label
 public struct LabelButtonView: View {
   let action: () -> Void
-  let label: String
+  let label: LocalizedStringKey
   let systemImage: String
   let font: Font
   

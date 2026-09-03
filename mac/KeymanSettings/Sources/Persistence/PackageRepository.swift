@@ -23,20 +23,78 @@ public enum LoadPackageError: LocalizedError {
   case missingKeyboardVersion
   case missingKmxFile
   case insufficientKeymanVersion(packageName: String, requiredKeymanVersion: String, actualKeymanVersion: String)
-
+  
+  private var packageBundle: LocalizedStringResource.BundleDescription {
+    .atURL(Bundle.module.bundleURL)
+  }
   public var errorDescription: String? {
     switch self {
-    case .invalidUrl: return "The URL is not valid."
-    case .unzipError: return "The keyboard package could not be unzipped."
-    case .containsNoFiles: return "The keyboard package contains no files."
-    case .containsNoKeyboards: return "The keyboard package contains no keyboards."
-    case .kmpJsonFileUnreadable: return "The package's kmp.json file could not be parsed."
-    case .kmpJsonFileNotFound: return "The package's kmp.json file was not found."
-    case .missingKeyboardName: return "A keyboard in the package has no name."
-    case .missingKeyboardId: return "A keyboard in the package has no ID."
-    case .missingKeyboardVersion: return "A keyboard in the package has no version."
-    case .missingKmxFile: return "A keyboard in the package has no corresponding KMX file."
-    case .insufficientKeymanVersion(let packageName, let requiredKeymanVersion, let actualKeymanVersion): return "The keyboard package '\(packageName)' requires Keyman version \(requiredKeymanVersion) but your version is \(actualKeymanVersion)."
+    case .invalidUrl:
+      let resource = LocalizedStringResource(
+        "invalid.url",
+        defaultValue: "The URL is not valid.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .unzipError:
+      let resource = LocalizedStringResource(
+        "could.not.unzip",
+        defaultValue: "The keyboard package could not be unzipped.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .containsNoFiles:
+      let resource = LocalizedStringResource(
+        "contains.no.files",
+        defaultValue: "The keyboard package contains no files.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .containsNoKeyboards:
+      let resource = LocalizedStringResource(
+        "contains.no.keyboards",
+        defaultValue: "The keyboard package contains no keyboards.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .kmpJsonFileUnreadable:
+      let resource = LocalizedStringResource(
+        "kmp.json.unreadable",
+        defaultValue: "The package's kmp.json file could not be parsed.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .kmpJsonFileNotFound:
+      let resource = LocalizedStringResource(
+        "kmp.json.not.found",
+        defaultValue: "The package's kmp.json file was not found.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .missingKeyboardName:
+      let resource = LocalizedStringResource(
+        "keyboard.name.missing",
+        defaultValue: "A keyboard in the package has no name.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .missingKeyboardId:
+      let resource = LocalizedStringResource(
+        "keyboard.id.missing",
+        defaultValue: "A keyboard in the package has no ID.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .missingKeyboardVersion:
+      let resource = LocalizedStringResource(
+        "keyboard.missing.version",
+        defaultValue: "A keyboard in the package has no version.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .missingKmxFile:
+      let resource = LocalizedStringResource(
+        "keyboard.missing.kmx.file",
+        defaultValue: "A keyboard in the package has no corresponding KMX file.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .insufficientKeymanVersion(let packageName, let requiredKeymanVersion, let actualKeymanVersion):
+      let resource = LocalizedStringResource(
+        "insufficient.keyman.version",
+        defaultValue: "The keyboard package '\(packageName)' requires Keyman version \(requiredKeymanVersion) but your version is \(actualKeymanVersion).",
+        bundle: packageBundle)
+      return String(localized: resource)
     }
   }
 }
