@@ -1,33 +1,32 @@
-$(function() {
+/// <reference path="../../../../../../node_modules/@types/jquery/index.d.ts"/>
+/// <reference path="../../../../../../node_modules/@types/jqueryui/index.d.ts"/>
+import { builder } from './builder.js';
 
-  $('#btnViewOptions').click(function () {
-    $('#chkShowAllModifierOptions')[0].checked = builder.showAllModifierCombinations;
-    $('#viewOptionsDialog').dialog('open');
-  });
+$('#btnViewOptions').click(function () {
+  ($('#chkShowAllModifierOptions')[0] as HTMLInputElement).checked = builder.showAllModifierCombinations;
+  $('#viewOptionsDialog').dialog('open');
+});
 
-  $('#chkShowAllModifierOptions').click(function (event) {
-    event.stopImmediatePropagation();
-    builder.showAllModifierCombinations = $('#chkShowAllModifierOptions')[0].checked;
-    builder.fillModifierSelect();
-    builder.prepareKey();
-  });
+$('#chkShowAllModifierOptions').click(function (event) {
+  event.stopImmediatePropagation();
+  builder.showAllModifierCombinations = ($('#chkShowAllModifierOptions')[0] as HTMLInputElement).checked;
+  builder.fillModifierSelect();
+  builder.prepareKey();
+});
 
-  $('#viewOptionsForm').on('submit', function() {
-    $('#viewOptionsDialog').dialog('close');
-    return false;
-  });
+$('#viewOptionsForm').on('submit', function() {
+  $('#viewOptionsDialog').dialog('close');
+  return false;
+});
 
-  $('#viewOptionsDialog').dialog({
-    autoOpen: false,
-    height: 300,
-    width: 350,
-    modal: true,
-    buttons: {
-      "Close": function () {
-        $(this).dialog('close');
-      }
+$('#viewOptionsDialog').dialog({
+  autoOpen: false,
+  height: 300,
+  width: 350,
+  modal: true,
+  buttons: {
+    "Close": function () {
+      $(this).dialog('close');
     }
-
-  });
-
-}.bind(builder));
+  }
+});

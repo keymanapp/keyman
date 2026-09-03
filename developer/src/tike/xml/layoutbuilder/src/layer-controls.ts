@@ -1,184 +1,184 @@
-$(function() {
+/// <reference path="../../../../../../node_modules/@types/jquery/index.d.ts"/>
+/// <reference path="../../../../../../node_modules/@types/jqueryui/index.d.ts"/>
+import { builder } from './builder.js';
 
-  $('#addLayerName').on('input', function() {
-    var layerName = $(this).val();
-    $('#addLayerList').val(layerName);
-    if($('#addLayerList')[0].selectedIndex < 0) {
-      $('#addLayerList').val('');
-      $('#addLayerNote').text('');
-    } else {
-      $('#addLayerNote').text(layerName+' is a recognised modifier-aware layer name.');
+$('#addLayerName').on('input', function(evt) {
+  var layerName = $(evt.currentTarget).val();
+  $('#addLayerList').val(layerName);
+  if(($('#addLayerList')[0] as HTMLSelectElement).selectedIndex < 0) {
+    $('#addLayerList').val('');
+    $('#addLayerNote').text('');
+  } else {
+    $('#addLayerNote').text(layerName+' is a recognised modifier-aware layer name.');
+  }
+});
+
+$('#addLayerList').change(function(evt) {
+  var v = $(evt.currentTarget).val();
+  if(v == '') {
+    $('#addLayerName').val('');
+    $('#addLayerNote').text('');
+  } else {
+    $('#addLayerName').val(v);
+    $('#addLayerNote').text(v+' is a recognised modifier-aware layer name.');
+  }
+});
+
+
+
+$('#btnAddLayer').click(function () {
+  $('#addLayerDialog').dialog('open');
+});
+
+$('#btnDelLayer').click(function () {
+  if ($('#selLayer option').length == 1) return;
+  builder.saveUndo();
+  const deletedLayer = KVKL[builder.lastPlatform].layer.splice(builder.lastLayerIndex, 1)[0];
+  updateNextLayerReferences(KVKL[builder.lastPlatform], deletedLayer.id, '');
+  builder.selectPlatform();
+  builder.generate(false,true);
+});
+
+$('#btnEditLayer').click(function () {
+  $('#layerName').val(KVKL[builder.lastPlatform].layer[builder.lastLayerIndex].id);
+  $('#layerPropertiesDialog').dialog('open');
+});
+
+//
+// Layer dialogs
+//
+
+function updateNextLayerReferences(platform, oldLayerName, newLayerName) {
+  const fixup = function(key) {
+    if (key.nextlayer == oldLayerName) {
+      key.nextlayer = newLayerName;
     }
-  });
-
-  $('#addLayerList').change(function() {
-    var v = $(this).val();
-    if(v == '') {
-      $('#addLayerName').val('');
-      $('#addLayerNote').text('');
-    } else {
-      $('#addLayerName').val(v);
-      $('#addLayerNote').text(v+' is a recognised modifier-aware layer name.');
-    }
-  });
-
-
-
-  $('#btnAddLayer').click(function () {
-    $('#addLayerDialog').dialog('open');
-  });
-
-  $('#btnDelLayer').click(function () {
-    if ($('#selLayer option').length == 1) return;
-    builder.saveUndo();
-    const deletedLayer = KVKL[builder.lastPlatform].layer.splice(builder.lastLayerIndex, 1)[0];
-    updateNextLayerReferences(KVKL[builder.lastPlatform], deletedLayer.id, '');
-    builder.selectPlatform();
-    builder.generate(false,true);
-  });
-
-  $('#btnEditLayer').click(function () {
-    $('#layerName').val(KVKL[builder.lastPlatform].layer[builder.lastLayerIndex].id);
-    $('#layerPropertiesDialog').dialog('open');
-  });
-
-  //
-  // Layer dialogs
-  //
-
-  function updateNextLayerReferences(platform, oldLayerName, newLayerName) {
-    const fixup = function(key) {
-      if (key.nextlayer == oldLayerName) {
-        key.nextlayer = newLayerName;
-      }
-    }
-
-    platform.layer.forEach(layer => {
-      if (layer.row) {
-        layer.row.forEach(row => {
-          if (row.key) {
-            row.key.forEach(key => {
-              fixup(key);
-
-              if (key.sk) {
-                key.sk.forEach(k => fixup(k));
-              }
-              if (key.flick) {
-                key.flick.forEach(k => fixup(k));
-              }
-              if (key.multitap) {
-                key.multitap.forEach(k => fixup(k));
-              }
-            });
-          }
-        });
-      }
-    });
   }
 
-  function submitLayerProperties() {
-    const newLayerName = $('#layerName').val();
-    if (!newLayerName.match(/^[a-zA-Z0-9_-]+$/)) {
-      alert('Layer name must contain only alphanumerics, underscore and hyphen.');
-      return false;
+  platform.layer.forEach(layer => {
+    if (layer.row) {
+      layer.row.forEach(row => {
+        if (row.key) {
+          row.key.forEach(key => {
+            fixup(key);
+
+            if (key.sk) {
+              key.sk.forEach(k => fixup(k));
+            }
+            if (key.flick) {
+              key.flick.forEach(k => fixup(k));
+            }
+            if (key.multitap) {
+              key.multitap.forEach(k => fixup(k));
+            }
+          });
+        }
+      });
     }
-    for(let i = 0; i < KVKL[builder.lastPlatform].layer.length; i++) {
-      if(i != builder.lastLayerIndex && KVKL[builder.lastPlatform].layer[i].id == newLayerName) {
-        alert('Layer name must not already be in use for the current platform.');
-        return false;
-      }
-    }
+  });
+}
 
-    builder.saveUndo();
-    builder.generate();
-
-    const platform = KVKL[builder.lastPlatform];
-    const oldLayerName = platform.layer[builder.lastLayerIndex].id;
-
-    updateNextLayerReferences(platform, oldLayerName, newLayerName);
-
-    platform.layer[builder.lastLayerIndex].id = newLayerName;
-    builder.prepareLayers();
-    $('#selLayer').val(builder.lastLayerIndex);
-    builder.selectLayer();
-    builder.generate();
-    $('#layerPropertiesDialog').dialog('close');
+function submitLayerProperties() {
+  const newLayerName = $('#layerName').val();
+  if (!newLayerName.match(/^[a-zA-Z0-9_-]+$/)) {
+    alert('Layer name must contain only alphanumerics, underscore and hyphen.');
     return false;
   }
-
-  $('#layerPropertiesForm').on('submit', submitLayerProperties);
-
-  $('#layerPropertiesDialog').dialog({
-    autoOpen: false,
-    height: 300,
-    width: 350,
-    modal: true,
-    buttons: {
-      "OK": submitLayerProperties,
-      "Cancel": function () {
-        $(this).dialog('close');
-      }
-    }
-  });
-
-  function submitLayerDialog() {
-    var id = $('#addLayerName').val();
-    if (!id.match(/^[a-zA-Z0-9_-]+$/)) {
-      alert('Layer name must contain only alphanumerics, underscore and hyphen.');
+  for(let i = 0; i < KVKL[builder.lastPlatform].layer.length; i++) {
+    if(i != builder.lastLayerIndex && KVKL[builder.lastPlatform].layer[i].id == newLayerName) {
+      alert('Layer name must not already be in use for the current platform.');
       return false;
     }
-    for(var i = 0; i < KVKL[builder.lastPlatform].layer.length; i++) {
-      if(KVKL[builder.lastPlatform].layer[i].id == id) {
-        alert('Layer name must not already be in use for the current platform.');
-        return false;
-      }
-    }
-    builder.saveUndo();
-    var layer = $.extend(true, {}, KVKL[builder.lastPlatform].layer[builder.lastLayerIndex]);
-    layer.id = id;
-    var n = KVKL[builder.lastPlatform].layer.push(layer) - 1;
-    builder.selectPlatform();
-    $('#selLayer').val(n);
-    builder.selectLayer();
-    builder.generate(false,true);
-    $('#addLayerDialog').dialog('close');
-    return false;
   }
 
-  $('#addLayerForm').on('submit', submitLayerDialog);
+  builder.saveUndo();
+  builder.generate();
 
-  $('#addLayerDialog').dialog({
-    autoOpen: false,
-    height: 300,
-    width: 350,
-    modal: true,
-    buttons: {
-      "OK": submitLayerDialog,
-      "Cancel": function () {
-        $(this).dialog('close');
-      }
+  const platform = KVKL[builder.lastPlatform];
+  const oldLayerName = platform.layer[builder.lastLayerIndex].id;
+
+  updateNextLayerReferences(platform, oldLayerName, newLayerName);
+
+  platform.layer[builder.lastLayerIndex].id = newLayerName;
+  builder.prepareLayers();
+  $('#selLayer').val(builder.lastLayerIndex);
+  builder.selectLayer();
+  builder.generate();
+  $('#layerPropertiesDialog').dialog('close');
+  return false;
+}
+
+$('#layerPropertiesForm').on('submit', submitLayerProperties);
+
+$('#layerPropertiesDialog').dialog({
+  autoOpen: false,
+  height: 300,
+  width: 350,
+  modal: true,
+  buttons: {
+    "OK": submitLayerProperties,
+    "Cancel": function () {
+      $(this).dialog('close');
     }
-  });
+  }
+});
 
-  $('#selectKeyDialog').dialog({
-    autoOpen: false,
-    height: 140,
-    width: 240,
-    modal: true,
-    buttons: {
-      "Cancel": function () {
-        builder.nextKeySelects = false;
-        $(this).dialog('close');
-      }
+function submitLayerDialog() {
+  var id = $('#addLayerName').val();
+  if (!id.match(/^[a-zA-Z0-9_-]+$/)) {
+    alert('Layer name must contain only alphanumerics, underscore and hyphen.');
+    return false;
+  }
+  for(var i = 0; i < KVKL[builder.lastPlatform].layer.length; i++) {
+    if(KVKL[builder.lastPlatform].layer[i].id == id) {
+      alert('Layer name must not already be in use for the current platform.');
+      return false;
     }
-  });
+  }
+  builder.saveUndo();
+  var layer = $.extend(true, {}, KVKL[builder.lastPlatform].layer[builder.lastLayerIndex]);
+  layer.id = id;
+  var n = KVKL[builder.lastPlatform].layer.push(layer) - 1;
+  builder.selectPlatform();
+  $('#selLayer').val(n);
+  builder.selectLayer();
+  builder.generate(false,true);
+  $('#addLayerDialog').dialog('close');
+  return false;
+}
 
-  $('#selLayer').change(function () {
-    if (builder.lastPlatform) builder.generate(false,false);
-    let selection = builder.saveSelection();
-    builder.selectLayer();
-    builder.restoreSelection(selection);
-    builder.saveState();
-  });
+$('#addLayerForm').on('submit', submitLayerDialog);
 
-}.bind(builder));
+$('#addLayerDialog').dialog({
+  autoOpen: false,
+  height: 300,
+  width: 350,
+  modal: true,
+  buttons: {
+    "OK": submitLayerDialog,
+    "Cancel": function () {
+      $(this).dialog('close');
+    }
+  }
+});
+
+$('#selectKeyDialog').dialog({
+  autoOpen: false,
+  height: 140,
+  width: 240,
+  modal: true,
+  buttons: {
+    "Cancel": function () {
+      builder.nextKeySelects = false;
+      $(this).dialog('close');
+    }
+  }
+});
+
+$('#selLayer').change(function () {
+  if (builder.lastPlatform) builder.generate(false,false);
+  let selection = builder.saveSelection();
+  builder.selectLayer();
+  builder.restoreSelection(selection);
+  builder.saveState();
+});

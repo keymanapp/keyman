@@ -136,7 +136,8 @@ begin
     Filename := CrackUTF8ZeroExtendedString(ARequestInfo.CommandType, ARequestInfo.Params.Values['Filename']);
     RespondTouchEditorState(Filename, AContext, ARequestInfo, AResponseInfo);
   end
-  else if ARequestInfo.Document.StartsWith('/app/source/toucheditor/lib/') then
+  else if ARequestInfo.Document.StartsWith('/app/source/toucheditor/lib/') or
+    ARequestInfo.Document.StartsWith('/app/source/toucheditor/src/') then
   begin
     RespondTouchEditorLib(AContext, ARequestInfo, AResponseInfo);
   end
@@ -208,7 +209,12 @@ var
   doc: string;
 begin
   doc := ARequestInfo.Document;
-  if doc.StartsWith('/app/source/toucheditor/lib/') and (Pos('..', doc) = 0) then
+  if doc.StartsWith('/app/source/toucheditor/src/') and (Pos('..', doc) = 0) then
+  begin
+    Delete(doc, 1, Length('/app/source/toucheditor/src/'));
+    RespondFile(GetLayoutBuilderPath + 'src/' + doc, AContext, ARequestInfo, AResponseInfo);
+  end
+  else if doc.StartsWith('/app/source/toucheditor/lib/') and (Pos('..', doc) = 0) then
   begin
     Delete(doc, 1, Length('/app/source/toucheditor/lib/'));
     RespondFile(GetLayoutBuilderPath + 'build/' + doc, AContext, ARequestInfo, AResponseInfo);
