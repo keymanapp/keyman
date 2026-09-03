@@ -20,19 +20,26 @@ export class LayrCompiler extends SectionCompiler {
     let valid = true;
     let totalLayerCount = 0;
     let hardwareLayers = 0;
-    let touchLayers = 0;
+    let touchLayerCount = 0;
+    let hasNullDeviceWidth = false;
     const deviceWidths = new Set<number>();
     this.keyboard3.layers?.forEach((layers) => {
       const { formId } = layers;
       if (formId === 'touch') {
-        touchLayers++;
+        touchLayerCount++;
         totalLayerCount += layers.layer?.length;
-        // TODO-LDML: CLDR-19754 spec does not require minDeviceWidth, but if multiple touch forms then it would be important for differentiation
         const { minDeviceWidth } = layers;
-        if (!minDeviceWidth ||
+        if (minDeviceWidth === undefined || minDeviceWidth === null) {
+          if(hasNullDeviceWidth) {
+            this.callbacks.reportMessage(LdmlCompilerMessages.Hint_MultipleTouchFormsWithoutMinDeviceWidth(layers));
+          }
+          hasNullDeviceWidth = true;
+        } else if (
+          (typeof minDeviceWidth === 'string' && (<string>minDeviceWidth).trim() === '') ||
+          Number.isNaN(Number(minDeviceWidth)) ||
           minDeviceWidth < constants.layr_min_minDeviceWidth ||
-          minDeviceWidth > constants.layr_max_minDeviceWidth ||
-          Number.isNaN(Number(minDeviceWidth))) {
+          minDeviceWidth > constants.layr_max_minDeviceWidth
+        ) {
           valid = false;
           this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidLayerWidth({minDeviceWidth}, layers));
         } else if (deviceWidths.has(minDeviceWidth)) {

@@ -12,7 +12,7 @@
       <row keys="one two three" />
     </layer>
   </layers>
-  <layers formId="touch" minDeviceWidth="1500">
+  <layers formId="touch" minDeviceWidth="1500"> <!-- max width 999mm -->
     <layer id="base">
       <row keys="one" />
       <row keys="two" />

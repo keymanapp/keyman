@@ -173,7 +173,16 @@ describe('layr', function () {
         LdmlCompilerMessages.Error_DuplicateLayerWidth({ minDeviceWidth: 120}),
       ]
     },
-    ...[0, 1024, 1500, `x` as unknown as number].map(minDeviceWidth => ({
+    {
+      subpath: 'sections/layr/hint-multiple-touch-forms-without-min-device-width.xml',
+      warnings: [
+        LdmlCompilerMessages.Hint_MultipleTouchFormsWithoutMinDeviceWidth(),
+      ]
+    },
+    {
+      subpath: 'sections/layr/multiple-forms-one-without-min-device-width.xml',
+    },
+    ...<any>[0, 1024, 1500, `x`, ``].map(minDeviceWidth => ({
       subpath: `sections/layr/error-bad-width-${minDeviceWidth}.xml`,
       errors: [
         //
