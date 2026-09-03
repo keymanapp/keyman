@@ -27,25 +27,25 @@ unit KeymanControlMessages;
 interface
 
 const
-  //KMC_KEYBOARDCHANGED = 1;   // I3949
-  //KMC_CHANGEUISTATE = 2;
-  KMC_GETLOADED = 3;
   KMC_REFRESH = 4;
   KMC_INTERFACEHOTKEY = 5;
 
   KMC_NOTIFYWELCOME = 6;
-  KMC_NOTIFYWELCOME_EVENT = 7;    // From Keyman to welcome window
+
+    // KMC_NOTIFYWELCOME commands
+    NW_NOTIFYHANDLE = 0;
+    NW_SENDBALLOON = 1;
+
+    // NW_SENDBALLOON options
+    NWB_IDENTIFYICON = 0;
+    NWB_TUTORIALFINISHED = 1;
+    NWB_KEYMANRUNNING = 2;
 
   KMC_ONSCREENKEYBOARD = 8;   // 7.0.248.0
 
   KMC_SETFOCUSINFO = 9; // 7.1.270.0
   KMC_GETLASTFOCUS = 10; // 7.1.270.0
   KMC_GETLASTACTIVE = 11; // 7.1.270.0
-
-  KMC_GETLASTKEYMANID = 12; // 7.1.274.0
-  KMC_GETLASTHKL = 13; // 7.1.274.0
-
-  //KMC_HKLCHANGED = 15; // 8.0.290.0   // I3949
 
   KMC_KEYDOWN = 16;
   KMC_KEYUP = 17;
@@ -58,34 +58,17 @@ const
   KMC_WATCHDOG_KEYEVENT         = 21; // 19.0 - let the LowLevelHookWatchDog know that input has happened on another thread
   KMC_WATCHDOG_HOOK_REINSTALL   = 22; // 19.0 - tell master controller about hook reinstall events
 
-  // KMC_WATCHDOG_HOOK_REINSTALL event types
-  WHR_TIMING         = 0;  // 19.0 - report on timing
-  WHR_INIT_FAILURE   = 1;  // 19.0 - hook failed to (re)install
-  WHR_UNINIT_FAILURE = 2;  // 19.0 - hook failed to uninstall
+    // KMC_WATCHDOG_HOOK_REINSTALL event types
+    WHR_TIMING         = 0;  // 19.0 - report on timing
+    WHR_INIT_FAILURE   = 1;  // 19.0 - hook failed to (re)install
+    WHR_UNINIT_FAILURE = 2;  // 19.0 - hook failed to uninstall
 
+  KMC_REGISTER_HOST_WINDOW_X64   = 23;
+  KMC_REGISTER_HOST_WINDOW_ARM64 = 24;
 
   PC_UPDATE = 0;
   PC_UPDATE_LANGUAGESWITCH = 1;
   PC_HOTKEYCHANGE = 2;
-
-  // KMC_KEYBOARDHOTKEY = 19;  // 9.0.459.0   // I4326 Deprecated in favour of language hotkeys
-  //KMC_LANGUAGEHOTKEY = 20;
-
-//TOUCH    KMC_CONTEXT = 19;
-
-  // KMC_NOTIFYWELCOME commands
-  NW_NOTIFYHANDLE = 0;
-  NW_SENDBALLOON = 1;
-
-  // NW_SENDBALLOON options
-  NWB_IDENTIFYICON = 0;
-  NWB_TUTORIALFINISHED = 1;
-  NWB_KEYMANRUNNING = 2;
-
-  // KMC_NOTIFYWELCOME_EVENT events
-  NWE_ICONCLICKED = 0;
-  NWE_MENUOPENED = 1;
-  NWE_MENUCLOSED = 2;
 
 implementation
 

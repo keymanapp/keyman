@@ -3,7 +3,7 @@
  *
  * Created by jahorton on 2024-07-08.
  *
- * This file defines many predictive-text engine's helper methods used for the
+ * This file defines the many predictive-text engine's helper methods used for the
  * overall process of text prediction.
  */
 

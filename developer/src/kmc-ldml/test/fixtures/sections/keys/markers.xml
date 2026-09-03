@@ -17,7 +17,7 @@
   </flicks>
 
   <layers formId="iso">
-    <layer id="base">
+    <layer modifiers="none">
       <row keys="ww" />
     </layer>
   </layers>

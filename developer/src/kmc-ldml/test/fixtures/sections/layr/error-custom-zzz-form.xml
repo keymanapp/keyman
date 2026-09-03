@@ -16,7 +16,7 @@
     </form>
   </forms>
   <layers formId="zzz">
-    <layer id="base">
+    <layer modifiers="none">
       <row keys="one two three" />
     </layer>
   </layers>
