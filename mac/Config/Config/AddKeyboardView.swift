@@ -36,7 +36,6 @@ struct AddKeyboardView: View {
             .progressViewStyle(.linear)
             .frame(width: 250)
           
-//          Text("\(Int(downloadCoordinator.downloadProgressFraction * 100))%")
           Text(downloadCoordinator.downloadProgressFraction, format: .percent.precision(.fractionLength(0)))
             .font(.body)
             .foregroundColor(.secondary)
