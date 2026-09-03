@@ -5,4 +5,5 @@ begin unicode > use(main)
 
 group(main) using keys
 
+c NOTE: using `fix` should not generate a warning in v17 target version compile (unlike v19 target version)
 + 'x' > fix
