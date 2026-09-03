@@ -190,6 +190,14 @@ typedef void (*PMODIFIERDIAGNOSTIC)(ModifierDiagnosticCode code, BYTE vk);
      only ever WIDENS what the cache already justifies. It can add a press the cache missed. It can
      never veto one the cache asserts.
 
+  4. ITS CURRENCY IS THE READER'S RESPONSIBILITY, NOT THE STRUCTURE'S (FR-103a, FR-103b). The feed
+     is WM_INPUT, an input-class message, and input-class messages are retrieved BEHIND every posted
+     message however much earlier they arrived. Both of this struct's consumers are reached through
+     a posted message, so both must drain pending raw input before reading it or they read a signal
+     that predates their own trigger. See SerialKeyEventServer::DrainPendingRawInput. Nothing in
+     these two arrays can reveal that they are behind -- which is exactly why it is written down
+     here, next to the discipline in property 2.
+
   Poison is PER KEY and clears ONLY on a fresh observation of that key -- never on a timer. A timer
   would decide that a key is knowable again because time passed, which is exactly the reasoning that
   makes a stale shadow dangerous. See PoisonUserHeldKeys.

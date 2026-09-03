@@ -617,6 +617,17 @@ private:
   BOOL ProcessQueuedKeyEvents() {
     SendDebugMessage("Processing queued key events");
 
+    // #8064 FR-103b. BEFORE the mutex, and before the batch reads the user-held signal. WM_USER is
+    // POSTED (see MessageLoop), so it is retrieved ahead of every WM_INPUT already queued, and the
+    // restore half would otherwise widen its set from a signal that has not yet seen observations
+    // the OS made before this batch was even requested. Same message-class hazard as FR-103a, one
+    // call site earlier; DrainPendingRawInput's doc comment carries the full reasoning.
+    //
+    // Deliberately outside the m_hKeyMutex hold below: this has nothing to do with the shared
+    // buffer, and clients wait on that mutex with a 500ms timeout (SerialKeyEventClient::
+    // SignalServer), so pumping messages while holding it would spend a budget for no reason.
+    DrainPendingRawInput();
+
     HANDLE handles[2] = { m_hThreadExitEvent, m_hKeyMutex };
 
     //
@@ -720,39 +731,67 @@ private:
   }
 
   /**
-    #8064 FR-103a. Applies every raw keyboard event already sitting in this thread's queue to the
-    user-held signal, and returns only when there is nothing left to apply.
+    #8064 FR-103a / FR-103b. Applies every raw keyboard event already sitting in this thread's queue
+    to the user-held signal, and returns only when there is nothing left to apply.
 
-    THIS IS NOT AN OPTIMISATION AND IT IS NOT DEFENSIVE PADDING. Without it, the signal that
-    ProcessModifierVerification reads has NOT yet seen observations the OS made BEFORE the verify
-    message was even posted -- and a signal reporting a hold the user has already let go of is
-    precisely the input that makes the correction decline. It is the stale shadow
-    CheckRawInputRegistrationStillOurs was written to prevent, arriving by a second route.
+    TWO CALL SITES, for one hazard: ProcessQueuedKeyEvents before it builds a batch (FR-103b), and
+    ProcessModifierVerification before it corrects one (FR-103a). Both read m_userHeld, both are
+    reached through a POSTED message, and neither can trust the signal until this has run.
+
+    THIS IS NOT AN OPTIMISATION AND IT IS NOT DEFENSIVE PADDING. Without it the signal has NOT yet
+    seen observations the OS made BEFORE the message that woke this code was even posted. In the
+    verify pass that means a signal reporting a hold the user has already let go of, which is
+    precisely the input that makes the correction decline -- the stale shadow
+    CheckRawInputRegistrationStillOurs was written to prevent, arriving by a second route. In the
+    prepare path it means the mirror image: a modifier the user has just pressed is already down to
+    GetAsyncKeyState, so the release half releases it, while the signal has not yet observed it and
+    so the restore half presses nothing back. FR-101's whole purpose is to keep that hold, and the
+    ordering was quietly denying it the observation it needed.
 
     The reason is message RETRIEVAL ORDER, which is by class and not by arrival time. GetMessage and
     PeekMessage return sent messages, then POSTED messages, then INPUT (hardware) messages, then
     WM_PAINT, then WM_TIMER. WM_INPUT is signalled by QS_RAWINPUT, QS_RAWINPUT is part of QS_INPUT,
     so WM_INPUT is retrieved in the input class -- BEHIND every posted message, however much earlier
-    it arrived. WM_KEYMAN_VERIFY_MODIFIER_EVENT is posted. So a user's modifier KEYUP the OS observed
-    before the batch's SendInput even returned is still undispatched when the verify runs, and
-    m_userHeld still reports that key held.
+    it arrived. WM_KEYMAN_VERIFY_MODIFIER_EVENT is posted, and so is the WM_USER that MessageLoop
+    posts on m_hKeyEvent. So a user's modifier transition the OS observed before the batch was even
+    requested is still undispatched when both of them run, and m_userHeld still reports the key's
+    previous state.
 
-    The self-post's OTHER ordering guarantee is untouched by this, and deliberately: the drain
+    The posted queue's OWN ordering guarantee is untouched by this, and deliberately: the drain
     filters on WM_INPUT alone, so it removes nothing from the posted queue. Every
-    WM_KEYMAN_MODIFIER_EVENT posted before the verify was already dispatched before it by
-    posted-message FIFO -- that claim is between two posted messages and it was always sound. This
-    repairs only the half of the ordering that spans two different message classes.
+    WM_KEYMAN_MODIFIER_EVENT posted before the verify, or before the WM_USER, was already dispatched
+    before it by posted-message FIFO -- that claim is between two posted messages and it was always
+    sound, and it is what keeps m_ModifierKeyboardState consistent with the batch that reads it. This
+    repairs only the half of the ordering that spans two different message classes. m_userHeld and
+    m_ModifierKeyboardState have disjoint feeds -- WM_INPUT and WM_KEYMAN_MODIFIER_EVENT
+    respectively -- so advancing one here cannot perturb the other.
 
     Dispatched rather than handled inline, so ProcessRawInput reads each HRAWINPUT inside its own
     WM_INPUT dispatch and WndProc still falls through to DefWindowProc for the system's cleanup. A
     raw input handle is valid only for the delivery of the message that carries it; nothing is
     stashed and nothing is read after its message is done.
 
-    Pulling forward a raw event that arrived AFTER the verify post is possible and harmless. A KEYUP
-    pulled forward makes the correction fire, which is the outcome wanted. A KEYDOWN pulled forward
-    makes it decline, which is the safe-direction error PrepareModifierVerificationCorrection's own
-    doc comment already accepts -- an unmatched KEYUP is re-pressable, an unmatched KEYDOWN on
-    hardware with no physical Right Ctrl is not.
+    Pulling forward a raw event that arrived AFTER the waking message was posted is possible and
+    harmless at both sites, but THE ARITHMETIC FLIPS BETWEEN THEM and each has to be checked on its
+    own -- the verify pass's argument cannot simply be pointed at the prepare path.
+
+    In the verify pass: a KEYUP pulled forward makes the correction fire, which is the outcome
+    wanted. A KEYDOWN pulled forward makes it decline, which is the safe-direction error
+    PrepareModifierVerificationCorrection's own doc comment already accepts -- an unmatched KEYUP is
+    re-pressable, an unmatched KEYDOWN on hardware with no physical Right Ctrl is not.
+
+    In the prepare path the two swap roles and both remain safe. A KEYDOWN pulled forward widens the
+    restore set, so the batch presses a modifier the user has genuinely just pressed -- and the
+    user's own eventual KEYUP balances that press, so it cannot latch. A KEYUP pulled forward
+    narrows it, so the hold is dropped for this batch, which is the accepted direction (FR-001,
+    FR-002, FR-004: losing a hold is the accepted direction; manufacturing a press is never one).
+
+    WHAT THIS DOES NOT DO IS CLOSE THE WINDOW, and saying so is not hedging. A modifier transition
+    can arrive after the drain returns and before SendInput has finished, and nothing here
+    synchronises m_userHeld against the injection -- there is no such primitive to reach for. So the
+    drain NARROWS the interval in which FR-101 is blind; it does not eliminate it. Stated plainly
+    for the same reason FR-104 makes the signal say *unknown* rather than guess: a mechanism that
+    reports itself more capable than it is, is the failure mode this whole design is built against.
   */
   void DrainPendingRawInput() {
     if (m_hwnd == NULL) {
@@ -774,8 +813,8 @@ private:
 
     if (drained >= kMaxDrain) {
       SendDebugMessageFormat(
-        "#8064 verification: stopped draining raw input at %d events with more still queued; the "
-        "user-held signal is more current than it was but is not guaranteed current",
+        "#8064 stopped draining raw input at %d events with more still queued; the user-held signal "
+        "is more current than it was but is not guaranteed current",
         kMaxDrain);
     }
   }
@@ -844,8 +883,10 @@ private:
     // holds only between two posted messages, which is the WM_KEYMAN_MODIFIER_EVENT case, and is
     // stated that way in JUSTIFICATION.md.
     //
-    // So the verify pass drains this queue itself before reading the signal: see
-    // DrainPendingRawInput. Ordinary arrivals are still applied here, in dispatch order.
+    // So both readers of the signal drain this queue themselves before reading it -- the batch in
+    // ProcessQueuedKeyEvents (FR-103b) and the verify pass in ProcessModifierVerification
+    // (FR-103a): see DrainPendingRawInput. Ordinary arrivals are still applied here, in dispatch
+    // order.
     if (msg == WM_INPUT) {
       ProcessRawInput((HRAWINPUT)lParam);
     }
