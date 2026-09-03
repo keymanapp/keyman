@@ -164,6 +164,35 @@ For the cases that need to see the *injected event* rather than its effect, rebu
   release the Shift the OSK clicked. Shift stays stuck: the exact outcome
   TEST_OSK-4's mechanism exists to avoid, arriving from the other direction.
 
+- **TEST_OSK-6**: a modifier the user is holding survives an OSK character click
+  - press and **hold** physical Left Shift, and keep holding it throughout
+  - confirm the oracle logs `HELD: SHIFT,LSHIFT`
+  - leave the OSK's own `Shift` **unlatched**, and click a character key on the OSK
+  - keep holding Shift for a few seconds after the click
+
+  Expected result:
+  - the oracle logs the momentary `ALL CLEAR` of the suppression and then
+    `HELD: SHIFT,LSHIFT` again -- the hold is restored
+  - characters typed on the hardware keyboard are still capitals until the tester
+    releases Shift
+
+  Why the suppression happens at all: the OSK must present the character key in the
+  shift state the OSK is showing, so `kbdKeyPressed`'s `PrepState` sends a KEYUP for
+  any modifier that is physically down but not latched on the OSK, and `FinalState`
+  restores it afterwards.
+
+  Observed with a live-state gate on that restore: **FAILURE.** The gate read
+  `GetAsyncKeyState` *after* `PrepState`'s own KEYUP, which is precisely what makes
+  the live state read up for a key the user is still holding -- so no branch could
+  ever restore, and the oracle stayed at `ALL CLEAR` with the tester's Shift still
+  physically down. The fact the gate needs is destroyed by the event it is gating, so
+  it is now taken from `FUserHeldShiftState` -- seeded from the pre-suppression
+  snapshot and retired by the user's own KEYUP through the hook feed, which this
+  unit's injected KEYUPs cannot fake because `ConsumeOskModifierEcho` eats them.
+
+  Note the measurement protocol of TEST_OSK-4 applies here too: pre-type and send
+  with the mouse, so releasing Shift is never confused with the suppression.
+
 ## Baseline
 
 [`evidence/baseline-shipped-build.md`](./evidence/baseline-shipped-build.md) records

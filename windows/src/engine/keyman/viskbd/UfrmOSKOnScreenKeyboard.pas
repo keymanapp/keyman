@@ -72,14 +72,22 @@ type
     VKI: TVisualKeyboardInfo;
     VisualKeyboards: TVisualKeyboardInfoList;
     FCachedShiftState: TExtShiftState;
-    // #8064: what a source OTHER THAN THIS UNIT is currently holding down, as observed through the
-    // low level hook feed. FCachedShiftState says the OSK pressed a modifier; it does NOT say the
-    // OSK is the only one holding it, and ResetShiftStates needs the difference. See
-    // UpdateUserHeldModifiers.
+    // #8064: what a source OTHER THAN THIS UNIT is currently holding down. FCachedShiftState says
+    // the OSK pressed a modifier; it does NOT say the OSK is the only one holding it, and both
+    // readers need that difference: ResetShiftStates, to decline a release that would cancel the
+    // user's own hold, and kbdKeyPressed's FinalState, to know a suppressed hold is still owed its
+    // restoring KEYDOWN. Read through UserHoldsModifier, never directly, for the chirality rules.
+    //
+    // Two writers. UpdateUserHeldModifiers maintains it from the low level hook feed and is the
+    // only one that RETIRES an entry. kbdKeyPressed's NoteSuppressedUserHold also seeds it, from
+    // the physical snapshot taken before PrepState suppresses a hold -- because that suppression
+    // destroys the evidence a poll would need, and because the feed cannot know about a hold that
+    // predates this window.
     FUserHeldShiftState: TExtShiftState;
     IsSimulatedLControlDown: Boolean;
     function GetAsyncShiftState: TExtShiftState;
     procedure UpdateUserHeldModifiers(VKCode, ScanCode, Flags: DWORD; IsUp: Boolean);
+    function UserHoldsModifier(shift: TExtShiftStateValue): Boolean;
     procedure UpdateKeyboard(FLoading: Boolean);
 
     function SaveWebPage(vk: TVisualKeyboard; const s: string): Boolean;
@@ -253,13 +261,44 @@ var
   LLRShift: Boolean;
 
 
+  (**
+   * #8064: PrepState is about to suppress a modifier that is down and that the OSK is not
+   * claiming, so something other than this unit is holding it -- FCachedShiftState is masked by
+   * kbd.ShiftState, so a modifier absent from `fkcss` cannot be an outstanding OSK press.
+   *
+   * Recorded BEFORE the suppressing KEYUP, because that KEYUP is what destroys the evidence: from
+   * then on the live key state reads up whether or not the user is still holding the key, and no
+   * poll can recover the difference. FinalState needs exactly that difference.
+   *
+   * Into FUserHeldShiftState, the field the hook feed maintains, because it is the same fact --
+   * "a source other than this unit holds this key". Seeding it here is what covers a hold that
+   * predates this window, which the feed never saw; and once seeded, the user's own physical KEYUP
+   * retires it through the feed like any other entry.
+   *)
+  procedure NoteSuppressedUserHold(shift: TExtShiftStateValue);
+  begin
+    // The one down state nobody holds: Windows' compatibility LCtrl for AltGr. Its release reaches
+    // the feed with SCAN_LEFT_CONTROL_SIMULATED, which UpdateUserHeldModifiers discards, so a seed
+    // made from it would never be retired and would go on declining teardown releases for the rest
+    // of the session. GetAsyncShiftState subtracts it in the chiral regime already; this covers the
+    // generic one, where essCtrl is read straight from VK_CONTROL.
+    if IsSimulatedLControlDown and (shift in [essCtrl, essLCtrl]) then
+      Exit;
+
+    Include(FUserHeldShiftState, shift);
+  end;
+
   procedure PrepState(fkcss, ass: TExtShiftState; shift: TExtShiftStateValue; vk: Integer);
   var
     FExtended: Dword;
   begin
     if vk in [VK_RCONTROL, VK_RMENU] then FExtended := KEYEVENTF_EXTENDEDKEY else FExtended := 0;
     if (shift in fkcss) and not (shift in ass) then do_keybd_event(vk, 0, FExtended, 0)
-    else if not (shift in fkcss) and (shift in ass) then do_keybd_event(vk, 0, FExtended or KEYEVENTF_KEYUP, 0);
+    else if not (shift in fkcss) and (shift in ass) then
+    begin
+      NoteSuppressedUserHold(shift);
+      do_keybd_event(vk, 0, FExtended or KEYEVENTF_KEYUP, 0);
+    end;
   end;
 
   procedure FinalState(fkcss, ass: TExtShiftState; shift: TExtShiftStateValue; vk: Integer);
@@ -271,10 +310,23 @@ var
     else if not (shift in fkcss) and (shift in ass) then
     begin
       // #8064: `ass` is stale by now -- the character keys and the COM property get intervene --
-      // so restoring blind can inject a KEYDOWN the user has already released. Undoing PrepState's
-      // own press (the branch above) needs no such check.
-      if (GetAsyncKeyState(vk) and $8000) = $8000 then
-        do_keybd_event(vk, 0, FExtended, 0);
+      // so restoring blind can inject a KEYDOWN the user has already released: a down state with
+      // no holder, which is the stuck modifier this whole area exists to avoid. Undoing
+      // PrepState's own press (the branch above) needs no such check.
+      //
+      // The test is the user-held signal, NOT GetAsyncKeyState. A poll cannot answer this question
+      // at all any more: PrepState's suppressing KEYUP has already made the live state read up, so
+      // a live test reads "up" for the user's still-held key, declines every restoration, and
+      // leaves the modifier dead in the user's hand -- the failure this branch exists to prevent,
+      // arriving from the other direction. The signal has no such blind spot: this unit's own
+      // injections are consumed as echoes by ConsumeOskModifierEcho and never clear a hold, while
+      // a genuine KEYUP from the user does, so it still separates the two cases after the
+      // suppression that a poll no longer can.
+      if UserHoldsModifier(shift) then
+        do_keybd_event(vk, 0, FExtended, 0)
+      else
+        KL.Log('kbdKeyPressed: not restoring %s -- the user has let go of it',
+          [ExtShiftStateToString([shift])]);
     end;
   end;
 begin
@@ -564,36 +616,6 @@ procedure TfrmOSKOnScreenKeyboard.ResetShiftStates;
 var
   FRemaining, FExpandedCache: TExtShiftState;
 
-  (**
-   * #8064: would a KEYUP for `shift` cancel a hold the USER has, as well as the OSK's press?
-   *
-   * Matched by the key the KEYUP actually lands on, never by family. A family test would be the
-   * obvious shortcut and it would be a regression: with the OSK holding essRCtrl and the user
-   * holding LCtrl, a family test suppresses the Right Ctrl release, and Right Ctrl is the one
-   * identity a user on hardware without that physical key cannot clear themselves -- the "until
-   * you reboot" class of report in manual-tests/GH-16462 - osk-sticky-modifier/README.md. Releasing Right Ctrl cannot touch Left Ctrl, so it
-   * must not be suppressed by it.
-   *
-   * The generic entries are the exception, and only in one direction: VK_CONTROL and VK_MENU sent
-   * unextended resolve to the LEFT key, so a left-hand or generic user hold is at risk from them
-   * and a right-hand one is not.
-   *)
-  function CancelsAUserHold(shift: TExtShiftStateValue): Boolean;
-  begin
-    case shift of
-      // TExtShiftState has no chiral Shift values, so essShift is every Shift hold there is.
-      essShift: Result := essShift in FUserHeldShiftState;
-      essLCtrl: Result := essLCtrl in FUserHeldShiftState;
-      essRCtrl: Result := essRCtrl in FUserHeldShiftState;
-      essLAlt:  Result := essLAlt in FUserHeldShiftState;
-      essRAlt:  Result := essRAlt in FUserHeldShiftState;
-      essCtrl:  Result := FUserHeldShiftState * [essCtrl, essLCtrl] <> [];
-      essAlt:   Result := FUserHeldShiftState * [essAlt, essLAlt] <> [];
-    else
-      Result := False;
-    end;
-  end;
-
   // #8064: a keyboard switch runs SetLRShift, which collapses the chiral Ctrl/Alt entries in
   // kbd.ShiftState to generic ones, so neither it nor kbd.LRShift can still name the VK that is
   // down. FCachedShiftState survives the collapse, so release from it directly -- gated on live
@@ -601,7 +623,7 @@ var
   //
   // The live check is NOT what keeps a physically-held modifier safe (I2177), and it never was:
   // once the OSK has pressed the key, the live read is down whether or not the user is also
-  // holding it. FUserHeldShiftState is what carries that, via CancelsAUserHold.
+  // holding it. FUserHeldShiftState is what carries that, via UserHoldsModifier.
   procedure ReleaseCached(shift: TExtShiftStateValue; vk: Integer; extended: DWord);
   begin
     if not (shift in FCachedShiftState) then
@@ -610,7 +632,7 @@ var
     if (GetAsyncKeyState(vk) and $8000) <> $8000 then
       Exit;
 
-    if CancelsAUserHold(shift) then
+    if UserHoldsModifier(shift) then
     begin
       // Left latched on purpose. The user's own physical release clears the one shared down state
       // and takes this press with it; a KEYUP here would instead kill the hold in their hand.
@@ -728,6 +750,10 @@ end;
  * "Other than this unit" is decided by ConsumeOskModifierEcho, an explicit ledger of injections,
  * NOT by reading the scan code -- see FOskPendingEcho for why the scan code cannot carry that.
  *
+ * That the echoes are consumed here, and that an OSK KEYUP therefore never retires a hold, is also
+ * what lets kbdKeyPressed's FinalState use this field: after PrepState's suppressing KEYUP a poll
+ * reads "up" for a key the user is still holding, and this field does not.
+ *
  * keyman32's own injections are excluded by KEYMAN_OSK_MODIFIER_FLAG_KEYMAN_INJECTED, decided in the
  * hook by IsKeymanInjectedKeyEvent and carried in the flags. This too was a scan-code test once, and
  * it was wrong for Right Shift in the unrecoverable direction -- see that constant.
@@ -775,6 +801,43 @@ begin
 
   KL.Log('UpdateUserHeldModifiers: vk=%x scan=%x isUp=%s UserHeld=%s',
     [VKCode, ScanCode, BoolToStr(IsUp, True), ExtShiftStateToString(FUserHeldShiftState)]);
+end;
+
+(**
+ * #8064: does the USER -- any holder other than this unit -- hold the key that `shift` names?
+ *
+ * Two callers, asking the same question of the same field for opposite reasons. ResetShiftStates
+ * asks whether a KEYUP it is about to emit would cancel a user hold as well as the OSK's press,
+ * and declines the release if so. kbdKeyPressed's FinalState asks whether a hold it suppressed is
+ * still owed its restoring KEYDOWN, and declines the press if not. Both sides of the same
+ * asymmetry: acting on a hold the user does not have leaves a modifier down with nobody to
+ * release it.
+ *
+ * Matched by the key the event actually lands on, never by family. A family test would be the
+ * obvious shortcut and it would be a regression: with the OSK holding essRCtrl and the user
+ * holding LCtrl, a family test suppresses the Right Ctrl release, and Right Ctrl is the one
+ * identity a user on hardware without that physical key cannot clear themselves -- the "until
+ * you reboot" class of report in manual-tests/GH-16462 - osk-sticky-modifier/README.md. Releasing Right Ctrl cannot touch Left Ctrl, so it
+ * must not be suppressed by it.
+ *
+ * The generic entries are the exception, and only in one direction: VK_CONTROL and VK_MENU sent
+ * unextended resolve to the LEFT key, so a left-hand or generic user hold is at risk from them
+ * and a right-hand one is not.
+ *)
+function TfrmOSKOnScreenKeyboard.UserHoldsModifier(shift: TExtShiftStateValue): Boolean;
+begin
+  case shift of
+    // TExtShiftState has no chiral Shift values, so essShift is every Shift hold there is.
+    essShift: Result := essShift in FUserHeldShiftState;
+    essLCtrl: Result := essLCtrl in FUserHeldShiftState;
+    essRCtrl: Result := essRCtrl in FUserHeldShiftState;
+    essLAlt:  Result := essLAlt in FUserHeldShiftState;
+    essRAlt:  Result := essRAlt in FUserHeldShiftState;
+    essCtrl:  Result := FUserHeldShiftState * [essCtrl, essLCtrl] <> [];
+    essAlt:   Result := FUserHeldShiftState * [essAlt, essLAlt] <> [];
+  else
+    Result := False;
+  end;
 end;
 
 procedure TfrmOSKOnScreenKeyboard.FormCreate(Sender: TObject);
