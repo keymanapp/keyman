@@ -1,18 +1,18 @@
 (*
   Name:             keymanpackagefile
   Copyright:        Copyright (C) SIL International.
-  Documentation:
-  Description:
+  Documentation:    
+  Description:      
   Create Date:      20 Jun 2006
 
   Modified Date:    29 Mar 2010
   Authors:          mcdurdin
-  Related Files:
-  Dependencies:
+  Related Files:    
+  Dependencies:     
 
-  Bugs:
-  Todo:
-  Notes:
+  Bugs:             
+  Todo:             
+  Notes:            
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Avoid processmessages in unzip
                     04 Dec 2006 - mcdurdin - Add Serialize function, support ShortcutRootPath in installation
@@ -37,7 +37,7 @@ uses
   keymanpackagecontentfiles, StdVcl, kmpinffile, KeymanContext, Graphics, Classes, internalinterfaces;
 
 type
-  TKeymanPackageFile = class(TKeymanAutoObject, IKeymanPackage, IKeymanPackageFile, IKeymanPackageFile2, IKeymanPackageFile3)
+  TKeymanPackageFile = class(TKeymanAutoObject, IKeymanPackage, IKeymanPackageFile, IKeymanPackageFile2)
   private
     FSourcePath: string;
     FSubFiles: IKeymanPackageContentFiles;
@@ -74,7 +74,6 @@ type
     { IKeymanPackageFile }
     procedure Install(Force: WordBool); safecall;
     function Install2(Force: WordBool): IKeymanPackageInstalled; safecall;
-    function Install3(Force: WordBool; BaseKeyboardID: Integer): IKeymanPackageInstalled; safecall;
   public
     constructor Create(AContext: TKeymanContext; const Filename: Widestring);
     destructor Destroy; override;
@@ -176,7 +175,7 @@ begin
     o := [ipLegacyRegisterAndInstallProfiles];
     if Force then
       Include(o, ipForce);
-    Execute(FFileName, o, 0);
+    Execute(FFileName, o);
   finally
     Free;
   end;
@@ -192,27 +191,7 @@ begin
     o := [];
     if Force then
       Include(o, ipForce);
-    Execute(FFileName, o, 0);
-  finally
-    Free;
-  end;
-
-  kpi := Context.Packages as IKeymanPackagesInstalled;
-  kpi.Refresh;
-  Result := kpi.Items[FFileName];
-end;
-
-function TKeymanPackageFile.Install3(Force: WordBool; BaseKeyboardID: Integer): IKeymanPackageInstalled;
-var
-  o: TKPInstallPackageOptions;
-  kpi: IKeymanPackagesInstalled;
-begin
-  with TKPInstallPackage.Create(Context) do
-  try
-    o := [];
-    if Force then
-      Include(o, ipForce);
-    Execute(FFileName, o, BaseKeyboardID);
+    Execute(FFileName, o);
   finally
     Free;
   end;
@@ -232,7 +211,7 @@ var
 begin
   if not FileExists(FFileName) then
     raise Exception.Create('File '+FFileName+' does not exist.');
-
+     
   if GetTempPath(260, buf) = 0 then
     raise Exception.Create('Unable to get temporary path: ' + IntToHex(GetLastError, 8) + ' ' + SysErrorMessage(GetLastError));
   FTempOutPath := buf;

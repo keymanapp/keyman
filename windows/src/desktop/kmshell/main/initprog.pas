@@ -207,7 +207,7 @@ end;
 
 function Init(var FMode: TKMShellMode; KeyboardFileNames: TStrings; var FSilent, FForce, FNoWelcome: Boolean;
   var FLogFile, FQuery: string; var FDisablePackages, FDefaultUILanguage: string; var FStartWithConfiguration: Boolean;
-  var FParentWindow: THandle; var FDefaultBCP47: string; var FDefaultLangID, FBaseKeyboard: Integer): Boolean;
+  var FParentWindow: THandle; var FDefaultBCP47: string; var FDefaultLangID: Integer): Boolean;
 var
   s: string;
   i: Integer;
@@ -264,7 +264,6 @@ begin
       else if s = '-bd' then FMode := fmBackgroundDownload
       else if s = '-an' then FMode := fmApplyInstallNow
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
-      else if s = 'bkd' then begin Inc(i); FBaseKeyboard := ParamStr(i); end
       else if s = '-mcompilekbds' then
       begin
         FMode := fmMCompileKbds;
@@ -331,7 +330,7 @@ end;
 
 procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TStrings; FSilent, FForce, FNoWelcome: Boolean;
   FLogFile, FQuery: string; FDisablePackages, FDefaultUILanguage: string; FStartWithConfiguration: Boolean; FParentWindow: THandle;
-  const FDefaultBCP47: string; FDefaultLangID, FBaseKeyboard: Integer); forward;
+  const FDefaultBCP47: string; FDefaultLangID: Integer); forward;
 
 procedure Run;
 var
@@ -342,7 +341,7 @@ var
   FForce: Boolean;
   FParentWindow: THandle;
   FLogFile: string;
-  FDefaultLangID, FBaseKeyboard: Integer;
+  FDefaultLangID: Integer;
   FDefaultBCP47, FDisablePackages, FDefaultUILanguage: string;
   FStartWithConfiguration: Boolean;
 begin
@@ -351,7 +350,7 @@ begin
   KeyboardFileNames := TStringList.Create;
   try
     FParentWindow := 0;
-    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FDefaultUILanguage, FStartWithConfiguration, FParentWindow, FDefaultBCP47, FDefaultLangID, FBaseKeyboard) then
+    if not Init(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FDefaultUILanguage, FStartWithConfiguration, FParentWindow, FDefaultBCP47, FDefaultLangID) then
     begin
   //TODO:   TUtilExecute.Shell(PChar('hh.exe mk:@MSITStore:'+ExtractFilePath(KMShellExe)+'keyman.chm::/context/keyman_usage.html'), SW_SHOWNORMAL);
       Exit;
@@ -359,7 +358,7 @@ begin
 
     if not LoadKMCOM then Exit;
     try
-      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FDefaultUILanguage, FStartWithConfiguration, FParentWindow, FDefaultBCP47, FDefaultLangID, FBaseKeyboard);
+      RunKMCOM(FMode, KeyboardFileNames, FSilent, FForce, FNoWelcome, FLogFile, FQuery, FDisablePackages, FDefaultUILanguage, FStartWithConfiguration, FParentWindow, FDefaultBCP47, FDefaultLangID);
     finally
       kmcom := nil;
     end;
@@ -398,7 +397,7 @@ end;
 
 procedure RunKMCOM(FMode: TKMShellMode; KeyboardFileNames: TStrings; FSilent, FForce, FNoWelcome: Boolean;
   FLogFile, FQuery: string; FDisablePackages, FDefaultUILanguage: string; FStartWithConfiguration: Boolean;
-  FParentWindow: THandle; const FDefaultBCP47: string; FDefaultLangID, FBaseKeyboard: Integer);
+  FParentWindow: THandle; const FDefaultBCP47: string; FDefaultLangID: Integer);
 var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
@@ -561,7 +560,7 @@ begin
         else ExitCode := 1;
 
     fmInstall:
-      if TInstallFile.Execute(KeyboardFileNames, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile, FBaseKeyboard)
+      if TInstallFile.Execute(KeyboardFileNames, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile)
         then ExitCode := 0
         else ExitCode := 1;
 

@@ -37,8 +37,7 @@ uses
   keymanerrorcodes, keymankeyboardinstalled, keymankeyboard, internalinterfaces;
 
 type
-  TKeymanKeyboardsInstalled = class(TKeymanAutoCollectionObject, IKeymanKeyboardsInstalled,
-  IKeymanKeyboardsInstalled2, IIntKeymanKeyboardsInstalled, IKeymanKeyboardsInstalled3)   // I4376
+  TKeymanKeyboardsInstalled = class(TKeymanAutoCollectionObject, IKeymanKeyboardsInstalled, IKeymanKeyboardsInstalled2, IIntKeymanKeyboardsInstalled)   // I4376
   private
     FKeyboards: TKeyboardList;
     procedure TriggerWindowsLanguageSync;
@@ -56,7 +55,6 @@ type
     procedure Install(const Filename: WideString; Force: WordBool); safecall;
     procedure Apply; safecall;
     function Install2(const Filename: WideString; Force: WordBool): IKeymanKeyboardInstalled; safecall;
-    function Install3(const Filename: WideString; Force: WordBool; BaseKeyboardID: Integer): IKeymanKeyboardInstalled; safecall;
     procedure RefreshInstalledKeyboards; safecall;
 
     { IIntKeymanKeyboardsInstalled }
@@ -103,7 +101,7 @@ procedure TKeymanKeyboardsInstalled.Install(const Filename: WideString; Force: W
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FileName, '', [ikLegacyRegisterAndInstallProfiles], nil, Force, 0);
+    Execute(FileName, '', [ikLegacyRegisterAndInstallProfiles], nil, Force);
   finally
     Free;
   end;
@@ -114,21 +112,7 @@ function TKeymanKeyboardsInstalled.Install2(const Filename: WideString;
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FileName, '', [], nil, Force, 0);
-  finally
-    Free;
-  end;
-
-  DoRefresh;
-  Result := Get_Items(FileName);
-end;
-
-function TKeymanKeyboardsInstalled.Install3(const Filename: WideString;
-  Force: WordBool; BaseKeyboardID: Integer): IKeymanKeyboardInstalled;
-begin
-  with TKPInstallKeyboard.Create(Context) do
-  try
-    Execute(FileName, '', [], nil, Force, BaseKeyboardID);
+    Execute(FileName, '', [], nil, Force);
   finally
     Free;
   end;
