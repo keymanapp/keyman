@@ -12,7 +12,7 @@
 #
 #    cd developer/src/kmc
 #    ./build.sh configure build # if needed
-#    ./build.sh build-fixtures
+#    ./build.sh fixtures-build
 #
 #  This will compile both the .xml and the .txt to build/test/fixtures and also emit the
 #  checksum for basic-xml.kmx so you can patch that into this file.
