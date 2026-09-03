@@ -153,8 +153,7 @@ signal that did not fire.
 > | A2 | off | **5/5** |
 > | A3 | **on** | **0/5** |
 >
-> close the race window — see
-> [`evidence/baseline-shipped-build.txt`](evidence/baseline-shipped-build.txt).
+> Turning the log on closes the race window.
 > Two consequences for a responder:
 >
 > - **A wedge that stops reproducing once you enable the log has not been

@@ -1,9 +1,9 @@
-# Issue 4 — `AIWin2000Unicode::PostKeys` can split a KEYDOWN/KEYUP pair under queue truncation (row `8`)
+# `AIWin2000Unicode::PostKeys` can split a KEYDOWN/KEYUP pair under queue truncation
 
-Draft, not filed. Producer row `8` in
-[`../MODIFIER-PRODUCERS.md`](../MODIFIER-PRODUCERS.md). Filing is an OPTIONAL
+Draft, not filed. One of the two unmitigated producers named in
+[`../TRIAGE.md`](../TRIAGE.md). Filing is an OPTIONAL
 step a maintainer may take; no PR is opened by the change that wrote this draft, so nothing here is
-waiting on one. See [README.md](./README.md).
+waiting on one. See [README.md](../README.md).
 
 ---
 
@@ -43,7 +43,7 @@ runtime observation has confirmed it: it requires a legacy/ANSI target,
 
 **Ask:** either guard the three truncation points so a split pair cannot happen
 (e.g. reject or flush atomically rather than silently clamping), or run the
-runtime observation described in `MODIFIER-PRODUCERS.md` Finding 3 (`debug=1`, a
+runtime observation described here (`debug=1`, a
 keyboard whose Shift rule outputs 250+ characters, watch for
 `"Too many INPUT events for queue"` immediately followed by an unmatched
 `VK_SHIFT` KEYDOWN) to establish real-world reachability before prioritising a

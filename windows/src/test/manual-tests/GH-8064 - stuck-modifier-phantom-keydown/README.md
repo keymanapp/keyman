@@ -253,8 +253,8 @@ Reproduced and fixed, measured on the same machine with one variable changed:
 | fixed build | 5/5 | 5/5 | **0/5 PASS** |
 
 `host32.exe --probe 1x2x3x --wait-for-rule 120 --iterations 5`, Left Shift held and
-released 1500 ms into the stall, Windows 11 Pro 26200. The red baseline is
-[`evidence/baseline-shipped-build.txt`](evidence/baseline-shipped-build.txt).
+released 1500 ms into the stall, Windows 11 Pro 26200. The fixed half of the pair
+is recorded in [`evidence/host32-fixed-19.0.277.txt`](evidence/host32-fixed-19.0.277.txt).
 
 ## Recovery
 

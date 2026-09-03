@@ -16,9 +16,8 @@
   transforms. Both are verified here, and an unmet one reports INCONCLUSIVE, not PASS.
 
   Host bitness is NOT a precondition. It was treated as one until 2026-08-31 -- see the host block
-  in the body for why that was wrong, and evidence/run-after-branch-2026-08-29.txt for the
-  correction. It is still reported on the result line, because no run of this script against a
-  64-bit host has been recorded yet.
+  in the body for why that was wrong. It is still reported on the result line, because no run of
+  this script against a 64-bit host has been recorded yet.
 
   Simulates the user with SendInput, real scan codes and dwExtraInfo 0. That works only because the
   fix identifies Keyman's own events by scan code and dwExtraInfo, not by LLKHF_INJECTED.
@@ -348,7 +347,7 @@ otepad.exe hands the request to the packaged Notepad -- a SEPARATE, already-runn
     # WH_KEYBOARD_LL is system-wide and serialkeyeventclient.cpp has no _WIN64 guard -- a 64-bit
     # client reaches the same single server by unsuffixed global name through the memory-mapped
     # file. stuck-mod-test.ps1 reproduces the wedge against 64-bit Notepad and has never had a
-    # bitness check. See evidence/run-after-branch-2026-08-29.txt, "correction".
+    # bitness check.
     #
     # host32 remains the RECOMMENDED host: it is the one used for the recorded before/after pair,
     # it drives the sequence itself, and it removes the packaged-app and multi-threaded-frame

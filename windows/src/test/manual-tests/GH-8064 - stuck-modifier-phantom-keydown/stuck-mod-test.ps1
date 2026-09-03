@@ -3,11 +3,11 @@
   stuck-mod-test.ps1 - GH-8064 REGRESSION GATE
   ============================================================================
 
-  Adapted from the standalone research rig C:/Github/kmrepro/kmproof.ps1, which
-  remains the source of the experiment below. This repo copy adds one thing: a
-  -Gate mode. The original rig is a DEMONSTRATION - it succeeds when the
-  stuck-modifier wedge reproduces and is shown to be Keyman-specific. A
-  regression gate needs the opposite polarity, so -Gate inverts it.
+  Adapted from a standalone research rig that remains the source of the
+  experiment below. This repo copy adds one thing: a -Gate mode. The original rig
+  is a DEMONSTRATION - it succeeds when the stuck-modifier wedge reproduces and is
+  shown to be Keyman-specific. A regression gate needs the opposite polarity, so
+  -Gate inverts it.
 
   WHAT THIS PROVES
   ----------------

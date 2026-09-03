@@ -1,12 +1,12 @@
-# Issue 5 — `InitHooks()`'s return value is discarded at startup (not a producer row; the feed-integrity gap already flagged in `serialkeyeventcommon.h:209-217`)
+# `InitHooks()`'s return value is discarded at startup (the feed-integrity gap already flagged in `serialkeyeventcommon.h:209-217`)
 
-Draft, not filed. Not a row in [`../MODIFIER-PRODUCERS.md`](../MODIFIER-PRODUCERS.md)
-*The producers* — this path emits nothing itself. It is the first of the three ways
+Draft, not filed. Not one of the producers named in [`../TRIAGE.md`](../TRIAGE.md)
+— this path emits nothing itself. It is the first of the three ways
 `serialkeyeventcommon.h:209-217` names for the modifier cache's feed to be dead
-while `flag_ShouldSerializeInput` still reads TRUE, so it sits behind row `1`'s
-mitigation rather than beside it. Filing is an OPTIONAL step a maintainer may
+while `flag_ShouldSerializeInput` still reads TRUE, so it sits behind that
+gap's mitigation rather than beside it. Filing is an OPTIONAL step a maintainer may
 take; no PR is opened by the change that wrote this draft, so nothing here is waiting on one. See
-[README.md](./README.md).
+[README.md](../README.md).
 
 ---
 

@@ -3,7 +3,7 @@
 Same machine, same session, same operator as the stock half. One variable
 changed between the two: keyman32.dll.
 
-  stock:  keyman32.dll  1,239,488 bytes  v19.0.276.0  Release  (stock 19.0.276, per evidence/baseline-shipped-build.txt)
+  stock:  keyman32.dll  1,239,488 bytes  v19.0.276.0  Release  (stock 19.0.276, from a clean installer run)
   fixed:  keyman32.dll  4,197,376 bytes  v19.0.277.0  Debug    (branch build, written 2026-08-31 20:12:20)
 
 Verdict: PASS  (OVERALL line in the log)

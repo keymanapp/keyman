@@ -1,5 +1,2 @@
-# Progress state for capture-8064-serializer.ps1 -- local to one run, not evidence.
-.t067-state.json
-
 # Capture listener stop-sentinels, if a run is interrupted before cleanup.
 *.log.stop
