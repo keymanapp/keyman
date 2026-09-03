@@ -6,6 +6,7 @@
     "rootDir": "src/",
     "allowJs": true,
     "preserveConstEnums": true,
+    "noImplicitAny": false, // TODO: remove this once we complete type cleanup
   },
   "include": [
     "src/**/*.ts",
