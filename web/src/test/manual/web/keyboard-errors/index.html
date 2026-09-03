@@ -67,15 +67,22 @@
       <li><i>timeout</i> keyboard: "Activation of 'Keyboard_timeout' failed: Download of Keyboard_timeout for language lo timed out."</li>
     </ul>
 
+    <p><b>Note:</b> This test page will only work on the local test server due to its
+    specific requirements for handling the 'timeout.js' file.</p>
+
     <h3><a href="../index.html">Return to testing home page</a></h3>
   </div>
 
     <script>
-      if (window.location.href.startsWith('file:')) {
+      if (!window.location.href.startsWith('http://localhost:3000')) {
         const body = document.getElementsByTagName('body')[0];
         body.innerHTML = `<h1>KeymanWeb Sample Page - Error Testing page</h1>
         <h2>Unable to load this test page!</h2>
-        <p>This page has to be loaded through the local test server.</p>
+        <p>This test page will only work on the local test server because it
+          requires special treatment when loading <i>timeout.js</i>
+          (see <a href="https://github.com/keymanapp/keyman/blob/a570108f8565b0110d726f1f40ffd5b6daf6f6d5/web/src/tools/testing/test-server/index.cjs#L12">
+          web/src/tools/testing/test-server/index.cjs#L12</a>). The
+          page has to be loaded through the local test server.</p>
         <p>Do the following:</p>
         <ol>
           <li>Open a terminal and navigate to the Keyman source root directory</li>
