@@ -27,6 +27,8 @@ unit RedistFiles;
 
 interface
 
+uses utilfiletypes;
+
 type
   TRedistFile = record
     FileName: string;
@@ -67,6 +69,12 @@ function GetUnicodeDataSourcePath(DefaultPath: string = ''): string;  // I3463
 function GetXMLTemplatePath: string;
 function GetDeveloperRootPath: string;
 function GetLayoutBuilderPath: string;   // I3885
+function GetLayoutBuilderTemplatePath: string;
+
+// Files in layout builder template/ path
+const
+  CTouchLayout_BasicTemplate = 'template-basic' + Ext_KeymanTouchLayout;
+  CTouchLayout_PhysicalKeyboardTemplate = 'physical-keyboard-template.js';
 
 implementation
 
@@ -150,6 +158,11 @@ end;
 function GetLayoutBuilderPath: string;   // I3885
 begin
   Result := GetXMLTemplatePath + 'layoutbuilder\';
+end;
+
+function GetLayoutBuilderTemplatePath: string;
+begin
+  Result := GetLayoutBuilderPath + 'templates\';
 end;
 
 function GetDeveloperRootPath: string;
