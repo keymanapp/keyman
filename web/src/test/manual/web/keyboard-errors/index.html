@@ -71,7 +71,7 @@
   </div>
 
     <script>
-      if (!window.location.href.startsWith('http://localhost:3000') && !window.location.href.startsWith('https://')) {
+      if (window.location.href.startsWith('file:')) {
         const body = document.getElementsByTagName('body')[0];
         body.innerHTML = `<h1>KeymanWeb Sample Page - Error Testing page</h1>
         <h2>Unable to load this test page!</h2>
