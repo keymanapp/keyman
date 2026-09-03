@@ -208,7 +208,7 @@ begin
 
   with TStringList.Create do
   try
-    LoadFromFile(GetLayoutBuilderPath + 'physical-keyboard-template.js');
+    LoadFromFile(GetLayoutBuilderTemplatePath + CTouchLayout_PhysicalKeyboardTemplate);
     baseTemplateLayer := String_UtoA(Text);
   finally
     Free;

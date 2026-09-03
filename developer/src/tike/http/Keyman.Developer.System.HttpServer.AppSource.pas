@@ -190,8 +190,7 @@ begin
   with NewXMLDocument do
   begin
     root := AddChild('TouchLayoutBuilder');
-    //root.AddChild('FileName').NodeValue := FBaseFileName;
-    root.AddChild('LibPath').NodeValue := '/app/source/toucheditor/lib/';//ConvertPathToFileURL(GetLayoutBuilderPath);
+    root.AddChild('LibPath').NodeValue := '/app/source/toucheditor/lib/';
     root.AddChild('LayoutJS').NodeValue := FData;
     FStyleSheet := LoadXMLDocument(GetLayoutBuilderPath + 'builder.xsl');
     root.TransformNode(FStyleSheet.DocumentElement, output);
@@ -209,11 +208,13 @@ var
   doc: string;
 begin
   doc := ARequestInfo.Document;
-  Delete(doc, 1, Length('/app/source/toucheditor/lib/'));
-  if Pos('..', doc) > 0 then
-    Respond404(AContext, ARequestInfo, AResponseInfo)
+  if doc.StartsWith('/app/source/toucheditor/lib/') and (Pos('..', doc) = 0) then
+  begin
+    Delete(doc, 1, Length('/app/source/toucheditor/lib/'));
+    RespondFile(GetLayoutBuilderPath + 'src/' + doc, AContext, ARequestInfo, AResponseInfo);
+  end
   else
-    RespondFile(GetLayoutBuilderPath + doc, AContext, ARequestInfo, AResponseInfo);
+    Respond404(AContext, ARequestInfo, AResponseInfo)
 end;
 
 procedure TAppSourceHttpResponder.SetSource(const Filename, Data: string);
