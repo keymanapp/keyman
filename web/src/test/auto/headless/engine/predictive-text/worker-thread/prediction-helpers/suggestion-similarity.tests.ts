@@ -118,7 +118,9 @@ const testModelWithCasing = new DummyModel({
 const build_its_is_set = () => {
   const metadata: PredictionMetadata = {
     matchLevel: SuggestionSimilarity.none,
-    preservationTransform: undefined
+    preservationTransform: undefined,
+    rawEditCount: 0, // does not matter for these tests
+    predictionLength: 0 // does not matter for these tests
   };
 
   const its: CorrectionPredictionTuple = {
@@ -228,16 +230,16 @@ describe('processSimilarity', () => {
     const expectation: CorrectionPredictionTuple[] = [
       {
         ...testSet.its,
-        metadata: { matchLevel: SuggestionSimilarity.exact, preservationTransform: undefined }
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.exact }
       }, {
         ...testSet.it_is,
-        metadata: { matchLevel: SuggestionSimilarity.sameKey, preservationTransform: undefined }
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameKey }
       }, {
         ...testSet.is,
-        metadata: { matchLevel: SuggestionSimilarity.none, preservationTransform: undefined }
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
       }, {
         ...testSet.is_not,
-        metadata: { matchLevel: SuggestionSimilarity.none, preservationTransform: undefined }
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
       }
     ];
 
@@ -275,16 +277,16 @@ describe('processSimilarity', () => {
     const expectation: CorrectionPredictionTuple[] = [
       {
         ...testSet.its,
-        metadata: { matchLevel: SuggestionSimilarity.sameKey, preservationTransform: undefined }
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameKey }
       }, {
         ...testSet.it_is,
-        metadata: { matchLevel: SuggestionSimilarity.exact, preservationTransform: undefined }
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.exact }
       }, {
         ...testSet.is,
-        metadata: { matchLevel: SuggestionSimilarity.none, preservationTransform: undefined }
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
       }, {
         ...testSet.is_not,
-        metadata: { matchLevel: SuggestionSimilarity.none, preservationTransform: undefined }
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
       }
     ];
 
@@ -339,17 +341,17 @@ describe('processSimilarity', () => {
       const expectation: CorrectionPredictionTuple[] = [
         {
           ...testSet.its,
-          metadata: { matchLevel: SuggestionSimilarity.sameKey, preservationTransform: undefined }
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameKey }
         }, {
           ...testSet.it_is,
           // case mismatch, detectable because we have access to a lowercasing/uppercasing function.
-          metadata: { matchLevel: SuggestionSimilarity.sameText, preservationTransform: undefined }
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameText }
         }, {
           ...testSet.is,
-          metadata: { matchLevel: SuggestionSimilarity.none, preservationTransform: undefined }
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }, {
           ...testSet.is_not,
-          metadata: { matchLevel: SuggestionSimilarity.none, preservationTransform: undefined }
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }
       ];
 
@@ -393,17 +395,17 @@ describe('processSimilarity', () => {
       const expectation: CorrectionPredictionTuple[] = [
         {
           ...testSet.its,
-          metadata: { matchLevel: SuggestionSimilarity.none, preservationTransform: undefined }
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }, {
           ...testSet.it_is,
           // case mismatch, detectable because we have access to a lowercasing/uppercasing function.
-          metadata: { matchLevel: SuggestionSimilarity.none, preservationTransform: undefined }
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }, {
           ...testSet.is,
-          metadata: { matchLevel: SuggestionSimilarity.none, preservationTransform: undefined }
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }, {
           ...testSet.is_not,
-          metadata: { matchLevel: SuggestionSimilarity.none, preservationTransform: undefined }
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }
       ];
 

@@ -131,7 +131,7 @@ describe('produceKeep', () => {
         p: 1
       },
       totalProb: 1,
-      metadata: { matchLevel: SuggestionSimilarity.exact, preservationTransform: null }
+      metadata: { matchLevel: SuggestionSimilarity.exact, preservationTransform: null, predictionLength: 0, rawEditCount: 'iphone'.length }
     };
 
     const tuple = createDefaultKeep(testModelWithCasing, context, trueInput);

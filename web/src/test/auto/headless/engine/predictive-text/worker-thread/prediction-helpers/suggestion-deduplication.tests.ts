@@ -29,7 +29,9 @@ const mockMetadata: (tc: CorrectionPredictionTupleCore) => CorrectionPredictionT
     ...t,
     metadata: {
       preservationTransform: null,
-      matchLevel: SuggestionSimilarity.none
+      matchLevel: SuggestionSimilarity.none,
+      rawEditCount: 0,    // does not matter for these tests.
+      predictionLength: 0 // does not matter for these tests.
     }
   }
 };

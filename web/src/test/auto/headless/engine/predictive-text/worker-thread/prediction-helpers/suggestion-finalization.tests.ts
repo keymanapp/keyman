@@ -50,7 +50,9 @@ const build_its_is_set = (verbose?: string) => {
 
   const metadata: PredictionMetadata = {
     matchLevel: SuggestionSimilarity.none,
-    preservationTransform: undefined
+    preservationTransform: undefined,
+    rawEditCount: 0,
+    predictionLength: 0
   };
 
   const its: CorrectionPredictionTuple = {
@@ -69,7 +71,7 @@ const build_its_is_set = (verbose?: string) => {
       p: 0.2
     },
     totalProb: 0.16,
-    metadata: {...metadata}
+    metadata: {...metadata, predictionLength: 0}
   };
 
   const it_is: CorrectionPredictionTuple = {
@@ -88,7 +90,7 @@ const build_its_is_set = (verbose?: string) => {
       p: 0.8
     },
     totalProb: 0.64,
-    metadata: {...metadata}
+    metadata: {...metadata, predictionLength: 0}
   };
 
   const is: CorrectionPredictionTuple = {
@@ -107,7 +109,7 @@ const build_its_is_set = (verbose?: string) => {
       p: 0.5
     },
     totalProb: 0.1,
-    metadata: {...metadata}
+    metadata: {...metadata, predictionLength: 0}
   };
 
   const is_not: CorrectionPredictionTuple = {
@@ -126,7 +128,7 @@ const build_its_is_set = (verbose?: string) => {
       p: 0.5
     },
     totalProb: 0.1,
-    metadata: {...metadata}
+    metadata: {...metadata, predictionLength: 2} // not counting the `'` here.
   };
 
   const baseDefinitions = {

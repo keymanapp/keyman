@@ -58,7 +58,7 @@ describe('buildAndMapPredictions', () => {
     const mappedPredictions = buildAndMapPredictions(
       transition,
       transition.base.displayTokenization,
-      {matchString: 'the', totalCost: 0},
+      {matchString: 'the', totalCost: 0, editCount: 0},
       1
     );
 
@@ -104,7 +104,7 @@ describe('buildAndMapPredictions', () => {
     const mappedPredictions = buildAndMapPredictions(
       transition,
       transition.base.displayTokenization,
-      {matchString: '', totalCost: 0},
+      {matchString: '', totalCost: 0, editCount: 0},
       1
     );
 
@@ -148,7 +148,7 @@ describe('buildAndMapPredictions', () => {
     const mappedPredictions = buildAndMapPredictions(
       transition,
       transition.base.displayTokenization,
-      {matchString: '', totalCost: 0},
+      {matchString: '', totalCost: 0, editCount: 0},
       1
     );
 
@@ -210,7 +210,7 @@ describe('buildAndMapPredictions', () => {
     const mappedPredictions = buildAndMapPredictions(
       transition,
       transition.final.displayTokenization,
-      {matchString: '', totalCost: 0},
+      {matchString: '', totalCost: 0, editCount: 0},
       1
     );
 

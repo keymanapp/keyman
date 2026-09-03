@@ -11,7 +11,9 @@ import {
 
 const defaultMetadata: PredictionMetadata = {
   matchLevel: SuggestionSimilarity.none,
-  preservationTransform: undefined
+  preservationTransform: undefined,
+  rawEditCount: 0,
+  predictionLength: 0
 }
 
 /*
@@ -49,7 +51,7 @@ describe('predictionAutoSelect', () => {
           p: 1
         },
         totalProb: 1,
-        metadata: defaultMetadata
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -81,7 +83,7 @@ describe('predictionAutoSelect', () => {
           p: 0.01
         },
         totalProb: 0.01,
-        metadata: defaultMetadata
+        metadata: {...defaultMetadata}
       },
       {
         correction: {
@@ -100,7 +102,7 @@ describe('predictionAutoSelect', () => {
           p: 0.8
         },
         totalProb: 0.8,
-        metadata: defaultMetadata
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -132,7 +134,7 @@ describe('predictionAutoSelect', () => {
           p: 1
         },
         totalProb: 1,
-        metadata: defaultMetadata
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -163,7 +165,7 @@ describe('predictionAutoSelect', () => {
         p: .05
       },
       totalProb: .04,
-      metadata: defaultMetadata
+      metadata: {...defaultMetadata}
     }
 
     const highestNonKeepSuggestion: CorrectionPredictionTuple= {
@@ -182,7 +184,7 @@ describe('predictionAutoSelect', () => {
         p: .55
       },
       totalProb: .44,
-      metadata: defaultMetadata
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CorrectionPredictionTuple[] = [
@@ -204,7 +206,7 @@ describe('predictionAutoSelect', () => {
           p: .4
         },
         totalProb: .32,
-        metadata: defaultMetadata
+        metadata: {...defaultMetadata}
       },
       {
         correction: {
@@ -222,7 +224,7 @@ describe('predictionAutoSelect', () => {
           p: 1
         },
         totalProb: .2,
-        metadata: defaultMetadata
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -253,7 +255,7 @@ describe('predictionAutoSelect', () => {
         p: .05
       },
       totalProb: .04,
-      metadata: defaultMetadata
+      metadata: {...defaultMetadata}
     }
 
     // To 'win', a suggestion (currently) needs at least twice the probability of the sum of all alternatives.
@@ -276,7 +278,7 @@ describe('predictionAutoSelect', () => {
         p: .01
       },
       totalProb: .008,
-      metadata: defaultMetadata
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CorrectionPredictionTuple[] = [
@@ -316,7 +318,7 @@ describe('predictionAutoSelect', () => {
         p: .05
       },
       totalProb: .04,
-      metadata: defaultMetadata
+      metadata: {...defaultMetadata}
     }
 
     // To 'win', a suggestion (currently) needs at least twice the probability of the sum of all alternatives.
@@ -339,7 +341,7 @@ describe('predictionAutoSelect', () => {
         p: .55
       },
       totalProb: .44,
-      metadata: defaultMetadata
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CorrectionPredictionTuple[] = [
@@ -361,7 +363,7 @@ describe('predictionAutoSelect', () => {
           p: .4
         },
         totalProb: .32,
-        metadata: defaultMetadata
+        metadata: {...defaultMetadata}
       },
       {
         correction: {
@@ -379,7 +381,7 @@ describe('predictionAutoSelect', () => {
           p: 1
         },
         totalProb: .2,
-        metadata: defaultMetadata
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -415,7 +417,7 @@ describe('predictionAutoSelect', () => {
         p: .05
       },
       totalProb: .04,
-      metadata: defaultMetadata
+      metadata: {...defaultMetadata}
     }
 
     const highestNonKeepSuggestion: CorrectionPredictionTuple= {
@@ -434,7 +436,7 @@ describe('predictionAutoSelect', () => {
         p: .75
       },
       totalProb: .675,
-      metadata: defaultMetadata
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CorrectionPredictionTuple[] = [
@@ -456,7 +458,7 @@ describe('predictionAutoSelect', () => {
           p: .2
         },
         totalProb: .18,
-        metadata: defaultMetadata
+        metadata: {...defaultMetadata}
       },
       {
         correction: {
@@ -474,7 +476,7 @@ describe('predictionAutoSelect', () => {
           p: 1
         },
         totalProb: .1,
-        metadata: defaultMetadata
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -508,7 +510,7 @@ describe('predictionAutoSelect', () => {
         p: 1
       },
       totalProb: 1,
-      metadata: { matchLevel: SuggestionSimilarity.exact, preservationTransform: null }
+      metadata: { ...defaultMetadata, matchLevel: SuggestionSimilarity.exact }
     }
 
     const expectedSuggestion: CorrectionPredictionTuple= {
@@ -527,7 +529,7 @@ describe('predictionAutoSelect', () => {
         p: .2
       },
       totalProb: .2,
-      metadata: { matchLevel: SuggestionSimilarity.sameKey, preservationTransform: null }
+      metadata: { ...defaultMetadata, matchLevel: SuggestionSimilarity.sameKey }
     };
 
     const predictions: CorrectionPredictionTuple[] = [
@@ -549,7 +551,7 @@ describe('predictionAutoSelect', () => {
           p: .8
         },
         totalProb: .8,
-        metadata: { matchLevel: SuggestionSimilarity.none, preservationTransform: null }
+        metadata: { ...defaultMetadata, matchLevel: SuggestionSimilarity.none, predictionLength: 3 }
       }
     ];
 
@@ -583,7 +585,7 @@ describe('predictionAutoSelect', () => {
         p: .05
       },
       totalProb: .035,
-      metadata: defaultMetadata
+      metadata: {...defaultMetadata}
     }
 
     const highestCorrectionSuggestion: CorrectionPredictionTuple= {
@@ -602,7 +604,7 @@ describe('predictionAutoSelect', () => {
         p: .1
       },
       totalProb: .07,
-      metadata: defaultMetadata
+      metadata: {...defaultMetadata}
     };
 
     const highestNonKeepSuggestion: CorrectionPredictionTuple= {
@@ -621,7 +623,7 @@ describe('predictionAutoSelect', () => {
         p: 1
       },
       totalProb: .3,
-      metadata: defaultMetadata
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CorrectionPredictionTuple[] = [
