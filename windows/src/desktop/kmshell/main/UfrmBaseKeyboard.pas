@@ -33,7 +33,8 @@ uses
   utilkmshell;
 
 function ConfigureBaseKeyboard(out BaseKeyboardID: Integer): Boolean;
-begin  with TfrmBaseKeyboard.Create(nil) do
+begin
+  with TfrmBaseKeyboard.Create(nil) do
   try
     Result := ShowModal = mrOk;
     if Result then
