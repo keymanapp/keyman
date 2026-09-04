@@ -194,6 +194,7 @@ export class SearchNode {
       // This is unique at each level, though it will reuse a previous ID if no new
       // one is provided (say, for 'insert' edits).
       this.spaceId = spaceId ?? priorNode.spaceId;
+      this.addedEditCost = priorNode.addedEditCost;
     } else {
       this.calculation = new ClassicalDistanceCalculation();
       this.matchedTraversals = [param1];

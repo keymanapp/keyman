@@ -61,27 +61,7 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
   }
 
   protected buildEdgesFromResults(priorResults: ReadonlyArray<TokenResultMapping>, inputs?: Distribution<Transform>): SearchNode[] {
-    const edgeInputs = inputs ?? this.inputs;
-
-    // With a newly-available input, we can extend new input-dependent paths from
-    // our previously-reached 'extractedResults' nodes.
-    let outboundNodes = priorResults.map((result) => {
-      // Hard restriction:  no further edits will be supported.  This helps keep the search
-      // more narrowly focused.
-      const substitutionsOnly = result.editCount == 2;
-
-      let deletionEdges: SearchNode[] = [];
-      if(!substitutionsOnly) {
-        deletionEdges         = result.buildDeletionEdges(edgeInputs, this.spaceId);
-      }
-      const substitutionEdges = result.buildSubstitutionEdges(edgeInputs, this.spaceId);
-
-      // Skip the queue for the first pass; there will ALWAYS be at least one pass,
-      // and queue-enqueing does come with a cost - avoid unnecessary overhead here.
-      return substitutionEdges.flatMap(e => e.processSubsetEdge()).concat(deletionEdges);
-    }).flat();
-
-    return outboundNodes;
+    return buildEdgesFromResults(priorResults, inputs ?? this.inputs, this.spaceId);
   }
 
   get currentCost() {
@@ -153,11 +133,42 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
   protected processPendingRoots(): void {
     super.processPendingRoots();
 
-    while(this.incomingTransposeRootNodes.length > 0) {
-      // Build only substitution edges from these.
-      const transpositionFirstHalves = this.incomingTransposeRootNodes.pop().buildSubstitutionEdges(this.inputs, this.spaceId);
-      transpositionFirstHalves.forEach((n) => n.addEdit());
+    if(this.incomingTransposeRootNodes.length > 0) {
+      const transpositionFirstHalves = processTransposeRoots(this.incomingTransposeRootNodes, this.inputs, this.spaceId);
+
+      this.incomingTransposeRootNodes.splice(0, this.incomingTransposeRootNodes.length);
       this.transposeQueue.enqueueAll(transpositionFirstHalves);
     }
   }
+}
+
+export function processTransposeRoots(priorResults: TokenResultMapping[], inputs: Distribution<Transform>, spaceId: number) {
+  // Build only substitution edges from these.
+  const transpositionFirstHalves = priorResults
+    .flatMap((entry) => entry.buildSubstitutionEdges(inputs, spaceId))
+    .flatMap(e => e.processSubsetEdge());
+  transpositionFirstHalves.forEach((n) => n.addEdit());
+  return transpositionFirstHalves;
+}
+
+export function buildEdgesFromResults(priorResults: ReadonlyArray<TokenResultMapping>, inputs: Distribution<Transform>, spaceId: number): SearchNode[] {
+  // With a newly-available input, we can extend new input-dependent paths from
+  // our previously-reached 'extractedResults' nodes.
+  let outboundNodes = priorResults.map((result) => {
+    // Hard restriction:  no further edits will be supported.  This helps keep the search
+    // more narrowly focused.
+    const substitutionsOnly = result.editCount == 2;
+
+    let deletionEdges: SearchNode[] = [];
+    if(!substitutionsOnly) {
+      deletionEdges         = result.buildDeletionEdges(inputs, spaceId);
+    }
+    const substitutionEdges = result.buildSubstitutionEdges(inputs, spaceId);
+
+    // Skip the queue for the first pass; there will ALWAYS be at least one pass,
+    // and queue-enqueing does come with a cost - avoid unnecessary overhead here.
+    return substitutionEdges.flatMap(e => e.processSubsetEdge()).concat(deletionEdges);
+  }).flat();
+
+  return outboundNodes;
 }

@@ -21,7 +21,7 @@ import { ContextState, determineContextSlideTransform } from './correction/conte
 import { ContextTransition, TransitionReversionView } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import { ModelCompositor } from './model-compositor.js';
-import { getBestTokenMatches } from './correction/distance-modeler.js';
+import { EDIT_DISTANCE_COST_SCALE, getBestTokenMatches } from './correction/distance-modeler.js';
 
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
@@ -78,7 +78,12 @@ export const CORRECTION_SEARCH_THRESHOLDS = {
    * in log-space, the search would stop at a total cost of 1 + this value if
    * a "full" set of suggestions had already been found.
    */
-  REPLACEMENT_SEARCH_THRESHOLD: 4 as const // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+
+  // Ensure at least one "edit distance cost unit" so that even heavily
+  // fat-fingered transpositions have a chance.  Note that the level is this
+  // applied, wordlist weightings have no effect and cannot prevent correction
+  // thresholding!
+  REPLACEMENT_SEARCH_THRESHOLD: EDIT_DISTANCE_COST_SCALE * 1.1
 }
 
 /**
