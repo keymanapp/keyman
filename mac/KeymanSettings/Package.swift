@@ -17,7 +17,8 @@ let package = Package(
         ),
     ],
     dependencies: [
-      .package(url: "https://github.com/weichsel/ZIPFoundation.git", .upToNextMajor(from: "0.9.0"))
+      .package(url: "https://github.com/weichsel/ZIPFoundation.git", .upToNextMajor(from: "0.9.0")),
+      .package(url: "https://github.com/getsentry/sentry-cocoa", from: "9.26.1")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -25,7 +26,8 @@ let package = Package(
         .target(
             name: "KeymanSettings",
             dependencies: [
-              .product(name: "ZIPFoundation", package: "ZIPFoundation")
+              .product(name: "ZIPFoundation", package: "ZIPFoundation"),
+              .product(name: "Sentry-Dynamic", package: "sentry-cocoa")
             ],
             path: "Sources",
             resources: [

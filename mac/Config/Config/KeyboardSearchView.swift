@@ -12,6 +12,7 @@ import SwiftUI
 import Combine
 import WebKit
 import KeymanSettings
+import OSLog
 
 struct KeyboardSearchView: NSViewRepresentable {
   @ObservedObject var coordinator: DownloadCoordinator
@@ -22,7 +23,8 @@ struct KeyboardSearchView: NSViewRepresentable {
 
   /** Creates the underlying NSView (WKWebView) for macOS */
   func makeNSView(context: Context) -> WKWebView {
-    print("makeNSView called")
+    Logger.app.debug("KeyboardSearchView makeNSView called")
+
     let webView = WKWebView()
     
     // assign the coordinator as the navigation delegate
@@ -41,7 +43,7 @@ struct KeyboardSearchView: NSViewRepresentable {
   func updateNSView(_ nsView: WKWebView, context: Context) {
     if coordinator.settings == nil {
       coordinator.settings = self.settings
-      print("updateNSView, settings intialized for coordinator")
+      Logger.app.debug("KeyboardSearchView updateNSView, settings intialized for coordinator")
     }
   }
 }
