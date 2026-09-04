@@ -11,8 +11,13 @@ Control case that is the worst field report. This file tells the two apart.
 Two producers stay unmitigated on every build, this one included, so a report
 after this fix ships is triaged here rather than treated as a regression:
 `keyman.exe` killed or crashed while an OSK sticky modifier is held, and
-`PostKeys` pair-splitting under queue truncation. Drafts for both are in
-[`issues/`](./issues/).
+`PostKeys` pair-splitting under queue truncation. Fully-worked reports for both are
+in [`issues/`](./issues/).
+
+Those two are deliberately unfiled. They ship as text so the evidence travels with
+the branch that found it rather than depending on a tracker round trip, and each is
+written as a finished report: a maintainer who wants one on the tracker can lift the
+body verbatim at any time.
 
 **Before either path, confirm the modifier is stuck at all.** A modifier that
 went *dead* while the user was holding it is the opposite failure and draws the
@@ -68,7 +73,7 @@ signal, and the recovery sweep destroys it.
 | **`KL.Log` lines from `do_keybd_event` / `ShiftStateChange` / `tmrCheckTimer`** | absent — the serializer is C++ and logs through `SendDebugMessageFormat`/ETW, not `KL.Log` | **present and decisive, in a `KLOGGING` build only** | **yes on a rebuild, unavailable in the field** `[measured]`. `common/windows/delphi/general/klog.pas:26` reads `{DEFINE KLOGGING}` — a comment, the `$` is missing — so in any build you can download every `Log` body compiles to an empty procedure. A `keyman.exe` rebuilt with `{$DEFINE KLOGGING}` emits `ShiftStateChange:`, `ResetShiftStates:`, `kbdKeyPressed: keybd_event vk=%x scan=%x flags=%x` and `UpdateKeyboard: VKI…`. **Blind spot:** it instruments `keyman.exe` only. `keyman32.dll` injects from inside every hooked process through the C++ ETW path and is invisible to an `OutputDebugString` capture of `keyman.exe` |
 | **`SendDebugMessageFormat` from `keybd_shift`, and `"cache says held but OS says up, clearing vkey=…"`** | present, naming the exact VK | absent — the OSK emits no `SendDebugMessage*` at all | **yes** `[measured]`, once enabled. 4 lines on the branch, 0 on the shipped build, each naming `['?LShift' 0xa0]` — the exact wedged VK — about 8 s after the phantom press |
 | **Scan code of the injected modifier, as seen by the hook** | `0xFF` (`SCAN_FLAG_KEYMAN_KEY_EVENT`, from `keybd_shift_reset` and the release path) | `0` — the OSK passes `bScan = 0` on every call | **yes for five of the six, and the practical replacement for `KL.Log` in the field** `[source-derived]`. **Right Shift is the exception, and the signal is absent for it:** `do_keybd_event` overwrites `SCAN_FLAG_KEYMAN_KEY_EVENT` with `SCANCODE_RSHIFT`, because `0x36` is what tells the receiving app which Shift it was, so an injected Right Shift is byte-identical at the hook to a physical one. Second caveat, **half-answered** `[measured]`: Windows *can* propagate `bScan = 0` untouched, but does not always. So read it one way only: **`scan == 0` means a `bScan = 0` injector, which on a released build means the OSK; `scan != 0` exculpates nobody** |
-| **`SendDebugMessageFormat` from the hook's modifier cache feed** | present: `"Modifier cache feed posted/failed/skipped [...]"`, distinguishing a successful post, a failed `PostMessage`, a `NULL` server window, and a Keyman-own event filtered out | absent | **yes** `[measured]`. 17 posts on the branch, 0 on the shipped build; every one carried `isUp` and a chiral `vkCode`, and all 17 matched the serializer's own view of the same event one-to-one. Only with this change |
+| **`SendDebugMessageFormat` from the hook's modifier cache feed** | present: `"Modifier cache feed posted/failed/skipped [...]"`, distinguishing a successful post, a failed `PostMessage`, a `NULL` server window, and a Keyman-own event filtered out | absent | **yes** `[measured]`, but **read it as a state, not a count.** The trace is edge-triggered: each line speaks for every user modifier event after it until the next feed line, and Keyman's own modifiers are announced once and then not again. One `posted` line with nothing after it therefore means every modifier event since was posted — that is the healthy shape, and its absence, not its scarcity, is the signal. `failed` and `no serializer window` are exempt and print every occurrence. Measured against a per-event build of the same decision: 17 posts on the branch, 0 on the shipped build, each carrying `isUp` and a chiral `vkCode`, all 17 matching the serializer's own view of the same event one-to-one. Only with this change |
 | **`SendDebugMessageFormat("verification: OS holds vkey=%s that the cache says nobody holds, correcting", …)`** | present only when the post-batch verification pass actually corrects a disagreement | absent — the OSK does not reach this code path | **yes, but rare by design** `[source-derived, rare by design]`. **Looked for and not found**: 0 lines in 5 logged iterations, alongside 4 reconcile-clears in the same run — the expected shape, not a failure to fire. Its *absence* is uninformative; its *presence* is strong evidence the serializer's residual race fired. Only with this change |
 | **`SerialKeyEventServer::WndProc` — `hwnd=… msg=… wParam=… lParam=… m_ModifierKeyboardState=[LS:… LC:… LA:… RS:… RC:… RA:…]`** | present, one line per key or modifier event reaching the re-injection, printing the VK, the flags word, **and the modifier cache itself** | absent — the OSK never reaches the serializer | **yes, and it is the one serializer-side signal a released build has** `[measured]`. It works on the build the user actually has, unlike every other row in this table. 92 passes in the shipped capture, 59 in the branch one. **Read `m_ModifierKeyboardState` directly:** a byte stuck at `80` across many consecutive events, with no matching KEYUP for it in the same log, *is* the wedge. x86 only (`serialkeyeventserver.cpp` is `#ifndef _WIN64`) |
 | **Which modifier is stuck** | any of the six | chirally constrained by `kbd.LRShift`: `VK_SHIFT` (to Left Shift) plus, when `LRShift`, the four chiral Ctrl/Alt VKs; when not, `VK_CONTROL`/`VK_MENU` (both to left). **`kbd.LRShift` does not always follow the keyboard** `[measured]`: `UpdateKeyboard` pins it `True` whenever the OSK has no visual keyboard loaded (`VKI=nil`), a state that does not self-heal | **weak.** A wedged **Right Ctrl** does not point at the serializer: the OSK emits extended `VK_RCONTROL` directly, and `SetLRShift`'s chirality collapse can strand one even on hardware that has the key. Corroboration only, never alone |
@@ -163,7 +168,7 @@ signal that did not fire.
 >   `GetAsyncKeyState`. The log is for finding out *which path*, on a wedge you can
 >   already produce.
 
-**An absent log line is not proof of an absent event.** Three separate ways it
+**An absent log line is not proof of an absent event.** Four separate ways it
 lies:
 
 - `ShouldDebug_1` and `Keyman_WriteDebugEvent2W` both bail out when
@@ -175,6 +180,11 @@ lies:
   the same captures already held 151 lines logging every pass through it, from the
   top of the enclosing `WndProc` 112 lines earlier. Check the callers before
   writing "absent".
+- **The modifier cache feed rows are edge-triggered.** They print when the feed's
+  decision *changes*, and Keyman's own modifiers are announced once, so one line
+  stands for every modifier event after it until the next. A missing line there
+  means "same as the line above", not "did not happen". `failed` and `no
+  serializer window` are the exceptions and print every occurrence.
 
 ## Procedure
 

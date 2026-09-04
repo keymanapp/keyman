@@ -129,6 +129,90 @@ BOOL IsTouchPanelVisible() {
   return touchPanelVisible;
 }
 
+/*
+  #8064 What the modifier cache feed did with a modifier event, traced at a volume proportional to
+  how interesting the answer is.
+
+  348b5980 removed this hook's previous #8064 tracing as noise, because the hook runs on every
+  keystroke, and that reasoning still holds: a line on every Shift press buries the log TRIAGE.md
+  sends a responder to read. Silence is not available either -- a feed that has quietly stopped
+  feeding is the #8064 class of bug, and a silent log cannot tell a healthy feed from one that never
+  ran.
+
+  So what is traced is the DECISION, and a decision the log already implies is dropped. Two rules,
+  and between them they keep the property that matters: for any modifier event in the "wparam:"
+  trace above, the log still says what the feed did with it.
+
+    - Keyman's own modifiers are announced once and then not again. They interleave with the user's
+      on every capital letter, so tracing each one would trace the alternation rather than the
+      decision -- and this is the one outcome the log can already answer unaided, since
+      IsKeymanInjectedKeyEvent reads nothing but the scan code and dwExtraInfo that the "wparam:"
+      line prints for every event.
+    - Every other decision is traced when it CHANGES. Its inputs are a process-wide flag read once
+      at startup and whether the serializer window is there, so it is near-constant while a user
+      types: the first user modifier event of the session names it, and a Shift held across twenty
+      keystrokes adds nothing. Each line therefore speaks for every user modifier event after it
+      until the next one, and says so, because a responder who reads one "posted" line as one post
+      has been misled by the compression.
+
+  The two anomaly decisions are exempt and trace every time: a feed that fails two hundred times is
+  a different fault from one that fails once, and neither is ordinary typing. Each also re-arms the
+  memo, so the recovery gets its own line and the claim above stays true.
+
+  Both memos are function-local statics, like IsConsoleWindow's above and for the same reason: a
+  WH_KEYBOARD_LL proc only ever runs on the thread that installed the hook, so they need no
+  synchronisation and are shared with nothing.
+*/
+enum ModifierCacheFeedDecision {
+  FeedNotYetTraced = 0,         // the memo's starting value, never traced
+  FeedPosted,                   // handed to the serializer
+  FeedSkippedSerializationOff,  // flag_ShouldSerializeInput is off, so nothing consumes the cache
+  FeedSkippedKeymanInjected,    // Keyman's own modifier, deliberately not fed (#8064)
+  FeedNoServerWindow,           // anomaly: nothing to post to
+  FeedPostFailed,               // anomaly: PostMessage refused it
+};
+
+static void TraceModifierCacheFeedDecision(ModifierCacheFeedDecision decision, DWORD vkCode, BOOL isUp, DWORD error) {
+  // Announced once, for the reason in the second bullet above, and kept out of the memo below so
+  // that it cannot make the user's stream look as though it were changing its mind.
+  static BOOL reportedKeymanInjected = FALSE;
+  if (decision == FeedSkippedKeymanInjected) {
+    if (!reportedKeymanInjected) {
+      reportedKeymanInjected = TRUE;
+      SendDebugMessageFormat("Modifier cache feed skipped, Keyman's own modifier [vkCode:%x isUp:%d]; every later one is skipped too and not traced again", vkCode, isUp);
+    }
+    return;
+  }
+
+  static ModifierCacheFeedDecision lastDecision = FeedNotYetTraced;
+  BOOL isAnomaly = decision == FeedNoServerWindow || decision == FeedPostFailed;
+  if (decision == lastDecision && !isAnomaly) {
+    return;
+  }
+  lastDecision = decision;
+
+  // Spelled out in full rather than composed from parts: TRIAGE.md sends a responder to grep
+  // "Modifier cache feed posted/failed/skipped", so whoever edits either side has to be able to
+  // find these strings in the source.
+  switch (decision) {
+  case FeedPosted:
+    SendDebugMessageFormat("Modifier cache feed posted [vkCode:%x isUp:%d], and for every user modifier event after it until the next feed line", vkCode, isUp);
+    break;
+  case FeedSkippedSerializationOff:
+    SendDebugMessageFormat("Modifier cache feed skipped, input serialization is off [vkCode:%x isUp:%d], and for every modifier event after it until the next feed line", vkCode, isUp);
+    break;
+  case FeedNoServerWindow:
+    SendDebugMessageFormat("Modifier cache feed skipped, no serializer window [vkCode:%x isUp:%d]", vkCode, isUp);
+    break;
+  case FeedPostFailed:
+    SendDebugMessageFormat("Modifier cache feed failed [vkCode:%x isUp:%d] with error %d", vkCode, isUp, error);
+    break;
+  case FeedSkippedKeymanInjected:  // returned above, and never reaches the memo
+  case FeedNotYetTraced:           // the memo's starting value, never traced
+    break;
+  }
+}
+
 LRESULT _kmnLowLevelKeyboardProc(
   _In_  int nCode,
   _In_  WPARAM wParam,
@@ -206,28 +290,31 @@ LRESULT _kmnLowLevelKeyboardProc(
   // by the reconcile, because the OS agrees. Tested here, not at the pass-through check below,
   // which this post precedes on purpose so modifiers are tracked with no Keyman keyboard active.
   if (isModifierKey(hs->vkCode)) {
-    // #8064 Trace the cache-feed decision, not every keystroke (348b5980 removed the old
-    // per-keystroke trace as noise): whether the event was filtered as Keyman's own, and whether
-    // the post reached the server.
-    // The decision itself lives in ShouldFeedModifierCache (keybd_shift.cpp) so the suite can reach
-    // it; isKeymanInjected stays here because the trace below reports the two inputs separately.
-    BOOL isKeymanInjected = IsKeymanInjectedKeyEvent(hs->scanCode, hs->dwExtraInfo);
-    if (ShouldFeedModifierCache(flag_ShouldSerializeInput, hs->scanCode, hs->dwExtraInfo)) {
+    // #8064 The decision itself lives in ShouldFeedModifierCache (keybd_shift.cpp) so the suite can
+    // reach it; the hook keeps the server lookup, the post and the trace, which need hook state the
+    // suite has no way to stand up. How loudly each outcome is said belongs to
+    // TraceModifierCacheFeedDecision -- see its comment; the calls below only name which one it was.
+    if (!ShouldFeedModifierCache(flag_ShouldSerializeInput, hs->scanCode, hs->dwExtraInfo)) {
+      // Which of the two terms refused it, without asking IsKeymanInjectedKeyEvent a second time:
+      // the predicate is serializeInput && !injected, so with serialization on, "Keyman's own" is
+      // the only way to arrive here. Worth naming apart, because a physical modifier misread as
+      // injected would silently stop being tracked, and that is #8064 in miniature.
+      TraceModifierCacheFeedDecision(
+        flag_ShouldSerializeInput ? FeedSkippedKeymanInjected : FeedSkippedSerializationOff,
+        hs->vkCode, isUp, 0);
+    } else {
       // Not an eat: processing continues either way, so a failed feed costs sync, not input. Still
-      // guarded and logged, because PostMessage to a NULL hwnd does not fail -- it misroutes to
+      // guarded and traced, because PostMessage to a NULL hwnd does not fail -- it misroutes to
       // this thread's own queue -- and a stale cache is exactly the #8064 class of bug.
       ISerialKeyEventServer *server = ISerialKeyEventServer::GetServer();
       HWND hwndServer = server ? server->GetWindow() : NULL;
       if (hwndServer == NULL) {
-        SendDebugMessageFormat("Modifier cache feed skipped, no serializer window [vkCode:%x isUp:%d]", hs->vkCode, isUp);
+        TraceModifierCacheFeedDecision(FeedNoServerWindow, hs->vkCode, isUp, 0);
       } else if (!PostMessage(hwndServer, WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs))) {
-        SendDebugMessageFormat("Modifier cache feed failed [vkCode:%x isUp:%d] with error %d", hs->vkCode, isUp, GetLastError());
+        TraceModifierCacheFeedDecision(FeedPostFailed, hs->vkCode, isUp, GetLastError());
       } else {
-        SendDebugMessageFormat("Modifier cache feed posted [vkCode:%x isUp:%d]", hs->vkCode, isUp);
+        TraceModifierCacheFeedDecision(FeedPosted, hs->vkCode, isUp, 0);
       }
-    } else {
-      SendDebugMessageFormat("Modifier cache feed skipped [vkCode:%x isUp:%d flag_ShouldSerializeInput:%d isKeymanInjected:%d]",
-        hs->vkCode, isUp, flag_ShouldSerializeInput, isKeymanInjected);
     }
   }
 

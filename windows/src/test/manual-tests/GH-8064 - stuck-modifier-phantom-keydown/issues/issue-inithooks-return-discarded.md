@@ -1,12 +1,13 @@
 # `InitHooks()`'s return value is discarded at startup (the feed-integrity gap already flagged in `serialkeyeventcommon.h:209-217`)
 
-Draft, not filed. Not one of the producers named in [`../TRIAGE.md`](../TRIAGE.md)
+Deliberately unfiled. Not one of the producers named in [`../TRIAGE.md`](../TRIAGE.md)
 — this path emits nothing itself. It is the first of the three ways
 `serialkeyeventcommon.h:209-217` names for the modifier cache's feed to be dead
 while `flag_ShouldSerializeInput` still reads TRUE, so it sits behind that
-gap's mitigation rather than beside it. Filing is an OPTIONAL step a maintainer may
-take; no PR is opened by the change that wrote this draft, so nothing here is waiting on one. See
-[README.md](../README.md).
+gap's mitigation rather than beside it. It ships as text so the evidence travels with
+the branch that found it rather than depending on a tracker round trip; filing stays
+open to any maintainer, who can lift the body below verbatim. Nothing here is waiting
+on that. See [README.md](../README.md).
 
 ---
 

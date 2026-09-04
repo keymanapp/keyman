@@ -15,8 +15,7 @@ builder_describe \
   \
   :oskbulkrenderer \
   :etl2log \
-  :texteditor \
-  :fakefreeze
+  :texteditor
 
 builder_parse "$@"
 

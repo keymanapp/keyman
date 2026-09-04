@@ -129,9 +129,6 @@
 #define KEYMSG_FLAG_TRANSITION(lParam) ((BYTE)((HIWORD(lParam) & (KF_UP | KF_REPEAT)) >> 14))
 
 // TODO: Deprecate overloading of scancodes and use dwExtraInfo instead
-// Nothing in the API blocks it: keybd_event's fourth parameter is dwExtraInfo, and all five direct
-// callers already pass it, as 0 (keyman32.cpp:924-925, kmhook_keyboard.cpp:147,
-// kmprocessactions.cpp:101-102). Retiring the scan arm means tagging those five, not a new channel.
 #define SCAN_FLAG_KEYMAN_KEY_EVENT          0xFF
 
 #define EXTRAINFO_FLAG_SERIALIZED_USER_KEY_EVENT 0x4B4D0000

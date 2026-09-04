@@ -1,9 +1,10 @@
 # `AIWin2000Unicode::PostKeys` can split a KEYDOWN/KEYUP pair under queue truncation
 
-Draft, not filed. One of the two unmitigated producers named in
-[`../TRIAGE.md`](../TRIAGE.md). Filing is an OPTIONAL
-step a maintainer may take; no PR is opened by the change that wrote this draft, so nothing here is
-waiting on one. See [README.md](../README.md).
+Deliberately unfiled. One of the two unmitigated producers named in
+[`../TRIAGE.md`](../TRIAGE.md). It ships as text so the evidence travels with the branch
+that found it rather than depending on a tracker round trip; filing stays open to any
+maintainer, who can lift the body below verbatim. Nothing here is waiting on that.
+See [README.md](../README.md).
 
 ---
 

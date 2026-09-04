@@ -8,15 +8,16 @@
  * Every other workstream in that spec ships whatever this program reports. If both routes are
  * refuted, FR-106 fires and the FR-100...FR-106 block is struck; nothing else waits on the answer.
  *
- * The question. dwExtraInfo has survived SendInput -> the low level hook since 2018
- * (keyman64.h:137-144). The SendInput -> *raw input* leg has never been measured, and Route 2 --
- * a second modifier shadow in the serializer, fed by WM_INPUT on the serializer's own thread --
- * rests entirely on it. Alongside it, three delivery questions: does WM_INPUT reach a
- * message-only window at all, does it reach one owned by a WORKER thread while the process's
- * MAIN thread is stalled, and does it reach one while the probe is unfocused. Raw input queues on
- * the REGISTERING thread; the low level hook marshals every event to the thread that installed it
- * (keyman.exe's main thread, keyman32.cpp:275-280), which is the thread whose stall causes the
- * eviction. That difference is the whole of Route 2's case.
+ * The question. dwExtraInfo has survived SendInput -> the low level hook since 2018 (the
+ * EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP provenance note in keyman64.h). The SendInput -> *raw
+ * input* leg has never been measured, and Route 2 -- a second modifier shadow in the serializer,
+ * fed by WM_INPUT on the serializer's own thread -- rests entirely on it. Alongside it, three
+ * delivery questions: does WM_INPUT reach a message-only window at all, does it reach one owned
+ * by a WORKER thread while the process's MAIN thread is stalled, and does it reach one while the
+ * probe is unfocused. Raw input queues on the REGISTERING thread; the low level hook marshals
+ * every event to the thread that installed it (keyman.exe's main thread, keyman32.cpp:275-280),
+ * which is the thread whose stall causes the eviction. That difference is the whole of Route 2's
+ * case.
  *
  * -------------------------------------------------------------------------------------------
  * FR-100a -- READ THIS BEFORE READING ANY hDevice COLUMN THIS PROGRAM PRINTS
@@ -41,7 +42,7 @@
  * -------------------------------------------------------------------------------------------
  *
  * Build (with the Keyman build environment sourced) -- the harness's documented one-liner,
- * ../README.md:202-203, the same line host32.cpp is built with:
+ * the same line host32.cpp is built with (../README.md, "host32 is a separate harness"):
  *   cl /nologo /W4 /EHsc /MT /DUNICODE /D_UNICODE rawinput-probe.cpp \
  *      /link /SUBSYSTEM:WINDOWS user32.lib gdi32.lib /OUT:rawinput-probe.exe
  *
@@ -69,12 +70,13 @@
   header, so it builds with the harness's cl one-liner and no build system, exactly as host32.cpp
   does. Provenance, so a drift is findable:
 
-    SCAN_FLAG_KEYMAN_KEY_EVENT           windows/src/engine/keyman32/keyman64.h:134
-    EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP  windows/src/engine/keyman32/keyman64.h:145
+    SCAN_FLAG_KEYMAN_KEY_EVENT           windows/src/engine/keyman32/keyman64.h
+    EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP  windows/src/engine/keyman32/keyman64.h
     SCANCODE_RSHIFT                      kbd.h in the Windows SDK -- the header
                                          keybd_shift.cpp:89 cites ("from kbd.h") and
                                          tests/keybd_shift.tests.cpp:2 includes. Corroborated
-                                         in-tree at ../README.md:298 and host32.cpp:46.
+                                         in-tree under "Recovery" in ../README.md, and at
+                                         host32.cpp:46.
 
   If any of the three changes in the tree and not here, this probe measures the wrong thing.
 */
@@ -711,9 +713,10 @@ Step3Tags(void) {
   Report(L"## Step 3 -- THE DECISIVE CAPTURE (W0 step 3)");
   Report(L"");
   Report(L"dwExtraInfo has survived SendInput -> the low level hook since 2018");
-  Report(L"(keyman64.h:137-144). The raw input leg has never been measured, and it is what Route 2");
-  Report(L"needs: RAWKEYBOARD carries ExtraInformation per event, which is the second reason W0");
-  Report(L"probes Route 2 before Route 1 -- WM_KEY* exposes no per-event dwExtraInfo at all.");
+  Report(L"(the wrap-tag provenance note in keyman64.h). The raw input leg has never been");
+  Report(L"measured, and it is what Route 2 needs: RAWKEYBOARD carries ExtraInformation per");
+  Report(L"event, which is the second reason W0 probes Route 2 before Route 1 -- WM_KEY*");
+  Report(L"exposes no per-event dwExtraInfo at all.");
   Report(L"");
   Report(L"Note on widths: RAWKEYBOARD.ExtraInformation is a 32-bit ULONG, while the hook's");
   Report(L"dwExtraInfo is ULONG_PTR. EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP is 0x%08X and fits, so the",

@@ -93,6 +93,7 @@ clean.
 |---|---|
 | `windows/src/support/fakefreeze` | the stimulus. Posts `KMC_WATCHDOG_FAKEFREEZE` to keyman.exe, which pauses for five seconds. Build with `./windows/src/support/fakefreeze/build.sh --debug build:x86` |
 | `host32/host32.cpp` | the 32-bit host, which drives the whole sequence itself |
+| `host32/rawinput-probe.cpp` | a measurement, not a fix: it changes no production file, and answers one question -- does a `WM_INPUT` feed on a worker thread keep delivering, with Keyman's `dwExtraInfo` tag intact, while the thread the low level hook was installed on is stalled. Its result is committed as [`evidence/rawinput-delivery.md`](evidence/rawinput-delivery.md). Build: `cl /nologo /W4 /EHsc /MT /DUNICODE /D_UNICODE rawinput-probe.cpp /link /SUBSYSTEM:WINDOWS user32.lib gdi32.lib /OUT:rawinput-probe.exe` |
 | `run-8064-test.ps1` | the automated harness |
 | `windows/src/test/manual-tests/keyboard_ll_identifier` | the wire logger. A `WH_KEYBOARD_LL` hook that logs `vkCode scanCode flags` for the nine modifier virtual keys. Delphi, and no binary is committed, so it has to be built |
 | the snippets below | the pass/fail oracle, and the recovery |
@@ -101,6 +102,10 @@ clean.
 > `keyboard_ll_identifier` installs a **global** low level hook and logs every
 > modifier keystroke on the machine while it runs. It does not log character keys,
 > but close it before typing anything sensitive.
+
+`rawinput-probe` is the one entry above that no step of this test invokes: it was
+run once, to settle a design question, and is listed so it is not mistaken for a
+repro step.
 
 ## Automated harness
 
@@ -187,6 +192,24 @@ false PASS, and a false PASS on this defect is worse than no test.
 `-Modifier RSHIFT` is the interesting case: Right Shift is the one modifier whose
 `SCAN_FLAG_KEYMAN_KEY_EVENT` is overwritten with `SCANCODE_RSHIFT`, so only the
 `dwExtraInfo` arm of the provenance gate covers it.
+
+### Why the provenance gate keeps a scan-code arm
+
+`IsKeymanInjectedKeyEvent` (`keybd_shift.cpp`) tests two tags, and the older of the
+two is the scan code: `SCAN_FLAG_KEYMAN_KEY_EVENT`, `0xFF`, written into the scan
+byte of the events Keyman injects. `keyman64.h` has carried a TODO to deprecate that
+overload in favour of `dwExtraInfo` since long before this branch, and nothing in the
+API blocks it: `keybd_event`'s fourth parameter *is* `dwExtraInfo`, and all five
+direct callers already pass it, as `0` -- `keyman32.cpp:924-925`,
+`kmhook_keyboard.cpp:147`, `kmprocessactions.cpp:101-102`. Retiring the scan arm is
+therefore a matter of tagging those five call sites, not of opening a new channel.
+*Those line numbers are a snapshot, checked at `d2a57b42f1` on 2026-09-03, and are
+not maintained.*
+
+This branch does not do it -- a bugfix is the wrong change to carry a deprecation --
+so the gate keeps both arms: the scan arm, which is the only cover those five
+untagged injections have, and `EXTRAINFO_FLAG_KEYMAN_MODIFIER_WRAP`, which is the
+only cover for the Right Shift shape above.
 
 ## Procedure, by hand
 
