@@ -18,9 +18,9 @@ type
       FPackage: IKeymanPackageInstalled; const BCP47: string); static;
   public
     class function BrowseAndInstallKeyboardFromFile(Owner: TComponent): Boolean; static;
-    class function Execute(KeyboardFileNames: TStrings; const FirstKeyboardFileName: string; FSilent, FNoWelcome: Boolean; const LogFile: string): Boolean; overload; static;
-    class function Execute(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile, BCP47: string): Boolean; overload; static;
-    class function Execute(Owner: TComponent; const FileNames: TStrings; ASilent: Boolean): Boolean; overload; static;
+    class function Execute(KeyboardFileNames: TStrings; const FirstKeyboardFileName: string; FSilent, FNoWelcome: Boolean; const LogFile: string; BaseKeyboardID: Integer): Boolean; overload; static;
+    class function Execute(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile, BCP47: string; BaseKeyboardID: Integer): Boolean; overload; static;
+    class function Execute(Owner: TComponent; const FileNames: TStrings; ASilent: Boolean; BaseKeyboardID: Integer): Boolean; overload; static;
   end;
 
 implementation
@@ -35,29 +35,30 @@ uses
   Keyman.Configuration.UI.KeymanProtocolHandler,
   Keyman.Configuration.UI.MitigationForWin10_1803,
   kmint,
+  KeymanOptionNames,
   UfrmHTML,
   UfrmInstallKeyboard;
 
 class function TInstallFile.Execute(KeyboardFileNames: TStrings; const FirstKeyboardFileName: string; FSilent, FNoWelcome: Boolean;
-  const LogFile: string): Boolean;
+  const LogFile: string; BaseKeyboardID: Integer): Boolean;
 begin
   if TKeymanProtocolHandler.CanHandle(FirstKeyboardFileName) then
   begin
-    Result := TKeymanProtocolHandler.Handle(nil, FirstKeyboardFileName, FSilent, FNoWelcome, LogFile);
+    Result := TKeymanProtocolHandler.Handle(nil, FirstKeyboardFileName, FSilent, FNoWelcome, LogFile, BaseKeyboardID);
   end
   else if (KeyboardFileNames.Count > 1) or (Pos('=', FirstKeyboardFileName) > 0) then
   begin
-    Result := TInstallFile.Execute(nil, KeyboardFileNames, FSilent)
+    Result := TInstallFile.Execute(nil, KeyboardFileNames, FSilent, BaseKeyboardID)
   end
   // TODO: support bare package ids from command line (if it does not include a file extension, assume it is a .kmp and try and download it)
 //  else if IsNotPackageOrKeyboardFile then
   else
   begin
-    Result := TInstallFile.Execute(nil, FirstKeyboardFileName, FSilent, FNoWelcome, LogFile, '');
+    Result := TInstallFile.Execute(nil, FirstKeyboardFileName, FSilent, FNoWelcome, LogFile, '', BaseKeyboardID);
   end;
 end;
 
-class function TInstallFile.Execute(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile, BCP47: string): Boolean;
+class function TInstallFile.Execute(Owner: TComponent; const FileName: string; ASilent, ANoWelcome: Boolean; const LogFile, BCP47: string; BaseKeyboardID: Integer): Boolean;
 var
   n: Integer;
   InstalledKeyboards: array of IKeymanKeyboardInstalled;
@@ -77,7 +78,7 @@ begin
     begin
       if ASilent then
       begin
-        InstallKeyboard(LogFile, BCP47);
+        InstallKeyboard(LogFile, BCP47, BaseKeyboardID);
         Result := True;
       end
       else
@@ -139,7 +140,7 @@ end;
 /// This is the handler for the `-i` parameter, e.g.
 ///   kmshell -i khmer_angkor.kmp c:\temp\sil_euro_latin.kmp=fr
 /// </summary>
-class function TInstallFile.Execute(Owner: TComponent; const FileNames: TStrings; ASilent: Boolean): Boolean;
+class function TInstallFile.Execute(Owner: TComponent; const FileNames: TStrings; ASilent: Boolean; BaseKeyboardID: Integer): Boolean;
 var
   i, j: Integer;
   FPackage: IKeymanPackageInstalled;
@@ -170,7 +171,7 @@ begin
       end;
       if IsPackage then
       begin
-        FPackage := (kmcom.Packages as IKeymanPackagesInstalled2).Install2(FileName, True);
+        FPackage := (kmcom.Packages as IKeymanPackagesInstalled3).Install3(FileName, True, BaseKeyboardID);
         if Length(FilenameBCP47) > 1
           then RegisterKeyboardPackageLanguage(FPackage, FilenameBCP47[1])
           else RegisterKeyboardPackageLanguage(FPackage, '');
@@ -178,7 +179,7 @@ begin
       end
       else
       begin
-        FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled2).Install2(FileName, True);
+        FKeyboard := (kmcom.Keyboards as IKeymanKeyboardsInstalled3).Install3(FileName, True, BaseKeyboardID);
         if (Length(FilenameBCP47) > 1) and (Trim(FilenameBCP47[1]) <> '')
           then BCP47Tag := FilenameBCP47[1]
           else BCP47Tag := TTIPMaintenance.GetFirstLanguage(FKeyboard);
@@ -209,6 +210,7 @@ end;
 class function TInstallFile.BrowseAndInstallKeyboardFromFile(Owner: TComponent): Boolean;
 var
   dlgOpen: TOpenDialog;
+  BaseKeyboardID : Integer;
 begin
   dlgOpen := TOpenDialog.Create(nil);
   try
@@ -216,9 +218,9 @@ begin
       'Keyman files (*.kmx, *.kxx, *.kmp)|*.kmx;*.kxx;*.kmp|Keyman keyboards (*.kmx,*.kxx)' +
       '|*.kmx;*.kxx|Keyman packages (*.kmp)|*.kmp|All files (*.*)|*.*';
     dlgOpen.Title := 'Install Keyman Keyboard';
-
+    BaseKeyboardID := kmcom.Options[KeymanOptionName(koBaseLayout)].Value;
     if dlgOpen.Execute then
-      Result := Execute(Owner, dlgOpen.FileName, False, False, '', '')
+      Result := Execute(Owner, dlgOpen.FileName, False, False, '', '', BaseKeyboardID)
     else
       Result := False;
   finally

@@ -264,6 +264,7 @@ begin
       else if s = '-bd' then FMode := fmBackgroundDownload
       else if s = '-an' then FMode := fmApplyInstallNow
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
+      else if s = '-bklid' then begin Inc(i); FBaseKeyboard := StrToInt('$' + ParamStr(i)); end
       else if s = '-mcompilekbds' then
       begin
         FMode := fmMCompileKbds;
@@ -560,7 +561,7 @@ begin
         else ExitCode := 1;
 
     fmInstall:
-      if TInstallFile.Execute(KeyboardFileNames, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile)
+      if TInstallFile.Execute(KeyboardFileNames, FirstKeyboardFileName, FSilent, FNoWelcome, FLogFile, FBaseKeyboard)
         then ExitCode := 0
         else ExitCode := 1;
 
