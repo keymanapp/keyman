@@ -174,7 +174,7 @@ uses
   Hints,
   HotkeyUtils,
   initprog,
-  Keyman.Configuration.Settings.BaseKeyboard,
+  Keyman.Configuration.System.BaseKeyboard,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.UI.UfrmDiagnosticTests,
   KeymanOptionNames,

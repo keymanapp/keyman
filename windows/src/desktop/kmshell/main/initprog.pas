@@ -115,7 +115,7 @@ uses
   GetOsVersion,
   help,
   HTMLHelpViewer,
-  Keyman.Configuration.Settings.BaseKeyboard,
+  Keyman.Configuration.System.BaseKeyboard,
   Keyman.Configuration.UI.InstallFile,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.System.UImportOlderVersionKeyboards11To13,
@@ -270,7 +270,7 @@ begin
         FMode := fmMCompileKbds;
         Inc(i);
         if i > ParamCount then Exit;
-        FQuery := ParamStr(i);
+        FBaseKeyboard := StrToInt('$' + ParamStr(i));
       end
       else if s = '-nowelcome'   then FNoWelcome := True
       else if s = '-kw' then FMode := fmKeyboardWelcome  // I2569
@@ -556,7 +556,7 @@ begin
         else ExitCode := 1;
 
     fmMCompileKbds:
-      if MCompileBaseKeyboard(FQuery)
+      if MCompileBaseKeyboard(FBaseKeyboard)
         then ExitCode := 0
         else ExitCode := 1;
 
