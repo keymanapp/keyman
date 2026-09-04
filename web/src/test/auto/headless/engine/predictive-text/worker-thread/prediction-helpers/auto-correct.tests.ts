@@ -1,6 +1,21 @@
 import { assert } from 'chai';
 
-import { AUTOSELECT_PROPORTION_THRESHOLD, CorrectionPredictionTuple, predictionAutoSelect, SuggestionSimilarity, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
+import {
+  AUTOSELECT_PROPORTION_THRESHOLD,
+  CorrectionPredictionTuple,
+  predictionAutoSelect,
+  PredictionMetadata,
+  SuggestionSimilarity,
+  tupleDisplayOrderSort
+} from "@keymanapp/lm-worker/test-index";
+
+const defaultMetadata: PredictionMetadata = {
+  matchLevel: SuggestionSimilarity.none,
+  preservationTransform: undefined,
+  rawEditCount: 0,
+  predictionLength: 0
+}
+
 /*
   * Preconditions:
   * - there should always be a 'keep' option.  Now, whether or not that option
@@ -35,7 +50,8 @@ describe('predictionAutoSelect', () => {
           },
           p: 1
         },
-        totalProb: 1
+        totalProb: 1,
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -66,7 +82,8 @@ describe('predictionAutoSelect', () => {
           },
           p: 0.01
         },
-        totalProb: 0.01
+        totalProb: 0.01,
+        metadata: {...defaultMetadata}
       },
       {
         correction: {
@@ -84,7 +101,8 @@ describe('predictionAutoSelect', () => {
           },
           p: 0.8
         },
-        totalProb: 0.8
+        totalProb: 0.8,
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -115,7 +133,8 @@ describe('predictionAutoSelect', () => {
           },
           p: 1
         },
-        totalProb: 1
+        totalProb: 1,
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -145,10 +164,11 @@ describe('predictionAutoSelect', () => {
         },
         p: .05
       },
-      totalProb: .04
+      totalProb: .04,
+      metadata: {...defaultMetadata}
     }
 
-    const highestNonKeepSuggestion: CorrectionPredictionTuple = {
+    const highestNonKeepSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'thin',
         p: .8
@@ -163,7 +183,8 @@ describe('predictionAutoSelect', () => {
         },
         p: .55
       },
-      totalProb: .44
+      totalProb: .44,
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CorrectionPredictionTuple[] = [
@@ -184,7 +205,8 @@ describe('predictionAutoSelect', () => {
           },
           p: .4
         },
-        totalProb: .32
+        totalProb: .32,
+        metadata: {...defaultMetadata}
       },
       {
         correction: {
@@ -201,7 +223,8 @@ describe('predictionAutoSelect', () => {
           },
           p: 1
         },
-        totalProb: .2
+        totalProb: .2,
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -214,7 +237,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`selects solitary non-'keep' suggestion when 'keep' does not match model`, () => {
-    const keepSuggestion: CorrectionPredictionTuple = {
+    const keepSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'thin',
         p: .8
@@ -231,14 +254,15 @@ describe('predictionAutoSelect', () => {
         },
         p: .05
       },
-      totalProb: .04
+      totalProb: .04,
+      metadata: {...defaultMetadata}
     }
 
     // To 'win', a suggestion (currently) needs at least twice the probability of the sum of all alternatives.
     // This threshold may be subject to change.
     //
     // Refer to AUTOSELECT_PROPORTION_THRESHOLD in predict-helpers.ts.
-    const onlyNonKeepSuggestion: CorrectionPredictionTuple = {
+    const onlyNonKeepSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'thin',
         p: .8
@@ -253,7 +277,8 @@ describe('predictionAutoSelect', () => {
         },
         p: .01
       },
-      totalProb: .008
+      totalProb: .008,
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CorrectionPredictionTuple[] = [
@@ -275,7 +300,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`does not select non-'keep' without sufficient winning probability`, () => {
-    const keepSuggestion: CorrectionPredictionTuple = {
+    const keepSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'thin',
         p: .8
@@ -292,14 +317,15 @@ describe('predictionAutoSelect', () => {
         },
         p: .05
       },
-      totalProb: .04
+      totalProb: .04,
+      metadata: {...defaultMetadata}
     }
 
     // To 'win', a suggestion (currently) needs at least twice the probability of the sum of all alternatives.
     // This threshold may be subject to change.
     //
     // Refer to AUTOSELECT_PROPORTION_THRESHOLD in predict-helpers.ts.
-    const highestNonKeepSuggestion: CorrectionPredictionTuple = {
+    const highestNonKeepSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'thin',
         p: .8
@@ -314,7 +340,8 @@ describe('predictionAutoSelect', () => {
         },
         p: .55
       },
-      totalProb: .44
+      totalProb: .44,
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CorrectionPredictionTuple[] = [
@@ -335,7 +362,8 @@ describe('predictionAutoSelect', () => {
           },
           p: .4
         },
-        totalProb: .32
+        totalProb: .32,
+        metadata: {...defaultMetadata}
       },
       {
         correction: {
@@ -352,7 +380,8 @@ describe('predictionAutoSelect', () => {
           },
           p: 1
         },
-        totalProb: .2
+        totalProb: .2,
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -370,7 +399,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it(`does select non-'keep' with sufficient winning probability`, () => {
-    const keepSuggestion: CorrectionPredictionTuple = {
+    const keepSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'thin',
         p: .8
@@ -387,10 +416,11 @@ describe('predictionAutoSelect', () => {
         },
         p: .05
       },
-      totalProb: .04
+      totalProb: .04,
+      metadata: {...defaultMetadata}
     }
 
-    const highestNonKeepSuggestion: CorrectionPredictionTuple = {
+    const highestNonKeepSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'thin',
         p: .9
@@ -405,7 +435,8 @@ describe('predictionAutoSelect', () => {
         },
         p: .75
       },
-      totalProb: .675
+      totalProb: .675,
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CorrectionPredictionTuple[] = [
@@ -426,7 +457,8 @@ describe('predictionAutoSelect', () => {
           },
           p: .2
         },
-        totalProb: .18
+        totalProb: .18,
+        metadata: {...defaultMetadata}
       },
       {
         correction: {
@@ -443,7 +475,8 @@ describe('predictionAutoSelect', () => {
           },
           p: 1
         },
-        totalProb: .1
+        totalProb: .1,
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -459,7 +492,7 @@ describe('predictionAutoSelect', () => {
   });
 
   it('ignores non key-matched suggestions when key-matched suggestions exist', () => {
-    const keepSuggestion: CorrectionPredictionTuple = {
+    const keepSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'cant',
         p: 1
@@ -477,10 +510,10 @@ describe('predictionAutoSelect', () => {
         p: 1
       },
       totalProb: 1,
-      matchLevel: SuggestionSimilarity.exact
+      metadata: { ...defaultMetadata, matchLevel: SuggestionSimilarity.exact }
     }
 
-    const expectedSuggestion: CorrectionPredictionTuple = {
+    const expectedSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'cant',
         p: 1
@@ -496,7 +529,7 @@ describe('predictionAutoSelect', () => {
         p: .2
       },
       totalProb: .2,
-      matchLevel: SuggestionSimilarity.sameKey
+      metadata: { ...defaultMetadata, matchLevel: SuggestionSimilarity.sameKey }
     };
 
     const predictions: CorrectionPredictionTuple[] = [
@@ -518,7 +551,7 @@ describe('predictionAutoSelect', () => {
           p: .8
         },
         totalProb: .8,
-        matchLevel: SuggestionSimilarity.none
+        metadata: { ...defaultMetadata, matchLevel: SuggestionSimilarity.none, predictionLength: 3 }
       }
     ];
 
@@ -534,7 +567,7 @@ describe('predictionAutoSelect', () => {
   // The idea:  avoid "over-correcting" when a potential correction has a
   // super-high-frequency word.
   it('does not auto-select suggestion if its root correction is not most likely', () => {
-    const keepSuggestion: CorrectionPredictionTuple = {
+    const keepSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'thi',
         p: .7
@@ -551,10 +584,11 @@ describe('predictionAutoSelect', () => {
         },
         p: .05
       },
-      totalProb: .035
+      totalProb: .035,
+      metadata: {...defaultMetadata}
     }
 
-    const highestCorrectionSuggestion: CorrectionPredictionTuple = {
+    const highestCorrectionSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'thi',
         p: .7
@@ -569,10 +603,11 @@ describe('predictionAutoSelect', () => {
         },
         p: .1
       },
-      totalProb: .07
+      totalProb: .07,
+      metadata: {...defaultMetadata}
     };
 
-    const highestNonKeepSuggestion: CorrectionPredictionTuple = {
+    const highestNonKeepSuggestion: CorrectionPredictionTuple= {
       correction: {
         sample: 'the',
         p: .3
@@ -587,7 +622,8 @@ describe('predictionAutoSelect', () => {
         },
         p: 1
       },
-      totalProb: .3
+      totalProb: .3,
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CorrectionPredictionTuple[] = [

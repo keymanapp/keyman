@@ -164,6 +164,15 @@ export function translateLayerAttrToModifier(layer: LDMLKeyboard.LKLayer) : numb
   return modifiers.split(',').map(m => translateModifierSubsetToLayer(m)).sort();
 }
 
+export function modifiersToString(modifiers: number) : string {
+  if (!modifiers) return 'none';
+  const result: string[] = [];
+  for(const mod of constants.keys_mod_map) {
+    if(mod[1] != constants.keys_mod_none && modifiers & mod[1]) result.push(mod[0]);
+  }
+  return result.join(' ');
+}
+
 function translateModifierSubsetToLayer(modifiers: string) : number {
   // TODO-LDML: Default #11072
   if (modifiers) {
@@ -186,7 +195,7 @@ function translateModifierSubsetToLayer(modifiers: string) : number {
  * @returns true if valid
  */
 export function validModifier(modifier?: string) : boolean {
-  if (!modifier) return true;  // valid to have no modifier, == none
+  if (!modifier) return false;  // hardware layer must have a modifier
   // TODO-LDML: enforce illegal combinations per spec.
   for (const sub of modifier.trim().split(',')) {
     for (const str of sub.trim().split(' ')) {

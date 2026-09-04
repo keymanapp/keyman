@@ -5,7 +5,14 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { deepCopy } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { CorrectionPredictionTuple, models, processSimilarity, SuggestionSimilarity, toAnnotatedSuggestion } from "@keymanapp/lm-worker/test-index";
+import {
+  CorrectionPredictionTuple,
+  models,
+  PredictionMetadata,
+  processSimilarity,
+  SuggestionSimilarity,
+  toAnnotatedSuggestion
+} from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -109,6 +116,13 @@ const testModelWithCasing = new DummyModel({
  * @returns
  */
 const build_its_is_set = () => {
+  const metadata: PredictionMetadata = {
+    matchLevel: SuggestionSimilarity.none,
+    preservationTransform: undefined,
+    rawEditCount: 0, // does not matter for these tests
+    predictionLength: 0 // does not matter for these tests
+  };
+
   const its: CorrectionPredictionTuple = {
     correction: {
       sample: 'its',
@@ -124,8 +138,8 @@ const build_its_is_set = () => {
       },
       p: 0.2
     },
-    totalProb: 0.16
-    // matchLevel does not yet exist.
+    totalProb: 0.16,
+    metadata: {...metadata}
   };
 
   const it_is: CorrectionPredictionTuple = {
@@ -143,7 +157,8 @@ const build_its_is_set = () => {
       },
       p: 0.8
     },
-    totalProb: 0.64
+    totalProb: 0.64,
+    metadata: {...metadata}
   };
 
   const is: CorrectionPredictionTuple = {
@@ -161,7 +176,8 @@ const build_its_is_set = () => {
       },
       p: 0.5
     },
-    totalProb: 0.1
+    totalProb: 0.1,
+    metadata: {...metadata}
   };
 
   const is_not: CorrectionPredictionTuple = {
@@ -179,7 +195,8 @@ const build_its_is_set = () => {
       },
       p: 0.5
     },
-    totalProb: 0.1
+    totalProb: 0.1,
+    metadata: {...metadata}
   };
 
   return {
@@ -213,16 +230,16 @@ describe('processSimilarity', () => {
     const expectation: CorrectionPredictionTuple[] = [
       {
         ...testSet.its,
-        matchLevel: SuggestionSimilarity.exact
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.exact }
       }, {
         ...testSet.it_is,
-        matchLevel: SuggestionSimilarity.sameKey
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameKey }
       }, {
         ...testSet.is,
-        matchLevel: SuggestionSimilarity.none
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
       }, {
         ...testSet.is_not,
-        matchLevel: SuggestionSimilarity.none
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
       }
     ];
 
@@ -260,16 +277,16 @@ describe('processSimilarity', () => {
     const expectation: CorrectionPredictionTuple[] = [
       {
         ...testSet.its,
-        matchLevel: SuggestionSimilarity.sameKey
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameKey }
       }, {
         ...testSet.it_is,
-        matchLevel: SuggestionSimilarity.exact
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.exact }
       }, {
         ...testSet.is,
-        matchLevel: SuggestionSimilarity.none
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
       }, {
         ...testSet.is_not,
-        matchLevel: SuggestionSimilarity.none
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
       }
     ];
 
@@ -324,17 +341,17 @@ describe('processSimilarity', () => {
       const expectation: CorrectionPredictionTuple[] = [
         {
           ...testSet.its,
-          matchLevel: SuggestionSimilarity.sameKey
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameKey }
         }, {
           ...testSet.it_is,
           // case mismatch, detectable because we have access to a lowercasing/uppercasing function.
-          matchLevel: SuggestionSimilarity.sameText
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameText }
         }, {
           ...testSet.is,
-          matchLevel: SuggestionSimilarity.none
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }, {
           ...testSet.is_not,
-          matchLevel: SuggestionSimilarity.none
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }
       ];
 
@@ -378,17 +395,17 @@ describe('processSimilarity', () => {
       const expectation: CorrectionPredictionTuple[] = [
         {
           ...testSet.its,
-          matchLevel: SuggestionSimilarity.none
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }, {
           ...testSet.it_is,
           // case mismatch, detectable because we have access to a lowercasing/uppercasing function.
-          matchLevel: SuggestionSimilarity.none
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }, {
           ...testSet.is,
-          matchLevel: SuggestionSimilarity.none
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }, {
           ...testSet.is_not,
-          matchLevel: SuggestionSimilarity.none
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
         }
       ];
 

@@ -1,0 +1,9 @@
+store(&NAME) 'warn_deprecated_statement-clearcontext-19'
+store(&VERSION) '19.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+c NOTE: using `clearcontext` SHOULD generate a warning in v19 target version compile (unlike v17 target version)
++ 'x' > clearcontext

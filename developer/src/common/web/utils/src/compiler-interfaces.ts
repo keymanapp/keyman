@@ -59,7 +59,7 @@ export enum CompilerErrorMask {
   Severity =  0x00F00000,  // includes reserved bits, 16 possible severity levels
   Error =     0x000FFFFF,  // error | namespace
   Namespace = 0x000FF000,  // 256 possible namespaces
-  BaseError = 0x00000FFF,  // error code, 2,048 possible error codes per namespace
+  BaseError = 0x00000FFF,  // error code, 4,096 possible error codes per namespace
   Reserved  = 0xFF000000,  // do not use these error values at this time
 };
 
@@ -313,6 +313,10 @@ export enum CompilerErrorNamespace {
    * kmc-copy 0xB000…0xBFFF
    */
   Copier = 0xB000,
+  /**
+   * kmc-convert 0xC000…0xCFFF
+   */
+  Converter = 0xC000,
 };
 
 type CompilerErrorSeverityOverride = CompilerErrorSeverity | 'disable';

@@ -45,6 +45,9 @@ $(function() {
       $('#selPlatformPresentation').val(lastPresentation);
       builder.selPlatformPresentationChange();
     }
+
+    var json = JSON.stringify(KVKL, null, '  ');
+    builder.saveJSON(json, true);
   }
 
   this.saveUndo = function (saveToRedo) {

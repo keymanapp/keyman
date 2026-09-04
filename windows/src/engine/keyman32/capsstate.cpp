@@ -29,3 +29,21 @@
 BOOL IsCapsLockOn(void) {
   return GetKeyState(VK_CAPITAL) & 1;
 }
+
+/**
+ * Resync the Caps Lock and Num Lock state cache.
+ * 
+ * Use when state may be stale after focus changes or when the toggle keys
+ * changed while this Keyman engine instance was not processing key events.
+ */
+void RefreshToggleState(void) {
+  DWORD previousShiftState = Globals::get_ShiftState();
+
+  if (GetKeyState(VK_CAPITAL) & 1) *Globals::ShiftState() |= CAPITALFLAG;
+  else *Globals::ShiftState() &= ~CAPITALFLAG;
+
+  if (GetKeyState(VK_NUMLOCK) & 1) *Globals::ShiftState() |= NUMLOCKFLAG;
+  else *Globals::ShiftState() &= ~NUMLOCKFLAG;
+
+  SendDebugMessageFormat("Enter: %x Exit: %x", previousShiftState, Globals::get_ShiftState());
+}

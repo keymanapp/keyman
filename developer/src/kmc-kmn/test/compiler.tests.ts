@@ -1,10 +1,15 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
 import 'mocha';
 import { assert } from 'chai';
-import { KmnCompiler } from '../src/main.js';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+import { KmxFileReader } from '@keymanapp/common-types';
+import { compileTestKeyboard } from './helpers/index.js';
+import { KmnCompiler } from '../src/main.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
 const keyboardsDir = __dirname + '/../../../../../common/test/keyboards/';
@@ -12,6 +17,16 @@ const baselineDir = keyboardsDir + 'baseline/';
 
 describe('Compiler class', function() {
   const callbacks = new TestCompilerCallbacks(this);
+
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest?.isFailed()) {
+      callbacks.printMessages();
+    }
+  });
 
   it('should throw on failure', async function() {
     const compiler = new KmnCompiler();
@@ -127,6 +142,22 @@ describe('Compiler class', function() {
     const kvkFixtureData = fs.readFileSync(kvkFixture);
     assert.equal(kvkData.byteLength, kvkFixtureData.byteLength);
     assert.deepEqual(kvkData, kvkFixtureData);
+  });
+
+  it('should trim all whitespace for `&targets` store', async function() {
+    const result = await compileTestKeyboard(callbacks, ['keyboards', 'targets-with-whitespace.kmn']);
+    assert.isNotNull(result);
+
+    // Verify implictly that `&targets` store was interpreted correctly as 'any'
+    // because the compiler generated both JS and KMX targets (#13721)
+    assert.isNotNull(result.artifacts.js);
+    assert.isNotNull(result.artifacts.kmx);
+
+    // Then verify directly that the `&targets` store was trimmed by looking at
+    // the final value in the kmx data
+    const reader = new KmxFileReader();
+    const keyboard = reader.read(result.artifacts.kmx.data);
+    assert.equal(keyboard.targets, 'any');
   });
 
 });

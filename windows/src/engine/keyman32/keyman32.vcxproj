@@ -1156,7 +1156,7 @@
     <ClInclude Include="KBD.H" />
     <ClInclude Include="keyboardoptions.h" />
     <ClInclude Include="keyman64.h" />
-    <ClInclude Include="keymancontrol.h" />
+    <ClInclude Include="..\..\..\include\keymancontrol.h" />
     <ClInclude Include="keyman-debug-etw.h" />
     <ClInclude Include="keyeventsenderthread.h" />
     <ClInclude Include="keystate.h" />

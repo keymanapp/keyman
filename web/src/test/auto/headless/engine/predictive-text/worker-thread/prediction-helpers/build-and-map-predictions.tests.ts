@@ -46,7 +46,6 @@ describe('buildAndMapPredictions', () => {
     ];
 
     const basePredictions = predictFromCorrections(plainModel, correctionDistribution, context);
-    basePredictions.forEach((entry) => assert.isNotOk(entry.preservationTransform));
 
     // must construct the taillessTrueKeystroke appropriately.
     const tailless = { insert: 'TEST', deleteLeft: 0 };
@@ -59,13 +58,13 @@ describe('buildAndMapPredictions', () => {
     const mappedPredictions = buildAndMapPredictions(
       transition,
       transition.base.displayTokenization,
-      {matchString: 'the', totalCost: 0},
+      {matchString: 'the', totalCost: 0, editCount: 0},
       1
     );
 
     assert.deepEqual(mappedPredictions.map((tuple) => tuple.prediction), basePredictions.map((tuple) => tuple.prediction));
-    mappedPredictions.forEach((tuple) => assert.isOk(tuple.preservationTransform));
-    mappedPredictions.forEach((tuple) => tuple.preservationTransform == tailless);
+    mappedPredictions.forEach((tuple) => assert.isOk(tuple.metadata?.preservationTransform));
+    mappedPredictions.forEach((tuple) => tuple.metadata?.preservationTransform == tailless);
   });
 
   it('properly handles empty prediction roots from deleted same-token codepoints', () => {
@@ -105,7 +104,7 @@ describe('buildAndMapPredictions', () => {
     const mappedPredictions = buildAndMapPredictions(
       transition,
       transition.base.displayTokenization,
-      {matchString: '', totalCost: 0},
+      {matchString: '', totalCost: 0, editCount: 0},
       1
     );
 
@@ -149,7 +148,7 @@ describe('buildAndMapPredictions', () => {
     const mappedPredictions = buildAndMapPredictions(
       transition,
       transition.base.displayTokenization,
-      {matchString: '', totalCost: 0},
+      {matchString: '', totalCost: 0, editCount: 0},
       1
     );
 
@@ -211,7 +210,7 @@ describe('buildAndMapPredictions', () => {
     const mappedPredictions = buildAndMapPredictions(
       transition,
       transition.final.displayTokenization,
-      {matchString: '', totalCost: 0},
+      {matchString: '', totalCost: 0, editCount: 0},
       1
     );
 

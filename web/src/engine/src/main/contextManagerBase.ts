@@ -327,7 +327,8 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
 
     if(!requestedStub) {
       if(keyboardId) {
-        throw new Error("No matching stub has been registered.");
+        const availableStubList = this.keyboardCache.getStubList().map(stub => `${stub.KI}@${stub.KLC}`);
+        throw new Error(`No matching stub has been registered for keyboard ${keyboardId}.  Available stubs: ${JSON.stringify(availableStubList)}`);
       } else {
         return {
           keyboard: Promise.resolve(null),
@@ -367,7 +368,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
 
         const keyboardPromise = this.keyboardCache.fetchKeyboard(requestedStub.KI);
         const timeoutPromise = new Promise<Keyboard>((resolve, reject) => {
-          const timeoutMsg = `Sorry, the ${requestedStub.name} keyboard for ${requestedStub.langName} is not currently available.`;
+          const timeoutMsg = `Download of ${requestedStub.KI} for language ${requestedStub.langId} timed out.`;
           window.setTimeout(() => reject(new Error(timeoutMsg)), ContextManagerBase.TIMEOUT_THRESHOLD);
         });
 

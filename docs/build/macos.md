@@ -41,9 +41,8 @@ Rosetta 2 installed.
 
 Many dependencies are only required for specific projects.
 
-* XCode (iOS, macOS) 12.4 or later is needed only for Keyman for macOS and Keyman
-  for iOS.
-  (Be sure to install XCode 26.2 or 26.3 maximum as they use clang 17.0 . Higher versions of XCode use Clang 21.0 which may not work)
+* XCode (iOS, macOS) 26.2 or 26.3 (not higher at this time, see #16416) 
+  is needed only for Keyman for macOS and Keyman for iOS ().
 
   * Install from App Store
   * Accept the Xcode license: `sudo xcodebuild -license accept`
@@ -109,7 +108,7 @@ PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
 
 ## KeymanWeb Dependencies
 
-* node.js, emscripten 3.1.46 or later
+* node.js 20.0, emscripten 3.1.64
 
 ### node.js
 
@@ -131,8 +130,8 @@ To install emscripten, `cd` to an appropriate path, and then:
 ```bash
 git clone https://github.com/emscripten-core/emsdk
 cd emsdk
-emsdk install 3.1.58
-emsdk activate 3.1.58
+./emsdk install 3.1.64
+./emsdk activate 3.1.64
 cd upstream/emscripten
 npm install
 export EMSCRIPTEN_BASE="$(pwd)"
@@ -145,7 +144,8 @@ If you are updating an existing install of Emscripten:
 cd emsdk
 git pull
 emsdk install 3.1.58
-emsdk activate 3.1.58
+./emsdk install 3.1.64
+./emsdk activate 3.1.64
 cd upstream/emscripten
 npm install
 ```
@@ -208,7 +208,9 @@ components such as emulator images and SDK updates.
 
 ```shell
 brew install node emscripten
-```
+* node.js 20.0, emscripten 3.1.64
+
+See section KeymanWeb Dependencies for installation
 
 ## Optional Tools
 

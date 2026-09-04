@@ -13,6 +13,7 @@ import {
 import { BrowserConfiguration } from './configuration.js';
 import { FocusAssistant } from './context/focusAssistant.js';
 
+export const KeyboardCookieName = 'KeymanWeb_Keyboard';
 export interface KeyboardCookie {
   current: string;
 }
@@ -46,7 +47,7 @@ function setTargetTextDirection(elem: HTMLElement, activeKeyboard: Keyboard): vo
 
 export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   private _activeKeyboard: KeyboardInfoPair;
-  private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
+  private cookieManager = new CookieSerializer<KeyboardCookie>(KeyboardCookieName);
   readonly focusAssistant = new FocusAssistant(() => this.activeTextStore?.isForcingScroll());
   readonly page: PageContextAttachment;
   private mostRecentTextStore: AbstractElementTextStore<any>;
@@ -531,8 +532,8 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
 
       this.engineConfig.alertHost?.wait(); // clear the wait message box, either way.
 
-      const message = (err as Error)?.message ||
-                      'Sorry, the ' + keyboardId + ' keyboard for ' + languageCode + ' is not currently available.';
+
+      const message = `Activation of '${keyboardId}' failed: ${(err as Error)?.message ?? err?.toString() ?? 'unknown error'}`;
 
       if(err instanceof KeyboardScriptError) {
         // We get signaled about error log messages if the site is connected to our Sentry error reporting
@@ -748,8 +749,8 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
    * Gets the 'saved keyboard' cookie value for the last keyboard used in the
    * iser's previous session.
    **/
-  public getSavedKeyboardRaw(): string {
-    const cookie = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
+  public getSavedKeyboardRaw(): string | null {
+    const cookie = new CookieSerializer<KeyboardCookie>(KeyboardCookieName);
     const v = cookie.load(decodeURIComponent);
 
     if(typeof(v.current) != 'string') {

@@ -7,7 +7,7 @@
   </keys>
 
   <layers formId="iso">
-    <layer id="base" modifiers="none">
+    <layer modifiers="none">
       <row keys="a" />
     </layer>
     <layer modifiers="altR, ctrl shift">
