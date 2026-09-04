@@ -224,7 +224,7 @@ import OSLog
   fileprivate init() async throws {
     try packageRepo = PackageRepository()
     self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
-    source = try packageRepo.readPackage(kmpFileUrl: self.kmpUrl)
+    source = try packageRepo.readPackageFromJson(kmpJsonFileUrl: self.kmpUrl)
   }
   
   @Test("Read package name") func readPackageName() async throws {
@@ -265,7 +265,7 @@ import OSLog
     fileprivate init() async throws {
       try packageRepo = PackageRepository()
       self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
-      self.packageSource = try packageRepo.readPackage(kmpFileUrl: self.kmpUrl)
+      self.packageSource = try packageRepo.readPackageFromJson(kmpJsonFileUrl: self.kmpUrl)
     }
 
     @Test("Check keyboard is disabled") func checkKeyboardDisabled() async throws {

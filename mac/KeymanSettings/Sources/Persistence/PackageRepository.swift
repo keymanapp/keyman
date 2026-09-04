@@ -100,7 +100,8 @@ public enum LoadPackageError: LocalizedError {
 }
 
 public class PackageRepository: PackageRepo {
-  fileprivate let packageFileName = "kmp.json"
+  fileprivate let packageJsonFilename = "kmp.json"
+  fileprivate let packageInfFilename = "kmp.inf"
   fileprivate let pathUtil: KeymanPaths
   
   public init() throws {
@@ -128,7 +129,7 @@ public class PackageRepository: PackageRepo {
         LogUtil.errorBreadcrumb("validation failed for \(url.lastPathComponent) with error: \(error as NSError)", category: .data)
       }
     }
-
+    
     return installedPackages
   }
   
@@ -140,14 +141,14 @@ public class PackageRepository: PackageRepo {
   public func loadSinglePackage(packageUrl: URL) throws -> KeymanPackage {
     Logger.data.info("loadSinglePackage from url: \(packageUrl.cleanUrlPath(), privacy: .public)")
     LogUtil.infoBreadcrumb("loadSinglePackage from url: \(packageUrl.cleanUrlPath())", category: .data)
-
+    
     guard let source =  try readPackageFromDirectory(packageDirectoryUrl: packageUrl) else { throw LoadPackageError.invalidUrl }
-      
+    
     let package = KeymanPackage(packageUrl: packageUrl, packageSource: source)
     try package.validate()
     return package
   }
-
+  
   /**
    * delete the package from disk
    */
@@ -171,7 +172,7 @@ public class PackageRepository: PackageRepo {
   public func createKeyman19SharedDataDirectoriesIfNeeded() throws {
     let packageDirectory = pathUtil.keyman19PackagesDirectory
     let packageTempDirectory = pathUtil.keyman19TempDirectory
-
+    
     // create the keyman-packages directory if it doesn't already exist
     if !FileManager.default.fileExists(atPath: packageDirectory.path(percentEncoded: false)) {
       try FileManager.default.createDirectory(at: packageDirectory, withIntermediateDirectories: true, attributes: nil)
@@ -181,7 +182,7 @@ public class PackageRepository: PackageRepo {
       Logger.data.info("Directory already exists: \(packageDirectory.cleanUrlPath(), privacy: .public)")
       LogUtil.infoBreadcrumb("Directory already exists: \(packageDirectory.cleanUrlPath())", category: .data)
     }
-
+    
     // create the temp directory if it doesn't already exist
     if !FileManager.default.fileExists(atPath: packageTempDirectory.path(percentEncoded: false)) {
       try FileManager.default.createDirectory(at: packageTempDirectory, withIntermediateDirectories: true, attributes: nil)
@@ -217,14 +218,14 @@ public class PackageRepository: PackageRepo {
       LogUtil.errorBreadcrumb("error clearing temp directory: \(error as NSError)", category: .data)
     }
   }
-
+  
   /**
    * get the url to where the specified kmp file should be downloaded
    */
   public func getDownloadUrl(for kmpFilename: String) -> URL {
     return self.pathUtil.keyman19TempDirectory.appendingPathComponent(kmpFilename)
   }
-
+  
   /**
    * get the url to where the specified package should initially be unzipped
    */
@@ -238,7 +239,7 @@ public class PackageRepository: PackageRepo {
   public func buildInstallationUrlForPackageName(directoryName: String) -> URL {
     return self.pathUtil.keyman19PackagesDirectory.appendingPathComponent(directoryName)
   }
-
+  
   /**
    * install keyboard at specified URL
    */
@@ -253,7 +254,7 @@ public class PackageRepository: PackageRepo {
       throw LoadPackageError.unzipError
     }
   }
-
+  
   /**
    * Check to see whether the shared Keyman data directory exists under 'Library/Group Containers/'
    */
@@ -321,15 +322,28 @@ public class PackageRepository: PackageRepo {
     Logger.data.info("readPackageFromDirectory from url: \(packageDirectoryUrl.cleanUrlPath(), privacy: .public)")
     LogUtil.infoBreadcrumb("readPackageFromDirectory from url: \(packageDirectoryUrl.cleanUrlPath())", category: .data)
     var packageSource: PackageSource? = nil
-    let kmpJsonFileUrl = packageDirectoryUrl.appendingPathComponent(packageFileName)
+    let kmpJsonFileUrl = packageDirectoryUrl.appendingPathComponent(packageJsonFilename)
+    let kmpInfFileUrl = packageDirectoryUrl.appendingPathComponent(packageInfFilename)
     
-    if !FileManager.default.fileExists(atPath: kmpJsonFileUrl.path(percentEncoded: false)) {
-      throw LoadPackageError.kmpJsonFileNotFound
-    }
-    
-    // if an error occurs, it will be propagated to caller
-    if let source = try readPackage(kmpFileUrl: kmpJsonFileUrl) {
-      packageSource = source
+    if FileManager.default.fileExists(atPath: kmpJsonFileUrl.path(percentEncoded: false)) {
+      // if an error occurs, it will be propagated to caller
+      if let source = try readPackageFromJson(kmpJsonFileUrl: kmpJsonFileUrl) {
+        packageSource = source
+      }
+    } else {
+      // if no kmp.json file, look for kmp.info instead
+      if FileManager.default.fileExists(atPath: kmpInfFileUrl.path(percentEncoded: false)) {
+        Logger.data.info("fallback to kmp.inf file at: \(kmpInfFileUrl.cleanUrlPath(), privacy: .public)")
+        LogUtil.infoBreadcrumb("fallback to kmp.inf file at: \(kmpInfFileUrl.cleanUrlPath())", category: .data)
+        
+        if let source = try readPackageFromInf(kmpInfFileUrl: kmpInfFileUrl) {
+          packageSource = source
+        }
+      } else {
+        // no kmp.json and no kmp.inf, so throw error
+        // the error designates only kmp.json missing as kmp.inf is a fallback
+        throw LoadPackageError.kmpJsonFileNotFound
+      }
     }
     
     return packageSource
@@ -338,10 +352,10 @@ public class PackageRepository: PackageRepo {
   /**
    * read and parse the kmp.json file at the specified URL
    */
-  func readPackage(kmpFileUrl: URL) throws -> PackageSource? {
+  func readPackageFromJson(kmpJsonFileUrl: URL) throws -> PackageSource? {
     var packageSource: PackageSource?
     do {
-      let jsonData = try Data(contentsOf: kmpFileUrl, options: .mappedIfSafe)
+      let jsonData = try Data(contentsOf: kmpJsonFileUrl, options: .mappedIfSafe)
       packageSource = try JSONDecoder().decode(PackageSource.self, from: jsonData)
       
     } catch let error as LoadPackageError {
@@ -353,6 +367,25 @@ public class PackageRepository: PackageRepo {
       LogUtil.errorBreadcrumb("readPackage error: \(error as NSError)", category: .data)
       throw LoadPackageError.kmpJsonFileUnreadable
     }
+    return packageSource
+  }
+  
+  /**
+   * read and parse the kmp.json file at the specified URL
+   */
+  func readPackageFromInf(kmpInfFileUrl: URL) throws -> PackageSource? {
+    var packageSource: PackageSource? = nil
+    
+    do {
+      let packageReader = KMPackageReader(url: kmpInfFileUrl)
+      if let packageInfo = try packageReader.loadPackageInfoFromInfFile() {
+        print("successfully read package: \(String(describing: packageInfo.packageName))")
+      }
+    } catch {
+      print("failed to read kmp.inf file, error: \(error)")
+      return nil
+    }
+    
     return packageSource
   }
 }
