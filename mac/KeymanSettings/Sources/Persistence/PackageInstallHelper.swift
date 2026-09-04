@@ -21,14 +21,30 @@ public enum PackageInstallationType {
   
   public var prompt: LocalizedStringResource {
     switch self {
-    case .newPackage(let packageName):               
-      return "The package '\(packageName)' is ready to install"
+    case .newPackage(let packageName):
+      return LocalizedStringResource(
+        "prompt.new.package",
+        defaultValue: "The package '\(packageName)' is ready to install",
+        bundle: .atURL(Bundle.module.bundleURL)
+      )
     case .replaceSameVersionPackage(let packageName):
-      return "The package '\(packageName)' is ready to re-install"
+      return LocalizedStringResource(
+        "prompt.replace.same.version.package",
+        defaultValue: "The package '\(packageName)' is ready to re-install",
+        bundle: .atURL(Bundle.module.bundleURL)
+      )
     case .replaceOlderPackage(let packageName, let existingVersion, let newVersion):
-      return "The package '\(packageName)' is ready to update from version \(existingVersion) to \(newVersion)"
+      return LocalizedStringResource(
+        "prompt.replace.older.package",
+        defaultValue: "The package '\(packageName)' is ready to update from version \(existingVersion) to \(newVersion)",
+        bundle: .atURL(Bundle.module.bundleURL)
+      )
     case .replaceNewerPackage(let packageName, let existingVersion, let newVersion):
-      return "The package '\(packageName)' is ready to downgrade from version \(existingVersion) to \(newVersion)"
+      return LocalizedStringResource(
+        "prompt.replace.newer.package",
+        defaultValue: "The package '\(packageName)' is ready to downgrade from version \(existingVersion) to \(newVersion)",
+        bundle: .atURL(Bundle.module.bundleURL)
+      )
     }
   }
 }

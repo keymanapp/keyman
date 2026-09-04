@@ -1,0 +1,237 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "contains.no.files" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The keyboard package contains no files."
+          }
+        }
+      }
+    },
+    "contains.no.keyboards" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The keyboard package contains no keyboards."
+          }
+        }
+      }
+    },
+    "could.not.unzip" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The keyboard package could not be unzipped."
+          }
+        }
+      }
+    },
+    "error.internal" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "An internal error occurred."
+          }
+        }
+      }
+    },
+    "exceeded.file.drop.limit" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Only a single .KMP file can be installed at a time."
+          }
+        }
+      }
+    },
+    "font.copy.error" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "There was an error copying the font."
+          }
+        }
+      }
+    },
+    "font.registration.error" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "There was an error registering the font."
+          }
+        }
+      }
+    },
+    "installation.in.progress" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A package installation is already in progress."
+          }
+        }
+      }
+    },
+    "insufficient.keyman.version" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The keyboard package '%1$@' requires Keyman version %2$@ but your version is %3$@."
+          }
+        }
+      }
+    },
+    "invalid.url" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The URL is not valid."
+          }
+        }
+      }
+    },
+    "keyboard.id.missing" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A keyboard in the package has no ID."
+          }
+        }
+      }
+    },
+    "keyboard.missing.kmx.file" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A keyboard in the package has no corresponding .KMX file."
+          }
+        }
+      }
+    },
+    "keyboard.missing.version" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A keyboard in the package has no version."
+          }
+        }
+      }
+    },
+    "keyboard.name.missing" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A keyboard in the package has no name."
+          }
+        }
+      }
+    },
+    "kmp.json.not.found" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The package's kmp.json file was not found."
+          }
+        }
+      }
+    },
+    "kmp.json.unreadable" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The package's kmp.json file could not be parsed."
+          }
+        }
+      }
+    },
+    "non.kmp.file" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The file %@ is not a .KMP file."
+          }
+        }
+      }
+    },
+    "prompt.new.package" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The package '%@' is ready to install"
+          }
+        }
+      }
+    },
+    "prompt.replace.newer.package" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The package '%1$@' is ready to downgrade from version %2$@ to %3$@"
+          }
+        }
+      }
+    },
+    "prompt.replace.older.package" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The package '%1$@' is ready to update from version %2$@ to %3$@"
+          }
+        }
+      }
+    },
+    "prompt.replace.same.version.package" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The package '%@' is ready to re-install"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.2"
+}

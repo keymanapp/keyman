@@ -24,7 +24,7 @@ import OSLog
 public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelegate, WKDownloadDelegate {
   @Published var isDownloading = false
   // progress is between 0.0 and 1.0
-  @Published var downloadProgress: Double = 0.0
+  @Published var downloadProgressFraction: Double = 0.0
   
   @Published var showConfirmPackageSheet = false
   @Published var installHelper: PackageInstallHelper?
@@ -100,13 +100,13 @@ public class DownloadCoordinator: NSObject, ObservableObject, WKNavigationDelega
     
     // reset progress states
     self.isDownloading = true
-    self.downloadProgress = 0.0
+    self.downloadProgressFraction = 0.0
     
     progressObserver = download.progress.observe(\.fractionCompleted, options: [.new]) { [weak self] _, change in
       guard let newValue = change.newValue else { return }
       
       Task { @MainActor [weak self] in
-        self?.downloadProgress = newValue
+        self?.downloadProgressFraction = newValue
       }
     }
   }
