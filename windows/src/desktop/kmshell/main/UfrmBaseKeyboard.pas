@@ -11,13 +11,14 @@ type
   TfrmBaseKeyboard = class(TfrmWebContainer)
     procedure TntFormCreate(Sender: TObject);
   private
+    FBaseKeyboardID: Integer;
     procedure Footer_Cancel;
     procedure Footer_OK(params: TStringList);
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
   end;
 
-function ConfigureBaseKeyboard: Boolean;
+function ConfigureBaseKeyboard(out BaseKeyboardID: Integer): Boolean;
 
 implementation
 
@@ -25,15 +26,19 @@ implementation
 
 uses
   BaseKeyboards,
-  kmint;
+  ErrorControlledRegistry,
+  RegistryKeys,
+  keymanapi_TLB,
+  kmint,
+  utilkmshell;
 
-function ConfigureBaseKeyboard: Boolean;
+function ConfigureBaseKeyboard(out BaseKeyboardID: Integer): Boolean;
 begin
   with TfrmBaseKeyboard.Create(nil) do
   try
     Result := ShowModal = mrOk;
     if Result then
-      kmcom.Apply;
+      BaseKeyboardID := FBaseKeyboardID;
   finally
     Free;
   end;
@@ -65,9 +70,9 @@ var
   v: Integer;
 begin
   if not TryStrToInt('$'+params.Values['id'], v) then Exit;
-  kmcom.Options['koBaseLayout'].Value := v;
-  kmcom.Options.Apply;
+  FBaseKeyboardID := v;
   ModalResult := mrOk;
 end;
+
 
 end.

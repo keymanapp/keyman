@@ -125,6 +125,7 @@ var
   FExitCode: Integer;
   FKVKName: WideString;
   FCreatedIcon: Boolean;
+  BaseKeyboardID: Integer;
 begin
   KL.MethodEnter(Self, 'Execute', [FileName,PackageID,ikPartOfPackage in FInstallOptions ,Force]);
   try
@@ -248,11 +249,13 @@ begin
       // Recompile a mnemonic layout to the user's selected base layout
       if ki.MnemonicLayout then   // I4169
       begin
+        with Context as TKeymanContext do
+          BaseKeyboardID := (Options as IKeymanOptions).Items['koBaseLayout'].Value;
         with TKPRecompileMnemonicKeyboard.Create(Context) do
         try
-          Execute(FDestFileName, PackageID);
+          Execute(FDestFileName, PackageID, BaseKeyboardID);
         finally
-          Free;
+          RecompileMnemonicKeyboard.Free;
         end;
       end;
     finally
