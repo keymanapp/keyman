@@ -49,7 +49,7 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
     this.leftDeleteLength = inputSample.deleteLeft;
 
     // Link to the grandparent node if it exists; transposes start construction rooted there.
-    const grandparentNode = this.parents[0].parents[0]
+    const grandparentNode = this.parents[0].parents[0];
     if(grandparentNode) {
       this.incomingTransposeRootNodes = [...grandparentNode.previousResults];
       this.linkAndQueueFromParent(grandparentNode, this.incomingTransposeRootNodes);
