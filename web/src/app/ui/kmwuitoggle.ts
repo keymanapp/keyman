@@ -258,7 +258,7 @@ if(!keyman) {
        *                             // and the like are defined on individual instances later.
        *                             // It thinks they're always null.
        **/
-      button(_src: string, _caption: string, _selected: boolean) {
+      private button(_src: string, _caption: string, _selected: boolean) {
         /**
          * Only ui.controllerHovered is referenced here:  it'd be easy enough to toggle it via closure
          * and extract this inner class into its own definition outside of `class ToggleUI`.
@@ -401,11 +401,9 @@ if(!keyman) {
       };
 
       /**
-       * Function     Initialize
-       * Scope        Private
-       * Description  Initialize Toggle User Interface
+       * Initialize Toggle User Interface
        **/
-      initialize() {
+      public initialize() {
         //Never initialize before KMW!
         if(!keyman.initialized || util.isTouchDevice()) {
           return;
@@ -482,12 +480,10 @@ if(!keyman) {
       }
 
       /**
-       * Function     updateKeyboardList
-       * Scope        Private
-       * Description  Rebuild the UI and keyboard list
+       * Rebuild the UI and keyboard list
        **/
-      readonly updateKeyboardList = () => {
-        if(!(keyman.initialized || this.initialized)) {
+      public readonly updateKeyboardList = () => {
+        if (!(keyman.initialized || this.initialized)) {
           return; //TODO: may want to restart the timer??
         }
 
@@ -562,10 +558,9 @@ if(!keyman) {
       //  var  _SelectedMenuItem;
 
       /**
-       * Function     selecKbd
-       * Scope        Private
+       * Select a keyboard from the drop down menu
+       *
        * @param       {number}  kbdIndex
-       * Description  Select a keyboard from the drop down menu
        **/
       private async selectKbd(kbdIndex: number): Promise<boolean> {
         let name: string, languageCode: string;
@@ -588,13 +583,12 @@ if(!keyman) {
       };
 
       /**
-       * Function     updateMenu
-       * Scope        Private
+       * Updates the menu selection when a change is required
+       *
        * @param       {string}    kbdName
        * @param       {?string=}  lgCode
-       * Description  Updates the menu selection when a change is required
        **/
-      updateMenu(kbdName: string, lgCode: string) {
+      public updateMenu(kbdName: string, lgCode: string) {
         let _k=document.getElementById('KMWSel_$');
 
         for(let i=0; i < this.keyboards.length; i++) {
@@ -629,7 +623,7 @@ if(!keyman) {
         }
       }
 
-      get stylingCSS() {
+      private get stylingCSS() {
         return `
 #KeymanWeb_KbdList {
   display: block;
@@ -713,11 +707,9 @@ if(!keyman) {
       }
 
       /**
-       * Function     createMenu
-       * Scope        Private
-       * Description  Create the drop down menu and populate with loaded KeymanWeb keyboards
+       * Create the drop down menu and populate with loaded KeymanWeb keyboards
        **/
-      createMenu() {
+      private createMenu() {
         if(typeof(this.keyboardMenu) == 'undefined') { // I2403 - Allow toggle design to be loaded twice
           this.keyboardMenu = util.createElement('ul');
           this.keyboardMenu.id='KeymanWeb_KbdList';
