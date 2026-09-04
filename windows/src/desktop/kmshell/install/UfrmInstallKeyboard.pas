@@ -312,7 +312,7 @@ begin
           t := TTempFileManager.Get('.log');
           BaseKeyboardString := IntToHex(kmcom.Options[KeymanOptionName(koBaseLayout)].Value, 8);
           try
-            ExecParams := '-log "'+t.Name+'" -bkd "'+BaseKeyboardString+'" -s -i "'+FInstallFile+'='+BCP47Tag+'"'+
+            ExecParams := '-log "'+t.Name+'" -bklid "'+BaseKeyboardString+'" -s -i "'+FInstallFile+'='+BCP47Tag+'"'+
               ' -nowelcome '+TTIPMaintenance.GetUserDefaultLangParameterString;
             KL.Log('Calling elevated kmshell %s', [ExecParams]);
             if WaitForElevatedConfiguration(GetForegroundWindow, ExecParams) = 0 then
