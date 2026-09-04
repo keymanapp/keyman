@@ -34,7 +34,7 @@ public class CheckPermissions {
       permissionsOK = Environment.isExternalStorageManager() ||
         checkPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
     }
-    // API 33+ needs no special permissions.
+    // API 33+ does not need any special permissions.
 
     return permissionsOK;
   }
