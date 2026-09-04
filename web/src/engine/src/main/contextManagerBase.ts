@@ -248,7 +248,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     const wasNull = !this.activeKeyboard;
 
     // If there was a previous activation attempt set and still active for the specified keyboard textStore,
-    // cancel it.  For exmaple, if the user selects a preloaded keyboard after having tried to select one
+    // cancel it.  For example, if the user selects a preloaded keyboard after having tried to select one
     // still async-loading, we should go with the later setting - the preloaded one.
     this.findAndPopActivation(this.currentKeyboardSrcTextStore());
 
@@ -322,7 +322,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     if(keyboardId) {
       requestedStub = this.keyboardCache.getStub(keyboardId, languageCode);
     } else {
-      languageCode == '';
+      languageCode = '';
     }
 
     if(!requestedStub) {
