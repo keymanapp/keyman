@@ -1,4 +1,4 @@
-unit Keyman.Configuration.Settings.BaseKeyboard;
+unit Keyman.Configuration.System.BaseKeyboard;
 
 interface
 
@@ -8,8 +8,7 @@ uses
   keymanapi_TLB;
 
 function SetBaseKeyboard(WindowHandle: THandle; BaseKeyboardID: Integer): Boolean;
-function MCompileBaseKeyboard(const BaseKeyboardIDText: string): Boolean;
-procedure CompileForBaseKeyboard(BaseKeyboardID: Integer);
+function MCompileBaseKeyboard(BaseKeyboardID: Integer): Boolean;
 
 implementation
 
@@ -47,7 +46,7 @@ begin
       WaitForElevatedConfiguration(WindowHandle, '-mcompilekbds ' + IntToHex(BaseKeyboardID, 8));
     end
     else
-      CompileForBaseKeyboard(BaseKeyboardID);
+      MCompileBaseKeyboard(BaseKeyboardID);
   end;
 
   kmcom.Options['koBaseLayout'].Value := BaseKeyboardID;
@@ -55,29 +54,21 @@ begin
   Result := True;
 end;
 
-function MCompileBaseKeyboard(const BaseKeyboardIDText: string): Boolean;
-var
-  BaseKeyboardID: Integer;
-begin
-  Result := False;
-  if not TryStrToInt('$' + BaseKeyboardIDText, BaseKeyboardID) or
-    not kmcom.SystemInfo.IsAdministrator then
-    Exit;
-  CompileForBaseKeyboard(BaseKeyboardID);
-  // TODO: sort out whether we need todo return a result
-  Result := True;
-end;
-
-procedure CompileForBaseKeyboard(BaseKeyboardID: Integer);
+function MCompileBaseKeyboard(BaseKeyboardID: Integer): Boolean;
 var
   i: Integer;
   kbd: IKeymanKeyboardInstalled;
 begin
+  Result := False;
+  // can be called from command line so test for admin
+  if not kmcom.SystemInfo.IsAdministrator then
+    Exit;
   for i := 0 to kmcom.Keyboards.Count - 1 do
   begin
     kbd := kmcom.Keyboards[i];
     (kbd as IKeymanKeyboardInstalled2).MCompileForBaseKeyboard(BaseKeyboardID);
   end;
+  Result := True;
 end;
 
 end.

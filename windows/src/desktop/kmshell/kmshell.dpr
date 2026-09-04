@@ -184,7 +184,7 @@ uses
   Keyman.System.ExecutionHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas',
   Keyman.Configuration.UI.UfrmStartInstall in 'main\Keyman.Configuration.UI.UfrmStartInstall.pas' {frmStartInstall},
   Keyman.Configuration.Util.NetworkConnection in 'util\Keyman.Configuration.Util.NetworkConnection.pas',
-  Keyman.Configuration.Settings.BaseKeyboard in 'settings\Keyman.Configuration.Settings.BaseKeyboard.pas';
+  Keyman.Configuration.System.BaseKeyboard in 'main\Keyman.Configuration.System.BaseKeyboard.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
