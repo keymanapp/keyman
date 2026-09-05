@@ -1,5 +1,5 @@
-/// <reference path="../../../../../../node_modules/@types/jquery/index.d.ts"/>
-/// <reference path="../../../../../../node_modules/@types/jqueryui/index.d.ts"/>
+/// <reference path="ext/index.d.cts"/>
+/// <reference path="ext/jquery-ui/index.d.cts"/>
 
 // temporary interface to streamline transform to Typescript
 interface Builder {
