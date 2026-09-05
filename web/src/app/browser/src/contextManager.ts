@@ -232,7 +232,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     }
   }
 
-  public setActiveTextStore(textStore: AbstractElementTextStore<any>, sendEvents?: boolean) {
+  public setActiveTextStore(textStore: AbstractElementTextStore<any>, sendEvents?: boolean): void {
     const previousTextStore = this.mostRecentTextStore;
     const originalTextStore = this.activeTextStore; // may differ, depending on focus state.
 
@@ -409,6 +409,11 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
    * the active keyboard changes when other controls are active.  Only
    * activates the keyboard if the specified control represents the
    * currently-active context.
+   *
+   * If kbdId and langId are both null, the control will use the global
+   * keyboard. If both are the empty string, the control will use the
+   * system keyboard (on desktop), or the first installed keyboard (on
+   * touch devices).
    *
    * This is the core method that backs
    * https://help.keyman.com/developer/engine/web/current-version/reference/core/setKeyboardForControl.

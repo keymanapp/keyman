@@ -315,14 +315,14 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
   }
 
   /**
-   * Function     getKeyboardForControl
-   * Scope        Public
-   * @param       {Element}    Pelem    Control element
-   * @return      {string|null}         The independently-managed keyboard for the control.
-   * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
-   *              If it is currently following the global keyboard setting, returns null instead.
+   * Returns the keyboard ID of the current independently-managed keyboard for this control.
+   * If it is currently following the global keyboard setting, returns null instead.
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboardForControl
+   *
+   * @param       {Element}    Pelem    Control element
+   * @return      {string|null}         The independently-managed keyboard for the control,
+   *                                    or null if it is following the global keyboard setting.
    */
   public getKeyboardForControl(Pelem: HTMLElement): string | null{
     const textStore = textStoreForElement(Pelem);
@@ -331,12 +331,13 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
   // Is not currently published API... but it exists.
   /**
-   * Function     getLanguageForControl
-   * Scope        Public
+   * Returns the language code used with the current independently-managed keyboard
+   * for this control. If it is currently following the global keyboard setting,
+   * returns null instead.
+   *
    * @param       {Element}    Pelem    Control element
-   * @return      {string|null}         The independently-managed keyboard for the control.
-   * Description  Returns the language code used with the current independently-managed keyboard for this control.
-   *              If it is currently following the global keyboard setting, returns null instead.
+   * @return      {string|null}         The independently-managed keyboard for the control,
+   *                                    or null if it is following the global keyboard setting.
    */
   public getLanguageForControl(Pelem: HTMLElement): string | null {
     const textStore = textStoreForElement(Pelem);
