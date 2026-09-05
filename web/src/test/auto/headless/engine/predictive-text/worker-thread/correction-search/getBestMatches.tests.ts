@@ -76,14 +76,16 @@ describe('Correction Searching', () => {
         // 't' -> 'b' (sub)
         'beh',
         // '' -> 'c' (insertion)
-        'tech'
+        'tech',
+        // 'eh' -> 'he' (transposition)
+        'the'
       ];
 
       await checkBatch(thirdBatch, secondCost);
 
       // All replace the low-likelihood case for the third input.
       const fourthBatch = [
-        'the', 'thi', 'tho', 'thr',
+        'thi', 'tho', 'thr',
         'thu', 'tha'
       ];
 

@@ -104,6 +104,12 @@ export interface PartialSearchEdge {
  */
 export class SearchNode {
   /**
+   * Denotes any additional edit-cost components not modeled by the core edit-distance
+   * computation object.
+   */
+  private addedEditCost = 0;
+
+  /**
    * The search-term keying method used by the active LexicalModel
    * @param str
    * @returns
@@ -188,6 +194,7 @@ export class SearchNode {
       // This is unique at each level, though it will reuse a previous ID if no new
       // one is provided (say, for 'insert' edits).
       this.spaceId = spaceId ?? priorNode.spaceId;
+      this.addedEditCost = priorNode.addedEditCost;
     } else {
       this.calculation = new ClassicalDistanceCalculation();
       this.matchedTraversals = [param1];
@@ -206,7 +213,7 @@ export class SearchNode {
    * by the current node.
    */
   get editCount(): number {
-    return this.calculation.getHeuristicFinalCost() + this.deleteAfterInsertEditPairs;
+    return this.calculation.getHeuristicFinalCost() + this.deleteAfterInsertEditPairs + this.addedEditCost;
   }
 
   /**
@@ -269,6 +276,10 @@ export class SearchNode {
     // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
     // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
     return EDIT_DISTANCE_COST_SCALE * this.editCount + this.inputSamplingCost;
+  }
+
+  addEdit() {
+    this.addedEditCost++;
   }
 
   /**

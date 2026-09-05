@@ -21,7 +21,7 @@ import { ContextState, determineContextSlideTransform } from './correction/conte
 import { ContextTransition, TransitionReversionView } from './correction/context-transition.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import { ModelCompositor } from './model-compositor.js';
-import { getBestTokenMatches } from './correction/distance-modeler.js';
+import { EDIT_DISTANCE_COST_SCALE, getBestTokenMatches } from './correction/distance-modeler.js';
 
 import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
@@ -78,7 +78,12 @@ export const CORRECTION_SEARCH_THRESHOLDS = {
    * in log-space, the search would stop at a total cost of 1 + this value if
    * a "full" set of suggestions had already been found.
    */
-  REPLACEMENT_SEARCH_THRESHOLD: 4 as const // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+
+  // Ensure at least one "edit distance cost unit" so that even heavily
+  // fat-fingered transpositions have a chance.  Note that the level is this
+  // applied, wordlist weightings have no effect and cannot prevent correction
+  // thresholding!
+  REPLACEMENT_SEARCH_THRESHOLD: EDIT_DISTANCE_COST_SCALE * 1.1
 }
 
 /**
@@ -662,7 +667,17 @@ export async function correctAndEnumerate(
       continue;
     }
 
-    if(match.editCount > 0 && !searchModules.find(s => s.correctionsEnabled)) {
+    // In the case of a backspace, we wipe out the original form of the search
+    // module and replace it with a format that also signals that corrections
+    // aren't enabled.
+    //
+    // To resolve this, we check the pre-transition form in order to check if
+    // corrections were enabled before a backspace.
+    const correctionsWereEnabled = transition.base.displayTokenization.tail.searchModule.correctionsEnabled;
+    if(match.editCount > 0
+      && !searchModules.find(s => s.correctionsEnabled)
+      && !(TransformUtils.isBackspace(inputTransform) && correctionsWereEnabled)
+    ) {
       continue;
     }
 
@@ -1075,19 +1090,6 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
   if(baseCorrection.length == 0) {
     // If the correction is rooted on an empty root, there's no basis for
     // auto-correcting to this suggestion.
-    return;
-  }
-
-  // Find the highest probability for any correction that led to a valid prediction.
-  // No need to full-on re-sort everything, though.
-  const bestCorrection = suggestionDistribution.reduce(
-    (prev, current) => prev?.correction.p > current.correction.p ? prev : current,
-    null
-  ).correction;
-  if(bestCorrection.p > bestSuggestion.correction.p) {
-    // Here, the best suggestion didn't come from the best correction.
-    // Is it actually reasonable to auto-correct?  We're probably just very
-    // biased toward its frequency.  (Maybe a threshold should be considered?)
     return;
   }
 
