@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.280 alpha 2026-09-05
+
+* fix(windows): open chm external links in user's browser (#16515)
+
 ## 19.0.279 alpha 2026-09-03
 
 * chore(web): tweak error message (#16495)
