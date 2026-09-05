@@ -14,7 +14,7 @@ test.describe.skip('First example from the guide', function () {
     await setTimeoutAndLoadPage(page, 'http://localhost:3000/build/docs/engine/guide/examples/__first-example.html');
   }
 
-  test('Input field shows US keyboard', async ({ page }) => {
+  test('Input field shows US keyboard', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     const oskTitleBar = await clickFieldAndWaitForOSK(page, page.getByPlaceholder('Hello World'));
@@ -29,7 +29,7 @@ test.describe.skip('First example from the guide', function () {
     await expect(await getSelectedKeyboardMenuText(page)).toBe('English - US');
   });
 
-  test('Keyman menu has expected keyboards', async ({ page }) => {
+  test('Keyman menu has expected keyboards', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     await clickFieldAndWaitForOSK(page, page.getByPlaceholder('Hello World'));
@@ -46,7 +46,7 @@ test.describe.skip('Auto-control example from the guide', function () {
     await setTimeoutAndLoadPage(page, 'http://localhost:3000/build/docs/engine/guide/examples/__auto-control.html');
   }
 
-  test('Input field shows Lao keyboard', async ({ page }) => {
+  test('Input field shows Lao keyboard', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     await page.getByTestId('multilingual' ).click();
@@ -57,7 +57,7 @@ test.describe.skip('Auto-control example from the guide', function () {
     await expect(page.locator('#keymanweb_title_bar')).toContainText('Lao (Phonetic)');
   });
 
-  test('Textarea shows Lao keyboard', async ({ page }) => {
+  test('Textarea shows Lao keyboard', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     await page.getByTestId('textarea').click();
@@ -74,7 +74,7 @@ test.describe.skip('Control-by-control example from the guide', function () {
     await setTimeoutAndLoadPage(page, 'http://localhost:3000/build/docs/engine/guide/examples/__control-by-control.html');
   }
 
-  test('address field does not have KeymanWeb enabled', async ({ page }) => {
+  test('address field does not have KeymanWeb enabled', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     await page.getByPlaceholder('id = address').click();
@@ -87,7 +87,7 @@ test.describe.skip('Control-by-control example from the guide', function () {
   });
 
   // TODO: #16080
-  test.skip('subject field does not show keyboard and defaults to system keyboard', async ({ page }) => {
+  test.skip('subject field does not show keyboard and defaults to system keyboard', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     await page.getByPlaceholder('id = subject').click();
@@ -101,7 +101,7 @@ test.describe.skip('Control-by-control example from the guide', function () {
     await expect(await getSelectedKeyboardMenuText(page)).toBe('(System keyboard)');
   });
 
-  test('message body field shows Lao keyboard', async ({ page }) => {
+  test('message body field shows Lao keyboard', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     await page.getByPlaceholder('id = text').click();
@@ -124,7 +124,7 @@ test.describe.skip('Full manual control example from the guide', function () {
     await setTimeoutAndLoadPage(page, 'http://localhost:3000/build/docs/engine/guide/examples/__full-manual-control.html');
   }
 
-  test('Shows English and no OSK after loading page', async ({ page }) => {
+  test('Shows English and no OSK after loading page', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
 
@@ -134,7 +134,7 @@ test.describe.skip('Full manual control example from the guide', function () {
     await expect(await page.evaluate(() => keyman.osk.isVisible())).not.toBeTruthy();
   });
 
-  test('Selecting English keyboard shows no OSK', async ({ page }) => {
+  test('Selecting English keyboard shows no OSK', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     // first switch to Hebrew
@@ -164,7 +164,7 @@ test.describe.skip('Full manual control example from the guide', function () {
     await expect(await page.evaluate(() => keyman.osk.isVisible())).not.toBeTruthy();
   });
 
-  test('Selecting Devanagari keyboard shows Devanagari OSK', async ({ page }) => {
+  test('Selecting Devanagari keyboard shows Devanagari OSK', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     const keyboardchangePromise = page.evaluate(async () => {
@@ -183,7 +183,7 @@ test.describe.skip('Full manual control example from the guide', function () {
     await expect(page.locator('#keymanweb_title_bar')).toContainText('Devanagari (INSCRIPT)');
   });
 
-  test('Selecting Hebrew shows Hebrew OSK', async ({ page }) => {
+  test('Selecting Hebrew shows Hebrew OSK', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     const keyboardchangePromise = page.evaluate(async () => {
@@ -208,7 +208,7 @@ test.describe.skip('Manual control example from the guide', function () {
     await setTimeoutAndLoadPage(page, 'http://localhost:3000/build/docs/engine/guide/examples/__manual-control.html');
   }
 
-  test('Does not show OSK after loading', async ({ page }) => {
+  test('Does not show OSK after loading', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     await page.getByTestId('multilingual').click();
@@ -218,7 +218,7 @@ test.describe.skip('Manual control example from the guide', function () {
     await expect(await page.evaluate(() => keyman.osk.isVisible())).not.toBeTruthy();
   });
 
-  test('Shows Lao OSK after clicking button', async ({ page }) => {
+  test('Shows Lao OSK after clicking button', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
     await page.getByAltText('KeymanWeb').click();
@@ -230,7 +230,7 @@ test.describe.skip('Manual control example from the guide', function () {
     await expect(page.locator('#keymanweb_title_bar')).toContainText('Lao');
   });
 
-  test('Hides Lao OSK after clicking button', async ({ page }) => {
+  test('Hides Lao OSK after clicking button', async ({ page } : { page: Page }) => {
     // Setup
     await beforeEach(page);
 
