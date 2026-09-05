@@ -1,0 +1,28 @@
+{
+  "name": "@keymanapp/developer-touch-layout-editor",
+  "description": "Keyman Developer Touch Layout Editor",
+  "keywords": [
+    "keyboard",
+    "keyman",
+    "kmn",
+    "keyman-touch-layout",
+    "unicode"
+  ],
+  "type": "module",
+  "files": [
+    "/build/src/"
+  ],
+  "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git",
+    "directory": "developer/src/tike/xml/layoutbuilder"
+  }
+}

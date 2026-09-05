@@ -1,70 +1,72 @@
-$(function() {
-  (function(search) {
-    var q = search.match(/Filename=(.+)(&|$)/);
-    if(q) {
-      builder.filename = decodeURIComponent(q[1]);
-    }
-  })(location.search);
+/// <reference path="ext/index.d.cts"/>
+/// <reference path="ext/jquery-ui/index.d.cts"/>
 
-  this.xscale = 1;
-  this.yscale = 1;
-  this.uniqId = 1;
+// temporary interface to streamline transform to Typescript
+interface Builder {
+  [key: string]: any;
+};
 
+declare global {
+  var KVKL: any;
+};
 
-  this.getPresentation = function () {
+export const builder: Builder = {
+  filename: '',
+  xscale: 1,
+  yscale: 1,
+  uniqId: 1,
+  getPresentation: function () {
     return $('#selPlatformPresentation').val();
-  }
+  },
 
-  this.saveSelection = function() {
+  saveSelection: function() {
     let key = builder.selectedKey(), subKey = builder.selectedSubKey();
     return {
       id: key.length ? $(key).data('id') : null,
       subId: subKey.length ? $(subKey).data('id') : null
     };
-  }
+  },
 
-  this.restoreSelection = function(selection) {
-    let key = $('#kbd .key').filter(function (_index) { return $(this).data('id') === selection.id; }).first();
+  restoreSelection: function(selection) {
+    let key = $('#kbd .key').filter(function (_index, elem) { return $(elem).data('id') === selection.id; }).first();
     if(!key || !key.length) {
       let keys = $('#kbd div.key');
       if(!keys.length) return;
-      key = keys[0];
+      key = $(keys[0]);
     }
     builder.selectKey(key);
-    let subKey = $('#sub-key-groups .key').filter(function (_index) { return $(this).data('id') === selection.subId; }).first();
+    let subKey = $('#sub-key-groups .key').filter(function (_index, elem) { return $(elem).data('id') === selection.subId; }).first();
     if(!subKey || !subKey.length) {
       let subKeys = $('#sub-key-groups div.key');
       if(!subKeys.length) return;
-      subKey = subKeys[0];
+      subKey = $(subKeys[0]);
     }
     builder.selectSubKey(subKey);
-  }
+  },
 
-  builder.selPlatformPresentationChange = function () {
+  selPlatformPresentationChange: function () {
     let lastSelection = builder.saveSelection();
     builder.selectKey(null, false);
     builder.selectSubKey(null);
     builder.prepareLayer();
     builder.restoreSelection(lastSelection);
     builder.saveState();
-  }
+  },
 
-  $('#selPlatformPresentation').change(builder.selPlatformPresentationChange);
-
-  builder.removeAllSubKeys = function() {
+  removeAllSubKeys: function() {
     $('#sub-key-groups .key').remove();
-  }
+  },
 
-  builder.prepareKeyCapTypes = function() {
+  prepareKeyCapTypes: function() {
     let types = $('#selKeyCapType'), subTypes = $('#selSubKeyCapType'), opts = '';
     for(let name of builder.specialKeyNames) {
       opts += '<option value="'+name+'">'+builder.renameSpecialKey(name)+' &nbsp; &nbsp; '+name+'</option>';
     }
     $(types).append(opts);
     $(subTypes).append(opts);
-  };
+  },
 
-  this.preparePlatforms = function () {
+  preparePlatforms: function () {
     var firstPlatform = null;
     $('#platforms').empty();
     for (var platform in KVKL) {
@@ -72,16 +74,16 @@ $(function() {
       var ul = document.createElement('ul');
       var li = document.createElement('li');
       var a = document.createElement('a');
-      $(a).data('platform', platform).text(platform).click(function () {
-        builder.selectPlatform($(this).data('platform'));
+      $(a).data('platform', platform).text(platform).click(function (evt) {
+        builder.selectPlatform($(evt.currentTarget).data('platform'));
       }).attr('href', 'javascript:void(0)');
       $(li).append(a).append(ul);
       $('#platforms').append(li);
       for (var layer in KVKL[platform].layer) {
         li = document.createElement('li');
-        $(li).data('platform', platform).data('layer', layer).text(KVKL[platform].layer[layer].id).click(function () {
-          builder.selectPlatform($(this).data('platform'));
-          builder.selectLayer($(this).data('layer'));
+        $(li).data('platform', platform).data('layer', layer).text(KVKL[platform].layer[layer].id).click(function (evt) {
+          builder.selectPlatform($(evt.currentTarget).data('platform'));
+          builder.selectLayer($(evt.currentTarget).data('layer'));
         });
         $(ul).append(li);
       }
@@ -95,7 +97,7 @@ $(function() {
     }
 
     builder.selectPlatform(firstPlatform);
-  }
+  },
 
   /**
   * Replace default key names by special font codes for modifier keys (copied from kmwosk.js)
@@ -104,19 +106,19 @@ $(function() {
   *  @return {string}
   **/
 
-  this.renameSpecialKey = function (oldText) {
+  renameSpecialKey: function (oldText) {
     //Note:  U+E000 *is* PUA but was not accepted by IE as a character in the EOT font, so Alt recoded as U+E019
-    return this.specialCharacters[oldText] ?
-      String.fromCharCode(0xE000 + this.specialCharacters[oldText]) :
+    return builder.specialCharacters[oldText] ?
+      String.fromCharCode(0xE000 + builder.specialCharacters[oldText]) :
       oldText;
-  }
+  },
 
-  this.prepareLayers = function () {
-    this.fillLayerSelect();
-    this.fillModifierSelect();
-  };
+  prepareLayers: function () {
+    builder.fillLayerSelect();
+    builder.fillModifierSelect();
+  },
 
-  this.fillLayerSelect = function() {
+  fillLayerSelect: function() {
     $('#selLayer option').remove();
     $('#selKeyNextLayer option').remove();
     $('#selSubKeyNextLayer option').remove();
@@ -143,17 +145,17 @@ $(function() {
       $(opt).append(KVKL[builder.lastPlatform].layer[layer].id);
       $('#selSubKeyNextLayer').append(opt);
     }
-  };
+  },
 
-  this.fillModifierSelect = function() {
-    var modifiers = this.showAllModifierCombinations ? this.validModifierCombinations : this.minimalModifierCombinations;
+  fillModifierSelect: function() {
+    var modifiers = builder.showAllModifierCombinations ? builder.validModifierCombinations : builder.minimalModifierCombinations;
 
     var
       $selKeyLayerOverride = $('#selKeyLayerOverride'),
       $selSubKeyLayerOverride = $('#selSubKeyLayerOverride'),
       $addLayerList = $('#addLayerList');
 
-    var add = function(e, val, text) {
+    var add = function(e, val, text?) {
       var opt = document.createElement('option');
       if(typeof text != 'undefined') {
         $(opt).attr('value', val);
@@ -174,7 +176,7 @@ $(function() {
 
 
     for (var modifier = 0; modifier < modifiers.length; modifier++) {
-      var name = this.getModifierCombinationName(modifiers[modifier]);
+      var name = builder.getModifierCombinationName(modifiers[modifier]);
 
       add($selKeyLayerOverride, name);
       add($selSubKeyLayerOverride, name);
@@ -212,35 +214,35 @@ $(function() {
       return modifierNames.indexOf(modifierName) >= 0;
     };
 
-    if(!this.showAllModifierCombinations) {
+    if(!builder.showAllModifierCombinations) {
       // Add any layer names that are already referenced
-      for(modifier = 0; modifier < this.validModifierCombinations.length; modifier++) {
-        var name = this.getModifierCombinationName(this.validModifierCombinations[modifier]);
-        if(!alreadyAdded(this.validModifierCombinations[modifier]) && isUsed(name)) {
+      for(modifier = 0; modifier < builder.validModifierCombinations.length; modifier++) {
+        var name = builder.getModifierCombinationName(builder.validModifierCombinations[modifier]);
+        if(!alreadyAdded(builder.validModifierCombinations[modifier]) && isUsed(name)) {
           add($selKeyLayerOverride, name);
           add($selSubKeyLayerOverride, name);
         }
       }
     }
-  };
+  },
 
-  this.getModifierCombinationFromLayerId = function(id) {
-    for(var i = 0; i < this.validModifierCombinations.length; i++) {
-      if(this.getModifierCombinationName(this.validModifierCombinations[i]) == id) {
-        return this.validModifierCombinations[i];
+  getModifierCombinationFromLayerId: function(id) {
+    for(var i = 0; i < builder.validModifierCombinations.length; i++) {
+      if(builder.getModifierCombinationName(builder.validModifierCombinations[i]) == id) {
+        return builder.validModifierCombinations[i];
       }
     }
     return 0;
-  };
+  },
 
-  this.isLayerIdShifted = function(id) {
-    return (builder.getModifierCombinationFromLayerId(id) & this.modifierCodes.SHIFT) != 0;
-  };
+  isLayerIdShifted: function(id) {
+    return (builder.getModifierCombinationFromLayerId(id) & builder.modifierCodes.SHIFT) != 0;
+  },
 
   /**
    * Adds annotating images to a key cap to indicate when it has sub keys
    */
-  this.addKeyAnnotations = function(key) {
+  addKeyAnnotations: function(key) {
     const longpress = $(key).data('longpress'), flick = $(key).data('flick'), multitap = $(key).data('multitap'), hint = $(key).data('hint');
 
     $('.has-flick', key).remove();
@@ -266,9 +268,9 @@ $(function() {
     } else {
       $('.hint', key).removeClass('custom-hint');
     }
-  }
+  },
 
-  this.hexToCodePoint = function(codePoint) {
+  hexToCodePoint: function(codePoint) {
     const codePointValue = parseInt(codePoint, 16);
     if (
       isNaN(codePointValue) ||
@@ -280,9 +282,9 @@ $(function() {
       return null;
     }
     return String.fromCodePoint(codePointValue);
-  }
+  },
 
-  this.unicodeKeyIdToString = function(id) {
+  unicodeKeyIdToString: function(id) {
     // duplicated from oskKey.ts
     if(!id || id.substr(0,2) != 'U_') {
       return null;
@@ -291,20 +293,20 @@ $(function() {
     let result = '';
     const codePoints = id.substr(2).split('_');
     for(let codePoint of codePoints) {
-      const codePointValue = this.hexToCodePoint(codePoint);
+      const codePointValue = builder.hexToCodePoint(codePoint);
       if(codePointValue) {
         result += codePointValue;
       }
     }
     return result ? result : null;
-  }
+  },
 
-  this.inferKeyText = function(text, id) {
-    let val = typeof text == 'string' && text != '' ? text : this.unicodeKeyIdToString(id) ?? '';
+  inferKeyText: function(text, id) {
+    let val = typeof text == 'string' && text != '' ? text : builder.unicodeKeyIdToString(id) ?? '';
     return val;
-  }
+  },
 
-  this.inferKeyHintText = function(keyHint, longpress, flickArray, multitap) {
+  inferKeyHintText: function(keyHint, longpress, flickArray, multitap) {
     let hint = keyHint;
     const flick = flickArray ? flickArray.reduce((o,f) => {o[f.direction] = f; return o}, {}) : null;
     if(!hint) {
@@ -346,16 +348,16 @@ $(function() {
 
     if(hint == null) return '';
     return builder.renameSpecialKey(hint);
-  }
+  },
 
-  this.escapeFontName = function(fontName) {
+  escapeFontName: function(fontName) {
     if(!fontName) {
       return "";
     }
     return JSON.stringify(fontName);
-  }
+  },
 
-  this.prepareLayer = function () {
+  prepareLayer: function () {
     var layer = KVKL[builder.lastPlatform].layer[builder.lastLayerIndex];
 
     var isLayerShifted = builder.isLayerIdShifted(layer.id);
@@ -377,21 +379,21 @@ $(function() {
     // Scaling for different platform images
     //
 
-    var pres = this.presentations[builder.getPresentation()];
+    var pres = builder.presentations[builder.getPresentation()];
     if (pres) {
-      this.xscale = pres.x / width;
-      this.yscale = pres.y / height;
+      builder.xscale = pres.x / width;
+      builder.yscale = pres.y / height;
     } else {
-      this.xscale = 0.5;
-      this.yscale = 0.5;
+      builder.xscale = 0.5;
+      builder.yscale = 0.5;
     }
 
     $('#kbd,#sub-key-groups')
-      .css('font-family', this.escapeFontName(KVKL[builder.lastPlatform].font))
+      .css('font-family', builder.escapeFontName(KVKL[builder.lastPlatform].font))
       .css('font-size', KVKL[builder.lastPlatform].fontsize || "1em");
 
     $('#inpKeyCap,#inpSubKeyCap')
-      .css('font-family', this.escapeFontName(KVKL[builder.lastPlatform].font))
+      .css('font-family', builder.escapeFontName(KVKL[builder.lastPlatform].font))
       .css('font-size', '18pt');
 
     $('#kbd div').remove();
@@ -402,7 +404,7 @@ $(function() {
         var key = layer.row[i].key[j];
         var nkey = builder.addKey('key', row, key.sp);
         var w = key.width ? key.width : 100;
-        var p = (key.pad ? key.pad : builder.keyMargin) * this.xscale;
+        var p = (key.pad ? key.pad : builder.keyMargin) * builder.xscale;
         let text = builder.inferKeyText(key.text, key.id);
 
         calcKeyWidth += parseInt(w, 10);
@@ -424,103 +426,99 @@ $(function() {
           .data('multitap', key.multitap)
           .data('type', 'key')
 
-          .css('width', (w * this.xscale) + 'px')
-          .css('height', (100 * this.yscale) + 'px')
-          .css('margin-top', (builder.keyMargin * this.yscale) + 'px')
+          .css('width', (w * builder.xscale) + 'px')
+          .css('height', (100 * builder.yscale) + 'px')
+          .css('margin-top', (builder.keyMargin * builder.yscale) + 'px')
           .css('margin-left', p + 'px')
-          .css('font-family', this.escapeFontName(key.font))
+          .css('font-family', builder.escapeFontName(key.font))
           .css('font-size', key.fontsize);
 
-        if(this.specialCharacters[text])
+        if(builder.specialCharacters[text])
           $(nkey).addClass('key-special-text');
 
         builder.addKeyAnnotations(nkey);
 
-        $('.text', nkey).text(this.renameSpecialKey(text));
+        $('.text', nkey).text(builder.renameSpecialKey(text));
         builder.updateHint($(nkey));
 
-        if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(this.getStandardKeyCap(key.id, key.layer ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
+        if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(builder.getStandardKeyCap(key.id, key.layer ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
 
 
         builder.updateKeyId(nkey);
       }
 
-      var calcWidth = calcKeyWidth + calcGapWidth;
-
       $('#kbd').attr('class', builder.getPresentation());
     }
 
     builder.updateKeySizeInfo();
-  };
+  },
 
-
-  this.updateKeySizeInfo = function() {
+  updateKeySizeInfo: function() {
     let rows = $('#kbd div.row');
-    rows.each(function() {
-      let keys = $('.key', this), keyWidth = 0, gapWidth = 0;
-      keys.each(function() {
-        let width = $(this).data('width'), pad = $(this).data('pad');
+    rows.each(function(_index, rowElem) {
+      let keys = $('.key', rowElem), keyWidth = 0, gapWidth = 0;
+      keys.each(function(_index, keyElem) {
+        let width = $(keyElem).data('width'), pad = $(keyElem).data('pad');
         keyWidth += width ? parseInt(width, 10) : 100;
         gapWidth += pad ? parseInt(pad, 10) : builder.keyMargin;
       });
       let count = keys.length, totalWidth = keyWidth + gapWidth;
-      $('.key-size', this).html(count + ' keys<br>' +
+      $('.key-size', rowElem).html(count + ' keys<br>' +
         keyWidth + ' key width<br>' +
         gapWidth + ' padding<br>' +
         totalWidth + ' total');
     });
-  }
+  },
 
-  this.getStandardKeyCap = function (id, shifted) {
+  getStandardKeyCap: function (id, shifted) {
     id = id ? id.toUpperCase() : '';
-    var i = this.standardKeyNames.findIndex(function(x) { return x.toUpperCase() == id });
-    return i >= 0 ? this.standardKeyCaps[i][shifted ? 1 : 0] : '';
-  };
+    var i = builder.standardKeyNames.findIndex(function(x) { return x.toUpperCase() == id });
+    return i >= 0 ? builder.standardKeyCaps[i][shifted ? 1 : 0] : '';
+  },
 
-  this.updateKeyId = function (nkey) {
+  updateKeyId: function (nkey) {
     $('.id', nkey).text(($(nkey).data('layer') || '') + ' ' + $(nkey).data('id'));
-  };
+  },
 
-  this.selectPlatform = function (val) {
+  selectPlatform: function (val) {
     builder.lastPlatform = val || $('#selPlatform').val();
 
     var listContainer = $('#selPlatformPresentation');
     $('option', listContainer).remove();
 
-    for (var i in this.presentations) {
+    for (var i in builder.presentations) {
       if (i.substring(0, builder.lastPlatform.length) != builder.lastPlatform) {
         continue;
       }
       var option = $(document.createElement('option'));
-      option.attr('value', i).text(this.presentations[i].name);
+      option.attr('value', i).text(builder.presentations[i].name);
       listContainer.append(option);
     }
 
     builder.prepareLayers();
     builder.selectLayer(0);
-  }
+  },
 
-  this.selectLayer = function (val) {
+  selectLayer: function (val) {
     let selection = builder.saveSelection();
     if(val) $('#selLayer').val(val);
     builder.lastLayerIndex = $('#selLayer').val();
     builder.prepareLayer();
     builder.restoreSelection(selection);
-  }
+  },
 
-  this.selectLayerByName = function (name) {
-    var layerOption = $('#selLayer option').filter(function (index) { return $(this).text() === name; });
+  selectLayerByName: function (name) {
+    var layerOption = $('#selLayer option').filter(function (_index, elem) { return $(elem).text() === name; });
     if (layerOption.length == 0) {
       alert('Layer ' + name + ' not found.');
     } else {
       builder.selectLayer(layerOption.attr('value'));
     }
-  }
+  },
 
+  commands: [],
 
-  this.commands = [];
-
-  this.command = function (cmd) {
+  command: function (cmd) {
     if (navigator.userAgent.indexOf('Keyman') < 0) {
       return false;
     }
@@ -536,9 +534,10 @@ $(function() {
       }, 10);
     }
     builder.commands.push(cmd);
-  }
+    return true;
+  },
 
-  this.addRow = function (position) {
+  addRow: function (position) {
     var row = document.createElement('div');
     $(row).addClass('row');
     var parentRow = builder.selectedKey().parent();
@@ -556,21 +555,20 @@ $(function() {
     $(row).append(rowKeySize);
 
     return row;
-  };
+  },
 
-
-  this.delSelectedKey = function () {
+  delSelectedKey: function () {
     var key = builder.selectedKey();
     var nextKey = $(key).next('.key');
     if (nextKey.length == 0) nextKey = $(key).prev('.key');
     if (nextKey.length == 0) {
-      return this.delSelectedRow();
+      return builder.delSelectedRow();
     }
     $(key).remove();
     builder.selectKey(nextKey);
-  }
+  },
 
-  this.delSelectedRow = function () {
+  delSelectedRow: function () {
     var parentRow = builder.selectedKey().parent();
     var nextKey = $(parentRow).next().children('.key').first();
     if (nextKey.length == 0) {
@@ -581,10 +579,9 @@ $(function() {
     }
     builder.selectKey(nextKey);
     $(parentRow).remove();
-  }
+  },
 
-
-  this.selectKey = function (key, adjustResizable) {
+  selectKey: function (key, adjustResizable) {
 
     if (arguments.length == 1 || adjustResizable)
       builder.selectedKey().resizable('destroy');
@@ -601,7 +598,7 @@ $(function() {
       }
       $('.kcontrol.wedge-horz,.kcontrol.wedge-vert,div#btnDelKey').css('display', 'block');
       builder.moveWedgesAround(key);
-      this.prepareKey();
+      builder.prepareKey();
       let subKeys = $('#sub-key-groups div.key');
       if(subKeys.length) {
         builder.selectSubKey(subKeys[0]);
@@ -616,9 +613,9 @@ $(function() {
       builder.enableSubKeyControls();
     }
     builder.saveState();
-  };
+  },
 
-  this.moveWedgesAround = function(key) {
+  moveWedgesAround: function(key) {
     const scrollOffset = $('#kbd-scroll-container').offset();
     const rowOffset = $(key).parent().offset();
     const offset = $(key).offset();
@@ -632,14 +629,14 @@ $(function() {
     if(!builder.textControlsInToolbar()) {
       $('input#inpKeyCap').offset({ left: offset.left + 16, top: offset.top + 4 }).width($(key).width() - 32);
     }
-  }
+  },
 
-  this.selectedKey = function () {
+  selectedKey: function () {
     return $('#kbd .selected');
-  }
+  },
 
-  this.wrapChange = function(f, opt) {
-    return function() {
+  wrapChange: function(f: (evt: JQueryEventObject) => any, opt) {
+    return function(evt: JQueryEventObject) {
       if(typeof opt == 'object' && opt.saveOnce) {
         if (!builder.hasSavedKeyUndo) {
           builder.saveUndo();
@@ -650,61 +647,24 @@ $(function() {
       } else {
         builder.saveUndo();
       }
-      var r = f.apply(this, arguments);
+      var r = f.apply(evt.currentTarget, [evt]);
       if(typeof opt == 'object' && opt.rescale) {
         builder.rescale();
       }
       builder.generate();
       return r;
     }
-  };
+  },
 
-  const inpKeyPaddingChange = builder.wrapChange(function () {
-    builder.selectedKey().data('pad', $(this).val())
-                         .css('margin-left', $(this).val() + 'px');
-  }, {rescale: true});
-
-  $('#inpKeyPadding')
-    .change(inpKeyPaddingChange)
-    .on('input', inpKeyPaddingChange);
-
-  const inpKeyWidthChange = builder.wrapChange(function () {
-    builder.selectedKey().data('width', $(this).val())
-                         .css('width', parseInt($(this).val(), 10) * this.xscale + 'px');
-  }, {rescale: true});
-
-  $('#inpKeyWidth')
-    .change(inpKeyWidthChange)
-    .on('input', inpKeyWidthChange);
-
-  const inpKeyNameChange = builder.wrapChange(function () {
-    let key = builder.selectedKey();
-    key.data('id', $(this).val());
-    builder.updateKeyId(key);
-    builder.keyCapChange(key.data('text'));
-  }, {saveOnce: true});
-
-  builder.wrapInstant = function(f) {
-    return function() {
-      window.setTimeout(f.bind(this), 0);
+  wrapInstant: function(f: (evt: JQueryEventObject) => any) {
+    return function(evt: JQueryEventObject) {
+      window.setTimeout(f.bind(evt.currentTarget, evt), 0);
     }
-  }
+  },
 
-  $('#inpKeyName')
-    .change(inpKeyNameChange)
-    .autocomplete({
-      source: builder.lookupKeyNames,
-      change: inpKeyNameChange,
-      select: builder.wrapInstant(inpKeyNameChange)
-    })
-    .on('input', inpKeyNameChange)
-    .blur(function () {
-      builder.hasSavedKeyUndo = false;
-    });
-
-  this.updateCharacterMap = function (val, fromSubKey) {
+  updateCharacterMap: function (val, fromSubKey) {
     // Update character map
-    var src = $(fromSubKey ? '#inpSubKeyCap' : '#inpKeyCap')[0];
+    var src = $(fromSubKey ? '#inpSubKeyCap' : '#inpKeyCap')[0] as HTMLInputElement;
 
     var x1 = src.selectionStart;
     var x2 = src.selectionEnd;
@@ -717,9 +677,9 @@ $(function() {
       }
       builder.command('selected-char,' + ch.toString());
     }
-  }
+  },
 
-  builder.toUnicodeString = function(s) {
+  toUnicodeString: function(s) {
     if(typeof s != 'string') return '';
     let r = '';
     for(let ch of s) {
@@ -727,22 +687,22 @@ $(function() {
       r += 'U+' + code.padStart(4, '0') + ' ';
     }
     return r.trim();
-  }
+  },
 
-  builder.fromUnicodeString = function(s) {
+  fromUnicodeString: function(s) {
     if(typeof s != 'string') return '';
     let chars = s.split(' '), r = '';
     for(let ch of chars) {
       if(!ch.match(/^u\+[0-9a-f]{1,6}$/i)) continue;
-      const codePointValue = this.hexToCodePoint(ch.substring(2));
+      const codePointValue = builder.hexToCodePoint(ch.substring(2));
       if(codePointValue) {
         r += codePointValue;
       }
     }
     return r;
-  }
+  },
 
-  builder.keyCapChange = function(val) {
+  keyCapChange: function(val) {
     const k = builder.selectedKey();
     k.data('text', val);
     let text = builder.inferKeyText(val, k.data('id'));
@@ -753,21 +713,10 @@ $(function() {
       k.removeClass('key-special-text');
     }
     builder.updateCharacterMap(text, false);
-  }
+  },
 
-  const inpKeyCapChange = builder.wrapChange(function (e) {
-    const val = $(this).val();
-    $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
-    builder.keyCapChange(val);
-  }, {saveOnce: true});
 
-  const inpKeyCapUnicodeChange = builder.wrapChange(function (e) {
-    const val = builder.fromUnicodeString($(this).val());
-    $('#inpKeyCap').val(val);
-    builder.keyCapChange(val);
-  }, {saveOnce: true});
-
-  builder.updateHint = function(key) {
+  updateHint: function(key) {
     const val = key.data('hint');
     const hintElement = $('.hint', key);
     hintElement.text(builder.inferKeyHintText(val, $(key).data('longpress'), $(key).data('flick'), $(key).data('multitap')));
@@ -781,116 +730,15 @@ $(function() {
     } else {
       hintElement.removeClass('key-special-text');
     }
+  },
 
-  }
-
-  builder.keyHintChange = function(val) {
+  keyHintChange: function(val) {
     const key = builder.selectedKey();
     key.data('hint', val);
     builder.updateHint(key);
-  }
+  },
 
-  const inpKeyHintChange = builder.wrapChange(function (e) {
-    const val = $(this).val();
-    $('#inpKeyHintUnicode').val(builder.toUnicodeString(val));
-    builder.keyHintChange(val);
-    builder.updateCharacterMap(val, false);
-  }, {saveOnce: true});
-
-  const inpKeyHintUnicodeChange = builder.wrapChange(function (e) {
-    const val = builder.fromUnicodeString($(this).val());
-    $('#inpKeyHint').val(val);
-    builder.keyHintChange(val);
-    builder.updateCharacterMap(val, false);
-  }, {saveOnce: true});
-
-
-  const selKeyCapTypeChange = builder.wrapChange(function () {
-    var val = $(this).val();
-    $('#inpKeyCap').val(val);
-    $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
-    builder.keyCapChange(val);
-    // We only EnableControls here because if the user types *BkSp* into the
-    // text field, we shouldn't hide the text field until next time the key is selected
-    builder.enableKeyControls();
-  });
-
-  $('#selKeyCapType').on('change', selKeyCapTypeChange);
-
-  $('#inpKeyCap')
-    .on('input', inpKeyCapChange)
-    .change(inpKeyCapChange)
-    .mouseup(function () {
-      builder.updateCharacterMap($(this).val(), false);
-    }).focus(function () {
-      builder.updateCharacterMap($(this).val(), false);
-    }).blur(function () {
-      builder.hasSavedKeyUndo = false;
-    });
-
-  $('#inpKeyCapUnicode')
-    .on('input', inpKeyCapUnicodeChange)
-    .change(inpKeyCapUnicodeChange)
-    .mouseup(function () {
-      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
-    }).focus(function () {
-      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
-    }).blur(function () {
-      builder.hasSavedKeyUndo = false;
-    });
-
-  $('#inpKeyHint')
-    .on('input', inpKeyHintChange)
-    .change(inpKeyHintChange)
-    .mouseup(function () {
-      builder.updateCharacterMap($(this).val(), false);
-    }).focus(function () {
-      builder.updateCharacterMap($(this).val(), false);
-    }).blur(function () {
-      builder.hasSavedKeyUndo = false;
-    });
-
-  $('#inpKeyHintUnicode')
-    .on('input', inpKeyHintUnicodeChange)
-    .change(inpKeyHintUnicodeChange)
-    .mouseup(function () {
-      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
-    }).focus(function () {
-      builder.updateCharacterMap(builder.fromUnicodeString($(this).val()), false);
-    }).blur(function () {
-      builder.hasSavedKeyUndo = false;
-    });
-
-  const selKeyTypeChange = builder.wrapChange(function () {
-    var sp = $(this).val();
-    if (sp == 0) {
-      builder.selectedKey().removeData('sp');
-    } else {
-      builder.selectedKey().data('sp', $(this).val());
-    }
-    builder.formatKey(builder.selectedKey(), $(this).val());
-  });
-
-  $('#selKeyType').change(selKeyTypeChange);
-
-  const selKeyNextLayerChange = builder.wrapChange(function () {
-    $(this).val() === '' ?
-      builder.selectedKey().removeData('nextlayer') :
-      builder.selectedKey().data('nextlayer', $(this).val());
-  });
-
-  $('#selKeyNextLayer').change(selKeyNextLayerChange);
-
-  const selKeyLayerOverrideChange = builder.wrapChange(function () {
-    $(this).val() === '' ?
-      builder.selectedKey().removeData('layer') :
-      builder.selectedKey().data('layer', $(this).val());
-    builder.updateKeyId(builder.selectedKey());
-  });
-
-  $('#selKeyLayerOverride').change(selKeyLayerOverrideChange);
-
-  this.enableKeyControls = function () {
+  enableKeyControls: function () {
     var key = builder.selectedKey();
     if (key.length == 0) {
       $('#keyToolbar *').attr('disabled', 'disabled');
@@ -902,9 +750,9 @@ $(function() {
       $('#sub-key-container').css('display', '');
       $('#key-cap-unicode-toolbar-item, #key-cap-toolbar-item').css('display', builder.specialCharacters[val] ? 'none' : '');
     }
-  }
+  },
 
-  this.rescale = function () {
+  rescale: function () {
     builder.saveUndo();
     const k = builder.selectedKey();
     const keyId = k.data('id');
@@ -917,18 +765,18 @@ $(function() {
         builder.selectKey(newKeyItems[keyItemIndex]);
       }
     }
-  };
+  },
 
-  this.translateFlickArrayToObject = function(flicks) {
+  translateFlickArrayToObject: function(flicks) {
     let res = {};
     for(let flick of flicks) {
       const {direction, ...item} = flick;
       res[direction] = item;
     }
     return res;
-  };
+  },
 
-  this.translateFlickObjectToArray = function(flicks) {
+  translateFlickObjectToArray: function(flicks) {
     if(!flicks) {
       return [];
     }
@@ -938,33 +786,33 @@ $(function() {
         return {...flicks[direction], direction: direction};
       }
     );
-  }
+  },
 
-  this.generate = function (display, force) {
+  generate: function (display, force) {
     var json = JSON.stringify(KVKL, null, '  ');
 
     var layer = KVKL[builder.lastPlatform].layer[builder.lastLayerIndex];
     layer.row = [];
 
     var rows = $('#kbd > div.row'), n = 1;
-    $(rows).each(function () {
+    $(rows).each(function (_index, rowElem) {
       var row = { id: n++, key: [] };
-      $(this).children(".key").each(function () {
-        if ($(this).hasClass('ui-draggable-dragging')) return;
-        var key = { "id": $(this).data('id'), "text": $(this).data('text') };
-        key.pad = $(this).data('pad');
-        key.width = $(this).data('width');
-        key.sp = $(this).data('sp');
-        key.font = $(this).data('font');
-        key.fontsize = $(this).data('fontsize');
-        key.nextlayer = $(this).data('nextlayer');
-        key.layer = $(this).data('layer');
-        key.hint = $(this).data('hint');
-        let longpress = $(this).data('longpress');
+      $(rowElem).children(".key").each(function (_index, elem) {
+        if ($(elem).hasClass('ui-draggable-dragging')) return;
+        var key: any = { "id": $(elem).data('id'), "text": $(elem).data('text') };
+        key.pad = $(elem).data('pad');
+        key.width = $(elem).data('width');
+        key.sp = $(elem).data('sp');
+        key.font = $(elem).data('font');
+        key.fontsize = $(elem).data('fontsize');
+        key.nextlayer = $(elem).data('nextlayer');
+        key.layer = $(elem).data('layer');
+        key.hint = $(elem).data('hint');
+        let longpress = $(elem).data('longpress');
         if(longpress && longpress.length) key.sk = longpress;
-        let flick = $(this).data('flick');
+        let flick = $(elem).data('flick');
         if(flick && flick.length) key.flick = builder.translateFlickArrayToObject(flick);
-        let multitap = $(this).data('multitap');
+        let multitap = $(elem).data('multitap');
         if(multitap && multitap.length) key.multitap = multitap;
         row.key.push(key);
       });
@@ -972,12 +820,12 @@ $(function() {
     });
 
     builder.saveJSON(json, force);
-  };
+  },
 
-  this.saveJSON = function(force) {
+  saveJSON: function(force) {
     builder.cleanupKVKL();
     var newJson = JSON.stringify(KVKL, null, '  ');
-    if(force || newJson != json) {
+    //TODO -- buggy if(force || newJson != json) {
       // When adding or deleting layers and platforms, we need to force because
       // that will not result in changes to the rows.
       $.ajax('/app/source/file', {
@@ -988,98 +836,31 @@ $(function() {
         }
       });
       $('#data').val(newJson);
-    }
-  };
+    // }
+  },
 
-  $('#kbd-scroll-container').on('scroll', function () {
-    const key = builder.selectedKey();
-    if(key.length) {
-      builder.moveWedgesAround(key[0]);
-    }
-  });
-  $('#wedgeAddRowAbove').click(builder.wrapChange(function () {
-    var row = builder.addRow('above'); builder.selectKey(builder.addKey('key', row));
-  }, {rescale: true}));
+  ctrlDown: false,
+  nextKeySelects: false,
 
-  $('#wedgeAddRowBelow').click(builder.wrapChange(function () {
-    var row = builder.addRow('below'); builder.selectKey(builder.addKey('key', row));
-  }, {rescale: true}));
-
-  $('#wedgeAddKeyLeft').click(builder.wrapChange(function () {
-    builder.selectKey(builder.addKey('key', 'before'));
-  }, {rescale: true}));
-
-  $('#wedgeAddKeyRight').click(builder.wrapChange(function () {
-    builder.selectKey(builder.addKey('key', 'after'));
-  }, {rescale: true}));
-
-  $('#btnDelKey').click(builder.wrapChange(function () {
-    builder.delSelectedKey();
-  }, {rescale: true}));
-
-  $('#btnGenerate').click(function () { builder.generate(false,false); });
-
-  $('input').focus(function () {
-    builder.lastFocus = this;
-  });
-
-  $('#btnTemplate').click(function () {
-    builder.command('template');
-  });
-
-  $('#btnImport').click(function () {
-    builder.command('import');
-  });
-
-  $('#kbd').click(function () {
-    builder.selectKey(null);
-  });
-
-  builder.ctrlDown = false;
-  builder.nextKeySelects = false;
-
-  builder.selectKeyByCode = function (code) {
+  selectKeyByCode: function (code) {
     if (code >= 0 && code < 256) {
       var keyName = builder.standardKeyNames[code];
-      var key = $('.key').filter(function (index) { return $(this).data('id') === keyName; });
+      var key = $('.key').filter(function (_index, elem) { return $(elem).data('id') === keyName; });
       if (key.length > 0) builder.selectKey(key[0]);
     }
-  }
+  },
 
-  $(document).keydown(function (event) {
-    if(!event.originalEvent.repeat) {
-      // We will get this event repeatedly while ctrl is held down,
-      // so if ctrlDown is cancelled, we don't want to set it again
-      builder.ctrlDown = (event.which == 17);
-    }
-    if (builder.nextKeySelects) {
-      $('#selectKeyDialog').dialog('close');
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      builder.nextKeySelects = false;
-      builder.selectKeyByCode(event.which);
-    }
-  });
+  loadingState: true,
 
-  $(document).keyup(function (event) {
-    if (builder.ctrlDown && event.which == 17) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      builder.nextKeySelects = true;
-      $('#selectKeyDialog').dialog('open');
-    }
-    builder.ctrlDown = false;
-  });
-
-  builder.loadingState = true;
-
-  builder.saveState = function() {
+  saveState: function() {
     if(builder.loadingState) return;
 
     var state = {
       platform: builder.lastPlatform,
       layer: builder.lastLayerIndex,
-      presentation: $('#selPlatformPresentation').val()
+      presentation: $('#selPlatformPresentation').val(),
+      key: undefined,
+      subkey: undefined,
     };
 
     var key = builder.selectedKey();
@@ -1096,9 +877,9 @@ $(function() {
       'Filename': builder.filename,
       'State': JSON.stringify(state)
     });
-  };
+  },
 
-  builder.loadState = function() {
+  loadState: function() {
     $.get('/app/source/toucheditor/state',
       {
         'Filename': builder.filename
@@ -1128,24 +909,249 @@ $(function() {
             builder.selectLayer();
           }
           if(data.key) {
-            builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === data.key; }).first());
+            builder.selectKey($('#kbd .key').filter(function (_index, elem) { return $(elem).data('id') === data.key; }).first());
           }
           if(data.subkey) {
-            builder.selectSubKey($('#sub-key-groups .key').filter(function (index) { return $(this).data('id') === data.subkey; }).first());
+            builder.selectSubKey($('#sub-key-groups .key').filter(function (_index, elem) { return $(elem).data('id') === data.subkey; }).first());
           }
         }
       }
     );
-  };
+  },
 
-  builder.textControlsInToolbar = function() {
+  textControlsInToolbar: function() {
     return $('body').hasClass('text-controls-in-toolbar');
+  },
+};
+
+(function(search) {
+  var q = search.match(/Filename=(.+)(&|$)/);
+  if(q) {
+    builder.filename = decodeURIComponent(q[1]);
   }
+})(location.search);
+
+$('#selPlatformPresentation').change(builder.selPlatformPresentationChange);
+
+const inpKeyPaddingChange = builder.wrapChange(function (evt: JQueryEventObject) {
+  builder.selectedKey().data('pad', $(evt.currentTarget).val())
+                        .css('margin-left', $(evt.currentTarget).val() + 'px');
+}, {rescale: true});
+
+$('#inpKeyPadding')
+  .change(inpKeyPaddingChange)
+  .on('input', inpKeyPaddingChange);
+
+const inpKeyWidthChange = builder.wrapChange(function (evt: JQueryEventObject) {
+    builder.selectedKey().data('width', $(evt.currentTarget).val())
+                         .css('width', parseInt($(evt.currentTarget).val(), 10) * builder.xscale + 'px');
+  }, {rescale: true});
+
+$('#inpKeyWidth')
+  .change(inpKeyWidthChange)
+  .on('input', inpKeyWidthChange);
+
+const inpKeyNameChange = builder.wrapChange(function (evt: JQueryEventObject) {
+  let key = builder.selectedKey();
+  key.data('id', $(evt.currentTarget).val());
+  builder.updateKeyId(key);
+  builder.keyCapChange(key.data('text'));
+}, {saveOnce: true});
+
+$('#inpKeyName')
+  .change(inpKeyNameChange)
+  .autocomplete({
+    source: builder.lookupKeyNames,
+    change: inpKeyNameChange,
+    select: builder.wrapInstant(inpKeyNameChange)
+  })
+  .on('input', inpKeyNameChange)
+  .blur(function () {
+    builder.hasSavedKeyUndo = false;
+  });
+
+const inpKeyCapChange = builder.wrapChange(function (evt: JQueryEventObject) {
+  const val = $(evt.currentTarget).val();
+  $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
+  builder.keyCapChange(val);
+}, {saveOnce: true});
+
+const inpKeyCapUnicodeChange = builder.wrapChange(function (evt: JQueryEventObject) {
+  const val = builder.fromUnicodeString($(evt.currentTarget).val());
+  $('#inpKeyCap').val(val);
+  builder.keyCapChange(val);
+}, {saveOnce: true});
+
+const inpKeyHintChange = builder.wrapChange(function (evt: JQueryEventObject) {
+  const val = $(evt.currentTarget).val();
+  $('#inpKeyHintUnicode').val(builder.toUnicodeString(val));
+  builder.keyHintChange(val);
+  builder.updateCharacterMap(val, false);
+}, {saveOnce: true});
+
+const inpKeyHintUnicodeChange = builder.wrapChange(function (evt: JQueryEventObject) {
+  const val = builder.fromUnicodeString($(evt.currentTarget).val());
+  $('#inpKeyHint').val(val);
+  builder.keyHintChange(val);
+  builder.updateCharacterMap(val, false);
+}, {saveOnce: true});
 
 
-}.bind(builder));
+const selKeyCapTypeChange = builder.wrapChange(function (evt: JQueryEventObject) {
+  var val = $(evt.currentTarget).val();
+  $('#inpKeyCap').val(val);
+  $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
+  builder.keyCapChange(val);
+  // We only EnableControls here because if the user types *BkSp* into the
+  // text field, we shouldn't hide the text field until next time the key is selected
+  builder.enableKeyControls();
+});
 
-function initBuilder() {
+$('#selKeyCapType').on('change', selKeyCapTypeChange);
+
+$('#inpKeyCap')
+  .on('input', inpKeyCapChange)
+  .change(inpKeyCapChange)
+  .mouseup(function (evt) {
+    builder.updateCharacterMap($(evt.currentTarget).val(), false);
+  }).focus(function (evt) {
+    builder.updateCharacterMap($(evt.currentTarget).val(), false);
+  }).blur(function (_evt) {
+    builder.hasSavedKeyUndo = false;
+  });
+
+$('#inpKeyCapUnicode')
+  .on('input', inpKeyCapUnicodeChange)
+  .change(inpKeyCapUnicodeChange)
+  .mouseup(function (evt) {
+    builder.updateCharacterMap(builder.fromUnicodeString($(evt.currentTarget).val()), false);
+  }).focus(function (evt) {
+    builder.updateCharacterMap(builder.fromUnicodeString($(evt.currentTarget).val()), false);
+  }).blur(function (_evt) {
+    builder.hasSavedKeyUndo = false;
+  });
+
+$('#inpKeyHint')
+  .on('input', inpKeyHintChange)
+  .change(inpKeyHintChange)
+  .mouseup(function (evt) {
+    builder.updateCharacterMap($(evt.currentTarget).val(), false);
+  }).focus(function (evt) {
+    builder.updateCharacterMap($(evt.currentTarget).val(), false);
+  }).blur(function (_evt) {
+    builder.hasSavedKeyUndo = false;
+  });
+
+$('#inpKeyHintUnicode')
+  .on('input', inpKeyHintUnicodeChange)
+  .change(inpKeyHintUnicodeChange)
+  .mouseup(function (evt) {
+    builder.updateCharacterMap(builder.fromUnicodeString($(evt.currentTarget).val()), false);
+  }).focus(function (evt) {
+    builder.updateCharacterMap(builder.fromUnicodeString($(evt.currentTarget).val()), false);
+  }).blur(function (_evt) {
+    builder.hasSavedKeyUndo = false;
+  });
+
+const selKeyTypeChange = builder.wrapChange(function (evt: JQueryEventObject) {
+  var sp = $(evt.currentTarget).val();
+  if (sp == 0) {
+    builder.selectedKey().removeData('sp');
+  } else {
+    builder.selectedKey().data('sp', $(evt.currentTarget).val());
+  }
+  builder.formatKey(builder.selectedKey(), $(evt.currentTarget).val());
+});
+
+$('#selKeyType').change(selKeyTypeChange);
+
+const selKeyNextLayerChange = builder.wrapChange(function (evt: JQueryEventObject) {
+  $(evt.currentTarget).val() === '' ?
+    builder.selectedKey().removeData('nextlayer') :
+    builder.selectedKey().data('nextlayer', $(evt.currentTarget).val());
+});
+
+$('#selKeyNextLayer').change(selKeyNextLayerChange);
+
+const selKeyLayerOverrideChange = builder.wrapChange(function (evt: JQueryEventObject) {
+  $(evt.currentTarget).val() === '' ?
+    builder.selectedKey().removeData('layer') :
+    builder.selectedKey().data('layer', $(evt.currentTarget).val());
+  builder.updateKeyId(builder.selectedKey());
+});
+
+$('#selKeyLayerOverride').change(selKeyLayerOverrideChange);
+
+$('#kbd-scroll-container').on('scroll', function () {
+  const key = builder.selectedKey();
+  if(key.length) {
+    builder.moveWedgesAround(key[0]);
+  }
+});
+$('#wedgeAddRowAbove').click(builder.wrapChange(function () {
+  var row = builder.addRow('above'); builder.selectKey(builder.addKey('key', row));
+}, {rescale: true}));
+
+$('#wedgeAddRowBelow').click(builder.wrapChange(function () {
+  var row = builder.addRow('below'); builder.selectKey(builder.addKey('key', row));
+}, {rescale: true}));
+
+$('#wedgeAddKeyLeft').click(builder.wrapChange(function () {
+  builder.selectKey(builder.addKey('key', 'before'));
+}, {rescale: true}));
+
+$('#wedgeAddKeyRight').click(builder.wrapChange(function () {
+  builder.selectKey(builder.addKey('key', 'after'));
+}, {rescale: true}));
+
+$('#btnDelKey').click(builder.wrapChange(function () {
+  builder.delSelectedKey();
+}, {rescale: true}));
+
+$('#btnGenerate').click(function () { builder.generate(false,false); });
+
+$('input').focus(function (evt) {
+  builder.lastFocus = evt.currentTarget;
+});
+
+$('#btnTemplate').click(function () {
+  builder.command('template');
+});
+
+$('#btnImport').click(function () {
+  builder.command('import');
+});
+
+$('#kbd').click(function () {
+  builder.selectKey(null);
+});
+
+$(document).keydown(function (event) {
+  if(!(event.originalEvent as KeyboardEvent).repeat) {
+    // We will get this event repeatedly while ctrl is held down,
+    // so if ctrlDown is cancelled, we don't want to set it again
+    builder.ctrlDown = (event.which == 17);
+  }
+  if (builder.nextKeySelects) {
+    $('#selectKeyDialog').dialog('close');
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    builder.nextKeySelects = false;
+    builder.selectKeyByCode(event.which);
+  }
+});
+
+$(document).keyup(function (event) {
+  if (builder.ctrlDown && event.which == 17) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    builder.nextKeySelects = true;
+    $('#selectKeyDialog').dialog('open');
+  }
+  builder.ctrlDown = false;
+});
+
+export function initBuilder() {
   $(function() {
     builder.cleanupKVKL();
     builder.prepareKeyCapTypes();
