@@ -11,6 +11,8 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.js",
+    "src/ext/jquery-ui/index.d.cts",
+    "src/ext/index.d.cts",
   ],
   "exclude": [
     "src/ext/*",

@@ -2,8 +2,8 @@
 // Character map drag+drop and double-click insertion
 //
 
-/// <reference path="../../../../../../node_modules/@types/jquery/index.d.ts"/>
-/// <reference path="../../../../../../node_modules/@types/jqueryui/index.d.ts"/>
+/// <reference path="ext/index.d.cts"/>
+/// <reference path="ext/jquery-ui/index.d.cts"/>
 
 import { builder } from './builder.js';
 
