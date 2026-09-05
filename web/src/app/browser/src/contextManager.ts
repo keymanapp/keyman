@@ -366,21 +366,22 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   protected currentKeyboardSrcTextStore(): AbstractElementTextStore<any> | null {
     const textStore = this.currentTextStore || this.mostRecentTextStore;
 
-    if(this.isTextStoreKeyboardIndependent(textStore)) {
+    if(this.isElementInIndependentMode(textStore?.getElement())) {
       return textStore;
     }
     return null;
   }
 
-  private isTextStoreKeyboardIndependent(textStore: AbstractElementTextStore<any>): boolean {
-    const attachment = textStore?.getElement()._kmwAttachment;
+  public isElementInIndependentMode(element: HTMLElement | null): boolean {
+    const attachment = element?._kmwAttachment;
 
     // If null or undefined, we're in 'global' mode.
-    return !!(attachment?.keyboard || attachment?.keyboard === '');
+    return !!(attachment &&
+      (attachment.keyboard !== undefined && attachment.keyboard !== null));
   }
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
-  public activateKeyboardForTextStore(kbd: KeyboardInfoPair, textStore: AbstractElementTextStore<any>): void {
+  protected activateKeyboardForTextStore(kbd: KeyboardInfoPair, textStore: AbstractElementTextStore<any>): void {
     const attachment = textStore?.getElement()._kmwAttachment;
 
     if(!attachment) {
@@ -421,7 +422,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
    * @param kbdId
    * @param langId
    */
-  public setKeyboardForTextStore(textStore: AbstractElementTextStore<any>, kbdId: string, langId: string): void {
+  public setKeyboardForTextStore(textStore: AbstractElementTextStore<any>, kbdId: string | null, langId: string | null): void {
     if(textStore instanceof DesignIFrameElementTextStore) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
@@ -436,20 +437,25 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     if(!attachment) {
       return;
     } else {
+      if(wasPriorTextStore && kbdId === null) {
+        this.findAndPopActivation(textStore);
+      }
+
       // Either establishes or cancels independent-keyboard mode by setting the
       // associated metadata.  This will have direct effects on the results
       // of .currentKeyboardSrcTextStore().
-      attachment.keyboard = kbdId || null;
-      attachment.languageCode = langId || null;
+      attachment.keyboard = kbdId ?? null;
+      attachment.languageCode = langId ?? null;
 
       // If it has just entered independent-keyboard mode, we need the second check.
       if(wasPriorTextStore || this.currentKeyboardSrcTextStore() == textStore) {
         const globalKbd = this.globalKeyboard.metadata;
 
-        // The `||` bits below - in case we're cancelling independent-keyboard mode.
+        // `??` preserves empty-string values for an explicit "system keyboard" state,
+        // while falling back to the global keyboard only when the control is truly unset.
         this.activateKeyboard(
-          attachment.keyboard || globalKbd.id,
-          attachment.languageCode || globalKbd.langId,
+          attachment.keyboard ?? globalKbd.id,
+          attachment.languageCode ?? globalKbd.langId,
           true
         );
       }
@@ -457,7 +463,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   }
 
   public getKeyboardStubForTextStore(textStore: AbstractElementTextStore<any>) {
-    if(!this.isTextStoreKeyboardIndependent(textStore)) {
+    if(!this.isElementInIndependentMode(textStore?.getElement())) {
       return this.globalKeyboard.metadata;
     } else {
       const attachment = textStore.getElement()._kmwAttachment;
@@ -578,7 +584,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
       langCode = lgCode;
     }
 
-    if(lastElem && lastElem._kmwAttachment.keyboard != null) {
+    if (lastElem && this.isElementInIndependentMode(lastElem)) {
       lastElem._kmwAttachment.keyboard = keyboardID;
       lastElem._kmwAttachment.languageCode = langCode;
     } else {
@@ -598,8 +604,10 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     const attachment = lastElem._kmwAttachment;
     const global = this.globalKeyboard;
 
-    if(attachment.keyboard != null) {
-      this.activateKeyboard(attachment.keyboard, attachment.languageCode, true);
+    if (this.isElementInIndependentMode(lastElem)) {
+      const keyboardId = attachment.keyboard ?? global?.metadata.id ?? '';
+      const languageCode = attachment.languageCode ?? global?.metadata.langId ?? '';
+      this.activateKeyboard(keyboardId, languageCode, true);
     } else if(!blockGlobalChange && (global?.metadata != this._activeKeyboard?.metadata)) {
       // TODO:  can we drop `!blockGlobalChange` in favor of the latter check?
       this.activateKeyboard(global?.metadata.id, global?.metadata.langId, true);

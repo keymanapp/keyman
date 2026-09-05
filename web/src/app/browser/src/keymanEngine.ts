@@ -292,7 +292,10 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * @param       {string|null=}  languageCode  A BCP47 language code which was used when
    *                                            registering the keyboard stub.
    */
-  public setKeyboardForControl(elem: HTMLElement, keyboard?: string, languageCode?: string): void {
+  public setKeyboardForControl(elem: HTMLElement, keyboard?: string | null, languageCode?: string | null): void {
+    if (!elem.ownerDocument.defaultView) {
+      return;
+    }
     if(elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
@@ -311,7 +314,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
       }
     }
 
-    this.contextManager.setKeyboardForTextStore(elem._kmwAttachment.textStore, keyboard, languageCode);
+    this.contextManager.setKeyboardForTextStore(elem._kmwAttachment.textStore, keyboard ?? null, languageCode ?? null);
   }
 
   /**
@@ -325,8 +328,12 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *                                    or null if it is following the global keyboard setting.
    */
   public getKeyboardForControl(Pelem: HTMLElement): string | null{
-    const textStore = textStoreForElement(Pelem);
-    return this.contextManager.getKeyboardStubForTextStore(textStore).id;
+    if(!Pelem || !this.contextManager.isElementInIndependentMode(Pelem)) {
+      return null;
+    }
+    // Preserves empty-string values, which denote the explicitly-requested
+    // 'system keyboard' state.  Returns null only for controls in 'global' mode.
+    return Pelem._kmwAttachment.keyboard;
   }
 
   // Is not currently published API... but it exists.
@@ -340,8 +347,10 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *                                    or null if it is following the global keyboard setting.
    */
   public getLanguageForControl(Pelem: HTMLElement): string | null {
-    const textStore = textStoreForElement(Pelem);
-    return this.contextManager.getKeyboardStubForTextStore(textStore).langId;
+    if(!Pelem || !this.contextManager.isElementInIndependentMode(Pelem)) {
+      return null;
+    }
+    return Pelem._kmwAttachment.languageCode;
   }
 
   public isAttached(x: HTMLElement): boolean {
