@@ -1,6 +1,7 @@
 /// <reference path="ext/index.d.cts"/>
 /// <reference path="ext/jquery-ui/index.d.cts"/>
 import { builder } from './builder.js';
+import { builderConstants } from './constants.js';
 
 //
 // Popup keys
@@ -68,7 +69,7 @@ builder.prepareSubKey = function () {
 
   $('#inpSubKeyGestureType').val(gestureType);
   let val = $(key).data('text');
-  $('#selSubKeyCapType').val(builder.specialCharacters[val] ? val : '');
+  $('#selSubKeyCapType').val(builderConstants.specialCharacters[val] ? val : '');
   $('#inpSubKeyCap').val(val);
   $('#inpSubKeyCapUnicode').val(builder.toUnicodeString(val));
   $('#inpSubKeyName').val($(key).data('id'));
@@ -91,7 +92,7 @@ $('#inpSubKeyName')
   .change(subKeyNameChange)
   .on('input', subKeyNameChange)
   .autocomplete({
-    source: builder.lookupKeyNames,
+    source: builderConstants.lookupKeyNames,
     change: subKeyNameChange,
     select: builder.wrapInstant(subKeyNameChange)
   }).blur(function () {
@@ -104,7 +105,7 @@ builder.subKeyCapChange = function(val) {
   k.data('text', val);
   let text = builder.inferKeyText(val, k.data('id'));
   $('.text', k).text(builder.renameSpecialKey(text));
-  if(builder.specialCharacters[text]) {
+  if(builderConstants.specialCharacters[text]) {
     k.addClass('key-special-text');
   } else {
     k.removeClass('key-special-text');
@@ -293,7 +294,7 @@ builder.enableSubKeyControls = function () {
     let val = $(key).data('text');
     $('#subKeyToolbar *').removeAttr('disabled');
     $('#subKeyToolbar #inpSubKeyGestureType').attr('disabled', 'disabled');
-    $('#sub-key-cap-unicode-toolbar-item, #sub-key-cap-toolbar-item').css('display', builder.specialCharacters[val] ? 'none' : '');
+    $('#sub-key-cap-unicode-toolbar-item, #sub-key-cap-toolbar-item').css('display', builderConstants.specialCharacters[val] ? 'none' : '');
     $('#chkSubKeyIsDefault').prop('disabled', $(key).data('type') != 'longpress');
   }
 }

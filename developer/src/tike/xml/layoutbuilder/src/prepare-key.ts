@@ -1,6 +1,7 @@
 /// <reference path="ext/index.d.cts"/>
 /// <reference path="ext/jquery-ui/index.d.cts"/>
 import { builder } from './builder.js';
+import { builderConstants } from './constants.js';
 
 builder.addKey = function (type, position, sp) {
   var key = document.createElement('div');
@@ -95,7 +96,7 @@ builder.prepareKey = function () {
   var key = builder.selectedKey();
   builder.hasSavedKeyUndo = false;
   let val = $(key).data('text');
-  $('#selKeyCapType').val(builder.specialCharacters[val] ? val : '');
+  $('#selKeyCapType').val(builderConstants.specialCharacters[val] ? val : '');
   $('#inpKeyCap').val(val);
   $('#inpKeyCapUnicode').val(builder.toUnicodeString(val));
 
@@ -145,7 +146,7 @@ builder.prepareKey = function () {
         .css('font-family',builder.escapeFontName(key.font))
         .css('font-size', key.fontsize);
 
-      if(builder.specialCharacters[text]) {
+      if(builderConstants.specialCharacters[text]) {
         $(nkey).addClass('key-special-text');
       }
 

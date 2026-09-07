@@ -1,8 +1,7 @@
 /// <reference path="ext/index.d.cts"/>
 /// <reference path="ext/jquery-ui/index.d.cts"/>
-import { builder } from './builder.js';
 
-builder.standardKeyNames = [
+const standardKeyNames = [
   'K_?00',      // &H0
   'K_LBUTTON',    // &H1
   'K_RBUTTON',    // &H2
@@ -273,7 +272,7 @@ builder.standardKeyNames = [
   'K_?FF'         // &HFF
 ];
 
-builder.standardKeyCaps = [
+const standardKeyCaps = [
   ['',''], // 'K_?00',      // &H0
   ['',''], // 'K_LBUTTON',    // &H1
   ['',''], // 'K_RBUTTON',    // &H2
@@ -544,18 +543,18 @@ builder.standardKeyCaps = [
   ['',''], // 'K_?FF'       // &HFF
 ];
 
-builder.lookupKeyNames = [];
+const lookupKeyNames = [];
 
-for (var i = 0; i < builder.standardKeyNames.length; i++) {
-  if (builder.standardKeyNames[i].indexOf('?') < 0) {
-    builder.lookupKeyNames.push(builder.standardKeyNames[i]);
+for (var i = 0; i < standardKeyNames.length; i++) {
+  if (standardKeyNames[i].indexOf('?') < 0) {
+    lookupKeyNames.push(standardKeyNames[i]);
   }
 }
-builder.lookupKeyNames.sort();
+lookupKeyNames.sort();
 
 // Defines the PUA code mapping for the various 'special' modifier/control/non-printing keys on keyboards.
 // This is lifted directly from specialCharacters.ts and must be kept in sync. See also CompileKeymanWeb.pas: CSpecialText10
-builder.specialCharacters = {
+const specialCharacters = {
   '*Shift*':    8,
   '*Enter*':    5,
   '*Tab*':      6,
@@ -623,9 +622,9 @@ builder.specialCharacters = {
   // TODO: Skipping size references
 };
 
-builder.specialKeyNames = Object.entries(builder.specialCharacters).map(ch => ch[0]);
+const specialKeyNames = Object.entries(specialCharacters).map(ch => ch[0]);
 
-builder.presentations = {
+const presentations = {
   "tablet-ipad-landscape": { "x": 829, "y": 299, "name": "iPad (landscape)" }, // 829x622 = iPad tablet box size; (97,101)-(926,723)
   "tablet-ipad-portrait": { "x": 605, "y": 300, "name": "iPad (portrait)" }, // 605x806 = iPad tablet box size; (98,94)-(703,900)
   "phone-iphone5-landscape": { "x": 731, "y": 196, "name": "iPhone 5 (landscape)" }, // 731x412 = iPhone box size; (144,39)-(875,451)
@@ -633,12 +632,12 @@ builder.presentations = {
   "desktop": { "x": 640, "y": 300, "name": "Desktop" },
 };
 
-builder.defaultPresentations = { "tablet": "tablet-ipad-landscape", "phone": "phone-iphone5-landscape", "desktop": "desktop" };
+const defaultPresentations = { "tablet": "tablet-ipad-landscape", "phone": "phone-iphone5-landscape", "desktop": "desktop" };
 
-builder.keyMargin = 15;
+const keyMargin = 15;
 
 // from kmwosk.js:
-builder.modifierCodes = {
+const modifierCodes = {
   "LCTRL":0x0001,
   "RCTRL":0x0002,
   "LALT":0x0004,
@@ -657,47 +656,46 @@ builder.modifierCodes = {
 
 // Lists the combinations that we allow users to use. Some are mutually exclusive,
 // such as Left+Right modifiers, or chiral and non-chiral modifiers (excl. Shift)
-builder.validModifierCombinations = [
+const validModifierCombinations = [
   0,
 
-  builder.modifierCodes.LCTRL,
-  builder.modifierCodes.RCTRL,
+  modifierCodes.LCTRL,
+  modifierCodes.RCTRL,
 
-  builder.modifierCodes.LALT,
-  builder.modifierCodes.LCTRL | builder.modifierCodes.LALT,
+  modifierCodes.LALT,
+  modifierCodes.LCTRL | modifierCodes.LALT,
 
-  builder.modifierCodes.RALT,
-  builder.modifierCodes.RCTRL | builder.modifierCodes.RALT,
+  modifierCodes.RALT,
+  modifierCodes.RCTRL | modifierCodes.RALT,
 
-  builder.modifierCodes.SHIFT,
+  modifierCodes.SHIFT,
 
-  builder.modifierCodes.LCTRL | builder.modifierCodes.SHIFT,
-  builder.modifierCodes.LALT | builder.modifierCodes.SHIFT,
-  builder.modifierCodes.LCTRL | builder.modifierCodes.LALT | builder.modifierCodes.SHIFT,
+  modifierCodes.LCTRL | modifierCodes.SHIFT,
+  modifierCodes.LALT | modifierCodes.SHIFT,
+  modifierCodes.LCTRL | modifierCodes.LALT | modifierCodes.SHIFT,
 
-  builder.modifierCodes.RCTRL | builder.modifierCodes.SHIFT,
-  builder.modifierCodes.RALT | builder.modifierCodes.SHIFT,
-  builder.modifierCodes.RCTRL | builder.modifierCodes.RALT | builder.modifierCodes.SHIFT,
+  modifierCodes.RCTRL | modifierCodes.SHIFT,
+  modifierCodes.RALT | modifierCodes.SHIFT,
+  modifierCodes.RCTRL | modifierCodes.RALT | modifierCodes.SHIFT,
 
-  builder.modifierCodes.CTRL,
-  builder.modifierCodes.CTRL | builder.modifierCodes.SHIFT,
+  modifierCodes.CTRL,
+  modifierCodes.CTRL | modifierCodes.SHIFT,
 
-  builder.modifierCodes.ALT,
-  builder.modifierCodes.CTRL | builder.modifierCodes.ALT,
-  builder.modifierCodes.SHIFT | builder.modifierCodes.ALT,
-  builder.modifierCodes.SHIFT | builder.modifierCodes.CTRL | builder.modifierCodes.ALT,
-  builder.modifierCodes.CAPS
+  modifierCodes.ALT,
+  modifierCodes.CTRL | modifierCodes.ALT,
+  modifierCodes.SHIFT | modifierCodes.ALT,
+  modifierCodes.SHIFT | modifierCodes.CTRL | modifierCodes.ALT,
+  modifierCodes.CAPS
 ];
 
-builder.minimalModifierCombinations = [
+const minimalModifierCombinations = [
   0,
-  builder.modifierCodes.RALT,
-  builder.modifierCodes.SHIFT,
-  builder.modifierCodes.RALT | builder.modifierCodes.SHIFT,
-  builder.modifierCodes.CAPS
+  modifierCodes.RALT,
+  modifierCodes.SHIFT,
+  modifierCodes.RALT | modifierCodes.SHIFT,
+  modifierCodes.CAPS
 ];
 
-builder.showAllModifierCombinations = false;
 
 // Add CAPS variants for all of the above
 (function addCapsCombinations(validCombinations, CAPS) {
@@ -708,9 +706,9 @@ builder.showAllModifierCombinations = false;
       validCombinations.push(newCombination);
     }
   }
-})(builder.validModifierCombinations, builder.modifierCodes.CAPS);
+})(validModifierCombinations, modifierCodes.CAPS);
 
-builder.modifierNames = [
+const modifierNames =[
   'leftctrl',   // 0x001
   'rightctrl',  // 0x002
   'leftalt',    // 0x004
@@ -729,11 +727,27 @@ builder.modifierNames = [
 *  @param  {Number}  c
 *  @return {string}
 **/
-builder.getModifierCombinationName = function(c) {
+const getModifierCombinationName = function(c) {
   var r = '';
   if(c == 0) return 'default';
-  for(var i = 0; i < builder.modifierNames.length; i++) {
-    if(c & (1<<i)) r += (r == '' ? '' : '-') + builder.modifierNames[i];
+  for(var i = 0; i < modifierNames.length; i++) {
+    if(c & (1<<i)) r += (r == '' ? '' : '-') + modifierNames[i];
   }
   return r;
+};
+
+export const builderConstants = {
+  standardKeyNames,
+  standardKeyCaps,
+  specialCharacters,
+  specialKeyNames,
+  presentations,
+  defaultPresentations,
+  keyMargin,
+  modifierCodes,
+  validModifierCombinations,
+  minimalModifierCombinations,
+  modifierNames,
+  lookupKeyNames,
+  getModifierCombinationName,
 };

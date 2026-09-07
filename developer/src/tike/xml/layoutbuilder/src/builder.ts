@@ -1,6 +1,8 @@
 /// <reference path="ext/index.d.cts"/>
 /// <reference path="ext/jquery-ui/index.d.cts"/>
 
+import { builderConstants } from "./constants.js";
+
 // temporary interface to streamline transform to Typescript
 interface Builder {
   [key: string]: any;
@@ -15,8 +17,9 @@ export const builder: Builder = {
   xscale: 1,
   yscale: 1,
   uniqId: 1,
-  lastPresentations: {...builder.defaultPresentations}, // TODO: this has an initialization order problem
+  lastPresentations: {...builderConstants.defaultPresentations},
   lastLayers: {},
+  showAllModifierCombinations: false,
   getPresentation: function () {
     return $('#selPlatformPresentation').val();
   },
@@ -62,7 +65,7 @@ export const builder: Builder = {
 
   prepareKeyCapTypes: function() {
     let types = $('#selKeyCapType'), subTypes = $('#selSubKeyCapType'), opts = '';
-    for(let name of builder.specialKeyNames) {
+    for(let name of builderConstants.specialKeyNames) {
       opts += '<option value="'+name+'">'+builder.renameSpecialKey(name)+' &nbsp; &nbsp; '+name+'</option>';
     }
     $(types).append(opts);
@@ -111,8 +114,8 @@ export const builder: Builder = {
 
   renameSpecialKey: function (oldText) {
     //Note:  U+E000 *is* PUA but was not accepted by IE as a character in the EOT font, so Alt recoded as U+E019
-    return builder.specialCharacters[oldText] ?
-      String.fromCharCode(0xE000 + builder.specialCharacters[oldText]) :
+    return builderConstants.specialCharacters[oldText] ?
+      String.fromCharCode(0xE000 + builderConstants.specialCharacters[oldText]) :
       oldText;
   },
 
@@ -151,7 +154,7 @@ export const builder: Builder = {
   },
 
   fillModifierSelect: function() {
-    var modifiers = builder.showAllModifierCombinations ? builder.validModifierCombinations : builder.minimalModifierCombinations;
+    var modifiers = builder.showAllModifierCombinations ? builderConstants.validModifierCombinations : builderConstants.minimalModifierCombinations;
 
     var
       $selKeyLayerOverride = $('#selKeyLayerOverride'),
@@ -179,7 +182,7 @@ export const builder: Builder = {
 
 
     for (var modifier = 0; modifier < modifiers.length; modifier++) {
-      var name = builder.getModifierCombinationName(modifiers[modifier]);
+      var name = builderConstants.getModifierCombinationName(modifiers[modifier]);
 
       add($selKeyLayerOverride, name);
       add($selSubKeyLayerOverride, name);
@@ -187,7 +190,7 @@ export const builder: Builder = {
     }
 
     var alreadyAdded = function(modifier) {
-      return builder.minimalModifierCombinations.indexOf(modifier) >= 0;
+      return builderConstants.minimalModifierCombinations.indexOf(modifier) >= 0;
     };
 
 
@@ -219,9 +222,9 @@ export const builder: Builder = {
 
     if(!builder.showAllModifierCombinations) {
       // Add any layer names that are already referenced
-      for(modifier = 0; modifier < builder.validModifierCombinations.length; modifier++) {
-        var name = builder.getModifierCombinationName(builder.validModifierCombinations[modifier]);
-        if(!alreadyAdded(builder.validModifierCombinations[modifier]) && isUsed(name)) {
+      for(modifier = 0; modifier < builderConstants.validModifierCombinations.length; modifier++) {
+        var name = builderConstants.getModifierCombinationName(builderConstants.validModifierCombinations[modifier]);
+        if(!alreadyAdded(builderConstants.validModifierCombinations[modifier]) && isUsed(name)) {
           add($selKeyLayerOverride, name);
           add($selSubKeyLayerOverride, name);
         }
@@ -230,16 +233,16 @@ export const builder: Builder = {
   },
 
   getModifierCombinationFromLayerId: function(id) {
-    for(var i = 0; i < builder.validModifierCombinations.length; i++) {
-      if(builder.getModifierCombinationName(builder.validModifierCombinations[i]) == id) {
-        return builder.validModifierCombinations[i];
+    for(var i = 0; i < builderConstants.validModifierCombinations.length; i++) {
+      if(builderConstants.getModifierCombinationName(builderConstants.validModifierCombinations[i]) == id) {
+        return builderConstants.validModifierCombinations[i];
       }
     }
     return 0;
   },
 
   isLayerIdShifted: function(id) {
-    return (builder.getModifierCombinationFromLayerId(id) & builder.modifierCodes.SHIFT) != 0;
+    return (builder.getModifierCombinationFromLayerId(id) & builderConstants.modifierCodes.SHIFT) != 0;
   },
 
   /**
@@ -370,19 +373,19 @@ export const builder: Builder = {
       var row = builder.addRow('bottom'), rowWidth = 0;
       for (var j = 0; j < layer.row[i].key.length; j++) {
         var key = layer.row[i].key[j];
-        rowWidth += (key.width ? parseInt(key.width, 10) : 100) + (key.pad ? parseInt(key.pad, 10) : builder.keyMargin);
+        rowWidth += (key.width ? parseInt(key.width, 10) : 100) + (key.pad ? parseInt(key.pad, 10) : builderConstants.keyMargin);
       }
       width = Math.max(width, rowWidth);
     }
 
-    width += builder.keyMargin;   // add right hand margin
-    var height = layer.row.length * (100 + builder.keyMargin);  // 50% of tablet height, 100 px per row, 5 px margin
+    width += builderConstants.keyMargin;   // add right hand margin
+    var height = layer.row.length * (100 + builderConstants.keyMargin);  // 50% of tablet height, 100 px per row, 5 px margin
 
     //
     // Scaling for different platform images
     //
 
-    var pres = builder.presentations[builder.getPresentation()];
+    var pres = builderConstants.presentations[builder.getPresentation()];
     if (pres) {
       builder.xscale = pres.x / width;
       builder.yscale = pres.y / height;
@@ -407,11 +410,11 @@ export const builder: Builder = {
         var key = layer.row[i].key[j];
         var nkey = builder.addKey('key', row, key.sp);
         var w = key.width ? key.width : 100;
-        var p = (key.pad ? key.pad : builder.keyMargin) * builder.xscale;
+        var p = (key.pad ? key.pad : builderConstants.keyMargin) * builder.xscale;
         let text = builder.inferKeyText(key.text, key.id);
 
         calcKeyWidth += parseInt(w, 10);
-        calcGapWidth += parseInt(key.pad ? key.pad : builder.keyMargin, 10);
+        calcGapWidth += parseInt(key.pad ? key.pad : builderConstants.keyMargin, 10);
 
         $(nkey)
           .data('id', key.id)
@@ -431,12 +434,12 @@ export const builder: Builder = {
 
           .css('width', (w * builder.xscale) + 'px')
           .css('height', (100 * builder.yscale) + 'px')
-          .css('margin-top', (builder.keyMargin * builder.yscale) + 'px')
+          .css('margin-top', (builderConstants.keyMargin * builder.yscale) + 'px')
           .css('margin-left', p + 'px')
           .css('font-family', builder.escapeFontName(key.font))
           .css('font-size', key.fontsize);
 
-        if(builder.specialCharacters[text])
+        if(builderConstants.specialCharacters[text])
           $(nkey).addClass('key-special-text');
 
         builder.addKeyAnnotations(nkey);
@@ -463,7 +466,7 @@ export const builder: Builder = {
       keys.each(function(_index, keyElem) {
         let width = $(keyElem).data('width'), pad = $(keyElem).data('pad');
         keyWidth += width ? parseInt(width, 10) : 100;
-        gapWidth += pad ? parseInt(pad, 10) : builder.keyMargin;
+        gapWidth += pad ? parseInt(pad, 10) : builderConstants.keyMargin;
       });
       let count = keys.length, totalWidth = keyWidth + gapWidth;
       $('.key-size', rowElem).html(count + ' keys<br>' +
@@ -475,8 +478,8 @@ export const builder: Builder = {
 
   getStandardKeyCap: function (id, shifted) {
     id = id ? id.toUpperCase() : '';
-    var i = builder.standardKeyNames.findIndex(function(x) { return x.toUpperCase() == id });
-    return i >= 0 ? builder.standardKeyCaps[i][shifted ? 1 : 0] : '';
+    var i = builderConstants.standardKeyNames.findIndex(function(x) { return x.toUpperCase() == id });
+    return i >= 0 ? builderConstants.standardKeyCaps[i][shifted ? 1 : 0] : '';
   },
 
   updateKeyId: function (nkey) {
@@ -489,21 +492,21 @@ export const builder: Builder = {
     var listContainer = $('#selPlatformPresentation');
     $('option', listContainer).remove();
 
-    for (var i in builder.presentations) {
+    for (var i in builderConstants.presentations) {
       if (i.substring(0, builder.lastPlatform.length) != builder.lastPlatform) {
         continue;
       }
       var option = $(document.createElement('option'));
-      option.attr('value', i).text(builder.presentations[i].name);
+      option.attr('value', i).text(builderConstants.presentations[i].name);
       if(builder.lastPresentations[builder.lastPlatform] == i) {
-        option.attr('selected', true);
+        option.prop('selected', true);
       }
       listContainer.append(option);
     }
 
     builder.prepareLayers();
     builder.selectLayer(builder.lastLayers[builder.lastPlatform] ?? 0);
-  }
+  },
 
   selectLayer: function (val) {
     let selection = builder.saveSelection();
@@ -713,7 +716,7 @@ export const builder: Builder = {
     k.data('text', val);
     let text = builder.inferKeyText(val, k.data('id'));
     $('.text', k).text(builder.renameSpecialKey(text));
-    if(builder.specialCharacters[text]) {
+    if(builderConstants.specialCharacters[text]) {
       k.addClass('key-special-text');
     } else {
       k.removeClass('key-special-text');
@@ -731,7 +734,7 @@ export const builder: Builder = {
     } else {
       hintElement.removeClass('custom-hint');
     }
-    if(builder.specialCharacters[val]) {
+    if(builderConstants.specialCharacters[val]) {
       hintElement.addClass('key-special-text');
     } else {
       hintElement.removeClass('key-special-text');
@@ -754,7 +757,7 @@ export const builder: Builder = {
       let val = $(key).data('text');
       $('#keyToolbar *').removeAttr('disabled');
       $('#sub-key-container').css('display', '');
-      $('#key-cap-unicode-toolbar-item, #key-cap-toolbar-item').css('display', builder.specialCharacters[val] ? 'none' : '');
+      $('#key-cap-unicode-toolbar-item, #key-cap-toolbar-item').css('display', builderConstants.specialCharacters[val] ? 'none' : '');
     }
   },
 
@@ -850,7 +853,7 @@ export const builder: Builder = {
 
   selectKeyByCode: function (code) {
     if (code >= 0 && code < 256) {
-      var keyName = builder.standardKeyNames[code];
+      var keyName = builderConstants.standardKeyNames[code];
       var key = $('.key').filter(function (_index, elem) { return $(elem).data('id') === keyName; });
       if (key.length > 0) builder.selectKey(key[0]);
     }
@@ -900,7 +903,7 @@ export const builder: Builder = {
           }
           builder.selectPlatform();
           if(data.presentation &&
-              builder.presentations[data.presentation] &&
+              builderConstants.presentations[data.presentation] &&
               $('#selPlatformPresentation option[value="'+data.presentation+'"]').length) {
             $('#selPlatformPresentation').val(data.presentation);
           } else {
@@ -908,7 +911,7 @@ export const builder: Builder = {
             $('#selPlatformPresentation').val($('#selPlatformPresentation option:first').val());
           }
 
-          builder.lastPresentations = {...(data.lastPresentations ?? this.defaultPresentations)};
+          builder.lastPresentations = {...(data.lastPresentations ?? builderConstants.defaultPresentations)};
           builder.lastLayers = {...(data.lastLayers ?? {})};
 
           let selection = builder.saveSelection();
@@ -972,7 +975,7 @@ const inpKeyNameChange = builder.wrapChange(function (evt: JQueryEventObject) {
 $('#inpKeyName')
   .change(inpKeyNameChange)
   .autocomplete({
-    source: builder.lookupKeyNames,
+    source: builderConstants.lookupKeyNames,
     change: inpKeyNameChange,
     select: builder.wrapInstant(inpKeyNameChange)
   })
