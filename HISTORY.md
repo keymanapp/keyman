@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.281 alpha 2026-09-07
+
+* chore(deps): bump fast-uri from 3.1.5 to 3.1.7 (#16511)
+* chore(deps): bump nanoid from 3.3.11 to 3.3.18 (#16512)
+* chore(deps): bump qs and express (#16513)
+* chore(web): adjust types in guide-examples tests (#16523)
+
 ## 19.0.280 alpha 2026-09-05
 
 * fix(windows): open chm external links in user's browser (#16515)
