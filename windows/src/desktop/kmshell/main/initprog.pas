@@ -222,6 +222,7 @@ begin
   FQuery := '';
   FMode := fmStart;
   KeyboardFileNames.Clear;
+  FBaseKeyboard := 0;
 
   i := 1;
   while i <= ParamCount do
@@ -264,13 +265,13 @@ begin
       else if s = '-bd' then FMode := fmBackgroundDownload
       else if s = '-an' then FMode := fmApplyInstallNow
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
-      else if s = '-bklid' then begin Inc(i); FBaseKeyboard := StrToInt('$' + ParamStr(i)); end
+      else if s = '-bklid' then begin Inc(i); FBaseKeyboard := StrToIntDef('$' + ParamStr(i), 0); end
       else if s = '-mcompilekbds' then
       begin
         FMode := fmMCompileKbds;
         Inc(i);
         if i > ParamCount then Exit;
-        FBaseKeyboard := StrToInt('$' + ParamStr(i));
+        FBaseKeyboard := StrToIntDef('$' + ParamStr(i), 0);
       end
       else if s = '-nowelcome'   then FNoWelcome := True
       else if s = '-kw' then FMode := fmKeyboardWelcome  // I2569
