@@ -12,7 +12,7 @@ unit keymanapi_TLB;
 // ************************************************************************ //
 
 // $Rev: 52393 $
-// File generated on 16/09/2021 6:54:44 PM from Type Library described below.
+// File generated on 7/09/2026 3:54:23 PM from Type Library described below.
 
 // ************************************************************************  //
 // Type Lib: C:\Projects\keyman\app\windows\src\engine\kmcomapi\kmcomapi (1)
@@ -87,6 +87,7 @@ const
   IID_IKeymanKeyboardLanguagesInstalled: TGUID = '{7DC22BC0-85BB-45C0-8EDB-A2F4BD1D500B}';
   IID_IKeymanKeyboardLanguagesFile: TGUID = '{5F90BCDA-F1C1-433A-8FD0-B498299D3C30}';
   IID_IKeymanKeyboardsInstalled2: TGUID = '{EA57C94F-C140-485E-941A-3F1D5A229024}';
+  IID_IKeymanKeyboardInstalled2: TGUID = '{3086C85C-932A-4726-BF76-2D74DD133AC9}';
   IID_IKeymanPackagesInstalled2: TGUID = '{F23B9848-2AEF-4A2B-BC3A-292E3A00D691}';
   IID_IKeymanKeyboardFile2: TGUID = '{EDE4326B-51F4-42D5-8251-B20B71993EC8}';
   IID_IKeymanPackageFile2: TGUID = '{9B43B6BC-C622-47EF-915E-6780CF53BAAA}';
@@ -248,6 +249,8 @@ type
   IKeymanKeyboardLanguagesFileDisp = dispinterface;
   IKeymanKeyboardsInstalled2 = interface;
   IKeymanKeyboardsInstalled2Disp = dispinterface;
+  IKeymanKeyboardInstalled2 = interface;
+  IKeymanKeyboardInstalled2Disp = dispinterface;
   IKeymanPackagesInstalled2 = interface;
   IKeymanPackagesInstalled2Disp = dispinterface;
   IKeymanKeyboardFile2 = interface;
@@ -1570,16 +1573,6 @@ type
   end;
 
 // *********************************************************************//
-// Interface: IKeymanKeyboardInstalled2
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {3086C85C-932A-4726-BF76-2D74DD133AC9}
-// *********************************************************************//
-  IKeymanKeyboardInstalled2 = interface(IKeymanKeyboardInstalled)
-    ['{3086C85C-932A-4726-BF76-2D74DD133AC9}']
-    procedure MCompileForBaseKeyboard(KLID: Integer); safecall;
-  end;
-
-// *********************************************************************//
 // DispIntf:  IKeymanKeyboardsInstalled2Disp
 // Flags:     (4416) Dual OleAutomation Dispatchable
 // GUID:      {EA57C94F-C140-485E-941A-3F1D5A229024}
@@ -1596,6 +1589,51 @@ type
     property Count: Integer readonly dispid 1;
     property _NewEnum: IUnknown readonly dispid -4;
     procedure Refresh; dispid 2;
+    function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
+                          out References: OleVariant): WideString; dispid 401;
+  end;
+
+// *********************************************************************//
+// Interface: IKeymanKeyboardInstalled2
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {3086C85C-932A-4726-BF76-2D74DD133AC9}
+// *********************************************************************//
+  IKeymanKeyboardInstalled2 = interface(IKeymanKeyboardInstalled)
+    ['{3086C85C-932A-4726-BF76-2D74DD133AC9}']
+    procedure MCompileForBaseKeyboard(KLID: Integer); safecall;
+  end;
+
+// *********************************************************************//
+// DispIntf:  IKeymanKeyboardInstalled2Disp
+// Flags:     (4416) Dual OleAutomation Dispatchable
+// GUID:      {3086C85C-932A-4726-BF76-2D74DD133AC9}
+// *********************************************************************//
+  IKeymanKeyboardInstalled2Disp = dispinterface
+    ['{3086C85C-932A-4726-BF76-2D74DD133AC9}']
+    procedure MCompileForBaseKeyboard(KLID: Integer); dispid 288;
+    property IconFilename: WideString readonly dispid 257;
+    procedure InstallVisualKeyboard(const Filename: WideString); dispid 258;
+    property KeymanID: Integer readonly dispid 259;
+    property Languages: IKeymanKeyboardLanguagesInstalled readonly dispid 260;
+    property Loaded: WordBool dispid 261;
+    property Options: IKeymanKeyboardOptions readonly dispid 262;
+    property OwnerPackage: IKeymanPackageInstalled readonly dispid 263;
+    property VisualKeyboard: IKeymanVisualKeyboard readonly dispid 264;
+    procedure Uninstall; dispid 265;
+    property Bitmap: IPicture readonly dispid 1;
+    property Copyright: WideString readonly dispid 2;
+    property DefaultBCP47Languages: WideString readonly dispid 3;
+    property DefaultPrimaryLanguage: Integer readonly dispid 4;
+    property DefaultWindowsLanguages: WideString readonly dispid 5;
+    property DefaultHotkey: IKeymanHotkey readonly dispid 6;
+    property Encodings: KeymanKeyboardEncodings readonly dispid 7;
+    property Filename: WideString readonly dispid 8;
+    function GetCharsUsed: WideString; dispid 9;
+    property ID: WideString readonly dispid 10;
+    property LayoutType: KeymanKeyboardLayoutType readonly dispid 11;
+    property Message: WideString readonly dispid 12;
+    property Name: WideString readonly dispid 13;
+    property Version: WideString readonly dispid 14;
     function SerializeXML(Flags: tagKeymanSerializeFlags; const ImagePath: WideString;
                           out References: OleVariant): WideString; dispid 401;
   end;

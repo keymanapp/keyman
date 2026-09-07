@@ -255,7 +255,7 @@ begin
         try
           Execute(FDestFileName, PackageID, BaseKeyboardID);
         finally
-          RecompileMnemonicKeyboard.Free;
+          Free;
         end;
       end;
     finally
