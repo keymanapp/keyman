@@ -120,16 +120,12 @@
 
         <data android:host="*" />
         <data android:pathPattern=".*\\.kmp" />
-        <data
-          android:mimeType="application/vnd.keyman.kmp+zip"
-          android:scheme="content" />
 
+        <data android:mimeType="application/vnd.keyman.kmp+zip" />
         <!--
           Backup MIME intents
         -->
-        <data
-          android:mimeType="application/octet-stream"
-          android:scheme="content" />
+        <data android:mimeType="application/octet-stream" />
       </intent-filter>
 
       <!--
