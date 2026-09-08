@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.282 alpha 2026-09-08
+
+* refactor(web): clarify function scope and update some function comments (#16532)
+
 ## 19.0.281 alpha 2026-09-07
 
 * chore(deps): bump fast-uri from 3.1.5 to 3.1.7 (#16511)
