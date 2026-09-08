@@ -278,21 +278,25 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
   /**
    * Associate control with independent keyboard settings initialized to a specific keyboard.
-   * The pair of `keyboard` and `languageCode` (if not `null`) must refer to a
+   * The pair of `keyboardId` and `languageCode` (if not `null` or empty string) must refer to a
    * registered keyboard stub.
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/setKeyboardForControl
    *
-   * @param       {Element}       elem          The control element to be managed manually
-   * @param       {string|null=}  keyboard      The id of a keyboard, consisting of the word
-   *                                            `Keyboard_` followed by the internal keyboard
-   *                                            name. For a keyboard with the internal name
-   *                                            `laokeys` this would be `Keyboard_laokeys`.
-   *                                            If `null` clears the set keyboard.
-   * @param       {string|null=}  languageCode  A BCP47 language code which was used when
-   *                                            registering the keyboard stub.
+   * @param  {Element}       elem          The control element to be managed manually
+   * @param  {string|null=}  keyboardId    The id of a keyboard, consisting of the word
+   *                                       `Keyboard_` followed by the internal keyboard name.
+   *                                       For a keyboard with the internal name `laokeys` this
+   *                                       would be `Keyboard_laokeys`.
+   *                                       If keyboardId and languageCode are both null, the
+   *                                       control will use the global keyboard.
+   *                                       If both are the empty string, the control will use the
+   *                                       system keyboard (on desktop), or the first installed
+   *                                       keyboard (on touch devices).
+   * @param  {string|null=}  languageCode  A BCP47 language code which was used when registering
+   *                                       the keyboard stub.
    */
-  public setKeyboardForControl(elem: HTMLElement, keyboard?: string | null, languageCode?: string | null): void {
+  public setKeyboardForControl(elem: HTMLElement, keyboardId?: string | null, languageCode?: string | null): void {
     if (!elem.ownerDocument.defaultView) {
       return;
     }
@@ -307,14 +311,14 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     }
 
     let stub = null;
-    if(keyboard) {
-      stub = this.keyboardRequisitioner.cache.getStub(keyboard, languageCode);
+    if(keyboardId) {
+      stub = this.keyboardRequisitioner.cache.getStub(keyboardId, languageCode);
       if(!stub) {
-        throw new Error(`No keyboard has been registered with id ${keyboard} and language code ${languageCode}.`);
+        throw new Error(`No keyboard has been registered with id ${keyboardId} and language code ${languageCode}.`);
       }
     }
 
-    this.contextManager.setKeyboardForTextStore(elem._kmwAttachment.textStore, keyboard ?? null, languageCode ?? null);
+    this.contextManager.setKeyboardForTextStore(elem._kmwAttachment.textStore, keyboardId, languageCode);
   }
 
   /**
