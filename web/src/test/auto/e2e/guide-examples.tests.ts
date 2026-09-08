@@ -123,6 +123,51 @@ test.describe('Control-by-control example from the guide', function () {
     // Verify "Lao - Lao (Phonetic)" is selected (bold) in the menu
     await expect(await getSelectedKeyboardMenuText(page)).toBe('Lao - Lao (Phonetic)');
   });
+
+  test('switching between fields always shows OSK where appropriate (#16522)', async ({ page }: { page: Page }) => {
+    const verifyOskNotShowing = async () => {
+      await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+      await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeFalsy();
+      await expect(page.getByRole('img', { name: 'Use Web Keyboard' })).toBeVisible();
+      await expect(page.getByRole('img', { name: 'Show On Screen Keyboard' }).isHidden()).toBeTruthy();
+    };
+
+    const verifyLaoOskShowing = async () => {
+      await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+      await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
+      await expect(page.getByRole('img', { name: 'Use Web Keyboard' })).toBeVisible();
+      await expect(page.getByRole('img', { name: 'Show On Screen Keyboard' })).toBeVisible();
+      await expect(page.locator('#keymanweb_title_bar')).toContainText('Lao (Phonetic)');
+      await expect(await getSelectedKeyboardMenuText(page)).toBe('Lao - Lao (Phonetic)');
+    };
+
+    // Setup
+    await beforeEach(page);
+
+    // Click the subject field - verify OSK is not shown since system-keyboard selected
+    await page.getByPlaceholder('id = subject').click();
+    await verifyOskNotShowing();
+
+    // Click the message body field (which is in KeymanWeb mode) - verify OSK shows
+    await page.getByPlaceholder('id = text').click();
+    await verifyLaoOskShowing();
+
+    // Click the subject field again - OSK should hide again
+    await page.getByPlaceholder('id = subject').click();
+    await verifyOskNotShowing();
+
+    // Execute
+    // Click the message body field again - OSK should show again
+    await page.getByPlaceholder('id = text').click();
+
+    // Verify
+    await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+    await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
+    await expect(page.getByRole('img', { name: 'Use Web Keyboard' })).toBeVisible();
+    await expect(page.getByRole('img', { name: 'Show On Screen Keyboard' })).toBeVisible();
+    await expect(page.locator('#keymanweb_title_bar')).toContainText('Lao (Phonetic)');
+    await expect(await getSelectedKeyboardMenuText(page)).toBe('Lao - Lao (Phonetic)');
+  });
 });
 
 test.describe('Full manual control example from the guide', function () {
