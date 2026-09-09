@@ -85,11 +85,11 @@
 
 
       <!--
-                 Capture content by MIME type, which is how Gmail broadcasts
-                 attachment open requests.  pathPattern and file extensions
-                 are ignored, so the MIME type *MUST* be explicit, otherwise
-                 we will match absolutely every file opened.
-            -->
+        Capture content by MIME type, which is how Gmail broadcasts
+        attachment open requests.  pathPattern and file extensions
+        are ignored, so the MIME type *MUST* be explicit, otherwise
+        we will match absolutely every file opened.
+      -->
       <intent-filter android:priority="50">
         <action android:name="android.intent.action.VIEW" />
 
@@ -98,17 +98,21 @@
 
         <!-- needed for mangled email messages -->
         <data
-          android:mimeType="application/keyman"
+          android:mimeType="application/vnd.keyman.kmp+zip"
           android:scheme="content" />
-        <!-- needed for mangled email messages -->
         <data
           android:mimeType="application/octet-stream"
           android:scheme="content" />
-        <data
-          android:mimeType="application/vnd.keyman.kmp+zip"
-          android:scheme="content" />
       </intent-filter>
 
+      <!--
+        Capture file open requests (pathPattern is honoured) where no
+        MIME type is provided in the Intent.  An Intent with a null
+        MIME type will never be matched by a filter with a set MIME
+        type, so we need a second intent-filter if we wish to also
+        match files with this extension and a non-null MIME type
+        (even if it is non-null but zero length).
+      -->
       <intent-filter android:priority="50">
         <action android:name="android.intent.action.VIEW" />
 
@@ -126,25 +130,6 @@
           Backup MIME intents
         -->
         <data android:mimeType="application/octet-stream" />
-      </intent-filter>
-
-      <!--
-            Capture file open requests (pathPattern is honoured) where no
-            MIME type is provided in the Intent.  An Intent with a null
-            MIME type will never be matched by a filter with a set MIME
-            type, so we need a second intent-filter if we wish to also
-            match files with this extension and a non-null MIME type
-            (even if it is non-null but zero length).
-      -->
-      <intent-filter android:priority="50">
-        <action android:name="android.intent.action.VIEW" />
-
-        <category android:name="android.intent.category.BROWSABLE" />
-        <category android:name="android.intent.category.DEFAULT" />
-
-        <data android:scheme="file" />
-        <data android:host="*" />
-        <data android:pathPattern="/.*\\.kmp" />
       </intent-filter>
 
       <intent-filter>
