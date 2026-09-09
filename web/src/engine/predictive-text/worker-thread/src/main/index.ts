@@ -245,7 +245,7 @@ export class LMLayerWorker {
         // it serves as a wordbreaking token.
         if(autoInsert != '') {
           configuration.appendsWordbreaks = {
-            breakingMarks: [autoInsert, '.', ',', ';', ':', '?', '!']
+            breakingMarks: [autoInsert, '.', ',', ';', ':', '?', '!', ' ', '\t', '\n']
           };
         } // else leave undefined (falsy) - it has unusual wordbreaking patterns,
           // so avoid further assumptions.
