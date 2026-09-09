@@ -4,7 +4,7 @@ title: Software Task - Update Keyman for Windows
 
 ## Check for Updates Automatically
 
-Keyman can check for updates automatically once a week. Here\'s how:
+Keyman can check for updates automatically. Here\'s how:
 
 1.  Open Keyman.
 
@@ -17,16 +17,19 @@ Keyman can check for updates automatically once a week. Here\'s how:
 
     ![](../desktop_images/tab-options.png)
 
-4.  Tick \'Automatically check keyman.com weekly for updates.\'
-
-5.  Click OK to apply changes.
+4.  Tick \'Automatically check for updates and download\'
 
 ## Check for Updates Manually
 
-You can check for updates at any time by clicking \'Check for
-Updates...\' from the Support tab of Keyman Configuration.
+You can check for updates at any time. Here\'s how:
 
-![](../desktop_images/tab-support.png)
+1. Select Update tab and click \'Check for new updates\'.
+
+    ![](../desktop_images/tab-update.png)
+
+2. Click \'Install update now\'.
+
+    ![](../desktop_images/install-update-now.png)
 
 ## Updating Manually
 
