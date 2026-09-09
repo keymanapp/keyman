@@ -163,6 +163,54 @@ describe('LMLayerWorker', function() {
       })));
     });
 
+    it('should send back an "error" message and recover when given an invalid filepath', function () {
+      var fakePostMessage = sinon.fake();
+      var context: MockedContext = {
+        postMessage: fakePostMessage
+      };
+      context.importScripts = importScriptsWith(context);
+
+      var worker = LMLayerWorker.install(context);
+      configWorker(worker);
+
+      worker.onMessage(createMessageEventWithData({
+        message: 'load',
+        source: {
+          type: 'file',
+          file: require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js") + "x"
+        }
+      }));
+
+      assert(fakePostMessage.calledOnce);
+      assert(fakePostMessage.calledWith(sinon.match({
+        message: 'error'
+      })));
+
+      // Validate internal state name - that we're still in an unloaded mode.
+      // worker.state is private, though.
+      assert.equal(worker['state'].name, 'modelless');
+      // Permit host engine 'unload' messages to pass through without error while in this state.
+      worker.onMessage(createMessageEventWithData({
+        message: 'unload'
+      }));
+
+      // No new message should be received in this case; it should pass through silently.
+      assert(fakePostMessage.calledOnce);
+
+      worker.onMessage(createMessageEventWithData({
+        message: 'load',
+        source: {
+          type: 'file',
+          file: require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js")
+        }
+      }));
+
+      assert(fakePostMessage.calledTwice);
+      assert(fakePostMessage.calledWith(sinon.match({
+        message: 'ready'
+      })));
+    });
+
     it('should send back a "ready" message when given raw code', function () {
       var fakePostMessage = sinon.fake();
       var context = {
