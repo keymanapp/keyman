@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.283 alpha 2026-09-09
+
+* change(web): allow autocorrection on input of basic whitespaces (#16541)
+
 ## 19.0.282 alpha 2026-09-08
 
 * refactor(web): clarify function scope and update some function comments (#16532)
