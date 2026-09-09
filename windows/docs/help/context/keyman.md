@@ -6,4 +6,4 @@ title: Keyman Configuration
 * [Options Tab](configuration-options)
 * [Hotkeys Tab](configuration-hotkeys)
 * [Support Tab](configuration-support)
-* [Keep in Touch Tab](configuration-keepintouch)
+* [Update Tab](configuration-update)
