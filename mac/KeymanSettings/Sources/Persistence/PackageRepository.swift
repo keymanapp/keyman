@@ -111,16 +111,13 @@ public class PackageRepository: PackageRepo {
   }
   
   /**
-   * Load the Keyman packages from disk and wrap each package as a `KeymanPackage` object
-   * If the `KeymanPackage` passes validation, then add it to the `installedPackages` array.
-   *
+   * Load the Keyman packages from disk and add it to the `installedPackages` array if it passes validation.
    */
   public func loadAllPackages() -> [KeymanPackage] {
     var installedPackages: [KeymanPackage] = []
-    let packageSourceMap = self.readKeymanPackagesForKeyman19()
+    let packageMap = self.readPackages()
     
-    for (url, source) in packageSourceMap {
-      let package = KeymanPackage(packageUrl: url, packageSource: source)
+    for (url, package) in packageMap {
       do {
         try package.validate()
         installedPackages.append(package)
@@ -129,8 +126,46 @@ public class PackageRepository: PackageRepo {
         LogUtil.errorBreadcrumb("validation failed for \(url.lastPathComponent) with error: \(error as NSError)", category: .data)
       }
     }
-    
+
     return installedPackages
+  }
+  
+  /**
+   * read packages at Keyman 19 location, Keyman-Packages directory inside Group Containers directory
+   */
+  func readPackages() -> [URL: KeymanPackage] {
+    let packageDirectoryUrl = self.pathUtil.keyman19PackagesDirectory
+    var packageMap: [URL: KeymanPackage] = [:]
+    
+    do {
+      // Get the URLs for all items in the directory that are not hidden
+      let directoryContents = try FileManager.default.contentsOfDirectory(
+        at: packageDirectoryUrl,
+        includingPropertiesForKeys: nil,
+        options: [.skipsHiddenFiles]
+      )
+      
+      for itemUrl in directoryContents {
+        // if the item is a directory, then attempt to read it as a keyboard package
+        if (itemUrl.hasDirectoryPath) {
+          do {
+            if let package =  try readPackageFromDirectory(packageDirectoryUrl: itemUrl) {
+              packageMap[itemUrl] = package
+            }
+          } catch let error as LoadPackageError {
+            Logger.data.error("package at \(itemUrl.cleanUrlPath(), privacy: .public) could not be loaded: \(error as NSError, privacy: .public)")
+            LogUtil.errorBreadcrumb("package at \(itemUrl.cleanUrlPath()) could not be loaded: \(error as NSError)", category: .data)
+          }
+        }
+      }
+    } catch {
+      Logger.data.error("failed to read directory: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("failed to read directory: \(error as NSError)", category: .data)
+    }
+    
+    Logger.data.info("readPackageSource: \(packageMap.count) packages read")
+    LogUtil.infoBreadcrumb("readPackageSource: \(packageMap.count) packages read", category: .data)
+    return packageMap
   }
   
   /**
@@ -142,9 +177,8 @@ public class PackageRepository: PackageRepo {
     Logger.data.info("loadSinglePackage from url: \(packageUrl.cleanUrlPath(), privacy: .public)")
     LogUtil.infoBreadcrumb("loadSinglePackage from url: \(packageUrl.cleanUrlPath())", category: .data)
     
-    guard let source =  try readPackageFromDirectory(packageDirectoryUrl: packageUrl) else { throw LoadPackageError.invalidUrl }
+    guard let package =  try readPackageFromDirectory(packageDirectoryUrl: packageUrl) else { throw LoadPackageError.invalidUrl }
     
-    let package = KeymanPackage(packageUrl: packageUrl, packageSource: source)
     try package.validate()
     return package
   }
@@ -272,63 +306,19 @@ public class PackageRepository: PackageRepo {
   }
   
   /**
-   * read packages at Keyman 19 location, inside Group Containers directory
-   */
-  func readKeymanPackagesForKeyman19() -> [URL: PackageSource] {
-    return readPackageSource(packageDirectoryUrl: self.pathUtil.keyman19PackagesDirectory)
-  }
-  
-  /**
-   * loop through all the sub-directories in the packages directory and try to read them as packages
-   */
-  func readPackageSource(packageDirectoryUrl: URL) -> [URL: PackageSource] {
-    var packageMap: [URL: PackageSource] = [:]
-    
-    do {
-      // Get the URLs for all items in the directory that are not hidden
-      let directoryContents = try FileManager.default.contentsOfDirectory(
-        at: packageDirectoryUrl,
-        includingPropertiesForKeys: nil,
-        options: [.skipsHiddenFiles]
-      )
-      
-      for itemUrl in directoryContents {
-        // if the item is a directory, then attempt to read it as a keyboard package
-        if (itemUrl.hasDirectoryPath) {
-          do {
-            if let packageSource =  try readPackageFromDirectory(packageDirectoryUrl: itemUrl) {
-              packageMap[itemUrl] = packageSource
-            }
-          } catch let error as LoadPackageError {
-            Logger.data.error("package at \(itemUrl.cleanUrlPath(), privacy: .public) could not be loaded: \(error as NSError, privacy: .public)")
-            LogUtil.errorBreadcrumb("package at \(itemUrl.cleanUrlPath()) could not be loaded: \(error as NSError)", category: .data)
-          }
-        }
-      }
-    } catch {
-      Logger.data.error("failed to read directory: \(error as NSError, privacy: .public)")
-      LogUtil.errorBreadcrumb("failed to read directory: \(error as NSError)", category: .data)
-    }
-    
-    Logger.data.info("readPackageSource: \(packageMap.count) packages read")
-    LogUtil.infoBreadcrumb("readPackageSource: \(packageMap.count) packages read", category: .data)
-    return packageMap
-  }
-  
-  /**
    * check the specified directory for the kmp.json file and read it if it exists
    */
-  func readPackageFromDirectory(packageDirectoryUrl: URL) throws -> PackageSource? {
-    Logger.data.info("readPackageFromDirectory from url: \(packageDirectoryUrl.cleanUrlPath(), privacy: .public)")
-    LogUtil.infoBreadcrumb("readPackageFromDirectory from url: \(packageDirectoryUrl.cleanUrlPath())", category: .data)
-    var packageSource: PackageSource? = nil
+  func readPackageFromDirectory(packageDirectoryUrl: URL) throws -> KeymanPackage? {
+    Logger.data.info("readKeymanPackageFromDirectory from url: \(packageDirectoryUrl.cleanUrlPath(), privacy: .public)")
+    LogUtil.infoBreadcrumb("readKeymanPackageFromDirectory from url: \(packageDirectoryUrl.cleanUrlPath())", category: .data)
+    var keymanPackage: KeymanPackage? = nil
     let kmpJsonFileUrl = packageDirectoryUrl.appendingPathComponent(packageJsonFilename)
     let kmpInfFileUrl = packageDirectoryUrl.appendingPathComponent(packageInfFilename)
     
     if FileManager.default.fileExists(atPath: kmpJsonFileUrl.path(percentEncoded: false)) {
       // if an error occurs, it will be propagated to caller
-      if let source = try readPackageFromJson(kmpJsonFileUrl: kmpJsonFileUrl) {
-        packageSource = source
+      if let package = try readPackageFromJson(kmpJsonFileUrl: kmpJsonFileUrl, in: packageDirectoryUrl) {
+        keymanPackage = package
       }
     } else {
       // if no kmp.json file, look for kmp.info instead
@@ -336,8 +326,8 @@ public class PackageRepository: PackageRepo {
         Logger.data.info("fallback to kmp.inf file at: \(kmpInfFileUrl.cleanUrlPath(), privacy: .public)")
         LogUtil.infoBreadcrumb("fallback to kmp.inf file at: \(kmpInfFileUrl.cleanUrlPath())", category: .data)
         
-        if let source = try readPackageFromInf(kmpInfFileUrl: kmpInfFileUrl) {
-          packageSource = source
+        if let package = try readPackageFromInf(kmpInfFileUrl: kmpInfFileUrl, in: packageDirectoryUrl) {
+          keymanPackage = package
         }
       } else {
         // no kmp.json and no kmp.inf, so throw error
@@ -346,46 +336,51 @@ public class PackageRepository: PackageRepo {
       }
     }
     
-    return packageSource
+    return keymanPackage
   }
   
   /**
    * read and parse the kmp.json file at the specified URL
    */
-  func readPackageFromJson(kmpJsonFileUrl: URL) throws -> PackageSource? {
+  func readPackageFromJson(kmpJsonFileUrl: URL, in packageDirectoryUrl: URL) throws -> KeymanPackage? {
     var packageSource: PackageSource?
+    var package: KeymanPackage?
     do {
       let jsonData = try Data(contentsOf: kmpJsonFileUrl, options: .mappedIfSafe)
       packageSource = try JSONDecoder().decode(PackageSource.self, from: jsonData)
-      
+      if let source = packageSource {
+        package = KeymanPackage(packageUrl: packageDirectoryUrl, packageSource: source)
+      }
     } catch let error as LoadPackageError {
       // if we encounter a LoadPackageError, propagate it
       throw error
     } catch {
       // otherwise convert the error to a LoadPackageError error
-      Logger.data.error("readPackage error: \(error as NSError, privacy: .public)")
-      LogUtil.errorBreadcrumb("readPackage error: \(error as NSError)", category: .data)
+      Logger.data.error("readKeymanPackageFromJson error: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("readKeymanPackageFromJson error: \(error as NSError)", category: .data)
       throw LoadPackageError.kmpJsonFileUnreadable
     }
-    return packageSource
+    return package
   }
   
   /**
    * read and parse the kmp.json file at the specified URL
    */
-  func readPackageFromInf(kmpInfFileUrl: URL) throws -> PackageSource? {
-    var packageSource: PackageSource? = nil
+  func readPackageFromInf(kmpInfFileUrl: URL, in packageDirectoryUrl: URL) throws -> KeymanPackage? {
+    var package: KeymanPackage? = nil
     
     do {
-      let packageReader = KMPackageReader(url: kmpInfFileUrl)
-      if let packageInfo = try packageReader.loadPackageInfoFromInfFile() {
-        print("successfully read package: \(String(describing: packageInfo.packageName))")
+      let packageReader = try KmpInfParser(fileUrl: kmpInfFileUrl, in: packageDirectoryUrl)
+      if let keymanPackage = try packageReader.parse() {
+        package = keymanPackage
+        Logger.data.info("successfully read package using kmp.inf: \(keymanPackage.packageName, privacy: .public)")
+        LogUtil.infoBreadcrumb("successfully read package using kmp.inf: \(keymanPackage.packageName)", category: .data)
       }
     } catch {
-      print("failed to read kmp.inf file, error: \(error)")
-      return nil
+      Logger.data.error("failed to read kmp.inf file: \(kmpInfFileUrl.cleanUrlPath(), privacy: .public), error: \(error)")
+      throw error
     }
     
-    return packageSource
+    return package
   }
 }
