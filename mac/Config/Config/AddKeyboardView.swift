@@ -32,11 +32,11 @@ struct AddKeyboardView: View {
             .font(.headline)
           
           // Native progress bar bound to the coordinator's value (0.0 to 1.0)
-          ProgressView(value: downloadCoordinator.downloadProgress, total: 1.0)
+          ProgressView(value: downloadCoordinator.downloadProgressFraction, total: 1.0)
             .progressViewStyle(.linear)
             .frame(width: 250)
           
-          Text("\(Int(downloadCoordinator.downloadProgress * 100))%")
+          Text(downloadCoordinator.downloadProgressFraction, format: .percent.precision(.fractionLength(0)))
             .font(.body)
             .foregroundColor(.secondary)
         }

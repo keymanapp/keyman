@@ -33,12 +33,35 @@ public enum InstallPackageError: LocalizedError {
   case fontRegistrationError
   case internalError // due to invalid state, should never occur
 
+  private var packageBundle: LocalizedStringResource.BundleDescription {
+      .atURL(Bundle.module.bundleURL)
+  }
   public var errorDescription: String? {
     switch self {
-    case .packageInstallationAlreadyInProgress: return "A package installation is already in progress."
-    case .fontCopyError: return "There was an error copying the font."
-    case .fontRegistrationError: return "There was an error registering the font."
-    case .internalError: return "An internal error occurred."
+    case .packageInstallationAlreadyInProgress:
+      let resource = LocalizedStringResource(
+        "installation.in.progress",
+        defaultValue: "A package installation is already in progress.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .fontCopyError:
+      let resource = LocalizedStringResource(
+        "font.copy.error",
+        defaultValue: "There was an error copying the font.",
+        bundle: packageBundle)
+      return String(localized: resource)
+   case .fontRegistrationError:
+      let resource = LocalizedStringResource(
+        "font.registration.error",
+        defaultValue: "There was an error registering the font.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .internalError:
+      let resource = LocalizedStringResource(
+        "error.internal",
+        defaultValue: "An internal error occurred.",
+        bundle: packageBundle)
+      return String(localized: resource)
     }
   }
 }
@@ -57,20 +80,27 @@ public extension Notification.Name {
   static let dataMigrated = Notification.Name("com.keyman.data.migrated")
 }
 
-// define LocalizedError so that UI can present a localizable message
-// when the attempt to install a KMP file using drag and drop fails
 public enum DropKmpError: LocalizedError {
   case invalidFileType(String)
-  case alreadyInstalled(String)
-  case installFailed(String)
-  case tooManyFiles
+  case exceededFileDropLimit
   
+  private var packageBundle: LocalizedStringResource.BundleDescription {
+      .atURL(Bundle.module.bundleURL)
+  }
   public var errorDescription: String? {
     switch self {
-    case .invalidFileType(let fileName): return "The file \(fileName) is not a .KMP file."
-    case .alreadyInstalled(let fileName): return "The package \(fileName) is already installed."
-    case .installFailed(let fileName): return "The file \(fileName) could not be installed."
-    case .tooManyFiles: return "Only a single .KMP file can be installed at a time."
+    case .invalidFileType(let fileName):
+      let resource = LocalizedStringResource(
+        "non.kmp.file",
+        defaultValue: "The file \(fileName) is not a .KMP file.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .exceededFileDropLimit:
+      let resource = LocalizedStringResource(
+        "exceeded.file.drop.limit",
+        defaultValue: "Only a single .KMP file can be installed at a time.",
+        bundle: packageBundle)
+      return String(localized: resource)
     }
   }
 }

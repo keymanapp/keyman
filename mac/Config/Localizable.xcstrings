@@ -1,0 +1,141 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Access has not been granted." : {
+
+    },
+    "Add Keyboard" : {
+
+    },
+    "Are you sure you want to delete the Keyman package '%@'?" : {
+
+    },
+    "Author:" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Checking..." : {
+
+    },
+    "Close" : {
+
+    },
+    "Configuration" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Copy link" : {
+
+    },
+    "Copyright:" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Downloading File..." : {
+
+    },
+    "Enable" : {
+
+    },
+    "Enable Keyman" : {
+
+    },
+    "enabled" : {
+
+    },
+    "Ensure Keyman.app is set to provide it with necessary control in System Settings > Privacy & Security > Accessibility." : {
+
+    },
+    "Finish installation" : {
+
+    },
+    "Fonts:" : {
+
+    },
+    "Grant Accessibility Permission" : {
+
+    },
+    "Help" : {
+
+    },
+    "Help not available." : {
+
+    },
+    "Install" : {
+
+    },
+    "Installation" : {
+
+    },
+    "Installation complete" : {
+
+    },
+    "Keyboards" : {
+
+    },
+    "Missing Keyman Components" : {
+
+    },
+    "OK" : {
+
+    },
+    "One or more Keyman components or permissions require your attention. Complete the following steps to restore your Keyman installation." : {
+
+    },
+    "Open Settings" : {
+
+    },
+    "Package Installation Failed" : {
+
+    },
+    "Package Version:" : {
+
+    },
+    "Proceed to continue with installation" : {
+
+    },
+    "Read me not available." : {
+
+    },
+    "Remove Package" : {
+
+    },
+    "Repairs Required" : {
+
+    },
+    "Resolve Issues" : {
+
+    },
+    "Restart Computer" : {
+
+    },
+    "Restart your Mac to complete the installation. After restarting, open Keyman Configuration again if it doesn't launch automatically." : {
+
+    },
+    "Run Keyman installer" : {
+
+    },
+    "Share Keyboard" : {
+
+    },
+    "Show keyboard help" : {
+
+    },
+    "To use Keyman, enable the Keyman input method in System Settings." : {
+
+    },
+    "Website:" : {
+
+    },
+    "Your Keyman input method is either missing or outdated. Run the Keyman installer to install a new version." : {
+
+    }
+  },
+  "version" : "1.2"
+}

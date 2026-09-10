@@ -136,7 +136,7 @@ struct MainConfigView: View {
         .dropDestination(for: URL.self) { urls, _ in
           // reject drop if it is more than one file
           guard let droppedFileUrl = urls.first, urls.count < 2 else {
-            let error = DropKmpError.tooManyFiles
+            let error = DropKmpError.exceededFileDropLimit
             self.alertMessage = error.localizedDescription
             self.isShowingDropKmpAlert = true
             return false // the drop failed
