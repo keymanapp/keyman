@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.284 alpha 2026-09-10
+
+* maint(developer): remove unused ajv dependency from kmc-convert (#16539)
+* fix(web): remove scroll-to-top on page load (#16531)
+
 ## 19.0.283 alpha 2026-09-09
 
 * change(web): allow autocorrection on input of basic whitespaces (#16541)
