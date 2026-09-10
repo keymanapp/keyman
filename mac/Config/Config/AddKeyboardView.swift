@@ -9,6 +9,7 @@
 
 import SwiftUI
 import KeymanSettings
+import OSLog
 
 struct AddKeyboardView: View {
   @EnvironmentObject var settings: SettingsContainer
@@ -52,7 +53,7 @@ struct AddKeyboardView: View {
       // Placement determines where on the bar it sits
       ToolbarItem(placement: .cancellationAction) {
         Button("Close") {
-          print("close button clicked")
+          Logger.app.debug("AddKeyboardView close button clicked")
           dismissAddKeyboardView()
           if settings.isInstallationInProgress() {
             settings.userCanceledPackageInstallation()
@@ -61,7 +62,7 @@ struct AddKeyboardView: View {
       }
     }
     .onDisappear {
-      print("AddKeyboardView onDisappear")
+      Logger.app.debug("AddKeyboardView onDisappear")
       downloadCoordinator.cancelActiveDownload()
     }
     .alert("Package Installation Failed", isPresented: $downloadCoordinator.loadPackageFailed) {
@@ -75,11 +76,13 @@ struct AddKeyboardView: View {
       if let helper = downloadCoordinator.installHelper {
         PackageConfirmationView(installHelper: helper) { accepted in
           if accepted {
-            print("installing validated package: \(helper.packageName ?? "unknown package")")
+            Logger.download.info("installing validated package: \(helper.packageName ?? "unknown package", privacy: .public)")
+            LogUtil.infoBreadcrumb("installing validated package: \(helper.packageName ?? "unknown package")", category: .download)
             do {
               try settings.installPackage()
             } catch {
-              print("failed to install package: \(helper.packageName ?? "unknown package") with error: \(error.localizedDescription)")
+              Logger.download.error("failed to install package: \(helper.packageName ?? "unknown package") with error: \(error as NSError, privacy: .public)")
+              LogUtil.errorBreadcrumb("failed to install package: \(helper.packageName ?? "unknown package") with error: \(error as NSError)", category: .download)
             }
           } else {
             settings.userCanceledPackageInstallation()

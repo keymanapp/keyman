@@ -8,10 +8,12 @@
 
 import Foundation
 import OSLog
+import Sentry
 
 extension Logger {
   private static let settingsSubsystem = "com.keyman.settings"
-  static let settings = Logger(subsystem: settingsSubsystem, category: "settings")
+  static let setup = Logger(subsystem: settingsSubsystem, category: "setup")
+  static let data = Logger(subsystem: settingsSubsystem, category: "data")
 }
 
 public struct ConfigAppUtil {
@@ -20,7 +22,9 @@ public struct ConfigAppUtil {
   // executes exactly once, the first time any config variable is read
   private static let configMap: [String: String]? = {
     guard let map = Bundle.main.infoDictionary?["Keyman"] as? [String: String] else {
-      fatalError("Keyman dictionary not found in main app bundle.")
+      let message = "Keyman dictionary not found in main app bundle."
+      LogUtil.errorBreadcrumb(message, category: .setup)
+      fatalError(message)
     }
     return map
   }()
@@ -63,5 +67,9 @@ public struct ConfigAppUtil {
       // get the actual version number from the application bundle
       return Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
     }
+  }
+  
+  static func captureSentryError(_ error: Error) {
+    SentrySDK.capture(error: error)
   }
 }

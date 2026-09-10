@@ -10,6 +10,7 @@
 
 import Foundation
 import AppKit
+import OSLog
 
 public class Keyboard: Identifiable, Hashable, Equatable {
   
@@ -84,9 +85,9 @@ public class Keyboard: Identifiable, Hashable, Equatable {
    * validate whether a corresponding kmx file exists for this keyboard
    */
   public func validateKmxFile(in packageDirectory: URL) throws {
-    let kmxFilePath = self.deriveKmxFileUrl(from: packageDirectory).path
-    if !FileManager.default.fileExists(atPath: kmxFilePath) {
-      print("** error: could not find kmx file \(kmxFilePath)")
+    let kmxFilePath = self.deriveKmxFileUrl(from: packageDirectory)
+    if !FileManager.default.fileExists(atPath: kmxFilePath.path(percentEncoded: false)) {
+      Logger.data.error("error: could not find kmx file \(kmxFilePath.cleanUrlPath(), privacy: .public)")
       throw LoadPackageError.missingKmxFile
     }
   }

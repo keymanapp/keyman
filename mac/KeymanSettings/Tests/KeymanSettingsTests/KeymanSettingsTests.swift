@@ -9,12 +9,13 @@
 
 import Testing
 import Foundation
+import OSLog
 @testable import KeymanSettings
 
 @Suite("Settings Container") struct SettingsContainersTests {
   
   fileprivate init() async throws {
-    print("init")
+    Logger.setup.info("init")
   }
   
   @Test("Check settings creation") @MainActor func testSettingsCreation() async throws {
@@ -138,7 +139,7 @@ import Foundation
 @Suite("Check Keyman paths") struct KeymanPathsTests {
   
   fileprivate init() async throws {
-    print("init")
+    Logger.setup.info("init")
   }
   
   @Test("Check Keyman 17 documents directory") func testKeyman17DocumentsDirectory() async throws {
@@ -191,7 +192,7 @@ import Foundation
   let moabiteKeyboardKey = "/sil_extinct/moabite.kmx"
   
   fileprivate init() async throws {
-    print("init Settings")
+    Logger.setup.info("init")
     do {
       try self.settingsRepo = DefaultsRepository(suiteName: "test.suite.name")
     } catch UserDefaultsError.unknownSuite {

@@ -8,6 +8,8 @@
 
 import SwiftUI
 import KeymanSettings
+import OSLog
+import Sentry
 
 struct MainConfigView: View {
   
@@ -54,7 +56,17 @@ struct MainConfigView: View {
   var body: some View {
     TabView (selection: $selectedTab) {
       VStack {
-        // the add keyboard button
+        // uncomment this Button to force sentry error (must edit scheme and disable 'Debug executable' to test)
+        /*
+          Button("Capture Sentry Error") {
+            let testError = NSError(domain: "SentryTest", code: 404, userInfo: [NSLocalizedDescriptionKey: "Testing Sentry from Keyman Config on Mac"])
+            SentrySDK.capture(error: testError)
+          }
+          .padding()
+          .buttonStyle(.borderedProminent)
+          .tint(.red)
+         */
+       // the add keyboard button
         LabelButtonView(
           action: { isShowingAddKeyboardSheet = true },
           label: "Add Keyboard",
@@ -96,7 +108,9 @@ struct MainConfigView: View {
         ) {
           Button("Delete", role: .destructive) {
             if let uuid = idToDelete {
-              print("deleting package.id: \(uuid)")
+              Logger.app.info("deleting package.id: \(uuid)")
+              LogUtil.infoBreadcrumb("deleting package.id: \(uuid)", category: .app)
+
               // use multiple expanded states?
               //expandedStates.removeValue(forKey: uuid)
               
@@ -156,13 +170,15 @@ struct MainConfigView: View {
             packageInstallHelper = nil
 
             if accepted {
-              print("installing validated package: \(helper.packageName ?? "unknown package")")
+              Logger.app.info("installing validated package: \(helper.packageName ?? "unknown package", privacy: .public)")
+              LogUtil.infoBreadcrumb("installing validated package: \(helper.packageName ?? "unknown package")", category: .app)
               do {
                 try settings.installPackage()
               } catch {
                 self.alertMessage = error.localizedDescription
                 self.isShowingDropKmpAlert = true
-                print("failed to install package: \(helper.packageName ?? "unknown package") with error: \(error.localizedDescription)")
+                Logger.app.error("failed to install package: \(helper.packageName ?? "unknown package", privacy: .public), error: \(error as NSError, privacy: .public)")
+                LogUtil.errorBreadcrumb("failed to install package: \(helper.packageName ?? "unknown package"), error: \(error)", category: .app)
               }
             } else {
               settings.userCanceledPackageInstallation()

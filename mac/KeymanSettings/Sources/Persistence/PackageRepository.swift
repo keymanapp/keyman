@@ -9,6 +9,7 @@
  */
 
 import Foundation
+import OSLog
 
 public enum LoadPackageError: LocalizedError {
   case invalidUrl
@@ -65,7 +66,8 @@ public class PackageRepository: PackageRepo {
         try package.validate()
         installedPackages.append(package)
       } catch {
-        print("validation failed for \(url) with error: \(error)")
+        Logger.data.error("validation failed for \(url.lastPathComponent, privacy: .public) with error: \(error as NSError, privacy: .public)")
+        LogUtil.errorBreadcrumb("validation failed for \(url.lastPathComponent) with error: \(error as NSError)", category: .data)
       }
     }
 
@@ -78,7 +80,9 @@ public class PackageRepository: PackageRepo {
    *
    */
   public func loadSinglePackage(packageUrl: URL) throws -> KeymanPackage {
-    print("loadSinglePackage from url: \(packageUrl)")
+    Logger.data.info("loadSinglePackage from url: \(packageUrl.cleanUrlPath(), privacy: .public)")
+    LogUtil.infoBreadcrumb("loadSinglePackage from url: \(packageUrl.cleanUrlPath())", category: .data)
+
     guard let source =  try readPackageFromDirectory(packageDirectoryUrl: packageUrl) else { throw LoadPackageError.invalidUrl }
       
     let package = KeymanPackage(packageUrl: packageUrl, packageSource: source)
@@ -90,12 +94,15 @@ public class PackageRepository: PackageRepo {
    * delete the package from disk
    */
   public func deletePackage(package: KeymanPackage) {
-    print("deleting package: \(package.sourceDirectoryUrl)")
+    Logger.data.info("deleting package: \(package.sourceDirectoryUrl.cleanUrlPath(), privacy: .public)")
+    LogUtil.infoBreadcrumb("deleting package: \(package.sourceDirectoryUrl.cleanUrlPath())", category: .data)
     do {
       try FileManager.default.removeItem(at: package.sourceDirectoryUrl)
-      print("deleted package: \(package.sourceDirectoryUrl)")
+      Logger.data.info("deleted package: \(package.sourceDirectoryUrl.cleanUrlPath(), privacy: .public)")
+      LogUtil.infoBreadcrumb("deleted package: \(package.sourceDirectoryUrl.cleanUrlPath())", category: .data)
     } catch {
-      print("could not delete directory: \(error.localizedDescription)")
+      Logger.data.error("could not delete directory: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("could not delete directory: \(error as NSError)", category: .data)
     }
   }
   
@@ -108,19 +115,23 @@ public class PackageRepository: PackageRepo {
     let packageTempDirectory = pathUtil.keyman19TempDirectory
 
     // create the keyman-packages directory if it doesn't already exist
-    if !FileManager.default.fileExists(atPath: packageDirectory.path) {
+    if !FileManager.default.fileExists(atPath: packageDirectory.path(percentEncoded: false)) {
       try FileManager.default.createDirectory(at: packageDirectory, withIntermediateDirectories: true, attributes: nil)
-      print("Created directory: \(packageDirectory.path)")
+      Logger.data.info("Created directory: \(packageDirectory.cleanUrlPath(), privacy: .public)")
+      LogUtil.infoBreadcrumb("Created directory: \(packageDirectory.cleanUrlPath())", category: .data)
     } else {
-      print("Directory already exists: \(packageDirectory.path)")
+      Logger.data.info("Directory already exists: \(packageDirectory.cleanUrlPath(), privacy: .public)")
+      LogUtil.infoBreadcrumb("Directory already exists: \(packageDirectory.cleanUrlPath())", category: .data)
     }
 
     // create the temp directory if it doesn't already exist
-    if !FileManager.default.fileExists(atPath: packageTempDirectory.path) {
+    if !FileManager.default.fileExists(atPath: packageTempDirectory.path(percentEncoded: false)) {
       try FileManager.default.createDirectory(at: packageTempDirectory, withIntermediateDirectories: true, attributes: nil)
-      print("Created directory: \(packageTempDirectory.path)")
+      Logger.data.info("Created directory: \(packageTempDirectory.cleanUrlPath(), privacy: .public)")
+      LogUtil.infoBreadcrumb("Created directory: \(packageTempDirectory.cleanUrlPath())", category: .data)
     } else {
-      print("Directory already exists: \(packageTempDirectory.path)")
+      Logger.data.info("Directory already exists: \(packageTempDirectory.cleanUrlPath(), privacy: .public)")
+      LogUtil.infoBreadcrumb("Directory already exists: \(packageTempDirectory.cleanUrlPath())", category: .data)
     }
   }
   
@@ -141,9 +152,11 @@ public class PackageRepository: PackageRepo {
         try fileManager.removeItem(at: fileURL)
       }
       
-      print("successfully cleared temp directory")
+      Logger.data.info("successfully cleared temp directory")
+      LogUtil.infoBreadcrumb("successfully cleared temp directory", category: .data)
     } catch {
-      print("error clearing temp directory: \(error.localizedDescription)")
+      Logger.data.error("error clearing temp directory: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("error clearing temp directory: \(error as NSError)", category: .data)
     }
   }
 
@@ -174,9 +187,11 @@ public class PackageRepository: PackageRepo {
   public func unzipKmpFile(at kmpFileUrl: URL, to packageDestinationUrl: URL) throws {
     do {
       try FileManager.default.unzipItem(at: kmpFileUrl, to: packageDestinationUrl)
-      print("Successfully unzipped the file!")
+      Logger.data.info("successfully unzipped the file")
+      LogUtil.infoBreadcrumb("successfully unzipped the file", category: .data)
     } catch {
-      print("Extraction failed: \(error.localizedDescription)")
+      Logger.data.error("extraction failed: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("extraction failed: \(error as NSError)", category: .data)
       throw LoadPackageError.unzipError
     }
   }
@@ -193,7 +208,7 @@ public class PackageRepository: PackageRepo {
    */
   func directoryExistsAtPath(directoryUrl: URL) -> Bool {
     var isDirectory: ObjCBool = false
-    let exists = FileManager.default.fileExists(atPath: directoryUrl.path, isDirectory: &isDirectory)
+    let exists = FileManager.default.fileExists(atPath: directoryUrl.path(percentEncoded: false), isDirectory: &isDirectory)
     return exists && isDirectory.boolValue
   }
   
@@ -226,15 +241,18 @@ public class PackageRepository: PackageRepo {
               packageMap[itemUrl] = packageSource
             }
           } catch let error as LoadPackageError {
-            print("** package at \(itemUrl) could not be loaded: \(error.localizedDescription)")
+            Logger.data.error("package at \(itemUrl.cleanUrlPath(), privacy: .public) could not be loaded: \(error as NSError, privacy: .public)")
+            LogUtil.errorBreadcrumb("package at \(itemUrl.cleanUrlPath()) could not be loaded: \(error as NSError)", category: .data)
           }
         }
       }
     } catch {
-      print("Failed to read directory: \(error.localizedDescription)")
+      Logger.data.error("failed to read directory: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("failed to read directory: \(error as NSError)", category: .data)
     }
     
-    print("\(packageMap.count) packages read")
+    Logger.data.info("readPackageSource: \(packageMap.count) packages read")
+    LogUtil.infoBreadcrumb("readPackageSource: \(packageMap.count) packages read", category: .data)
     return packageMap
   }
   
@@ -242,11 +260,12 @@ public class PackageRepository: PackageRepo {
    * check the specified directory for the kmp.json file and read it if it exists
    */
   func readPackageFromDirectory(packageDirectoryUrl: URL) throws -> PackageSource? {
-    print("readPackageFromDirectory from url: \(packageDirectoryUrl)")
+    Logger.data.info("readPackageFromDirectory from url: \(packageDirectoryUrl.cleanUrlPath(), privacy: .public)")
+    LogUtil.infoBreadcrumb("readPackageFromDirectory from url: \(packageDirectoryUrl.cleanUrlPath())", category: .data)
     var packageSource: PackageSource? = nil
     let kmpJsonFileUrl = packageDirectoryUrl.appendingPathComponent(packageFileName)
     
-    if !FileManager.default.fileExists(atPath: kmpJsonFileUrl.path) {
+    if !FileManager.default.fileExists(atPath: kmpJsonFileUrl.path(percentEncoded: false)) {
       throw LoadPackageError.kmpJsonFileNotFound
     }
     
@@ -272,7 +291,8 @@ public class PackageRepository: PackageRepo {
       throw error
     } catch {
       // otherwise convert the error to a LoadPackageError error
-      print("readPackage error: \(error.localizedDescription)")
+      Logger.data.error("readPackage error: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("readPackage error: \(error as NSError)", category: .data)
       throw LoadPackageError.kmpJsonFileUnreadable
     }
     return packageSource

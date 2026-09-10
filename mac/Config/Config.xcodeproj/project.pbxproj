@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D83272A82F57614400F71698 /* KeymanSettings in Frameworks */ = {isa = PBXBuildFile; productRef = D83272A72F57614400F71698 /* KeymanSettings */; };
+		D88B79CA30472B3B00F10D14 /* Sentry-Dynamic in Frameworks */ = {isa = PBXBuildFile; productRef = D88B79C930472B3B00F10D14 /* Sentry-Dynamic */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +71,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D83272A82F57614400F71698 /* KeymanSettings in Frameworks */,
+				D88B79CA30472B3B00F10D14 /* Sentry-Dynamic in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,6 +142,7 @@
 			name = Config;
 			packageProductDependencies = (
 				D83272A72F57614400F71698 /* KeymanSettings */,
+				D88B79C930472B3B00F10D14 /* Sentry-Dynamic */,
 			);
 			productName = Config;
 			productReference = D88F03C62F50ED5000C02A31 /* Keyman Configuration.app */;
@@ -220,6 +223,9 @@
 			);
 			mainGroup = D88F03BD2F50ED5000C02A31;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D88B79C830472B3B00F10D14 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D88F03C72F50ED5000C02A31 /* Products */;
 			projectDirPath = "";
@@ -629,10 +635,26 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		D88B79C830472B3B00F10D14 /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.26.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		D83272A72F57614400F71698 /* KeymanSettings */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = KeymanSettings;
+		};
+		D88B79C930472B3B00F10D14 /* Sentry-Dynamic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D88B79C830472B3B00F10D14 /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = "Sentry-Dynamic";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
