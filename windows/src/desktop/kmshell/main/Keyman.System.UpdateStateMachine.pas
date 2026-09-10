@@ -41,7 +41,7 @@ type
     constructor Create(Context: TUpdateStateMachine);
     procedure EnterState; virtual; abstract;
     procedure ExitState; virtual; abstract;
-    procedure HandleCheck; virtual; abstract;
+    procedure HandleCheck(ManualCheck: Boolean); virtual; abstract;
     function  HandleKmShell: Integer; virtual; abstract;
     procedure HandleDownload; virtual; abstract;
     procedure HandleAbort; virtual; abstract;
@@ -80,7 +80,7 @@ type
     constructor Create(AForce: Boolean);
     destructor Destroy; override;
 
-    procedure HandleCheck;
+    procedure HandleCheck(ManualCheck: Boolean);
     function HandleKmShell: Integer;
     procedure HandleDownload;
     procedure HandleAbort;
@@ -166,7 +166,7 @@ type
   public
     procedure EnterState; override;
     procedure ExitState; override;
-    procedure HandleCheck; override;
+    procedure HandleCheck(ManualCheck: Boolean); override;
     function HandleKmShell: Integer; override;
     procedure HandleDownload; override;
     procedure HandleAbort; override;
@@ -180,7 +180,7 @@ type
   public
     procedure EnterState; override;
     procedure ExitState; override;
-    procedure HandleCheck; override;
+    procedure HandleCheck(ManualCheck: Boolean); override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
     procedure HandleAbort; override;
@@ -192,7 +192,7 @@ type
     function DownloadUpdatesBackground: Boolean;
     procedure EnterState; override;
     procedure ExitState; override;
-    procedure HandleCheck; override;
+    procedure HandleCheck(ManualCheck: Boolean); override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
     procedure HandleAbort; override;
@@ -203,7 +203,7 @@ type
   public
     procedure EnterState; override;
     procedure ExitState; override;
-    procedure HandleCheck; override;
+    procedure HandleCheck(ManualCheck: Boolean); override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
     procedure HandleAbort; override;
@@ -238,7 +238,7 @@ type
   public
     procedure EnterState; override;
     procedure ExitState; override;
-    procedure HandleCheck; override;
+    procedure HandleCheck(ManualCheck: Boolean); override;
     function  HandleKmShell: Integer; override;
     procedure HandleDownload; override;
     procedure HandleAbort; override;
@@ -520,11 +520,11 @@ begin
   end;
 end;
 
-procedure TUpdateStateMachine.HandleCheck;
+procedure TUpdateStateMachine.HandleCheck(ManualCheck: Boolean);
 begin
   if not IsCurrentStateAssigned then
     Exit;
-  CurrentState.HandleCheck;
+  CurrentState.HandleCheck(ManualCheck);
 end;
 
 function TUpdateStateMachine.HandleKmShell: Integer;
@@ -639,13 +639,13 @@ begin
 
 end;
 
-procedure IdleState.HandleCheck;
+procedure IdleState.HandleCheck(ManualCheck: Boolean);
 var
   CheckForUpdates: TRemoteUpdateCheck;
   Result: TRemoteUpdateCheckResult;
 begin
 
-  CheckForUpdates := TRemoteUpdateCheck.Create(True);
+  CheckForUpdates := TRemoteUpdateCheck.Create(True, ManualCheck);
   try
     Result := CheckForUpdates.Run;
   finally
@@ -669,7 +669,7 @@ begin
   // Remote manages the last check time therefore
   // we will allow it to return early if it hasn't reached
   // the configured time between checks.
-  CheckForUpdates := TRemoteUpdateCheck.Create(False);
+  CheckForUpdates := TRemoteUpdateCheck.Create(False, False);
   try
     UpdateCheckResult := CheckForUpdates.Run;
   finally
@@ -748,13 +748,13 @@ begin
   // Exit UpdateAvailableState
 end;
 
-procedure UpdateAvailableState.HandleCheck;
+procedure UpdateAvailableState.HandleCheck(ManualCheck: Boolean);
 var
   CheckForUpdates: TRemoteUpdateCheck;
   Result: TRemoteUpdateCheckResult;
 begin
   // Check if new updates while in this state
-  CheckForUpdates := TRemoteUpdateCheck.Create(True);
+  CheckForUpdates := TRemoteUpdateCheck.Create(True, ManualCheck);
   try
     Result := CheckForUpdates.Run;
   finally
@@ -866,7 +866,7 @@ begin
   // Exit DownloadingState
 end;
 
-procedure DownloadingState.HandleCheck;
+procedure DownloadingState.HandleCheck(ManualCheck: Boolean);
 begin
 
 end;
@@ -887,7 +887,7 @@ begin
       bucStateContext.RemoveCachedFiles;
       FMutex.ReleaseOwnership; // Mutex must be freed before changing state
       ChangeState(IdleState);
-      bucStateContext.CurrentState.HandleCheck;
+      bucStateContext.CurrentState.HandleCheck(False);
     end;
   finally
     FreeAndNil(FMutex);
@@ -906,7 +906,7 @@ begin
       bucStateContext.RemoveCachedFiles;
       FMutex.ReleaseOwnership;  // Mutex must be freed before changing state
       ChangeState(IdleState);
-      bucStateContext.CurrentState.HandleCheck;
+      bucStateContext.CurrentState.HandleCheck(False);
     end;
   finally
     FreeAndNil(FMutex);
@@ -961,13 +961,13 @@ begin
   // Exit DownloadingState
 end;
 
-procedure WaitingRestartState.HandleCheck;
+procedure WaitingRestartState.HandleCheck(ManualCheck: Boolean);
 var
   CheckForUpdates: TRemoteUpdateCheck;
   Result: TRemoteUpdateCheckResult;
 begin
   // Check if new updates while in this state
-  CheckForUpdates := TRemoteUpdateCheck.Create(True);
+  CheckForUpdates := TRemoteUpdateCheck.Create(True, ManualCheck);
   try
     Result := CheckForUpdates.Run;
   finally
@@ -996,7 +996,7 @@ begin
     begin
       // Return to Idle state and check for Updates state
       ChangeState(IdleState);
-      bucStateContext.CurrentState.HandleCheck;
+      bucStateContext.CurrentState.HandleCheck(False);
       Result := kmShellContinue;
     end
     else
@@ -1198,7 +1198,7 @@ begin
 
 end;
 
-procedure InstallingState.HandleCheck;
+procedure InstallingState.HandleCheck(ManualCheck: Boolean);
 begin
 
 end;
