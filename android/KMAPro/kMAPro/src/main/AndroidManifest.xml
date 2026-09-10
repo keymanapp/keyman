@@ -98,13 +98,12 @@
         <category android:name="android.intent.category.BROWSABLE" />
         <category android:name="android.intent.category.DEFAULT" />
 
+        <data android:scheme="content" />
+        <data android:host="*" />
+
         <!-- needed for mangled email messages -->
-        <data
-          android:mimeType="application/vnd.keyman.kmp+zip"
-          android:scheme="content" />
-        <data
-          android:mimeType="application/octet-stream"
-          android:scheme="content" />
+        <data android:mimeType="application/vnd.keyman.kmp+zip"/>
+        <data android:mimeType="application/octet-stream"/>
       </intent-filter>
 
       <!--
@@ -119,6 +118,10 @@
         <category android:name="android.intent.category.BROWSABLE" />
         <category android:name="android.intent.category.DEFAULT" />
 
+        <data android:scheme="file" />
+        <data android:scheme="content" />
+
+        <data android:host="*" />
         <data android:pathPattern=".*\\.kmp" />
 
         <data android:mimeType="application/vnd.keyman.kmp+zip" />
@@ -174,11 +177,11 @@
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
 
-        <data android:host="keyman-staging.com" />
-        <data android:host="keyman.com" />
-
         <data android:scheme="http" />
         <data android:scheme="https" />
+
+        <data android:host="keyman-staging.com" />
+        <data android:host="keyman.com" />
 
         <data android:pathPrefix="/go/package/download" />
         <data android:pathPrefix="/keyboards/install" />
