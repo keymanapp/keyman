@@ -118,38 +118,38 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   /**
    * initializer to create for kmp.inf file
    */
-    init(
-      packageUrl: URL,
-      keyboards: [Keyboard],
-      fonts: [String],
-      packageName: String,
-      packageVersion: String,
-      minimumKeymanVersion: String = "7.0.0",
-      author: String? = nil,
-      websiteUrl: URL?,
-      copyright: String? = nil,
-      readmeFilename: String? = nil,
-      helpFilename: String? = nil,
-      graphicFilename: String?
-    ) throws {
-      // Replicate package validations
-      if keyboards.isEmpty { throw LoadPackageError.containsNoKeyboards }
-      
-      self.id = UUID()
-      self.sourceDirectoryUrl = packageUrl
-      self.sharePackageUrl = KeymanPackage.buildSharePackageUrl(packageUrl: self.sourceDirectoryUrl)
-      self.keyboards = keyboards
-      self.fonts = fonts
-      self.packageName = packageName
-      self.packageVersion = packageVersion
-      self.minimumSupportedKeymanVersion = minimumKeymanVersion
-      self.author = author
-      self.websiteUrl = websiteUrl
-      self.copyright = copyright
-      self.readmeFilename = readmeFilename
-      self.helpFilename = helpFilename
-      self.graphicFilename = graphicFilename
-    }
+  public init(
+    packageUrl: URL,
+    keyboards: [Keyboard],
+    fonts: [String],
+    packageName: String,
+    packageVersion: String,
+    minimumKeymanVersion: String = "7.0.0",
+    author: String? = nil,
+    websiteUrl: URL? = nil,
+    copyright: String? = nil,
+    readmeFilename: String? = nil,
+    helpFilename: String? = nil,
+    graphicFilename: String? = nil
+  ) throws {
+    // Replicate package validations
+    if keyboards.isEmpty { throw LoadPackageError.containsNoKeyboards }
+    
+    self.id = UUID()
+    self.sourceDirectoryUrl = packageUrl
+    self.sharePackageUrl = KeymanPackage.buildSharePackageUrl(packageUrl: self.sourceDirectoryUrl)
+    self.keyboards = keyboards
+    self.fonts = fonts
+    self.packageName = packageName
+    self.packageVersion = packageVersion
+    self.minimumSupportedKeymanVersion = minimumKeymanVersion
+    self.author = author
+    self.websiteUrl = websiteUrl
+    self.copyright = copyright
+    self.readmeFilename = readmeFilename
+    self.helpFilename = helpFilename
+    self.graphicFilename = graphicFilename
+  }
 
   /**
    * build an array of Keyboard objects using the array of KeyboardSource object created from the kmp.json and the package URL
@@ -181,28 +181,6 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
       }
     }
     return fontNames.sorted()
-  }
-
-  /**
-   * initializer that does not rely on package source -- provided to create unit test dat
-   */
-  public init(sourceDirectoryUrl: URL, sharePackageUrl: URL? = nil, keyboards: [Keyboard], packageName: String, packageVersion: String,
-              minimumKeymanVersion: String = "7.0.0", author: String? = nil, website: URL? = nil, copyright: String? = nil,
-              readmeFileName: String? = nil, helpFilename: String? = nil, graphicName: String? = nil) {
-    self.id = UUID()
-    self.sourceDirectoryUrl = sourceDirectoryUrl
-    self.sharePackageUrl = sharePackageUrl
-    self.keyboards = keyboards
-    self.packageName = packageName
-    self.packageVersion = packageVersion
-    self.minimumSupportedKeymanVersion = minimumKeymanVersion
-    self.author = author
-    self.websiteUrl = website
-    self.copyright = copyright
-    self.readmeFilename = readmeFileName
-    self.helpFilename = helpFilename
-    self.graphicFilename = graphicName
-    self.fonts = []
   }
   
   /**

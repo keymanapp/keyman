@@ -151,7 +151,6 @@ class KmpInfParser {
     // validate collected data before building
     try self.validateParsedData()
     
-    //
     return try self.buildPackage()
   }
   
