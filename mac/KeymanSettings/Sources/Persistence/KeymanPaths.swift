@@ -113,13 +113,6 @@ public struct KeymanPaths {
   }
   
   fileprivate func logPaths() {
-    Logger.setup.debug("documents: \(self.keyman17DocumentsDirectory!.cleanUrlPath())")
-    Logger.setup.debug("keyman 17 packages: \(self.keyman17PackagesDirectory!.cleanUrlPath())")
-    
-    Logger.setup.debug("support directory: \(self.keyman18SupportDirectory!.cleanUrlPath())")
-    Logger.setup.debug("support keyman directory: \(self.keyman18DataDirectory!.cleanUrlPath())")
-    Logger.setup.debug("keyman 18 packages: \(self.keyman18PackagesDirectory!.cleanUrlPath())")
-    
     Logger.setup.debug("container: \(self.keyman19ContainerDirectory.cleanUrlPath())")
     Logger.setup.debug("preferences: \(self.keyman19PreferencesDirectory.cleanUrlPath())")
     Logger.setup.debug("keyman 19 packages: \(self.keyman19PackagesDirectory.cleanUrlPath())")
