@@ -7,6 +7,7 @@
  */
 
 import SwiftUI
+import AppKit
 import KeymanSettings
 import OSLog
 import Sentry
@@ -61,11 +62,52 @@ struct ConfigApp: App {
     }
     .windowResizability(.contentSize)
     .defaultSize(width: 600, height: 500)
+    .commands {
+      CommandGroup(replacing: .appInfo) {
+        Button {
+          AboutPanelPresenter.showAboutPanel()
+        } label: {
+          Label("About Keyman Configuration", systemImage: "info.circle")
+        }
+      }
+    }
     
     // for testing purposes
 //    Window("Install Test", id: "install-debug") {
 //      InstallDebugView()
 //        .environmentObject(installation)
 //    }
+  }
+}
+
+@MainActor
+private enum AboutPanelPresenter {
+  private static var aboutWindow: NSWindow?
+  
+  static func showAboutPanel() {
+    let contentView = AboutPanelView()
+    
+    let window = aboutWindow ?? makeAboutWindow()
+    window.contentView = NSHostingView(rootView: contentView)
+    window.center()
+    window.makeKeyAndOrderFront(nil)
+    aboutWindow = window
+    
+    NSApp.activate(ignoringOtherApps: true)
+  }
+  
+  private static func makeAboutWindow() -> NSWindow {
+    let window = NSWindow(
+      contentRect: NSRect(x: 0, y: 0, width: 570, height: 200),
+      styleMask: [.titled, .closable],
+      backing: .buffered,
+      defer: false
+    )
+    
+    window.titleVisibility = .hidden
+    window.titlebarAppearsTransparent = true
+    window.isReleasedWhenClosed = false
+    window.backgroundColor = .windowBackgroundColor
+    return window
   }
 }

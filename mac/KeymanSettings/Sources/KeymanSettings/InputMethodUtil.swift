@@ -316,7 +316,7 @@ public class InputMethodUtil {
           let targetSource = sources.first else {
       Logger.setup.error("Could not find the specified input source with bundleID: \(bundleId, privacy: .public)")
       LogUtil.errorBreadcrumb("Could not find the specified input source with bundleID: \(bundleId)", category: .setup)
-     return(nil)
+      return(nil)
     }
     
     return targetSource
