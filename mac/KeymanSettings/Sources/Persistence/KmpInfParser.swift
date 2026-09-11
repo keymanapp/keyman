@@ -84,7 +84,10 @@ class KmpInfParser {
     }
     return nil
   }
-  var helpFilename: String? {
+  private var graphicFilename: String? {
+    return self.packageMap[PackageProperty.graphicfile.rawValue]
+  }
+  private var helpFilename: String? {
     if self.fileMap.keys.contains(where: { $0 == defaultHelpFilename }) {
       return defaultHelpFilename
     }
@@ -102,9 +105,6 @@ class KmpInfParser {
   }
   private var author: String? {
     return self.infoMap[InfoProperty.author.rawValue]
-  }
-  private var graphicFilename: String? {
-    return self.infoMap[PackageProperty.graphicfile.rawValue]
   }
   
   /**
@@ -290,7 +290,8 @@ class KmpInfParser {
       pair = (key.lowercased(), [])
     } else {
       // create an array of strings from the value part of the string, converting each Substring to a String
-      let valueArray = parts[1].split(separator: ",").map(String.init)
+      let valueArray = self.splitValuesPreservingQuotes(parts[1])
+//      let valueArray = parts[1].split(separator: ",").map(String.init)
       
       // remove the quote marks from each element of the value array
       let cleanValueArray = valueArray.map {
@@ -301,6 +302,33 @@ class KmpInfParser {
     }
     
     return pair
+  }
+  
+  /**
+   * Splits a value string while ignoring any commas that appear inside double-quoted sections.
+   * Doing this instead of a basic `String.split()` to allow values to contain a comma.
+   */
+  private func splitValuesPreservingQuotes(_ fullValue: Substring) -> [String] {
+    var valueArray: [String] = []
+    var subValue = ""
+    var insideQuotes = false
+   
+    for char in fullValue {
+      if char == "\"" {
+        // starting or ending subValue
+        insideQuotes.toggle()
+        subValue.append(char)      // preserve the quote; it's stripped later
+      } else if char == "," && !insideQuotes {
+        // collect subValue and clear for next
+        valueArray.append(subValue)
+        subValue = ""
+      } else {
+        // add content to current subValue
+        subValue.append(char)
+      }
+    }
+    valueArray.append(subValue)
+    return valueArray
   }
   
   /**
@@ -349,8 +377,10 @@ class KmpInfParser {
       case .author:
         self.infoMap[key.lowercased()] = value[0]
       case .website:
-        // get second value, first is description
-        self.infoMap[key.lowercased()] = value[1]
+        // get second value if it exists, first is description
+        if (self.infoMap.count > 1) {
+          self.infoMap[key.lowercased()] = value[1]
+        }
       }
     } else {
       Logger.data.debug("ignoring unknown info property: \(key, privacy: .public)")

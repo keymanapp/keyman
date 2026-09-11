@@ -17,6 +17,7 @@ public enum LoadPackageError: LocalizedError {
   case containsNoFiles
   case containsNoKeyboards
   case kmpJsonFileUnreadable
+  case kmpInfFileUnreadable
   case kmpJsonFileNotFound
   case missingKeyboardName
   case missingKeyboardId
@@ -57,6 +58,12 @@ public enum LoadPackageError: LocalizedError {
       let resource = LocalizedStringResource(
         "kmp.json.unreadable",
         defaultValue: "The package's kmp.json file could not be parsed.",
+        bundle: packageBundle)
+      return String(localized: resource)
+    case .kmpInfFileUnreadable:
+      let resource = LocalizedStringResource(
+        "kmp.inf.unreadable",
+        defaultValue: "The package's kmp.inf file could not be parsed.",
         bundle: packageBundle)
       return String(localized: resource)
     case .kmpJsonFileNotFound:
@@ -377,8 +384,9 @@ public class PackageRepository: PackageRepo {
         LogUtil.infoBreadcrumb("successfully read package using kmp.inf: \(keymanPackage.packageName)", category: .data)
       }
     } catch {
-      Logger.data.error("failed to read kmp.inf file: \(kmpInfFileUrl.cleanUrlPath(), privacy: .public), error: \(error)")
-      throw error
+      Logger.data.error("readPackageFromInf, failed to read kmp.inf file: \(kmpInfFileUrl.cleanUrlPath(), privacy: .public), error: \(error as NSError)")
+      LogUtil.errorBreadcrumb("readPackageFromInf, failed to read kmp.inf file: \(kmpInfFileUrl.cleanUrlPath()), error: \(error as NSError)", category: .data)
+      throw LoadPackageError.kmpInfFileUnreadable
     }
     
     return package
