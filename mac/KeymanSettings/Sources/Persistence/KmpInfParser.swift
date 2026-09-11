@@ -291,7 +291,6 @@ class KmpInfParser {
     } else {
       // create an array of strings from the value part of the string, converting each Substring to a String
       let valueArray = self.splitValuesPreservingQuotes(parts[1])
-//      let valueArray = parts[1].split(separator: ",").map(String.init)
       
       // remove the quote marks from each element of the value array
       let cleanValueArray = valueArray.map {
