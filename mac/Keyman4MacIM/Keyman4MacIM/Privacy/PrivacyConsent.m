@@ -34,6 +34,47 @@
 #import "PrivacyConsent.h"
 #import "KMLogs.h"
 
+// command strings passed from Keyman Configuration
+NSString *kMigrateCommand = @"migrate";
+NSString *kAccessCommand = @"access";
+NSString *kCheckCommand = @"check";
+
+// notification messages sent to Keyman Configuration
+NSString *kAcessibilityPermissionGrantedMessage = @"granted";
+NSString *kAcessibilityPermissionNotGrantedMessage = @"not-granted";
+
+/**
+ * Make a request to the system to add Accessibility permissions for the Keyman input method.
+ * Executed as requested by the Keyman Configuration app.
+ */
+int requestAccessibility(void) {
+  os_log_info([KMLogs startupLog], "requestAccessibility executed");
+  [PrivacyConsent.shared requestPrivacyAccessForKeyman19:^void (void){
+    os_log_info([KMLogs startupLog], "requestAccessibility completion handler: requestPrivacyAccessForKeyman19 completed");
+  }];
+  return 0;
+}
+
+/**
+ * Check whether Accessibility permissions have been granted by the user for the Keyman input method.
+ * Executed as requested by the Keyman Configuration app.
+ */
+int checkAccessibility(void) {
+  BOOL hasAccess = NO;
+  NSString *message = kAcessibilityPermissionNotGrantedMessage;
+  
+  hasAccess = [PrivacyConsent.shared checkPostEventAccess];
+  os_log_info([KMLogs startupLog], "checkAccessibility hasAccess: %{public}@", hasAccess?@"YES":@"NO");
+  
+  if (hasAccess) {
+    message = kAcessibilityPermissionGrantedMessage;
+  }
+
+  [[NSDistributedNotificationCenter defaultCenter] postNotificationName:@"com.keyman.accessibility.state" object:message userInfo:nil deliverImmediately:YES];
+
+  return hasAccess;
+}
+
 @implementation PrivacyConsent
 
 + (PrivacyConsent *)shared
@@ -261,5 +302,6 @@
   }
   return granted;
 }
+
 
 @end

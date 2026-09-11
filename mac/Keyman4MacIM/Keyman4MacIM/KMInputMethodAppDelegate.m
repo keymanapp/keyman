@@ -30,6 +30,7 @@ NSString *processorType = @"Unknown";
 
 // distributed notifications
 NSString *const kKeyboardsChanged = @"com.keyman.keyboards.changed";
+NSString *const kAccessibilityCheckedRequest = @"com.keyman.accessibility.check.request";
 
 // in-app notifications
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
@@ -83,9 +84,9 @@ id _lastServerWithOSKShowing = nil;
   if (self) {    
     // first notify user and request access to Accessibility/PostEvent permissions
     // pass block as completion handler to complete init with initCompletion
-    [PrivacyConsent.shared requestPrivacyAccess:^void (void){
-      [self initCompletion];
-    }];
+//    [PrivacyConsent.shared requestPrivacyAccess:^void (void){
+//      [self initCompletion];
+//    }];
   }
   
   return self;
@@ -131,11 +132,11 @@ id _lastServerWithOSKShowing = nil;
 
   // register to receive notifications generated from Keyman Configuration App
   [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardsChanged:) name:kKeyboardsChanged object:nil];
-
+  [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAccessibilityCheckRequested:) name:kAccessibilityCheckedRequest object:nil];
+  
   // start Input Method lifecycle
   [KMInputMethodLifecycle.shared startLifecycle];
 }
-
 
 /**
  * When packages have been installed, removed, enabled or disabled -- notification from the Keyman Configuration app
@@ -143,6 +144,14 @@ id _lastServerWithOSKShowing = nil;
 - (void)handleKeyboardsChanged:(NSNotification *)notification {
   os_log_debug([KMLogs configLog], "***KMInputMethodAppDelegate handleKeyboardsChanged");
   [self reloadEnabledKeyboards];
+}
+
+/**
+ * When packages have been installed, removed, enabled or disabled -- notification from the Keyman Configuration app
+ */
+- (void)handleAccessibilityCheckRequested:(NSNotification *)notification {
+  BOOL hasAccess = checkAccessibility();
+  os_log_info([KMLogs startupLog], "KMInputMethodAppDelegate handleAccessibilityCheckRequested, hasAccess: %{public}@", hasAccess?@"YES":@"NO");
 }
 
 /**

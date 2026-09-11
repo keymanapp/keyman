@@ -171,9 +171,17 @@ public class InstallationCheck {
   public func startInstallationEvaluation() {
     // call the input method to check whether Accessibility permission has been granted
     if (self.isInputMethodInstalled && self.isInputMethodCurrent) &&
-        (self.isEvaluatingNewInstallation || self.installationState?.isComplete == true) {
-      self.inputMethodUtil.doAsyncAccessibilityCheck()
+        (self.isEvaluatingNewInstallation || self.isReadyForRepairCheckAtStartup()) {
+      self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
     }
+  }
+  
+  /**
+   * Returns true if we should check at app startup whether the installation needs repair.
+   * Simply returns true if the installation is complete.
+   */
+  func isReadyForRepairCheckAtStartup() -> Bool {
+    return self.installationState?.isComplete == true
   }
   
   /**

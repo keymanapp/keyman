@@ -441,7 +441,7 @@ public class InstallationContainer : ObservableObject {
    * call Keyman as a separate process with an argument that checks whether accessibility has been granted by the user
    */
   public func checkAccessibilityPermissionGranted() {
-    self.inputMethodUtil.doAsyncAccessibilityCheck()
+    self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: true)
   }
   
   /**
