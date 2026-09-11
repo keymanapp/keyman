@@ -383,7 +383,11 @@ public class PackageRepository: PackageRepo {
         Logger.data.info("successfully read package using kmp.inf: \(keymanPackage.packageName, privacy: .public)")
         LogUtil.infoBreadcrumb("successfully read package using kmp.inf: \(keymanPackage.packageName)", category: .data)
       }
+    } catch let error as LoadPackageError {
+      // if we encounter a LoadPackageError, propagate it
+      throw error
     } catch {
+      // otherwise convert the error to a LoadPackageError error
       Logger.data.error("readPackageFromInf, failed to read kmp.inf file: \(kmpInfFileUrl.cleanUrlPath(), privacy: .public), error: \(error as NSError)")
       LogUtil.errorBreadcrumb("readPackageFromInf, failed to read kmp.inf file: \(kmpInfFileUrl.cleanUrlPath()), error: \(error as NSError)", category: .data)
       throw LoadPackageError.kmpInfFileUnreadable

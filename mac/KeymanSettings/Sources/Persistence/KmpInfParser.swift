@@ -378,7 +378,7 @@ class KmpInfParser {
         self.infoMap[key.lowercased()] = value[0]
       case .website:
         // get second value if it exists, first is description
-        if (self.infoMap.count > 1) {
+        if (value.count > 1) {
           self.infoMap[key.lowercased()] = value[1]
         }
       }
