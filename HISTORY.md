@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.285 alpha 2026-09-11
+
+* fix(web): handle 'unload' message while attempting model 'load' (#16548)
+* fix(android): load KMP files from app-external sources (#16392)
+
 ## 19.0.284 alpha 2026-09-10
 
 * maint(developer): remove unused ajv dependency from kmc-convert (#16539)
