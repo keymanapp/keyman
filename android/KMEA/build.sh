@@ -9,6 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "${KEYMAN_ROOT}/resources/build/ci/sentry-control.inc.sh"
 
 # ################################ Main script ################################
 
@@ -19,6 +20,7 @@ builder_describe "Builds Keyman Engine for Android." \
   "configure" \
   "build" \
   "test             Runs lint and unit tests." \
+  "publish-symbols  Publishes symbols to Sentry." \
   ":engine          Builds Engine"
 
 builder_parse "$@"
@@ -79,6 +81,13 @@ do_test() {
   ./gradlew $GRADLE_DAEMON $TEST_FLAGS
 }
 
-builder_run_action clean:engine    rm -rf build app/build
-builder_run_action build:engine    do_build
-builder_run_action test:engine     do_test
+do_publish_symbols() {
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    sentry_upload_web "${KEYMAN_ROOT}/web/build/app/webview/release/"
+  fi
+}
+
+builder_run_action clean:engine     rm -rf build app/build
+builder_run_action build:engine     do_build
+builder_run_action test:engine      do_test
+builder_run_action publish-symbols  do_publish_symbols

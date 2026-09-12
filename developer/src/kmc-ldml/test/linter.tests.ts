@@ -7,8 +7,14 @@ import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js'
 describe('linter-tests', function() {
     this.slow(500); // 0.5 sec -- json schema validation takes a while
 
-    before(function() {
+    this.beforeEach(function() {
       compilerTestCallbacks.clear();
+    });
+
+    this.afterEach(function() {
+      if(this.currentTest.isFailed()) {
+        compilerTestCallbacks.printMessages();
+      }
     });
 
     it('should warn on mark keys with no display', async function () {

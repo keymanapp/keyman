@@ -11,7 +11,7 @@
     <key id="hmaqtugha" output="ħ" longPressKeyIds="a e"/>
     <key id="that" output="ថា"/>
   </keys>
-  <layers formId="us" minDeviceWidth="123">
+  <layers formId="us">
     <layer modifiers="none">
       <row keys="hmaqtugha that"/>
     </layer>
