@@ -71,6 +71,11 @@ export class Win32Tray {
           open(ngrokAddress);
           break;
         case 'item-id-show-console':
+          // #9694 - the first time, this has to be called twice for the console
+          // window to appear. This could probably be fixed in the source
+          // node-hide-console-window component, but this works well enough and
+          // has little in the way of side-effects.
+          WindowsConsole.showConsole();
           WindowsConsole.showConsole();
           break;
         case 'item-id-hide-console':

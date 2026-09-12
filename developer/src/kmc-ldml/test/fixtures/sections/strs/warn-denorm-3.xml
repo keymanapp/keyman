@@ -17,8 +17,8 @@
     <string id="ess" value="S" />
   </variables>
 
-  <layers formId="us" minDeviceWidth="123">
-    <layer id="zz">
+  <layers formId="us">
+    <layer modifiers="none">
       <row keys="ess" />
     </layer>
   </layers>
