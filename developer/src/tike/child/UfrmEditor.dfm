@@ -449,14 +449,6 @@ inherited frmEditor: TfrmEditor
     Left = 450
     Top = 30
   end
-  object dlgPrint: TPrintDialog
-    Left = 450
-    Top = 58
-  end
-  object dlgPrintSetup: TPrinterSetupDialog
-    Left = 478
-    Top = 30
-  end
   object dlgFind: TFindDialog
     Left = 478
     Top = 58

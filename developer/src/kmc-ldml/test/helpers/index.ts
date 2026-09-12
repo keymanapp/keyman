@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
 import { util, KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, CompilerError } from "@keymanapp/developer-utils";
-import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
+import { LdmlCompilerMessages, LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
 import { LdmlCompilerOptions } from '../../src/compiler/ldml-compiler-options.js';
@@ -20,7 +20,7 @@ import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
 import DependencySections = KMXPlus.DependencySections;
 import Section = KMXPlus.Section;
 import { ElemCompiler, ListCompiler, StrsCompiler } from '../../src/compiler/empty-compiler.js';
-import { KmnCompiler } from '@keymanapp/kmc-kmn';
+import { KmnCompiler, KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { VarsCompiler } from '../../src/compiler/vars.js';
 
 /**
@@ -279,6 +279,18 @@ export function scrubContextFromMessages(messages: CompilerEvent[]): CompilerEve
   });
 }
 
+function messagesToString(messages?: CompilerEventOrMatch[]) {
+  return messages?.length
+    ? messages
+      .map(message =>
+        Object.keys(LdmlCompilerMessages).find(key => (<any>LdmlCompilerMessages)[key] === message.code) ??
+        Object.keys(KmnCompilerMessages).find(key => (<any>KmnCompilerMessages)[key] === message.code) ??
+        'unknown message'
+      )
+      .join(', ')
+    : 'unknown';
+}
+
 /**
  * Run a bunch of cases
  * @param cases cases to run
@@ -290,8 +302,14 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
   const callbacks = new TestCompilerCallbacks();
   for (const testcase of cases) {
     const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
-    const testHeading = expectFailure ? `should fail to compile: ${testcase.subpath}`:
-                                        `should compile: ${testcase.subpath}`;
+    const testHeading = `${testcase.subpath}: ` + (
+      testcase.throws ? `should fail to compile with an exception` :
+      typeof testcase.errors === 'boolean' ? `should fail to compile with errors` :
+      testcase.errors?.length ? `should fail to compile with errors: ${messagesToString(testcase.errors)}` :
+      testcase.warnings?.length ? `should compile with hints or warnings: ${messagesToString(testcase.warnings)}` :
+      'should compile without hints, warnings, or errors'
+    );
+
     it(testHeading, async function () {
       callbacks.clear();
       // special case for an expected exception

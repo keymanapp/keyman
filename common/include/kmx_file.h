@@ -51,9 +51,10 @@ namespace kmx {
 
 #define VERSION_160 0x00001000
 #define VERSION_170 0x00001100
+#define VERSION_190 0x00001300
 
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_170
+#define VERSION_MAX VERSION_190
 
 //
 // Backspace types
@@ -201,7 +202,7 @@ namespace kmx {
 //#define CODE_EXTENDEDEND  0x0B  deprecated
 #define CODE_SWITCH     0x0C
 #define CODE_KEY      0x0D
-#define CODE_CLEARCONTEXT 0x0E
+#define CODE_CLEARCONTEXT 0x0E    // deprecated in 19.0
 #define CODE_CALL     0x0F
 // UC_SENTINEL_EXTENDEDEND  0x10
 #define CODE_CONTEXTEX    0x11
@@ -234,7 +235,7 @@ namespace kmx {
 #define U_CODE_DEADKEY u"\u0008"
 #define U_CODE_EXTENDED u"\u000A"
 #define U_CODE_SWITCH u"\u000C"
-#define U_CODE_CLEARCONTEXT u"\u000E"
+#define U_CODE_CLEARCONTEXT u"\u000E"   // deprecated in 19.0
 #define U_CODE_CALL u"\u000F"
 #define U_CODE_EXTENDEDEND u"\u0010"
 #define U_CODE_CONTEXTEX u"\u0011"
@@ -256,7 +257,7 @@ namespace kmx {
 #define C_CODE_DEADKEY(deadkey) U_UC_SENTINEL U_CODE_DEADKEY deadkey
 #define C_CODE_EXTENDED(varargs) U_UC_SENTINEL U_CODE_EXTENDED varargs
 #define C_CODE_SWITCH(val) U_UC_SENTINEL U_CODE_SWITCH val
-#define C_CODE_CLEARCONTEXT() U_UC_SENTINEL U_CODE_CLEARCONTEXT
+#define C_CODE_CLEARCONTEXT() U_UC_SENTINEL U_CODE_CLEARCONTEXT   // deprecated in 19.0
 #define C_CODE_CALL(val) U_UC_SENTINEL U_CODE_CALL val
 #define C_CODE_CONTEXTEX(val) U_UC_SENTINEL U_CODE_CONTEXTEX val
 #define C_CODE_NOTANY(val) U_UC_SENTINEL U_CODE_NOTANY val

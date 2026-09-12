@@ -33,7 +33,7 @@ Comment:     enter=not mappable, causes ctx reset.
   </keys>
 
   <layers formId="us">
-    <layer id="base">
+    <layer modifiers="none">
       <row keys="a gap" /> <!-- number row -->
       <row keys="q gap" /> <!-- q w ... -->
       <row keys="gap" />

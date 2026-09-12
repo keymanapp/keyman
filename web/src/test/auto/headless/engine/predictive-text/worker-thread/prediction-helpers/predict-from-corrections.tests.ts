@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { deepCopy } from "keyman/common/web-utils";
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { models, predictFromCorrections, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
+import { models, predictFromCorrections } from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -115,7 +115,7 @@ describe('predictFromCorrections', () => {
     const predictions = predictFromCorrections(model, correctionDistribution, context);
     predictions.forEach((entry) => assert.equal(entry.correction.sample, 'Its'));
     predictions.forEach((entry) => assert.equal(entry.correction.p, 0.6));
-    predictions.sort(tupleDisplayOrderSort);
+    predictions.sort((a, b) => b.totalProb - a.totalProb);
 
     assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions);
 
@@ -167,7 +167,7 @@ describe('predictFromCorrections', () => {
     const predictions = predictFromCorrections(model, correctionDistribution, context);
     predictions.forEach((entry) => assert.equal(entry.correction.sample, 'Its'));
     predictions.forEach((entry) => assert.equal(entry.correction.p, 0.6));
-    predictions.sort(tupleDisplayOrderSort);
+    predictions.sort((a, b) => b.totalProb - a.totalProb);
 
     assert.sameOrderedMembers(predictions.map((entry) => entry.prediction.sample.displayAs), ["it's", "its"]);
     assert.sameDeepOrderedMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions.map((entry) => {
@@ -247,7 +247,7 @@ describe('predictFromCorrections', () => {
     });
 
     const predictions = predictFromCorrections(model, correctionDistribution, context);
-    predictions.sort(tupleDisplayOrderSort);
+    predictions.sort((a, b) => b.totalProb - a.totalProb);
 
     assert.sameOrderedMembers(predictions.map((entry) => entry.prediction.sample.displayAs), ["is", "it's", "isn't", "its"]);
     assert.sameDeepMembers(predictions.map((entry) => entry.prediction.sample), dummied_suggestions.flatMap((entry) => entry));
