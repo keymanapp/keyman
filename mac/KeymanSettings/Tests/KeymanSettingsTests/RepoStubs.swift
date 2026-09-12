@@ -107,6 +107,8 @@ class PackageRepoStub: PackageRepo {
    * creates a package containing two keyboards, one enabled and one disabled
    */
   func loadAllPackages() -> [KeymanPackage] {
+    var packageArray: [KeymanPackage] = []
+  
     let packagesDirectoryUrl = URL(filePath: "/Users/linguist-sil/Library/Group%20Containers/group.com.keyman/Library/Application%20Support/Keyman-Packages/")!
     let testPackageDirectoryName = extinctPackageName
     let testPackageUrl = packagesDirectoryUrl.appendingPathComponent(testPackageDirectoryName)
@@ -115,11 +117,16 @@ class PackageRepoStub: PackageRepo {
     let hittiteKeyboardId = "hittite_basic"
     let hittiteKeyboard = Keyboard(name: "hittite basic", keyboardId: hittiteKeyboardId, packageDirectoryName: testPackageDirectoryName, enabled: false)
     
-    let testPackage = KeymanPackage(sourceDirectoryUrl: testPackageUrl,
-                                    keyboards: [moabiteKeyboard, hittiteKeyboard], packageName: "Extinct Languages", packageVersion: "1.1.03")
-    testPackageId = testPackage.id
+    do {
+      let testPackage = try KeymanPackage(packageUrl: testPackageUrl, keyboards: [moabiteKeyboard, hittiteKeyboard], fonts: [],
+                                          packageName: "Extinct Languages", packageVersion: "1.1.03")
+      self.testPackageId = testPackage.id
+      packageArray.append(testPackage)
+    } catch {
+      print("loadAllPackages() failed")
+    }
     
-    return [testPackage]
+    return packageArray
   }
   
   func deletePackage(package: KeymanPackage) {

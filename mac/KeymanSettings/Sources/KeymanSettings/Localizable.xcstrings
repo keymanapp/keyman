@@ -155,6 +155,17 @@
         }
       }
     },
+    "kmp.inf.unreadable" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The package's kmp.inf file could not be parsed."
+          }
+        }
+      }
+    },
     "kmp.json.not.found" : {
       "extractionState" : "extracted_with_value",
       "localizations" : {
