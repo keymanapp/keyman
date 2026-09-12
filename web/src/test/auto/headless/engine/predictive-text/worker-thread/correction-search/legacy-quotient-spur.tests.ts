@@ -9,17 +9,23 @@
 
 import { assert } from 'chai';
 
+import { LexicalModelTypes } from '@keymanapp/common-types';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import {
+  buildEdgesFromResults,
   generateSubsetId,
   LegacyQuotientRoot,
   LegacyQuotientSpur,
-  models
+  models,
+  processTransposeRoots,
+  TokenResultMapping
 } from '@keymanapp/lm-worker/test-index';
 
 import { buildCantLinearFixture } from '../../helpers/buildCantLinearFixture.js';
 import { analyzeQuotientNodeResults } from '../../helpers/analyzeQuotientNodeResults.js';
 
+import Distribution = LexicalModelTypes.Distribution;
+import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
 const testModel = new TrieModel(jsonFixture('models/tries/english-1000'));
@@ -320,6 +326,110 @@ describe('LegacyQuotientSpur', () => {
 
       assert.sameMembers(analysis.found, matchTargets);
       assert.isEmpty(analysis.foundWithDuplicates);
+    });
+  });
+
+  describe('transposition handling', () => {
+    const tehDistributions: Distribution<Transform>[] = [
+      [
+        { sample: { insert: 't', deleteLeft: 0, id: 1 }, p: .55},
+        { sample: { insert: 'r', deleteLeft: 0, id: 1 }, p: .45}
+      ], [
+        { sample: { insert: 'e', deleteLeft: 0, id: 1 }, p: .9},
+        { sample: { insert: 's', deleteLeft: 0, id: 1 }, p: .1}
+      ], [
+        { sample: { insert: 'h', deleteLeft: 0, id: 1 }, p: .9},
+        { sample: { insert: 'n', deleteLeft: 0, id: 1 }, p: .1}
+      ]
+    ];
+
+    it('corrects to `the` for a targeted, deep search for a `teh` transposition', () => {
+      const root = new LegacyQuotientRoot(testModel);
+
+      const rootResults: TokenResultMapping[] = [];
+      while(root.currentCost < Number.POSITIVE_INFINITY) {
+        const result = root.handleNextNode();
+        if(result.type == 'complete') {
+          rootResults.push(result.mapping);
+        }
+      }
+
+      const entry_empty = rootResults.find((entry) => entry.matchString == '')
+      assert.isOk(entry_empty);
+
+      const firstSpur = new LegacyQuotientSpur(root, tehDistributions[0], tehDistributions[0][0]);
+      const edgesFromEmpty = buildEdgesFromResults([entry_empty], firstSpur.inputs, firstSpur.spaceId);
+      const edge_t = edgesFromEmpty.find((entry) => entry.resultKey == 't');
+      assert.isOk(edge_t);
+
+      // now, try to do something with entry_t.
+      const secondSpur = new LegacyQuotientSpur(firstSpur,  tehDistributions[1], tehDistributions[1][0]);
+      const thirdSpur  = new LegacyQuotientSpur(secondSpur, tehDistributions[2], tehDistributions[2][0]);
+
+      const entry_t = new TokenResultMapping(firstSpur, edge_t);
+      const transposeFirstHalves = processTransposeRoots([entry_t], thirdSpur.inputs, thirdSpur.spaceId);
+
+      const edge_th = transposeFirstHalves.find((entry) => entry.resultKey == 'th' && entry.editCount == 1);
+      assert.isOk(edge_th);
+
+      const entry_th = new TokenResultMapping(thirdSpur, edge_th);
+      const transposeSecondHalves = buildEdgesFromResults([entry_th], secondSpur.inputs, thirdSpur.spaceId);
+      const edge_the = transposeSecondHalves.find((entry) => entry.resultKey == 'the' && entry.editCount == 1);
+      assert.isOk(edge_the);
+    });
+
+    it('corrects to `the` for an sequential, broad search for a `teh` transposition', () => {
+      const root = new LegacyQuotientRoot(testModel);
+
+      const rootResults: TokenResultMapping[] = [];
+      while(root.currentCost < Number.POSITIVE_INFINITY) {
+        const result = root.handleNextNode();
+        if(result.type == 'complete') {
+          rootResults.push(result.mapping);
+        }
+      }
+
+      const entry_empty = rootResults.find((entry) => entry.matchString == '')
+      assert.isOk(entry_empty);
+
+      const firstSpur = new LegacyQuotientSpur(root, tehDistributions[0], tehDistributions[0][0]);
+      const firstResults: TokenResultMapping[] = [];
+      while(firstSpur.currentCost < Number.POSITIVE_INFINITY) {
+        const result = firstSpur.handleNextNode();
+        if(result.type == 'complete') {
+          firstResults.push(result.mapping);
+        }
+      }
+
+      const entry_t = firstResults.find((entry) => entry.matchString == 't' && entry.editCount == 0);
+      assert.isOk(entry_t);
+
+      // now, try to do something with entry_t.
+      const secondSpur = new LegacyQuotientSpur(firstSpur,  tehDistributions[1], tehDistributions[1][0]);
+      const secondResults: TokenResultMapping[] = [];
+      while(secondSpur.currentCost < Number.POSITIVE_INFINITY) {
+        const result = secondSpur.handleNextNode();
+        if(result.type == 'complete') {
+          secondResults.push(result.mapping);
+        }
+      }
+
+      const thirdSpur  = new LegacyQuotientSpur(secondSpur, tehDistributions[2], tehDistributions[2][0]);
+      const thirdResults: TokenResultMapping[] = [];
+      while(thirdSpur.currentCost < Number.POSITIVE_INFINITY) {
+        const result = thirdSpur.handleNextNode();
+        if(result.type == 'complete') {
+          thirdResults.push(result.mapping);
+        }
+      }
+
+      const entry_the = thirdResults.find((entry) => entry.matchString == 'the' && entry.editCount == 1);
+      assert.isOk(entry_the);
+
+      thirdResults.sort((a, b) => a.totalCost - b.totalCost);
+      const the_index = thirdResults.findIndex((entry) => entry.matchString == 'the' && entry.editCount == 1);
+      // `teh` should appear fairly early as a viable correction .
+      assert.isBelow(the_index, 10);
     });
   });
 });
