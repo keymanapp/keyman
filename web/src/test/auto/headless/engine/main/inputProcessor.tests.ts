@@ -103,7 +103,7 @@ describe('InputProcessor', function() {
     let testDistribution: KeyDistribution = [];
     let keyboardWithHarness: JSKeyboardInterface;
 
-    let mainWebScriptURL = require.resolve('@keymanapp/lm-worker/worker-main.wrapped.js');
+    let mainWebScriptURL = require.resolve('@keymanapp/lm-worker/worker-main.js');
 
     // Easy peasy long context:  use the unminified main script for the predictive-text worker!
     let coreSourceCode = fs.readFileSync(mainWebScriptURL, 'utf-8');

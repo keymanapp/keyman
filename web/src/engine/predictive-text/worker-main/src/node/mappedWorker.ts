@@ -9,6 +9,8 @@ import { URL } from 'node:url';
 
 /**
  * Defines mappings from Node Worker signatures to WebWorker signatures
+ *
+ * TODO: move this to a separate module, no need for it to be embedded string
  */
 const nodeWorkerToWebWorkerMappingSource = `
 import { parentPort } from 'node:worker_threads';
@@ -42,32 +44,23 @@ function importScripts(...args) {
 const self = globalThis;
 self.postMessage = postMessage;
 self.importScripts = importScripts;
+self.self = self; // make it global!
+// Start off by importing the main worker itself
+// importScripts('${import.meta.dirname}/../../../worker-thread/build/lib/worker-main.js');
+console.dir(import.meta);
+importScripts('${import.meta.dirname}/worker-main.js');
 `;
+
+
 
 /**
  * Uses the Node version of Workers to provide proper, authentic separate-thread
  * 'sandboxing'.  Also intercepts and interprets certain WebWorker method signatures
  * necessary to run the WebWorker-oriented worker code.
- *
- * Alternatively, only after writing this did I discover this package:
- * https://github.com/developit/web-worker.  They also ran one notable issue I did:
- * Node 18.x, at least, does not support use of Node Blobs for construction of a
- * Worker: https://github.com/developit/web-worker/pull/32... unlike Web Workers.
- *
- * So... Base64-encoded Data URLs it is.
- *
- * What we have here is perfectly fine for now, but if we need more complicated
- * cross-platform Worker support in the future, it may be wise to swap to use of
- * that package.
  */
 export class MappedWorker extends worker.Worker implements Worker {
-  constructor(scriptStr: string) {
-    const concatenatedScript = `
-    ${nodeWorkerToWebWorkerMappingSource}
-
-    ${scriptStr}
-    `;
-    const buffer = Buffer.from(concatenatedScript);
+  constructor() {
+    const buffer = Buffer.from(nodeWorkerToWebWorkerMappingSource);
     const dataSrc = "data:text/javascript;base64," + buffer.toString('base64');
     //@ts-ignore
     super(new URL(dataSrc));

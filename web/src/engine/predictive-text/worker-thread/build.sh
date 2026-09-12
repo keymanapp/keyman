@@ -34,7 +34,7 @@ builder_describe \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         "/web/src/engine/predictive-text/worker-thread/${LIB}/worker-main.wrapped.min.js"
+  build         "/web/src/engine/predictive-text/worker-thread/${LIB}/worker-main.min.js"
 
 builder_parse "$@"
 
@@ -81,11 +81,12 @@ function do_build() {
     $INTERMEDIATE/worker-main.min.js.map \
     --clean
 
-  node build-wrapper.js $INTERMEDIATE/worker-main.js \
-    --out $LIB/worker-main.wrapped.js \
-    --sourceMap
-  node build-wrapper.js $INTERMEDIATE/worker-main.min.js \
-    --out $LIB/worker-main.wrapped.min.js
+  cp $INTERMEDIATE/worker-main.js $LIB/worker-main.js
+  cp $INTERMEDIATE/worker-main.js.map $LIB/worker-main.js.map
+  cp $INTERMEDIATE/worker-main.d.ts $LIB/worker-main.d.ts
+  cp $INTERMEDIATE/worker-main.min.js $LIB/worker-main.min.js
+  cp $INTERMEDIATE/worker-main.min.js.map $LIB/worker-main.min.js.map
+  # cp $INTERMEDIATE/worker-main.min.d.ts $LIB/worker-main.min.d.ts
 }
 
 function do_test() {

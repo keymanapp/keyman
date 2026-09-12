@@ -32,7 +32,7 @@ builder_describe_outputs \
   build:templates               "/web/src/engine/predictive-text/templates/build/obj/index.js" \
   build:wordbreakers            "/web/src/engine/predictive-text/wordbreakers/build/main/obj/index.js" \
   build:worker-main             "/web/src/engine/predictive-text/worker-main/build/lib/index.mjs" \
-  build:worker-thread           "/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.wrapped.js"
+  build:worker-thread           "/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.js"
 
 #### Build action definitions ####
 
