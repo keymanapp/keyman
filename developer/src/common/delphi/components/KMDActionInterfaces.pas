@@ -45,17 +45,6 @@ type
     function CanClearSelection: Boolean;
   end;
 
-  IKMDPrintActions = interface
-    ['{C6F05AD6-42A3-404F-944C-904393A51837}']
-    //function PageSetup: Boolean;
-    function PrintFile: Boolean;
-  end;
-
-  IKMDPrintPreviewActions = interface(IKMDPrintActions)
-    ['{B5879BC4-7A0C-4E00-AAE3-E2D48489152A}']
-    function PrintPreview: Boolean;
-  end;
-
   IKMDViewExpandEditorActions = interface
     ['{680A172E-A221-4CDA-B68C-1E2AF8487510}']
     procedure ExpandContractEditor;

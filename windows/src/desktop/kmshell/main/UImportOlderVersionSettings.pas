@@ -73,7 +73,6 @@ begin
     kmcom.Options['koKeyboardHotkeysAreToggle'].Value := True;
     kmcom.Options['koAltGrCtrlAlt'].Value := False;
     kmcom.Options['koShowHints'].Value := True;
-    kmcom.Options['koSwitchLanguageForAllApplications'].Value := True;
 
     { Startup }
     kmcom.Options['koShowStartup'].Value := True;
@@ -82,7 +81,6 @@ begin
     { OSK }
     kmcom.Options['koReleaseShiftKeysAfterKeyPress'].Value := False;
     kmcom.Options['koAutoOpenOSK'].Value := False;
-    kmcom.Options['koAutoSwitchOSKPages'].Value := True;
     //// TODO: kmcom.Options['koShowOSKOnStartup'] := True;
 
     { Advanced }   // I3629
@@ -109,7 +107,6 @@ begin
         kmcom.Options['koTestKeymanFunctioning'].Value := not ValueExists(SRegValue_TestKeymanFunctioning) or ReadBool(SRegValue_TestKeymanFunctioning);
 
         kmcom.Options['koReleaseShiftKeysAfterKeyPress'].Value := ValueExists(SRegValue_ReleaseShiftKeysAfterKeyPress) and ReadBool(SRegValue_ReleaseShiftKeysAfterKeyPress);
-        kmcom.Options['koAutoSwitchOSKPages'].Value := not ValueExists(SRegValue_AutoSwitchOSKPages) or ReadBool(SRegValue_AutoSwitchOSKPages);
 
         if OpenKeyReadOnly(SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine70_CU+'\hotkeys\1') or OpenKeyReadOnly(SRegKey_UpgradeBackupPath_CU + SRegKey_KeymanEngine70_CU+'\hotkeys\8') then
         begin

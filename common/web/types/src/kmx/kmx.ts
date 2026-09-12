@@ -24,7 +24,8 @@ export enum KMX_Version {
   VERSION_140 = 0x00000E00,
   VERSION_150 = 0x00000F00,
   VERSION_160 = 0x00001000,
-  VERSION_170 = 0x00001100
+  VERSION_170 = 0x00001100,
+  VERSION_190 = 0x00001300,
 };
 
 
@@ -165,9 +166,10 @@ export class KMXFile {
   public static readonly VERSION_150 = KMX_Version.VERSION_150;
   public static readonly VERSION_160 = KMX_Version.VERSION_160;
   public static readonly VERSION_170 = KMX_Version.VERSION_170;
+  public static readonly VERSION_190 = KMX_Version.VERSION_190;
 
   public static readonly VERSION_MIN = this.VERSION_50;
-  public static readonly VERSION_MAX = this.VERSION_170;
+  public static readonly VERSION_MAX = this.VERSION_190;
 
   //
   // Backspace types
@@ -308,7 +310,7 @@ export class KMXFile {
   //public static readonly CODE_EXTENDEDEND =  0x0B;  deprecated
   public static readonly CODE_SWITCH =       0x0C;
   public static readonly CODE_KEY =          0x0D;
-  public static readonly CODE_CLEARCONTEXT = 0x0E;
+  public static readonly CODE_CLEARCONTEXT = 0x0E;    // deprecated in 19.0
   public static readonly CODE_CALL =         0x0F;
   // UC_SENTINEL_EXTENDEDEND  0x10
   public static readonly CODE_CONTEXTEX =    0x11;

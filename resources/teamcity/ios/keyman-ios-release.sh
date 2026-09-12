@@ -243,6 +243,7 @@ function do_build() {
 
 function do_publish() {
   _publish_to_downloads_keyman_com
+  ios_publish_symbols
   tc_upload_help "Keyman for iOS" ios
 
   if [[ "${KEYMAN_TIER}" == "stable" ]]; then

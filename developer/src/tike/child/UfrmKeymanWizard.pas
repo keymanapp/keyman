@@ -159,7 +159,7 @@ type
     Filename: string;
   end;
 
-  TfrmKeymanWizard = class(TfrmTikeEditor, IKMDPrintActions {TODO:, IKMDPrintPreviewActions})
+  TfrmKeymanWizard = class(TfrmTikeEditor)
     dlgBrowseBitmap: TOpenPictureDialog;
     dlgSaveExport: TSaveDialog;
     dlgSaveBitmap: TSavePictureDialog;
@@ -523,11 +523,6 @@ type
 
     function CanChangeView(FView: TCodeDesignView): Boolean; override;   // I4678
     procedure ChangeView(FView: TCodeDesignView); override;   // I4678
-
-    { IKMDPrintActions }
-    function PrintFile: Boolean;
-    { IKMDPrintPreviewActions }
-    //TODO: function PrintPreview: Boolean;
 
     function CanReloadAsTextFileFormatClick: Boolean; override;   // I3637
     procedure ReloadAsTextFileFormatClick(TextFileFormat: TTextFileFormat);   // I3637
@@ -1507,16 +1502,6 @@ begin
 
   Result := True;
 end;
-
-function TfrmKeymanWizard.PrintFile: Boolean;
-begin
-  Result := frameSource.PrintFile(FileName);
-end;
-
-{TODO: function TfrmKeymanWizard.PrintPreview: Boolean;
-begin
-  Result := frameSource.PrintPreview(FileName);
-end;}
 
 function TfrmKeymanWizard.GetCurrentRule: TKeyboardParser_LayoutRule;
 var
