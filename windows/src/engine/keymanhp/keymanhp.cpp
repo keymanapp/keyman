@@ -98,9 +98,7 @@ const PWSTR
 
   szFail_UnknownError = L"Unknown error %d",
   szFail_ErrorFormat = L"%s: %s (%d)",
-  szFail_ErrorFormat_OtherUnknown = L"%s: An unknown error occurred",
-
-  szWindowClass_x86_Wnd = L"TfrmKeyman7Main"; // Do not localize
+  szFail_ErrorFormat_OtherUnknown = L"%s: An unknown error occurred";
 
 //const char *szGPA_ChangeWindowMessageFilter = "ChangeWindowMessageFilter"; // Do not localize
 #define KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE_KEYMANHP KEYMAN_SENTRY_LOGGER_DESKTOP_ENGINE ARCH_LOG_FILE
@@ -352,6 +350,15 @@ BOOL StartKeyman(HWND hWnd)
 
   if(!Keyman_Initialise(hWnd, FALSE))
     return Fail(hWnd, szError_FailedToInitialise);
+
+  // Tell the x86 controller our architecture's controller window handle which
+  // will process wm_keyman_refresh messages (in keyman##.dll)
+  UINT wm_keyman_control = RegisterWindowMessage(RWM_KEYMAN_CONTROL_W);
+#if defined(_M_X64)
+  PostMessage(hwndController, wm_keyman_control, KMC_REGISTER_HOST_WINDOW_X64, (LPARAM) hWnd);
+#elif defined(_M_ARM64)
+  PostMessage(hwndController, wm_keyman_control, KMC_REGISTER_HOST_WINDOW_ARM64, (LPARAM) hWnd);
+#endif
 
   KeymanStarted = TRUE;
 

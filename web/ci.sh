@@ -15,6 +15,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${KEYMAN_ROOT}/resources/build/utils.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/zip.inc.sh"
 . "${KEYMAN_ROOT}/resources/build/ci/pull-requests.inc.sh"
+. "${KEYMAN_ROOT}/resources/build/ci/sentry-control.inc.sh"
 
 # This script runs from its own folder
 cd "${THIS_SCRIPT_PATH}"
@@ -42,21 +43,6 @@ builder_parse "$@"
 KEYMAN_TIER=$(cat ../TIER.md)
 BUILD_NUMBER=$(cat ../VERSION.md)
 
-function web_sentry_upload () {
-  if [[ -z "${SENTRY_ORG:-}" ]] || [[ -z "${SENTRY_PROJECT:-}" ]]; then
-    echo "Skipping Sentry upload: SENTRY_ORG and/or SENTRY_PROJECT are unset."
-    return
-  fi
-
-  echo "Uploading $1 to Sentry..."
-
-  # --strip-common-prefix does not take an argument, unlike --strip-prefix.  It auto-detects
-  # the most common prefix instead.
-  sentry-cli releases files "${KEYMAN_VERSION_GIT_TAG}" upload-sourcemaps --strip-common-prefix "$1" \
-    --rewrite --ext js --ext map --ext ts
-  echo "Upload successful."
-}
-
 function build_action() {
   # Build step:  since CI builds start (and should start) from scratch, run the following
   # three actions:
@@ -73,11 +59,10 @@ function build_action() {
     for sourcemap in "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/"*.map; do
       node "${KEYMAN_ROOT}/web/build/tools/building/sourcemap-root/index.js" null "${sourcemap}" --clean
     done
-    web_sentry_upload "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/"
+    sentry_upload_web "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/"
 
     # And, of course, the main build-products too
-    web_sentry_upload "${KEYMAN_ROOT}/web/build/app/webview/release/"
-    web_sentry_upload "${KEYMAN_ROOT}/web/build/publish/release/"
+    sentry_upload_web "${KEYMAN_ROOT}/web/build/publish/release/"
   fi
 }
 

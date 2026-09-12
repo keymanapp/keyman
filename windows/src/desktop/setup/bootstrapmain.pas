@@ -416,7 +416,7 @@ function TSetupBootstrap.CheckForOldVersionScenario: Boolean;   // I4460
 var
   OldKMShellPath: string;
 begin
-  if not (GetOS in [osLegacy, osVista]) then   // I4365
+  if GetOS <> osLegacy then   // I4365
     Exit(False);
 
   if FInstallInfo.Packages.Count = 0 then

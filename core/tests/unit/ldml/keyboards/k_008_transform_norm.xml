@@ -21,14 +21,14 @@ https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboar
   </keys>
 
   <layers formId="us">
-    <layer modifiers="none" id="base">
+    <layer modifiers="none">
       <row keys="u-0320 1 2 3 4 5 6 7 8 9 0" />
       <row keys="q w e r t y u i o p" />
       <row keys="a s d f g h j k l" />
       <row keys="z x c v b n m" />
       <row keys="space" />
     </layer>
-    <layer modifiers="shift" id="shift">
+    <layer modifiers="shift">
       <row keys="u-0300 u-00e8 nfd nfc not-nfd stampy lgtm u-0344" />
     </layer>
   </layers>
