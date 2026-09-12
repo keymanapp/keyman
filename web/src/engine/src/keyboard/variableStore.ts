@@ -7,6 +7,6 @@
 export type VariableStores = { [name: string]: string; };
 
 export interface VariableStoreSerializer {
-  loadStore(keyboardID: string, storeName: string): string;
+  loadStore(keyboardID: string, storeName: string): string | undefined;
   saveStore(keyboardID: string, storeName: string, storeValue: string): void;
 }

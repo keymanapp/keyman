@@ -8,9 +8,9 @@
 #include "targetver.h"
 
 #include <Windows.h>
+#include "../../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "mcompile.h"
-#include "mc_kmxfile.h"
 #include "mc_syskbd.h"
-#include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
+#include "../../../../common/include/kmx_file.h"
 #include "../../../../common/windows/cpp/include/xstring.h"
 #include "../../../../common/windows/cpp/include/keymansentry.h"

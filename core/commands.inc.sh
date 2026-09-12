@@ -100,6 +100,7 @@ do_test() {
     fi
 
   fi
+  JUNIT_RESULTS+=("##teamcity[importData type='junit' path='keyman/core/build/$target/$BUILDER_CONFIGURATION/meson-logs/testlog.junit.xml']")
   builder_finish_action success test:$target
 }
 

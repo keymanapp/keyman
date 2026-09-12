@@ -7,6 +7,6 @@
     <CompilerWarningsAsErrors>True</CompilerWarningsAsErrors>
     <CheckFilenameConventions>True</CheckFilenameConventions>
     <SkipMetadataFiles>True</SkipMetadataFiles>
-    <ProjectType>lexicalmodel</ProjectType>
+    <ProjectType>keyboard</ProjectType>
   </Options>
 </KeymanDeveloperProject>

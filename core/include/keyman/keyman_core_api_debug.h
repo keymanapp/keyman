@@ -24,6 +24,8 @@ extern "C"
 #endif
 
 /**
+ * @name DEBUG_MAX_CONTEXT constant
+ *
  * The maximum size of context in km_core_cu units for a single debug
  * event. This is taken from MAXCONTEXT in keyman32 (Windows) and is purely
  * a convenience value. We can increase it if there is a demonstrated need.
@@ -31,6 +33,8 @@ extern "C"
 #define DEBUG_MAX_CONTEXT 80
 
 /**
+ * @name DEBUG_MAX_STORE_OFFSETS constant
+ *
  * The number of stores that can be processed in a rule. This is taken from
  * MAXSTOREOFFSETS in keyman32 (Windows) and is purely a convenience value.
  * We can increase it if there is a demonstrated need.
@@ -39,16 +43,27 @@ extern "C"
 #define DEBUG_STORE_OFFSETS_SIZE (DEBUG_MAX_STORE_OFFSETS*2+1)
 
 /**
- * These modifier flags are used internally in the kmx engine, so will be
- * exposed only in debugging modifier states.
+ * @name KM_CORE_MODIFIER_VIRTUALKEY constant
+ *
+ * This modifier flag is used internally in the kmx engine, so will be exposed
+ * only in debugging modifier states.
  */
 #define KM_CORE_MODIFIER_VIRTUALKEY      0x4000
+
+/**
+ * @name KM_CORE_MODIFIER_VIRTUALCHARKEY constant
+ *
+ * This modifier flag is used internally in the kmx engine, so will be exposed
+ * only in debugging modifier states.
+ */
 #define KM_CORE_MODIFIER_VIRTUALCHARKEY  0x8000
 
 /**
- * Input key event data. The `character` member is derived from
- * a US English key event for vk + modifier_state, and is 0 if
- * the vk + modifier_state do not generate a character.
+ * @name km_core_state_debug_key_info struct
+ *
+ * Input key event data. The `character` member is derived from a US English key
+ * event for vk + modifier_state, and is 0 if the vk + modifier_state do not
+ * generate a character.
  *
  * Used only in event type KM_CORE_DEBUG_BEGIN.
  */
@@ -59,6 +74,8 @@ typedef struct {
 } km_core_state_debug_key_info;
 
 /**
+ * @name km_core_state_debug_kmx_option_info struct
+ *
  * Option event data.
  *
  * Used only in event type KM_CORE_DEBUG_SET_OPTION.
@@ -69,6 +86,8 @@ typedef struct {
 } km_core_state_debug_kmx_option_info;
 
 /**
+ * @name km_core_state_debug_kmx_info struct
+ *
  * KMX processor data for each event. kmx_base.h defines the types that are
  * passed in here, read only. Warning: context may contain sentinel values
  * for markers, with the kmx UC_SENTINEL, CODE_CONTEXT, DEADKEY pattern.
@@ -78,7 +97,6 @@ typedef struct {
  *
  * Used in all event types except KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_END.
  */
-
 typedef struct {
   km_core_cu context[DEBUG_MAX_CONTEXT];     // The context matched by the rule (? may not need this?) // TODO: rename to context_matched
   void *group;  // LPGROUP
@@ -93,6 +111,8 @@ typedef struct {
 } km_core_state_debug_kmx_info;
 
 /**
+ * @name km_core_state_debug_item struct
+ *
  * A single debug event.
  */
 typedef struct {
@@ -103,6 +123,8 @@ typedef struct {
 } km_core_state_debug_item;
 
 /**
+ * @name km_core_debug_type enum
+ *
  * A single debug event.
  */
 enum km_core_debug_type {
@@ -132,29 +154,37 @@ enum km_core_debug_type {
 #define KM_CORE_DEBUG_FLAG_OUTPUTKEYSTROKE     0x0001
 
 /**
+ * @name km_core_state_debug_set function
+ *
  * Enable or disable debug tracing
  *
  * @param state     Pointer to initialized state
  * @param value     Set to 1 to enable debugging, 0 to disable
- *
  * @returns   KM_CORE_STATUS_OK on success
  */
 KMN_API
 km_core_status
-km_core_state_debug_set(km_core_state *state, int value);
+km_core_state_debug_set(
+  km_core_state *state,
+  int value
+);
 
 /**
+ * @name km_core_state_debug_get function
+ *
  * Get current debug tracing status
  *
  * @param state     Pointer to initialized state
- *
  * @returns   1 if debugging is enabled, 0 otherwise
  */
 KMN_API
 uint8_t
-km_core_state_debug_get(km_core_state const *state);
+km_core_state_debug_get(
+  km_core_state const *state
+);
 
 /**
+ * @name km_core_state_debug_items function
  * Read current debug trace log
  *
  * @param state     Pointer to initialized state
@@ -166,7 +196,12 @@ km_core_state_debug_get(km_core_state const *state);
  */
 KMN_API
 km_core_state_debug_item const *
-km_core_state_debug_items(km_core_state const *state, size_t *num_items);
+km_core_state_debug_items(
+  km_core_state const *state,
+  size_t *num_items
+);
+
+/* $EOF */
 
 #if defined(__cplusplus)
 } // extern "C"

@@ -419,7 +419,7 @@ if(!keyman) {
         this.controller.style.background = 'url('+imgPath+'kmwcontroller2x.gif)';
         this.controller.style.padding = '1px 2px';
 
-        // Create keyboard list and OSK control buttones, and set initial styles
+        // Create keyboard list and OSK control buttons, and set initial styles
         const v1=util.loadCookie<KeyboardCookie>(KeyboardCookieName);
         let kbdEnabledOnLoad=false;
         if(typeof(v1.current) != 'undefined') {

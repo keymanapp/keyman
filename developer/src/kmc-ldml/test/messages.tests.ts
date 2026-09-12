@@ -20,8 +20,8 @@ describe('LdmlCompilerMessages', function () {
     const fakeOffsetNumber = 1234;
     const fakeOffsetObject = withOffset(fakeOffsetNumber);
     for(const key of keys) {
-      // exclude this one, does not need line numbers
-      if (key == 'Error_InvalidFile') continue;
+      // exclude these ones, do not need line numbers
+      if (key == 'Error_InvalidFile' || key == 'Error_InvalidTargetVersion') continue;
       if (typeof m[key] == 'function') {
         total++;
         const f = m[key] as Function;

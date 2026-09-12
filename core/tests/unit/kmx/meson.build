@@ -1,40 +1,22 @@
-# Copyright:    © 2018 SIL International.
-# Description:  Cross platform build script to compile libkeymancore API unit tests.
-# Create Date:  19 Oct 2018
-# Authors:      Marc Durdin, Tim Eves (TSE)
-# History:      19  Oct 2018 - TSE - Added test for context API functions.
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# Created by Tim Eves (TSE) on 2018-10-19
+#
+# Cross platform build script to compile kmx processor unit tests.
 #
 
-# TODO -- why are these differing from the standard.meson.build flags?
-if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
-  warns = [
-     '-Wno-missing-field-initializers',
-     '-Wno-unused-parameter'
-  ]
-else
-  warns = []
-endif
+kmx_test_path = meson.current_build_dir()
 
-source_path = meson.current_source_dir()
-test_path = meson.current_build_dir()
-tests_flags = []
-common_test_keyboards_baseline = source_path / '../../../../common/test/keyboards/baseline'
-
-if cpp_compiler.get_id() == 'emscripten'
-  # TODO: we will move the tests to ES6 in the future
-  # '-sMODULARIZE', '-sEXPORT_ES6',
-  tests_flags += ['-lnodefs.js', wasm_exported_runtime_methods]
-endif
-
-kmx = executable('kmx',
-    ['kmx.cpp', common_test_files],
-    cpp_args: defns + warns,
-    include_directories: [inc, libsrc, '../../kmx_test_source'],
-    link_args: links + tests_flags,
-    dependencies: [icu_uc, icu_i18n],
+kmx_tests_executable = executable('kmx_tests',
+    ['kmx.tests.cpp', common_test_files_without_main],
+    cpp_args: defns + test_warns,
+    include_directories: [test_includes, '../../kmx_test_source'],
+    link_args: links + test_link_args,
+    dependencies: test_dependencies,
     objects: [lib.extract_all_objects(recursive: false), kmx_test_source_lib.extract_all_objects(recursive: false)])
 
-tests = [
+kmx_tests = [
   'k_0000___null_keyboard',
   'k_0001___nul',
   'k_0002___nul_with_initial_context',
@@ -90,12 +72,6 @@ tests = [
   # TODO-web-core: Skipped: 'k_0813___deadkey_cancelled_by_arrow',
 ]
 
-
-node = find_program('node', required: true)
-
-kmc_root = meson.current_source_dir() / '../../../../developer/src/kmc/build/src/kmc.js'
-kmc_cmd = [node, '--enable-source-maps', kmc_root]
-
 if build_machine.system() == 'windows'
   cat_cmd = [find_program(meson.current_source_dir() / 'cat.bat', required: true)]
 else
@@ -104,7 +80,7 @@ endif
 
 test_keyboards_kpj = ''
 test_keyboards_kmp_json = ''
-foreach kbd : tests
+foreach kbd : kmx_tests
   if test_keyboards_kmp_json.startswith('{')
     test_keyboards_kmp_json += ''',
   '''
@@ -155,12 +131,12 @@ keyboards_kpj = configure_file(
 
 all_keyboards = custom_target('all_keyboards',
   input: keyboards_kpj,
-  output: [tests[0]+'.kmp'],
+  output: [kmx_tests[0]+'.kmp'],
   depfile: 'keyboards.dep',
   command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@']
 )
 
-foreach kbd : tests
+foreach kbd : kmx_tests
   kbd_src_path = common_test_keyboards_baseline / kbd + '.kmn'
 
   content = run_command(
@@ -192,73 +168,11 @@ foreach kbd : tests
   )
 endforeach
 
-foreach kbd : tests
-  test(kbd, kmx, depends: [all_keyboards], args: [test_path / kbd + '.kmn', test_path / kbd + '.kmx'])
+foreach kbd : kmx_tests
+  test('kmx/' + kbd, kmx_tests_executable, depends: [all_keyboards], args: [kmx_test_path / kbd + '.kmn', kmx_test_path / kbd + '.kmx'], suite: 'kmx', protocol: 'gtest')
 endforeach
 
 # binary file unit tests
 
 subdir('fixtures')
 
-# test for km_core_keyboard_get_key_list
-
-# For following tests, we need to be copying from source_path,
-# not build_path, so we'll just update test_path accordingly. This
-# should work for Linux, macOS, and WASM.
-test_path = source_path
-
-key_e = executable('key_list_tests', ['kmx_key_list.tests.cpp', common_test_files],
-                cpp_args: defns + warns,
-                include_directories: [inc, libsrc],
-                link_args: links + tests_flags,
-                dependencies: [icu_uc, icu_i18n],
-                objects: lib.extract_all_objects(recursive: false))
-test_kbd = 'kmx_key_list'
-
-kbd_src = files(test_kbd + '.kmn')
-kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
-kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
-  output: test_kbd + '.log',
-  input: kbd_src,
-  command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
-)
-test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
-
-# test for imx list
-
-imx_e = executable('imx_list_tests', ['kmx_imx.tests.cpp', common_test_files],
-                cpp_args: defns + warns,
-                include_directories: [inc, libsrc],
-                link_args: links + tests_flags,
-                dependencies: [icu_uc, icu_i18n],
-                objects: lib.extract_all_objects(recursive: false))
-
-test_kbd = 'kmx_imsample'
-
-kbd_src = files(test_kbd + '.kmn')
-kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
-kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
-  output: test_kbd + '.log',
-  input: kbd_src,
-  command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
-)
-test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
-
-external_e = executable('ext_event_tests', ['kmx_external_event.tests.cpp', common_test_files],
-                cpp_args: defns + warns,
-                include_directories: [inc, libsrc],
-                link_args: links + tests_flags,
-                dependencies: [icu_uc, icu_i18n],
-                objects: lib.extract_all_objects(recursive: false))
-
-test_kbd = 'k_0702___caps_always_off'
-
-
-kbd_src = common_test_keyboards_baseline + '/' + test_kbd + '.kmn'
-kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
-kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
-  output: test_kbd + '.log',
-  input: kbd_src,
-  command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
-)
-test('ext_event', external_e,  depends: kbd_log, args: [kbd_obj] )

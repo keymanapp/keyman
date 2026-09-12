@@ -43,7 +43,6 @@ if cpp_compiler.get_id() == 'emscripten'
   add_global_arguments('-pthread', language: [ 'cpp', 'c' ] )
 endif
 
-subdir('docs/internal')
 subdir('include')
 subdir('src')
 subdir('tests')

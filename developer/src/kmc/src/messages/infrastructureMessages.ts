@@ -227,5 +227,10 @@ export class InfrastructureMessages {
     However, as a file already exists with the same name, kmc cannot continue.
   `);
 
+  static ERROR_InvalidTargetVersion = SevError | 0x002D;
+  static Error_InvalidTargetVersion = (o:{targetVersion:string}) => m(
+    this.ERROR_InvalidTargetVersion,
+    `Target version parameter '${def(o.targetVersion)}' is not a valid Keyman version.`,
+  );
 }
 

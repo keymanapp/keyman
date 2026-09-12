@@ -217,7 +217,9 @@ const
   TSS_NEWLAYER = 42;
   TSS_OLDLAYER = 43;
 
-  TSS__MAX = 43;
+  TSS_DISPLAYMAP = 44;
+
+  TSS__MAX = 44;
 
 type
   TSystemStore = (ssNone = 0, ssBitmap = 1, ssCopyright = 2, ssHotkey = 3, ssLanguage = 4, ssLayout = 5, ssMessage = 6,
