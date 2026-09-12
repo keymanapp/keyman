@@ -129,7 +129,10 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   }
 
   get path(): CompilerPathCallbacks {
-    return path;
+    return {
+      ...path,
+      isAbsolute: path.win32.isAbsolute
+    };
   }
 
   get fs(): CompilerFileSystemCallbacks {
