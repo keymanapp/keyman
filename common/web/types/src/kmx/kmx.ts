@@ -346,7 +346,7 @@ export class KMXFile {
   //public static readonly CODE_EXTENDEDEND =  0x0B;  deprecated
   public static readonly CODE_SWITCH =       0x0C;
   public static readonly CODE_KEY =          0x0D;
-  public static readonly CODE_CLEARCONTEXT = 0x0E;
+  public static readonly CODE_CLEARCONTEXT = 0x0E;    // deprecated in 19.0
   public static readonly CODE_CALL =         0x0F;
   // UC_SENTINEL_EXTENDEDEND  0x10
   public static readonly CODE_CONTEXTEX =    0x11;

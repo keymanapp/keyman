@@ -285,6 +285,8 @@ namespace KmnCompilerMessages {
     ERROR_NameMustNotContainParentheses =               SevError | 0x0B9,
     ERROR_NameMustNotContainSquareBrackets =            SevError | 0x0BA,
 
+    WARN_DeprecatedStatement =                          SevWarn | 0x0BB,
+
     FATAL_BufferOverflow =                              SevFatal | 0x0C0
 //    FATAL_Break =                                       SevFatal | 0x0C1,      unused
   };

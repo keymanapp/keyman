@@ -9,7 +9,7 @@ import Keys = KMXPlus.Keys;
 import KeysKeys = KMXPlus.KeysKeys;
 import ListItem = KMXPlus.ListItem;
 import KeysFlicks = KMXPlus.KeysFlicks;
-import { allUsedKeyIdsInFlick, allUsedKeyIdsInKey, allUsedKeyIdsInLayers, calculateUniqueKeys, hashFlicks, hashKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
+import { allUsedKeyIdsInFlick, allUsedKeyIdsInKey, allUsedKeyIdsInLayers, calculateUniqueKeys, hashFlicks, hashKeys, translateLayerAttrToModifier } from '../util/util.js';
 import { SubstitutionUse, Substitutions } from './substitution-tracker.js';
 
 /** reserved name for the special gap key. space is not allowed in key ids. */
@@ -225,13 +225,9 @@ export class KeysCompiler extends SectionCompiler {
     // Finally, kmap
     // Use LayerMap + keys to generate compiled keys for hardware
     const hardwareLayers = this.hardwareLayers();
-    /* c8 ignore next 3 */
-    if (hardwareLayers.length > 1) {
-      // validation should have already caught this
-      throw Error(
-        `Internal error: Expected 0 or 1 hardware layer, not ${hardwareLayers.length}`
-      );
-    } else if (hardwareLayers.length === 1) {
+    if (hardwareLayers.length >= 1) {
+      // Only 1 hardware layer is supported; however, `LayrCompiler` will report
+      // on this error, so we can just process the first one here
       const theLayers = hardwareLayers[0];
       const { formId } = theLayers;
       for (const layer of theLayers.layer) {
@@ -461,12 +457,6 @@ export class KeysCompiler extends SectionCompiler {
     let valid = true;
 
     const { modifiers } = layer;
-    if (!validModifier(modifiers)) {
-      this.callbacks.reportMessage(
-        LdmlCompilerMessages.Error_InvalidModifier({ modifiers }, layer)
-      );
-      valid = false;
-    }
 
     if (layer.row.length > keymap.length) {
       this.callbacks.reportMessage(
@@ -484,7 +474,7 @@ export class KeysCompiler extends SectionCompiler {
           LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({
             row: y + 1,
             hardware: layers.formId,
-            modifiers: modifiers || 'none',
+            modifiers,
           }, row)
         );
         valid = false;
@@ -501,7 +491,7 @@ export class KeysCompiler extends SectionCompiler {
               keyId: key,
               col: x + 1,
               row: y + 1,
-              layer: layer.id,
+              layer: layer.id ?? layer.modifiers, // just to give a useful reference point in the error message
               form: "hardware",
             }, row)
           );

@@ -7,6 +7,16 @@
 #
 # See README.md for more information.
 #
+#    cd developer/src/kmc
+#    ./build.sh configure build # if needed
+#    ./build.sh fixtures-build
+#
+#  This will compile both the .xml and the .txt to build/test/fixtures and also emit the
+#  checksum for basic-xml.kmx so you can patch that into this file.
+#
+# For the format of this file, see “hextobin.ts”
+#
+# P.S. surprisingly, the Dart language highlighter in VSCode does a helpful job on this file.
 
 block(kmxheader)  #  struct COMP_KEYBOARD {
   4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
@@ -398,7 +408,7 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   index(strNull,strUs,2)            #   KMXPLUS_STR hardware = 'us'
   00 00 00 00                       #   KMX_DWORD layer;
   01 00 00 00 # count
-  7B 00 00 00                       #   KMX_DWORD minDeviceWidth; // 123
+  00 00 00 00                       #   KMX_DWORD minDeviceWidth; // 0
   # layers 0
   00 00 00 00                       #   KMXPLUS_STR id;
   00 00 00 00                       #   KMX_DWORD mod

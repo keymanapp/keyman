@@ -5,7 +5,7 @@ import { deepCopy } from 'keyman/common/web-utils';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { CorrectionPredictionTuple, finalizeSuggestions, models } from "@keymanapp/lm-worker/test-index";
+import { CorrectionPredictionTuple, PredictionMetadata, SuggestionSimilarity, finalizeSuggestions, models } from "@keymanapp/lm-worker/test-index";
 
 import DummyModel = models.DummyModel;
 import Outcome = LexicalModelTypes.Outcome;
@@ -48,6 +48,13 @@ const testModelWithoutSpacing = new DummyModel({
 const build_its_is_set = (verbose?: string) => {
   const verboseFlag = (verbose == 'verbose' ? true : false);
 
+  const metadata: PredictionMetadata = {
+    matchLevel: SuggestionSimilarity.none,
+    preservationTransform: undefined,
+    rawEditCount: 0,
+    predictionLength: 0
+  };
+
   const its: CorrectionPredictionTuple = {
     correction: {
       sample: 'its',
@@ -63,8 +70,8 @@ const build_its_is_set = (verbose?: string) => {
       },
       p: 0.2
     },
-    totalProb: 0.16
-    // matchLevel does not yet exist.
+    totalProb: 0.16,
+    metadata: {...metadata, predictionLength: 0}
   };
 
   const it_is: CorrectionPredictionTuple = {
@@ -82,7 +89,8 @@ const build_its_is_set = (verbose?: string) => {
       },
       p: 0.8
     },
-    totalProb: 0.64
+    totalProb: 0.64,
+    metadata: {...metadata, predictionLength: 0}
   };
 
   const is: CorrectionPredictionTuple = {
@@ -100,7 +108,8 @@ const build_its_is_set = (verbose?: string) => {
       },
       p: 0.5
     },
-    totalProb: 0.1
+    totalProb: 0.1,
+    metadata: {...metadata, predictionLength: 0}
   };
 
   const is_not: CorrectionPredictionTuple = {
@@ -118,7 +127,8 @@ const build_its_is_set = (verbose?: string) => {
       },
       p: 0.5
     },
-    totalProb: 0.1
+    totalProb: 0.1,
+    metadata: {...metadata, predictionLength: 2} // not counting the `'` here.
   };
 
   const baseDefinitions = {

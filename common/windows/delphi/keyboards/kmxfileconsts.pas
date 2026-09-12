@@ -56,7 +56,7 @@ const
 //#define CODE_EXTENDEDEND	= $0B  deprecated
   CODE_SWITCH			= $0C;
   CODE_KEY			= $0D;
-  CODE_CLEARCONTEXT	= $0E;
+  CODE_CLEARCONTEXT	= $0E;    // deprecated in 19.0
   CODE_CALL		 =	$0F;
 // UC_SENTINEL_EXTENDEDEND  0x10
   CODE_CONTEXTEX = $11;
