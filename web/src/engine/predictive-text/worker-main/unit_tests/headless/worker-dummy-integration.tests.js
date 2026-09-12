@@ -4,7 +4,7 @@ import fs from 'fs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { LMLayer, SourcemappedWorker as Worker } from '#./node/index.js';
+import { LMLayer, NodeWorker as Worker } from '#./node/index.js';
 import { capabilities, iGotDistractedByHazel } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 /*

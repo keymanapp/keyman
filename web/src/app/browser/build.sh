@@ -49,13 +49,13 @@ compile_and_copy() {
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/browser"
   SRC_ROOT="${KEYMAN_ROOT}/web/src/app/browser/src"
 
-  node_es_bundle "${SRC_ROOT}/debug-main.js" \
+  node_es_bundle "${SRC_ROOT}/main.js" \
     --out        "${BUILD_ROOT}/debug/keymanweb.js" \
     --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/browser/debug" \
     --target     "es6"
 
-  node_es_bundle "${SRC_ROOT}/release-main.js" \
+  node_es_bundle "${SRC_ROOT}/main.js" \
     --out        "${BUILD_ROOT}/release/keymanweb.js" \
     --charset    "utf8" \
     --profile    "${BUILD_ROOT}/filesize-profile.log" \
@@ -71,6 +71,14 @@ compile_and_copy() {
 
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
+
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.js" "${BUILD_ROOT}/debug/worker-main.js"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.js.map" "${BUILD_ROOT}/debug/worker-main.js.map"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.d.ts" "${BUILD_ROOT}/debug/worker-main.d.ts"
+
+  # TODO: rename to lm-worker.js? do we keep debug/release distinction through .js vs .min.js or via folder?
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.min.js" "${BUILD_ROOT}/release/worker-main.js"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.min.js.map" "${BUILD_ROOT}/release/worker-main.js.map"
 
   # Update the build/publish copy of our build artifacts
   prepare

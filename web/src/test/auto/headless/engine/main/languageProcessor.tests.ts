@@ -8,7 +8,7 @@ import path from 'node:path';
 
 import { assert } from 'chai';
 
-import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
+import { NodeWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
 import { LexicalModelCompiler } from '@keymanapp/kmc-model';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { SyntheticTextStore } from 'keyman/engine/keyboard';
