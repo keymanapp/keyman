@@ -85,42 +85,33 @@
 
 
       <!--
-                 Capture content by MIME type, which is how Gmail broadcasts
-                 attachment open requests.  pathPattern and file extensions
-                 are ignored, so the MIME type *MUST* be explicit, otherwise
-                 we will match absolutely every file opened.
-            -->
+        Capture content by MIME type, which is how Gmail broadcasts
+        attachment open requests.  pathPattern and file extensions
+        are ignored, so the MIME type *MUST* be explicit, otherwise
+        we will match absolutely every file opened.
+
+        See https://developer.android.com/guide/components/intents-filters#DataTest, item 3.
+      -->
       <intent-filter android:priority="50">
         <action android:name="android.intent.action.VIEW" />
 
         <category android:name="android.intent.category.BROWSABLE" />
         <category android:name="android.intent.category.DEFAULT" />
 
-        <!-- needed for properly formatted email messages -->
-        <data
-          android:mimeType="application/vnd.keyman"
-          android:scheme="content" />
+        <data android:scheme="content" />
+        <data android:host="*" />
+
         <!-- needed for mangled email messages -->
-        <data
-          android:mimeType="application/keyman"
-          android:scheme="content" />
-        <!-- needed for mangled email messages -->
-        <data
-          android:mimeType="application/octet-stream"
-          android:scheme="content" />
-        <data
-          android:mimeType="application/x-keyman-package"
-          android:scheme="content" />
+        <data android:mimeType="application/vnd.keyman.kmp+zip"/>
+        <data android:mimeType="application/octet-stream"/>
       </intent-filter>
 
       <!--
-                 Capture file open requests (pathPattern is honoured) where no
-                 MIME type is provided in the Intent.  An Intent with a null
-                 MIME type will never be matched by a filter with a set MIME
-                 type, so we need a second intent-filter if we wish to also
-                 match files with this extension and a non-null MIME type
-                 (even if it is non-null but zero length).
-            -->
+        Capture open requests (pathPattern is honoured) where MIME
+        type is provided in the Intent and a URI is provided.
+
+        See https://developer.android.com/guide/components/intents-filters#DataTest, item 4.
+      -->
       <intent-filter android:priority="50">
         <action android:name="android.intent.action.VIEW" />
 
@@ -128,19 +119,28 @@
         <category android:name="android.intent.category.DEFAULT" />
 
         <data android:scheme="file" />
+        <data android:scheme="content" />
+
         <data android:host="*" />
-        <data android:pathPattern="/.*\\.kmp" />
+        <data android:pathPattern=".*\\.kmp" />
+
+        <data android:mimeType="application/vnd.keyman.kmp+zip" />
+        <!--
+          Backup MIME intents
+        -->
+        <data android:mimeType="application/octet-stream" />
       </intent-filter>
 
       <!--
-                 Capture file open requests (pathPattern is honoured) where a
-                 (possibly blank) MIME type is provided in the Intent.  This
-                 filter may only be necessary for supporting ES File Explorer,
-                 which has the probably buggy behaviour of using an Intent
-                 with a MIME type that is set but zero-length.  It's
-                 impossible to match such a type except by using a global
-                 wildcard.
-            -->
+        Capture file open requests (pathPattern is honoured) where no
+        MIME type is provided in the Intent.  An Intent with a null
+        MIME type will never be matched by a filter with a set MIME
+        type, so we need a second intent-filter if we wish to also
+        match files with this extension and a non-null MIME type
+        (even if it is non-null but zero length).
+
+        See https://developer.android.com/guide/components/intents-filters#DataTest, item 2.
+      -->
       <intent-filter android:priority="50">
         <action android:name="android.intent.action.VIEW" />
 
@@ -148,25 +148,10 @@
         <category android:name="android.intent.category.DEFAULT" />
 
         <data android:scheme="file" />
+        <data android:scheme="content" />
+
         <data android:host="*" />
-        <data android:mimeType="*/*" />
-        <data android:pathPattern="/.*\\.kmp" />
-      </intent-filter>
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-
-        <!-- http:// and  https:// protocols -->
-        <data
-          android:host="*"
-          android:pathPattern="/.*\\.kmp"
-          android:scheme="http" />
-        <data
-          android:host="*"
-          android:pathPattern="/.*\\.kmp"
-          android:scheme="https" />
+        <data android:pathPattern=".*\\.kmp" />
       </intent-filter>
 
       <intent-filter>
@@ -192,35 +177,14 @@
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
 
-        <data
-          android:host="keyman-staging.com"
-          android:scheme="http"
-          android:pathPrefix="/go/package/download" />
+        <data android:scheme="http" />
+        <data android:scheme="https" />
 
-        <data
-          android:host="keyman.com"
-          android:scheme="https"
-          android:pathPrefix="/go/package/download" />
+        <data android:host="keyman-staging.com" />
+        <data android:host="keyman.com" />
 
-      </intent-filter>
-
-      <intent-filter android:priority="50">
-        <!-- KMAPro should also be able to handle /keyboards/install links and convert to /go/package/download -->
-        <action android:name="android.intent.action.VIEW" />
-
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-
-        <data
-          android:host="keyman-staging.com"
-          android:scheme="http"
-          android:pathPrefix="/keyboards/install" />
-
-        <data
-          android:host="keyman.com"
-          android:scheme="https"
-          android:pathPrefix="/keyboards/install" />
-
+        <data android:pathPrefix="/go/package/download" />
+        <data android:pathPrefix="/keyboards/install" />
       </intent-filter>
 
     </activity>

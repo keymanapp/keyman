@@ -32,6 +32,7 @@ builder_describe "Builds Keyman Engine and the Keyman app for use on iOS devices
   "configure" \
   "build" \
   "test" \
+  "publish-symbols              Publishes symbols to Sentry" \
   ":engine                      Builds KeymanEngine.xcframework, usable by our main app and by third-party apps" \
   ":app=keyman                  Builds the Keyman app for iOS platforms" \
   ":help                        Online documentation" \
@@ -50,3 +51,4 @@ function do_test_help() {
 }
 
 builder_run_action        test:help    do_test_help
+builder_run_child_actions publish-symbols

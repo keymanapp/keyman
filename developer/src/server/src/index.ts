@@ -1,12 +1,17 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Keyman Developer Server main program
+ */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import chalk from 'chalk';
 import express from 'express';
 import multer from 'multer';
 import * as ws from 'ws';
+import KEYMAN_VERSION from '@keymanapp/keyman-version';
 import { KeymanSentry } from './KeymanSentry.js';
 import { standardPaths } from './standardPaths.js';
-import { environment } from './environment.js';
 import setupRoutes from './routes.js';
 import { shutdown } from './shutdown.js';
 import { initTray } from './tray.js';
@@ -23,7 +28,7 @@ const options = {
 // set of options if an error occurs.
 await loadOptions();
 
-console.log(`Starting Keyman Developer Server ${environment.versionWithTag}, listening on port ${getOption('web host port')}.`);
+console.log(`Starting Keyman Developer Server ${KEYMAN_VERSION.VERSION_WITH_TAG}, listening on port ${getOption('web host port')}.`);
 
 KeymanSentry.init();
 try {
@@ -74,7 +79,7 @@ export async function run() {
 
   /* Setup routes */
 
-  setupRoutes(app, upload, wsServer, environment);
+  setupRoutes(app, upload, wsServer);
 
   /* Start the web server */
 

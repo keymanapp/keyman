@@ -10,6 +10,8 @@ $(function() {
   this.yscale = 1;
   this.uniqId = 1;
 
+  this.lastPresentations = {...this.defaultPresentations};
+  this.lastLayers = {};
 
   this.getPresentation = function () {
     return $('#selPlatformPresentation').val();
@@ -41,6 +43,7 @@ $(function() {
   }
 
   builder.selPlatformPresentationChange = function () {
+    builder.lastPresentations[builder.lastPlatform] = builder.getPresentation();
     let lastSelection = builder.saveSelection();
     builder.selectKey(null, false);
     builder.selectSubKey(null);
@@ -493,11 +496,14 @@ $(function() {
       }
       var option = $(document.createElement('option'));
       option.attr('value', i).text(this.presentations[i].name);
+      if(builder.lastPresentations[builder.lastPlatform] == i) {
+        option.attr('selected', true);
+      }
       listContainer.append(option);
     }
 
     builder.prepareLayers();
-    builder.selectLayer(0);
+    builder.selectLayer(builder.lastLayers[builder.lastPlatform] ?? 0);
   }
 
   this.selectLayer = function (val) {
@@ -1079,7 +1085,9 @@ $(function() {
     var state = {
       platform: builder.lastPlatform,
       layer: builder.lastLayerIndex,
-      presentation: $('#selPlatformPresentation').val()
+      presentation: $('#selPlatformPresentation').val(),
+      lastPresentations: builder.lastPresentations,
+      lastLayers: builder.lastLayers,
     };
 
     var key = builder.selectedKey();
@@ -1118,6 +1126,9 @@ $(function() {
             // The last selected presentation is no longer available; select the first option instead
             $('#selPlatformPresentation').val($('#selPlatformPresentation option:first').val());
           }
+
+          builder.lastPresentations = {...(data.lastPresentations ?? this.defaultPresentations)};
+          builder.lastLayers = {...(data.lastLayers ?? {})};
 
           let selection = builder.saveSelection();
           builder.prepareLayer();

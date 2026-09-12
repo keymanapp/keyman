@@ -1,0 +1,11 @@
+store(&NAME) 'targets_with_whitespace'
+store(&VERSION) '10.0'
+
+c this used to generate KM0207B: At least one compile target must be specified
+store(&TARGETS) ' any'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ 'x' > 'y'
