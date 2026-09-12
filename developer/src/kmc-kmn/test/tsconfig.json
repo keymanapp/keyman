@@ -11,7 +11,8 @@
   "include": [
       "**/*.tests.ts",
       "./helpers/index.ts",
-      "./kmw/util.ts"
+      "./kmw/util.ts",
+      "./ng-compiler/keyboard-names.ts"
   ],
   "references": [
       { "path": "../../../../common/web/keyman-version/" },
