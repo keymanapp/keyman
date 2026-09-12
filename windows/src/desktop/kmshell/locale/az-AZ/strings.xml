@@ -167,7 +167,7 @@
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.420.0 -->
-  <string name="S_Languages_Uninstall" comment="Remove language profile">X</string>
+  <string name="S_Languages_Uninstall" comment="Remove language profile">✕</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 9.0.420.0 -->
