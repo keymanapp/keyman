@@ -1,3 +1,8 @@
+/*
+ * Keyman is copyright (C)  SIL Global. MIT License.
+ *
+ * Mnemonic layout support for Linux
+ */
 
 #pragma once
 #ifndef DEADKEY_H
@@ -5,6 +10,13 @@
 
 #include "mc_import_rules.h"
 #include <map>
+#include "keymap.h"
+
+struct KMX_DeadkeyMapping {  // I4353
+  KMX_WCHAR deadkey, dkid;
+  KMX_DWORD shift;
+  KMX_WORD vk;
+};
 
 /** @brief create a Vector of DeadKey containing all combinations of deadkey + character for ALL possible Linux keyboards */
 std::vector<DeadKey*> create_deadkeys_by_basechar();
