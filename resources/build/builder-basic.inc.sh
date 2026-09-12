@@ -309,3 +309,11 @@ _builder_basic_find_should_sentry_release
 # correct version
 #
 _builder_basic_set_keyman_standard_build_path
+
+if builder_is_macos; then
+  if [[ -z "${HOMEBREW_PREFIX+x}" ]]; then
+    HOMEBREW_PREFIX=`brew --prefix`
+  fi
+
+  export PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
+fi

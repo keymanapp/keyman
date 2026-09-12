@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/minimum-versions.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 ################################ Main script ################################
 
@@ -33,26 +34,12 @@ WORDBREAK_PROP_SRC_LOCAL="./WordBreakProperty.txt"
 EMOJI_DATA_SRC_HREF="https://www.unicode.org/Public/$KEYMAN_VERSION_UNICODE/ucd/emoji/emoji-data.txt"
 EMOJI_DATA_SRC_LOCAL="./emoji-data.txt"
 
-function downloadPropertyFile() {
-  local SRC="$1"
-  local DEST="$2"
-
-  local RETRY=5       # Curl retries this number of times before giving up
-  local RETRY_DELAY=5 # Make curl sleep this amount of time before each retry when a transfer has failed
-
-  echo "Downloading ${SRC} - ${RETRY} attempts"
-  # local URL_DOWNLOAD_FILE=`curl --retry "$RETRY" --retry-delay "$RETRY_DELAY" --silent "${SRC}" | "$JQ" -r .txt`
-  curl --fail --retry "$RETRY" --retry-delay "$RETRY_DELAY" --silent "$SRC" --output "$DEST" || {
-      builder_die "Downloading $SRC failed with error $?"
-  }
-}
-
 do_download() {
-  downloadPropertyFile "${BLOCKS_SRC_HREF}"          "${BLOCKS_SRC_LOCAL}"
-  downloadPropertyFile "${UNICODE_DATA_SRC_HREF}"    "${UNICODE_DATA_SRC_LOCAL}"
+  util_curl_download_file_with_retry "${BLOCKS_SRC_HREF}"          "${BLOCKS_SRC_LOCAL}"
+  util_curl_download_file_with_retry "${UNICODE_DATA_SRC_HREF}"    "${UNICODE_DATA_SRC_LOCAL}"
 
-  downloadPropertyFile "${WORDBREAK_PROP_SRC_HREF}"  "${WORDBREAK_PROP_SRC_LOCAL}"
-  downloadPropertyFile "${EMOJI_DATA_SRC_HREF}"      "${EMOJI_DATA_SRC_LOCAL}"
+  util_curl_download_file_with_retry "${WORDBREAK_PROP_SRC_HREF}"  "${WORDBREAK_PROP_SRC_LOCAL}"
+  util_curl_download_file_with_retry "${EMOJI_DATA_SRC_HREF}"      "${EMOJI_DATA_SRC_LOCAL}"
 }
 
 builder_run_action download  do_download

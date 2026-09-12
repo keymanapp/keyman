@@ -118,6 +118,7 @@ type
     { Public declarations }
     procedure SetFocus; override;
     procedure SetupCharMapDrop;
+    procedure ApplyTemplate;
     function Load(const AFilename: string; ALoadFromTemplate, ALoadFromString: Boolean): Boolean;
     procedure Save(const AFilename: string);
     function SaveToString: string;
@@ -315,6 +316,16 @@ end;
 procedure TframeTouchLayoutBuilder.TouchLayoutMessage(Sender: TObject; const Message: string);
 begin
   LogMessage(plsError, FFilename, Message, 0, 0);
+end;
+
+(**
+ * Apply the template referenced by TemplateFileName to the current
+ * layout, and mark the file as modified.
+ *)
+procedure TframeTouchLayoutBuilder.ApplyTemplate;
+begin
+  Load('', True, False);   // applies the template
+  FSavedLayoutJS := '';    // marks the file as dirty
 end;
 
 function TframeTouchLayoutBuilder.Load(const AFilename: string; ALoadFromTemplate, ALoadFromString: Boolean): Boolean;

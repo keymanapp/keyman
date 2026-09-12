@@ -327,7 +327,8 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
 
     if(!requestedStub) {
       if(keyboardId) {
-        throw new Error("No matching stub has been registered.");
+        const availableStubList = this.keyboardCache.getStubList().map(stub => `${stub.KI}@${stub.KLC}`);
+        throw new Error(`No matching stub has been registered for keyboard ${keyboardId}.  Available stubs: ${JSON.stringify(availableStubList)}`);
       } else {
         return {
           keyboard: Promise.resolve(null),

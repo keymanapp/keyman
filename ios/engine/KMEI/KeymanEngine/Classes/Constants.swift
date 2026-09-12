@@ -33,6 +33,7 @@ public enum Key {
   /// Dictionary of prediction/correction toggle settings keyed by language id in UserDefaults
   static let userPredictSettings = "UserPredictionEnablementSettings"
   static let userCorrectSettings = "UserCorrectionEnablementSettings"
+  static let userAutocorrectSettings = "UserAutocorrectionEnablementSettings"
 
   // Internal user defaults keys
   static let engineVersion = "KeymanEngineVersion"

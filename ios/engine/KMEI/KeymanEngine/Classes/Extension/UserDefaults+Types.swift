@@ -331,6 +331,17 @@ public extension UserDefaults {
       set(prefs, forKey: Key.userCorrectSettings)
     }
   }
+  
+  // stores a dictionary of autocorrection-enablement settings keyed to language ids, i.e., [langID: Bool]
+  var autocorrectionEnablements: [String: Bool]? {
+    get {
+      return dictionary(forKey: Key.userAutocorrectSettings) as? [String : Bool]
+    }
+    
+    set(prefs) {
+      set(prefs, forKey: Key.userAutocorrectSettings)
+    }
+  }
 
   var portraitKeyboardHeight: Double {
     get {
@@ -386,5 +397,23 @@ public extension UserDefaults {
     }
     prefs?[forLanguageID] = correctSetting
     correctionEnablements = prefs
+  }
+  
+  func autocorrectSettingForLanguage(languageID: String) -> Bool {
+    if let dict = autocorrectionEnablements {
+      return dict[languageID] ?? true
+    } else {
+      return true
+    }
+  }
+  
+  func set(autocorrectSetting: Bool, forLanguageID: String) {
+    var prefs: [String: Bool]?
+    prefs = autocorrectionEnablements
+    if prefs == nil {
+      prefs = [String: Bool]()
+    }
+    prefs?[forLanguageID] = autocorrectSetting
+    autocorrectionEnablements = prefs
   }
 }

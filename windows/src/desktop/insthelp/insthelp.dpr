@@ -11,7 +11,7 @@ uses
   UserMessages in '..\..\..\..\common\windows\delphi\general\UserMessages.pas';
 
 {$R version.res}
-{-R manifest.res}
+{$R manifest.res}
 
 begin
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);

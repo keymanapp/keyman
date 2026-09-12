@@ -285,81 +285,6 @@ describe('processSimilarity', () => {
     assert.deepEqual(it_is.prediction.sample, keep_it_is);
   });
 
-  it(`creates an 'exact'-match suggestion as 'keep' if no exact-match exists`, () => {
-    const context: Context = {
-      left: 'iphon',
-      right: '',
-      startOfBuffer: true,
-      endOfBuffer: true
-    };
-
-    const trueInput: ProbabilityMass<Transform> = {
-      sample: {
-        insert: 'e',
-        deleteLeft: 0
-      },
-      p: 1
-    };
-
-    const iPhone: CorrectionPredictionTuple = {
-      correction: {
-        sample: 'iphone',
-        p: 0.8
-      },
-      prediction: {
-        sample: {
-          transform: {
-            insert: 'iPhone',
-            deleteLeft: 5
-          },
-          displayAs: 'iPhone'
-        },
-        p: 0.8
-      },
-      totalProb: 0.64
-      // matchLevel does not yet exist.
-    };
-
-    const distribution: CorrectionPredictionTuple[] = [
-      iPhone
-    ];
-
-    const keep_iphone: CorrectionPredictionTuple = {
-      correction: {
-        sample: 'iphone',
-        p: 1
-      },
-      prediction: {
-        sample: {
-          transform: {
-            insert: 'iphone',
-            deleteLeft: 5
-          },
-          displayAs: '<iphone>',
-          matchesModel: false,
-          tag: 'keep'
-        },
-        p: 1
-      },
-      totalProb: 1,
-      matchLevel: SuggestionSimilarity.exact
-    };
-
-
-    const expectation: CorrectionPredictionTuple[] = [
-      {
-        ...keep_iphone,
-        matchLevel: SuggestionSimilarity.exact
-      }, {
-        ...iPhone,
-        matchLevel: SuggestionSimilarity.sameText
-      }
-    ];
-
-    processSimilarity(testModelWithCasing, distribution, context, trueInput);
-    assert.sameDeepMembers(distribution, expectation);
-  });
-
   describe('with casing', () => {
     // If we ever add a mode that can force lowercase for certain words even
     // when the context is title-cased or upper-cased, this scenario would be
@@ -415,18 +340,9 @@ describe('processSimilarity', () => {
 
       processSimilarity(testModelWithCasing, distribution, context, trueInput);
 
-      // Because we mucked with the casing here, a new 'keep' was generated.
-      // Find it, confirm it exists and meets basic expectations, then remove it
-      // for easy comparison to pre-existing entries.
-      //
-      // We'll be less thorough checking this 'keep', as the "creates an 'exact'..."
-      // test above is thorough enough and tests the behavior already.
-
+      // Because we mucked with the casing here, there is no perfect 'keep' match.
       const keep = distribution.find((entry) => entry.prediction.sample.tag == 'keep');
-      assert.isOk(keep);
-      assert.equal(keep.prediction.sample.displayAs, '<It\'s>');
-
-      distribution.splice(distribution.indexOf(keep), 1);
+      assert.isNotOk(keep);
       assert.sameDeepMembers(distribution, expectation);
     });
   });
@@ -478,18 +394,9 @@ describe('processSimilarity', () => {
 
       processSimilarity(testModelWithoutCasing, distribution, context, trueInput);
 
-      // Because we mucked with the casing here, a new 'keep' was generated.
-      // Find it, confirm it exists and meets basic expectations, then remove it
-      // for easy comparison to pre-existing entries.
-      //
-      // We'll be less thorough checking this 'keep', as the "creates an 'exact'..."
-      // test above is thorough enough and tests the behavior already.
-
+      // Because we mucked with the casing here, there is no perfect 'keep' match.
       const keep = distribution.find((entry) => entry.prediction.sample.tag == 'keep');
-      assert.isOk(keep);
-      assert.equal(keep.prediction.sample.displayAs, '<It\'s>');
-
-      distribution.splice(distribution.indexOf(keep), 1);
+      assert.isNotOk(keep);
       assert.sameDeepMembers(distribution, expectation);
     });
   });

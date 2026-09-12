@@ -1,5 +1,5 @@
 # Keyman Engine for Web
-The Original Code is (C) SIL International
+The Original Code is (C) SIL Global
 
 ## Prerequisites
 See [build configuration](../docs/build/index.md) for details on how to

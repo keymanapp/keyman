@@ -18,10 +18,10 @@ export interface ModelSpec {
    * The path/URL to the file that defines the model.  If both `path` and `code` are specified,
    * `path` takes precedence.
    */
-  path: string;
+  path?: string;
 
   /**
    * The raw JS script defining the model.  Only used if `path` is not specified.
    */
-  code: string;
+  code?: string;
 }

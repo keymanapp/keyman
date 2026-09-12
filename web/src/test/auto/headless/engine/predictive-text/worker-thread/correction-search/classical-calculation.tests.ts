@@ -1,5 +1,6 @@
 import { assert } from 'chai';
-import { ClassicalDistanceCalculation } from '@keymanapp/lm-worker/test-index';
+import { ClassicalDistanceCalculation, EditOperation, EditTuple, forNewIndices } from '@keymanapp/lm-worker/test-index';
+import sinon from 'sinon';
 
 // Very useful for diagnosing unit test issues when path inspection is needed.
 // Not currently used ('cause that's noisy during test runs).
@@ -17,17 +18,13 @@ export function prettyPrintMatrix(matrix: number[][]) {
   }
 }
 
-function compute(input: string, match: string, mode?: string, bandSize?: number) {
-  let buffer = new ClassicalDistanceCalculation();
+function compute(input: string, match: string, mode?: string, bandSize?: number, allowTransposes: boolean = true) {
+  let buffer = new ClassicalDistanceCalculation({noTransposes: !allowTransposes, diagonalWidth: bandSize || 1});
 
   /* SUPPORTED MODES:
    * "InputThenMatch"  // adds all input chars, then all match chars.
    * "MatchThenInput"  // adds all match chars, then all input chars.
    */
-
-  // TEMP:  once diagonal expansion is implemented, do this LATER, AFTER adding the chars.
-  bandSize = bandSize || 1;
-  buffer.diagonalWidth = bandSize;
 
   switch(mode || "InputThenMatch") {
     case "InputThenMatch":
@@ -54,6 +51,120 @@ function compute(input: string, match: string, mode?: string, bandSize?: number)
 
   return buffer;
 }
+
+describe('forNewIndices', () => {
+  it('iterates extended row properly (small calc)', () => {
+    const mockedCalc = new ClassicalDistanceCalculation({diagonalWidth: 2});
+    sinon.replaceGetter(mockedCalc, 'inputSequence', () => new Array(2));
+    sinon.replaceGetter(mockedCalc, 'matchSequence', () => new Array(3));
+
+    const fake = sinon.fake();
+    forNewIndices(mockedCalc, true, fake);
+
+    assert.equal(fake.callCount, 3);
+    for(let i=0; i < fake.callCount; i++) {
+      // row value should be fixed - the last row.
+      assert.equal(fake.args[i][0], 1);
+
+      // column value should increment on each step.
+      assert.equal(fake.args[i][1], 0 + i);
+
+      // actual column position within the internal representation of the row
+      assert.equal(fake.args[i][2], 1 + i);
+    }
+  });
+
+  it('iterates extended row properly (large calc)', () => {
+    const mockedCalc = new ClassicalDistanceCalculation({diagonalWidth: 2});
+    sinon.replaceGetter(mockedCalc, 'inputSequence', () => new Array(8));
+    sinon.replaceGetter(mockedCalc, 'matchSequence', () => new Array(9));
+
+    const fake = sinon.fake();
+    forNewIndices(mockedCalc, true, fake);
+
+    assert.equal(fake.callCount, 4);  // diagonalWidth + 1, + 1 because +1 column over rows.
+    for(let i=0; i < fake.callCount; i++) {
+      // row value should be fixed - the last row.
+      assert.equal(fake.args[i][0], 7);
+
+      // column value should increment on each step
+      assert.equal(fake.args[i][1], 5 /* last row index - diagonalWidth */ + i);
+
+      // actual column position within the internal representation of the row
+      // and start as far left as possible
+      assert.equal(fake.args[i][2], i);
+    }
+  });
+
+  it('iterates extended column properly (small calc)', () => {
+    const mockedCalc = new ClassicalDistanceCalculation({diagonalWidth: 2});
+    sinon.replaceGetter(mockedCalc, 'inputSequence', () => new Array(3));
+    sinon.replaceGetter(mockedCalc, 'matchSequence', () => new Array(2));
+
+    const fake = sinon.fake();
+    forNewIndices(mockedCalc, false, fake);
+
+    assert.equal(fake.callCount, 3);
+    for(let i=0; i < fake.callCount; i++) {
+      // row value should increment on each step.
+      assert.equal(fake.args[i][0], 0 + i);
+
+      // column value should be fixed - the last column.
+      assert.equal(fake.args[i][1], 1);
+
+      // Actual column position within the internal representation of the row.
+      // Note that internally, columns 'shift backward' when moving forward
+      // in rows.
+      assert.equal(fake.args[i][2], 3 - i);
+    }
+  });
+
+  it('iterates extended column properly (large calc) (1)', () => {
+    const mockedCalc = new ClassicalDistanceCalculation({diagonalWidth: 3});
+    sinon.replaceGetter(mockedCalc, 'inputSequence', () => new Array(8));
+    sinon.replaceGetter(mockedCalc, 'matchSequence', () => new Array(9));
+
+    const fake = sinon.fake();
+    forNewIndices(mockedCalc, false, fake);
+
+    assert.equal(fake.callCount, 3); // diagonalWidth + 1,  -1 because 1 less row
+    for(let i=0; i < fake.callCount; i++) {
+      // row value should increment on each step.
+      assert.equal(fake.args[i][0], (8 - 3) + i);
+
+      // column value should be fixed - the last column.
+      assert.equal(fake.args[i][1], 8);
+
+      // Actual column position within the internal representation of the row.
+      // Note that internally, columns 'shift backward' when moving forward
+      // in rows.
+      assert.equal(fake.args[i][2], 6 - i); // 6 = 2 * diagWidth
+    }
+  });
+
+  it('iterates extended column properly (large calc) (2)', () => {
+    const mockedCalc = new ClassicalDistanceCalculation({diagonalWidth: 3});
+    sinon.replaceGetter(mockedCalc, 'inputSequence', () => new Array(9));
+    sinon.replaceGetter(mockedCalc, 'matchSequence', () => new Array(9));
+
+    const fake = sinon.fake();
+    forNewIndices(mockedCalc, false, fake);
+
+    assert.equal(fake.callCount, 4); // diagonalWidth + 1
+    for(let i=0; i < fake.callCount; i++) {
+      // row value should increment on each step.
+      assert.equal(fake.args[i][0], (9 - 4) + i);
+
+      // column value should be fixed - the last column.
+      assert.equal(fake.args[i][1], 8);
+
+      // Actual column position within the internal representation of the row.
+      // Note that internally, columns 'shift backward' when moving forward
+      // in rows.
+      assert.equal(fake.args[i][2], 6 - i); // 6 = 2 * diagWidth
+    }
+  });
+});
 
 describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
   describe('unweighted', function() {
@@ -151,6 +262,15 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
       assert.equal(compute("jellyifhs", "jellyfish", "MatchThenInput").getFinalCost(), 2);
     });
 
+    it("'jellyifhs' -> 'jellyfish' = 2 (no transposes)", function() {
+      // edits when without transposes:
+      // delete i           (jellyfhs)
+      // substitute h -> i  (jellyfis)
+      // insert h at end    (jellyfish)
+      assert.equal(compute("jellyifhs", "jellyfish", "InputThenMatch", 3, false).getFinalCost(), 3);
+      assert.equal(compute("jellyifhs", "jellyfish", "MatchThenInput", 3, false).getFinalCost(), 3);
+    });
+
     it("'aadddres' -> 'address' = 3", function() {
       // If diagonal set to '1', cost is reported as 4.
       assert.equal(compute("aadddres", "address", "InputThenMatch").getFinalCost(), 3); // Error - is returning 5, not 4 (which would be correct for current implementation state)
@@ -174,7 +294,7 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
 
       assert.equal(buffer.getFinalCost(), 2);
       const path = buffer.editPath();
-      assert.includeMembers(path, ['transpose-start', 'transpose-end', 'insert']);
+      assert.includeMembers(path[0].map(e => e.op), ['transpose-start', 'transpose-end', 'insert']);
     });
 
     describe("Intermediate cost tests", function() {
@@ -471,86 +591,224 @@ describe('Classical Damerau-Levenshtein edit-distance calculation', function() {
   });
 
   describe("edit path construction", function() {
-    let op = {
-      s: 'substitute',
-      m: 'match',
-      i: 'insert',
-      d: 'delete',
-      ts: 'transpose-start',
-      te: 'transpose-end',
-      ti: 'transpose-insert',
-      td: 'transpose-delete'
-    }
-
     it("'accomodate' -> 'accommodate'", function() {
       let buffer = compute("accomodate", "accommodate", "InputThenMatch");
 
-      let editSequence = [
-      //  a     c     c     o     m
-        op.m, op.m, op.m, op.m, op.m,
-      // +m    o      d     a     t    e
-        op.i, op.m, op.m, op.m, op.m, op.m
-      ];
+      // While the two 'm's are interchangable, the path will favor
+      // a result with the longest contiguous set of matches.
+      let editSequences: EditTuple<EditOperation>[][] = [[
+        { op: 'match', input: 0 /* 'a' */, match: 0 /* 'a' */},
+        { op: 'match', input: 1 /* 'c' */, match: 1 /* 'c' */},
+        { op: 'match', input: 2 /* 'c' */, match: 2 /* 'c' */},
+        { op: 'match', input: 3 /* 'o' */, match: 3 /* 'o' */},
+        { op: 'insert',                    match: 4 /* 'm' */},  // insert is earlier
+        { op: 'match', input: 4 /* 'm' */, match: 5 /* 'm' */}, // longer contiguous match sequence
+        { op: 'match', input: 5 /* 'o' */, match: 6 /* 'o' */},
+        { op: 'match', input: 6 /* 'd' */, match: 7 /* 'd' */},
+        { op: 'match', input: 7 /* 'a' */, match: 8 /* 'a' */},
+        { op: 'match', input: 8 /* 't' */, match: 9 /* 't' */},
+        { op: 'match', input: 9 /* 'e' */, match: 10 /* 'e' */}
+      ], [
+        { op: 'match', input: 0 /* 'a' */, match: 0 /* 'a' */},
+        { op: 'match', input: 1 /* 'c' */, match: 1 /* 'c' */},
+        { op: 'match', input: 2 /* 'c' */, match: 2 /* 'c' */},
+        { op: 'match', input: 3 /* 'o' */, match: 3 /* 'o' */},
+        { op: 'match', input: 4 /* 'm' */, match: 4 /* 'm' */},
+        { op: 'insert',                    match: 5 /* 'm' */}, // now inserting later.
+        { op: 'match', input: 5 /* 'o' */, match: 6 /* 'o' */},
+        { op: 'match', input: 6 /* 'd' */, match: 7 /* 'd' */},
+        { op: 'match', input: 7 /* 'a' */, match: 8 /* 'a' */},
+        { op: 'match', input: 8 /* 't' */, match: 9 /* 't' */},
+        { op: 'match', input: 9 /* 'e' */, match: 10 /* 'e' */}
+      ]];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      assert.sameDeepOrderedMembers(buffer.editPath(), editSequences);
     });
 
     it("'harras' -> 'harass'", function() {
       let buffer = compute("harras", "harass", "InputThenMatch");
 
-      let editSequence = [
-        //  h     a     r    -r     a    s     +s
-          op.m, op.m, op.m, op.d, op.m, op.m, op.i
+      let bestEditSequence: EditTuple<string>[] = [
+        { op: 'match', input: 0, match: 0}, // h, h
+        { op: 'match', input: 1, match: 1}, // a, a
+        { op: 'match', input: 2, match: 2}, // r, r
+        { op: 'substitute', input: 3, match: 3}, // r => a
+        { op: 'substitute', input: 4, match: 4}, // a => s
+        { op: 'match', input: 5, match: 5}
       ];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      let altSequence: EditTuple<string>[] = [
+        { op: 'match', input: 0, match: 0},
+        { op: 'match', input: 1, match: 1},
+        { op: 'match', input: 2, match: 2},
+        { op: 'delete', input: 3},
+        { op: 'match', input: 4, match: 3},
+        { op: 'match', input: 5, match: 4},
+        { op: 'insert',          match: 5}
+      ];
+
+      const viablePaths = buffer.editPath();
+      // Note that the position of the 'delete' and the 'insert' in
+      // `altSequence` may be repositioned +1 way each, making 2x2 = 4 ways in
+      // total... then +1 for the substitute approach.
+      assert.equal(viablePaths.length, 5);
+      assert.deepEqual(viablePaths[0], bestEditSequence);
+      assert.includeDeepMembers(viablePaths, [altSequence]);
     });
 
     it("'access' -> 'assess'", function() {
       let buffer = compute("access", "assess", "InputThenMatch");
 
-      let editSequence = [
-        //  a    c/s   c/s    e     s    s
-          op.m, op.s, op.s, op.m, op.m, op.m
+      let editSequence: EditTuple<string>[] = [
+        { op: 'match', input: 0, match: 0},
+        { op: 'substitute', input: 1, match: 1},
+        { op: 'substitute', input: 2, match: 2},
+        { op: 'match', input: 3, match: 3},
+        { op: 'match', input: 4, match: 4},
+        { op: 'match', input: 5, match: 5}
       ];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      const viablePaths = buffer.editPath();
+      assert.equal(viablePaths.length, 1);
+      assert.deepEqual(viablePaths[0], editSequence);
     });
 
     it("'ifhs' -> 'fish'", function() {
       let buffer = compute("ifhs", "fish");
 
-      let editSequence = [
-          op.ts, op.te, op.ts, op.te
+      let editSequence: EditTuple<string>[] = [
+        { op: 'transpose-start', input: 0, match: 0},
+        { op: 'transpose-end', input: 1, match: 1},
+        { op: 'transpose-start', input: 2, match: 2},
+        { op: 'transpose-end', input: 3, match: 3}
       ];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      const viablePaths = buffer.editPath();
+      assert.equal(viablePaths.length, 1);
+      assert.deepEqual(viablePaths[0], editSequence);
+    });
+
+    it("'jellyifhs' -> 'jellyfish' (no transposes)", function() {
+      // edits when without transposes:
+      // delete i           (jellyfhs)
+      // substitute h -> i  (jellyfis)
+      // insert h at end    (jellyfish)
+      const buffer = compute("jellyifhs", "jellyfish", "InputThenMatch", 3, false);
+
+      const viablePaths = buffer.editPath();
+      assert.isAtLeast(viablePaths.length, 1);
+
+      // Assert:  the following path exists as one option.
+      assert.includeDeepMembers(viablePaths, [[
+        { op: 'match', input: 0, match: 0},
+        { op: 'match', input: 1, match: 1},
+        { op: 'match', input: 2, match: 2},
+        { op: 'match', input: 3, match: 3},
+        { op: 'match', input: 4, match: 4},
+        { op: 'delete', input: 5},
+        { op: 'match', input: 6, match: 5},
+        { op: 'substitute', input: 7, match: 6},
+        { op: 'match', input: 8, match: 7},
+        { op: 'insert', match: 8}
+      ]]);
     });
 
     it("'then' -> 'their'", function() {
       let buffer = compute("then", "their");
 
-      let editSequence = [
-          op.m, op.m, op.m, op.s, op.i
+      let editSequence: EditTuple<string>[] = [
+        { op: 'match', input: 0, match: 0},
+        { op: 'match', input: 1, match: 1}, // best sequence:  continguous matches
+        { op: 'match', input: 2, match: 2}, // + adjacent substitutes
+        { op: 'substitute', input: 3, match: 3},
+        { op: 'insert',               match: 4},
       ];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      let altSequence: EditTuple<string>[] = [
+        { op: 'match', input: 0, match: 0},
+        { op: 'match', input: 1, match: 1},
+        { op: 'match', input: 2, match: 2},
+        { op: 'insert',          match: 3},
+        { op: 'substitute', input: 3, match: 4},
+      ];
+
+      const viablePaths = buffer.editPath();
+      assert.equal(viablePaths.length, 2);
+      assert.deepEqual(viablePaths[0], editSequence);
+      assert.deepEqual(viablePaths[1], altSequence);
     });
 
     // Two transpositions:  abc -> ca, ig <- ghi.  Also, one deletion:  'd'.
     it("'abczdefig' -> 'cazefghi'", function() {
       let buffer = compute("abczdefig", "cazefghi", "InputThenMatch", 2);
 
-      let editSequence = [
-        // --- abc -> ca ----
-        // a/c    b/_    c/a    z     -d    e     f
-          op.ts, op.td, op.te, op.m, op.d, op.m, op.m,
-        // --- ig -> ghi ----
-        // i/g    _/h    g/i
-          op.ts, op.ti, op.te
+      let editSequence: EditTuple<string>[] = [
+        { op: 'transpose-start', input: 0, match: 0},
+        { op: 'transpose-delete', input: 1},
+        { op: 'transpose-end', input: 2, match: 1},
+        { op: 'match', input: 3, match: 2},
+        { op: 'delete', input: 4},
+        { op: 'match', input: 5, match: 3},
+        { op: 'match', input: 6, match: 4},
+        { op: 'transpose-start', input: 7, match: 5},
+        { op: 'transpose-insert',          match: 6},
+        { op: 'transpose-end', input: 8, match: 7}
       ];
 
-      assert.deepEqual(buffer.editPath(), editSequence);
+      const viablePaths = buffer.editPath();
+      assert.equal(viablePaths.length, 1);
+      assert.deepEqual(viablePaths[0], editSequence);
+    });
+
+    it('works well for whitespaced-context analogues', () => {
+      // Corresponds closely to an actual sliding-context window scenario that
+      // once occurred. I did tweak the end ('r' was actually a 'p') for a bit
+      // more rigor.
+      const src = "a b c d?;e f g, h i j k l m n o p"
+      const dst =   "q c d?;e f g, h i j k l m n o r"
+      const buffer = compute(src, dst, "InputThenMatch", 4);
+
+      let editSequence: EditTuple<string>[] = [
+        { op: 'delete', input: 0},
+        { op: 'delete', input: 1},
+        { op: 'substitute', input: 2, match: 0},
+        { op: 'match', input: 3, match: 1},
+        { op: 'match', input: 4, match: 2},
+        { op: 'match', input: 5, match: 3},
+        { op: 'match', input: 6, match: 4},
+        { op: 'match', input: 7, match: 5},
+        { op: 'match', input: 8, match: 6},
+        { op: 'match', input: 9, match: 7},
+        { op: 'match', input: 10, match: 8},
+        { op: 'match', input: 11, match: 9},
+        { op: 'match', input: 12, match: 10},
+        { op: 'match', input: 13, match: 11},
+        { op: 'match', input: 14, match: 12},
+        { op: 'match', input: 15, match: 13},
+        { op: 'match', input: 16, match: 14},
+        { op: 'match', input: 17, match: 15},
+        { op: 'match', input: 18, match: 16},
+        { op: 'match', input: 19, match: 17},
+        { op: 'match', input: 20, match: 18},
+        { op: 'match', input: 21, match: 19},
+        { op: 'match', input: 22, match: 20},
+        { op: 'match', input: 23, match: 21},
+        { op: 'match', input: 24, match: 22},
+        { op: 'match', input: 25, match: 23},
+        { op: 'match', input: 26, match: 24},
+        { op: 'match', input: 27, match: 25},
+        { op: 'match', input: 28, match: 26},
+        { op: 'match', input: 29, match: 27},
+        { op: 'match', input: 30, match: 28},
+        { op: 'match', input: 31, match: 29},
+        { op: 'substitute', input: 32, match: 30},
+      ];
+
+      const viablePaths = buffer.editPath();
+      // There are alternate variations for the first four tokens, but only one
+      // puts the substitute next to the long stretch of matches.
+      assert.equal(viablePaths.length, 4);
+      assert.deepEqual(viablePaths[0], editSequence);
     });
   })
 });

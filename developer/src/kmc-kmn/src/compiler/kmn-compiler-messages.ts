@@ -1,4 +1,4 @@
-import { KeyAddress } from "../kmw-compiler/validate-layout-file.js";
+import { KeyAddress } from "../kmw-compiler/compile-layout-file.js";
 import { kmnfile } from "../kmw-compiler/compiler-globals.js";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageObjectSpec as mx, CompilerMessageDef as def, CompilerMessageSpecWithException, KeymanUrls } from "@keymanapp/developer-utils";
 import { ObjectWithCompileContext } from "@keymanapp/common-types";

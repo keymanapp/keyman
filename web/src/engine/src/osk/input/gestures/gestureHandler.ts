@@ -1,8 +1,23 @@
-import { ActiveKeyBase, KeyDistribution } from "keyman/engine/keyboard";
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2023-10-16.
+ *
+ * The GestureHandler interface defines methods common to all OSK
+ * gesture-handling classes, providing a common abstraction for common-path
+ * gesture support.
+ */
+
+import { KeyDistribution } from "keyman/engine/keyboard";
+import { type CorrectionDistanceMap } from "../../corrections.js";
 
 export interface GestureHandler {
   /**
-   * Triggers cancellation of any further processing for the gesture being handled.
+   * Triggers cancellation of any further processing for the gesture being
+   * handled.
+   *
+   * The method should be able to safely handle the `cancel` method being called
+   * multiple times, much like `clearTimeout` in JS.
    */
   cancel(): void;
 
@@ -32,7 +47,7 @@ export interface GestureHandler {
    * simple-tap corrections, allowing gestures to utilize the values as a basis
    * for their own calculations as appropriate.
    *
-   * @param baseDistMap The distance map used for simple-tap corrections
+   * @param baseDistanceMap The distance map used for simple-tap corrections
    */
-  currentStageKeyDistribution(baseDistMap: Map<ActiveKeyBase, number>): KeyDistribution | null;
+  currentStageKeyDistribution(baseDistanceMap: CorrectionDistanceMap): KeyDistribution | null;
 }

@@ -20,5 +20,6 @@
 #define __CAPSSTATE_H
 
 BOOL IsCapsLockOn(void);
+void RefreshToggleState(void);
 
 #endif

@@ -62,11 +62,6 @@ export class HostTextStore extends SyntheticTextStore {
     this.savedState = SyntheticTextStore.from(this);
   }
 
-  restoreTo(original: TextStore): void {
-    this.savedState = SyntheticTextStore.from(this);
-    super.restoreTo(original);
-  }
-
   updateContext(text: string, selStart: number, selEnd: number): boolean {
     let shouldResetContext = false;
     const tempTextStore = new SyntheticTextStore(text, selStart ?? KMWString.length(text), selEnd ?? KMWString.length(text));

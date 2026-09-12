@@ -11,6 +11,7 @@
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
+    "strictNullChecks": false,
     "noUnusedLocals": true,
     "allowJs": true,
 

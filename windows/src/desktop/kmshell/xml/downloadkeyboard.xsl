@@ -67,7 +67,7 @@
       </head>
       <body>
         <iframe id="contentframe" frameborder="0">
-          <xsl:attribute name="src"><xsl:value-of select='/Keyman/keyman-com' />/go/windows/<xsl:value-of select="/Keyman/version-info/@versionRelease" />/download-keyboards?version=<xsl:value-of select="/Keyman/Version" /></xsl:attribute>&#160;
+          <xsl:attribute name="src"><xsl:value-of select='/Keyman/keyman-com' />/go/windows/<xsl:value-of select="/Keyman/version-info/@versionRelease" />/download-keyboards?lang=<xsl:value-of select="/Keyman/locale"/>&amp;version=<xsl:value-of select="/Keyman/Version" /></xsl:attribute>&#160;
         </iframe>
         <div id="footerframe">
           <div style="float:left; padding-left: 8px">
