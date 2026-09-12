@@ -17,7 +17,7 @@ title: Contextual Help
 * [Keyman Configuration - Options Tab](configuration-options)
 * [Keyman Configuration - Hotkeys Tab](configuration-hotkeys)
 * [Keyman Configuration - Support Tab](configuration-support)
-* [Keyman Configuration - Keep in Touch Tab](configuration-keepintouch)
+* [Keyman Configuration - Update Tab](configuration-update)
 * [Base Keyboard dialog](base-keyboard)
 * [Change Hotkey dialog](change-hotkey)
 * [Proxy Configuration dialog](proxy-configuration)

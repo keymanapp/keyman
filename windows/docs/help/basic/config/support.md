@@ -4,7 +4,7 @@ title:  Keyman Configuration - Support Tab
 
 The Support tab of Keyman Configuration displays Keyman version
 information and support tools. You can use the Support tab to send a
-support request, check Windows language settings, check for updates, and
+support request, check Windows language settings, and
 view Keyman version information.
 
 ![](../../desktop_images/tab-support.png)
@@ -29,12 +29,6 @@ You can collect diagnostic information about Keyman by clicking the
 \'Diagnostics\' link under the \'Useful Links\' section. The support
 diagnostic will collect critical diagnostic information from your
 computer and generate a report.
-
-## Checking for Updates
-
-To check for Keyman updates, from the Support tab of Keyman
-Configuration click the \'Check for Updates\' link. You can also
-download and install Keyman again from the Keyman website.
 
 ## About Version Information
 
