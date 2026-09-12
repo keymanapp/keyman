@@ -249,7 +249,7 @@
       </Component>
 
       <Component Directory="FontsFolder">
-        <File Name='keymanweb-osk.ttf' TrueType='yes' Source='..\tike\xml\layoutbuilder\keymanweb-osk.ttf' KeyPath="yes" />
+        <File Name='keymanweb-osk.ttf' TrueType='yes' Source='..\tike\xml\layoutbuilder\src\assets\fonts\keymanweb-osk.ttf' KeyPath="yes" />
       </Component>
 
     </ComponentGroup>
