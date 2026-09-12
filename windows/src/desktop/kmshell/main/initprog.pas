@@ -702,7 +702,9 @@ begin
     try
       if (FMode = fmBackgroundUpdateCheck) then
       begin
-        BUpdateSM.HandleCheck;
+        // -buc BackgroundUpdateCheck is designed to be called by a
+        // scheduled service therefore it is not a "manual" check
+        BUpdateSM.HandleCheck(False);
         Result := True;
         Exit;
       end
