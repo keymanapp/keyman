@@ -2,30 +2,9 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  */
 import { test, expect, type Page } from '@playwright/test';
-import { clickFieldAndWaitForOSK, getAllKeyboardMenuText, getSelectedKeyboardMenuText, loadPage } from './e2eUtils';
+import { clickFieldAndWaitForOSK, getAllKeyboardMenuText, getSelectedKeyboardMenuText, setTimeoutAndLoadPage } from './e2eUtils';
 
 declare const keyman: any;
-
-async function setTimeoutAndLoadPage(page: Page, url: string, numKeyboards: number): Promise<void> {
-  test.setTimeout(5000);
-
-  await loadPage(page, url);
-
-  await page.waitForFunction(
-    (num: number) => typeof keyman !== 'undefined' && keyman.getKeyboards().length >= num,
-    numKeyboards
-  );
-
-  // Now that we know that the expected number of keyboards were loaded, we can
-  // force trigger updateKeyboardList() instead of waiting for the timeout which
-  // might come in the middle of the tests
-  await page.evaluate(() => {
-    if (keyman.ui && keyman.ui.updateTimer) {
-      clearTimeout(keyman.ui.updateTimer);
-    }
-    keyman.ui?.updateKeyboardList();
-  });
-}
 
 test.describe('First example from the guide', function () {
   const beforeEach = async (page: Page) => {

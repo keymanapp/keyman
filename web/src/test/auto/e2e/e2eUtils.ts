@@ -2,7 +2,7 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  */
 
-import { type Locator, type Page } from "@playwright/test";
+import { type Locator, type Page, test } from "@playwright/test";
 
 declare const keyman: any;
 
@@ -85,4 +85,33 @@ export async function clickFieldAndWaitForOSK(page: Page, fieldLocator: Locator)
   await waitForKeyboardSelection(page);
   await page.waitForFunction(() => keyman.osk.isVisible());
   return page.locator('#keymanweb_title_bar');
+}
+
+/**
+ * Set the timeout for loading the page, load the page and update the keyboard
+ * list after it's fully loaded and all keyboards are loaded, .
+ *
+ * @param page          The playwright page object
+ * @param url           The URL to load
+ * @param numKeyboards  Expected number of keyboards to load
+ */
+export async function setTimeoutAndLoadPage(page: Page, url: string, numKeyboards: number): Promise<void> {
+  test.setTimeout(5000);
+
+  await loadPage(page, url);
+
+  await page.waitForFunction(
+    (num: number) => typeof keyman !== 'undefined' && keyman.getKeyboards().length >= num,
+    numKeyboards
+  );
+
+  // Now that we know that the expected number of keyboards were loaded, we can
+  // force trigger updateKeyboardList() instead of waiting for the timeout which
+  // might come in the middle of the tests
+  await page.evaluate(() => {
+    if (keyman.ui && keyman.ui.updateTimer) {
+      clearTimeout(keyman.ui.updateTimer);
+    }
+    keyman.ui?.updateKeyboardList();
+  });
 }
