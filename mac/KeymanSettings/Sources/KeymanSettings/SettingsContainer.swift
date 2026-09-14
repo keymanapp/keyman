@@ -72,8 +72,10 @@ public extension Notification.Name {
   static let accessibilityStateResponse = Notification.Name("com.keyman.accessibility.state")
   // sent from config app (DefaultsRepository), received by input method
   static let keyboardsChanged = Notification.Name("com.keyman.keyboards.changed")
-  // sent from config app (DefaultsRepository), received by input method
+  // sent from config app (InputMethodUtil), received by input method
   static let accessibilityCheckRequest = Notification.Name("com.keyman.accessibility.check.request")
+  // sent from config app (InputMethodUtil), received by input method
+  static let accessibilityRequest = Notification.Name("com.keyman.accessibility.request")
 }
 
 // in-app notifications

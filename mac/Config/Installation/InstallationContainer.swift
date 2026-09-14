@@ -63,7 +63,9 @@ public class InstallationContainer : ObservableObject {
     // If we can now confirm that the user restarted (the final task), then the installation
     // will be complete and there is no need to evaluate the state.
     // Otherwise, evaluate the installation to prepare for a new installation or check for repairs.
-    if !self.validateConfirmRestart() {
+    if self.confirmRestartRequired() {
+      self.confirmUserRestarted()
+    } else {
       self.registerObservers()
       self.installationCheck.startInstallationEvaluation()
     }
@@ -126,7 +128,8 @@ public class InstallationContainer : ObservableObject {
    */
   @objc func handleAccessibilityGranted(_ notification: Notification) {
     guard self.installationState != nil else { return }
-    
+    Logger.app.debug("handleAccessibilityGranted received")
+
     // the confirmAccess task can now be marked as completed
     if let task = self.currentTask() {
       if task.taskType == .confirmAccess {
@@ -141,23 +144,31 @@ public class InstallationContainer : ObservableObject {
    * called when `NSNotification.Name.accessibilityNotGranted` is received
    */
   @objc func handleAccessibilityNotGranted(_ notification: Notification) {
+    Logger.app.debug("handleAccessibilityNotGranted received")
     NotificationCenter.default.post(name: .checkAccessibilityFailure, object: nil, userInfo: nil)
   }
   
   /**
-   * If the current task is confirmRestart, mark it as complete if the user has restarted.
+   * If the current task is confirmRestart, mark it as complete if the user has restarted their mac.
    */
-  func validateConfirmRestart() -> Bool {
+  func confirmUserRestarted() {
+    guard let task = self.currentTask() else { return }
+    guard self.installationState != nil else { return }
+    
+    if task.taskType == .confirmRestart &&  self.checkUserHasRestarted() {
+      // the confirmAccess task can now be marked as completed
+      self.updateTaskAsCompleted(taskType: .confirmRestart)
+    }
+  }
+  
+  /**
+   * Check whether waiting to confirm that the user restarted.
+   */
+  func confirmRestartRequired() -> Bool {
     guard let task = self.currentTask() else { return false }
     guard self.installationState != nil else { return false }
     
-    if task.taskType == .confirmRestart &&  self.validateUserHasRestarted() {
-      // the confirmAccess task can now be marked as completed
-      self.updateTaskAsCompleted(taskType: .confirmRestart)
-      return true
-    } else {
-      return false
-    }
+    return task.taskType == .confirmRestart
   }
   
   /**
@@ -240,7 +251,7 @@ public class InstallationContainer : ObservableObject {
     case .requestRestart:
       completedTask = self.notifyUserPromptedToRestart()
     case .confirmRestart:
-      completedTask = self.validateUserHasRestarted()
+      completedTask = self.checkUserHasRestarted()
     }
     
     if completedTask {
@@ -347,7 +358,7 @@ public class InstallationContainer : ObservableObject {
   /**
    * Check whether the user has restarted by comparing the latest startup time to the time we requested the user to restart
    */
-  public func validateUserHasRestarted() -> Bool {
+  public func checkUserHasRestarted() -> Bool {
     var hasRestarted = false
     
     guard let state = self.installationState else { return false }
@@ -441,7 +452,7 @@ public class InstallationContainer : ObservableObject {
    * call Keyman as a separate process with an argument that checks whether accessibility has been granted by the user
    */
   public func checkAccessibilityPermissionGranted() {
-    self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: true)
+    self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
   }
   
   /**

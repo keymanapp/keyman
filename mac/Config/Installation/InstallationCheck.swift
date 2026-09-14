@@ -181,7 +181,11 @@ public class InstallationCheck {
    * Simply returns true if the installation is complete.
    */
   func isReadyForRepairCheckAtStartup() -> Bool {
-    return self.installationState?.isComplete == true
+    let readyForRepairCheck = self.installationState?.isComplete == true
+    
+    Logger.app.debug("isReadyForRepairCheckAtStartup: \(readyForRepairCheck, privacy: .public)")
+
+    return readyForRepairCheck
   }
   
   /**

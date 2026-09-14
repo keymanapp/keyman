@@ -146,7 +146,7 @@ int checkAccessibility(void) {
     // call completionHandler immediately
     withCompletionHandler();
   } else {
-    os_log([KMLogs privacyLog], "does not have Accessibility, calling requestListenEventAccess");
+    os_log([KMLogs privacyLog], "does not have Accessibility, calling requestPostEventAccess");
     [self requestPostEventAccess];
     withCompletionHandler();
   }
