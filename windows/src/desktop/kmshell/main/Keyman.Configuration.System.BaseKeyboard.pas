@@ -8,27 +8,29 @@ uses
   keymanapi_TLB;
 
 (**
-  Returns true if the keyboard files need to be compiled for the specified KLID.
-  @param  BaseKeyboardID  KLID of the base keyboard to compile.
-  @returns  True  If the keyboard files need to be compiled.
-*)
+ * Returns true if the keyboard files need to be compiled for the specified KLID.
+ * @param  BaseKeyboardID  KLID of the base keyboard to compile.
+ * @returns  True  If the keyboard files need to be compiled.
+ *)
 function BaseKeyboardNeedsMCompile(BaseKeyboardID: Integer): Boolean;
 
 (**
-  Sets the base keyboard KLID for the current user and compiles the keyboard
-  files if necessary. In the case the compiled keyboard files are not present,
-  it will require elevation.
-  @param  WindowHandle  Window handle to own the elevation prompt.
-  @param  BaseKeyboardID  KLID of the base keyboard KLID to set.
-  @returns  True  when the base keyboard setting has been applied.
-*)
+ * Sets the base keyboard KLID for the current user and compiles the keyboard
+ * files if necessary. In the case the compiled keyboard files are not present,
+ * it will require elevation.
+ * @param  WindowHandle  Window handle to own the elevation prompt.
+ * @param  BaseKeyboardID  KLID of the base keyboard KLID to set.
+ * @returns  True  when the base keyboard setting has been applied.
+ *)
 function SetBaseKeyboard(WindowHandle: THandle; BaseKeyboardID: Integer): Boolean;
 
 (**
-  Compiles the base keyboard files for the specified KLID.
-  @param  BaseKeyboardID  KLID of the base keyboard to compile.
-  @returns  True  when the compilation is successful.
-*)
+ * Compiles the base keyboard files for the specified KLID.
+ * Must run elevated.
+ *
+ * @param  BaseKeyboardID  KLID of the base keyboard to compile.
+ * @returns  True  when the compilation is successful.
+ *)
 function MCompileBaseKeyboard(BaseKeyboardID: Integer): Boolean;
 
 implementation

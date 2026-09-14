@@ -20,12 +20,12 @@ type
 
 
 (**
-  Form for the user to select a base keyboard. If the user selects a base
-  keyboard, the KLID of the selected base keyboard is returned in
-  BaseKeyboardID.
-  @param  [out] BaseKeyboardID  KLID of the base keyboard selected by the user.
-  @returns  True  if the user selected a base keyboard.
-*)
+ * Form for the user to select a base keyboard. If the user selects a base
+ * keyboard, the KLID of the selected base keyboard is returned in
+ * BaseKeyboardID.
+ * @param  [out] BaseKeyboardID  KLID of the base keyboard selected by the user.
+ * @returns  True  if the user selected a base keyboard.
+ *)
 function ConfigureBaseKeyboard(out BaseKeyboardID: Integer): Boolean;
 
 implementation
