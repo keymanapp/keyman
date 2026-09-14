@@ -82,7 +82,9 @@ id _lastServerWithOSKShowing = nil;
 
 - (id)init {
   self = [super init];
-  if (self) {    
+  if (self) {
+    [self registerObservers];
+    
     // first notify user and request access to Accessibility/PostEvent permissions
     // pass block as completion handler to complete init with initCompletion
     [PrivacyConsent.shared requestPrivacyAccess:^void (void){
@@ -125,7 +127,15 @@ id _lastServerWithOSKShowing = nil;
   if (self.runLoopEventSrc && runLoop) {
     CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
   }
-  
+
+  // start Input Method lifecycle
+  [KMInputMethodLifecycle.shared startLifecycle];
+}
+
+/**
+ * Register observers for local and distributed notifications
+ */
+- (void)registerObservers {
   // register to receive notifications generated from KMInputMethodLifecycle
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodActivated:) name:kInputMethodActivatedNotification object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodDeactivated:) name:kInputMethodDeactivatedNotification object:nil];
@@ -135,9 +145,6 @@ id _lastServerWithOSKShowing = nil;
   [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleKeyboardsChanged:) name:kKeyboardsChanged object:nil];
   [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAccessibilityCheckRequested:) name:kAccessibilityCheckedRequest object:nil];
   [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAccessibilityRequested:) name:kAccessibilityRequest object:nil];
-
-  // start Input Method lifecycle
-  [KMInputMethodLifecycle.shared startLifecycle];
 }
 
 /**
@@ -296,7 +303,7 @@ id _lastServerWithOSKShowing = nil;
 
   // assign custom keyboard tags in Sentry
   [KMSentryHelper addKeyboardTag:keyboardFileName];
-//  [KMSentryHelper addHasAccessibilityTag:[PrivacyConsent.shared checkAccessibility]];
+  [KMSentryHelper addHasAccessibilityTag:[PrivacyConsent.shared checkAccessibility]];
   [KMSentryHelper addOskVisibleTag:[self.oskWindow.window isVisible]];
   [KMSentryHelper addArchitectureTag:processorType];
 }
