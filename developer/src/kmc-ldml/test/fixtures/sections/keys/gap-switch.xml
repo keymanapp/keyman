@@ -11,11 +11,11 @@
   </keys>
 
   <layers formId="us">
-    <layer id="base">
+    <layer modifiers="none">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="Q W" />
     </layer>
-    <layer id="shift">
+    <layer modifiers="shift">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="q w" />
     </layer>

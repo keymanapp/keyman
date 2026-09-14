@@ -20,7 +20,7 @@
   </keys>
 
   <layers formId="us">
-    <layer modifiers="none" id="base">
+    <layer modifiers="none">
       <row keys="gap overbar underbar circumflex" />
       <row keys="gap gap e gap gap y u i o gap" />
       <row keys="a" />

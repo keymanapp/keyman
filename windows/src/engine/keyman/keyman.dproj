@@ -211,7 +211,6 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\TempFileManager.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utiltsf.pas"/>
-        <DCCReference Include="GlobalKeyboardChangeManager.pas"/>
         <DCCReference Include="..\..\global\delphi\general\utilwow64.pas"/>
         <DCCReference Include="..\..\global\delphi\general\USendInputString.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Upload_Settings.pas"/>
