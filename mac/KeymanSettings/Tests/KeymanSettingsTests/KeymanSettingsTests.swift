@@ -218,38 +218,39 @@ import OSLog
 @Suite("Read Keyman package") struct KeymanPackageRepositoryTests {
   let packageRepo: PackageRepository
   let kmpUrl: URL
-  let source: PackageSource?
+  let keymanPackage: KeymanPackage?
   let fakePackageUrl: URL = URL(fileURLWithPath: "/fake/test/destination/amharic-fake")
+  let fakeDirectoryUrl: URL = URL(fileURLWithPath: "/fake/test/destination")
 
   fileprivate init() async throws {
     try packageRepo = PackageRepository()
     self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
-    source = try packageRepo.readPackageFromJson(kmpJsonFileUrl: self.kmpUrl)
+    keymanPackage = try packageRepo.readPackageFromJson(kmpJsonFileUrl: self.kmpUrl, in: fakeDirectoryUrl)
   }
   
   @Test("Read package name") func readPackageName() async throws {
-    let packageSource = try #require(source)
-    #expect(packageSource.packageName == "GFF Amharic Keyboard")
+    let package = try #require(keymanPackage)
+    #expect(package.packageName == "GFF Amharic Keyboard")
   }
   
   @Test("Read package version") func readPackageVersion() async throws {
-    let packageSource = try #require(source)
-    #expect(packageSource.packageVersion == "3.1.2")
+    let package = try #require(keymanPackage)
+    #expect(package.packageVersion == "3.1.2")
   }
   
   @Test("Read copyright") func readCopyright() async throws {
-    let packageSource = try #require(source)
-    #expect(packageSource.copyright == "© Geʾez Frontier Foundation, SIL International")
+    let package = try #require(keymanPackage)
+    #expect(package.copyright == "© Geʾez Frontier Foundation, SIL International")
   }
   
   @Test("Read keyboard count") func readKeyboardCount() async throws {
-    let packageSource = try #require(source)
-    #expect(packageSource.keyboards?.count == 1)
+    let package = try #require(keymanPackage)
+    #expect(package.keyboards.count == 1)
   }
   
   @Test("Read keyboard name") func readKeyboardName() async throws {
-    let packageSource = try #require(source)
-    let keyboard = try #require(packageSource.keyboards?.first)
+    let package = try #require(keymanPackage)
+    let keyboard = try #require(package.keyboards.first)
     #expect(keyboard.name == "አማርኛ (Amharic)")
   }
   
@@ -259,30 +260,27 @@ import OSLog
   @Suite("Check keyboard state") struct KeyboardStateTests {
     let packageRepo: PackageRepository
     let kmpUrl: URL
-    let packageSource: PackageSource?
-    let fakePackageUrl: URL = URL(fileURLWithPath: "/fake/test/destination/amharic-fake")
-    
+    let keymanPackage: KeymanPackage?
+    let fakePackageUrl: URL = URL(fileURLWithPath: "/fake/test/amharic-fake")
+    let fakePackageDirectoryUrl: URL = URL(fileURLWithPath: "/fake/test/amharic-fake")
+
     fileprivate init() async throws {
       try packageRepo = PackageRepository()
       self.kmpUrl = try #require(Bundle.module.url(forResource: "amharic.kmp", withExtension: "json"))
-      self.packageSource = try packageRepo.readPackageFromJson(kmpJsonFileUrl: self.kmpUrl)
+      self.keymanPackage = try packageRepo.readPackageFromJson(kmpJsonFileUrl: self.kmpUrl, in: fakePackageDirectoryUrl)
     }
 
-    @Test("Check keyboard is disabled") func checkKeyboardDisabled() async throws {
-      let package = try #require(self.packageSource)
-      let keyboards = try #require(package.keyboards)
-      let keyboardSource = try #require(keyboards.first)
-      let keyboard = Keyboard(keyboardSource: keyboardSource, packageDirectoryName: "amharic-fake")
-      
+    @Test("Check keyboard is enabled") func checkKeyboardEnabled() async throws {
+      let package = try #require(self.keymanPackage)
+      let keyboard = try #require(package.keyboards.first)
+
       #expect(keyboard.enabled)
     }
 
     @Test("Check keyboard key") func checkKeyboardKey() async throws {
-      let package = try #require(self.packageSource)
-      let keyboards = try #require(package.keyboards)
-      let keyboardSource = try #require(keyboards.first)
-      let keyboard = Keyboard(keyboardSource: keyboardSource, packageDirectoryName: "amharic-fake")
-      
+      let package = try #require(self.keymanPackage)
+      let keyboard = try #require(package.keyboards.first)
+
       #expect(keyboard.keyboardKey == "/amharic-fake/gff_amharic.kmx")
     }
  }
