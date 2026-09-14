@@ -1,0 +1,86 @@
+kmnTree: line*
+line: compileTarget? content? NEWLINE
+compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
+content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
+  headerAssign|normalStoreAssign|ruleBlock
+text: plainText|outsStatement
+plainText: textRange|simpleText
+simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|
+  DECIMAL|HEXADECIMAL|OCTAL|NUL|deadkeyStatement|BEEP
+textRange: simpleText rangeEnd+
+rangeEnd: RANGE simpleText
+virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
+modifier: SHIFT|CAPS|MODIFIER
+keyCode: KEY_CODE|STRING|DECIMAL
+ruleBlock: beginStatement|groupStatement|productionBlock
+beginStatement: BEGIN entryPoint? CHEVRON useStatement
+entryPoint: UNICODE|NEWCONTEXT|POSTKEYSTROKE|ANSI
+useStatement: USE LEFT_BR groupName RIGHT_BR
+groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
+groupName: groupNameElement+
+groupNameElement: PARAMETER|OCTAL|permittedKeyword
+permittedKeyword: ALWAYS|ANSI|BEEP|BEGIN|BITMAP_HEADER|CAPS|CONTEXT|
+  COPYRIGHT_HEADER|DECIMAL|FREES|HEXADECIMAL|HOTKEY_HEADER|KEY_CODE|
+  KEYS|LANGUAGE_HEADER|LAYOUT_HEADER|MATCH|MESSAGE_HEADER|NAME_HEADER|
+  NEWCONTEXT|NOMATCH|NUL|OCTAL|OFF|ON|ONLY|POSTKEYSTROKE|READONLY|
+  RETURN|SHIFT|UNICODE|USING|VERSION_HEADER
+groupQualifier: usingKeys|READONLY
+usingKeys: USING KEYS
+productionBlock: lhsBlock CHEVRON rhsBlock
+lhsBlock: MATCH|NOMATCH|inputBlock
+inputBlock: NUL? ifLikeStatement* inputContext? keystroke?
+inputContext: inputElement+
+inputElement: anyStatement|notanyStatement|contextStatement|indexStatement|text
+keystroke: PLUS keystrokeElement+
+keystrokeElement: anyStatement|simpleText|outsStatement
+rhsBlock: outputStatement+
+outputStatement: useStatement|callStatement|setNormalStore|saveStatement|
+  resetStore|setSystemStore|layerStatement|indexStatement|
+  contextStatement|CONTEXT|RETURN|text|BEEP
+
+# Statement Rules
+anyStatement: ANY LEFT_BR normalStoreName RIGHT_BR
+callStatement: CALL LEFT_BR normalStoreName RIGHT_BR
+deadkeyStatement: DEADKEY LEFT_BR deadkeyName RIGHT_BR
+notanyStatement: NOTANY LEFT_BR normalStoreName RIGHT_BR
+saveStatement: SAVE LEFT_BR normalStoreName RIGHT_BR
+baselayoutStatement: BASELAYOUT_SHORTCUT LEFT_BR plainText+ RIGHT_BR
+layerStatement: LAYER_SHORTCUT LEFT_BR plainText+ RIGHT_BR
+platformStatement: PLATFORM_SHORTCUT LEFT_BR plainText+ RIGHT_BR
+ifLikeStatement: ifStatement|platformStatement|baselayoutStatement
+ifStatement: ifNormalStoreStatement|ifSystemStoreStatement
+ifNormalStoreStatement: IF LEFT_BR normalStoreName comparison plainText+ RIGHT_BR
+ifSystemStoreStatement: IF LEFT_BR systemStoreNameForIf comparison plainText+ RIGHT_BR
+systemStoreNameForIf: systemStoreName|BASELAYOUT|LAYER|NEWLAYER|OLDLAYER|PLATFORM
+comparison:EQUAL|NOT_EQUAL
+contextStatement: CONTEXT LEFT_BR offset RIGHT_BR
+indexStatement: INDEX LEFT_BR normalStoreName COMMA offset RIGHT_BR
+offset: OCTAL|PARAMETER
+outsStatement: OUTS LEFT_BR storeName RIGHT_BR
+
+# System and Variable Store Rules
+systemStoreAssign: systemStore text*
+systemStore: STORE LEFT_BR systemStoreName RIGHT_BR
+systemStoreName: BITMAP|CASEDKEYS|COPYRIGHT|DISPLAYMAP|ETHNOLOGUECODE|
+  HOTKEY|INCLUDECODES|KEYBOARDVERSION|KMW_EMBEDCSS|KMW_EMBEDJS|KMW_HELPFILE|
+  KMW_HELPTEXT|KMW_RTL|LANGUAGE|LAYOUTFILE|MESSAGE|MNEMONICLAYOUT|NAME|
+  OLDCHARPOSMATCHING|TARGETS|VERSION|VISUALKEYBOARD|WINDOWSLANGUAGES|CAPSALWAYSOFF|
+  CAPSONONLY|SHIFTFREESCAPS
+normalStoreAssign: normalStore text*
+normalStore: STORE LEFT_BR normalStoreName RIGHT_BR
+normalStoreName: normalStoreNameElement+
+normalStoreNameElement: PARAMETER|OCTAL|permittedKeyword
+deadkeyName: deadkeyNameElement+
+deadkeyNameElement: PARAMETER|OCTAL|permittedKeyword
+storeName: systemStoreName|normalStoreName
+setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
+setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR
+systemStoreNameForSet: systemStoreName|LAYER
+resetStore: RESET LEFT_BR normalStoreName RIGHT_BR
+capsAlwaysOff: CAPS ALWAYS OFF
+capsOnOnly: CAPS ON ONLY
+shiftFreesCaps: SHIFT FREES CAPS
+headerAssign: headerName headerValue
+headerValue: text+|PARAMETER?
+headerName: BITMAP_HEADER|COPYRIGHT_HEADER|HOTKEY_HEADER|LANGUAGE_HEADER|
+  LAYOUT_HEADER|MESSAGE_HEADER|NAME_HEADER|VERSION_HEADER
