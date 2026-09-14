@@ -88,8 +88,15 @@ public:
 
 	static DWORD *ShiftState();
 
-#ifndef _WIN64
   static LONG *RefreshTag();
+  static LONG get_RefreshTag();
+
+#ifndef _WIN64
+  static HWND get_hwndHostX64();
+  static HWND get_hwndHostARM64();
+
+  static HWND *hwndHostX64();
+  static HWND *hwndHostARM64();
 #endif
 
 	static HHOOK get_hhookGetMessage();
@@ -216,8 +223,7 @@ typedef struct tagKEYMAN64THREADDATA
   BOOL CoreProcessEventRun;  // True if core process event has been run
 
   BOOL FInRefreshKeyboards;
-  BOOL RefreshRequired;
-  LONG RefreshTag_Thread; // TODO: we may be able to eliminate this with our delayed refresh pattern?
+  LONG RefreshTag_Thread;
 
   /* Addin Globals */
 

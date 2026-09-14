@@ -12,7 +12,7 @@ import { assert } from 'chai';
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
-import { determineTraversallessCorrectionSequences, TokenizedIntermediatePrediction, ModelCompositor, models } from "@keymanapp/lm-worker/test-index";
+import { determineTraversallessCorrectionSequences, TokenizedIntermediatePrediction, ModelCompositor, models, SuggestionSimilarity } from "@keymanapp/lm-worker/test-index";
 
 import Context = LexicalModelTypes.Context;
 import DummyModel = models.DummyModel;
@@ -441,13 +441,16 @@ describe('determineTraversallessCorrectionSequences', () => {
         correction: 'd',
         casingRoot: 'd'
       }],
+      probabilities: {
+        prediction: .25,
+        correction: trueInput.p,
+        total: .25 * trueInput.p
+      },
       metadata: {
-        probabilities: {
-          prediction: .25,
-          correction: trueInput.p,
-          total: .25 * trueInput.p
-        },
-        autoSelectable: true
+        autoSelectable: true,
+        matchLevel: SuggestionSimilarity.none,
+        rawEditCount: 0,
+        predictionLength: 0
       }
     };
 

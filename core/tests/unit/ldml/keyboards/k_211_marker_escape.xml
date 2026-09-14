@@ -18,7 +18,7 @@
   </keys>
 
   <layers formId="us">
-    <layer modifiers="none" id="base">
+    <layer modifiers="none">
       <row keys="B 1 2 3" />
       <row keys="q w e" /> <!-- etc -->
       <row keys="a s d" /> <!-- etc -->

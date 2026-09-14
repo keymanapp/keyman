@@ -132,7 +132,7 @@ describe('predictFromCorrectionSequence', () => {
 
       const predictions = predictFromCorrectionSequence(model, parameters);
       predictions.forEach((entry) => assert.equal(entry.components[0].correction, 'Its'));
-      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, 0.6));
+      predictions.forEach((entry) => assert.equal(entry.probabilities.correction, 0.6));
       predictions.sort(tupleDisplayOrderSort);
 
       assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components[0].prediction), dummied_suggestions.map((s) => {
@@ -141,8 +141,8 @@ describe('predictFromCorrectionSequence', () => {
         return s;
       }));
 
-      assert.approximately(predictions[0].metadata.probabilities.total, 0.18 * 0.6, 0.00001);
-      assert.approximately(predictions[1].metadata.probabilities.total, 0.02 * 0.6, 0.00001);
+      assert.approximately(predictions[0].probabilities.total, 0.18 * 0.6, 0.00001);
+      assert.approximately(predictions[1].probabilities.total, 0.02 * 0.6, 0.00001);
     });
 
     it('constructs suggestions matching multiple lexical entries directly - with transform ID', () => {
@@ -198,7 +198,7 @@ describe('predictFromCorrectionSequence', () => {
 
       const predictions = predictFromCorrectionSequence(model, parameters);
       predictions.forEach((entry) => assert.equal(entry.components[0].correction, 'Its'));
-      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, 0.6));
+      predictions.forEach((entry) => assert.equal(entry.probabilities.correction, 0.6));
       predictions.sort(tupleDisplayOrderSort);
 
       assert.sameOrderedMembers(predictions.map((entry) => entry.components[0].prediction.displayAs), ["it's", "its"]);
@@ -208,8 +208,8 @@ describe('predictFromCorrectionSequence', () => {
         return entry;
       }));
 
-      assert.approximately(predictions[0].metadata.probabilities.total, 0.18 * 0.6, 0.00001);
-      assert.approximately(predictions[1].metadata.probabilities.total, 0.02 * 0.6, 0.00001);
+      assert.approximately(predictions[0].probabilities.total, 0.18 * 0.6, 0.00001);
+      assert.approximately(predictions[1].probabilities.total, 0.02 * 0.6, 0.00001);
       predictions.forEach((prediction) => assert.equal(prediction.components[0].prediction.transform.id, transitionID));
     });
 
@@ -259,7 +259,7 @@ describe('predictFromCorrectionSequence', () => {
 
       const predictions = predictFromCorrectionSequence(model, parameters);
       predictions.forEach((entry) => assert.deepEqual(entry.components.map((c => c.correction)), ['appl']));
-      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, 1));
+      predictions.forEach((entry) => assert.equal(entry.probabilities.correction, 1));
       predictions.sort(tupleDisplayOrderSort);
 
       assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.map((c) => c.prediction)), [dummied_suggestions.map((s) => {
@@ -383,12 +383,12 @@ describe('predictFromCorrectionSequence', () => {
 
       const predictions = predictFromCorrectionSequence(model, parameters);
       predictions.forEach((entry) => assert.deepEqual(entry.components.map((c) => c.correction), ['g', ' ', 'apple']));
-      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, parameters.tokens.reduce((accum, curr) => accum * curr.correction.p, 1)));
+      predictions.forEach((entry) => assert.equal(entry.probabilities.correction, parameters.tokens.reduce((accum, curr) => accum * curr.correction.p, 1)));
       predictions.sort(tupleDisplayOrderSort);
 
       assert.sameDeepOrderedMembers(predictions[0].components.map((c) => c.prediction), expected_predictions);
 
-      assert.approximately(predictions[0].metadata.probabilities.prediction, expected_prediction_p, 0.00001);
+      assert.approximately(predictions[0].probabilities.prediction, expected_prediction_p, 0.00001);
     });
 
     it('returns no results if all correction tokens lack predictions', () => {
@@ -587,13 +587,13 @@ describe('predictFromCorrectionSequence', () => {
       assert.equal(predictions.length, 1);
 
       predictions.forEach((entry) => assert.deepEqual(entry.components.map((c) => c.correction), ['g', ' ', 'app']));
-      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, parameters.tokens.reduce((accum, curr) => accum * curr.correction.p, 1)));
+      predictions.forEach((entry) => assert.equal(entry.probabilities.correction, parameters.tokens.reduce((accum, curr) => accum * curr.correction.p, 1)));
       predictions.sort(tupleDisplayOrderSort);
 
       assert.deepEqual(predictions[0].components.map((c) => c.prediction.transform.insert), ['g', ' ', 'apple']);
       assert.sameDeepOrderedMembers(predictions[0].components.map((entry) => entry.prediction), expected_predictions);
 
-      assert.approximately(predictions[0].metadata.probabilities.prediction, expected_prediction_p, 0.00001);
+      assert.approximately(predictions[0].probabilities.prediction, expected_prediction_p, 0.00001);
     });
 
     it('uses all suggestions generated from context-final correction-tokens', () => {
@@ -729,13 +729,13 @@ describe('predictFromCorrectionSequence', () => {
       assert.equal(predictions.length, dummied_suggestion_sequences[dummied_suggestion_sequences.length - 1].length);
 
       predictions.forEach((entry) => assert.deepEqual(entry.components.map((c) => c.correction), ['golden', ' ', 'app']));
-      predictions.forEach((entry) => assert.equal(entry.metadata.probabilities.correction, parameters.tokens.reduce((accum, curr) => accum * curr.correction.p, 1)));
+      predictions.forEach((entry) => assert.equal(entry.probabilities.correction, parameters.tokens.reduce((accum, curr) => accum * curr.correction.p, 1)));
       predictions.sort(tupleDisplayOrderSort);
 
       assert.sameDeepOrderedMembers(predictions.map((entry) => entry.components.map((c) => c.prediction)), expected_prediction_sequences);
 
       for(let i = 0; i < predictions.length; i++) {
-        assert.approximately(predictions[i].metadata.probabilities.prediction, expected_prediction_seq_probs[i], 0.00001, `Expected probabilty mismatch at index ${i}`);
+        assert.approximately(predictions[i].probabilities.prediction, expected_prediction_seq_probs[i], 0.00001, `Expected probabilty mismatch at index ${i}`);
       }
     });
   });

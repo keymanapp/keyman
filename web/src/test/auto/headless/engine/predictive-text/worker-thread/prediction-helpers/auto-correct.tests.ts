@@ -1,6 +1,22 @@
 import { assert } from 'chai';
 
-import { AUTOSELECT_PROPORTION_THRESHOLD, CompositedIntermediatePrediction, predictionAutoSelect, SuggestionSimilarity, tupleDisplayOrderSort } from "@keymanapp/lm-worker/test-index";
+import {
+  AUTOSELECT_PROPORTION_THRESHOLD,
+  CompositedIntermediatePrediction,
+  correctionValidForAutoSelect,
+  predictionAutoSelect,
+  PredictionMetadata,
+  SuggestionSimilarity,
+  tupleDisplayOrderSort
+} from "@keymanapp/lm-worker/test-index";
+
+const defaultMetadata: PredictionMetadata = {
+  autoSelectable: true,
+  matchLevel: SuggestionSimilarity.none,
+  rawEditCount: 0,
+  predictionLength: 0
+}
+
 /*
   * Preconditions:
   * - there should always be a 'keep' option.  Now, whether or not that option
@@ -31,14 +47,12 @@ describe('predictionAutoSelect', () => {
           },
           correction: 'apple',
         },
-        metadata: {
-          probabilities: {
-            prediction: 1,
-            correction: 1,
-            total: 1
-          },
-          autoSelectable: true
-        }
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1
+        },
+        metadata: defaultMetadata
       }
     ];
 
@@ -65,14 +79,12 @@ describe('predictionAutoSelect', () => {
           },
           correction: '5'
         },
-        metadata: {
           probabilities: {
             prediction: 0.01,
             correction: 1,
             total: 0.01
           },
-          autoSelectable: false
-        }
+        metadata: {...defaultMetadata}
       },
       {
         components: {
@@ -86,14 +98,12 @@ describe('predictionAutoSelect', () => {
           },
           correction: '5'
         },
-        metadata: {
-          probabilities: {
-            prediction: 0.8,
-            correction: 1,
-            total: 0.8
-          },
-          autoSelectable: false
-        }
+        probabilities: {
+          prediction: 0.8,
+          correction: 1,
+          total: 0.8
+        },
+        metadata: {...defaultMetadata, autoSelectable: correctionValidForAutoSelect('5')}
       }
     ];
 
@@ -120,14 +130,12 @@ describe('predictionAutoSelect', () => {
           },
           correction: 'appl'
         },
-        metadata: {
-          probabilities: {
-            prediction: 1,
-            correction: 1,
-            total: 1
-          },
-          autoSelectable: true
-        }
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1
+        },
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -153,14 +161,12 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'thin'
       },
-      metadata: {
-        probabilities: {
-          prediction: .05,
-          correction: .8,
-          total: .05 * .8
-        },
-        autoSelectable: true
-      }
+      probabilities: {
+        prediction: .05,
+        correction: .8,
+        total: .05 * .8
+      },
+      metadata: {...defaultMetadata}
     }
 
     const highestNonKeepSuggestion: CompositedIntermediatePrediction = {
@@ -174,14 +180,12 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'thin'
       },
-      metadata: {
-        probabilities: {
-          prediction: .55,
-          correction: .8,
-          total: .55 * .8
-        },
-        autoSelectable: true
-      }
+      probabilities: {
+        prediction: .55,
+        correction: .8,
+        total: .55 * .8
+      },
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CompositedIntermediatePrediction[] = [
@@ -198,14 +202,12 @@ describe('predictionAutoSelect', () => {
           },
           correction: 'thin'
         },
-        metadata: {
-          probabilities: {
-            prediction: .4,
-            correction: .8,
-            total: .4 * .8
-          },
-          autoSelectable: true
-        }
+        probabilities: {
+          prediction: .4,
+          correction: .8,
+          total: .4 * .8
+        },
+        metadata: {...defaultMetadata}
       },
       {
         components: {
@@ -218,14 +220,12 @@ describe('predictionAutoSelect', () => {
           },
           correction: 'thic'
         },
-        metadata: {
-          probabilities: {
-            prediction: 1,
-            correction: .2,
-            total: 1 * .2
-          },
-          autoSelectable: true
-        }
+        probabilities: {
+          prediction: 1,
+          correction: .2,
+          total: 1 * .2
+        },
+        metadata: {...defaultMetadata}
       }
     ];
 
@@ -251,14 +251,12 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'thin'
       },
-      metadata: {
         probabilities: {
           prediction: .05,
           correction: .8,
           total: .8 * .05
         },
-        autoSelectable: true
-      }
+      metadata: {...defaultMetadata}
     }
 
     // To 'win', a suggestion (currently) needs at least twice the probability of the sum of all alternatives.
@@ -276,14 +274,12 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'thin'
       },
-      metadata: {
-        probabilities: {
-          prediction: .01,
-          correction: .8,
-          total: .01 * .8
-        },
-        autoSelectable: true
-      }
+      probabilities: {
+        prediction: .01,
+        correction: .8,
+        total: .01 * .8
+      },
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CompositedIntermediatePrediction[] = [
@@ -291,8 +287,8 @@ describe('predictionAutoSelect', () => {
       onlyNonKeepSuggestion
     ];
 
-    const totalProb = predictions.reduce((accum, current) => accum + current.metadata.probabilities.total, 0);
-    assert.isBelow(onlyNonKeepSuggestion.metadata.probabilities.total, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
+    const totalProb = predictions.reduce((accum, current) => accum + current.probabilities.total, 0);
+    assert.isBelow(onlyNonKeepSuggestion.probabilities.total, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
 
     predictions.sort(tupleDisplayOrderSort);
 
@@ -318,14 +314,12 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'thin'
       },
-      metadata: {
-        probabilities: {
-          prediction: .05,
-          correction: .8,
-          total: .05 * .8
-        },
-        autoSelectable: true
-      }
+      probabilities: {
+        prediction: .05,
+        correction: .8,
+        total: .05 * .8
+      },
+      metadata: {...defaultMetadata}
     }
 
     // To 'win', a suggestion (currently) needs at least twice the probability of the sum of all alternatives.
@@ -343,14 +337,12 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'thin'
       },
-      metadata: {
-        probabilities: {
-          prediction: .55,
-          correction: .8,
-          total: .55 * .8
-        },
-        autoSelectable: true
-      }
+      probabilities: {
+        prediction: .55,
+        correction: .8,
+        total: .55 * .8
+      },
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CompositedIntermediatePrediction[] = [
@@ -367,14 +359,12 @@ describe('predictionAutoSelect', () => {
           },
           correction: 'thin'
         },
-        metadata: {
-          probabilities: {
-            prediction: .4,
-            correction: .8,
-            total: .4 * .8
-          },
-          autoSelectable: true
-        }
+        probabilities: {
+          prediction: .4,
+          correction: .8,
+          total: .4 * .8
+        },
+        metadata: {...defaultMetadata}
       },
       {
         components: {
@@ -387,19 +377,17 @@ describe('predictionAutoSelect', () => {
           },
           correction: 'thic'
         },
-        metadata: {
-          probabilities: {
-            prediction: 1,
-            correction: .2,
-            total: 1 * .2
-          },
-          autoSelectable: true
-        }
+        probabilities: {
+          prediction: 1,
+          correction: .2,
+          total: 1 * .2
+        },
+        metadata: {...defaultMetadata}
       }
     ];
 
-    const totalProb = predictions.reduce((accum, current) => accum + current.metadata.probabilities.total, 0);
-    assert.isBelow(highestNonKeepSuggestion.metadata.probabilities.total, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
+    const totalProb = predictions.reduce((accum, current) => accum + current.probabilities.total, 0);
+    assert.isBelow(highestNonKeepSuggestion.probabilities.total, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
 
     predictions.sort(tupleDisplayOrderSort);
 
@@ -425,15 +413,13 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'thin'
       },
-      metadata: {
         probabilities: {
           prediction: .05,
           correction: .8,
           total: .05 * .8
         },
-        autoSelectable: true
-      }
-    }
+      metadata: {...defaultMetadata}
+    };
 
     const highestNonKeepSuggestion: CompositedIntermediatePrediction = {
       components: {
@@ -446,14 +432,12 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'thin'
       },
-      metadata: {
-        probabilities: {
-          prediction: .75,
-          correction: .9,
-          total: .75 * .9
-        },
-        autoSelectable: true
-      }
+      probabilities: {
+        prediction: .75,
+        correction: .9,
+        total: .75 * .9
+      },
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CompositedIntermediatePrediction[] = [
@@ -470,14 +454,12 @@ describe('predictionAutoSelect', () => {
           },
           correction: 'thin'
         },
-        metadata: {
-          probabilities: {
-            prediction: .2,
-            correction: .9,
-            total: .2 * .9
-          },
-          autoSelectable: true
-        }
+        probabilities: {
+          prediction: .2,
+          correction: .9,
+          total: .2 * .9
+        },
+        metadata: {...defaultMetadata}
       },
       {
         components: {
@@ -490,19 +472,17 @@ describe('predictionAutoSelect', () => {
           },
           correction: 'thic'
         },
-        metadata: {
-          probabilities: {
-            prediction: 1,
-            correction: .1,
-            total: 1 * .1
-          },
-          autoSelectable: true
-        }
+        probabilities: {
+          prediction: 1,
+          correction: .1,
+          total: 1 * .1
+        },
+        metadata: {...defaultMetadata}
       }
     ];
 
-    const totalProb = predictions.reduce((accum, current) => accum + current.metadata.probabilities.total, 0);
-    assert.isAbove(highestNonKeepSuggestion.metadata.probabilities.total, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
+    const totalProb = predictions.reduce((accum, current) => accum + current.probabilities.total, 0);
+    assert.isAbove(highestNonKeepSuggestion.probabilities.total, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
 
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
@@ -526,15 +506,12 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'cant'
       },
-      metadata: {
-        probabilities: {
-          prediction: 1,
-          correction: 1,
-          total: 1 * 1
-        },
-        autoSelectable: true,
-        matchLevel: SuggestionSimilarity.exact
-      }
+      probabilities: {
+        prediction: 1,
+        correction: 1,
+        total: 1 * 1
+      },
+      metadata: { ...defaultMetadata, matchLevel: SuggestionSimilarity.exact }
     }
 
     const expectedSuggestion: CompositedIntermediatePrediction = {
@@ -548,15 +525,12 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'cant'
       },
-      metadata: {
-        probabilities: {
-          prediction: .2,
-          correction: 1,
-          total: .2 * 1
-        },
-        autoSelectable: true,
-        matchLevel: SuggestionSimilarity.sameKey
-      }
+      probabilities: {
+        prediction: .2,
+        correction: 1,
+        total: .2 * 1
+      },
+      metadata: { ...defaultMetadata, matchLevel: SuggestionSimilarity.sameKey }
     };
 
     const predictions: CompositedIntermediatePrediction[] = [
@@ -573,15 +547,12 @@ describe('predictionAutoSelect', () => {
           },
           correction: 'cant'
         },
-        metadata: {
-          probabilities: {
-            prediction: .8,
-            correction: 1,
-            total: .8 * 1
-          },
-          autoSelectable: true,
-          matchLevel: SuggestionSimilarity.none
-        }
+        probabilities: {
+          prediction: .8,
+          correction: 1,
+          total: .8 * 1
+        },
+        metadata: { ...defaultMetadata, matchLevel: SuggestionSimilarity.none, predictionLength: 3 }
       }
     ];
 
@@ -610,15 +581,13 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'thi'
       },
-      metadata: {
-        probabilities: {
-          prediction: .05,
-          correction: .7,
-          total: .05 * .7
-        },
-        autoSelectable: true
-      }
-    }
+      probabilities: {
+        prediction: .05,
+        correction: .7,
+        total: .05 * .7
+      },
+      metadata: {...defaultMetadata}
+    };
 
     const highestCorrectionSuggestion: CompositedIntermediatePrediction = {
       components: {
@@ -631,14 +600,12 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'thi',
       },
-      metadata: {
-        probabilities: {
-          prediction: .1,
-          correction: .7,
-          total: .1 * .7
-        },
-        autoSelectable: true
-      }
+      probabilities: {
+        prediction: .1,
+        correction: .7,
+        total: .1 * .7
+      },
+      metadata: {...defaultMetadata}
     };
 
     const highestNonKeepSuggestion: CompositedIntermediatePrediction = {
@@ -652,14 +619,12 @@ describe('predictionAutoSelect', () => {
         },
         correction: 'the'
       },
-      metadata: {
-        probabilities: {
-          prediction: 1,
-          correction: .3,
-          total: 1 * .3
-        },
-        autoSelectable: true
-      }
+      probabilities: {
+        prediction: 1,
+        correction: .3,
+        total: 1 * .3
+      },
+      metadata: {...defaultMetadata}
     };
 
     const predictions: CompositedIntermediatePrediction[] = [
@@ -668,8 +633,8 @@ describe('predictionAutoSelect', () => {
       highestCorrectionSuggestion
     ];
 
-    const totalProb = predictions.reduce((accum, current) => accum + current.metadata.probabilities.total, 0);
-    assert.isAbove(highestNonKeepSuggestion.metadata.probabilities.total, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
+    const totalProb = predictions.reduce((accum, current) => accum + current.probabilities.total, 0);
+    assert.isAbove(highestNonKeepSuggestion.probabilities.total, totalProb * AUTOSELECT_PROPORTION_THRESHOLD, 'test setup is no longer valid');
 
     const originalPredictions = [].concat(predictions);
     assert.doesNotThrow(() => predictionAutoSelect(predictions));
