@@ -16,7 +16,7 @@ import Foundation
 import KeymanSettings
 import OSLog
 
-let currentDataModelVersionNumber = 2
+let dataModelVersionStoreInGroupContainer = 2
 
 public enum InstallationPhase: String {
   case inputMethodMissing
@@ -141,7 +141,7 @@ public class InstallationCheck {
   public func isMigrationNeeded() -> Bool {
     var migrationNeeded = true
     
-    if self.defaultsRepository.readDataModelVersion() == currentDataModelVersionNumber {
+    if self.defaultsRepository.readDataModelVersion() >= dataModelVersionStoreInGroupContainer {
       migrationNeeded = false
     }
 
