@@ -1,6 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Setup URL routes for Keyman Developer Server
+ */
 import * as express from 'express';
 import * as ws from 'ws';
 import * as multer from 'multer';
+import KEYMAN_VERSION from '@keymanapp/keyman-version';
 import handleIncKeyboardsJs from './handlers/inc/keyboards-js.js';
 import { data, DebugFont, DebugKeyboard, DebugModel, DebugObject, DebugPackage, isValidId } from './data.js';
 import apiGet from './handlers/api/debugobject/get.js';
@@ -11,22 +17,20 @@ import apiUnregister from './handlers/api/debugobject/unregister.js';
 import handleIncPackagesJson from './handlers/inc/packages-json.js';
 import apiPackageRegister from './handlers/api/package/register.js';
 import handleIncKeyboardsCss from './handlers/inc/keyboards-css.js';
-import { Environment } from './version-data.js';
 import { standardPaths } from './standardPaths.js';
 import chalk from 'chalk';
 import { shutdown } from './shutdown.js';
 import { getOption } from './options.js';
+import { serverSitePath } from './environment.js';
 
-export default function setupRoutes(app: express.Express, upload: multer.Multer, wsServer: ws.WebSocketServer, environment: Environment ) {
+export default function setupRoutes(app: express.Express, upload: multer.Multer, wsServer: ws.WebSocketServer ) {
 
   /* Middleware - JSON and logging */
 
   app.use(express.json()); // for parsing application/json
 
   app.use(function (req, _res, next) {
-    // if(environment.environment == 'local') {
-      console.log(req.method + ' ' + req.path);
-    // }
+    console.log(req.method + ' ' + req.path);
     next();
   });
 
@@ -51,7 +55,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
 
   /* All routes */
 
-  app.use('/', express.static('build/src/site'));
+  app.use('/', express.static(serverSitePath()));
 
   app.post('/upload', localhostOnly, upload.single('file'), (req, res, next) => {
     const name = req.file.originalname;
@@ -93,7 +97,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
   app.get('/inc/packages.json', handleIncPackagesJson);
 
   app.get('/api-public/version', (req,res,next)=>{
-    res.json({version: environment.versionWithTag, isApiAvailable: isLocalhost(req)});
+    res.json({version: KEYMAN_VERSION.VERSION_WITH_TAG, isApiAvailable: isLocalhost(req)});
     next();
   });
 

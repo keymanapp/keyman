@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/developer-utils";
 
 const Namespace = CompilerErrorNamespace.Infrastructure;
@@ -87,10 +90,6 @@ export class InfrastructureMessages {
   static HINT_ProjectIsVersion10 = SevHint | 0x0014;
   static Hint_ProjectIsVersion10 = () => m(this.HINT_ProjectIsVersion10,
     `The project file is an older version and can be upgraded to version 17.0`);
-
-  static ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile = SevError | 0x0015;
-  static Error_OutFileCanOnlyBeSpecifiedWithSingleInfile = () => m(this.ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile,
-    `Parameter --out-file can only be used with a single input file.`);
 
   static ERROR_InvalidMessageFormat = SevError | 0x0016;
   static Error_InvalidMessageFormat = (o:{message:string}) => m(this.ERROR_InvalidMessageFormat,
@@ -217,6 +216,16 @@ export class InfrastructureMessages {
     this.INFO_ProjectNotValidatedSuccessfully,
     `${def(o.relativeFilename)} failed to validate.`
   )});
+
+  static ERROR_OutFileMustBeAFolder = SevError | 0x002C;
+  static Error_OutFileMustBeAFolder = () => m(
+    this.ERROR_OutFileMustBeAFolder,
+    `Parameter --out-file must refer to a folder.`, `
+    If multiple input files are specified, or if the parameter --out-file ends
+    with a slash (/) or backslash (\\), or if the folder referenced by the
+    parameter already exists, then kmc will treat the parameter as a folder.
+    However, as a file already exists with the same name, kmc cannot continue.
+  `);
 
 }
 

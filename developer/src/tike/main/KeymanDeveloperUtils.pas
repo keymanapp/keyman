@@ -285,7 +285,7 @@ begin
   if not GetKmshellPath(kmshell) then
     Exit(False);
 
-  Result := TUtilExecute.WaitForProcess('"'+kmshell+'" -uk "'+nm+'"', ExtractFilePath(kmshell));  // I3475
+  Result := TUtilExecute.WaitForProcess('"'+kmshell+'" -uk "'+nm+'" -s', ExtractFilePath(kmshell));  // I3475
 end;
 
 function UninstallPackage(const nm: string): Boolean;
