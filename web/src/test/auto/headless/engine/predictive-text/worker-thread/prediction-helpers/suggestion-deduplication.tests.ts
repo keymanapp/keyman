@@ -5,11 +5,11 @@ import { deepCopy } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import {
-  CorrectionPredictionTuple,
-  CorrectionPredictionTupleCore,
-  SuggestionSimilarity,
+  CompositedIntermediatePrediction,
   dedupeSuggestions,
-  models
+  models,
+  PredictionMetadata,
+  SuggestionSimilarity
 } from "@keymanapp/lm-worker/test-index";
 
 import Context = LexicalModelTypes.Context;
@@ -24,16 +24,11 @@ const testModel = new DummyModel({
   // No suggestions needed here, so we don't define any.
 });
 
-const mockMetadata: (tc: CorrectionPredictionTupleCore) => CorrectionPredictionTuple = (t: CorrectionPredictionTupleCore) => {
-  return {
-    ...t,
-    metadata: {
-      preservationTransform: null,
-      matchLevel: SuggestionSimilarity.none,
-      rawEditCount: 0,    // does not matter for these tests.
-      predictionLength: 0 // does not matter for these tests.
-    }
-  }
+const commonMetadata: PredictionMetadata = {
+  matchLevel: SuggestionSimilarity.none,
+  autoSelectable: true,
+  rawEditCount: 0,    // does not matter for these tests.
+  predictionLength: 0 // does not matter for these tests.
 };
 
 /**
@@ -42,77 +37,80 @@ const mockMetadata: (tc: CorrectionPredictionTupleCore) => CorrectionPredictionT
  * @returns
  */
 const build_its_is_set = () => {
-  const its: CorrectionPredictionTupleCore = {
-    correction: {
-      sample: 'its',
-      p: 0.8
-    },
-    prediction: {
-      sample: {
+  const its: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 's',
           deleteLeft: 0
         },
         displayAs: 'its'
       },
-      p: 0.2
+      correction: 'its'
     },
-    totalProb: 0.16
-    // matchLevel does not yet exist.
+    probabilities: {
+      prediction: .2,
+      correction: .8,
+      total: .2 * .8
+    },
+    metadata: commonMetadata
   };
 
-  const it_is: CorrectionPredictionTupleCore = {
-    correction: {
-      sample: 'its',
-      p: 0.8
-    },
-    prediction: {
-      sample: {
+  const it_is: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: '\'s',
           deleteLeft: 0
         },
         displayAs: 'it\'s'
       },
-      p: 0.8
+      correction: 'its'
     },
-    totalProb: 0.64
+    probabilities: {
+      prediction: .8,
+      correction: .8,
+      total: .8 * .8
+    },
+    metadata: commonMetadata
   };
 
-  const is: CorrectionPredictionTupleCore = {
-    correction: {
-      sample: 'is',
-      p: 0.2
-    },
-    prediction: {
-      sample: {
+  const is: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 's',
           deleteLeft: 1
         },
         displayAs: 'is'
       },
-      p: 0.5
+      correction: 'is'
     },
-    totalProb: 0.1
+    probabilities: {
+      prediction: .5,
+      correction: .2,
+      total: .5 * .2
+    },
+    metadata: commonMetadata
   };
 
-  const is_not: CorrectionPredictionTupleCore = {
-    correction: {
-      sample: 'is',
-      p: 0.2
-    },
-    prediction: {
-      sample: {
+  const is_not: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 'sn\'t',
           deleteLeft: 1
         },
         displayAs: 'isn\'t'
       },
-      p: 0.5
+      correction: 'is'
     },
-    totalProb: 0.1
+    probabilities: {
+      prediction: .5,
+      correction: .2,
+      total: .5 * .2
+    },
+    metadata: commonMetadata
   };
 
   return {
@@ -133,7 +131,12 @@ describe('dedupeSuggestions', () => {
     };
 
     const testSet = build_its_is_set();
-    const predictions: CorrectionPredictionTuple[] = [...Object.values(testSet)].map(mockMetadata) ;
+    const predictions: CompositedIntermediatePrediction[] = [...Object.values(testSet)].map((entry) => {
+      return {
+        ...entry,
+        metadata: commonMetadata
+      }
+    });
 
     const deduplicated = dedupeSuggestions(testModel, predictions, context);
 
@@ -154,16 +157,26 @@ describe('dedupeSuggestions', () => {
       ...Object.values(testSet).map((entry) => deepCopy(entry)),
       ...Object.values(testSet).map((entry) => deepCopy(entry)),
       deepCopy(testSet.it_is) // as in, `it's`, the contraction.
-    ].map(mockMetadata);
+    ].map((entry) => {
+      return {
+        ...entry,
+        metadata: commonMetadata
+      }
+    });
 
     const deduplicated = dedupeSuggestions(testModel, predictions, context);
-    const expected = [...Object.values(testSet)].map(mockMetadata);
+    const expected = [...Object.values(testSet)].map((entry) => {
+      return {
+        ...entry,
+        metadata: commonMetadata
+      }
+    });
     // Note:  only changes the _total_ probability.
     //
     // There's no mathematically safe way to combine the components if the
     // underlying correction sources differ between duplicated suggestions,
     // though it's mathematically safe to combine their product.
-    expected.forEach((entry) => entry.totalProb *= (entry.prediction.sample.transform.insert == '\'s') ? 3 : 2);
+    expected.forEach((entry) => entry.probabilities.total *= (entry.components.prediction.transform.insert == '\'s') ? 3 : 2);
 
     assert.deepEqual(deduplicated, expected);
   });
