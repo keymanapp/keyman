@@ -16,6 +16,8 @@ import Foundation
 import KeymanSettings
 import OSLog
 
+let currentDataModelVersionNumber = 2
+
 public enum InstallationPhase: String {
   case inputMethodMissing
   case inputMethodOutdated
@@ -107,6 +109,10 @@ public class InstallationCheck {
     self.isInputMethodCurrent = keymanIsCurrent
     self.inputMethodVersion = keymanVersion
 
+    if self.isMigrationNeeded() {
+      _ = self.migrateData()
+    }
+    
     let installState = InstallationCheck.readInstallationState(from: defaultsRepo)
 
     if (keymanExists && keymanIsCurrent) {
@@ -129,6 +135,34 @@ public class InstallationCheck {
     self.registerObservers()
   }
 
+  /**
+   * Check the user defaults to see whether a migration is needed
+   */
+  public func isMigrationNeeded() -> Bool {
+    var migrationNeeded = true
+    
+    if self.defaultsRepository.readDataModelVersion() == currentDataModelVersionNumber {
+      migrationNeeded = false
+    }
+
+    Logger.app.debug("isMigrationNeeded: \(migrationNeeded)")
+    return migrationNeeded
+  }
+  
+  /**
+   * Run the Keyman input method as a subprocess to migrate data to the shared space and immediately exit
+   */
+  public func migrateData() -> Bool {
+    let success = self.inputMethodUtil.invokeKeymanInputMethodMigration()
+    Logger.app.debug("migrateData migration suceeded: \(success)")
+
+    // check whether
+    if success {
+      NotificationCenter.default.post(name: .dataMigrated, object: nil)
+    }
+    return success
+  }
+  
   /**
    * Check the condition of the InstallationState as recorded in the UserDefaults.
    * Determine whether it is `stale` and should be deleted
