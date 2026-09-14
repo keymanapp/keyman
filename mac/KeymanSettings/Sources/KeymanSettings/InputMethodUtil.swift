@@ -172,14 +172,33 @@ public class InputMethodUtil {
     return self.invokeKeymanInputMethodAsSubProcess(argument: kMigrateCommand) == 0
   }
   
+  /**
+   * Calls Keyman input method to request accessibility permission.
+   * The call varies based on whether Keyman is running or not.
+   *
+   * If the input method is running, then send a notification to the input method
+   * to request access.
+   * 
+   * If the input method is not running, invoke the input method as a separate process
+   * with a special argument that causes it to run, request access and exit.
+   */
+
   public func invokeKeymanInputMethodRequestAccess() -> Bool {
     var success = false
+    
+    Logger.setup.info("invokeKeymanInputMethodRequestAccess()")
+    LogUtil.infoBreadcrumb("invokeKeymanInputMethodRequestAccess()", category: .setup)
     do {
-      // because we are launching Keyman with a specific command line argument
-      // for this request, we must kill it first
-      _ = self.killKeymanInputMethod()
-      
-      try self.launchKeymanInputMethodAsSeparateProcess(argument: kAccessCommand)
+      if self.isKeymanInputMethodRunning() {
+        // Keyman is not running, send notification to input method
+        Logger.setup.debug("invokeKeymanInputMethodRequestAccess(), calling sendAccessibilityRequest()")
+        self.sendAccessibilityRequest()
+      } else {
+        // Keyman is not running, launch and request accessibility with specific command line argument
+        Logger.setup.debug("invokeKeymanInputMethodRequestAccess(), calling launchKeymanInputMethodAsSeparateProcess()")
+        try self.launchKeymanInputMethodAsSeparateProcess(argument: kAccessCommand)
+      }
+        
       success = true
     } catch {
       Logger.setup.error("error requesting Accessibility from input method: \(error as NSError, privacy: .public)")
@@ -191,21 +210,70 @@ public class InputMethodUtil {
   
   /**
    * Calls Keyman input method to check whether it has accessibility permission granted.
-   * The actual result is not returned from Keyman when called as a separate process.
+   * The call varies based on whether Keyman is running or not.
+   *
+   * If the input method is not running, then invoke it as a separate process with a special argument
+   * so that it runs, checks the access, sends a notification and exits.
+   *
+   * If the input method is running, then do not kill it unless `forceRestart` flag is set to true.
+   * Instead send a notification to instruct it to make the check and respond.
+   *
+   * If the input method is running and `forceRestart` is true, then kill Keyman and invoke it
+   * as a separate process. This is needed when a user is in the middle of an install or repair.
+   *
+   * The actual result is not returned from Keyman.
    * After this function is called, listen to the `DistributedNotificationCenter` for the notification named
    * `accessibilityStateResponse`
    * It contains a message with a value of `granted` or `not-granted`
    */
-  func invokeKeymanInputMethodCheckAccess() throws {
+  func invokeKeymanInputMethodCheckAccess(forceInputMethodRestart forceRestart: Bool) throws {
     Logger.setup.info("invokeKeymanInputMethodCheckAccess()")
     LogUtil.infoBreadcrumb("invokeKeymanInputMethodCheckAccess()", category: .setup)
-    // because we are launching Keyman with a specific command line argument
-    // for this request, we must kill it first
-    _ = self.killKeymanInputMethod()
     
-    try self.launchKeymanInputMethodAsSeparateProcess(argument: kCheckCommand)
+    var keymanIsRunning = self.isKeymanInputMethodRunning()
+    
+    if keymanIsRunning, forceRestart {
+      // kill Keyman so that it refreshes its accessibility state
+      _ = self.killKeymanInputMethod()
+      keymanIsRunning = false
+      Logger.setup.debug("invokeKeymanInputMethodCheckAccess(), killed Keyman")
+    }
+    
+    if keymanIsRunning {
+      // Keyman is running: check accessibility by sending distributed notification
+      Logger.setup.debug("invokeKeymanInputMethodCheckAccess(), calling sendAccessibilityCheckRequest()")
+      self.sendAccessibilityCheckRequest()
+    } else {
+      // Keyman is not running, launch and check accessibility with specific command line argument
+      Logger.setup.debug("invokeKeymanInputMethodCheckAccess(), calling launchKeymanInputMethodAsSeparateProcess()")
+      try self.launchKeymanInputMethodAsSeparateProcess(argument: kCheckCommand)
+    }
   }
   
+  /**
+   * Send a distributed notification to check the state of Accessibility permission.
+   */
+  func sendAccessibilityCheckRequest() {
+    DistributedNotificationCenter.default().postNotificationName (
+      .accessibilityCheckRequest,
+      object: nil,
+      userInfo: nil,
+      deliverImmediately: true
+    )
+  }
+
+  /**
+   * Send a distributed notification to request Accessibility permission.
+   */
+  func sendAccessibilityRequest() {
+    DistributedNotificationCenter.default().postNotificationName (
+      .accessibilityRequest,
+      object: nil,
+      userInfo: nil,
+      deliverImmediately: true
+    )
+  }
+
   /**
    * run Keyman as a subprocess with the specifed argument and return the result
    */
@@ -263,9 +331,9 @@ public class InputMethodUtil {
    * Calls Keyman input method to check whether it has accessibility permission granted.
    * Receives response as distributed notification named `accessibilityStateResponse`
    */
-  public func doAsyncAccessibilityCheck() {
+  public func doAsyncAccessibilityCheck(forceInputMethodRestart forceRestart: Bool) {
     do {
-      try self.invokeKeymanInputMethodCheckAccess()
+      try self.invokeKeymanInputMethodCheckAccess(forceInputMethodRestart: forceRestart)
     } catch {
       Logger.setup.error("invoking Keyman failed: \(error as NSError, privacy: .public)")
       LogUtil.errorBreadcrumb("invoking Keyman failed: \(error as NSError)", category: .setup)
