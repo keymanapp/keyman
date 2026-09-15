@@ -13,6 +13,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 import {
   buildEdgesFromResults,
+  CORRECTION_SEARCH_THRESHOLDS,
   generateSubsetId,
   LegacyQuotientRoot,
   LegacyQuotientSpur,
@@ -428,8 +429,16 @@ describe('LegacyQuotientSpur', () => {
 
       thirdResults.sort((a, b) => a.totalCost - b.totalCost);
       const the_index = thirdResults.findIndex((entry) => entry.matchString == 'the' && entry.editCount == 1);
-      // `teh` should appear fairly early as a viable correction .
+      // `teh` should appear fairly early as a viable correction.
       assert.isBelow(the_index, 10);
+
+      // This test portion is a bit "white box" - it should verify that a
+      // specific conditional within `shouldStopSearchingEarly` returns true.
+      //
+      // We want to make sure we don't auto-ignore transposition cases by
+      // accident by failing that conditional.
+      const the_entry = thirdResults[the_index];
+      assert.isBelow(the_entry.totalCost - thirdResults[0].totalCost, CORRECTION_SEARCH_THRESHOLDS.REPLACEMENT_SEARCH_THRESHOLD);
     });
   });
 });
