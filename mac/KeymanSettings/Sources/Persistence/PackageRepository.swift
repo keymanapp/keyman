@@ -328,7 +328,7 @@ public class PackageRepository: PackageRepo {
         keymanPackage = package
       }
     } else {
-      // if no kmp.json file, look for kmp.info instead
+      // if no kmp.json file, look for kmp.inf instead
       if FileManager.default.fileExists(atPath: kmpInfFileUrl.path(percentEncoded: false)) {
         Logger.data.info("fallback to kmp.inf file at: \(kmpInfFileUrl.cleanUrlPath(), privacy: .public)")
         LogUtil.infoBreadcrumb("fallback to kmp.inf file at: \(kmpInfFileUrl.cleanUrlPath())", category: .data)

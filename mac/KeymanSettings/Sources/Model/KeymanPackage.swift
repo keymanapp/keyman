@@ -132,9 +132,6 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     helpFilename: String? = nil,
     graphicFilename: String? = nil
   ) throws {
-    // Replicate package validations
-    if keyboards.isEmpty { throw LoadPackageError.containsNoKeyboards }
-    
     self.id = UUID()
     self.sourceDirectoryUrl = packageUrl
     self.sharePackageUrl = KeymanPackage.buildSharePackageUrl(packageUrl: self.sourceDirectoryUrl)
@@ -346,23 +343,4 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
   public static func == (lhs: KeymanPackage, rhs: KeymanPackage) -> Bool {
     return lhs.id == rhs.id // only compare unique IDs
   }
-  
-  /*
-   public var sourceDirectoryUrl: URL
-   
-   // the URL for downloading the package from keyman.com
-   public let sharePackageUrl: URL?
-
-   public let keyboards: [Keyboard]
-   public let fonts: [String]
-   public let packageName: String
-   public let packageVersion: String
-   public let minimumSupportedKeymanVersion: String
-   
-   public let author: String?
-   public let websiteUrl: URL?
-   public let copyright: String?
-
-   */
-  
 }

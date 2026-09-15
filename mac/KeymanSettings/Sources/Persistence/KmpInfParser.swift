@@ -3,8 +3,11 @@
  *
  * Created by Shawn Schantz on 2026-09-04
  *
- * Parses the contents of a kmp.inf file.
- * After collecting all the data, it validates it and creates a KeymanPackage
+ * Parses the contents of a kmp.inf file, a legacy format for describing a Keyman package.
+ * The kmp.json superseded the kmp.inf file somewhere around Keyman version 10, so the
+ * kmp.inf will only be read if the kmp.json is not found in the package.
+ 
+ * After parsing and collecting the data, it is validated and a KeymanPackage is created.
  */
 
 import Foundation
