@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { ManagedPromise } from "keyman/common/web-utils";
 
 export class TouchEventPromiseMap {

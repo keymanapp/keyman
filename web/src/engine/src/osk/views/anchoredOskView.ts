@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+
 import { DeviceSpec } from 'keyman/common/web-utils';
 import { landscapeView } from 'keyman/engine/dom-utils';
 
@@ -6,11 +10,6 @@ import { getViewportScale } from '../screenUtils.js';
 import { ViewConfiguration } from '../config/viewConfiguration.js';
 import { StaticActivator } from './activator.js';
 import { TwoStateActivator } from './twoStateActivator.js';
-
-/***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
-***/
 
 export class AnchoredOSKView extends OSKView {
 
