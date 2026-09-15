@@ -1,3 +1,13 @@
+(*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Ross Cruickshank on 2026-09-dd-12
+ *
+ *
+ * This unit assists in setting the base keyboard configuration,
+ * including compiling the installed keyboard layouts against
+ * the selected base keyboard.
+ *)
 unit Keyman.Configuration.System.BaseKeyboard;
 
 interface
@@ -16,8 +26,8 @@ function BaseKeyboardNeedsMCompile(BaseKeyboardID: Integer): Boolean;
 
 (**
  * Sets the base keyboard KLID for the current user and compiles the keyboard
- * files if necessary. In the case the compiled keyboard files are not present,
- * it will require elevation.
+ * layout files if necessary. In the case the compiled keyboard files are
+ *not present, it will require elevation.
  * @param  WindowHandle  Window handle to own the elevation prompt.
  * @param  BaseKeyboardID  KLID of the base keyboard KLID to set.
  * @returns  True  when the base keyboard setting has been applied.
@@ -25,7 +35,7 @@ function BaseKeyboardNeedsMCompile(BaseKeyboardID: Integer): Boolean;
 function SetBaseKeyboard(WindowHandle: THandle; BaseKeyboardID: Integer): Boolean;
 
 (**
- * Compiles the base keyboard files for the specified KLID.
+ * Compiles the installed keyboard layouts for the specified KLID.
  * Must run elevated.
  *
  * @param  BaseKeyboardID  KLID of the base keyboard to compile.

@@ -402,7 +402,6 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
-  BaseKeyboardID: Integer;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -550,7 +549,7 @@ begin
       end;
 
     fmBaseKeyboard:   // I4169
-      if ConfigureBaseKeyboard(BaseKeyboardID) and SetBaseKeyboard(0, BaseKeyboardID)
+      if ConfigureAndSetBaseKeyboard(0)
         then ExitCode := 0
         else ExitCode := 1;
 
