@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "KMPackage.h"
-#import "KMConfigurationWindowController.h"
 #import "KMLogs.h"
 
 @implementation KMPackage
@@ -91,9 +90,6 @@ NSString *filename = nil; // This is the filename from the FileWrapper (if any)
     filenameTempKMP = nil;
     return NO;
   }
-  
-  KMConfigurationWindowController *configWindowController = (KMConfigurationWindowController *)[self.AppDelegate configWindow];
-  [configWindowController handleRequestToInstallPackage:self];
   
   return YES; // Even if the user decides not to, we need to return Yes to prevent displaying an error message.
 }

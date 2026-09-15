@@ -54,8 +54,6 @@
 	<string>Keyman_Input_Connection</string>
 	<key>InputMethodServerControllerClass</key>
 	<string>KMInputController</string>
-	<key>InputMethodServerPreferencesWindowControllerClass</key>
-	<string>KMConfigurationWindowController</string>
 	<key>Keyman</key>
 	<dict>
 		<key>SentryEnvironment</key>

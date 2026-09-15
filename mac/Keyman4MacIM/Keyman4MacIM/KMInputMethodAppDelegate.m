@@ -10,8 +10,6 @@
 #import "KMInputMethodLifecycle.h"
 #import "KMSettingsRepository.h"
 #import "KMDataRepository.h"
-#import "KMConfigurationWindowController.h"
-#import "KMDownloadKBWindowController.h"
 #import "ZipArchive.h"
 #import "KMPackageReader.h"
 #import "KMPackageInfo.h"
@@ -32,9 +30,6 @@ NSString *processorType = @"Unknown";
 NSString *const kKeyboardsChanged = @"com.keyman.keyboards.changed";
 NSString *const kAccessibilityCheckedRequest = @"com.keyman.accessibility.check.request";
 NSString *const kAccessibilityRequest = @"com.keyman.accessibility.request";
-
-// in-app notifications
-NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
 @implementation NSString (VersionNumbers)
 /**
@@ -73,7 +68,7 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @synthesize kvk = _kvk;
 @synthesize keyboardName = _keyboardName;
 @synthesize keyboardsPath = _keyboardsPath;
-@synthesize kmxFileList = _kmxFileList;
+//@synthesize kmxFileList = _kmxFileList;
 @synthesize selectedKeyboard = _selectedKeyboard;
 @synthesize enabledKeyboards = _enabledKeyboards;
 @synthesize contextBuffer = _contextBuffer;
@@ -97,10 +92,6 @@ id _lastServerWithOSKShowing = nil;
 
 - (void)initCompletion {
   os_log_info([KMLogs startupLog], "initCompletionHandler method invoked");
-  [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
-                                                     andSelector:@selector(handleURLEvent:withReplyEvent:)
-                                                   forEventClass:kInternetEventClass
-                                                      andEventID:kAEGetURL];
   
   self.lowLevelEventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
                                            kCGHeadInsertEventTap,
@@ -306,38 +297,6 @@ id _lastServerWithOSKShowing = nil;
   [KMSentryHelper addHasAccessibilityTag:[PrivacyConsent.shared checkAccessibility]];
   [KMSentryHelper addOskVisibleTag:[self.oskWindow.window isVisible]];
   [KMSentryHelper addArchitectureTag:processorType];
-}
-
-- (void)handleURLEvent:(NSAppleEventDescriptor*)event withReplyEvent:(NSAppleEventDescriptor*)replyEvent {
-  
-  [self processURL:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]];
-}
-
-- (void)processURL:(NSString*)rawUrl {
-  NSMutableString *urlStr = [NSMutableString stringWithString:rawUrl];
-  [urlStr replaceOccurrencesOfString:@"keyman:" withString:@"keyman/" options:0 range:NSMakeRange(0, 7)];
-  NSURL *url = [NSURL URLWithString:urlStr];
-  os_log_debug([KMLogs keyboardLog], "processURL, url = %{public}@", url);
-  
-  if ([url.lastPathComponent isEqualToString:@"download"]) {
-    if (_connection != nil) {
-      os_log_debug([KMLogs keyboardLog], "Already downloading a keyboard.");
-      return;
-    }
-    
-    NSURL *downloadUrl;
-    NSArray *params = [[url query] componentsSeparatedByString:@"&"];
-    for (NSString *value in params) {
-      NSUInteger index = NSNotFound;
-      if ((index = [value rangeOfString:@"filename="].location) != NSNotFound)
-        _downloadFilename = [NSString stringWithString:[value substringFromIndex:index+9]];
-      else if ((index = [value rangeOfString:@"url="].location) != NSNotFound) {
-        NSString *urlString = [NSString stringWithString:[value substringFromIndex:index+4]];
-        urlString = [urlString stringByRemovingPercentEncoding];
-        downloadUrl = [NSURL URLWithString:urlString];
-      }
-    }
-  }
 }
 
 + (KMInputMethodAppDelegate *)AppDelegate {
@@ -557,95 +516,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   return _keyboardsPath;
 }
 
-- (NSArray *)kmxFileList {
-  if (_kmxFileList == nil) {
-    os_log_debug([KMLogs dataLog], "creating kmxFileList");
-    NSArray *kmxFiles = [self getKmxFilesInKeyboardsDirectory];
-    _kmxFileList = [[NSMutableArray alloc] initWithCapacity:0];
-    NSMutableArray *others = nil;
-    for (NSString *filePath in kmxFiles) {
-      os_log_debug([KMLogs dataLog], "kmxFileList, filePath: %{public}@", filePath);
-      NSString *packageFolder = [self packageFolderFromPath:filePath];
-      NSInteger index = [self indexForPackageFolder:packageFolder];
-      if ([packageFolder isEqualToString:@"Others"]) {
-        if (others == nil)
-          others = [NSMutableArray arrayWithCapacity:0];
-        [others addObject:filePath];
-      }
-      else {
-        if (index >= 0) {
-          [[_kmxFileList objectAtIndex:index] addObject:filePath];
-        }
-        else {
-          NSMutableArray *pArray = [[NSMutableArray alloc] initWithObjects:filePath, nil];
-          [_kmxFileList addObject:pArray];
-        }
-      }
-    }
-    
-    if (others != nil)
-      [_kmxFileList addObject:others];
-  }
-  
-  return _kmxFileList;
-}
-
-- (NSString *)kmxFilePathAtIndex:(NSUInteger)index {
-  NSUInteger x = 0;
-  NSUInteger len = _kmxFileList.count;
-  for (int i = 0; i < len; i++) {
-    x++;
-    NSArray *pArray = (NSArray *)[_kmxFileList objectAtIndex:i];
-    for (NSString *path in pArray) {
-      if (index == x)
-        return path;
-      x++;
-    }
-  }
-  
-  return nil;
-}
-
-- (NSString *)packagePathAtIndex:(NSUInteger)index {
-  NSString *packagePath = nil;
-  NSUInteger x = 0;
-  NSUInteger len = _kmxFileList.count;
-  for (int i = 0; i < len; i++) {
-    NSArray *pArray = (NSArray *)[_kmxFileList objectAtIndex:i];
-    if (!pArray.count) {
-      i++;
-      x++;
-      continue;
-    }
-    
-    if (index >= x && index <= (x+pArray.count)) {
-      packagePath = [[pArray objectAtIndex:0] stringByDeletingLastPathComponent];
-      break;
-    }
-    
-    x += (pArray.count+1);
-  }
-  
-  return packagePath;
-}
-
-- (NSInteger)indexForPackageFolder:(NSString *)packageFolder {
-  NSInteger index = -1;
-  NSUInteger len = _kmxFileList.count;
-  for (int i = 0; i < len; i++) {
-    NSArray *pArray = (NSArray *)[_kmxFileList objectAtIndex:i];
-    if (pArray.count > 0) {
-      NSString *packageFolder2 = [self packageFolderFromPath:[pArray objectAtIndex:0]];
-      if ([packageFolder isEqualToString:packageFolder2]) {
-        index = i;
-        break;
-      }
-    }
-  }
-  
-  return index;
-}
-
 - (NSString *)packageFolderFromPath:(NSString *)path {
   NSString *packageFolder = nil;
   NSString *sourcePath = [self keyboardsPath];
@@ -663,19 +533,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (KMPackageInfo *)loadPackageInfo:(NSString *)path {
   return [self.packageReader loadPackageInfo:path];
-}
-
-- (NSString *)packageNameFromPackageInfo:(NSString *)packageFolder {
-  NSString *packageName = nil;
-  
-  NSString *path = [[self keyboardsPath] stringByAppendingPathComponent:packageFolder];
-  KMPackageInfo *packageInfo = [self.packageReader loadPackageInfo:path];
-  
-  if (packageInfo) {
-    packageName = packageInfo.packageName;
-  }
-  
-  return packageName;
 }
 
 - (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder {
@@ -841,11 +698,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)setDefaultKeymanMenuItems {
-  NSMenuItem *config = [self.menu itemWithTag:CONFIG_MENUITEM_TAG];
-  if (config) {
-    [config setAction:@selector(menuAction:)];
-  }
-  
   NSMenuItem *osk = [self.menu itemWithTag:OSK_MENUITEM_TAG];
   if (osk) {
     [osk setAction:@selector(menuAction:)];
@@ -1066,17 +918,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   return _oskWindow;
 }
 
-- (void)showConfigurationWindow {
-  os_log_debug([KMLogs uiLog], "Showing config window...");
-  [self.configWindow.window centerInParent];
-  [self.configWindow.window makeKeyAndOrderFront:nil];
-  [self.configWindow.window setLevel:NSFloatingWindowLevel];
-}
-
-- (void)registerConfigurationWindow:(NSWindowController *)window {
-  _configWindow = window;
-}
-
 - (void)showOSK {
   [self.oskWindow prepareToShowOsk];
   [[self.oskWindow window] makeKeyAndOrderFront:nil];
@@ -1097,16 +938,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  *       probably be managed better.
  */
 
-- (NSWindowController *)configWindow {
-  if (_configWindow.window == nil) {
-    os_log_debug([KMLogs uiLog], "Creating config window...");
-    _configWindow = [[KMConfigurationWindowController alloc] initWithWindowNibName:@"preferences"];
-    [self observeCloseFor:_configWindow.window];
-  }
-  
-  return _configWindow;
-}
-
 // TODO: rewrite confusing pattern, multiple methods differing only by underscore
 - (NSWindowController *)aboutWindow_ {
   return _aboutWindow;
@@ -1119,19 +950,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   }
   
   return _aboutWindow;
-}
-
-- (NSWindowController *)infoWindow_ {
-  return _infoWindow;
-}
-
-- (NSWindowController *)infoWindow {
-  if (_infoWindow.window == nil) {
-    _infoWindow = [[KMInfoWindowController alloc] initWithWindowNibName:@"KMInfoWindowController"];
-    [self observeCloseFor:_infoWindow.window];
-  }
-  
-  return _infoWindow;
 }
 
 - (NSWindowController *)kbHelpWindow_ {
@@ -1147,19 +965,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   return _kbHelpWindow;
 }
 
-- (NSWindowController *)downloadKBWindow_ {
-  return _downloadKBWindow;
-}
-
-- (NSWindowController *)downloadKBWindow {
-  if (_downloadKBWindow.window == nil) {
-    _downloadKBWindow = [[KMDownloadKBWindowController alloc] initWithWindowNibName:@"KMDownloadKBWindowController"];
-    [self observeCloseFor:_downloadKBWindow.window];
-  }
-  
-  return _downloadKBWindow;
-}
-
 /*
  * Release windows after closing -- no need to keep them hanging about
  */
@@ -1173,198 +978,10 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (void)windowWillClose:(NSNotification *)notification {
   NSWindow* window = notification.object;
-  if (window == _downloadKBWindow.window) {
-    _downloadKBWindow.window = nil;
-  } else if(window == _kbHelpWindow.window) {
+  if(window == _kbHelpWindow.window) {
     _kbHelpWindow.window = nil;
-  } else if(window == _infoWindow.window) {
-    _infoWindow.window = nil;
-  } else if(window == _configWindow.window) {
-    _configWindow.window = nil;
   }
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSWindowWillCloseNotification object:window];
-}
-
-/*
- * Endpoints for download process
- * TODO: this should really be refactored
- */
-
-- (void)downloadComplete:(NSModalResponse) returnCode {
-  os_log_debug([KMLogs uiLog], "downloadComplete, NSModalResponse returnCode: %ld", (long)returnCode);
-  if (returnCode == NSModalResponseCancel) {
-    os_log_debug([KMLogs uiLog], "downloadComplete, returnCode == NSModalResponseCancel");
-    [_connection cancel];
-  }
-  else if (returnCode == NSModalResponseOK) {
-    os_log_debug([KMLogs uiLog], "downloadComplete, returnCode == NSModalResponseOK");
-
-    [_downloadKBWindow close];
-
-    if (self.configWindow.window != nil) {
-      os_log_debug([KMLogs uiLog], "downloadComplete, self.configWindow.window != nil");
-      [self.configWindow.window makeKeyAndOrderFront:nil];
-      if (![[self.configWindow.window childWindows] containsObject:self.infoWindow.window]) {
-        [self.configWindow.window addChildWindow:self.infoWindow.window ordered:NSWindowAbove];
-      }
-      [self.infoWindow.window centerInParent];
-      [self.infoWindow.window makeKeyAndOrderFront:nil];
-    }
-    else {
-      os_log_debug([KMLogs uiLog], "downloadComplete, self.configWindow.window == nil");
-      [self.infoWindow.window centerInParent];
-      [self.infoWindow.window makeKeyAndOrderFront:nil];
-      [self.infoWindow.window setLevel:NSFloatingWindowLevel];
-    }
-    
-    NSString *packagePath = [self.keyboardsPath stringByAppendingPathComponent:[self.downloadFilename stringByDeletingPathExtension]];
-    [self.infoWindow setPackagePath:packagePath];
-  }
-  
-  _downloadInfoView = nil;
-  _connection = nil;
-  _downloadFilename = nil;
-  _receivedData = nil;
-  _expectedBytes = 0;
-}
-
-- (NSAlert *)downloadInfoView {
-  os_log_debug([KMLogs uiLog], "downloadInfoView");
-  if (_downloadInfoView == nil) {
-    _downloadInfoView = [[NSAlert alloc] init];
-    [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-downloading", nil)];
-    [_downloadInfoView setInformativeText:@""];
-    [_downloadInfoView addButtonWithTitle:NSLocalizedString(@"button-cancel-downloading", nil)];
-    [_downloadInfoView setAlertStyle:NSAlertStyleInformational];
-    [_downloadInfoView setAccessoryView:self.progressIndicator];
-  }
-  
-  return _downloadInfoView;
-}
-
-- (NSProgressIndicator *)progressIndicator {
-  os_log_debug([KMLogs uiLog], "progressIndicator");
-  if (_progressIndicator == nil) {
-    _progressIndicator = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(0, 0, 300, 20)];
-    [_progressIndicator setIndeterminate:NO];
-    [_progressIndicator setMinValue:0];
-    [_progressIndicator setMaxValue:100];
-    [_progressIndicator setDoubleValue:0];
-  }
-  
-  return _progressIndicator;
-}
-
-- (void)downloadKeyboardFromKeyboardId:(NSString *)keyboardId {
-  KeymanVersionInfo keymanVersionInfo = [self versionInfo];
-  NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/go/package/download/%@?platform=macos&tier=%@",
-                                     keymanVersionInfo.keymanCom, keyboardId, keymanVersionInfo.tier]];  //&bcp47=%@&update=0
-  _downloadFilename = [NSString stringWithFormat:@"%@.kmp", keyboardId];
-  [self downloadKeyboardFromURL:url];
-}
-
-
-- (void)downloadKeyboardFromURL:(NSURL *)url {
-  NSURL* downloadUrl = url;
-  os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, url.path: %{public}@", url.path);
-
-  if (downloadUrl && _downloadFilename) {
-    if (_infoWindow.window != nil)
-      [_infoWindow close];
-    
-    [self.downloadInfoView setInformativeText:self.downloadFilename];
-    
-    if (self.configWindow.window != nil) {
-      os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, self.configWindow.window != nil");
-      [self.configWindow.window makeKeyAndOrderFront:nil];
-      if (![[self.configWindow.window childWindows] containsObject:self.downloadKBWindow.window]) {
-        [self.configWindow.window addChildWindow:self.downloadKBWindow.window ordered:NSWindowAbove];
-      }
-      [self.downloadKBWindow.window centerInParent];
-      [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
-      
-      /*
-       Open sheet off of config window, not the download window.
-       This is because, if the download is successful,
-       the download window will be closed by the sheet.
-       */
-      [self.downloadInfoView beginSheetModalForWindow:self.configWindow.window completionHandler:^(NSModalResponse returnCode)  {
-        [self downloadComplete:returnCode];
-      }];
-    }
-    else {
-      os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, self.configWindow.window == nil");
-      [self.downloadKBWindow.window centerInParent];
-      [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
-      [self.downloadKBWindow.window setLevel:NSFloatingWindowLevel];
-      /*
-       Open sheet off of config window, same as above.
-       */
-      [self.downloadInfoView beginSheetModalForWindow:self.configWindow.window completionHandler:^(NSModalResponse returnCode)  {
-        [self downloadComplete:returnCode];
-      }];
-    }
-    
-    if (_connection == nil) {
-      os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, _connection == nil, set button title cancel downloading, tag = -1");
-     [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-downloading", nil)];
-      NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
-      [button setTitle:NSLocalizedString(@"button-cancel-downloading", nil)];
-      [button setTag:-1];
-      [self.progressIndicator setDoubleValue:0];
-      NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
-      _receivedData = [[NSMutableData alloc] initWithLength:0];
-      _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
-    }
-  }
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-  [self.receivedData setLength:0];
-  self.expectedBytes = [response expectedContentLength];
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-  [self.receivedData appendData:data];
-  float progress = ((float)[self.receivedData length]/(float)self.expectedBytes)*100;
-  [self.progressIndicator setDoubleValue:progress];
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-  _connection = nil;
-  _downloadFilename = nil;
-  _receivedData = nil;
-  _expectedBytes = 0;
-}
-
-- (NSURLRequest *)connection:(NSURLConnection *)connection
-             willSendRequest:(nonnull NSURLRequest *)request
-            redirectResponse:(nullable NSURLResponse *)response {
-  return request;
-}
-
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
-  return nil;
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-  os_log_debug([KMLogs uiLog], "connectionDidFinishLoading");
-  NSString *filePath = [self.keyboardsPath stringByAppendingPathComponent:self.downloadFilename];
-  [self.receivedData writeToFile:filePath atomically:YES];
-  [self unzipFile:filePath];
-  [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-  
-  [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-download-complete", nil)];
-  NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
-  os_log_debug([KMLogs uiLog], "connectionDidFinishLoading, set button title download complete, tag = 1");
-  [button setTitle:NSLocalizedString(@"button-download-complete", nil)];
-  [button setTag:1];
-  [[NSNotificationCenter defaultCenter] postNotificationName:kKeymanKeyboardDownloadCompletedNotification
-                                                      object:self
-                                                    userInfo:nil];
-  _connection = nil;
-  _receivedData = nil;
-  _expectedBytes = 0;
 }
 
 - (void)handleKeyEvent:(NSEvent *)event {
@@ -1433,162 +1050,6 @@ extern const CGKeyCode kProcessPendingBuffer;
       postEvent(ev);
     CFRelease(ev);
   }
-}
-
-// Check the package info to ensure that we support this version
-// (e.g. Keyman 15 does not support a 16.0 version package)
-- (BOOL)verifyPackageVersionInTempFolder: (NSString *)tempDestFolder filePath:(NSString *)filePath {
-  KMPackageInfo *packageInfo = [self loadPackageInfo:tempDestFolder];
-  if(packageInfo == nil) {
-    os_log_info([KMLogs eventsLog], "Could not find kmp.json in %{public}@", filePath);
-  } else {
-    NSString* requiredVersion = [packageInfo.fileVersion minimalVersionNumberString];
-    KeymanVersionInfo keymanVersionInfo = [self versionInfo];
-    NSString *currentVersion = [keymanVersionInfo.versionRelease minimalVersionNumberString];
-    
-    if ([requiredVersion compare:currentVersion options:NSNumericSearch] == NSOrderedDescending) {
-      // currentVersion is lower than the requiredVersion
-      os_log_error([KMLogs keyboardLog], "Package %{public}@ requires a newer version of Keyman: %{public}@", filePath, requiredVersion);
-    } else {
-      return YES;
-    }
-  }
-  return NO;
-}
-
-// TODO: This seriously needs to be refactored out of the app delegate and into
-//       a keyboard install module
-- (BOOL)unzipFile:(NSString *)filePath {
-  BOOL didUnzip = NO;
-  NSError *error = nil;
-  NSString *fileName = filePath.lastPathComponent;
-  NSString *folderName = [fileName stringByDeletingPathExtension];
-
-  os_log_debug([KMLogs keyboardLog], "unzipFile, folderName: %{public}@, fileName: %{public}@", folderName, fileName);
-
-  // First we unzip into a temp folder, and check kmp.json for the fileVersion
-  // before we continue installation. We don't want to overwrite existing
-  // package if it is there if the files are not compatible with the installed
-  // version of Keyman.
-  
-  NSString *tempFolderName = [folderName stringByAppendingString:@".tmp.install"];
-  NSString *tempDestFolder = [self.keyboardsPath stringByAppendingPathComponent:tempFolderName];
-  
-  ZipArchive *za = [[ZipArchive alloc] init];
-  if ([za UnzipOpenFile:filePath]) {
-    os_log_debug([KMLogs keyboardLog], "unzipFile, Unzipping %{public}@ to %{public}@", filePath, tempDestFolder);
-    if ([[NSFileManager defaultManager] fileExistsAtPath:tempDestFolder]) {
-      os_log_debug([KMLogs keyboardLog], "unzipFile, The temp destination folder already exists. Overwriting...");
-    }
-    
-    didUnzip = [za UnzipFileTo:tempDestFolder overWrite:YES];
-    [za UnzipCloseFile];
-  }
-  
-  if (!didUnzip) {
-    os_log_error([KMLogs keyboardLog], "unzipFile, Failed to unzip file: %{public}@", filePath);
-    return NO;
-  }
-  
-  os_log_debug([KMLogs keyboardLog], "unzipFile, Unzipped file: %{public}@", filePath);
-  
-  BOOL didInstall = [self verifyPackageVersionInTempFolder:tempDestFolder filePath:filePath];
-  
-  NSString *destFolder = [self.keyboardsPath stringByAppendingPathComponent:folderName];
-
-  // Remove existing package if it exists
-  if (didInstall && [[NSFileManager defaultManager] fileExistsAtPath:destFolder]) {
-    os_log_debug([KMLogs keyboardLog], "unzipFile, The destination folder already exists. Overwriting...");
-    [[NSFileManager defaultManager] removeItemAtPath:destFolder error:&error];
-    if (error != nil) {
-      os_log_error([KMLogs keyboardLog], "unzipFile, Unable to remove destination folder %{public}@", destFolder);
-      didInstall = NO;
-    }
-  }
-  
-  //
-  // We believe this package is valid, let's go ahead and install it
-  //
-  
-  // Rename the temp folder to the desired dest folder. removing existing folder first
-  if(didInstall) {
-    [[NSFileManager defaultManager] moveItemAtPath:tempDestFolder toPath:destFolder error:&error];
-    if (error != nil) {
-      os_log_error([KMLogs keyboardLog], "unzipFile, Unable to move temp folder %{public}@ to dest folder %{public}@", tempDestFolder, destFolder);
-      didInstall = NO;
-    }
-  }
-  
-  if(!didInstall) {
-    [[NSFileManager defaultManager] removeItemAtPath:tempDestFolder error:&error];
-    if (error != nil) {
-      os_log_error([KMLogs keyboardLog], "unzipFile, Unable to remove temp folder %{public}@", tempDestFolder);
-    }
-    
-    return NO;
-  }
-  
-  // Package has installed, now scan for keyboards and fonts
-  // TODO: we need to be reading the kmp.json data to determine keyboards to install
-  NSString * keyboardFolderPath = [self.keyboardsPath stringByAppendingPathComponent:folderName];
-  os_log_debug([KMLogs keyboardLog], "unzipFile, folderName: %{public}@, keyboardFolderPath: %{public}@", folderName, keyboardFolderPath);
-  [self installFontsAtPath:keyboardFolderPath];
-  
-  for (NSString *kmxFile in [self getKmxFilesAtPath:keyboardFolderPath]) {
-    NSString *partialPath = [KMDataRepository.shared buildPartialPathFrom:folderName keyboardFile:[kmxFile lastPathComponent]];
-    [self addEnabledKeyboard:partialPath];
-  }
-  [self saveEnabledKeyboards];
-  
-  return YES;
-}
-
-- (NSString *)fontsPath {
-  if (_fontsPath == nil) {
-    BOOL isDir;
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-    
-    if (paths.count == 1) {
-      NSString *path = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"Fonts"];
-      if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir] && isDir)
-        _fontsPath = [NSString stringWithString:path];
-    }
-  }
-  
-  return _fontsPath;
-}
-
-- (void)installFontsAtPath:(NSString *)path {
-  NSString *fontsPath = self.fontsPath;
-  if (fontsPath == nil)
-    return;
-  
-  NSArray *fonts = [self FontFilesAtPath:path];
-  for (NSString *srcPath in fonts) {
-    NSString *destPath = [fontsPath stringByAppendingPathComponent:[srcPath lastPathComponent]];
-    NSError *error;
-    if ([[NSFileManager defaultManager] fileExistsAtPath:destPath])
-      [[NSFileManager defaultManager] removeItemAtPath:destPath error:&error];
-    
-    if (error == nil)
-      [[NSFileManager defaultManager] copyItemAtPath:srcPath toPath:destPath error:&error];
-    
-    if (error != nil)
-      os_log_error([KMLogs keyboardLog], "installFontsAtPath error = %{public}@", error);
-  }
-}
-
-- (NSArray *)FontFilesAtPath:(NSString *)path {
-  NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:path];
-  NSMutableArray *fontFiles = [[NSMutableArray alloc] initWithCapacity:0];
-  NSString *filePath;
-  while (filePath = (NSString *)[dirEnum nextObject]) {
-    NSString *extension = [[filePath pathExtension] lowercaseString];
-    if ([extension isEqualToString:@"ttf"] || [extension isEqualToString:@"otf"])
-      [fontFiles addObject:[path stringByAppendingPathComponent:filePath]];
-  }
-  
-  return fontFiles;
 }
 
 @end
