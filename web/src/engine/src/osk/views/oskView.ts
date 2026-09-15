@@ -1280,12 +1280,11 @@ export abstract class OSKView
    * @return      {boolean}
    *
    */
-  doShow(p: {
+  protected doShow(p: {
     x: number,
     y: number,
     userLocated: boolean
   }) {
-    // Newer style 'doShow' emitted from .present by default.
     this.legacyEvents.callEvent('show', p);
   }
 
@@ -1296,7 +1295,7 @@ export abstract class OSKView
    * @return      {void}
    *
    */
-  doHide(hiddenByUser: boolean) {
+  protected doHide(hiddenByUser: boolean) {
     const p={
       HiddenByUser: hiddenByUser
     };
