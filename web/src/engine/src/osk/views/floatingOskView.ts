@@ -508,7 +508,7 @@ export class FloatingOSKView extends OSKView {
 
     Ls.position='absolute';
     // Keep it hidden if not currently displayed.
-    if(this.activationModel.activate) {
+    if(this.activationModel.canActivate) {
       Ls.display='block'; //Ls.visibility='visible';
     }
     Ls.left='0px';
