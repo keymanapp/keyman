@@ -101,15 +101,25 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
       // Stage 2:  process subset further OR build remaining edges
 
       if(currentNode.hasPartialInput) {
-        // Re-use the current queue; the number of total inputs considered still holds.
-        this.transposeQueue.enqueueAll(currentNode.processSubsetEdge());
+        // Re-use the current queue; the number of total inputs considered still
+        // holds.
+        const nextProcessingStepNodes = currentNode
+          .processSubsetEdge()
+          .filter(e => e.editCount == currentNode.editCount);
+        this.transposeQueue.enqueueAll(nextProcessingStepNodes);
         return unmatchedResult;
       }
 
-      // If here, we've properly done the first half of a transpose.  Now for the other half...
-
-      // const transposeSecondHalfNodes = currentNode.buildSubstitutionEdges((this.parents[0] as LegacyQuotientSpur).inputs, this.spaceId);
-      const transposeSecondHalfNodes = this.buildEdgesFromResults([new TokenResultMapping(this, currentNode)], (this.parents[0] as LegacyQuotientSpur).inputs);
+      // If here, we've properly done the first half of a transpose.  Now for
+      // the other half...
+      const transposeSecondHalfNodes = this.buildEdgesFromResults(
+        [new TokenResultMapping(this, currentNode)],
+        (this.parents[0] as LegacyQuotientSpur).inputs
+      ).filter(
+        // Ignore all paths that charge a new insert/delete edit while modeling
+        // a transposition edit.
+        e => e.editCount == currentNode.editCount
+      );
       this.queueNodes(transposeSecondHalfNodes);
       return unmatchedResult;
     }
@@ -144,10 +154,19 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
 
 export function processTransposeRoots(priorResults: TokenResultMapping[], inputs: Distribution<Transform>, spaceId: number) {
   // Build only substitution edges from these.
-  const transpositionFirstHalves = priorResults
-    .flatMap((entry) => entry.buildSubstitutionEdges(inputs, spaceId))
-    .flatMap(e => e.processSubsetEdge());
-  transpositionFirstHalves.forEach((n) => n.addEdit());
+  const transpositionFirstHalves = priorResults.flatMap((entry) => {
+    const entryFirstHalves = entry.buildSubstitutionEdges(inputs, spaceId)
+      // Perform the first step of processing the edge...
+      .flatMap(e => e.processSubsetEdge())
+      // and eliminate any that cost a non-transpose edit.  We don't blend
+      // transpose edits with insert or delete edits.
+      .filter(e => e.editCount == entry.editCount);
+
+    // Now, add the unit of edit cost charged for modeling a transposition.
+    entryFirstHalves.forEach(e => e.addEdit());
+    return entryFirstHalves;
+  });
+
   return transpositionFirstHalves;
 }
 
