@@ -83,9 +83,9 @@ export class PageIntegrationHandlers {
    * Reset context when entering or exiting the active element.
    * Will also trigger OSK shift state / layer reset.
    **/
-  private pageFocusHandler: (e: FocusEvent) => boolean = () => {
+  private pageFocusHandler: (e: FocusEvent) => Promise<boolean> = async () => {
     if(!this.focusAssistant.maintainingFocus && this.engine.osk?.vkbd) {
-      this.engine.contextManager.deactivateCurrentTextStore();
+      await this.engine.contextManager.deactivateCurrentTextStore();
       this.engine.contextManager.resetContext();
     }
     return false;
@@ -135,10 +135,10 @@ export class PageIntegrationHandlers {
     return false;
   };
 
-  private touchMoveActivationHandler: (e: TouchEvent) => boolean = (e) => {
+  private touchMoveActivationHandler: (e: TouchEvent) => Promise<boolean> = async (e) => {
     if(this.deactivateOnScroll) {  // Android / Chrone case.
       this.focusAssistant.focusing = false;
-      this.engine.contextManager.deactivateCurrentTextStore();
+      await this.engine.contextManager.deactivateCurrentTextStore();
     }
 
     const y = e.touches[0].screenY;
@@ -149,11 +149,11 @@ export class PageIntegrationHandlers {
     return false;
   };
 
-  private touchEndActivationHandler: (e: TouchEvent) => boolean = (e) => {
+  private touchEndActivationHandler: (e: TouchEvent) => Promise<boolean> = async (e) => {
     // Should not hide OSK if simply closing the language menu (30/4/15)
     // or if the focusing timer (focusAssistant.setFocusTimer) is still active.
     if(this.deactivateOnRelease && !this.engine.touchLanguageMenu && !this.focusAssistant.focusing) {
-      this.engine.contextManager.deactivateCurrentTextStore();
+      await this.engine.contextManager.deactivateCurrentTextStore();
     }
     this.deactivateOnRelease=false;
     return false;

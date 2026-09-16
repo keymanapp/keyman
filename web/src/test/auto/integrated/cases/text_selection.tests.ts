@@ -23,13 +23,13 @@ describe('Text Selection', function() {
 
   /* Utility functions */
 
-  function setupElement(ele: HTMLElement): HTMLElement {
+  const setupElement = async (ele: HTMLElement): Promise<HTMLElement> => {
     const keyman: KeymanEngine = window[keyman_window];
-    keyman.setActiveElement(ele);
+    await keyman.setActiveElement(ele);
     return ele;
   }
 
-  function assertInputSteps(ele: HTMLElement, count: number, setup: any) {
+  const assertInputSteps = (ele: HTMLElement, count: number, setup: any) => {
     return new Promise<void>((resolve, reject) => {
       let i = 0;
       const listener = function() {
@@ -44,8 +44,9 @@ describe('Text Selection', function() {
     });
   }
 
-  function instantiateBrowserDriver(ele: HTMLElement) {
-    return new KMWRecorder.BrowserDriver(setupElement(ele));
+  const instantiateBrowserDriver = async (ele: HTMLElement) => {
+    const setupEle = await setupElement(ele);
+    return new KMWRecorder.BrowserDriver(setupEle);
   }
 
   /* Define key event specs */
@@ -111,7 +112,7 @@ describe('Text Selection', function() {
        */
       it('Should do a basic transform without selection involved', async () => {
         const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-        const eventDriver = instantiateBrowserDriver(ele);
+        const eventDriver = await instantiateBrowserDriver(ele);
 
         await assertInputSteps(ele, 5, () => {
           eventDriver.simulateEvent(keys.E);
@@ -127,7 +128,7 @@ describe('Text Selection', function() {
 
       it('Should do a basic transform without selection involved - SMP', async () => {
         const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-        const eventDriver = instantiateBrowserDriver(ele);
+        const eventDriver = await instantiateBrowserDriver(ele);
 
         await assertInputSteps(ele, 5, () => {
           eventDriver.simulateEvent(keys.J);
@@ -152,7 +153,7 @@ describe('Text Selection', function() {
          */
         it('Should do a basic selection replacement, in '+direction+' direction', async () => {
           const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-          const eventDriver = instantiateBrowserDriver(ele);
+          const eventDriver = await instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
 
@@ -182,7 +183,7 @@ describe('Text Selection', function() {
 
         it('Should do a basic selection replacement, with a matching rule, in '+direction+' direction', async () => {
           const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-          const eventDriver = instantiateBrowserDriver(ele);
+          const eventDriver = await instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
 
@@ -212,7 +213,7 @@ describe('Text Selection', function() {
 
         it('Should do a basic selection replacement, in '+direction+' direction - SMP', async () => {
           const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-          const eventDriver = instantiateBrowserDriver(ele);
+          const eventDriver = await instantiateBrowserDriver(ele);
 
           // Step 1: 'fghj'
 
@@ -248,7 +249,7 @@ describe('Text Selection', function() {
          */
         it('Should ignore context when a selection, in '+direction+' direction, is made', async () => {
           const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-          const eventDriver = instantiateBrowserDriver(ele);
+          const eventDriver = await instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
 
@@ -278,7 +279,7 @@ describe('Text Selection', function() {
 
         it('Should ignore context when a selection, in '+direction+' direction, is made - SMP', async () => {
           const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-          const eventDriver = instantiateBrowserDriver(ele);
+          const eventDriver = await instantiateBrowserDriver(ele);
 
           // Step 1: 'fghj'
 
@@ -314,7 +315,7 @@ describe('Text Selection', function() {
          */
         it('Should correctly delete selection, in '+direction+' direction, with backspace and not lose sync', async () => {
           const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-          const eventDriver = instantiateBrowserDriver(ele);
+          const eventDriver = await instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
 
@@ -354,7 +355,7 @@ describe('Text Selection', function() {
 
         it('Should correctly delete selection, in '+direction+' direction, with backspace and not lose sync - SMP', async () => {
           const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-          const eventDriver = instantiateBrowserDriver(ele);
+          const eventDriver = await instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
 
@@ -400,7 +401,7 @@ describe('Text Selection', function() {
          */
         it('Should correctly replace selection, in '+direction+' direction, and not lose sync', async () => {
           const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-          const eventDriver = instantiateBrowserDriver(ele);
+          const eventDriver = await instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
 
@@ -448,7 +449,7 @@ describe('Text Selection', function() {
 
         it('Should correctly replace selection, in '+direction+' direction, and not lose sync - SMP', async () => {
           const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-          const eventDriver = instantiateBrowserDriver(ele);
+          const eventDriver = await instantiateBrowserDriver(ele);
 
           // Step 1: 'abcx'
 
@@ -502,7 +503,7 @@ describe('Text Selection', function() {
          */
         it('Should not treat the selection, in '+direction+' direction, as context', async () => {
           const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-          const eventDriver = instantiateBrowserDriver(ele);
+          const eventDriver = await instantiateBrowserDriver(ele);
 
           // Step 1: 'xabcx'
 
@@ -533,7 +534,7 @@ describe('Text Selection', function() {
 
         it('Should not treat the selection, in '+direction+' direction, as context - SMP', async () => {
           const ele = document.getElementById("singleton") as HTMLInputElement | HTMLTextAreaElement;
-          const eventDriver = instantiateBrowserDriver(ele);
+          const eventDriver = await instantiateBrowserDriver(ele);
 
           // Step 1: [k][f][g][h][k]
 
