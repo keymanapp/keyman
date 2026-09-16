@@ -16,6 +16,7 @@ namespace kmcmp {
   extern int CompileTarget;
   extern int BeginLine[4];
   extern int currentLine;
+  extern int TargetVersion;
   extern NamedCodeConstants *CodeConstants;
   extern kmcmp_LoadFileProc loadfileproc;
 
