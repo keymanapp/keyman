@@ -47,23 +47,24 @@ implementation
 
 uses
   kmint,
-  utilkmshell;
+  utilkmshell,
+  utilstr;
 
 function BaseKeyboardNeedsMCompile(BaseKeyboardID: Integer): Boolean;
 var
   I: Integer;
   Keyboard: IKeymanKeyboardInstalled;
-  BaseFileName: string;
+  KeyboardFileName: string;
   BaseKeyboardIDHex: string;
 begin
   BaseKeyboardIDHex := IntToHex(BaseKeyboardID, 8);
   for I := 0 to kmcom.Keyboards.Count - 1 do
   begin
     Keyboard := kmcom.Keyboards.Items[I];
-    BaseFileName := Keyboard.Filename;
-    if FileExists(BaseFileName) and
-      (not FileExists(ChangeFileExt(BaseFileName, '') + '-' + BaseKeyboardIDHex + '.kmx') or
-       not FileExists(ChangeFileExt(BaseFileName, '') + '-' + BaseKeyboardIDHex + '-d.kmx')) then
+    KeyboardFileName := Keyboard.Filename;
+    if FileExists(KeyboardFileName) and
+      (not FileExists(InsertBKLIDFilename(KeyboardFileName, BaseKeyboardIDHex)) or
+       not FileExists(InsertBKLIDDeadkeyFilename(KeyboardFileName, BaseKeyboardIDHex))) then
       Exit(True);
   end;
   Result := False;

@@ -1,18 +1,18 @@
 (*
   Name:             UpgradeMnemonicLayout
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      31 Dec 2014
 
   Modified Date:    2 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          31 Dec 2014 - mcdurdin - I4553 - V9.0 - Upgrade to 476 or later requires recompile of all mnemonic layouts
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
                     08 Apr 2015 - mcdurdin - I4651 - V9.0 - Mnemonic layout recompiler maps AltGr+VK_BKSLASH rather than VK_OEM_102
@@ -46,7 +46,8 @@ uses
   kmint,
   RegistryKeys,
   utilexecute,
-  utilkmshell;
+  utilkmshell,
+  utilstr;
 
 const
   { CurrentMnemonicLayoutVersion = 476;  // First 9.0 build with fixes for mnemonic layouts }
@@ -171,7 +172,7 @@ begin
   FBaseKeyboardIDHex := IntToHex(BaseKeyboardID, 8);
   FBaseFileName := Keyboard.Filename;
   FDestFileName := OutputFileName;
-  FDestDeadkeyFileName := ChangeFileExt(FDestFileName, '') + '-d.kmx';   // I4552
+  FDestDeadkeyFileName := InsertBKLIDDeadkeyFilename(FBaseFileName, FBaseKeyboardIDHex);   // I4552
   FMCompilePath := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_MCompileExe);
   FDestPath := ExtractFileDir(Keyboard.Filename);
 

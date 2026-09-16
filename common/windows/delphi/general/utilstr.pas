@@ -1,18 +1,18 @@
 (*
   Name:             utilstr
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    8 Jun 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Refactor util functions into multiple units
                     23 Aug 2006 - mcdurdin - Add StringToExtString and WideQuotedStr functions
                     14 Sep 2006 - mcdurdin - Add RectToString, StringToRect, use widestrings for some functions
@@ -58,7 +58,25 @@ function GetTokenFromCaret(line: string; var selx, sellen: Integer): string;
 
 function WideQuotedStr(const str: WideString): WideString; deprecated;  // I3310
 
+(**
+  * Creates the compiled keyboard filename by inserting the base keyboard ID
+  * before the .kmx extension.
+  *
+  * @param  BaseFileName       Base keyboard filename, in the form keyboardname.kmx.
+  * @param  BaseKeyboardIDHex  Base keyboard ID in hexadecimal form.
+  * @return Compiled keyboard filename, in the form keyboardname-<KLID>.kmx.
+  *)
+function InsertBKLIDFilename(const BaseFileName: string; BaseKeyboardIDHex: string): string;
 
+(**
+  * Creates the dead-key compiled keyboard filename by inserting the base
+  * keyboard ID and -d suffix before the .kmx extension.
+  *
+  * @param  BaseFileName       Base keyboard filename, in the form keyboardname.kmx.
+  * @param  BaseKeyboardIDHex  Base keyboard ID in hexadecimal form.
+  * @return Dead-key compiled keyboard filename, in the form keyboardname-<KLID>-d.kmx.
+  *)
+function InsertBKLIDDeadkeyFilename(const BaseFileName: string; BaseKeyboardIDHex: string): string;
 
 implementation
 
@@ -78,7 +96,7 @@ begin
     Result := '';
     Exit;
   end;
-  
+
   if s[1] = '"' then
   begin
     Delete(s,1,1);
@@ -416,6 +434,16 @@ begin
   Delete(s,1,n);
 
   Result.Bottom := StrToIntDef(s, 0);
+end;
+
+function InsertBKLIDFilename(const BaseFileName: string; BaseKeyboardIDHex: string): string;
+begin
+    Result := ChangeFileExt(BaseFileName, '') + '-' + BaseKeyboardIDHex + '.kmx';
+end;
+
+function InsertBKLIDDeadkeyFilename(const BaseFileName: string; BaseKeyboardIDHex: string): string;
+begin
+  Result := ChangeFileExt(BaseFileName, '') + '-' + BaseKeyboardIDHex + '-d.kmx'
 end;
 
 end.

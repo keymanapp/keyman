@@ -47,6 +47,7 @@ uses
   RegistryKeys,
   utilexecute,
   utilkeyman,
+  utilstr,
   utilsystem;
 
 function GetKeyboardLayoutFileName(id: Integer): string;
@@ -83,8 +84,8 @@ begin
 
   FBaseKeyboardIDHex := IntToHex(BaseKeyboardID, 8);
   FBaseFileName := FDestPath + '\' + ExtractFileName(FileName);   // I3581
-  FDestFileName := ChangeFileExt(FBaseFileName, '') + '-'+FBaseKeyboardIDHex + '.kmx';
-  FDestDeadkeyFileName := ChangeFileExt(FBaseFileName, '') + '-'+FBaseKeyboardIDHex + '-d.kmx';   // I4552
+  FDestFileName := InsertBKLIDFilename(FBaseFileName, FBaseKeyboardIDHex);
+  FDestDeadkeyFileName := InsertBKLIDDeadkeyFilename(FBaseFileName, FBaseKeyboardIDHex); // I4552
   FMCompilePath := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_MCompileExe);
 
   { Recompile with the traditional deadkey behaviour }
