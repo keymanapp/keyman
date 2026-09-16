@@ -510,8 +510,17 @@ export const builder: Builder = {
 
   selectLayer: function (val) {
     let selection = builder.saveSelection();
-    if(val) $('#selLayer').val(val);
+    if(val !== null && val !== undefined) {
+      $('#selLayer').val(val);
+    }
+
     builder.lastLayerIndex = $('#selLayer').val();
+    if(builder.lastLayerIndex === null) {
+      // If the layer has just been deleted, go to the first layer
+      builder.lastLayerIndex = 0;
+      builder.lastLayers[builder.lastPlatform] = 0;
+      $('#selLayer').val(builder.lastLayerIndex);
+    }
     builder.prepareLayer();
     builder.restoreSelection(selection);
   },
@@ -1173,4 +1182,5 @@ export function initBuilder() {
     builder.enableUndoControls();
     builder.loadState();
   });
+  return builder;
 }

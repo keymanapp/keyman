@@ -34,7 +34,7 @@
   <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/cleanup.js</xsl:attribute></script>
   <script type="module">
     import { initBuilder } from "./toucheditor/lib/src/builder.js";
-    initBuilder();
+    window.builder = initBuilder();
   </script>
 </head>
 <body class='text-controls-in-toolbar'>
