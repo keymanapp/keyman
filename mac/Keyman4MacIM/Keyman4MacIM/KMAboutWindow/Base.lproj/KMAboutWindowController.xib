@@ -28,31 +28,25 @@
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="FYn-ZH-f76" userLabel="Photo Image View">
                         <rect key="frame" x="0.0" y="95" width="450" height="150"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="450" id="hah-EB-4r4"/>
-                            <constraint firstAttribute="height" constant="150" id="oF1-V1-6Sf"/>
+                            <constraint firstAttribute="height" constant="150" id="CFJ-LY-fKM"/>
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="image" id="LQf-V6-Tof"/>
                     </imageView>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="wFc-QI-nGq" customClass="KMBarView">
                         <rect key="frame" x="0.0" y="245" width="450" height="7"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="7" id="NHA-id-0ze"/>
-                            <constraint firstAttribute="width" constant="450" id="vat-1d-q8p"/>
-                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="7" id="vyH-ga-e1G"/>
-                        </constraints>
                     </customView>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="sgd-KC-LbG" userLabel="SIL Image View">
                         <rect key="frame" x="366" y="259" width="74" height="44"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="74" id="hjC-xL-hLw"/>
-                            <constraint firstAttribute="height" constant="44" id="uhI-gi-EpR"/>
+                            <constraint firstAttribute="height" constant="44" id="ADe-Ye-Ido"/>
+                            <constraint firstAttribute="width" constant="74" id="TJi-qO-IJA"/>
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="SILAndikaV1RGB" id="0zb-i2-bhN"/>
                     </imageView>
                     <imageView autoresizesSubviews="NO" horizontalHuggingPriority="251" verticalHuggingPriority="251" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="UOr-Co-IuK" userLabel="Keyman Image View">
                         <rect key="frame" x="15" y="252" width="400" height="58"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="58" id="AMG-Zr-ebx"/>
+                            <constraint firstAttribute="width" constant="400" id="AoY-ao-qdx"/>
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="left" imageScaling="proportionallyUpOrDown" image="keyman-88" id="4mp-20-rlf"/>
                     </imageView>
@@ -104,20 +98,20 @@
                             <stackView autoresizesSubviews="NO" orientation="vertical" alignment="trailing" spacing="12" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="500" verticalClippingResistancePriority="500" horizontalHuggingPriority="750" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a6P-E8-rqT" userLabel="Button Stack View">
                                 <rect key="frame" x="306" y="0.0" width="120" height="50"/>
                                 <endViews>
-                                    <button horizontalHuggingPriority="249" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XIT-T3-xre">
+                                    <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XIT-T3-xre">
                                         <rect key="frame" x="0.0" y="0.0" width="120" height="24"/>
                                         <buttonCell key="cell" type="push" title="Close" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Kab-Up-fYH">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
-                                        <constraints>
-                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="18" id="CPF-NR-u5o"/>
-                                        </constraints>
                                         <connections>
                                             <action selector="closeAction:" target="-2" id="frJ-pm-Iyg"/>
                                         </connections>
                                     </button>
                                 </endViews>
+                                <constraints>
+                                    <constraint firstItem="XIT-T3-xre" firstAttribute="top" secondItem="a6P-E8-rqT" secondAttribute="top" constant="26" id="bIe-ot-aZh"/>
+                                </constraints>
                                 <visibilityPriorities>
                                     <integer value="1000"/>
                                 </visibilityPriorities>
@@ -126,6 +120,9 @@
                                 </customSpacing>
                             </stackView>
                         </subviews>
+                        <constraints>
+                            <constraint firstItem="a6P-E8-rqT" firstAttribute="leading" secondItem="adk-EC-UDE" secondAttribute="leading" constant="306" id="NYK-06-pVk"/>
+                        </constraints>
                         <visibilityPriorities>
                             <integer value="1000"/>
                             <integer value="1000"/>
@@ -137,20 +134,22 @@
                     </stackView>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="wFc-QI-nGq" secondAttribute="trailing" id="3IX-BW-75e"/>
-                    <constraint firstItem="FYn-ZH-f76" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="4Pt-4T-0oy"/>
-                    <constraint firstItem="wFc-QI-nGq" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="5wh-lg-tMG"/>
-                    <constraint firstItem="adk-EC-UDE" firstAttribute="trailing" secondItem="se5-gp-TjO" secondAttribute="trailing" constant="-12" id="6Rg-pr-AED"/>
-                    <constraint firstItem="sgd-KC-LbG" firstAttribute="centerY" secondItem="UOr-Co-IuK" secondAttribute="centerY" id="6m8-lC-irl"/>
-                    <constraint firstItem="adk-EC-UDE" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="12" id="7wd-0M-bxz"/>
-                    <constraint firstAttribute="trailing" secondItem="FYn-ZH-f76" secondAttribute="trailing" id="A7I-Rh-hkf"/>
-                    <constraint firstAttribute="bottom" secondItem="FYn-ZH-f76" secondAttribute="bottom" priority="750" constant="95" id="L7A-L6-Rcz"/>
-                    <constraint firstItem="UOr-Co-IuK" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="8" id="Ovf-6T-VEs"/>
-                    <constraint firstItem="adk-EC-UDE" firstAttribute="top" secondItem="FYn-ZH-f76" secondAttribute="bottom" constant="12" id="Rr4-xC-Lrr"/>
-                    <constraint firstItem="UOr-Co-IuK" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="15" id="Wq2-xT-mCh"/>
-                    <constraint firstItem="wFc-QI-nGq" firstAttribute="top" secondItem="UOr-Co-IuK" secondAttribute="bottom" id="ZZw-D6-rjh"/>
-                    <constraint firstItem="FYn-ZH-f76" firstAttribute="top" secondItem="wFc-QI-nGq" secondAttribute="bottom" id="kuI-RR-4wa"/>
-                    <constraint firstAttribute="trailing" secondItem="sgd-KC-LbG" secondAttribute="trailing" constant="10" id="xGg-Cj-G34"/>
+                    <constraint firstItem="UOr-Co-IuK" firstAttribute="top" secondItem="se5-gp-TjO" secondAttribute="top" constant="8" id="2cd-bu-w6z"/>
+                    <constraint firstItem="FYn-ZH-f76" firstAttribute="top" secondItem="wFc-QI-nGq" secondAttribute="bottom" id="2wN-mt-Qbd"/>
+                    <constraint firstItem="FYn-ZH-f76" firstAttribute="centerX" secondItem="adk-EC-UDE" secondAttribute="centerX" id="8qF-UT-hwh"/>
+                    <constraint firstAttribute="trailing" secondItem="UOr-Co-IuK" secondAttribute="trailing" constant="35" id="BaD-4V-ga8"/>
+                    <constraint firstItem="wFc-QI-nGq" firstAttribute="top" secondItem="UOr-Co-IuK" secondAttribute="bottom" id="F7y-5P-0tW"/>
+                    <constraint firstItem="adk-EC-UDE" firstAttribute="top" secondItem="FYn-ZH-f76" secondAttribute="bottom" constant="12" id="LvW-Cv-vTZ"/>
+                    <constraint firstItem="UOr-Co-IuK" firstAttribute="centerY" secondItem="sgd-KC-LbG" secondAttribute="centerY" id="PDY-X6-qlv"/>
+                    <constraint firstItem="UOr-Co-IuK" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="15" id="RQx-jn-py8"/>
+                    <constraint firstItem="adk-EC-UDE" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="12" id="Tis-mf-N2h"/>
+                    <constraint firstAttribute="trailing" secondItem="wFc-QI-nGq" secondAttribute="trailing" id="YPm-pH-poH"/>
+                    <constraint firstItem="wFc-QI-nGq" firstAttribute="leading" secondItem="FYn-ZH-f76" secondAttribute="leading" id="fYN-8p-Miu"/>
+                    <constraint firstItem="wFc-QI-nGq" firstAttribute="trailing" secondItem="FYn-ZH-f76" secondAttribute="trailing" id="gsp-Ze-zpk"/>
+                    <constraint firstAttribute="trailing" secondItem="sgd-KC-LbG" secondAttribute="trailing" constant="10" id="kNz-z2-ZBh"/>
+                    <constraint firstItem="wFc-QI-nGq" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" id="pOe-aA-Kv2"/>
+                    <constraint firstItem="wFc-QI-nGq" firstAttribute="top" secondItem="sgd-KC-LbG" secondAttribute="bottom" constant="7" id="qbm-Tp-QKA"/>
+                    <constraint firstAttribute="bottom" secondItem="adk-EC-UDE" secondAttribute="bottom" constant="17" id="z7K-y6-p1a"/>
                 </constraints>
             </view>
             <connections>

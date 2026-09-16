@@ -243,7 +243,6 @@ public class InputMethodUtil {
       // Keyman is running: check accessibility by sending distributed notification
       Logger.setup.debug("invokeKeymanInputMethodCheckAccess(), calling sendAccessibilityCheckRequest()")
       self.sendAccessibilityCheckRequest()
-      
     } else {
       // Keyman is not running, launch and check accessibility with specific command line argument
       Logger.setup.debug("invokeKeymanInputMethodCheckAccess(), calling launchKeymanInputMethodAsSeparateProcess()")

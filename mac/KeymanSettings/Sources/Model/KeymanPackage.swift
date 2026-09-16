@@ -132,7 +132,7 @@ public class KeymanPackage: Identifiable, Hashable, Equatable {
     helpFilename: String? = nil,
     graphicFilename: String? = nil
   ) throws {
-    // Replicate package validations
+TODO    // Replicate package validations
     if keyboards.isEmpty { throw LoadPackageError.containsNoKeyboards }
     
     self.id = UUID()
