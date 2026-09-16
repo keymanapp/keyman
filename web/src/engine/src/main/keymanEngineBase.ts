@@ -4,7 +4,7 @@
 import { type KeyEvent, JSKeyboard, Keyboard, KeyboardProperties, KeyboardKeymanGlobal, ProcessorAction } from "keyman/engine/keyboard";
 import { ProcessorInitOptions } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader } from "keyman/engine/keyboard";
-import { WorkerFactory } from "@keymanapp/lexical-model-layer/web"
+import { type WorkerFactory } from "@keymanapp/lexical-model-layer/web"
 import { InputProcessor } from './headless/inputProcessor.js';
 import { OSKView } from "keyman/engine/osk";
 import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId, DOMCloudRequester } from "keyman/engine/keyboard-storage";
@@ -107,10 +107,7 @@ export class KeymanEngineBase<
   };
 
   /**
-   * @param worker  A configured WebWorker to serve as the predictive-text engine's main thread.
-   *                Available in the following variants:
-   *                - sourcemapped, unminified (debug)
-   *                - non-sourcemapped + minified (release)
+   * @param worker  A factory that provides a Worker that serves as the predictive-text engine's main thread.
    * @param config
    * @param contextManager
    * @param processorConfigInitializer A one-time use closure used to initialize certain critical components reliant
@@ -129,7 +126,7 @@ export class KeymanEngineBase<
     const processorConfiguration = processorConfigInitializer(this);
     processorConfiguration.baseLayout = determineBaseLayout();
     this.interface = processorConfiguration.keyboardInterface as KeyboardInterfaceBase<ContextManagerT>;
-    this.core = new InputProcessor(config.hostDevice, workerFactory, processorConfiguration);
+    this.core = new InputProcessor(config.hostDevice, config.sourcePath, workerFactory, processorConfiguration);
 
     this.core.languageProcessor.on('statechange', (state) => {
       // The banner controller cannot directly trigger a layout-refresh at this time,

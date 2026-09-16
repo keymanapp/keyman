@@ -1,12 +1,12 @@
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
 describe('LMLayerWorker', function () {
-  // This one makes multiple subsequent calls across the WebWorker boundary, so we should be generous here.
+  // This one makes multiple subsequent calls across the PredictiveTextWorker boundary, so we should be generous here.
   this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   describe('Usage within a Web Worker', function () {
     it('should install itself in the worker context', function (done) {
-      let worker = new Worker(document.location.protocol + '//' + document.location.host + "/worker-main.js");
+      let worker = new Worker('/engine/predictive-text/worker-thread/build/lib/worker-thread.js');
       worker.onmessage = function thisShouldBeCalled(message) {
         done();
         worker.terminate();

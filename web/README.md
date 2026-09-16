@@ -98,7 +98,7 @@ graph TD;
     Gestures["/web/src/engine/gesture-processor"];
     Gestures-->WebUtils;
 
-    subgraph PredText["PredText: WebWorker + its interface"]
+    subgraph PredText["PredText: WebPredictiveTextWorker + its interface"]
         LMLayer;
         LMWorker;
         Models;

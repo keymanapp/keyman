@@ -4,8 +4,13 @@
 
 // Defines types related to Node workers.
 import * as worker from 'node:worker_threads';
+import * as path from 'node:path';
 import { Buffer } from 'node:buffer';
-import { URL } from 'node:url';
+import { fileURLToPath, URL } from 'node:url';
+
+const __filename__ = fileURLToPath(import.meta.url);
+const __dirname__ = path.dirname(__filename__);
+const workerThreadFilename = __dirname__ + "/../../../../worker-thread/build/lib/worker-thread.js";
 
 /**
  * Defines mappings from Node Worker signatures to WebWorker signatures
@@ -46,26 +51,22 @@ self.postMessage = postMessage;
 self.importScripts = importScripts;
 self.self = self; // make it global!
 // Start off by importing the main worker itself
-// importScripts('${import.meta.dirname}/../../../worker-thread/build/lib/worker-main.js');
-console.dir(import.meta);
-importScripts('${import.meta.dirname}/worker-main.js');
+importScripts(${JSON.stringify(workerThreadFilename)});
 `;
-
-
 
 /**
  * Uses the Node version of Workers to provide proper, authentic separate-thread
  * 'sandboxing'.  Also intercepts and interprets certain WebWorker method signatures
  * necessary to run the WebWorker-oriented worker code.
  */
-export class MappedWorker extends worker.Worker implements Worker {
+export class NodePredictiveTextWorker extends worker.Worker implements Worker {
   constructor() {
     const buffer = Buffer.from(nodeWorkerToWebWorkerMappingSource);
     const dataSrc = "data:text/javascript;base64," + buffer.toString('base64');
     //@ts-ignore
     super(new URL(dataSrc));
 
-    // WebWorkers have a defined `onmessage` function, rather than this.on('message', ...)
+    // Workers have a defined `onmessage` function, rather than this.on('message', ...)
     this.on('message', (ev) => {
       if(this.onmessage) {
         this.onmessage({data: ev[0]});

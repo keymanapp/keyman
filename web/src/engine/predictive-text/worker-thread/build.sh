@@ -34,7 +34,7 @@ builder_describe \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         "/web/src/engine/predictive-text/worker-thread/${LIB}/worker-main.min.js"
+  build         "/web/src/engine/predictive-text/worker-thread/${LIB}/worker-thread.min.js"
 
 builder_parse "$@"
 
@@ -48,7 +48,7 @@ function do_configure() {
 
 function do_build() {
   # Declaration bundling.
-  tsc --emitDeclarationOnly --outFile $INTERMEDIATE/worker-main.d.ts
+  tsc --emitDeclarationOnly --outFile $INTERMEDIATE/worker-thread.d.ts
 
   # Some automated tests currently rely upon the individual output files.
   tsc
@@ -57,19 +57,19 @@ function do_build() {
 
 
   # The ES6 target needs no polyfills - we go straight to the wrapped version.
-  node_es_bundle src/main/worker-main.ts \
-    --out $INTERMEDIATE/worker-main.js \
+  node_es_bundle src/main/worker-thread.ts \
+    --out $INTERMEDIATE/worker-thread.js \
     --charset "utf8" \
     --target "es6" \
     --sourceRoot '@keymanapp/keyman/web/src/engine/predictive-text/worker-thread/src/main'
 
   node "$SRCMAP_CLEANER" \
-    $INTERMEDIATE/worker-main.js.map \
-    $INTERMEDIATE/worker-main.js.map \
+    $INTERMEDIATE/worker-thread.js.map \
+    $INTERMEDIATE/worker-thread.js.map \
     --clean
 
-  node_es_bundle src/main/worker-main.ts \
-    --out $INTERMEDIATE/worker-main.min.js \
+  node_es_bundle src/main/worker-thread.ts \
+    --out $INTERMEDIATE/worker-thread.min.js \
     --minify \
     --charset "utf8" \
     --profile build/filesize-profile.log \
@@ -77,16 +77,16 @@ function do_build() {
     --sourceRoot '@keymanapp/keyman/web/src/engine/predictive-text/worker-thread/src/main'
 
   node "$SRCMAP_CLEANER" \
-    $INTERMEDIATE/worker-main.min.js.map \
-    $INTERMEDIATE/worker-main.min.js.map \
+    $INTERMEDIATE/worker-thread.min.js.map \
+    $INTERMEDIATE/worker-thread.min.js.map \
     --clean
 
-  cp $INTERMEDIATE/worker-main.js $LIB/worker-main.js
-  cp $INTERMEDIATE/worker-main.js.map $LIB/worker-main.js.map
-  cp $INTERMEDIATE/worker-main.d.ts $LIB/worker-main.d.ts
-  cp $INTERMEDIATE/worker-main.min.js $LIB/worker-main.min.js
-  cp $INTERMEDIATE/worker-main.min.js.map $LIB/worker-main.min.js.map
-  # cp $INTERMEDIATE/worker-main.min.d.ts $LIB/worker-main.min.d.ts
+  cp $INTERMEDIATE/worker-thread.js $LIB/worker-thread.js
+  cp $INTERMEDIATE/worker-thread.js.map $LIB/worker-thread.js.map
+  cp $INTERMEDIATE/worker-thread.d.ts $LIB/worker-thread.d.ts
+  cp $INTERMEDIATE/worker-thread.min.js $LIB/worker-thread.min.js
+  cp $INTERMEDIATE/worker-thread.min.js.map $LIB/worker-thread.min.js.map
+  # cp $INTERMEDIATE/worker-thread.min.d.ts $LIB/worker-thread.min.d.ts
 }
 
 function do_test() {

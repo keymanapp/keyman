@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { LMLayer, WebWorker }   from "@keymanapp/lexical-model-layer/web";
+import { LMLayer, webPredictiveTextWorkerFactory }   from "@keymanapp/lexical-model-layer/web";
 
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 import { defaultCapabilities } from '../helpers.mjs';
@@ -28,7 +28,7 @@ describe('LMLayer using dummy model', function () {
     let loc = document.location;
     // config.testFile generally starts with a '/', with the path resembling the actual full local
     // filesystem for the drive.
-    domain = `${loc.protocol}/${loc.host}`
+    domain = `${loc.protocol}//${loc.host}`;
 
     // Test-config setups will take care of the rest; the server-path will be rooted at the repo root.
     // With aliasing for resources/.
@@ -52,7 +52,7 @@ describe('LMLayer using dummy model', function () {
 
   describe('Prediction', function () {
     it('will predict future suggestions', function () {
-      var lmLayer = new LMLayer(defaultCapabilities, WebWorker.constructInstance(), true);
+      var lmLayer = new LMLayer(defaultCapabilities, webPredictiveTextWorkerFactory.constructTestInstance(), true);
 
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {
@@ -93,7 +93,7 @@ describe('LMLayer using dummy model', function () {
 
   describe('Wordbreaking', function () {
     it('will perform (default) wordbreaking and return word at caret', function () {
-      var lmLayer = new LMLayer(defaultCapabilities, WebWorker.constructInstance());
+      var lmLayer = new LMLayer(defaultCapabilities, webPredictiveTextWorkerFactory.constructTestInstance());
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but

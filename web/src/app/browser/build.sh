@@ -72,13 +72,13 @@ compile_and_copy() {
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
 
-  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.js" "${BUILD_ROOT}/debug/worker-main.js"
-  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.js.map" "${BUILD_ROOT}/debug/worker-main.js.map"
-  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.d.ts" "${BUILD_ROOT}/debug/worker-main.d.ts"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.js" "${BUILD_ROOT}/debug/worker-thread.js"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.js.map" "${BUILD_ROOT}/debug/worker-thread.js.map"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.d.ts" "${BUILD_ROOT}/debug/worker-thread.d.ts"
 
   # TODO: rename to lm-worker.js? do we keep debug/release distinction through .js vs .min.js or via folder?
-  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.min.js" "${BUILD_ROOT}/release/worker-main.js"
-  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.min.js.map" "${BUILD_ROOT}/release/worker-main.js.map"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.min.js" "${BUILD_ROOT}/release/worker-thread.js"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.min.js.map" "${BUILD_ROOT}/release/worker-thread.js.map"
 
   # Update the build/publish copy of our build artifacts
   prepare

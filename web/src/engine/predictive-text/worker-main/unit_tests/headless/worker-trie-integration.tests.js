@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { LMLayer, NodeWorker as Worker } from '#./node/index.js';
+import { LMLayer, nodePredictiveTextWorkerFactory } from '#./node/index.js';
 import { capabilities } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 /*
@@ -14,7 +14,7 @@ describe('LMLayer using the trie model', function () {
   let worker;
 
   beforeEach(function() {
-    worker = Worker.constructInstance();
+    worker = nodePredictiveTextWorkerFactory.constructInstance();
     lmLayer = new LMLayer(capabilities(), worker, true);
   });
 

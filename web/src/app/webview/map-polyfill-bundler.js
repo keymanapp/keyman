@@ -20,7 +20,7 @@ const commonConfig = {
   sourceRoot: '@keymanapp/keyman/web/build/app/webview/debug/'
 };
 
-await prepareTslibTreeshaking(commonConfig, /worker-main(?:\.min)?\.js/);
+await prepareTslibTreeshaking(commonConfig, /worker-thread(?:\.min)?\.js/);
 
 await esbuild.build(commonConfig);
 
