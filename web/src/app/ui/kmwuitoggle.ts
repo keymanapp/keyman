@@ -151,6 +151,7 @@ if(!keyman) {
         }
 
         osk.addEventListener('show', (oskPosition) => {
+          console.log('kmwuitoggle: show osk');
           // Ensure that the ui.controller is visible if help is displayed
           this.controller.style.display = 'block';
           this.oskButton._setSelected(true);
@@ -158,10 +159,13 @@ if(!keyman) {
           return oskPosition;
         });
 
-        osk.addEventListener('hide', (byUser) => {
-          if(byUser['HiddenByUser']) {
+        osk.addEventListener('hide', (byUser: {
+          HiddenByUser?: boolean
+        }) => {
+          console.log('kmwuitoggle: hide osk');
+          // if(byUser.HiddenByUser) {
             this.oskButton._setSelected(false);
-          }
+          // }
         });
       };
 

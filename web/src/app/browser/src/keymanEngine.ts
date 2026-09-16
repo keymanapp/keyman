@@ -75,11 +75,21 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.core.keyboardProcessor, this.contextManager);
 
-    // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
+    // Scrolls the document-body to ensure that a focused element remains visible after the OSK
+    // appears. Also save and restore osk state if element is in independent mode.
     this.contextManager.on('textstorechange', (textStore) => {
       const elem = (textStore as AbstractElementTextStore<any>)?.getElement();
-      if(this.osk) {
-        (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = elem;
+      console.log(`KeymanEngine.textstorechange: id=${elem?.name}, prev=${(this.osk?.activationModel as TwoStateActivator<HTMLElement>)?.activationTrigger?.name}`);
+      if (this.osk) {
+        const activator = this.osk.activationModel as TwoStateActivator<HTMLElement>;
+        const previousElem = activator.activationTrigger;
+        if (previousElem && this.contextManager.isElementInIndependentMode(previousElem)) {
+          previousElem._kmwAttachment.oskEnabled = activator.enabled;
+        }
+        activator.activationTrigger = elem;
+        if (elem && this.contextManager.isElementInIndependentMode(elem)) {
+          activator.enabled = elem._kmwAttachment.oskEnabled;
+        }
       }
 
       if(this.config.hostDevice.touchable && textStore) {

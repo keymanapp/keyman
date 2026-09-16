@@ -503,6 +503,7 @@ export class FloatingOSKView extends OSKView {
   }
 
   public setDisplayPositioning() {
+    console.log(`FloatingOskView.setDisplayPositioning for ${this.typedActivationModel?.activationTrigger?.name}`);
     const {style} = this._Box;
 
     style.position='absolute';
@@ -563,6 +564,8 @@ export class FloatingOSKView extends OSKView {
       return;
     }
 
+    console.log(`FloatingOskView.present() for ${this.typedActivationModel?.activationTrigger?.name}`);
+
     this.titleBar.showPin(this.userPositioned);
 
     super.present();
@@ -576,6 +579,8 @@ export class FloatingOSKView extends OSKView {
   }
 
   public startHide(hiddenByUser: boolean) {
+    console.log(`FloatingOskView.startHide() for ${this.typedActivationModel?.activationTrigger?.name}`);
+
     super.startHide(hiddenByUser);
 
     if(hiddenByUser) {

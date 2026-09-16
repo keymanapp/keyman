@@ -160,7 +160,7 @@ test.describe('Control-by-control example from the guide', function () {
     // Click the message body field again - OSK should show again
     await page.getByPlaceholder('id = text').click();
 
-    // Verify
+    // Verify (#16522)
     await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
     await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
     await expect(page.getByRole('img', { name: 'Use Web Keyboard' })).toBeVisible();

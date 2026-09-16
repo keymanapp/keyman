@@ -20,6 +20,7 @@ declare global {
      * A custom property used by Keyman Engine for Web to tag elements that it has attached to.
      */
     _kmwAttachment: AttachmentInfo,     // Used to track each input element's attachment data.
+    name: string
   }
 }
 

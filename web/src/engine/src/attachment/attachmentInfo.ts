@@ -12,6 +12,13 @@ export class AttachmentInfo {
   public inputMode?: string;
 
   /**
+   * For elements that don't use the global keyboard, this tracks whether
+   * or not the OSK is enabled for the element. The state will be saved
+   * when loosing focus, and restored when regaining focus.
+   */
+  public oskEnabled: boolean = false;
+
+  /**
    * Constructor for AttachmentInfo.
    *
    * @param textStore - Provides the core interface between the DOM and the actual keyboard.
