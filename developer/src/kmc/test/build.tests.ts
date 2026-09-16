@@ -9,10 +9,7 @@ import { assert } from 'chai';
 
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
-import { clearOptions } from '../src/util/options.js';
-import { BuildProject } from '../src/commands/buildClasses/BuildProject.js';
 import { unitTestEndpoints } from '../src/commands/build.js';
-
 import { clearOptions } from '../src/util/options.js';
 import { BuildProject } from '../src/commands/buildClasses/BuildProject.js';
 import { BuildLdmlKeyboard } from '../src/commands/buildClasses/BuildLdmlKeyboard.js';
