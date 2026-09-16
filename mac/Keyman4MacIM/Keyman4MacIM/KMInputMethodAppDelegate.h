@@ -73,7 +73,7 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, strong) NSString *keyboardsPath;
 @property (nonatomic, strong) NSString *fontsPath;
 @property (nonatomic, strong) NSMutableArray *kmxFileList;
-@property (nonatomic, strong) NSMutableArray *activeKeyboards;
+@property (nonatomic, strong) NSMutableArray *enabledKeyboards;
 @property (assign) int numberOfKeyboardMenuItems;
 @property (nonatomic, strong) NSMutableString *contextBuffer;
 @property (nonatomic, assign) NSEventModifierFlags currentModifiers;
@@ -95,7 +95,7 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, assign) NSUInteger expectedBytes;
 
 - (NSMenu *)menu;
-- (void)saveActiveKeyboards;
+- (void)saveEnabledKeyboards;
 - (void)applyPersistedOptions;
 - (void)showAboutWindow;
 - (void)showOSK;
