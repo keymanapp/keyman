@@ -343,6 +343,9 @@ do_sentry() {
   sentry-cli upload-dif "build/$CONFIG"
   popd > /dev/null
 
+  pushd "$CONFIGAPP_BASE_PATH" > /dev/null
+  sentry-cli upload-dif "build/Build/Products/$CONFIG"
+  popd > /dev/null
 }
 
 do_install() {
@@ -386,6 +389,7 @@ do_publish_installer() {
     builder_echo info "writing download info for Keyman installer..."
     local UPLOAD_PATH="${KEYMAN_MAC_BASE_PATH}/build/upload/${KEYMAN_VERSION}"
     write_download_info "${UPLOAD_PATH}" "Keyman-${KEYMAN_VERSION_FOR_FILENAME}.pkg" "Keyman Installer Package" pkg mac
+    do_sentry
   else
     builder_echo info "not writing download info because we are not on a CI build..."
   fi
