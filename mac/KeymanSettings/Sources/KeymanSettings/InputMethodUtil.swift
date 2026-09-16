@@ -190,11 +190,11 @@ public class InputMethodUtil {
     LogUtil.infoBreadcrumb("invokeKeymanInputMethodRequestAccess()", category: .setup)
     do {
       if self.isKeymanInputMethodRunning() {
-        // Keyman is not running, send notification to input method
+        // Keyman is running, send notification to input method
         Logger.setup.debug("invokeKeymanInputMethodRequestAccess(), calling sendAccessibilityRequest()")
         self.sendAccessibilityRequest()
       } else {
-        // Keyman is not running, launch and request accessibility with specific command line argument
+        // Keyman is not running, launch input method and request accessibility with specific command line argument
         Logger.setup.debug("invokeKeymanInputMethodRequestAccess(), calling launchKeymanInputMethodAsSeparateProcess()")
         try self.launchKeymanInputMethodAsSeparateProcess(argument: kAccessCommand)
       }
