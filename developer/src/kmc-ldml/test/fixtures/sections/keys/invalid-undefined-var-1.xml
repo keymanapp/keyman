@@ -8,7 +8,7 @@
   </keys>
 
   <layers formId="us">
-    <layer id="base">
+    <layer modifiers="none">
       <row keys="5" />
     </layer>
   </layers>

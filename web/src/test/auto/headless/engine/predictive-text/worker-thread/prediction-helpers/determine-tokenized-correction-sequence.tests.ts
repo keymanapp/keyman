@@ -22,7 +22,8 @@ import {
   ContextTokenization,
   TokenizedIntermediatePrediction,
   ModelCompositor,
-  TokenizationResultMapping
+  TokenizationResultMapping,
+  SuggestionSimilarity
 } from "@keymanapp/lm-worker/test-index";
 
 import Context = LexicalModelTypes.Context;
@@ -391,13 +392,16 @@ describe('determineTokenizedCorrectionSequence', () => {
         correction: 'd',
         casingRoot: 'd'
       }],
+      probabilities: {
+        prediction: .25,
+        correction: trueInput.p,
+        total: .25 * trueInput.p
+      },
       metadata: {
-        probabilities: {
-          prediction: .25,
-          correction: trueInput.p,
-          total: .25 * trueInput.p
-        },
-        autoSelectable: true
+        autoSelectable: true,
+        matchLevel: SuggestionSimilarity.none,
+        rawEditCount: 0,
+        predictionLength: 0
       }
     };
 

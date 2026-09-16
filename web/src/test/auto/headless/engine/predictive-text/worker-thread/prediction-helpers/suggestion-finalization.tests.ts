@@ -5,7 +5,13 @@ import { deepCopy } from 'keyman/common/web-utils';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { CompositedIntermediatePrediction, finalizeSuggestions, models } from "@keymanapp/lm-worker/test-index";
+import {
+  CompositedIntermediatePrediction,
+  finalizeSuggestions,
+  models,
+  PredictionMetadata,
+  SuggestionSimilarity
+} from "@keymanapp/lm-worker/test-index";
 
 import DummyModel = models.DummyModel;
 import Outcome = LexicalModelTypes.Outcome;
@@ -48,6 +54,14 @@ const testModelWithoutSpacing = new DummyModel({
  */
 const build_its_is_set = (verbose?: string) => {
   const verboseFlag = (verbose == 'verbose' ? true : false);
+
+  const metadata: PredictionMetadata = {
+    autoSelectable: true,
+    matchLevel: SuggestionSimilarity.none,
+    rawEditCount: 0,
+    predictionLength: 0
+  };
+
   const its: CompositedIntermediatePrediction = {
     components: {
       prediction: {
@@ -59,15 +73,12 @@ const build_its_is_set = (verbose?: string) => {
       },
       correction: 'its'
     },
-    metadata: {
-      probabilities: {
-        prediction: .2,
-        correction: .8,
-        total: .2 * .8
-      },
-      autoSelectable: true
-      // matchLevel does not yet exist.
-    }
+    probabilities: {
+      prediction: .2,
+      correction: .8,
+      total: .2 * .8
+    },
+    metadata: {...metadata}
   };
 
   const it_is: CompositedIntermediatePrediction = {
@@ -81,14 +92,12 @@ const build_its_is_set = (verbose?: string) => {
       },
       correction: 'its'
     },
-    metadata: {
-      probabilities: {
-        prediction: .8,
-        correction: .8,
-        total: .8 * .8
-      },
-      autoSelectable: true
-    }
+    probabilities: {
+      prediction: .8,
+      correction: .8,
+      total: .8 * .8
+    },
+    metadata: {...metadata}
   };
 
   const is: CompositedIntermediatePrediction = {
@@ -102,14 +111,12 @@ const build_its_is_set = (verbose?: string) => {
       },
       correction: 'is'
     },
-    metadata: {
-      probabilities: {
-        prediction: .5,
-        correction: .2,
-        total: .5 * .2
-      },
-      autoSelectable: true
-    }
+    probabilities: {
+      prediction: .5,
+      correction: .2,
+      total: .5 * .2
+    },
+    metadata: {...metadata}
   };
 
   const is_not: CompositedIntermediatePrediction = {
@@ -123,14 +130,12 @@ const build_its_is_set = (verbose?: string) => {
       },
       correction: 'is'
     },
-    metadata: {
-      probabilities: {
-        prediction: .5,
-        correction: .2,
-        total: .5 * .2
-      },
-      autoSelectable: true
-    }
+    probabilities: {
+      prediction: .5,
+      correction: .2,
+      total: .5 * .2
+    },
+    metadata: {...metadata}
   };
 
   const baseDefinitions = {
@@ -145,12 +150,12 @@ const build_its_is_set = (verbose?: string) => {
 
     const mapped: Outcome<Suggestion & { 'correction-p'?: number, 'lexical-p'?: number }> = {
       ...deepCopy(entry.components.prediction),
-      p: entry.metadata.probabilities.total
+      p: entry.probabilities.total
     };
 
     if(verboseFlag) {
-      mapped['correction-p'] = entry.metadata.probabilities.correction;
-      mapped['lexical-p'] = entry.metadata.probabilities.prediction;
+      mapped['correction-p'] = entry.probabilities.correction;
+      mapped['lexical-p'] = entry.probabilities.prediction;
     }
 
     return mapped;

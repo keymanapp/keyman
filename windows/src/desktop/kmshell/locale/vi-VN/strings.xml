@@ -343,10 +343,6 @@
   <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">Luôn hiện Cửa sổ Bàn phím ảo khi bàn phím Keyman được chọn</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">Tự động chuyển sang Bàn phím ảo/Trợ giúp phù hợp khi chọn bàn phím</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Gỡ lỗi</string>
   <!-- Context: Configuration Dialog - Options tab -->

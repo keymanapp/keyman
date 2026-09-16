@@ -5,7 +5,14 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { deepCopy } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { CompositedIntermediatePrediction, models, processSimilarity, SuggestionSimilarity, toAnnotatedSuggestion } from "@keymanapp/lm-worker/test-index";
+import {
+  CompositedIntermediatePrediction,
+  models,
+  PredictionMetadata,
+  processSimilarity,
+  SuggestionSimilarity,
+  toAnnotatedSuggestion
+} from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -103,6 +110,13 @@ const testModelWithCasing = new DummyModel({
   // No suggestions needed here, so we don't define any.
 });
 
+const commonMetadata: PredictionMetadata = {
+  autoSelectable: true,
+  matchLevel: SuggestionSimilarity.none,
+  rawEditCount: 0, // does not matter for these tests
+  predictionLength: 0 // does not matter for these tests
+};
+
 /**
  * Builds a fresh copy of test values useful for suggestion-similarity
  * testing.
@@ -120,15 +134,12 @@ const build_its_is_set = () => {
       },
       correction: 'its'
     },
-    metadata: {
-      probabilities: {
-        prediction: .2,
-        correction: .8,
-        total: .2 * .8
-      },
-      autoSelectable: true
-      // matchLevel does not yet exist.
-    }
+    probabilities: {
+      prediction: .2,
+      correction: .8,
+      total: .2 * .8
+    },
+    metadata: {...commonMetadata}
   };
 
   const it_is: CompositedIntermediatePrediction = {
@@ -142,14 +153,12 @@ const build_its_is_set = () => {
       },
       correction: 'its'
     },
-    metadata: {
-      probabilities: {
-        prediction: .8,
-        correction: .8,
-        total: .8 * .8
-      },
-      autoSelectable: true
-    }
+    probabilities: {
+      prediction: .8,
+      correction: .8,
+      total: .8 * .8
+    },
+    metadata: {...commonMetadata}
   };
 
   const is: CompositedIntermediatePrediction = {
@@ -163,14 +172,12 @@ const build_its_is_set = () => {
       },
       correction: 'is'
     },
-    metadata: {
-      probabilities: {
-        prediction: .5,
-        correction: .2,
-        total: .5 * .2
-      },
-      autoSelectable: true
-    }
+    probabilities: {
+      prediction: .5,
+      correction: .2,
+      total: .5 * .2
+    },
+    metadata: {...commonMetadata}
   };
 
   const is_not: CompositedIntermediatePrediction = {
@@ -184,14 +191,12 @@ const build_its_is_set = () => {
       },
       correction: 'is'
     },
-    metadata: {
-      probabilities: {
-        prediction: .5,
-        correction: .2,
-        total: .5 * .2
-      },
-      autoSelectable: true
-    }
+    probabilities: {
+      prediction: .5,
+      correction: .2,
+      total: .5 * .2
+    },
+    metadata: {...commonMetadata}
   };
 
   return {
@@ -222,11 +227,21 @@ describe('processSimilarity', () => {
     const testSet = build_its_is_set();
     const distribution = [...Object.values(testSet)];
 
-    const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
-    expectation[0].metadata.matchLevel = SuggestionSimilarity.exact;    // its
-    expectation[1].metadata.matchLevel = SuggestionSimilarity.sameKey;  // it_is
-    expectation[2].metadata.matchLevel = SuggestionSimilarity.none;     // is
-    expectation[3].metadata.matchLevel = SuggestionSimilarity.none;     // is_not
+    const expectation: CompositedIntermediatePrediction[] = [
+      {
+        ...testSet.its,
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.exact }
+      }, {
+        ...testSet.it_is,
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameKey }
+      }, {
+        ...testSet.is,
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
+      }, {
+        ...testSet.is_not,
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
+      }
+    ];
 
     const its = testSet.its;
     const original_its = deepCopy(its);
@@ -259,11 +274,21 @@ describe('processSimilarity', () => {
     const testSet = build_its_is_set();
     const distribution = [...Object.values(testSet)];
 
-    const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
-    expectation[0].metadata.matchLevel = SuggestionSimilarity.sameKey;  // its
-    expectation[1].metadata.matchLevel = SuggestionSimilarity.exact;    // it_is
-    expectation[2].metadata.matchLevel = SuggestionSimilarity.none;     // is
-    expectation[3].metadata.matchLevel = SuggestionSimilarity.none;     // is_not
+    const expectation: CompositedIntermediatePrediction[] = [
+      {
+        ...testSet.its,
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameKey }
+      }, {
+        ...testSet.it_is,
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.exact }
+      }, {
+        ...testSet.is,
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
+      }, {
+        ...testSet.is_not,
+        metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
+      }
+    ];
 
     const it_is = testSet.it_is;
     const original_it_is = deepCopy(it_is);
@@ -300,14 +325,12 @@ describe('processSimilarity', () => {
           },
           correction: 'appl'
         },
-        metadata: {
-          probabilities: {
-            prediction: 1,
-            correction: 1,
-            total: 1
-          },
-          autoSelectable: true
-        }
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1
+        },
+        metadata: commonMetadata
       }
     ];
 
@@ -352,11 +375,23 @@ describe('processSimilarity', () => {
 
       const distribution = [...Object.values(testSet)];
 
-      const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
-      expectation[0].metadata.matchLevel = SuggestionSimilarity.sameKey;   // its
-      expectation[1].metadata.matchLevel = SuggestionSimilarity.sameText;  // it_is
-      expectation[2].metadata.matchLevel = SuggestionSimilarity.none;      // is
-      expectation[3].metadata.matchLevel = SuggestionSimilarity.none;      // is_not
+      const expectation: CompositedIntermediatePrediction[] = [
+        {
+          ...testSet.its,
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameKey }
+        }, {
+          ...testSet.it_is,
+          // case mismatch, detectable because we have access to a lowercasing/uppercasing function.
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameText }
+        }, {
+          ...testSet.is,
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
+        }, {
+          ...testSet.is_not,
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
+        }
+      ];
+
       processSimilarity(testModelWithCasing, distribution, context, models.applyTransform(trueInput.sample, context));
 
       // Because we mucked with the casing here, there is no perfect 'keep' match.
@@ -394,7 +429,22 @@ describe('processSimilarity', () => {
 
       const distribution = [...Object.values(testSet)];
 
-      const expectation: CompositedIntermediatePrediction[] = [...Object.values(testSet)];
+      const expectation: CompositedIntermediatePrediction[] = [
+        {
+          ...testSet.its,
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
+        }, {
+          ...testSet.it_is,
+          // case mismatch, detectable because we have access to a lowercasing/uppercasing function.
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
+        }, {
+          ...testSet.is,
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
+        }, {
+          ...testSet.is_not,
+          metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
+        }
+      ];
 
       expectation.forEach((entry) => entry.metadata.matchLevel = SuggestionSimilarity.none);
       processSimilarity(testModelWithoutCasing, distribution, context, models.applyTransform(trueInput.sample, context));

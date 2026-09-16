@@ -12,7 +12,7 @@ import { assert } from 'chai';
 import { LexicalModelTypes } from "@keymanapp/common-types";
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
-import { CompositedIntermediatePrediction, createDefaultKeep, models, SuggestionSimilarity } from "@keymanapp/lm-worker/test-index";
+import { CompositedIntermediatePrediction, createDefaultKeep, models, PredictionMetadata, SuggestionSimilarity } from "@keymanapp/lm-worker/test-index";
 
 import CasingFunction = LexicalModelTypes.CasingFunction;
 import Context = LexicalModelTypes.Context;
@@ -21,6 +21,12 @@ import DummyOptions = models.DummyOptions;
 import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import Transform = LexicalModelTypes.Transform;
 
+const commonMetadata: PredictionMetadata = {
+  autoSelectable: false,
+  rawEditCount: 0,
+  predictionLength: 0,
+  matchLevel: SuggestionSimilarity.none
+}
 
 /*
  * This file's tests use these parts of a lexical model:
@@ -116,14 +122,15 @@ describe('createDefaultKeep', () => {
         },
         correction: 'appl'
       },
+      probabilities: {
+        prediction: 1,
+        correction: 1,
+        total: 1 * 1
+      },
       metadata: {
-        probabilities: {
-          prediction: 1,
-          correction: 1,
-          total: 1 * 1
-        },
-        autoSelectable: false,
-        matchLevel: SuggestionSimilarity.exact
+        ...commonMetadata,
+        matchLevel: SuggestionSimilarity.exact,
+        rawEditCount: 'keep'.length
       }
     };
 
@@ -160,14 +167,15 @@ describe('createDefaultKeep', () => {
         },
         correction: 'iphone'
       },
+      probabilities: {
+        prediction: 1,
+        correction: 1,
+        total: 1 * 1
+      },
       metadata: {
-        probabilities: {
-          prediction: 1,
-          correction: 1,
-          total: 1 * 1
-        },
-        autoSelectable: false,
-        matchLevel: SuggestionSimilarity.exact
+        ...commonMetadata,
+        matchLevel: SuggestionSimilarity.exact,
+        rawEditCount: 'iphone'.length
       }
     };
 
@@ -204,14 +212,15 @@ describe('createDefaultKeep', () => {
         },
         correction: 'iphone'
       },
+      probabilities: {
+        prediction: 1,
+        correction: 1,
+        total: 1 * 1
+      },
       metadata: {
-        probabilities: {
-          prediction: 1,
-          correction: 1,
-          total: 1 * 1
-        },
-        autoSelectable: false,
-        matchLevel: SuggestionSimilarity.exact
+        ...commonMetadata,
+        matchLevel: SuggestionSimilarity.exact,
+        rawEditCount: 'iphone'.length
       }
     };
 
@@ -248,14 +257,15 @@ describe('createDefaultKeep', () => {
         },
         correction: 'iphone'
       },
+      probabilities: {
+        prediction: 1,
+        correction: 1,
+        total: 1 * 1
+      },
       metadata: {
-        probabilities: {
-          prediction: 1,
-          correction: 1,
-          total: 1 * 1
-        },
-        autoSelectable: false,
-        matchLevel: SuggestionSimilarity.exact
+        ...commonMetadata,
+        matchLevel: SuggestionSimilarity.exact,
+        rawEditCount: 'iphone'.length
       }
     };
 
@@ -292,14 +302,15 @@ describe('createDefaultKeep', () => {
         },
         correction: 'and'
       },
+      probabilities: {
+        prediction: 1,
+        correction: 1,
+        total: 1 * 1
+      },
       metadata: {
-        probabilities: {
-          prediction: 1,
-          correction: 1,
-          total: 1 * 1
-        },
-        autoSelectable: false,
-        matchLevel: SuggestionSimilarity.exact
+        ...commonMetadata,
+        matchLevel: SuggestionSimilarity.exact,
+        rawEditCount: 'and'.length
       }
     };
 
@@ -336,14 +347,15 @@ describe('createDefaultKeep', () => {
         },
         correction: 'iphones'
       },
+      probabilities: {
+        prediction: 1,
+        correction: 1,
+        total: 1 * 1
+      },
       metadata: {
-        probabilities: {
-          prediction: 1,
-          correction: 1,
-          total: 1 * 1
-        },
-        autoSelectable: false,
-        matchLevel: SuggestionSimilarity.exact
+        ...commonMetadata,
+        matchLevel: SuggestionSimilarity.exact,
+        rawEditCount: 'iphones'.length
       }
     };
 
@@ -380,13 +392,13 @@ describe('createDefaultKeep', () => {
         },
         correction: ''
       },
+      probabilities: {
+        prediction: 1,
+        correction: 1,
+        total: 1 * 1
+      },
       metadata: {
-        probabilities: {
-          prediction: 1,
-          correction: 1,
-          total: 1 * 1
-        },
-        autoSelectable: false,
+        ...commonMetadata,
         matchLevel: SuggestionSimilarity.exact
       }
     };

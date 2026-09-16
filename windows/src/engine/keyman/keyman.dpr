@@ -86,7 +86,6 @@ uses
   Keyman.System.Util.RenderLanguageIcon in '..\..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas',
   TempFileManager in '..\..\..\..\common\windows\delphi\general\TempFileManager.pas',
   utiltsf in '..\..\global\delphi\general\utiltsf.pas',
-  GlobalKeyboardChangeManager in 'GlobalKeyboardChangeManager.pas',
   utilwow64 in '..\..\global\delphi\general\utilwow64.pas',
   USendInputString in '..\..\global\delphi\general\USendInputString.pas',
   Upload_Settings in '..\..\..\..\common\windows\delphi\general\Upload_Settings.pas',

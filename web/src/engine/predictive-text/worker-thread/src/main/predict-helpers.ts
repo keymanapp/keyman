@@ -1,3 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by jahorton on 2024-07-08.
+ *
+ * This file defines the many predictive-text engine's helper methods used for the
+ * overall process of text prediction.
+ */
+
 import * as models from '@keymanapp/models-templates';
 import { KMWString } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
@@ -71,6 +80,38 @@ export const CORRECTION_SEARCH_THRESHOLDS = {
    * a "full" set of suggestions had already been found.
    */
   REPLACEMENT_SEARCH_THRESHOLD: 4 as const // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+}
+
+/**
+ * Tracks common intermediate prediction data, such as its underlying probabilities and its similarity to the actual context.
+ */
+export interface PredictionMetadata {
+  /**
+   * Indicates that the 'suggestion' represents context changes that qualify for
+   * auto-selection.
+   */
+  autoSelectable: boolean;
+
+  /**
+   * How directly the prediction matches the current token in the context.
+   *
+   * This is determined later in the suggestion-analysis project and is not
+   * available upon initial construction of this type.
+   */
+  matchLevel: SuggestionSimilarity;
+
+  /**
+   * Indicates the number of raw Damerau-Levenshtein edits represented by
+   * the correction, not including the substitution of sufficiently-likely
+   * neighbor fat-finger keys at each step.
+   */
+  rawEditCount: number;
+
+  /**
+   * Indicates the codepoint length by which the current token will be
+   * extended when the Suggestion is applied.
+   */
+  predictionLength: number;
 }
 
 /**
@@ -156,31 +197,6 @@ export interface PredictionProbabilities {
   total: number;
 }
 
-/**
- * Tracks common intermediate prediction data, such as its underlying probabilities and its similarity to the actual context.
- */
-export interface PredictionMetadata {
-  /**
-   * Tracks the relevant probability components contributing to a generated
-   * prediction.
-   */
-  probabilities: PredictionProbabilities;
-
-  /**
-   * Indicates that the 'suggestion' represents context changes that qualify for
-   * auto-selection.
-   */
-  autoSelectable: boolean;
-
-  /**
-   * How directly the prediction matches the current token in the context.
-   *
-   * This is determined later in the suggestion-analysis project and is not
-   * available upon initial construction of this type.
-   */
-  matchLevel?: SuggestionSimilarity;
-}
-
 export interface TokenizedIntermediatePrediction {
   /**
    * Contains the tokenized components to be used to construct a full
@@ -188,6 +204,11 @@ export interface TokenizedIntermediatePrediction {
    * component.
    */
   components: TokenizedPredictionData[];
+  /**
+   * Tracks the relevant probability components contributing to a generated
+   * prediction.
+   */
+  probabilities: PredictionProbabilities;
   /**
    * Tracks common intermediate prediction data, such as its underlying probabilities and its similarity to the actual context.
    */
@@ -199,6 +220,11 @@ export interface CompositedIntermediatePrediction {
    * Contains the fully composited predictive-text Suggestion and its underlying correction string.
    */
   components: CompositedPredictionData;
+  /**
+   * Tracks the relevant probability components contributing to a generated
+   * prediction.
+   */
+  probabilities: PredictionProbabilities;
   /**
    * Tracks common intermediate prediction data, such as its underlying probabilities and its similarity to the actual context.
    */
@@ -251,7 +277,7 @@ export function tupleDisplayOrderSort(a: IntermediatePrediction, b: Intermediate
   }
 
   // Probability distance
-  return b.metadata.probabilities.total - a.metadata.probabilities.total;
+  return b.probabilities.total - a.probabilities.total;
 }
 
 export function determineTraversallessCorrectionSequences(
@@ -804,6 +830,7 @@ export async function correctAndEnumerate(
     // Worth considering:  extend Traversal to allow direct prediction lookups?
     // let traversal = match.finalTraversal;
 
+    // // if costFactor > 1, penalize with bonus edit cost if we're not using the most likely transform!
     const tokenization = match.matchingSpace.tokenization;
     const suggestionRange = determineSuggestionRange(transition.base.displayTokenization.tokens, tokenization.tokens, (a, b) => a.spaceId == b.spaceId);
     suggestionRange.transitionId = transition.transitionId;
@@ -846,13 +873,14 @@ export function shouldStopSearchingEarly(
       // Very useful for stopping 'sooner' when words reach a sufficient length.
       return true;
     } else {
-      // Sort the prediction list; we need them in descending order for the next check.
-      rawPredictions.sort(tupleDisplayOrderSort);
+      // Sort the prediction list; we need them in descending probability order
+      // for the next check.
+      rawPredictions.sort((a, b) => b.probabilities.total - a.probabilities.total);
 
-      // If the best suggestion from the search's current tier fails to beat the worst
+      // If the best result at the current state of the search fails to beat the worst
       // pending suggestion from previous tiers, assume all further corrections will
       // similarly fail to win; terminate the search-loop.
-      if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].metadata.probabilities.total > Math.exp(-currentCorrectionCost)) {
+      if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].probabilities.total > Math.exp(-currentCorrectionCost)) {
         return true;
       }
     }
@@ -972,14 +1000,16 @@ export function predictFromCorrectionSequence(
 
     const returnVal: TokenizedIntermediatePrediction = {
       components: [...predictionPrefix, tuple],
+      probabilities: {
+        prediction: predictionCost,
+        correction: correctionCost,
+        total: predictionCost * correctionCost
+      },
       metadata: {
-        probabilities: {
-          prediction: predictionCost,
-          correction: correctionCost,
-          total: predictionCost * correctionCost
-        },
         autoSelectable: tuple.autoSelectable,
-        matchLevel: SuggestionSimilarity.none
+        matchLevel: SuggestionSimilarity.none,
+        rawEditCount: 0,
+        predictionLength: 0
       }
     }
 
@@ -1051,19 +1081,21 @@ export function composeIntermediatePredictions(predictions: TokenizedIntermediat
     }
 
     return {
-      components: components.reduce((total, current) => {
-        const mergedTransform = models.buildMergedTransform(total.prediction.transform, current.prediction.transform);
-        const mergedDisplayAs = total.prediction.displayAs + current.prediction.displayAs
+      ...predictionData,
+      components: components.reduce(
+        (total, current) => {
+          const mergedTransform = models.buildMergedTransform(total.prediction.transform, current.prediction.transform);
+          const mergedDisplayAs = total.prediction.displayAs + current.prediction.displayAs
 
-        return {
-          prediction: {...total.prediction, transform: mergedTransform, displayAs: mergedDisplayAs},
-          correction: total.correction + current.correction
+          return {
+            prediction: {...total.prediction, transform: mergedTransform, displayAs: mergedDisplayAs},
+            correction: total.correction + current.correction
+          }
+        }, {
+          prediction: {...components[0].prediction, transform: reduceBaseTransform, displayAs: ''},
+          correction: ''
         }
-      }, {
-        prediction: {...components[0].prediction, transform: reduceBaseTransform, displayAs: ''},
-        correction: ''
-      }),
-      metadata: predictionData.metadata
+      )
     };
   });
 }
@@ -1101,7 +1133,7 @@ export function dedupeSuggestions(
     // Merge 'em!
     const existingSuggestion = suggestionDistribMap[predictedWord];
     if(existingSuggestion) {
-      existingSuggestion.metadata.probabilities.total += tuple.metadata.probabilities.total;
+      existingSuggestion.probabilities.total += tuple.probabilities.total;
     } else {
       suggestionDistribMap[predictedWord] = tuple;
     }
@@ -1249,14 +1281,16 @@ export function createDefaultKeep(
       prediction: keepOption,
       correction: truePrefix
     },
+    probabilities: {
+      prediction: MAX_PROB,
+      correction: inputTransformProb,
+      total: inputTransformProb * MAX_PROB
+    },
     metadata: {
-      probabilities: {
-        prediction: MAX_PROB,
-        correction: inputTransformProb,
-        total: inputTransformProb * MAX_PROB
-      },
       autoSelectable: false,
-      matchLevel: SuggestionSimilarity.exact
+      matchLevel: SuggestionSimilarity.exact,
+      rawEditCount: KMWString.length(truePrefix),
+      predictionLength: 0
     }
   };
 }
@@ -1332,8 +1366,8 @@ export function predictionAutoSelect(suggestionDistribution: CompositedIntermedi
 
   // Find the highest probability for any correction that led to a valid prediction.
   // No need to full-on re-sort everything, though.
-  const bestCorrectionP = suggestionDistribution.reduce((prev, current) => Math.max(prev, current.metadata.probabilities.correction), 0);
-  if(bestCorrectionP > bestSuggestion.metadata.probabilities.correction) {
+  const bestCorrectionP = suggestionDistribution.reduce((prev, current) => Math.max(prev, current.probabilities.correction), 0);
+  if(bestCorrectionP > bestSuggestion.probabilities.correction) {
     // Here, the best suggestion didn't come from the best correction.
     // Is it actually reasonable to auto-correct?  We're probably just very
     // biased toward its frequency.  (Maybe a threshold should be considered?)
@@ -1347,13 +1381,16 @@ export function predictionAutoSelect(suggestionDistribution: CompositedIntermedi
   const bestSuggestionTier = bestSuggestion.metadata.matchLevel;
 
   // compare best vs other probabilities of compatible tier.
-  const probSum = suggestionDistribution.reduce((accum, current) => {
+  const probSum = suggestionDistribution
+    .filter((s) => (s.metadata.predictionLength ?? 0) <= (bestSuggestion.metadata.predictionLength ?? 0))
+    .filter((s) => (s.metadata.rawEditCount ?? 0) <= (bestSuggestion.metadata.rawEditCount ?? 0))
+    .reduce((accum, current) => {
     // If the suggestion is from a different similarity tier, do not count it against
     // the required auto-select probability ratio threshold.  That threshold should
     // only apply within the suggestion's tier.
-    return accum + (current.metadata.matchLevel == bestSuggestionTier ? current.metadata.probabilities.total : 0)
+    return accum + (current.metadata.matchLevel == bestSuggestionTier ? current.probabilities.total : 0)
   }, 0);
-  const proportionOfBest = bestSuggestion.metadata.probabilities.total / probSum;
+  const proportionOfBest = bestSuggestion.probabilities.total / probSum;
   if(proportionOfBest < AUTOSELECT_PROPORTION_THRESHOLD) {
     return;
   }
@@ -1396,7 +1433,7 @@ export function finalizeSuggestions(
 
   const suggestions = deduplicatedSuggestionTuples.map((tuple) => {
     const prediction = tuple.components.prediction;
-    const probs = tuple.metadata.probabilities;
+    const probs = tuple.probabilities;
 
     if(!verbose) {
       return {

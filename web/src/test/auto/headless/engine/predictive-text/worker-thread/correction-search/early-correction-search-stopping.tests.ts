@@ -4,10 +4,11 @@ import { CORRECTION_SEARCH_THRESHOLDS, TokenizedIntermediatePrediction, ModelCom
 
 function mockTokenizedPrediction(value: number) {
   return {
+    components: [],
+    probabilities: {
+      total: value
+    },
     metadata: {
-      probabilities: {
-        total: value
-      }
     }
   } as TokenizedIntermediatePrediction
 }
@@ -47,7 +48,6 @@ describe('correction-search: shouldStopSearchingEarly', () => {
     assert.isAtLeast(predictionProbs.length, ModelCompositor.MAX_SUGGESTIONS, "test setup no longer valid");
 
     // The only part for each entry we actually care about here:  .totalProb.
-    /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]} */
     const predictions = predictionProbs.map((entry) => mockTokenizedPrediction(entry));
 
     const baseCost = 1;

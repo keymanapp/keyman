@@ -4,7 +4,13 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { deepCopy } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { CompositedIntermediatePrediction, dedupeSuggestions, models } from "@keymanapp/lm-worker/test-index";
+import {
+  CompositedIntermediatePrediction,
+  dedupeSuggestions,
+  models,
+  PredictionMetadata,
+  SuggestionSimilarity
+} from "@keymanapp/lm-worker/test-index";
 
 import Context = LexicalModelTypes.Context;
 import DummyModel = models.DummyModel;
@@ -17,6 +23,13 @@ const testModel = new DummyModel({
   wordbreaker: wordBreakers.default
   // No suggestions needed here, so we don't define any.
 });
+
+const commonMetadata: PredictionMetadata = {
+  matchLevel: SuggestionSimilarity.none,
+  autoSelectable: true,
+  rawEditCount: 0,    // does not matter for these tests.
+  predictionLength: 0 // does not matter for these tests.
+};
 
 /**
  * Builds a fresh copy of test values useful for suggestion-similarity
@@ -35,15 +48,12 @@ const build_its_is_set = () => {
       },
       correction: 'its'
     },
-    metadata: {
-      probabilities: {
-        prediction: .2,
-        correction: .8,
-        total: .2 * .8
-      },
-      autoSelectable: true
-      // matchLevel does not yet exist.
-    }
+    probabilities: {
+      prediction: .2,
+      correction: .8,
+      total: .2 * .8
+    },
+    metadata: commonMetadata
   };
 
   const it_is: CompositedIntermediatePrediction = {
@@ -57,14 +67,12 @@ const build_its_is_set = () => {
       },
       correction: 'its'
     },
-    metadata: {
-      probabilities: {
-        prediction: .8,
-        correction: .8,
-        total: .8 * .8
-      },
-      autoSelectable: true
-    }
+    probabilities: {
+      prediction: .8,
+      correction: .8,
+      total: .8 * .8
+    },
+    metadata: commonMetadata
   };
 
   const is: CompositedIntermediatePrediction = {
@@ -78,14 +86,12 @@ const build_its_is_set = () => {
       },
       correction: 'is'
     },
-    metadata: {
-      probabilities: {
-        prediction: .5,
-        correction: .2,
-        total: .5 * .2
-      },
-      autoSelectable: true
-    }
+    probabilities: {
+      prediction: .5,
+      correction: .2,
+      total: .5 * .2
+    },
+    metadata: commonMetadata
   };
 
   const is_not: CompositedIntermediatePrediction = {
@@ -99,14 +105,12 @@ const build_its_is_set = () => {
       },
       correction: 'is'
     },
-    metadata: {
-      probabilities: {
-        prediction: .5,
-        correction: .2,
-        total: .5 * .2
-      },
-      autoSelectable: true
-    }
+    probabilities: {
+      prediction: .5,
+      correction: .2,
+      total: .5 * .2
+    },
+    metadata: commonMetadata
   };
 
   return {
@@ -127,7 +131,12 @@ describe('dedupeSuggestions', () => {
     };
 
     const testSet = build_its_is_set();
-    const predictions = [...Object.values(testSet)];
+    const predictions: CompositedIntermediatePrediction[] = [...Object.values(testSet)].map((entry) => {
+      return {
+        ...entry,
+        metadata: commonMetadata
+      }
+    });
 
     const deduplicated = dedupeSuggestions(testModel, predictions, context);
 
@@ -148,16 +157,26 @@ describe('dedupeSuggestions', () => {
       ...Object.values(testSet).map((entry) => deepCopy(entry)),
       ...Object.values(testSet).map((entry) => deepCopy(entry)),
       deepCopy(testSet.it_is) // as in, `it's`, the contraction.
-    ];
+    ].map((entry) => {
+      return {
+        ...entry,
+        metadata: commonMetadata
+      }
+    });
 
     const deduplicated = dedupeSuggestions(testModel, predictions, context);
-    const expected = [...Object.values(testSet)];
+    const expected = [...Object.values(testSet)].map((entry) => {
+      return {
+        ...entry,
+        metadata: commonMetadata
+      }
+    });
     // Note:  only changes the _total_ probability.
     //
     // There's no mathematically safe way to combine the components if the
     // underlying correction sources differ between duplicated suggestions,
     // though it's mathematically safe to combine their product.
-    expected.forEach((entry) => entry.metadata.probabilities.total *= (entry.components.prediction.transform.insert == '\'s') ? 3 : 2);
+    expected.forEach((entry) => entry.probabilities.total *= (entry.components.prediction.transform.insert == '\'s') ? 3 : 2);
 
     assert.deepEqual(deduplicated, expected);
   });
