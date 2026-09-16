@@ -16,15 +16,12 @@
 #import "KMPackageReader.h"
 #import "KMInputController.h"
 #import "KMAboutWindowController.h"
-#import "KMInfoWindowController.h"
 #import "KMKeyboardHelpWindowController.h"
 #import "OSKWindowController.h"
 #import "NSWindow+SuppMethods.h"
 #import "NSString+SuppMethods.h"
 
 typedef void(^PostEventCallback)(CGEventRef eventToPost);
-
-extern NSString *const kKeymanKeyboardDownloadCompletedNotification;
 
 typedef struct {
     NSString *sentryEnvironment;
@@ -38,13 +35,12 @@ typedef struct {
 } KeymanVersionInfo;
 
 // tags for default menu items, displayed whether keyboards are active or not
-static const int DIVIDER_MENUITEM_TAG = -4;
-static const int CONFIG_MENUITEM_TAG = -3;
+static const int DIVIDER_MENUITEM_TAG = -3;
 static const int OSK_MENUITEM_TAG = -2;
 static const int ABOUT_MENUITEM_TAG = -1;
 
 // the number of menu items that do not represent active keyboards
-static const int DEFAULT_KEYMAN_MENU_ITEM_COUNT = 4;
+static const int DEFAULT_KEYMAN_MENU_ITEM_COUNT = 3;
 
 // the tag for the first keyboard dynamically added to the menu
 static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG = 0;
@@ -71,8 +67,6 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, strong) NSImage *keyboardIcon;
 // TODO: refactor above properties
 @property (nonatomic, strong) NSString *keyboardsPath;
-@property (nonatomic, strong) NSString *fontsPath;
-@property (nonatomic, strong) NSMutableArray *kmxFileList;
 @property (nonatomic, strong) NSMutableArray *enabledKeyboards;
 @property (assign) int numberOfKeyboardMenuItems;
 @property (nonatomic, strong) NSMutableString *contextBuffer;
@@ -81,49 +75,29 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, assign) CFRunLoopSourceRef runLoopEventSrc;
 @property (nonatomic, assign) BOOL contextChangedByLowLevelEvent;
 @property (nonatomic, strong) OSKWindowController *oskWindow;
-@property (nonatomic, strong) NSAlert *downloadInfoView;
-@property (nonatomic, strong) NSProgressIndicator *progressIndicator;
 @property (nonatomic, weak) KMInputController *inputController;
-@property (nonatomic, strong) NSWindowController *configWindow;
-@property (nonatomic, strong) NSWindowController *downloadKBWindow;
 @property (nonatomic, strong) KMAboutWindowController *aboutWindow;
-@property (nonatomic, strong) KMInfoWindowController *infoWindow;
 @property (nonatomic, strong) KMKeyboardHelpWindowController *kbHelpWindow;
-@property (nonatomic, strong) NSURLConnection *connection;
-@property (nonatomic, strong) NSString *downloadFilename;
-@property (nonatomic, strong) NSMutableData *receivedData;
-@property (nonatomic, assign) NSUInteger expectedBytes;
 
 - (NSMenu *)menu;
 - (void)saveEnabledKeyboards;
 - (void)applyPersistedOptions;
 - (void)showAboutWindow;
 - (void)showOSK;
-- (void)showConfigurationWindow;
 - (void)selectKeyboardFromMenu:(NSInteger)tag;
 - (void)handleKeyEvent:(NSEvent *)event;
 - (void)loadKeyboardFromKmxFile:(KMXFile *)kmx;
 - (void)resetKmx;
 - (NSEventModifierFlags) determineModifiers;
-- (BOOL)unzipFile:(NSString *)filePath;
-- (NSWindowController *)downloadKBWindow_;
 - (NSWindowController *)aboutWindow_;
-- (NSWindowController *)infoWindow_;
 - (NSWindowController *)kbHelpWindow_;
-- (void)processURL:(NSString*)rawUrl;
-- (void)downloadKeyboardFromKeyboardId:(NSString *)keyboardId;
-- (NSString *)kmxFilePathAtIndex:(NSUInteger)index;
-- (NSString *)packagePathAtIndex:(NSUInteger)index;
-- (NSInteger)indexForPackageFolder:(NSString *)packageFolder;
 - (NSString *)packageFolderFromPath:(NSString *)path;
 - (KMPackageInfo *)loadPackageInfo:(NSString *)path;
-- (NSString *)packageNameFromPackageInfo:(NSString *)packageFolder;
 - (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder;
 - (NSString *)kvkFilePathFromFilename:(NSString *)kvkFilename;
 - (NSString *)oskWindowTitle;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
 - (KeymanVersionInfo)versionInfo;
-- (void)registerConfigurationWindow:(NSWindowController *)window;
 - (BOOL)canForceSentryEvents;
 @end
 

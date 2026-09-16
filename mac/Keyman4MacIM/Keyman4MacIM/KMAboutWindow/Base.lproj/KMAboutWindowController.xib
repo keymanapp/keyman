@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24765" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24765"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -20,7 +20,7 @@
             <windowStyleMask key="styleMask" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="450" height="318"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1055"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1410"/>
             <view key="contentView" id="se5-gp-TjO" customClass="KMAboutBGView">
                 <rect key="frame" x="0.0" y="0.0" width="450" height="318"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -57,10 +57,10 @@
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="left" imageScaling="proportionallyUpOrDown" image="keyman-88" id="4mp-20-rlf"/>
                     </imageView>
                     <stackView distribution="fill" orientation="horizontal" alignment="baseline" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="adk-EC-UDE" userLabel="Main Stack View">
-                        <rect key="frame" x="12" y="18" width="426" height="65"/>
+                        <rect key="frame" x="12" y="17" width="426" height="66"/>
                         <subviews>
                             <stackView distribution="equalSpacing" orientation="vertical" alignment="leading" spacing="14" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="750" horizontalClippingResistancePriority="200" verticalClippingResistancePriority="500" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="axE-0r-Aby" userLabel="Text Stack View">
-                                <rect key="frame" x="0.0" y="4" width="294" height="61"/>
+                                <rect key="frame" x="0.0" y="5" width="294" height="61"/>
                                 <subviews>
                                     <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="i8D-2n-KYh" userLabel="License Agreement">
                                         <rect key="frame" x="0.0" y="50" width="89" height="11"/>
@@ -73,7 +73,7 @@
                                             <action selector="licenseAction:" target="-2" id="DOO-Wo-6Sv"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="300" translatesAutoresizingMaskIntoConstraints="NO" id="ln9-LY-e8d">
+                                    <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="300" translatesAutoresizingMaskIntoConstraints="NO" id="ln9-LY-e8d">
                                         <rect key="frame" x="-2" y="25" width="71" height="11"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Version 1.0.100" id="69w-EI-e3y">
                                             <font key="font" metaFont="miniSystem"/>
@@ -81,7 +81,7 @@
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="300" translatesAutoresizingMaskIntoConstraints="NO" id="IcZ-9F-kwH">
+                                    <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="300" translatesAutoresizingMaskIntoConstraints="NO" id="IcZ-9F-kwH">
                                         <rect key="frame" x="-2" y="0.0" width="106" height="11"/>
                                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Copyright ©2017-2019" id="fjZ-Vg-DtW">
                                             <font key="font" metaFont="miniSystem"/>
@@ -102,24 +102,10 @@
                                 </customSpacing>
                             </stackView>
                             <stackView autoresizesSubviews="NO" orientation="vertical" alignment="trailing" spacing="12" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="500" verticalClippingResistancePriority="500" horizontalHuggingPriority="750" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a6P-E8-rqT" userLabel="Button Stack View">
-                                <rect key="frame" x="306" y="0.0" width="120" height="52"/>
+                                <rect key="frame" x="306" y="0.0" width="120" height="50"/>
                                 <endViews>
-                                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xqc-bi-pPI">
-                                        <rect key="frame" x="-7" y="25" width="134" height="32"/>
-                                        <buttonCell key="cell" type="push" title="Configuration" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vkh-b5-vO7">
-                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                            <font key="font" metaFont="system"/>
-                                        </buttonCell>
-                                        <constraints>
-                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="18" id="W0C-Lh-ns5"/>
-                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="120" id="l3A-K7-gqm"/>
-                                        </constraints>
-                                        <connections>
-                                            <action selector="configAction:" target="-2" id="3W6-cm-6P5"/>
-                                        </connections>
-                                    </button>
-                                    <button horizontalHuggingPriority="249" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XIT-T3-xre">
-                                        <rect key="frame" x="-7" y="-7" width="134" height="32"/>
+                                    <button horizontalHuggingPriority="249" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XIT-T3-xre">
+                                        <rect key="frame" x="0.0" y="0.0" width="120" height="24"/>
                                         <buttonCell key="cell" type="push" title="Close" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Kab-Up-fYH">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
@@ -132,15 +118,10 @@
                                         </connections>
                                     </button>
                                 </endViews>
-                                <constraints>
-                                    <constraint firstItem="XIT-T3-xre" firstAttribute="width" secondItem="xqc-bi-pPI" secondAttribute="width" id="qAX-Lf-GxY"/>
-                                </constraints>
                                 <visibilityPriorities>
-                                    <integer value="1000"/>
                                     <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
-                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                 </customSpacing>
                             </stackView>
