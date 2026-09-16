@@ -16,6 +16,13 @@ import Foundation
 import KeymanSettings
 import OSLog
 
+// The data model version number is updated by the input method.
+// We only read the value here, and if it is current, then there is no need
+// to trigger data migration. If data migration is necessary, then it must be
+// performed by the input method because the input method alone has access
+// to the data before it was shared in an app group beginning with Keyman 19.
+let dataModelVersionStoreInGroupContainer = 2
+
 public enum InstallationPhase: String {
   case inputMethodMissing
   case inputMethodOutdated
@@ -107,6 +114,10 @@ public class InstallationCheck {
     self.isInputMethodCurrent = keymanIsCurrent
     self.inputMethodVersion = keymanVersion
 
+    if self.isMigrationNeeded() {
+      _ = self.migrateData()
+    }
+    
     let installState = InstallationCheck.readInstallationState(from: defaultsRepo)
 
     if (keymanExists && keymanIsCurrent) {
@@ -129,6 +140,34 @@ public class InstallationCheck {
     self.registerObservers()
   }
 
+  /**
+   * Check the user defaults to see whether a migration is needed
+   */
+  public func isMigrationNeeded() -> Bool {
+    var migrationNeeded = true
+    
+    if self.defaultsRepository.readDataModelVersion() >= dataModelVersionStoreInGroupContainer {
+      migrationNeeded = false
+    }
+
+    Logger.app.debug("isMigrationNeeded: \(migrationNeeded)")
+    return migrationNeeded
+  }
+  
+  /**
+   * Run the Keyman input method as a subprocess to migrate data to the shared space and immediately exit
+   */
+  public func migrateData() -> Bool {
+    let success = self.inputMethodUtil.invokeKeymanInputMethodMigration()
+    Logger.app.debug("migrateData migration suceeded: \(success)")
+
+    // check whether
+    if success {
+      NotificationCenter.default.post(name: .dataMigrated, object: nil)
+    }
+    return success
+  }
+  
   /**
    * Check the condition of the InstallationState as recorded in the UserDefaults.
    * Determine whether it is `stale` and should be deleted

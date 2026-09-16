@@ -237,7 +237,7 @@ public class InstallationContainer : ObservableObject {
     
     switch task.taskType {
     case .prepareNewInstall:
-      completedTask = self.migrateData()
+      completedTask = true
     case .prepareNewRepair:
       completedTask = true
     case .enableInputMethod:
@@ -286,13 +286,8 @@ public class InstallationContainer : ObservableObject {
    * Run the Keyman input method as a subprocess to migrate data to the shared space and immediately exit
    */
   public func migrateData() -> Bool {
-    let success = self.inputMethodUtil.invokeKeymanInputMethodMigration()
+    let success = self.installationCheck.migrateData()
     Logger.app.debug("migration suceeded: \(success)")
-
-    // check whether
-    if success {
-      NotificationCenter.default.post(name: .dataMigrated, object: nil)
-    }
     return success
   }
   

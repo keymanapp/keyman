@@ -80,7 +80,7 @@ public extension Notification.Name {
 
 // in-app notifications
 public extension Notification.Name {
-  // sent from InstallationContainer to SettingsContainer
+  // sent from InstallationContainer to SettingsContainer so it can reload packages
   static let dataMigrated = Notification.Name("com.keyman.data.migrated")
 }
 
