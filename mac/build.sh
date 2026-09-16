@@ -15,7 +15,7 @@ builder_describe "Builds Keyman for macOS." \
   "clean" \
   "configure" \
   "build" \
-  "publish     Publishes debug info to Sentry and builds DMG, .download_info for distribution" \
+  "publish     Publishes debug info to Sentry and creates installer, .download_info for distribution" \
   "test" \
   "install     Installs Keyman.app and Keyman Configuration.app locally." \
   ":engine     KeymanEngine4Mac" \
@@ -198,14 +198,6 @@ do_build_app ( ) {
   #check_code_sign_status
 }
 
-do_build_settings_package ( ) {
-  ### Build Keyman Settings Package ###
-  builder_heading "Building Keyman Settings Package"
-  execBuildCommand "Keyman Settings Package" xcodebuild $BUILD_OPTIONS $BUILD_ACTIONS -scheme KeymanSettings \
-    -destination 'platform=macOS' -derivedDataPath ./build \
-    BUILD_LIBRARY_FOR_DISTRIBUTION=YES
-}
-
 do_build_config_app ( ) {
   ### Build Keyman Configuration.app (Configuration app) ###
   builder_heading "Building Keyman Configuration.app"
@@ -295,7 +287,6 @@ do_build_testapp() {
 # In case both install & publish actions are specified, we should still only notarize once.
 DID_NOTARIZE=false
 
-# MAC-CONFIG-TODO: delete this if we only ever notarize installer package
 do_notarize() {
   if [[ $DID_NOTARIZE == false ]]; then
     ### Validate notarization environment variables ###
@@ -352,6 +343,9 @@ do_sentry() {
   sentry-cli upload-dif "build/$CONFIG"
   popd > /dev/null
 
+  pushd "$CONFIGAPP_BASE_PATH" > /dev/null
+  sentry-cli upload-dif "build/Build/Products/$CONFIG"
+  popd > /dev/null
 }
 
 do_install() {
@@ -359,7 +353,7 @@ do_install() {
     builder_die "build.sh install should not be run on CI"
   elif ! builder_has_option --quick && ! builder_is_debug_build; then
     echo "about to notarize"
-    # do not notarize if quick option is specified or not a relase build
+    # do not notarize if quick option is specified or not a release build
     # notarization fails unless signed with Developer ID certificate
     # which is not used in debug builds
     do_notarize
@@ -382,23 +376,6 @@ do_install() {
   "$KEYMAN_MAC_BASE_PATH/local-deploy.sh" "$KM4MIM_APP_BASE_PATH" "$KM4M_CONFIG_APP_BASE_PATH"
 }
 
-# MAC-CONFIG-TODO: delete this and everything else related to building .dmg
-do_publish() {
-  builder_if_release_build_level do_notarize
-
-  builder_heading "Preparing files for release deployment..."
-  ./setup/build.sh
-
-  "${KM4MIM_BASE_PATH}/make-km-dmg.sh"
-
-  local UPLOAD_PATH="${KM4MIM_BASE_PATH}/output/upload/${KEYMAN_VERSION}"
-  write_download_info "${UPLOAD_PATH}" "keyman-${KEYMAN_VERSION_FOR_FILENAME}.dmg" "Keyman4MacIM" dmg mac
-
-  if builder_is_ci_build && builder_is_ci_build_level_release; then
-    do_sentry
-  fi
-}
-
 do_create_installer() {
   builder_heading "Creating installer package..."
 
@@ -412,6 +389,7 @@ do_publish_installer() {
     builder_echo info "writing download info for Keyman installer..."
     local UPLOAD_PATH="${KEYMAN_MAC_BASE_PATH}/build/upload/${KEYMAN_VERSION}"
     write_download_info "${UPLOAD_PATH}" "Keyman-${KEYMAN_VERSION_FOR_FILENAME}.pkg" "Keyman Installer Package" pkg mac
+    do_sentry
   else
     builder_echo info "not writing download info because we are not on a CI build..."
   fi
@@ -435,7 +413,6 @@ builder_run_action test:app       execBuildCommand "$IM_NAME-tests" "xcodebuild 
 builder_run_action test:help      check-markdown  "$KEYMAN_ROOT/mac/docs/help"
 builder_run_action build:app      do_update_app_metadata
 
-#builder_run_action build:configapp      do_build_settings_package
 builder_run_action build:configapp      do_build_config_app
 
 builder_run_action build:testapp  do_build_testapp
@@ -443,6 +420,5 @@ builder_run_action build:testapp  do_build_testapp
 
 builder_run_action install do_install
 
-#builder_run_action publish do_publish
 builder_run_action publish do_create_installer
 builder_run_action publish do_publish_installer
