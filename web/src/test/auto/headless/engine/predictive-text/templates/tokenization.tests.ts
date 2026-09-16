@@ -175,7 +175,7 @@ describe('Tokenization functions', function() {
     });
 
     it('properly handles empty-context cases', function() {
-      // Wordbreaking on a empty space => no word.
+      // Wordbreaking on a empty space => no word, but empty initial token.
       let context = {
         left: '', startOfBuffer: true,
         right: '', endOfBuffer: true
@@ -184,7 +184,7 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       let expectedResult: models.Tokenization = {
-        left: [],
+        left: [{text: '', isWhitespace: false}],
         right: [],
         caretSplitsToken: false
       };
@@ -193,11 +193,11 @@ describe('Tokenization functions', function() {
     });
 
     it('properly handles null context cases', function() {
-      // Wordbreaking on a empty space => no word.
+      // Wordbreaking on a empty space => no word, but empty initial token.
       let tokenization = models.tokenize(wordBreakers.default, null);
 
       let expectedResult: models.Tokenization = {
-        left: [],
+        left: [{text: '', isWhitespace: false}],
         right: [],
         caretSplitsToken: false
       };

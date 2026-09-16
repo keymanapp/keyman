@@ -1,37 +1,51 @@
 import { CorrectionResultMapping } from "./correction-result-mapping.js";
 import { TokenizationCorrector, TokenResult } from './tokenization-corrector.js';
 
-export class TokenizationResultMapping implements CorrectionResultMapping<ReadonlyArray<TokenResult>> {
-  readonly matchingSpace: TokenizationCorrector;
-  readonly matchedResult: ReadonlyArray<TokenResult>;
+export interface TokenizationResult {
+  tokenCorrections: ReadonlyArray<TokenResult>,
+  totalEditCount: number,
+  totalEditableCodepoints: number
+}
 
-  constructor(tokenization: TokenResult[], corrector: TokenizationCorrector) {
+export class TokenizationResultMapping implements CorrectionResultMapping<TokenizationResult> {
+  readonly matchingSpace: TokenizationCorrector;
+  readonly matchedResult: TokenizationResult;
+
+  constructor(tokenization: TokenResult[], corrector?: TokenizationCorrector) {
     this.matchingSpace = corrector;
-    this.matchedResult = tokenization;
+
+    this.matchedResult = {
+      tokenCorrections: tokenization,
+      totalEditCount: tokenization.reduce((accum, curr) => accum + curr.knownCost, 0),
+      // If based on a legacy/custom model not using traversals, we don't
+      // support edit operations (for correction) beyond the direct results of
+      // the most recent input distribution.
+      totalEditableCodepoints: corrector?.correctableCodepoints ?? 0
+    }
   }
 
   get spaceId(): number {
-    return this.matchingSpace.tokenization.spaceId;
+    return this.matchingSpace?.tokenization.spaceId;
   }
 
-  // /**
-  //  * Gets the number of Damerau-Levenshtein edits needed to reach the node's
-  //  * matchString from the output induced by the input sequence used to reach it.
-  //  *
-  //  * (This is scaled by `SearchSpace.EDIT_DISTANCE_COST_SCALE` when included in
-  //  * `totalCost`.)
-  //  */
-  // get knownCost(): number {
-  //   return this.node.editCount;
-  // }
+  /**
+   * Gets the number of Damerau-Levenshtein edits needed to reach the node's
+   * matchString from the output induced by the input sequence used to reach it.
+   *
+   * (This is scaled by `SearchSpace.EDIT_DISTANCE_COST_SCALE` when included in
+   * `totalCost`.)
+   */
+  get knownCost(): number {
+    return this.matchedResult.totalEditCount;
+  }
 
-  // /**
-  //  * Gets the "input sampling cost" of the edge, which should be considered as the
-  //  * negative log-likelihood of the input path taken to reach the node.
-  //  */
-  // get inputSamplingCost(): number {
-  //   return this.node.inputSamplingCost;
-  // }
+  /**
+   * Gets the "input sampling cost" of the edge, which should be considered as the
+   * negative log-likelihood of the input path taken to reach the node.
+   */
+  get inputSamplingCost(): number {
+    return this.matchedResult.tokenCorrections.reduce((accum, curr) => accum + curr.inputSamplingCost, 0);
+  }
 
   /**
    * Gets the "total cost" of the edge, which should be considered as the
@@ -40,6 +54,6 @@ export class TokenizationResultMapping implements CorrectionResultMapping<Readon
    * to the resulting output.
    */
   get totalCost(): number {
-    return this.matchedResult.reduce((total, curr) => total + curr.totalCost, 0);
+    return this.matchedResult.tokenCorrections.reduce((total, curr) => total + curr.totalCost, 0);
   }
 }

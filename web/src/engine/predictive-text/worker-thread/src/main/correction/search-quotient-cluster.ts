@@ -12,8 +12,8 @@ import { PriorityQueue } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { CORRECTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';
-import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { generateSpaceSeed, InputSegment, SearchQuotientNode } from './search-quotient-node.js';
+import { SearchQuotientRoot } from './search-quotient-root.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
 import { TokenResultMapping } from './token-result-mapping.js';
 
@@ -68,6 +68,10 @@ export class SearchQuotientCluster extends SearchQuotientNode {
       // If there's a source-range key mismatch - via mismatch in count or in actual ID, we have an error.
       if(path.sourceRangeKey != sourceRangeKey) {
         throw new Error(`SearchQuotientNode does not share the same source identifiers as others in the cluster`);
+      }
+
+      if(path instanceof SearchQuotientRoot) {
+        throw new Error(`SearchQuotientRoot instances may not be part of clusters`);
       }
 
       lowestPossibleSingleCost = Math.min(lowestPossibleSingleCost, path.lowestPossibleSingleCost);
@@ -173,16 +177,16 @@ export class SearchQuotientCluster extends SearchQuotientNode {
 
     // What if we're trying to merge something previously split?
     // That can only happen at the head of the incoming space, so we check for it early here.
-    if(space.inputCount == 1 && space instanceof SearchQuotientSpur) {
+    if(space.inputCount == 1 && space instanceof SearchQuotientSpur && space.parents[0] instanceof SearchQuotientRoot) {
       // In such a case... the 'leading edge' of the incoming space needs to be checked
       // against the trailing edge of `this` instance's entries.
       const thisTailInputSource = this.inputSegments[this.inputSegments.length - 1];
-      const thisTailSpaceIds = this.parents.map((path) => (path as SearchQuotientSpur).inputSource.subsetId);
+      const thisTailSpaceIds = this.parents.map((path) => (path as SearchQuotientSpur).inputSource?.subsetId);
       const spaceHeadInputSource = space.inputSegments[0];
 
       const isOnSplitInput =
         thisTailSpaceIds.some((entry) => entry == space.inputSource.subsetId)
-        && thisTailInputSource.end == spaceHeadInputSource.start;
+        && thisTailInputSource?.end == spaceHeadInputSource.start;
 
       // In this case, we only rebuild the single path; an outer stack frame will reconstitute
       // the split cluster from the individual paths built here.
@@ -217,7 +221,9 @@ export class SearchQuotientCluster extends SearchQuotientNode {
   split(charIndex: number): [SearchQuotientNode, SearchQuotientNode][] {
     // Don't rebuild if this is already a perfect split point!
     if(this.codepointLength <= charIndex) {
-      return [[this, new LegacyQuotientRoot(this.model)]];
+      // We'll assume that the search path is either using legacy nodes or is not;
+      // we shouldn't see mixed-use cases.
+      return [[this, (this.parents[0] as SearchQuotientSpur).constructRoot()]];
     }
 
     const results = this.parents.flatMap((p) => p.split(charIndex));

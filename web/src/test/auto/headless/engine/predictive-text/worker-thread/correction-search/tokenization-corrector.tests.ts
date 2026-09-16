@@ -21,18 +21,20 @@ import {
   ExecutionTimer,
   generateSubsetId,
   getBestMatches,
-  LegacyQuotientSpur,
   models,
   PathInputProperties,
   PathResult,
   SearchQuotientNode,
   SearchQuotientRoot,
+  SubstitutionQuotientSpur,
   TokenizationCorrector,
   TokenResult,
-  TokenizationResultMapping
+  TokenizationResultMapping,
+  TokenizationResult
 } from '@keymanapp/lm-worker/test-index';
 
 import Distribution = LexicalModelTypes.Distribution;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
 import TrieModel = models.TrieModel;
 import Transform = LexicalModelTypes.Transform;
 
@@ -86,22 +88,21 @@ function buildFixture_therefore() {
   const therefTokens: ContextToken[] = []; // as in "therefore"
   const the_efTokens: ContextToken[] = []; // as in "the effect"
 
-  // TODO:  Use SubstitutionQuotientSpur instead!
   let firstTokenNode: SearchQuotientNode = new SearchQuotientRoot(plainModel);
   for(let i=0; i < 3; i++) {
-    firstTokenNode = new LegacyQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
+    firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
   }
 
   the_efTokens.push(new ContextToken(firstTokenNode, false));
 
-  firstTokenNode = new LegacyQuotientSpur(firstTokenNode, [distributions[3][1]], {
+  firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, [distributions[3][1]], {
     ...inputSources[3],
     subsetId: generateSubsetId()
   });
 
   // whitespace token alternate - using the ' ' input instead.
   const whitespaceToken = new ContextToken(
-    new LegacyQuotientSpur(
+    new SubstitutionQuotientSpur(
       new SearchQuotientRoot(plainModel),
       [distributions[3][0]],
       { ...inputSources[3], subsetId: generateSubsetId() }
@@ -112,11 +113,11 @@ function buildFixture_therefore() {
 
   let secondTokenNode: SearchQuotientNode = new SearchQuotientRoot(plainModel);
   for(let i=4; i < distributions.length; i++) {
-    firstTokenNode = new LegacyQuotientSpur(firstTokenNode, distributions[i], {
+    firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, distributions[i], {
       ...inputSources[i],
       subsetId: generateSubsetId()
     });
-    secondTokenNode = new LegacyQuotientSpur(secondTokenNode, distributions[i], {
+    secondTokenNode = new SubstitutionQuotientSpur(secondTokenNode, distributions[i], {
       ...inputSources[i],
       subsetId: generateSubsetId()
     })
@@ -171,17 +172,16 @@ function buildFixture_terminalWhitespace() {
   const fullTokens: ContextToken[] = [];
   const lastToken: ContextToken[] = [];
 
-  // TODO:  Use SubstitutionQuotientSpur instead!
   let firstTokenNode: SearchQuotientNode = new SearchQuotientRoot(plainModel);
   for(let i=0; i < 5; i++) {
-    firstTokenNode = new LegacyQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
+    firstTokenNode = new SubstitutionQuotientSpur(firstTokenNode, distributions[i], inputSources[i]);
   }
 
   fullTokens.push(new ContextToken(firstTokenNode, false));
 
   // whitespace token alternate - using the ' ' input instead.
   const whitespaceToken = new ContextToken(
-    new LegacyQuotientSpur(
+    new SubstitutionQuotientSpur(
       new SearchQuotientRoot(plainModel),
       distributions[5],
       inputSources[5],
@@ -303,7 +303,7 @@ describe('TokenizationCorrector', () => {
       assert.equal(searchResult.type, 'complete');
       if(searchResult.type == 'complete') {
         const mapping = searchResult.mapping;
-        const tokenResults = mapping.matchedResult;
+        const tokenResults = mapping.matchedResult.tokenCorrections;
         assert.isNotNaN(searchResult.cost);
         assert.equal(searchResult.cost, searchResult.mapping.totalCost);
         assert.equal(tokenResults.length, 1);
@@ -316,14 +316,63 @@ describe('TokenizationCorrector', () => {
       }
 
       searchResult = instance.handleNextNode();
-      // There should be more results that may be found.
+      // There should be more searching to perform before aborting.
       assert.notEqual(searchResult.type, 'none');
 
       do {
         searchResult = instance.handleNextNode();
       } while(searchResult.type == 'intermediate');
 
-      assert.notEqual(searchResult.type, 'none');
+      // However, no other valid results are within correction range
+      // while rooted on 6 input transforms.
+      assert.equal(searchResult.type, 'none');
+    });
+
+    it('returns no result when a single correctable token lacks a model match', () => {
+      const fixture = buildFixture_therefore();
+
+      const theref = fixture.theref.tail;
+      const xInput: ProbabilityMass<Transform> = {
+        sample: {
+          insert: 'x',
+          deleteLeft: 0,
+          id: 123
+        },
+        p: 1
+      }
+      const therefx = new SubstitutionQuotientSpur(theref.searchModule, [xInput], xInput);
+      const yInput: ProbabilityMass<Transform> = {
+        sample: {
+          insert: 'y',
+          deleteLeft: 0,
+          id: 124
+        },
+        p: 1
+      }
+      const therefxy = new SubstitutionQuotientSpur(therefx, [yInput], yInput);
+      const zInput: ProbabilityMass<Transform> = {
+        sample: {
+          insert: 'z',
+          deleteLeft: 0,
+          id: 125
+        },
+        p: 1
+      }
+      const therefxyz = new ContextToken(new SubstitutionQuotientSpur(therefxy, [zInput], zInput));
+      const therefxyzTokenization = new ContextTokenization([therefxyz]);
+
+      const instance = new TokenizationCorrector(
+        therefxyzTokenization,
+        1,
+        fixture.filter
+      );
+
+      let searchResult: PathResult<TokenizationResultMapping>;
+      do {
+        searchResult = instance.handleNextNode();
+      } while(searchResult.type == 'intermediate');
+
+      assert.equal(searchResult.type, 'none');
     });
 
     it('finds corrections for a group of tokens with two correctable', () => {
@@ -346,7 +395,7 @@ describe('TokenizationCorrector', () => {
       let firstResults: ReadonlyArray<TokenResult>;
       if(searchResult.type == 'complete') {
         const mapping = searchResult.mapping;
-        const tokenResults = mapping.matchedResult;
+        const tokenResults = mapping.matchedResult.tokenCorrections;
         firstResults = tokenResults;
         assert.isNotNaN(searchResult.cost);
         assert.equal(searchResult.cost, searchResult.mapping.totalCost);
@@ -369,7 +418,7 @@ describe('TokenizationCorrector', () => {
         searchResult = instance.handleNextNode();
         if(searchResult.type == 'complete') {
           const mapping = searchResult.mapping;
-          const tokenResults = mapping.matchedResult;
+          const tokenResults = mapping.matchedResult.tokenCorrections;
 
           // Verify that the first (bound) token is not altered further.
           // It should receive no further correction attempts.
@@ -380,7 +429,7 @@ describe('TokenizationCorrector', () => {
       } while(searchResult.type != 'none');
     });
 
-    it('immediately returns a single result when the only represented token is uncorrectable', () => {
+    it('immediately returns with no result when the only represented token is uncorrectable', () => {
       const fixture = buildFixture_terminalWhitespace();
 
       const tokenization = fixture.spaceOnly;
@@ -392,13 +441,7 @@ describe('TokenizationCorrector', () => {
       );
 
       const searchResult = instance.handleNextNode();
-      assert.equal(searchResult.type, 'complete');
-      if(searchResult.type == 'complete') {
-        assert.equal(searchResult.mapping.matchedResult[0].matchString, ' ');
-      }
-
-      const nilResult = instance.handleNextNode();
-      assert.equal(nilResult.type, 'none');
+      assert.equal(searchResult.type, 'none');
     });
 
     it('returns a single result when the final token is uncorrectable', () => {
@@ -419,8 +462,8 @@ describe('TokenizationCorrector', () => {
 
       assert.equal(searchResult.type, 'complete');
       if(searchResult.type == 'complete') {
-        assert.equal(searchResult.mapping.matchedResult[0].matchString, 'space');
-        assert.equal(searchResult.mapping.matchedResult[1].matchString, ' ');
+        assert.equal(searchResult.mapping.matchedResult.tokenCorrections[0].matchString, 'space');
+        assert.equal(searchResult.mapping.matchedResult.tokenCorrections[1].matchString, ' ');
       }
 
       const nilResult = instance.handleNextNode();
@@ -437,20 +480,20 @@ describe('TokenizationCorrector', () => {
         let haveSeenSingleTokenCorrection = false;
         let haveSeenThreeTokenCorrection = false;
         for await(let phraseMatch of getBestMatches<
-          ReadonlyArray<TokenResult>,
+          TokenizationResult,
           TokenizationResultMapping,
           TokenizationCorrector
           >(correctors, buildTestTimer())) {
 
-          if(phraseMatch.matchedResult.length == 1) {
+          if(phraseMatch.matchedResult.tokenCorrections.length == 1) {
             if(!haveSeenSingleTokenCorrection) {
-              assert.sameOrderedMembers(phraseMatch.matchedResult.map((t) => t.matchString), ['theref' /* -ore */]);
+              assert.sameOrderedMembers(phraseMatch.matchedResult.tokenCorrections.map((t) => t.matchString), ['theref' /* -ore */]);
             }
 
             haveSeenSingleTokenCorrection = true;
-          } else if(phraseMatch.matchedResult.length == 3) {
+          } else if(phraseMatch.matchedResult.tokenCorrections.length == 3) {
             if(!haveSeenThreeTokenCorrection) {
-              assert.sameOrderedMembers(phraseMatch.matchedResult.map((t) => t.matchString), ['the', ' ', 'ef' /* -fort */]);
+              assert.sameOrderedMembers(phraseMatch.matchedResult.tokenCorrections.map((t) => t.matchString), ['the', ' ', 'ef' /* -fort */]);
             }
             haveSeenThreeTokenCorrection = true;
           }
