@@ -1,18 +1,18 @@
 (*
   Name:             GetOsVersion
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 Dec 2006
 
   Modified Date:    28 May 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 Dec 2006 - mcdurdin - Add osVista
                     04 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     24 Oct 2012 - mcdurdin - I3487 - V9.0 - Add detection of Win8
@@ -27,7 +27,7 @@ uses
   Winapi.Windows;
 
 type
-  TOS = (osLegacy, osVista, osWin7, osWin8, osWin10, osOther);   // I3669   // I4222
+  TOS = (osLegacy, osWin10, osOther);   // I3669   // I4222
 
 function GetOs: TOS;
 
@@ -46,12 +46,7 @@ begin
   begin
     case osv.dwMajorVersion of
       5: Result := osLegacy;
-      6: case osv.dwMinorVersion of
-           0: Result := osVista;
-           1: Result := osWin7;
-           2: Result := osWin8;  // I3487
-           else Result := osWin8;  // I3669
-         end;
+      6: Result := osLegacy;
       10: Result := osWin10;
     else
       Result := osWin10;

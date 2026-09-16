@@ -33,7 +33,7 @@ describe('PageContextAttachment', () => {
     it('empty doc has no elements', () => {
       const doc = createDocument('<!doctype html><html><body></body></html>');
       const sut = new PageContextAttachment(doc, null);
-      sut.listInputs();
+      sut['listInputs']();
 
       assert.isEmpty(sut.sortedInputs);
     });
@@ -66,7 +66,7 @@ describe('PageContextAttachment', () => {
           <textarea></textarea>
         </body></html>`);
       const sut = new PageContextAttachment(doc, null);
-      sut.listInputs();
+      sut['listInputs']();
 
       const expected = ['email', 'search', 'text', 'url', 'textarea'];
       const types = sut.sortedInputs.map((e) => ((e as HTMLInputElement).type));
@@ -83,7 +83,7 @@ describe('PageContextAttachment', () => {
           <textarea id="4" class="kmw-disabled"></textarea>
         </body></html>`);
       const sut = new PageContextAttachment(doc, null);
-      sut.listInputs();
+      sut['listInputs']();
 
       const expected = ['1', '3'];
       const types = sut.sortedInputs.map((e) => (e as HTMLInputElement).id);
@@ -102,7 +102,7 @@ describe('PageContextAttachment', () => {
           const sut = new PageContextAttachment(doc, null);
           const elem = doc.getElementById('1');
 
-          const result = sut.isKMWInput(elem);
+          const result = sut['isKMWInput'](elem);
           assert.isTrue(result, `${elementType} should be treated as input element`);
       });
     });
@@ -118,7 +118,7 @@ describe('PageContextAttachment', () => {
           const sut = new PageContextAttachment(doc, null);
           const elem = doc.getElementById('1');
 
-          const result = sut.isKMWInput(elem);
+          const result = sut['isKMWInput'](elem);
           assert.isFalse(result, `${elementType} should not be treated as input element`);
         });
     });
@@ -131,7 +131,7 @@ describe('PageContextAttachment', () => {
       const sut = new PageContextAttachment(doc, null);
       const elem = doc.getElementById('1');
 
-      const result = sut.isKMWInput(elem);
+      const result = sut['isKMWInput'](elem);
       assert.isTrue(result);
     });
 

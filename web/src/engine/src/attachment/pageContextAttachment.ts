@@ -163,7 +163,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    * Call this method **once**, when the page is fully loaded, to attach to all page elements
    * eligible to serve as context for Keyman keyboard input.
    */
-  install(manualAttach: boolean) {
+  public install(manualAttach: boolean) {
     // This field gets referenced by any non-design iframes detected during _SetupDocument.
     // Thus, we must initialize it now.
     this.manualAttach = manualAttach;
@@ -186,15 +186,15 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   /**
-   * Function     setupElementAttachment
-   * Scope        Private
-   * @param       {Element}   x   An element from the page valid for KMW attachment
-   * Description  Establishes the base KeymanWeb data for newly-attached elements.
-   *              Does not establish input hooks, which are instead handled during enablement.
+   * Establishes the base KeymanWeb data for newly-attached elements.
+   * Does not establish input hooks, which are instead handled during enablement.
+   *
+   * @param  {Element} x  An element from the page valid for KMW attachment
    */
-  setupElementAttachment(x: HTMLElement) {
-    // The `_kmwAttachment` property tag maintains all relevant KMW-maintained data regarding the element.
-    // It is disgarded upon de-attachment.
+  private setupElementAttachment(x: HTMLElement) {
+    // The `_kmwAttachment` property tag maintains all relevant
+    // KMW-maintained data regarding the element. It is disgarded upon
+    // de-attachment.
     if(x._kmwAttachment) {
       return;
     } else {
@@ -214,26 +214,24 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   /**
-   * Function     clearElementAttachment
-   * Scope        Private
+   * Clear element attachment
+   *
    * @param       {Element}   x   An element from the page valid for KMW attachment
-   * Description  Establishes the base KeymanWeb data for newly-attached elements.
-   *              Does not establish input hooks, which are instead handled during enablement.
    */
-  clearElementAttachment(x: HTMLElement) {
+  private clearElementAttachment(x: HTMLElement) {
     // We need to clear the object when de-attaching; helps prevent memory leaks.
     x._kmwAttachment = null;
   }
 
   /**
-   * Function     isKMWInput
-   * Scope        Private
-   * @param       {Element}   x   An element from the page.
-   * @return      {boolean}      true if the element is viable for KMW attachment.
-   * Description  Examines potential input elements to determine whether or not they are viable for KMW attachment.
-   *              Also filters elements not supported for touch devices when device.touchable == true.
+   * Examines potential input elements to determine whether or not they
+   * are viable for KMW attachment. Also filters elements not supported
+   * for touch devices when device.touchable == true.
+   *
+   * @param   {Element}  x  An element from the page.
+   * @return  {boolean}     true if the element is viable for KMW attachment.
    */
-  isKMWInput(x: HTMLElement): boolean {
+  private isKMWInput(x: HTMLElement): boolean {
     if(x instanceof x.ownerDocument.defaultView.HTMLTextAreaElement) {
       return true;
     } else if(x instanceof x.ownerDocument.defaultView.HTMLInputElement) {
@@ -270,12 +268,13 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   /**
-   * Function     isAttached
-   * Scope        Private
-   * @param       {Element}   x   An element from the page.
-   * @return      {boolean}       true if KMW is attached to the element, otherwise false.
+   * Determines if KMW is attached to the specified element.
+   *
+   * @param   {Element} x  An element from the page.
+   * @return  {boolean}    true if KMW is attached to the element,
+   *                       otherwise false.
    */
-  isAttached(x: HTMLElement) {
+  public isAttached(x: HTMLElement) {
     if(x._kmwAttachment) {
       return true;
     }
@@ -300,13 +299,14 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   /**
-   * Function     isKMWDisabled
-   * Scope        Private
-   * @param       {Element}   x   An element from the page.
-   * @return      {boolean}      true if the element's properties indicate a 'disabled' state.
-   * Description  Examines attachable elements to determine their default enablement state.
+   * Examines attachable elements to determine their default enablement
+   * state.
+   *
+   * @param   {Element}  x  An element from the page.
+   * @return  {boolean}     true if the element's properties indicate a
+   *                        'disabled' state.
    */
-  isKMWDisabled(x: HTMLElement): boolean {
+  private isKMWDisabled(x: HTMLElement): boolean {
     const c = x.className;
 
     // Exists for some HTMLElements, such as HTMLInputElement.
@@ -321,75 +321,82 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   /**
-   * Function     enableInputElement
-   * Scope        Private
-   * @param       {Element}   Pelem   An element from the document to be enabled with full KMW handling.
-   * @param       {boolean=}   isAlias A flag that indicates if the element is a simulated input element for touch.
-   * Description  Performs the basic enabling setup for one element and adds it to the inputList if it is an input element.
-   *              Note that this method is called for both desktop and touch control routes; the touch route calls it from within
-   *              enableTouchElement as it must first establish the simulated touch element to serve as the alias "input element" here.
-   *              Note that the 'kmw-disabled' property is managed by the MutationObserver and by the surface API calls.
+   * Performs the basic enabling setup for the specified element and
+   * adds it to the inputList if it is an input element.
+   *
+   * @param {Element}  elem  An element from the document to be
+   *                         enabled with full KMW handling.
+   *
+   * Note that this method is called for both desktop and touch control
+   * routes; the touch route calls it from within enableTouchElement as
+   * it must first establish the simulated touch element to serve as the
+   * alias "input element" here.
+   *
+   * Note that the 'kmw-disabled' property is managed by the
+   * MutationObserver and by the surface API calls.
    */
-  enableInputElement(Pelem: HTMLElement) {
-    if(!this.isKMWDisabled(Pelem)) {
-      if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
-        this._AttachToIframe(Pelem);
+  private enableInputElement(elem: HTMLElement) {
+    if(!this.isKMWDisabled(elem)) {
+      if(elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) {
+        this._AttachToIframe(elem);
       } else {
-        this.setupElementAttachment(Pelem);
+        this.setupElementAttachment(elem);
 
-        Pelem._kmwAttachment.inputMode = Pelem.inputMode ?? 'text';
+        elem._kmwAttachment.inputMode = elem.inputMode ?? 'text';
         this.disableInputModeObserver();
         // ensures that the system keyboard doesn't show on mobile devices.
-        Pelem.inputMode = 'none';
+        elem.inputMode = 'none';
         this.enableInputModeObserver();
 
-        Pelem.classList.add('keymanweb-font');
-        this._inputList.push(Pelem);
+        elem.classList.add('keymanweb-font');
+        this._inputList.push(elem);
 
-        this.emit('enabled', Pelem);
+        this.emit('enabled', elem);
       }
     }
   };
 
   /**
-   * Function     disableInputElement
-   * Scope        Private
-   * @param       {Element}   Pelem   An element from the document to be enabled with full KMW handling.
-   * @param       {boolean=}   isAlias A flag that indicates if the element is a simulated input element for touch.
-   * Description  Inverts the process of enableInputElement, removing all event-handling from the element.
-   *              Note that the 'kmw-disabled' property is managed by the MutationObserver and by the surface API calls.
+   * Inverts the process of enableInputElement, removing all event-handling
+   * from the element.
+   *
+   * @param  {Element}  elem  An element from the document to be enabled
+   *                          with full KMW handling.
+   *
+   * Note that the 'kmw-disabled' property is managed by the
+   * MutationObserver and by the surface API calls.
    */
-  disableInputElement(Pelem: HTMLElement) {
-    if(!Pelem) {
+  private disableInputElement(elem: HTMLElement) {
+    if(!elem) {
       return;
     }
 
     // Do NOT test for pre-disabledness - we also use this to fully detach without officially 'disabling' via kmw-disabled.
-    if((Pelem.ownerDocument.defaultView && Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) ||
-        Pelem instanceof HTMLIFrameElement) {
-      this._DetachFromIframe(Pelem);
+    if((elem.ownerDocument.defaultView && elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) ||
+        elem instanceof HTMLIFrameElement) {
+      this._DetachFromIframe(elem);
     } else {
-      if(this.isAttached(Pelem)) {
-        const intendedInputMode = Pelem._kmwAttachment?.inputMode;
+      if(this.isAttached(elem)) {
+        const intendedInputMode = elem._kmwAttachment?.inputMode;
 
         this.disableInputModeObserver();
         // restores the last-known setting before KMW forced it to 'none'.
         // Refer to enableInputElement.
-        Pelem.inputMode = intendedInputMode;
+        elem.inputMode = intendedInputMode;
         this.enableInputModeObserver();
       }
 
-      const cnIndex = Pelem.className.indexOf('keymanweb-font');
+      const cnIndex = elem.className.indexOf('keymanweb-font');
       if(cnIndex >= 0) { // See note about the alias below.
-        Pelem.className = Pelem.className.replace('keymanweb-font', '').trim();
+        elem.className = elem.className.replace('keymanweb-font', '').trim();
       }
 
       // Remove the element from our internal input tracking.
-      const index = this.inputList.indexOf(Pelem);
+      const index = this.inputList.indexOf(elem);
       if(index > -1) {
         this._inputList.splice(index, 1);
       }
-      this.emit('disabled', Pelem);
+      this.emit('disabled', elem);
     }
 
     return;
@@ -404,49 +411,52 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   // said flag unnecessary.
 
   /**
-   * Function     enableTouchElement
-   * Scope        Private
-   * @param       {Element}  Pelem   An input or textarea element from the page.
-   * @return      {boolean}  Returns true if it creates a simulated input element for Pelem; false if not.
-   * Description  Creates a simulated input element for the specified INPUT or TEXTAREA, comprising:
-   *              an outer DIV, matching the position, size and style of the base element
-   *              a scrollable DIV within that outer element
-   *              two SPAN elements within the scrollable DIV, to hold the text before and after the caret
+   * Creates a simulated input element for the specified INPUT or TEXTAREA,
+   * comprising:
+   * - an outer DIV, matching the position, size and style of the base element
+   * - a scrollable DIV within that outer element
+   * - two SPAN elements within the scrollable DIV, to hold the text
+   *   before and after the caret
    *
-   *              The left border of the second SPAN is flashed on and off as a visible caret
+   * The left border of the second SPAN is flashed on and off as a
+   * visible caret
    *
-   *              Also ensures the element is registered on keymanweb's internal input list.
+   * Also ensures the element is registered on keymanweb's internal
+   * input list.
+   *
+   * @param   {Element}  elem  An input or textarea element from the page.
+   * @return  {boolean}  Returns true if it creates a simulated input
+   *                     element for elem; false if not.
    */
-  enableTouchElement(Pelem: HTMLElement) {
-    if(this.isKMWDisabled(Pelem)) {
-      this.emit('disabled', Pelem);
+  private enableTouchElement(elem: HTMLElement) {
+    if(this.isKMWDisabled(elem)) {
+      this.emit('disabled', elem);
       return false;
     }
 
-    if(!this.isAttached(Pelem)) {
-      this.setupElementAttachment(Pelem);
+    if(!this.isAttached(elem)) {
+      this.setupElementAttachment(elem);
     }
 
     // Set font for base element
-    this.enableInputElement(Pelem);
+    this.enableInputElement(elem);
 
     return true;
   }
 
   /**
-   * Function     disableTouchElement
-   * Scope        Private
-   * @param       {Element}  Pelem   An input or textarea element from the page.
-   * Description  Destroys the simulated input element for the specified INPUT or TEXTAREA and reverts
-   *              back to desktop-style 'enablement' for the base control.
+   * Destroys the simulated input element for the specified INPUT or
+   * TEXTAREA and reverts back to desktop-style 'enablement' for the
+   * base control.
+   * @param  {Element}  elem  An input or textarea element from the page.
    */
-  disableTouchElement(Pelem: HTMLElement) {
+  private disableTouchElement(elem: HTMLElement) {
     // Do not check for the element being officially disabled - it's also used for detachment.
-    if(this.isAttached(Pelem)) {
-      const intendedInputMode = Pelem._kmwAttachment.inputMode;
+    if(this.isAttached(elem)) {
+      const intendedInputMode = elem._kmwAttachment.inputMode;
 
       this.disableInputModeObserver();
-      Pelem.inputMode = intendedInputMode;
+      elem.inputMode = intendedInputMode;
       this.enableInputModeObserver();
     }
   }
@@ -484,30 +494,29 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   };
 
   /**
-     * Function     _AttachToIframe
-     * Scope        Private
-     * @param       {Element}      Pelem       IFrame to which KMW will be attached
-     * Description  Attaches KeymanWeb to IFrame
+     * Attaches KeymanWeb to IFrame
+     *
+     * @param  {Element}  elem  IFrame to which KMW will be attached
      */
-  _AttachToIframe(Pelem: HTMLIFrameElement) {
+  private _AttachToIframe(elem: HTMLIFrameElement) {
     try {
-      const Lelem=Pelem.contentWindow.document;
+      const Lelem=elem.contentWindow.document;
       /* editable Iframe */
       if(Lelem) {
         if(Lelem.designMode.toLowerCase() == 'on') {
           // Set up a reference alias; the internal document will need the same attachment info!
-          this.setupElementAttachment(Pelem);
-          Lelem.body._kmwAttachment = Pelem._kmwAttachment;
+          this.setupElementAttachment(elem);
+          Lelem.body._kmwAttachment = elem._kmwAttachment;
 
-          this._inputList.push(Pelem);
-          this.emit('enabled', Pelem);
+          this._inputList.push(elem);
+          this.emit('enabled', elem);
         } else {
           // If already attached, do not attempt to attach again.
           if(this.embeddedPageContexts.filter((context) => context.document == Lelem).length == 0) {
             // Lelem is the IFrame's internal document; set 'er up!
             const embeddedPageAttachment = new PageContextAttachment(Lelem, {
               ...this.options,
-              owner: Pelem
+              owner: elem
             });
 
             this.embeddedPageContexts.push(embeddedPageAttachment);
@@ -525,24 +534,23 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   /**
-   * Function     _DetachFromIframe
-   * Scope        Private
-   * @param       {Element}      Pelem       IFrame to which KMW will be attached
-   * Description  Detaches KeymanWeb from an IFrame
+   * Detaches KeymanWeb from an IFrame
+   *
+   * @param  {Element}  elem  IFrame to which KMW will be attached
    */
-  _DetachFromIframe(Pelem: HTMLIFrameElement) {
+  private _DetachFromIframe(elem: HTMLIFrameElement) {
     const detachFromDesignIframe = () => {
-      this.clearElementAttachment(Pelem);
+      this.clearElementAttachment(elem);
 
-      const index = this._inputList.indexOf(Pelem);
+      const index = this._inputList.indexOf(elem);
       if(index != -1) {
         this._inputList.splice(index, 1);
       }
-      this.emit('disabled', Pelem);
+      this.emit('disabled', elem);
     }
 
     try {
-      const Lelem=Pelem.contentWindow.document;
+      const Lelem=elem.contentWindow.document;
       /* editable Iframe */
       if(Lelem) {
         if(Lelem.designMode.toLowerCase() == 'on') {
@@ -571,7 +579,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     } catch(err) {
       // If we were previously attached but the content doc/window have been unloaded,
       // we can at least address attachment via the attachment object.
-      if(Pelem._kmwAttachment) {
+      if(elem._kmwAttachment) {
         detachFromDesignIframe();
       }
 
@@ -581,122 +589,117 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   /**
-   * Function     attachToControl
-   * Scope        Public
-   * @param       {Element}    Pelem       Element to which KMW will be attached
-   * Description  Attaches KMW to control (or IFrame)
+   * Attaches KMW to control (or IFrame)
+   *
+   * @param  {Element}  elem  Element to which KMW will be attached
    */
-  attachToControl(Pelem: HTMLElement) {
+  public attachToControl(elem: HTMLElement) {
     const touchable = this.device.touchable;
 
     // Exception for IFrame elements, in case of async loading issues.  (Fixes fun iframe loading bug with Chrome.)
-    if(this.isAttached(Pelem) && !(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement)) {
+    if(this.isAttached(elem) && !(elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement)) {
       return; // We're already attached.
     }
 
-    if(this.isKMWInput(Pelem)) {
-      if(this.isKMWDisabled(Pelem)) {
+    if(this.isKMWInput(elem)) {
+      if(this.isKMWDisabled(elem)) {
         // Future improvement - go ahead and attach, but in disabled state?
         // Can't use `enableControl` later without that... or without the page
         // directly manipulating `kmw-disabled`, anyway.
         // Note:  this idea may require some shuffling of iframe-related handling
         // to handle everything cleanly.
-        this.emit('disabled', Pelem);
+        this.emit('disabled', elem);
       } else {
         if(touchable) {
-          this.enableTouchElement(Pelem);
+          this.enableTouchElement(elem);
         } else {
-          this.enableInputElement(Pelem);
+          this.enableInputElement(elem);
         }
       }
     } else if(touchable) {
       // Maybe an 'invalid' instead?
-      this.emit('disabled', Pelem);
+      this.emit('disabled', elem);
     }
   }
 
   /**
-   * Function     detachFromControl
-   * Scope        Public
-   * @param       {Element}    Pelem       Element from which KMW will detach
-   * Description  Detaches KMW from a control (or IFrame)
+   * Detaches KMW from a control (or IFrame)
+   *
+   * @param  {Element}  elem  Element from which KMW will detach
    */
-  detachFromControl(Pelem: HTMLElement) {
-    if(!(this.isAttached(Pelem) || Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement)) {
+  public detachFromControl(elem: HTMLElement) {
+    if(!(this.isAttached(elem) || elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement)) {
       return;  // We never were attached.
     }
 
     // #1 - if element is enabled, disable it.  But don't manipulate the 'kmw-disabled' tag.
-    if(this.isKMWInput(Pelem)) {
+    if(this.isKMWInput(elem)) {
       // Is it already disabled?
-      if(!this.isKMWDisabled(Pelem)) {
-        this._DisableControl(Pelem);
+      if(!this.isKMWDisabled(elem)) {
+        this._DisableControl(elem);
       }
     }
 
     // #2 - clear attachment data.
-    this.clearElementAttachment(Pelem);
+    this.clearElementAttachment(elem);
   }
 
   /**
-   * Function     _DisableControl
-   * Scope        Private
-   * @param       {Element}      Pelem       Element to be disabled
-   * Description  Disable KMW control element
+   * Disable KMW control element
+   *
+   * @param  {Element}  elem  Element to be disabled
    */
-  _DisableControl(Pelem: HTMLElement) {
+  private _DisableControl(elem: HTMLElement) {
     // Only operate on attached elements!  Non-design-mode IFrames don't get attachment markers, so we check them specifically instead.
-    if(this.isAttached(Pelem) || Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
+    if(this.isAttached(elem) || elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) {
       if(this.device.touchable) {
-        this.disableTouchElement(Pelem);
+        this.disableTouchElement(elem);
       }
 
       this.listInputs(); // Fix up our internal input ordering scheme.
-      this.disableInputElement(Pelem);
+      this.disableInputElement(elem);
     }
   }
 
   /**
-   * Function     _EnableControl
-   * Scope        Private
-   * @param       {Element}    Pelem   Element to be enabled
-   * Description  Enable KMW control element
+   * Enable KMW control element
+   *
+   * @param  {Element}  elem  Element to be enabled
    */
-  _EnableControl(Pelem: HTMLElement) {
-    if(this.isAttached(Pelem)) { // Only operate on attached elements!
+  private _EnableControl(elem: HTMLElement) {
+    if(this.isAttached(elem)) { // Only operate on attached elements!
       if(this.device.touchable) {
-        this.enableTouchElement(Pelem);
+        this.enableTouchElement(elem);
 
       } else {
-        this.enableInputElement(Pelem);
+        this.enableInputElement(elem);
       }
 
       this.listInputs();
-    } else if(nestedInstanceOf(Pelem, "HTMLIFrameElement")) {
+    } else if(nestedInstanceOf(elem, "HTMLIFrameElement")) {
       // Future fix idea for this case:  when disabling a normal-iframe, keep the child instance.
       // Just call 'shutdown' on it.  Then, re-'install' here.
       // Current architecture unfortunately conflates 'enable' and 'detach' for iframes, though. :(
       // Should be 'easy enough' to address if and when the time comes.
       // But for now, this'll keep things smoothed over.
-      this._AttachToIframe(Pelem as HTMLIFrameElement);
+      this._AttachToIframe(elem as HTMLIFrameElement);
     }
   }
 
 
   /**
-   * Function     disableControl
-   * Scope        Public
-   * @param       {Element}      Pelem       Element to be disabled
-   * Description  Disables a KMW control element
+   * Disables a KMW control element
+   *
+   * @param  {Element}  elem  Element to be disabled
    */
-  disableControl(Pelem: HTMLElement) {
-    if(!this.isAttached(Pelem)) {
-      console.warn("KeymanWeb is not attached to element " + Pelem);
+  public disableControl(elem: HTMLElement) {
+    if(!this.isAttached(elem)) {
+      console.warn("KeymanWeb is not attached to element " + elem);
     }
 
-    const cn = Pelem.className;
+    const cn = elem.className;
     if(cn.indexOf('kmw-disabled') < 0) { // if not already explicitly disabled...
-      Pelem.className = cn ? cn + ' kmw-disabled' : 'kmw-disabled';
+      elem.className = cn ? cn + ' kmw-disabled' : 'kmw-disabled';
     }
 
     // The rest is triggered within MutationObserver code.
@@ -704,22 +707,20 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   /**
-   * Function     enableControl
-   * Scope        Public
-   * @param       {Element}      Pelem       Element to be disabled
-   * Description  Disables a KMW control element
+   * Enables a KMW control element
+   * @param  {Element}  elem  Element to be enabled
    */
-  enableControl(Pelem: HTMLElement) {
+  public enableControl(elem: HTMLElement) {
     // Current architecture unfortunately conflates 'enable' and 'detach' for iframes, so a
     // disabled iframe appears detached.
-    if(!this.isAttached(Pelem) && !nestedInstanceOf(Pelem, "HTMLIFrameElement")) {
-      console.warn("KeymanWeb is not attached to element " + Pelem);
+    if(!this.isAttached(elem) && !nestedInstanceOf(elem, "HTMLIFrameElement")) {
+      console.warn("KeymanWeb is not attached to element " + elem);
     }
 
-    const cn = Pelem.className;
+    const cn = elem.className;
     const tagIndex = cn.indexOf('kmw-disabled');
     if(tagIndex >= 0) { // if already explicitly disabled...
-      Pelem.className = cn.replace('kmw-disabled', '').trim();
+      elem.className = cn.replace('kmw-disabled', '').trim();
     }
 
     // The rest is triggered within MutationObserver code.
@@ -729,7 +730,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   // Create an ordered list of all text and search input elements and textarea elements
   // except any tagged with class 'kmw-disabled'
   // TODO: email and url types should perhaps use default keyboard only
-  listInputs() {
+  private listInputs() {
     const eList: SortableInput[]=[];
     const t1=document.getElementsByTagName('input');
     const t2=document.getElementsByTagName('textarea');
@@ -773,7 +774,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    *
    * @param      {number|boolean}  bBack     Direction to move (0 or 1)
    */
-  findNeighboringInput(activeBase: HTMLElement, bBack: number|boolean) {
+  public findNeighboringInput(activeBase: HTMLElement, bBack: number|boolean) {
     let i: number;
     const t=this.sortedInputs;
 
@@ -805,28 +806,30 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
 
 
   /**
-   * Function     _GetDocumentEditables
-   * Scope        Private
-   * @param       {Element}     Pelem     HTML element
-   * @return      {Array<Element>}        A list of potentially-editable controls.  Further filtering [as with isKMWInput() and
-   *                                      isKMWDisabled()] is required.
+   * Get a list of all potentially-editable controls within the
+   * specified element.
+   *
+   * @param   {Element}         elem  HTML element
+   * @return  {Array<Element>}  A list of potentially-editable controls.
+   *                            Further filtering [as with isKMWInput()
+   *                            and isKMWDisabled()] is required.
    */
-  private _GetDocumentEditables(Pelem: HTMLElement): (HTMLElement)[] {
+  private _GetDocumentEditables(elem: HTMLElement): (HTMLElement)[] {
     let possibleInputs: (HTMLElement)[] = [];
 
     // Document.ownerDocument === null, so we better check that it's not null before proceeding.
-    if(Pelem.ownerDocument && Pelem instanceof Pelem.ownerDocument.defaultView.HTMLElement) {
-      const dv = Pelem.ownerDocument.defaultView;
+    if(elem.ownerDocument && elem instanceof elem.ownerDocument.defaultView.HTMLElement) {
+      const dv = elem.ownerDocument.defaultView;
 
-      if(Pelem instanceof dv.HTMLInputElement || Pelem instanceof dv.HTMLTextAreaElement) {
-        possibleInputs.push(Pelem);
-      } else if(Pelem instanceof dv.HTMLIFrameElement) {
-        possibleInputs.push(Pelem);
+      if(elem instanceof dv.HTMLInputElement || elem instanceof dv.HTMLTextAreaElement) {
+        possibleInputs.push(elem);
+      } else if(elem instanceof dv.HTMLIFrameElement) {
+        possibleInputs.push(elem);
       }
     }
 
     // Constructing it like this also allows for individual element filtering for the auto-attach MutationObserver without errors.
-    if(Pelem.getElementsByTagName) {
+    if(elem.getElementsByTagName) {
       /**
        * Function     LiTmp
        * Scope        Private
@@ -835,7 +838,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
        * Description  Local function to get list of editable controls
        */
       const LiTmp = function(_colon: string): HTMLElement[] {
-        return arrayFromNodeList(Pelem.getElementsByTagName(_colon));
+        return arrayFromNodeList(elem.getElementsByTagName(_colon));
       };
 
       // Note that isKMWInput() will block IFRAME elements as necessary for touch-based devices.
@@ -843,25 +846,26 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     }
 
     // Not all active browsers may support the method, but only those that do would work with contenteditables anyway.
-    if(Pelem.querySelectorAll) {
-      possibleInputs = possibleInputs.concat(arrayFromNodeList(Pelem.querySelectorAll('[contenteditable]')));
+    if(elem.querySelectorAll) {
+      possibleInputs = possibleInputs.concat(arrayFromNodeList(elem.querySelectorAll('[contenteditable]')));
     }
 
-    if(Pelem.ownerDocument && Pelem instanceof Pelem.ownerDocument.defaultView.HTMLElement && Pelem.isContentEditable) {
-      possibleInputs.push(Pelem);
+    if(elem.ownerDocument && elem instanceof elem.ownerDocument.defaultView.HTMLElement && elem.isContentEditable) {
+      possibleInputs.push(elem);
     }
 
     return possibleInputs;
   }
 
   /**
-   * Function     _SetupDocument
-   * Scope        Private
-   * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
-   * Description  Used to automatically attach KMW to editable controls, regardless of control path.
+   * Automatically attach KMW to editable controls, regardless of
+   * control path.
+   *
+   * @param  {Element}  elem  the root element of a document, including
+   *                           IFrame documents.
    */
-  private _SetupDocument(Pelem: HTMLElement) { // I1961
-    const possibleInputs = this._GetDocumentEditables(Pelem);
+  private _SetupDocument(elem: HTMLElement) { // I1961
+    const possibleInputs = this._GetDocumentEditables(elem);
 
     for(let Li = 0; Li < possibleInputs.length; Li++) {
       // It knows how to handle pre-loaded iframes appropriately.
@@ -870,14 +874,15 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   /**
-   * Function     _ClearDocument
-   * Scope        Private
-   * @param       {Element}     Pelem - the root element of a document, including IFrame documents.
-   * Description  Used to automatically detach KMW from editable controls, regardless of control path.
-   *              Mostly used to clear out all controls of a detached IFrame.
+   * Automatically detach KMW from editable controls, regardless of
+   * control path. Mostly used to clear out all controls of a detached
+   * IFrame.
+   *
+   * @param  {Element}  elem  the root element of a document, including
+   *                          IFrame documents.
    */
-  private _ClearDocument(Pelem: HTMLElement) { // I1961
-    const possibleInputs = this._GetDocumentEditables(Pelem);
+  private _ClearDocument(elem: HTMLElement) { // I1961
+    const possibleInputs = this._GetDocumentEditables(elem);
 
     for(let Li = 0; Li < possibleInputs.length; Li++) {
       // It knows how to handle pre-loaded iframes appropriately.
@@ -886,7 +891,13 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
 
-  _EnablementMutationObserverCore = (mutations: MutationRecord[]) => {
+  /**
+   * Callback function for the MutationObserver that enables or disables
+   * the control if a change is detected controls.
+   *
+   * @param mutations
+   */
+  private _EnablementMutationObserverCore = (mutations: MutationRecord[]) => {
     for(let i=0; i < mutations.length; i++) {
       const mutation = mutations[i];
 
@@ -919,7 +930,14 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     }
   };
 
-  _AutoAttachObserverCore = (mutations: MutationRecord[]) => {
+  /**
+   * Callback handler for the MutationObserver which handles the
+   * auto-attach lifecycle - when elements appear in the DOM, KMW attaches
+   * to them; when they are removed, KMW detaches from them.
+   *
+   * @param mutations
+   */
+  private _AutoAttachObserverCore = (mutations: MutationRecord[]) => {
     let inputElementAdditions: HTMLElement[] = [];
     let inputElementRemovals: HTMLElement[] = [];
 
@@ -999,24 +1017,23 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   };
 
   /**
-   * Function     _MutationAdditionObserved
-   * Scope        Private
-   * @param       {Element}  Pelem     A page input, textarea, or iframe element.
-   * Description  Used by the MutationObserver event handler to properly setup any elements dynamically added to the document post-initialization.
+   * Properly setup any elements dynamically added to the document
+   * post-initialization. Used by the MutationObserver event handler.
    *
+   * @param  {Element}  elem  A page input, textarea, or iframe element.
    */
-  _MutationAdditionObserved = (Pelem: HTMLElement) => {
-    if(Pelem instanceof Pelem.ownerDocument.defaultView.HTMLIFrameElement) {
+  private _MutationAdditionObserved = (elem: HTMLElement) => {
+    if(elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) {
       //Problem:  the iframe is loaded asynchronously, and we must wait for it to load fully before hooking in.
 
       const attachFunctor = () => {  // Triggers at the same time as iframe's onload property, after its internal document loads.
         // Provide a minor delay to allow 'load' event handlers to set the design-mode property.
         window.setTimeout(() => {
-          this.attachToControl(Pelem);
+          this.attachToControl(elem);
         }, 1);
       };
 
-      Pelem.addEventListener('load', attachFunctor);
+      elem.addEventListener('load', attachFunctor);
 
       // The following block breaks for design-mode iframes, at least in Chrome; a blank document may exist
       // before the load of the desired actual document.
@@ -1031,7 +1048,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
       //   window.setTimeout(attachFunctor, 1);
       // }
     } else {
-      this.attachToControl(Pelem);
+      this.attachToControl(elem);
     }
   }
 
@@ -1041,7 +1058,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   }
 
   // To be called by the object responsible for webpage-integration.
-  initMutationObservers(document: Document, manualAttach: boolean) {
+  private initMutationObservers(document: Document, manualAttach: boolean) {
     if(typeof MutationObserver == 'function') {
       const observationTarget = document.querySelector('body');
       let observationConfig: MutationObserverInit;
@@ -1066,13 +1083,13 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     }
   }
 
-  enableInputModeObserver() {
+  private enableInputModeObserver() {
     const observationTarget = document.querySelector('body');
     const observationConfig = { subtree: true, attributes: true, attributeFilter: ['inputmode'] };
     this.inputModeObserver?.observe(observationTarget, observationConfig);
   }
 
-  disableInputModeObserver() {
+  private disableInputModeObserver() {
     this.inputModeObserver?.disconnect();
   }
 
@@ -1082,7 +1099,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    *
    *  @return   {string}
    */
-  getBaseFont() {
+  private getBaseFont() {
     const ipInput    = document.getElementsByTagName('input');
     const ipTextArea = document.getElementsByTagName('textarea');
     let n=0, fs: string;
@@ -1135,8 +1152,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
    *  @param  {Object}  kfd   KFont font descriptor
    *  @return {string}
    *
-   **/
-  buildAttachmentFontStyle(keyboardFontDescriptor: InternalKeyboardFont): string {
+   */
+  private buildAttachmentFontStyle(keyboardFontDescriptor: InternalKeyboardFont): string {
     const kfd = keyboardFontDescriptor;
 
     // Get name of font to be applied
@@ -1177,7 +1194,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     return s;
   }
 
-  setAttachmentFont(
+ public setAttachmentFont(
     keyboardFontDescriptor: InternalKeyboardFont,
     fontRoot: string,
     os: DeviceSpec.OperatingSystem
@@ -1190,7 +1207,7 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
     // our child instances of this class. (via `this.embeddedPageContexts`)
   }
 
-  shutdown() {
+  public shutdown() {
     try {
       this.enablementObserver?.disconnect();
       this.attachmentObserver?.disconnect();
