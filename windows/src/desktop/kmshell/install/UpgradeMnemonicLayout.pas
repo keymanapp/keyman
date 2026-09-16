@@ -1,18 +1,18 @@
 (*
   Name:             UpgradeMnemonicLayout
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      31 Dec 2014
 
   Modified Date:    2 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          31 Dec 2014 - mcdurdin - I4553 - V9.0 - Upgrade to 476 or later requires recompile of all mnemonic layouts
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
                     08 Apr 2015 - mcdurdin - I4651 - V9.0 - Mnemonic layout recompiler maps AltGr+VK_BKSLASH rather than VK_OEM_102
@@ -137,7 +137,6 @@ end;
 function GetShortKeyboardName(const FileName: string): string;
 begin
   if (LowerCase(ExtractFileExt(FileName)) = '.kmx') or
-      (LowerCase(ExtractFileExt(FileName)) = '.kxx') or
       (LowerCase(ExtractFileExt(FileName)) = '.kmp')
     then Result := ChangeFileExt(ExtractFileName(FileName), '')
     else Result := FileName;
