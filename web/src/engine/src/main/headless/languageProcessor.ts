@@ -25,34 +25,16 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   private _state: StateChangeEnum = 'inactive';
 
+  readonly workerFactory: WorkerFactory;
+  readonly supportsRightDeletions: boolean;
+  private workerPath: string;
+
   public constructor(predictiveWorkerFactory: WorkerFactory, transcriptionCache: TranscriptionCache, supportsRightDeletions: boolean = false) {
     super();
 
+    this.workerFactory = predictiveWorkerFactory;
     this.recentTranscriptions = transcriptionCache;
-
-    // Establishes KMW's platform 'capabilities', which limit the range of context a LMLayer
-    // model may expect.
-    const capabilities: Capabilities = {
-      maxLeftContextCodePoints: 64,
-      // Since the apps don't yet support right-deletions.
-      maxRightContextCodePoints: supportsRightDeletions ? 0 : 64
-    }
-
-    if(!predictiveWorkerFactory) {
-      return;
-    }
-
-    let workerInstance: Worker;
-    try {
-      workerInstance = predictiveWorkerFactory?.constructInstance();
-    } catch(e) {
-      // We can condition on `lmEngine` being null/undefined.
-      console.warn('Web workers are not available: ' + (e ?? '').toString());
-      workerInstance = null;
-    }
-    if(workerInstance) {
-      this.lmEngine = new LMLayer(capabilities, workerInstance);
-    }
+    this.supportsRightDeletions = supportsRightDeletions;
   }
 
   public get activeModel(): ModelSpec {
@@ -65,6 +47,34 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   public get state(): StateChangeEnum {
     return this._state;
+  }
+
+  public init(path: string) {
+    if(!this.workerFactory || this.workerPath) {
+      return;
+    }
+
+    this.workerPath = path;
+
+    // Establishes KMW's platform 'capabilities', which limit the range of context a LMLayer
+    // model may expect.
+    const capabilities: Capabilities = {
+      maxLeftContextCodePoints: 64,
+      // Since the apps don't yet support right-deletions.
+      maxRightContextCodePoints: this.supportsRightDeletions ? 0 : 64
+    }
+
+    let workerInstance: Worker;
+    try {
+      workerInstance = this.workerFactory?.constructInstance(this.workerPath);
+    } catch(e) {
+      // We can condition on `lmEngine` being null/undefined.
+      console.warn('Web workers are not available: ' + (e ?? '').toString());
+      workerInstance = null;
+    }
+    if(workerInstance) {
+      this.lmEngine = new LMLayer(capabilities, workerInstance);
+    }
   }
 
   public unloadModel() {
@@ -429,7 +439,6 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   public get isActive(): boolean {
     if(!this.canEnable) {
-      this._mayPredict = false;
       return false;
     }
     return (this.activeModel || false) && this._mayPredict;
@@ -441,7 +450,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public get mayPredict() {
-    return this._mayPredict;
+    return this.canEnable ? !!this._mayPredict : false;
   }
 
   public set mayPredict(flag: boolean) {

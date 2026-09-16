@@ -7,8 +7,8 @@ import * as sinon from 'sinon';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KeyboardTest, RecordedPhysicalKeystroke, RecordedSequenceTestSet } from '@keymanapp/recorder-core';
-import { NodeWorker } from '@keymanapp/lexical-model-layer/node';
-import { DeviceSpec, KMWString } from 'keyman/common/web-utils';
+import { NodeWorkerFactory } from '@keymanapp/lexical-model-layer/node';
+import { DeviceSpec, KMWString, timedPromise } from 'keyman/common/web-utils';
 
 import { InputProcessor } from 'keyman/engine/main';
 import { JSKeyboardInterface } from 'keyman/engine/js-processor';
@@ -16,6 +16,8 @@ import { DefaultOutputRules, JSKeyboard, KeyDistribution, KeyEvent, KeyEventSpec
 import { PredictionContext } from 'keyman/engine/interfaces';
 import { DEFAULT_PROCESSOR_INIT_OPTIONS, NodeKeyboardLoader } from 'keyman/test/resources';
 import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
+
+import { getWorkerPath } from 'keyman/test/resources';
 
 import Context = LexicalModelTypes.Context;
 import Suggestion = LexicalModelTypes.Suggestion;
@@ -62,13 +64,10 @@ describe('InputProcessor', function() {
       assert.isNotNull(core);
     });
 
-    it('has expected default values after initialization', function () {
-      let core;
+    it('has expected default values after initialization', async function () {
+      let core: InputProcessor;
       try {
-        // Can construct without the second parameter; if so, the final assertion - .mayPredict
-        // will be invalidated.  (No worker, no ability to predict.)
-        // @ts-ignore
-        core = new InputProcessor(device, NodeWorker, {
+        core = new InputProcessor(device, new NodeWorkerFactory(), {
           baseLayout: 'us',
           keyboardInterface: new JSKeyboardInterface({}, null, new VariableStoreTestSerializer()),
           defaultOutputRules: new DefaultOutputRules()
@@ -88,7 +87,17 @@ describe('InputProcessor', function() {
         assert.equal('default', core.keyboardProcessor.layerId, 'Default layer is not set to "default"');
         assert.isUndefined(core.keyboardProcessor.activeKeyboard, 'Initialized with already-active keyboard');
 
-        // Lifted from languageProcessor.js - the core should not be changing these with its init.
+        // Before the language-processor is initialized, the worker is unconstructed.
+        assert.isUndefined(core.languageProcessor.activeModel);
+        assert.isFalse(core.languageProcessor.isActive);
+        assert.isFalse(core.languageProcessor.mayPredict);
+        assert.isFalse(core.languageProcessor.canEnable);
+
+        core.languageProcessor.init(getWorkerPath());
+
+        await timedPromise(250);
+
+        // The worker should, after a wait, be initialized in a state without a loaded model.
         assert.isUndefined(core.languageProcessor.activeModel);
         assert.isFalse(core.languageProcessor.isActive);
         assert.isTrue(core.languageProcessor.mayPredict);
@@ -309,8 +318,9 @@ describe('InputProcessor', function() {
     });
 
     it('replaces appended whitespace when a manually-applied suggestion is followed by a K_SPACE (dummy models)', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodeWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
+      langProcessor.init(getWorkerPath());
 
       try {
         await langProcessor.loadModel(simpleTestingDummyModel);
@@ -366,8 +376,9 @@ describe('InputProcessor', function() {
     });
 
     it('replaces appended whitespace when a manually-applied suggestion is followed by a K_SPACE (trie models)', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodeWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
+      langProcessor.init(getWorkerPath());
 
       try {
         await langProcessor.loadModel(simpleTrieModel);
@@ -424,8 +435,9 @@ describe('InputProcessor', function() {
     });
 
     it('auto-applies a suggestion properly when available and triggered appropriately', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodeWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
+      langProcessor.init(getWorkerPath());
 
       try {
         await langProcessor.loadModel(simpleTestingDummyModel);
@@ -476,8 +488,9 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after manually applying a suggestion and immediately backspacing', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodeWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
+      langProcessor.init(getWorkerPath());
 
       try {
         // This feature only activates with 14.0+ models.
@@ -533,8 +546,9 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after returning to the whitespace after a manually-applied suggestion', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodeWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
+      langProcessor.init(getWorkerPath());
 
       try {
         // This feature only activates with 14.0+ models.
@@ -594,8 +608,9 @@ describe('InputProcessor', function() {
     });
 
     it("displays a reversion after returning to the end of a manually-applied suggestion's body", async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodeWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
+      langProcessor.init(getWorkerPath());
 
       try {
         // This feature only activates with 14.0+ models.
@@ -656,8 +671,9 @@ describe('InputProcessor', function() {
     });
 
     it("does not display a reversion after backspacing part of an applied suggestion", async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodeWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
+      langProcessor.init(getWorkerPath());
 
       try {
         // This feature only activates with 14.0+ models.
@@ -720,8 +736,9 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after auto-applying a suggestion and immediately backspacing', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodeWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
+      langProcessor.init(getWorkerPath());
 
       try {
         // This feature only activates with 14.0+ models.
@@ -775,8 +792,9 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after returning to the whitespace after a auto-applied suggestion', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodeWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
+      langProcessor.init(getWorkerPath());
 
       try {
         // This feature only activates with 14.0+ models.
@@ -829,8 +847,9 @@ describe('InputProcessor', function() {
     });
 
     it("displays a reversion after returning to the end of an auto-applied suggestion's body", async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodeWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
+      langProcessor.init(getWorkerPath());
 
       try {
         // This feature only activates with 14.0+ models.

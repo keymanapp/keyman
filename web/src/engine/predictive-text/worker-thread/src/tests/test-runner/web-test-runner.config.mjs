@@ -8,7 +8,7 @@ import { dirname, resolve } from 'path';
 import { LauncherWrapper, sessionStabilityReporter } from '@keymanapp/common-test-resources/test-runner-stability-reporter.mjs';
 
 const dir = dirname(fileURLToPath(import.meta.url));
-const KEYMAN_ROOT = resolve(dir, '../../../../../../');
+const KEYMAN_ROOT = resolve(dir, '../../../../../../../../');
 
 /** @type {import('@web/test-runner').TestRunnerConfig} */
 export default {

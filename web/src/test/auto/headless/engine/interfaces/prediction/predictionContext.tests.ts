@@ -5,8 +5,10 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { PredictionContext } from 'keyman/engine/interfaces';
-import { NodeWorker } from "@keymanapp/lexical-model-layer/node";
+import { NodeWorkerFactory } from "@keymanapp/lexical-model-layer/node";
 import { SyntheticTextStore } from 'keyman/engine/keyboard';
+
+import { getWorkerPath } from 'keyman/test/resources';
 
 import Suggestion = LexicalModelTypes.Suggestion;
 
@@ -70,7 +72,8 @@ describe("PredictionContext", () => {
   let langProcessor: LanguageProcessor;
 
   beforeEach(function() {
-    langProcessor = new LanguageProcessor(NodeWorker, new TranscriptionCache());
+    langProcessor = new LanguageProcessor(new NodeWorkerFactory(), new TranscriptionCache());
+    langProcessor.init(getWorkerPath());
   });
 
   afterEach(function() {

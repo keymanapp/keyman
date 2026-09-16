@@ -17,12 +17,11 @@
     "headless/**/*.ts",
     "integrated/**/*.ts",
     "resources/@types/*.d.ts",
-    "predictive-text/**/*.ts",
+    "resources/**/.ts",
   ],
 
   "references": [
     { "path": "../../engine" },
-    { "path": "resources" },
     { "path": "headless-resources" },
   ]
 }

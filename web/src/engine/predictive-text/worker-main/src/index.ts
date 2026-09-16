@@ -1,7 +1,7 @@
 export { LMLayer } from './lmlayer.js';
-export { NodeWorker } from './node/node-worker.js';
-export { WebWorker } from './web/web-worker.js';
+export { NodeWorkerFactory } from './node/node-worker.js';
+export { WebWorkerFactory } from './web/web-worker.js';
 
 export interface WorkerFactory {
-  constructInstance(): Worker
+  constructInstance(workerSourcePath: string): Worker
 }

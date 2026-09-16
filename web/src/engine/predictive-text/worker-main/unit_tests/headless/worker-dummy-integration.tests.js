@@ -4,8 +4,9 @@ import fs from 'fs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { LMLayer, NodeWorker as Worker } from '#./node/index.js';
+import { LMLayer, NodeWorkerFactory } from '#./node/index.js';
 import { capabilities, iGotDistractedByHazel } from '@keymanapp/common-test-resources/model-helpers.mjs';
+import { getWorkerPath } from 'keyman/test/resources';
 
 /*
  * Shows off the LMLayer API, using the full prediction interface.
@@ -20,7 +21,7 @@ describe('LMLayer using dummy model', function () {
   let worker;
 
   beforeEach(function() {
-    worker = Worker.constructInstance();
+    worker = (new NodeWorkerFactory()).constructInstance(getWorkerPath());
     lmLayer = new LMLayer(capabilities(), worker);
   });
 

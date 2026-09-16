@@ -240,6 +240,7 @@ export class KeymanEngineBase<
     }
 
     config.initialize(optionSpec);
+    this.core.languageProcessor.init(config.sourcePath + '/worker-main.js');
 
     // Initialize supplementary plane string extensions
     KMWString.enableSupplementaryPlane(true);

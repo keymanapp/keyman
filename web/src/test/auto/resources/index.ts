@@ -19,3 +19,7 @@ export function getKeymanRoot(): string {
 export function getWebTestResourcesPath(): string {
   return getKeymanRoot() + '/web/src/test/auto/resources';
 }
+
+export function getWorkerPath(): string {
+  return `${getKeymanRoot()}web/build/publish/release/worker-main.js`;
+}

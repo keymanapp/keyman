@@ -6,7 +6,7 @@ describe('LMLayerWorker', function () {
 
   describe('Usage within a Web Worker', function () {
     it('should install itself in the worker context', function (done) {
-      let worker = new Worker(document.location.protocol + '//' + document.location.host + "/worker-main.js");
+      let worker = new Worker(document.location.protocol + '//' + document.location.host + "/web/src/engine/predictive-text/worker-thread/build/lib/worker-main.js");
       worker.onmessage = function thisShouldBeCalled(message) {
         done();
         worker.terminate();

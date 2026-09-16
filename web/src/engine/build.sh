@@ -61,6 +61,9 @@ do_build () {
 }
 
 run_tests() {
+  # Ensure test resources are properly built.
+  tsc -b ../test/auto/resources
+
   # Run javascript tests
   #
   # Trying to run languageProcessor.tests.js with c8 coverage fails with:

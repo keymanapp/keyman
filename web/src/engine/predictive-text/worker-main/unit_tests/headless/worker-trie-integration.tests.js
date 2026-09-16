@@ -3,8 +3,9 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { LMLayer, NodeWorker as Worker } from '#./node/index.js';
+import { LMLayer, NodeWorkerFactory } from '#./node/index.js';
 import { capabilities } from '@keymanapp/common-test-resources/model-helpers.mjs';
+import { getWorkerPath } from 'keyman/test/resources';
 
 /*
  * How to run the worlist
@@ -14,7 +15,7 @@ describe('LMLayer using the trie model', function () {
   let worker;
 
   beforeEach(function() {
-    worker = Worker.constructInstance();
+    worker = (new NodeWorkerFactory()).constructInstance(getWorkerPath());
     lmLayer = new LMLayer(capabilities(), worker, true);
   });
 

@@ -8,58 +8,57 @@ import { Buffer } from 'node:buffer';
 import { URL } from 'node:url';
 
 /**
- * Defines mappings from Node Worker signatures to WebWorker signatures
- *
- * TODO: move this to a separate module, no need for it to be embedded string
- */
-const nodeWorkerToWebWorkerMappingSource = `
-import { parentPort } from 'node:worker_threads';
-import fs from 'node:fs';
-import vm from 'node:vm';
-
-function postMessage(...args) {
-  parentPort.postMessage.call(parentPort, args);
-}
-
-parentPort.on('message', (ev) => {
-  onmessage({data: ev});
-});
-
-function importScripts(...args) {
-  function loadScriptInContext(scriptPath) {
-    let scriptStr = fs.readFileSync(scriptPath);
-    var script = new vm.Script(scriptStr, { filename: scriptPath });
-    script.runInThisContext();
-  }
-
-  for(let arg of args) {
-    loadScriptInContext(arg);
-  }
-}
-
-/*
- * You'd think the method signature mapping would be implied from the first line,
- * but all three lines must be explicitly specified or the emulation will fail.
- */
-const self = globalThis;
-self.postMessage = postMessage;
-self.importScripts = importScripts;
-self.self = self; // make it global!
-// Start off by importing the main worker itself
-// importScripts('${import.meta.dirname}/../../../worker-thread/build/lib/worker-main.js');
-console.dir(import.meta);
-importScripts('${import.meta.dirname}/worker-main.js');
-`;
-
-
-
-/**
  * Uses the Node version of Workers to provide proper, authentic separate-thread
  * 'sandboxing'.  Also intercepts and interprets certain WebWorker method signatures
  * necessary to run the WebWorker-oriented worker code.
  */
 export class MappedWorker extends worker.Worker implements Worker {
-  constructor() {
+  constructor(sourcePathString: string) {
+    /**
+     * Defines mappings from Node Worker signatures to WebWorker signatures
+     *
+     * TODO: move this to a separate module, no need for it to be embedded string
+     */
+    const nodeWorkerToWebWorkerMappingSource = `
+    import { parentPort } from 'node:worker_threads';
+    import fs from 'node:fs';
+    import vm from 'node:vm';
+
+    // Useful for diagnosis, but leads to noisiness in test logs
+    // console.dir(import.meta);
+
+    function postMessage(...args) {
+      parentPort.postMessage.call(parentPort, args);
+    }
+
+    parentPort.on('message', (ev) => {
+      onmessage({data: ev});
+    });
+
+    function importScripts(...args) {
+      function loadScriptInContext(scriptPath) {
+        let scriptStr = fs.readFileSync(scriptPath);
+        var script = new vm.Script(scriptStr, { filename: scriptPath });
+        script.runInThisContext();
+      }
+
+      for(let arg of args) {
+        loadScriptInContext(arg);
+      }
+    }
+
+    /*
+    * You'd think the method signature mapping would be implied from the first line,
+    * but all three lines must be explicitly specified or the emulation will fail.
+    */
+    const self = globalThis;
+    self.postMessage = postMessage;
+    self.importScripts = importScripts;
+    self.self = self; // make it global!
+    // Start off by importing the main worker itself
+    importScripts('${sourcePathString}');
+    `;
+
     const buffer = Buffer.from(nodeWorkerToWebWorkerMappingSource);
     const dataSrc = "data:text/javascript;base64," + buffer.toString('base64');
     //@ts-ignore

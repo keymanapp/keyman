@@ -8,7 +8,7 @@ import path from 'node:path';
 
 import { assert } from 'chai';
 
-import { NodeWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
+import { NodeWorkerFactory } from "@keymanapp/lexical-model-layer/node";
 import { LexicalModelCompiler } from '@keymanapp/kmc-model';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { SyntheticTextStore } from 'keyman/engine/keyboard';
@@ -16,6 +16,8 @@ import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 
 import { ModelSpec } from 'keyman/engine/interfaces';
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+
+import { getWorkerPath } from 'keyman/test/resources';
 
 const KEYMAN_ROOT = env.KEYMAN_ROOT;
 
@@ -35,7 +37,8 @@ describe('LanguageProcessor', function() {
   const callbacks = new TestCompilerCallbacks(this);
 
   beforeEach(function() {
-    languageProcessor = new LanguageProcessor(LMWorker, new TranscriptionCache());
+    languageProcessor = new LanguageProcessor(new NodeWorkerFactory(), new TranscriptionCache());
+    languageProcessor.init(getWorkerPath());
   });
 
   afterEach(function() {
