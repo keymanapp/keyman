@@ -297,9 +297,6 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *                                       the keyboard stub.
    */
   public setKeyboardForControl(elem: HTMLElement, keyboardId?: string | null, languageCode?: string | null): void {
-    if (!elem.ownerDocument.defaultView) {
-      return;
-    }
     if(elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
@@ -329,18 +326,20 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *
    * @param       {Element}      elem   Control element
    * @return      {string|null}         The independently-managed keyboard for the control,
-   *                                    or null if it is following the global keyboard setting.
+   *                                    '' for independently-managed but set to system
+   *                                    keyboard, or null if it is following the global keyboard
+   *                                    setting.
    */
   public getKeyboardForControl(elem: HTMLElement): string | null{
     if(!elem || !this.contextManager.isElementInIndependentMode(elem)) {
       return null;
     }
-    const keyboard = elem._kmwAttachment.keyboard;
-    if(keyboard === '') {
+    const keyboardId = elem._kmwAttachment.keyboard;
+    if(keyboardId === '') {
       return '';
     }
-    const stub = this.keyboardRequisitioner.cache.getStub(keyboard, elem._kmwAttachment.languageCode);
-    return stub?.KI ?? keyboard;
+    const stub = this.keyboardRequisitioner.cache.getStub(keyboardId, elem._kmwAttachment.languageCode);
+    return stub?.KI ?? keyboardId;
   }
 
   // Is not currently published API... but it exists.
@@ -350,14 +349,15 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    * returns null instead.
    *
    * @param       {Element}      elem  Control element
-   * @return      {string|null}        The independently-managed keyboard for the control,
-   *                                   or null if it is following the global keyboard setting.
+   * @return      {string|null}        The language code for the control (or '' for the system-
+   *                                   specified language) if independently managed, or null if
+   *                                   using global mode.
    */
   public getLanguageForControl(elem: HTMLElement): string | null {
     if(!elem || !this.contextManager.isElementInIndependentMode(elem)) {
       return null;
     }
-    return elem._kmwAttachment.languageCode;
+    return elem._kmwAttachment.languageCode ?? '';
   }
 
   public isAttached(x: HTMLElement): boolean {
