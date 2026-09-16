@@ -77,7 +77,7 @@ struct InstallDebugView: View {
           Text(verbatim: "Request Restart")
         }
         Button {
-          _ = installation.validateUserHasRestarted()
+          _ = installation.checkUserHasRestarted()
         } label: {
           Text(verbatim: "Check Restart")
         }
