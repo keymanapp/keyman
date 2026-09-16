@@ -16,6 +16,11 @@ import Foundation
 import KeymanSettings
 import OSLog
 
+// The data model version number is updated by the input method.
+// We only read the value here, and if it is current, then there is no need
+// to trigger data migration. If data migration is necessary, then it must be
+// performed by the input method because the input method alone has access
+// to the data before it was shared in an app group beginning with Keyman 19.
 let dataModelVersionStoreInGroupContainer = 2
 
 public enum InstallationPhase: String {
