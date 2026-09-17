@@ -62,21 +62,21 @@ function WideQuotedStr(const str: WideString): WideString; deprecated;  // I3310
   * Creates the compiled keyboard filename by inserting the base keyboard ID
   * before the .kmx extension.
   *
-  * @param  BaseFileName       Base keyboard filename, in the form keyboardname.kmx.
+  * @param  KeyboardFileName       Keyboard filename, in the form keyboardname.kmx.
   * @param  BaseKeyboardIDHex  Base keyboard ID in hexadecimal form.
   * @return Compiled keyboard filename, in the form keyboardname-<KLID>.kmx.
   *)
-function InsertBKLIDFilename(const BaseFileName: string; BaseKeyboardIDHex: string): string;
+function InsertBKLIDFilename(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
 
 (**
   * Creates the dead-key compiled keyboard filename by inserting the base
   * keyboard ID and -d suffix before the .kmx extension.
   *
-  * @param  BaseFileName       Base keyboard filename, in the form keyboardname.kmx.
+  * @param  KeyboardFileName       Keyboard filename, in the form keyboardname.kmx.
   * @param  BaseKeyboardIDHex  Base keyboard ID in hexadecimal form.
   * @return Dead-key compiled keyboard filename, in the form keyboardname-<KLID>-d.kmx.
   *)
-function InsertBKLIDDeadkeyFilename(const BaseFileName: string; BaseKeyboardIDHex: string): string;
+function InsertBKLIDDeadkeyFilename(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
 
 implementation
 
@@ -436,14 +436,14 @@ begin
   Result.Bottom := StrToIntDef(s, 0);
 end;
 
-function InsertBKLIDFilename(const BaseFileName: string; BaseKeyboardIDHex: string): string;
+function InsertBKLIDFilename(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
 begin
-    Result := ChangeFileExt(BaseFileName, '') + '-' + BaseKeyboardIDHex + '.kmx';
+    Result := ChangeFileExt(KeyboardFileName, '') + '-' + BaseKeyboardIDHex + '.kmx';
 end;
 
-function InsertBKLIDDeadkeyFilename(const BaseFileName: string; BaseKeyboardIDHex: string): string;
+function InsertBKLIDDeadkeyFilename(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
 begin
-  Result := ChangeFileExt(BaseFileName, '') + '-' + BaseKeyboardIDHex + '-d.kmx'
+  Result := ChangeFileExt(KeyboardFileName, '') + '-' + BaseKeyboardIDHex + '-d.kmx'
 end;
 
 end.
