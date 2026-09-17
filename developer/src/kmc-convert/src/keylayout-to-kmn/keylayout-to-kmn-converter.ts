@@ -108,7 +108,7 @@ export class KeylayoutToKmnConverter {
       return null;
     }
     try {
-      if (!KeylayoutReader.validate(jsonO, inputFilename)) {
+      if (!KeylayoutReader.unitTestEndpoints.validate(jsonO, inputFilename)) {
         return null;
       }
     } catch (e: any) {
@@ -184,7 +184,7 @@ export class KeylayoutToKmnConverter {
     * @param  jsonObj: json Object containing all data read from a keylayout file
     * @return an object containing the name of the input file, an array of behaviors and a populated array of Rules[]
     */
-  public createRuleData(dataUkelele: ProcessedData, jsonObj: Keylayout.KeylayoutXMLSourceFile): ProcessedData | null {
+  private createRuleData(dataUkelele: ProcessedData, jsonObj: Keylayout.KeylayoutXMLSourceFile): ProcessedData | null {
 
     const rules: Rule[] = [];
     let dkCounterC3: number = 0;
@@ -518,7 +518,7 @@ export class KeylayoutToKmnConverter {
     * @param  dataUkelele: an object containing the name of the in/output file, an array of behaviors and an array of Rules
     * @return an object containing the name of the input file, an array of behaviors and the revised array of Rule[]
     */
-  public reviewRuleInputData(dataUkelele: ProcessedData): ProcessedData {
+  private reviewRuleInputData(dataUkelele: ProcessedData): ProcessedData {
 
     // check for duplicate C2 and C3 rules in rules (e.g. [NCAPS RALT K_8]  >  dk(C12) ): create a separate array of unique rules,
     // then compare to rules and mark first occurrence  of a rule in rules
@@ -626,7 +626,7 @@ export class KeylayoutToKmnConverter {
    * @param  isCAPSused  : boolean flag to indicate if CAPS is used in a keylayout file or not
    * @return string - a modifier value suitable for use in a .kmn-file
    */
-  public createKmnModifier(keylayoutModifier: string, isCAPSused: boolean): string {
+  private createKmnModifier(keylayoutModifier: string, isCAPSused: boolean): string {
 
     const kmnModifier: string[] = [];
     const modifierState = keylayoutModifier.split(" ");
@@ -708,7 +708,7 @@ export class KeylayoutToKmnConverter {
    * @param  keylayoutModifier the modifier string used in the .keylayout-file
    * @return "caps" or undefined if "caps" is not found
    */
-  public checkIfCapsIsUsed(keylayoutModifier: string[][]): boolean {
+  private checkIfCapsIsUsed(keylayoutModifier: string[][]): boolean {
     if (!keylayoutModifier)
       return false;
     // make sure we always have a whitespace before and after each modifier( to distinguish from caps? )
@@ -716,11 +716,11 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-  * @brief  member function to check if a modifier can be used in Keyman
-  * @param  keylayoutModifier the modifier string used in the .keylayout-file
-  * @return true if the modifier can be used in keyman; false if not
-  */
-  public isAcceptableKeymanModifier(keylayoutModifier: string): boolean {
+   * @brief  member function to check if a modifier can be used in Keyman
+   * @param  keylayoutModifier the modifier string used in the .keylayout-file
+   * @return true if the modifier can be used in keyman; false if not
+   */
+  private isAcceptableKeymanModifier(keylayoutModifier: string): boolean {
     if (keylayoutModifier === null)
       return false;
     const modifierSingle = keylayoutModifier.toUpperCase().split(" ");
@@ -737,7 +737,7 @@ export class KeylayoutToKmnConverter {
    * @param  pos Ukelele (=mac) keycodes
    * @return VK
    */
-  public mapUkeleleKeycodeToVK(pos: number): string {
+  private mapUkeleleKeycodeToVK(pos: number): string {
     const vk = [
       "K_A"          /* A */,
       "K_S"          /* S */,
@@ -799,12 +799,12 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-  * @brief  member function to return an index for a given actionID
-  * @param  data an object containing all data read from a .keylayout file
-  * @param  search :string - value 'id' to be found
-  * @return a number specifying the index of an actionId
-  */
-  public getActionIndexFromActionId(data: Keylayout.KeylayoutXMLSourceFile, search: string): number {
+   * @brief  member function to return an index for a given actionID
+   * @param  data an object containing all data read from a .keylayout file
+   * @param  search :string - value 'id' to be found
+   * @return a number specifying the index of an actionId
+   */
+  private getActionIndexFromActionId(data: Keylayout.KeylayoutXMLSourceFile, search: string): number {
     if (!data.keyboard?.actions?.action) {
       return -1;
     }
@@ -817,12 +817,12 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-  * @brief  member function to  find the actionID of a certain state-next pair
-  * @param  data an object containing all data read from a .keylayout file
-  * @param  search :string value 'next' to be found
-  * @return a string containing the actionId of a certain state(none)-next pair
-  */
-  public getActionIdFromActionNext(data: Keylayout.KeylayoutXMLSourceFile, search: string): string {
+   * @brief  member function to  find the actionID of a certain state-next pair
+   * @param  data an object containing all data read from a .keylayout file
+   * @param  search :string value 'next' to be found
+   * @return a string containing the actionId of a certain state(none)-next pair
+   */
+  private getActionIdFromActionNext(data: Keylayout.KeylayoutXMLSourceFile, search: string): string {
     if (search !== "none" && data.keyboard?.actions?.action) {
       for (const action of data.keyboard.actions.action) {
         if (action.when) {
@@ -843,7 +843,7 @@ export class KeylayoutToKmnConverter {
    * @param  search  : KeylayoutFileData[] - an array[{keycode,modifier}]  to be found
    * @return a string[] containing modifiers
    */
-  public getModifierArrayFromKeyModifierArray(data: ProcessedData["modifiers"], search: KeylayoutFileData[]): string[][] | [null] {
+  private getModifierArrayFromKeyModifierArray(data: ProcessedData["modifiers"], search: KeylayoutFileData[]): string[][] | [null] {
     const returnString1D: string[][] = [];
     for (let i = 0; i < search.length; i++) {
       if (search[i].behavior === undefined || search[i].behavior === null) {
@@ -860,7 +860,7 @@ export class KeylayoutToKmnConverter {
    * @param  search :string an actionId to be found
    * @return a string containing the output character
    */
-  public getOutputFromActionIdNone(data: Keylayout.KeylayoutXMLSourceFile, search: string): string {
+  private getOutputFromActionIdNone(data: Keylayout.KeylayoutXMLSourceFile, search: string): string {
     let OutputValue: string = "";
 
     if (!data.keyboard?.actions?.action) {
@@ -880,12 +880,12 @@ export class KeylayoutToKmnConverter {
   }
 
   /**
-  * @brief  member function to return array of [Keycode,Keyname,actionId,actionIDIndex, output] for a given actionID in of [ actionID,state,output]
-  * @param  data an object containing all data read from a .keylayout file
-  * @param  search :idStateOutputObject[] - array of [{ actionID,state,output }]
-  * @return a KeylayoutFileData[] containing [{Keycode,Keyname,actionId,actionID, output}]
-  */
-  public getKeyActionOutputArrayFromActionStateOutputArray(data: Keylayout.KeylayoutXMLSourceFile, search: ActionStateOutput[]): KeylayoutFileData[] {
+   * @brief  member function to return array of [Keycode,Keyname,actionId,actionIDIndex, output] for a given actionID in of [ actionID,state,output]
+   * @param  data an object containing all data read from a .keylayout file
+   * @param  search :idStateOutputObject[] - array of [{ actionID,state,output }]
+   * @return a KeylayoutFileData[] containing [{Keycode,Keyname,actionId,actionID, output}]
+   */
+  private getKeyActionOutputArrayFromActionStateOutputArray(data: Keylayout.KeylayoutXMLSourceFile, search: ActionStateOutput[]): KeylayoutFileData[] {
 
     if ((search === undefined) || (search === null))
       return [];
@@ -918,7 +918,7 @@ export class KeylayoutToKmnConverter {
    * @param  search  : string a 'state' to be found
    * @return an array: idStateOutputObject[] containing all [{actionId, state, output}] for a certain state
    */
-  public getActionStateOutputArrayFromActionState(data: Keylayout.KeylayoutXMLSourceFile, search: string): ActionStateOutput[] {
+  private getActionStateOutputArrayFromActionState(data: Keylayout.KeylayoutXMLSourceFile, search: string): ActionStateOutput[] {
     const actionStateOutput: ActionStateOutput[] = [];
     if (search !== "none" && data.keyboard?.actions?.action) {
       for (const action of data.keyboard.actions.action) {
@@ -948,7 +948,7 @@ export class KeylayoutToKmnConverter {
    * @return an array: KeylayoutFileData[] containing [{KeyName,actionId,behavior,modifier,output}]
    */
 
-  public getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(data: Keylayout.KeylayoutXMLSourceFile, search: KeylayoutFileData[], isCAPSused: boolean): KeylayoutFileData[] {
+  private getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray(data: Keylayout.KeylayoutXMLSourceFile, search: KeylayoutFileData[], isCAPSused: boolean): KeylayoutFileData[] {
     const keyBehaviorModOutput = [];
     if (!((search === undefined) || (search === null) || (search.length === 0))) {
       for (let i = 0; i < search.length; i++) {
@@ -990,7 +990,7 @@ export class KeylayoutToKmnConverter {
    * @param  isCAPSused  : boolean - flag to indicate if CAPS is used in a keylayout file or not
    * @return an array: KeylayoutFileData[] containing [{actionID,output, behavior,keyname,modifier}]
    */
-  public getActionOutputBehaviorKeyModiFromActionIDStateOutput(data: Keylayout.KeylayoutXMLSourceFile, modi: string[][], search: string, outchar: string, isCapsused: boolean): KeylayoutFileData[] {
+  private getActionOutputBehaviorKeyModiFromActionIDStateOutput(data: Keylayout.KeylayoutXMLSourceFile, modi: string[][], search: string, outchar: string, isCapsused: boolean): KeylayoutFileData[] {
     const actionOutputBehaviorKeyModi = [];
     if ((!modi) || (search === "") || (search === undefined)) {
       return [];
@@ -1037,7 +1037,7 @@ export class KeylayoutToKmnConverter {
    * @param  search  : string - an actionId to be found
    * @return an array: KeylayoutFileData[] containing [{keycode,behavior}]
    */
-  public getKeyModifierArrayFromActionID(data: Keylayout.KeylayoutXMLSourceFile, search: string): KeylayoutFileData[] {
+  private getKeyModifierArrayFromActionID(data: Keylayout.KeylayoutXMLSourceFile, search: string): KeylayoutFileData[] {
     const mapIndexObject1D: KeylayoutFileData[] = [];
     for (let i = 0; i < data.keyboard.keyMapSet[0].keyMap.length; i++) {
       for (let j = 0; j < data.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
@@ -1056,5 +1056,21 @@ export class KeylayoutToKmnConverter {
   /** @internal */
   public unitTestEndpoints = {
     convert: this.convert.bind(this),
+
+    reviewRuleInputData: this.reviewRuleInputData.bind(this),
+    createKmnModifier: this.createKmnModifier.bind(this),
+    checkIfCapsIsUsed: this.checkIfCapsIsUsed.bind(this),
+    isAcceptableKeymanModifier: this.isAcceptableKeymanModifier.bind(this),
+    mapUkeleleKeycodeToVK: this.mapUkeleleKeycodeToVK.bind(this),
+
+    getActionIndexFromActionId: this.getActionIndexFromActionId.bind(this),
+    getActionIdFromActionNext: this.getActionIdFromActionNext.bind(this),
+    getModifierArrayFromKeyModifierArray: this.getModifierArrayFromKeyModifierArray.bind(this),
+    getOutputFromActionIdNone: this.getOutputFromActionIdNone.bind(this),
+    getKeyActionOutputArrayFromActionStateOutputArray: this.getKeyActionOutputArrayFromActionStateOutputArray.bind(this),
+    getActionStateOutputArrayFromActionState: this.getActionStateOutputArrayFromActionState.bind(this),
+    getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray: this.getKeyBehaviorModOutputArrayFromKeyActionBehaviorOutputArray.bind(this),
+    getActionOutputBehaviorKeyModiFromActionIDStateOutput: this.getActionOutputBehaviorKeyModiFromActionIDStateOutput.bind(this),
+    getKeyModifierArrayFromActionID: this.getKeyModifierArrayFromActionID.bind(this),
   };
 }
