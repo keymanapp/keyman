@@ -50,7 +50,7 @@ type
 
   TKPInstallPackage = class(TKPBase)
   public
-    procedure Execute(const FileName: string; Options: TKPInstallPackageOptions);
+    procedure Execute(const FileName: string; Options: TKPInstallPackageOptions; BaseKeyboardID: Integer);
   end;
 
 implementation
@@ -85,7 +85,7 @@ uses
 { TKPInstallPackage }
 
 
-procedure TKPInstallPackage.Execute(const FileName: string; Options: TKPInstallPackageOptions);
+procedure TKPInstallPackage.Execute(const FileName: string; Options: TKPInstallPackageOptions; BaseKeyboardID: Integer);
       function GetHHIcon: string;
       var
         buf: array[0..260] of char;
@@ -112,7 +112,7 @@ var
   FErrorValue: Cardinal;
   FSrcFileName: string;
 
-  procedure InstallKeyboard(FileName: string);
+  procedure InstallKeyboard(FileName: string; BaseKeyboardID: Integer);
   var
     FOptions: TKPInstallKeyboardOptions;
     kbd: TPackageKeyboard;
@@ -132,7 +132,7 @@ var
 
     with TKPInstallKeyboard.Create(Context) do
     try
-      Execute(FileName, PackageName, FOptions, FLanguages, ipForce in Options);
+      Execute(FileName, PackageName, FOptions, FLanguages, ipForce in Options, BaseKeyboardID);
     finally
       Free;
     end;
@@ -253,12 +253,12 @@ begin
         begin
           case inf.Files[i].FileType of
             ftKeymanFile:
-              InstallKeyboard(dest + inf.Files[i].FileName);
+              InstallKeyboard(dest + inf.Files[i].FileName, BaseKeyboardID);
 
             ftPackageFile:
               with TKPInstallPackage.Create(Context) do
               try
-                Execute(dest + inf.Files[i].FileName, Options);
+                Execute(dest + inf.Files[i].FileName, Options, BaseKeyboardID);
               finally
                 Free;
               end;
