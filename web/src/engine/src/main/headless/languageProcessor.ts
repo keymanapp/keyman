@@ -25,33 +25,39 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   private _state: StateChangeEnum = 'inactive';
 
-  public constructor(predictiveWorkerFactory: WorkerFactory, sourcePath: string, transcriptionCache: TranscriptionCache, supportsRightDeletions: boolean = false) {
+  private capabilities: Capabilities;
+
+  public constructor(private predictiveWorkerFactory: WorkerFactory, sourcePath: string, transcriptionCache: TranscriptionCache, supportsRightDeletions: boolean = false) {
     super();
 
     this.recentTranscriptions = transcriptionCache;
 
     // Establishes KMW's platform 'capabilities', which limit the range of context a LMLayer
     // model may expect.
-    const capabilities: Capabilities = {
+    this.capabilities = {
       maxLeftContextCodePoints: 64,
       // Since the apps don't yet support right-deletions.
       maxRightContextCodePoints: supportsRightDeletions ? 0 : 64
     }
 
-    if(!predictiveWorkerFactory) {
+    this.instantiateWorkerAndEngine(sourcePath);
+  }
+
+  private instantiateWorkerAndEngine(sourcePath: string) {
+    if(!this.predictiveWorkerFactory) {
       return;
     }
 
     let workerInstance: Worker;
     try {
-      workerInstance = predictiveWorkerFactory?.constructInstance(sourcePath);
+      workerInstance = this.predictiveWorkerFactory.constructInstance(sourcePath);
     } catch(e) {
       // We can condition on `lmEngine` being null/undefined.
       console.warn('Web workers are not available: ' + (e ?? '').toString());
       workerInstance = null;
     }
     if(workerInstance) {
-      this.lmEngine = new LMLayer(capabilities, workerInstance);
+      this.lmEngine = new LMLayer(this.capabilities, workerInstance, this.modelLoaded.bind(this));
     }
   }
 
@@ -80,6 +86,14 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
     this.emit('statechange', 'inactive');
   }
 
+  modelLoaded(config: Configuration) {
+    this.configuration = config;
+    if(this.mayPredict) {
+      this._state = 'configured';
+      this.emit('statechange', 'configured');
+    }
+  }
+
   loadModel(model: ModelSpec): Promise<void> {
     if(!model) {
       throw new Error("Null reference not allowed.");
@@ -101,13 +115,19 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
       this.emit('statechange', 'active');
     }
 
-    return this.lmEngine.loadModel(source, specType).then((config: Configuration) => {
-      this.configuration = config;
-      if(this.mayPredict) {
-        this._state = 'configured';
-        this.emit('statechange', 'configured');
-      }
-    }).catch((error) => {
+    if(globalThis.hasOwnProperty('getModelWorkerPath_13862') && specType == 'file') {
+      // #13862 - on Android, we have a workaround for an apparent Chrome bug to
+      // load a concatenated worker + lexical model as the worker thread. See
+      // KMManager.java for full details.
+      const workerPath = (<any>globalThis).getModelWorkerPath_13862(model.id);
+      this.lmEngine.shutdown();
+      this.instantiateWorkerAndEngine(workerPath);
+      // TODO: there are some async questions around loading the worker here
+      // TODO: additional error handling?
+      return Promise.resolve();
+    }
+
+    return this.lmEngine.loadModel(source, specType).then(this.modelLoaded.bind(this)).catch((error) => {
       // Does this provide enough logging information?
       let message: string;
       if(error instanceof Error) {

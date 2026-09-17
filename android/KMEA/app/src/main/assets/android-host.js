@@ -22,6 +22,13 @@ sentryManager.init();
 
 window.addEventListener('load', init, false);
 
+/**
+ * getModelWorkerPath_13862 - see #13862
+ */
+window.getModelWorkerPath_13862 = function(modelId) {
+  return '/data/models/' + modelId + '/worker-thread-' + modelId + '.model.js';
+}
+
 function init() {
   //document.body.style.backgroundColor="transparent";
   //window.console.log('Device type = '+device);

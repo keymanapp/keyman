@@ -29,7 +29,7 @@ describe('LMLayer using the trie model', function () {
       // Parameter 3 = true:  enables 'test mode', disables correction-search timeout.
       // This helps prevent the correction-search timeout from flaking out periodically during unit tests in
       // CI, since remote servers / devices are involved.
-      var lmLayer = new LMLayer(defaultCapabilities, webPredictiveTextWorkerFactory.constructTestInstance(), true);
+      var lmLayer = new LMLayer(defaultCapabilities, webPredictiveTextWorkerFactory.constructTestInstance(), undefined,/* testMode */ true);
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
@@ -71,7 +71,7 @@ describe('LMLayer using the trie model', function () {
     //
     // https://community.software.sil.org/t/search-term-to-key-in-lexical-model-not-working-both-ways-by-default/3133
     it('should use the default searchTermToKey()', function () {
-      var lmLayer = new LMLayer(defaultCapabilities, webPredictiveTextWorkerFactory.constructTestInstance(), /* testMode */ true);
+      var lmLayer = new LMLayer(defaultCapabilities, webPredictiveTextWorkerFactory.constructTestInstance(), undefined, /* testMode */ true);
 
       let loc = document.location;
       return lmLayer.loadModel(

@@ -10,7 +10,7 @@ describe('LMLayer', function () {
 
   describe('[[constructor]]', function () {
     it('should construct with a single argument', function () {
-      let lmLayer = new LMLayer(defaultCapabilities, webPredictiveTextWorkerFactory.constructTestInstance(), true);
+      let lmLayer = new LMLayer(defaultCapabilities, webPredictiveTextWorkerFactory.constructTestInstance(), undefined, /* testMode */ true);
       assert.instanceOf(lmLayer, LMLayer);
       lmLayer.shutdown();
     });

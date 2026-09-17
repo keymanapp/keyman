@@ -6,6 +6,7 @@ package com.keyman.engine;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1182,8 +1183,55 @@ public final class KMManager {
           }
         }
       }
+
+      createModelWorkerFiles_13862(context);
     } catch (Exception e) {
       KMLog.LogException(TAG, "Failed to copy assets. Error: ", e);
+    }
+  }
+
+  /**
+   * #13862
+   *
+   * This is a workaround for what appears to be a Chrome bug: `importScript` is
+   * unreliable in a Worker context: https://issues.chromium.org/447941315 is one
+   * possible reference.
+   *
+   * This function, along with related infrastructure code (search #13862),
+   * avoids `importScript` altogether by appending the lexical model code to the
+   * worker code, causing both to be loaded together when the worker is
+   * instantiated.
+   */
+  public static void createModelWorkerFiles_13862(Context context) {
+    try {
+      AssetManager assetManager = context.getAssets();
+      File modelsDirectory = new File(getResourceRoot(), KMDefault_LexicalModelPackages);
+      if (modelsDirectory.exists() && modelsDirectory.isDirectory()) {
+        // enumerate subdirectories
+        File[] modelDirectories = modelsDirectory.listFiles();
+        for (File modelDirectory : modelDirectories) {
+          if (modelDirectory.isDirectory()) {
+            File[] modelFiles = modelDirectory.listFiles();
+            // enumerate files
+            for (File modelFile : modelFiles) {
+              if (modelFile.getName().endsWith(".model.js") && !modelFile.getName().startsWith("worker-thread")) {
+                String destinationFilename = modelDirectory.getPath() + File.separator + "worker-thread-" + modelFile.getName();
+                InputStream inputStream = assetManager.open(KMFilename_LMWorker);
+                FileOutputStream outputStream = new FileOutputStream(destinationFilename);
+                FileUtils.copy(inputStream, outputStream);
+
+                // TODO: FileUtils.copy closes the stream; it should not, as it did not open the stream
+
+                FileInputStream inputModelStream = new FileInputStream(modelFile);
+                FileOutputStream appendStream = new FileOutputStream(destinationFilename, true);
+                FileUtils.copy(inputModelStream, appendStream);
+              }
+            }
+          }
+        }
+      }
+    } catch(Exception e) {
+      KMLog.LogException(TAG, "Failed to create model worker files. Error: ", e);
     }
   }
 

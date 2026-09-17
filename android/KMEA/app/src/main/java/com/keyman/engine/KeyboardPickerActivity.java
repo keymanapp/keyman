@@ -695,6 +695,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
     }
     storage.lexicalModels.addAll(lexList);
     storage.lexicalModels.notifyDataSetChanged();
+    KMManager.createModelWorkerFiles_13862(context);  // #13862
   }
 
   protected static List<Keyboard> getKeyboardsList(Context context) {
