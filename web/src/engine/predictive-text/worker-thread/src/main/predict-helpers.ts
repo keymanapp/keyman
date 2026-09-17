@@ -532,7 +532,7 @@ export function buildAndMapPredictions(
   transition: ContextTransition,
   tokenization: ContextTokenization,
   // Originally, Readonly<TokenResultMapping> - but we only need these three components here.
-  match: Readonly<{matchString: string, totalCost: number, editCount: number}>,
+  match: Readonly<{matchString: string, correctionCost: number, editCount: number}>,
   costFactor: number
 ): CorrectionPredictionTuple[] {
   const model = transition.final.model;
@@ -545,7 +545,7 @@ export function buildAndMapPredictions(
 
   // --- to move into predictFromCorrections ---
   let correction = match.matchString;
-  let rootCost = match.totalCost;
+  let rootCost = match.correctionCost;
 
   // Replace the existing context with the correction.
   const correctionTransform: Transform = {
@@ -656,7 +656,7 @@ export async function correctAndEnumerate(
 
   // Only run the correction search when corrections are enabled.
   let rawPredictions: CorrectionPredictionTuple[] = [];
-  let bestCorrectionCost: number;
+  let bestTotalCost: number;
   const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
   for await(const match of getBestTokenMatches(searchModules, timer)) {
     // Corrections obtained:  now to predict from them!
@@ -700,8 +700,8 @@ export async function correctAndEnumerate(
     const predictions = buildAndMapPredictions(transition, tokenization, match, costFactor);
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
-    if(predictions.length > 0 && bestCorrectionCost === undefined) {
-      bestCorrectionCost = match.totalCost * costFactor;
+    if(predictions.length > 0 && bestTotalCost === undefined) {
+      bestTotalCost = match.totalCost * costFactor;
     }
 
     // If we're getting the same prediction again, it's lower-cost.  Update!
@@ -714,7 +714,7 @@ export async function correctAndEnumerate(
 
     rawPredictions = rawPredictions.concat(predictions);
 
-    if(shouldStopSearchingEarly(bestCorrectionCost, match.totalCost, rawPredictions)) {
+    if(shouldStopSearchingEarly(bestTotalCost, match.totalCost, rawPredictions)) {
       break;
     }
   }
@@ -738,20 +738,15 @@ export function shouldStopSearchingEarly(
     return true;
     // If enough have been found, we're safe to terminate earlier.
   } else if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
-    if(currentCorrectionCost >= bestCorrectionCost + CORRECTION_SEARCH_THRESHOLDS.REPLACEMENT_SEARCH_THRESHOLD) {
-      // Very useful for stopping 'sooner' when words reach a sufficient length.
-      return true;
-    } else {
-      // Sort the prediction list; we need them in descending probability order
-      // for the next check.
-      rawPredictions.sort((a, b) => b.totalProb - a.totalProb);
+    // Sort the prediction list; we need them in descending probability order
+    // for the next check.
+    rawPredictions.sort((a, b) => b.totalProb - a.totalProb);
 
-      // If the best result at the current state of the search fails to beat the worst
-      // pending suggestion from previous tiers, assume all further corrections will
-      // similarly fail to win; terminate the search-loop.
-      if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].totalProb > Math.exp(-currentCorrectionCost)) {
-        return true;
-      }
+    // If the best result at the current state of the search fails to beat the worst
+    // pending suggestion from previous tiers, assume all further corrections will
+    // similarly fail to win; terminate the search-loop.
+    if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].totalProb > Math.exp(-currentCorrectionCost)) {
+      return true;
     }
   }
 

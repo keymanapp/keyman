@@ -1,7 +1,7 @@
 import { PriorityQueue } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
-import { CORRECTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';
+import { PREDICTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';
 import { SearchQuotientNode } from './search-quotient-node.js';
 import { SearchQuotientRoot } from './search-quotient-root.js';
 import { SearchNode } from './distance-modeler.js';
@@ -10,7 +10,7 @@ import LexicalModel = LexicalModelTypes.LexicalModel;
 import { TokenResultMapping } from './token-result-mapping.js';
 
 export class LegacyQuotientRoot extends SearchQuotientRoot {
-  private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR);
+  private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(PREDICTION_QUEUE_COMPARATOR);
   private processed: SearchNode[] = [];
 
   constructor(model: LexicalModel) {

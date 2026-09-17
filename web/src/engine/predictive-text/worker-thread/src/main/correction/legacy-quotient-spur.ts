@@ -11,7 +11,7 @@
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KMWString, PriorityQueue } from 'keyman/common/web-utils';
 
-import { CORRECTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';
+import { PREDICTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';
 import { SearchNode } from './distance-modeler.js';
 import { SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
@@ -24,7 +24,7 @@ import Transform = LexicalModelTypes.Transform;
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export class LegacyQuotientSpur extends SearchQuotientSpur {
-  private transposeQueue: PriorityQueue<SearchNode> = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR);
+  private transposeQueue: PriorityQueue<SearchNode> = new PriorityQueue(PREDICTION_QUEUE_COMPARATOR);
   private incomingTransposeRootNodes: TokenResultMapping[] = [];
 
   public readonly insertLength: number;
