@@ -85,6 +85,14 @@ compile_and_copy() {
 
   node map-polyfill-bundler.js
 
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.js" "${BUILD_ROOT}/debug/worker-thread.js"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.js.map" "${BUILD_ROOT}/debug/worker-thread.js.map"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.d.ts" "${BUILD_ROOT}/debug/worker-thread.d.ts"
+
+  # TODO: rename to lm-worker.js? do we keep debug/release distinction through .js vs .min.js or via folder?
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.min.js" "${BUILD_ROOT}/release/worker-thread.js"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.min.js.map" "${BUILD_ROOT}/release/worker-thread.js.map"
+
   # For dependent test pages.
   builder_launch /web/src/test/manual/embed/android-harness/build.sh configure,build
 }

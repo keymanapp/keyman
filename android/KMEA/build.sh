@@ -55,6 +55,8 @@ do_build() {
   builder_echo "Copying Keyman Web artifacts"
   cp "$KEYMAN_ROOT/web/build/app/webview/$BUILDER_CONFIGURATION/keymanweb-webview.js" "$ENGINE_ASSETS/"
   cp "$KEYMAN_ROOT/web/build/app/webview/$BUILDER_CONFIGURATION/keymanweb-webview.js.map" "$ENGINE_ASSETS/"
+  cp "$KEYMAN_ROOT/web/build/app/webview/$BUILDER_CONFIGURATION/worker-thread.js" "$ENGINE_ASSETS/"
+  cp "$KEYMAN_ROOT/web/build/app/webview/$BUILDER_CONFIGURATION/worker-thread.js.map" "$ENGINE_ASSETS/"
   cp "$KEYMAN_ROOT/web/build/app/webview/$BUILDER_CONFIGURATION/map-polyfill.js" "$ENGINE_ASSETS/"
   cp "$KEYMAN_ROOT/web/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/"
   cp "$KEYMAN_ROOT/web/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/"
