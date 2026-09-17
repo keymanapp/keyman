@@ -52,7 +52,7 @@ describe('LMLayer using dummy model', function () {
 
   describe('Prediction', function () {
     it('will predict future suggestions', function () {
-      var lmLayer = new LMLayer(defaultCapabilities, webPredictiveTextWorkerFactory.constructTestInstance(), true);
+      var lmLayer = new LMLayer(defaultCapabilities, webPredictiveTextWorkerFactory.constructTestInstance(), undefined, /* testMode */ true);
 
       var stripIDs = function(suggestions) {
         suggestions.forEach(function(suggestion) {

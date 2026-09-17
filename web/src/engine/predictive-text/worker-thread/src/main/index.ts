@@ -204,6 +204,18 @@ export class LMLayerWorker {
    * @param capabilities Capabilities on offer from the keyboard.
    */
   public loadModel(model: LexicalModel) {
+    if(this.state.name == 'unconfigured') {
+      // #13862 - concatenated worker+model needs a different initialization
+      // order. As this does not match the original state machine initialization
+      // order -- 'loadModel' call ends up being made by the lexical model code
+      // itself before 'config' message is received -- we patch also the state
+      // machine in the LMLayer. See KMManager.java for full details.
+      this._preloadedModel = model;
+
+      // `loadModel` will be called again in the state transition to modeless.
+      return;
+    }
+
     // TODO:  pass _platformConfig to model so that it can self-configure to the platform,
     // returning a Configuration.
 
@@ -278,6 +290,8 @@ export class LMLayerWorker {
     this.transitionToLoadingState();
   }
 
+  private _preloadedModel: LexicalModel = null;
+
   /**
    * Sets the initial state, i.e., `unconfigured`.
    * This state only handles `config` messages, and will
@@ -297,6 +311,14 @@ export class LMLayerWorker {
         this._testMode = !!payload.testMode;
 
         this.transitionToLoadingState();
+
+        // #13862 - out-of-order initialization for concatenated worker+model.
+        // See KMManager.java for full details.
+        if(this._preloadedModel !== null) {
+          const preloadedModel = this._preloadedModel;
+          this._preloadedModel = null;
+          this.loadModel(preloadedModel);
+        }
       }
     }
   }

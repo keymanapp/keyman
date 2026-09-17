@@ -15,7 +15,7 @@ describe('LMLayer using the trie model', function () {
 
   beforeEach(function() {
     worker = nodePredictiveTextWorkerFactory.constructInstance();
-    lmLayer = new LMLayer(capabilities(), worker, true);
+    lmLayer = new LMLayer(capabilities(), worker, undefined, /* testMode */ true);
   });
 
   afterEach(function () {

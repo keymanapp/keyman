@@ -74,11 +74,11 @@ export class LMLayer {
    * @param uri URI of the underlying LMLayer worker code. This will usually be a blob:
    *            or file: URI. If uri is not provided, this will start the default Worker.
    */
-  constructor(capabilities: Capabilities, worker: Worker, testMode?: boolean) {
+  constructor(capabilities: Capabilities, worker: Worker, modelLoaded?: (conf: Configuration) => void, testMode?: boolean) {
     // Either use the given worker, or instantiate the default worker.
     this._worker = worker;
     this._worker.onmessage = this.onMessage.bind(this)
-    this._declareLMLayerReady = null;
+    this._declareLMLayerReady = modelLoaded ?? null; // #13862
     this._predictPromises = new PromiseStore();
     this._wordbreakPromises = new PromiseStore();
     this._acceptPromises = new PromiseStore();
