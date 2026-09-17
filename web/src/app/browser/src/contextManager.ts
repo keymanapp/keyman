@@ -376,8 +376,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     const attachment = element?._kmwAttachment;
 
     // If null or undefined, we're in 'global' mode.
-    return !!(attachment &&
-      (attachment.keyboard !== undefined && attachment.keyboard !== null));
+    return attachment?.keyboard !== undefined && attachment.keyboard !== null;
   }
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
@@ -447,8 +446,8 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
       // Either establishes or cancels independent-keyboard mode by setting the
       // associated metadata.  This will have direct effects on the results
       // of .currentKeyboardSrcTextStore().
-      attachment.keyboard = kbdId ?? null;
-      attachment.languageCode = langId ?? null;
+      attachment.keyboard = kbdId;
+      attachment.languageCode = langId;
 
       // If it has just entered independent-keyboard mode, we need the second check.
       if(wasPriorTextStore || this.currentKeyboardSrcTextStore() == textStore) {
