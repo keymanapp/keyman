@@ -9,7 +9,7 @@
 |  Package | Description |
 |  --- | --- |
 |  [@keymanapp/kmc-analyze](./kmc-analyze.md) | kmc-analyze - keyboard analysis classes, including tools for <code>&amp;displayMap</code>. |
-|  [@keymanapp/kmc-convert](./kmc-convert.md) | kmc-convert - keyboard conversion tool between keyboard layouts (e.g. .keylayout -> .kmn). |
+|  [@keymanapp/kmc-convert](./kmc-convert.md) | kmc-convert - conversion tool between keyboard layouts (e.g. .keylayout -> .kmn). |
 |  [@keymanapp/kmc-keyboard-info](./kmc-keyboard-info.md) |  |
 |  [@keymanapp/kmc-kmn](./kmc-kmn.md) | kmc-kmn - Keyman keyboard compiler |
 |  [@keymanapp/kmc-ldml](./kmc-ldml.md) |  |
