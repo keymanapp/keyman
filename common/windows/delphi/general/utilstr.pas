@@ -62,21 +62,21 @@ function WideQuotedStr(const str: WideString): WideString; deprecated;  // I3310
   * Creates the compiled keyboard filename by inserting the base keyboard ID
   * before the .kmx extension.
   *
-  * @param  KeyboardFileName       Keyboard filename, in the form keyboardname.kmx.
-  * @param  BaseKeyboardIDHex  Base keyboard ID in hexadecimal form.
-  * @return Compiled keyboard filename, in the form keyboardname-<KLID>.kmx.
+  * @param  KeyboardFileName       Keyboard filename, in the form '[path\]keyboardid[.kmx]'
+  * @param  BaseKeyboardIDHex      Base keyboard KLID in eight digit hexadecimal form
+  * @return Compiled keyboard filename, in the form '[path\]keyboardid-<KLID>.kmx'
   *)
-function InsertBKLIDFilename(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
+function GetKeyboardFilenameWithBaseKeyboardID(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
 
 (**
   * Creates the dead-key compiled keyboard filename by inserting the base
   * keyboard ID and -d suffix before the .kmx extension.
   *
-  * @param  KeyboardFileName       Keyboard filename, in the form keyboardname.kmx.
-  * @param  BaseKeyboardIDHex  Base keyboard ID in hexadecimal form.
-  * @return Dead-key compiled keyboard filename, in the form keyboardname-<KLID>-d.kmx.
+  * @param  KeyboardFileName       Keyboard filename, in the form '[path]\keyboardid[.kmx]'
+  * @param  BaseKeyboardIDHex      Base keyboard KLID in eight digit hexadecimal form
+  * @return Dead-key compiled keyboard filename, in the form '[path\]keyboardid-<KLID>-d.kmx'
   *)
-function InsertBKLIDDeadkeyFilename(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
+function GetKeyboardFilenameWithBaseKeyboardIDAndDeadkey(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
 
 implementation
 
@@ -436,14 +436,14 @@ begin
   Result.Bottom := StrToIntDef(s, 0);
 end;
 
-function InsertBKLIDFilename(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
+function GetKeyboardFilenameWithBaseKeyboardID(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
 begin
     Result := ChangeFileExt(KeyboardFileName, '') + '-' + BaseKeyboardIDHex + '.kmx';
 end;
 
-function InsertBKLIDDeadkeyFilename(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
+function GetKeyboardFilenameWithBaseKeyboardIDAndDeadkey(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
 begin
-  Result := ChangeFileExt(KeyboardFileName, '') + '-' + BaseKeyboardIDHex + '-d.kmx'
+  Result := ChangeFileExt(KeyboardFileName, '') + '-' + BaseKeyboardIDHex + '-d.kmx';
 end;
 
 end.

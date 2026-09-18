@@ -266,6 +266,7 @@ begin
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
       else if s = '-mcompilekbds' then
       begin
+        // Requires elevated context
         FMode := fmMCompileKbds;
         Inc(i);
         if i > ParamCount then Exit;
