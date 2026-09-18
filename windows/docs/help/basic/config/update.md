@@ -2,7 +2,7 @@
 title:  Keyman Configuration - Update Tab
 ---
 
-The Update tab of Keyman Configuration provides the option to update and install Keyman version manually.
+The Update tab in Keyman Configuration allows you to manually check for and install Keyman updates.
 
 ![](../../desktop_images/tab-update.png)
 
