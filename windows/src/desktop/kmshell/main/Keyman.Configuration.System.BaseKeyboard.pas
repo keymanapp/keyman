@@ -1,7 +1,7 @@
 (*
  * Keyman is copyright (C) SIL Global. MIT License.
  *
- * Created by Ross Cruickshank on 2026-09-dd-12
+ * Created by Ross Cruickshank on 2026-09-12
  *
  *
  * This unit assists in setting the base keyboard configuration,
