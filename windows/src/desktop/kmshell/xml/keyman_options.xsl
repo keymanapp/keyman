@@ -16,6 +16,16 @@
           <xsl:for-each select="//KeymanOption[group=current()/name]">
             <xsl:if test="optiontype = 1">
               <xsl:call-template name="option" />
+              <xsl:if test="id='koStartWithWindows' and value='True' and //StartupDisabled='True'">
+                <div class="options_startup_warning">
+                  <div><xsl:value-of select="$locale/string[@name='S_StartupDisabledWarning']"/></div>
+                  <xsl:call-template name="button">
+                    <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_StartupSettings']"/></xsl:with-param>
+                    <xsl:with-param name="command">keyman:options_startupsettings</xsl:with-param>
+                    <xsl:with-param name="tabid">1</xsl:with-param>
+                  </xsl:call-template>
+                </div>
+              </xsl:if>
             </xsl:if>
           </xsl:for-each>
           <xsl:if test="current() != //OptionGroups/OptionGroup[last()]">

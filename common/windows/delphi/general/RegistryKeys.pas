@@ -283,6 +283,8 @@ const
 
   SRegValue_WindowsRun_Keyman          = 'Keyman';
 
+  SRegKey_StartupApproved_Run = 'Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run';
+
   SRegValue_LanguageCheckDisabledItems = 'language check disabled items'; // CU
 
 {-------------------------------------------------------------------------------
@@ -413,6 +415,11 @@ function BuildKeyboardSuggestedLanguagesKey_LM(const KeyboardID: string): string
 function BuildKeyboardLanguagesKey_CU(const KeyboardID: string): string;
 
 implementation
+
+uses
+  System.Win.Registry,
+  Windows,
+  SysUtils;
 
 function BuildKeyboardOptionKey_CU(const KeyboardID: string): string;
 begin
