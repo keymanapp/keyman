@@ -507,7 +507,7 @@ folder, and the files in that folder will follow the
 
 ## `kmc convert` options
 
-Converts keyboard source files between formats i.e. keylayout -> .kmn keeping the original name and saving with new extention 
+Converts keyboard source files between formats e.g. .keylayout -> .kmn keeping the original name and saving the output with new extention 
 
 `-p, --out-path <filename>`
 
