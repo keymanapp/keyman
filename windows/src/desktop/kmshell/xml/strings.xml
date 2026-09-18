@@ -406,6 +406,21 @@
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 19.0.286.0 -->
+  <string name="S_StartupDisabledWarning" comment="Startup options - Windows has disabled Keyman startup">Windows has disabled Keyman from starting automatically. Enable Keyman in Windows Startup settings.</string>
+
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 19.0.286.0 -->
+  <string name="S_Button_StartupSettings" comment="Startup options - open Windows Startup settings">Open Windows Startup settings</string>
+
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 19.0.286.0 -->
+  <string name="S_StartupDisabledWarningOpenSettings" comment="Startup options - Windows has disabled Keyman startup opening settings">Windows has disabled Keyman from starting automatically. Open Windows Startup settings now?</string>
+
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koShowStartup" comment="Startup options - show/hide splash screen">Show splash screen</string>
 

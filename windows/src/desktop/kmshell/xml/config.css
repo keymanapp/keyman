@@ -736,6 +736,20 @@ table tr
 {
   display: none;
 }
+.options_startup_warning
+{
+  background: #FFF4CE;
+  border: 1px solid #D6B656;
+  color: #4A3B00;
+  margin: 4px 8px 8px 32px;
+  padding: 8px;
+}
+.options_startup_warning input,
+.options_startup_warning button
+{
+  margin-left: 0;
+  margin-top: 6px;
+}
 #options_control
 {
   left: 0;
