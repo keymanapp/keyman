@@ -48,7 +48,7 @@ implementation
 uses
   kmint,
   utilkmshell,
-  utilstr;
+  utilfiletypes;
 
 function BaseKeyboardNeedsMCompile(BaseKeyboardID: Integer): Boolean;
 var
@@ -63,8 +63,8 @@ begin
     Keyboard := kmcom.Keyboards.Items[I];
     KeyboardFileName := Keyboard.Filename;
     if FileExists(KeyboardFileName) and
-      (not FileExists(InsertBKLIDFilename(KeyboardFileName, BaseKeyboardIDHex)) or
-       not FileExists(InsertBKLIDDeadkeyFilename(KeyboardFileName, BaseKeyboardIDHex))) then
+      (not FileExists(BuildKeyboardFilenameWithBaseKeyboardID(KeyboardFileName, BaseKeyboardIDHex)) or
+       not FileExists(BuildKeyboardFilenameWithBaseKeyboardIDAndDeadkey(KeyboardFileName, BaseKeyboardIDHex))) then
       Exit(True);
   end;
   Result := False;

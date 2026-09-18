@@ -58,26 +58,6 @@ function GetTokenFromCaret(line: string; var selx, sellen: Integer): string;
 
 function WideQuotedStr(const str: WideString): WideString; deprecated;  // I3310
 
-(**
-  * Creates the compiled keyboard filename by inserting the base keyboard ID
-  * before the .kmx extension.
-  *
-  * @param  KeyboardFileName       Keyboard filename, in the form '[path\]keyboardid[.kmx]'
-  * @param  BaseKeyboardIDHex      Base keyboard KLID in eight digit hexadecimal form
-  * @return Compiled keyboard filename, in the form '[path\]keyboardid-<KLID>.kmx'
-  *)
-function GetKeyboardFilenameWithBaseKeyboardID(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
-
-(**
-  * Creates the dead-key compiled keyboard filename by inserting the base
-  * keyboard ID and -d suffix before the .kmx extension.
-  *
-  * @param  KeyboardFileName       Keyboard filename, in the form '[path]\keyboardid[.kmx]'
-  * @param  BaseKeyboardIDHex      Base keyboard KLID in eight digit hexadecimal form
-  * @return Dead-key compiled keyboard filename, in the form '[path\]keyboardid-<KLID>-d.kmx'
-  *)
-function GetKeyboardFilenameWithBaseKeyboardIDAndDeadkey(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
-
 implementation
 
 uses
@@ -434,16 +414,6 @@ begin
   Delete(s,1,n);
 
   Result.Bottom := StrToIntDef(s, 0);
-end;
-
-function GetKeyboardFilenameWithBaseKeyboardID(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
-begin
-    Result := ChangeFileExt(KeyboardFileName, '') + '-' + BaseKeyboardIDHex + '.kmx';
-end;
-
-function GetKeyboardFilenameWithBaseKeyboardIDAndDeadkey(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
-begin
-  Result := ChangeFileExt(KeyboardFileName, '') + '-' + BaseKeyboardIDHex + '-d.kmx';
 end;
 
 end.
