@@ -44,13 +44,13 @@ compile_and_copy() {
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/webview"
   SRC_ROOT="${KEYMAN_ROOT}/web/src/app/webview/src"
 
-  node_es_bundle "${SRC_ROOT}/debug-main.js" \
+  node_es_bundle "${SRC_ROOT}/main.js" \
     --out        "${BUILD_ROOT}/debug/keymanweb-webview.js" \
     --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/webview/debug" \
     --target     "es6"
 
-  node_es_bundle "${SRC_ROOT}/release-main.js" \
+  node_es_bundle "${SRC_ROOT}/main.js" \
     --out        "${BUILD_ROOT}/release/keymanweb-webview.js" \
     --charset    "utf8" \
     --profile    "${BUILD_ROOT}/filesize-profile.log" \
@@ -84,6 +84,14 @@ compile_and_copy() {
   done
 
   node map-polyfill-bundler.js
+
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.js" "${BUILD_ROOT}/debug/worker-thread.js"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.js.map" "${BUILD_ROOT}/debug/worker-thread.js.map"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.d.ts" "${BUILD_ROOT}/debug/worker-thread.d.ts"
+
+  # TODO: rename to lm-worker.js? do we keep debug/release distinction through .js vs .min.js or via folder?
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.min.js" "${BUILD_ROOT}/release/worker-thread.js"
+  cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.min.js.map" "${BUILD_ROOT}/release/worker-thread.js.map"
 
   # For dependent test pages.
   builder_launch /web/src/test/manual/embed/android-harness/build.sh configure,build

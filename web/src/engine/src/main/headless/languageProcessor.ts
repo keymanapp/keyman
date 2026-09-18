@@ -1,5 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
+import { LMLayer, type WorkerFactory } from "@keymanapp/lexical-model-layer/web";
 import { Transcription, TextStoreLanguageProcessorInterface, SyntheticTextStore, ProcessorAction } from 'keyman/engine/keyboard';
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import { ContextWindow } from "./contextWindow.js";
@@ -25,7 +25,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   private _state: StateChangeEnum = 'inactive';
 
-  public constructor(predictiveWorkerFactory: WorkerFactory, transcriptionCache: TranscriptionCache, supportsRightDeletions: boolean = false) {
+  public constructor(predictiveWorkerFactory: WorkerFactory, sourcePath: string, transcriptionCache: TranscriptionCache, supportsRightDeletions: boolean = false) {
     super();
 
     this.recentTranscriptions = transcriptionCache;
@@ -44,7 +44,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
     let workerInstance: Worker;
     try {
-      workerInstance = predictiveWorkerFactory?.constructInstance();
+      workerInstance = predictiveWorkerFactory?.constructInstance(sourcePath);
     } catch(e) {
       // We can condition on `lmEngine` being null/undefined.
       console.warn('Web workers are not available: ' + (e ?? '').toString());

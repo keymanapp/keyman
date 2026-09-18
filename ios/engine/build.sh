@@ -109,6 +109,7 @@ function update_bundle ( ) {
   cp "$KMW_RESOURCES/osk/kmwosk.css"            "$BUNDLE_PATH/kmwosk.css"
   cp "$KMW_RESOURCES/osk/keymanweb-osk.ttf"     "$BUNDLE_PATH/keymanweb-osk.ttf"
   cp "$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
+  cp "$KMW_PRODUCT/worker-thread.js"            "$BUNDLE_PATH/worker-thread.js"
   cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
 }
 

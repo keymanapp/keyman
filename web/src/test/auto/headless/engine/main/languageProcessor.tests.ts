@@ -8,7 +8,7 @@ import path from 'node:path';
 
 import { assert } from 'chai';
 
-import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
+import { nodePredictiveTextWorkerFactory } from "@keymanapp/lexical-model-layer/node";
 import { LexicalModelCompiler } from '@keymanapp/kmc-model';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { SyntheticTextStore } from 'keyman/engine/keyboard';
@@ -35,7 +35,7 @@ describe('LanguageProcessor', function() {
   const callbacks = new TestCompilerCallbacks(this);
 
   beforeEach(function() {
-    languageProcessor = new LanguageProcessor(LMWorker, new TranscriptionCache());
+    languageProcessor = new LanguageProcessor(nodePredictiveTextWorkerFactory, '', new TranscriptionCache());
   });
 
   afterEach(function() {
@@ -54,7 +54,7 @@ describe('LanguageProcessor', function() {
           constructInstance() {
             throw new Error("Simulating a platform without Worker support");
           }
-        }, new TranscriptionCache());
+        }, '', new TranscriptionCache());
         assert.isFalse(workerlessProcessor.canEnable);
       } catch {
         assert.fail('Worker construction error was unhandled');

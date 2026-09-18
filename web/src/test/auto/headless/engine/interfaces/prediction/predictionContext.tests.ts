@@ -5,7 +5,7 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { PredictionContext } from 'keyman/engine/interfaces';
-import { NodeWorker } from "@keymanapp/lexical-model-layer/node";
+import { nodePredictiveTextWorkerFactory } from "@keymanapp/lexical-model-layer/node";
 import { SyntheticTextStore } from 'keyman/engine/keyboard';
 
 import Suggestion = LexicalModelTypes.Suggestion;
@@ -70,7 +70,7 @@ describe("PredictionContext", () => {
   let langProcessor: LanguageProcessor;
 
   beforeEach(function() {
-    langProcessor = new LanguageProcessor(NodeWorker, new TranscriptionCache());
+    langProcessor = new LanguageProcessor(nodePredictiveTextWorkerFactory, '', new TranscriptionCache());
   });
 
   afterEach(function() {
