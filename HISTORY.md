@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.288 alpha 2026-09-18
+
+* change(web): remove TokenizationCorrector class only used in epic/boundary-correction (#16581)
+
 ## 19.0.287 alpha 2026-09-17
 
 * fix(web): support autocorrection of transposed text (#16450)
