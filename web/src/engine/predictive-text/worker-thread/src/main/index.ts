@@ -242,13 +242,25 @@ export default class LMLayerWorker {
     }
   }
 
-  private loadModelFile(url: string) {
+  private loadModelFile(url: string, tryCount: number = 0) {
     // The self/global WebWorker method, allowing us to directly import another script file into WebWorker scope.
     // If built correctly, the model's script file will auto-register the model with loadModel() above.
     try {
       this._importScripts(url);
     } catch (err) {
-      this.error("Error occurred when attempting to load dictionary", err);
+      // #13862: attempt to mitigate NetworkError on Chrome by retrying before giving up
+      tryCount++;
+      if(err instanceof Error && err.name == 'NetworkError') {
+        if(tryCount < 4) {
+          // increase delay with each retry: 10msec, 100msec, 1000msec
+          console?.warn(`NetworkError when attempting to load dictionary (attempt ${tryCount} of 4, will retry after ${10 ** tryCount} msec): ${err.toString()}`);
+          setTimeout(() => this.loadModelFile(url, tryCount), 10 ** tryCount);
+        } else {
+          this.error(`NetworkError when attempting to load dictionary (attempt ${tryCount} of 4, giving up): ${err.toString()}`);
+        }
+      } else {
+        this.error("Error occurred when attempting to load dictionary", err);
+      }
     }
   }
 
