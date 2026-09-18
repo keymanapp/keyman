@@ -12,7 +12,6 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { CorrectionResultMapping } from './correction-result-mapping.js';
 import { SearchNode, TraversableToken } from "./distance-modeler.js";
-import { TokenResult } from './tokenization-corrector.js';
 
 // Circular type reference; do not actually require direct use of the prototype
 // or constructor!
@@ -46,7 +45,7 @@ export function initTokenResultFilterer() {
   return closure;
 }
 
-export class TokenResultMapping implements CorrectionResultMapping<SearchNode>, TokenResult {
+export class TokenResultMapping implements CorrectionResultMapping<SearchNode> {
   readonly matchingSpace: SearchQuotientNode;
   private readonly node: SearchNode;
   readonly spaceId: number;

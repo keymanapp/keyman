@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.287 alpha 2026-09-17
+
+* fix(web): support autocorrection of transposed text (#16450)
+* fix(web): allow to set default keyboard to 'off' (#16524)
+
 ## 19.0.286 alpha 2026-09-16
 
 * fix(developer): trim new words entered into the wordlist editor (#16538)
