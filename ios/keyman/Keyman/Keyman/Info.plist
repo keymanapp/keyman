@@ -45,10 +45,10 @@
 	<string>10.0.0</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<key>KeymanVersionWithTag</key>
-	<string>10.0.0-local</string>
 	<key>KeymanVersionEnvironment</key>
 	<string>local</string>
+	<key>KeymanVersionWithTag</key>
+	<string>10.0.0-local</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
