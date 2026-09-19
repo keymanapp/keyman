@@ -427,7 +427,7 @@ describe('LegacyQuotientSpur', () => {
       const entry_the = thirdResults.find((entry) => entry.matchString == 'the' && entry.editCount == 1);
       assert.isOk(entry_the);
 
-      thirdResults.sort((a, b) => a.totalCost - b.totalCost);
+      thirdResults.sort((a, b) => a.correctionCost - b.correctionCost);
       const the_index = thirdResults.findIndex((entry) => entry.matchString == 'the' && entry.editCount == 1);
       // `teh` should appear fairly early as a viable correction.
       assert.isBelow(the_index, 10);
@@ -438,7 +438,7 @@ describe('LegacyQuotientSpur', () => {
       // We want to make sure we don't auto-ignore transposition cases by
       // accident by failing that conditional.
       const the_entry = thirdResults[the_index];
-      assert.isBelow(the_entry.totalCost - thirdResults[0].totalCost, CORRECTION_SEARCH_THRESHOLDS.REPLACEMENT_SEARCH_THRESHOLD);
+      assert.isBelow(the_entry.correctionCost - thirdResults[0].correctionCost, CORRECTION_SEARCH_THRESHOLDS.REPLACEMENT_SEARCH_THRESHOLD);
     });
   });
 });
