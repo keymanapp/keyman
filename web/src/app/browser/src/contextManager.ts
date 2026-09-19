@@ -423,7 +423,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
    */
   public setKeyboardForTextStore(textStore: AbstractElementTextStore<any>, kbdId?: string | null, langId?: string | null): void {
     if(textStore instanceof DesignIFrameElementTextStore) {
-      console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
+      console.warn("ContextManager.setKeyboardForTextStore cannot set keyboard on iframes.");
       return;
     }
 

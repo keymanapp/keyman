@@ -183,23 +183,22 @@ export class FloatingOSKView extends OSKView {
   }.bind(this);
 
   /**
-   * Function     enabled
-   * Scope        Public
-   * @return      {boolean|number}    True if KMW OSK enabled
-   * Description  Test if KMW OSK is enabled
+   * Test if KMW OSK is enabled
+   *
+   * @return      {boolean}    True if KMW OSK enabled
    */
-  ['isEnabled'](): boolean {
+  public isEnabled(): boolean {
     return this.displayIfActive;
   }
 
   /**
-   * Function     isVisible
-   * Scope        Public
-   * @return      {boolean|number}    True if KMW OSK visible
-   * Description  Test if KMW OSK is actually visible
-   * Note that this will usually return false after any UI event that results in (temporary) loss of input focus
+   * Test if KMW OSK is actually visible
+   * Note that this will usually return false after any UI event that results in
+   * (temporary) loss of input focus.
+   *
+   * @return      {boolean}    True if KMW OSK visible
    */
-  ['isVisible'](): boolean {
+  public isVisible(): boolean {
     return this._Visible;
   }
 
@@ -504,30 +503,30 @@ export class FloatingOSKView extends OSKView {
   }
 
   public setDisplayPositioning() {
-    const Ls = this._Box.style;
+    const {style} = this._Box;
 
-    Ls.position='absolute';
+    style.position='absolute';
     // Keep it hidden if not currently displayed.
     if(this.activationModel.canActivate) {
-      Ls.display='block'; //Ls.visibility='visible';
+      style.display='block'; //Ls.visibility='visible';
     }
-    Ls.left='0px';
+    style.left='0px';
     if(this.specifiedPosition || this.userPositioned) {
-      Ls.left = this.x+'px';
-      Ls.top  = this.y+'px';
+      style.left = this.x+'px';
+      style.top  = this.y+'px';
     } else {
       const el: HTMLElement = this.typedActivationModel.activationTrigger || null;
 
       if(this.dfltX) {
-        Ls.left=this.dfltX;
+        style.left=this.dfltX;
       } else if(typeof el != 'undefined' && el != null) {
-        Ls.left=getAbsoluteX(el) + 'px';
+        style.left=getAbsoluteX(el) + 'px';
       }
 
       if(this.dfltY) {
-        Ls.top=this.dfltY;
+        style.top=this.dfltY;
       } else if(typeof el != 'undefined' && el != null) {
-        Ls.top=(getAbsoluteY(el) + el.offsetHeight)+'px';
+        style.top=(getAbsoluteY(el) + el.offsetHeight)+'px';
       }
     }
 
@@ -584,24 +583,22 @@ export class FloatingOSKView extends OSKView {
     }
   }
 
-  ['show'](bShow?: boolean) {
+  public show(bShow?: boolean) {
     if(bShow !== undefined) {
-      super['show'](bShow);
+      super.show(bShow);
     } else {
-      super['show']();
+      super.show();
     }
     this.savePersistedLayout();
   }
 
   /**
-   * Function     userPositioned
-   * Scope        Public
-   * @return      {(boolean|number)}          true if user located
-   * Description  Test if OSK window has been repositioned by user
-   *
+   * Test if OSK window has been repositioned by user
    * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/userLocated
+   *
+  * @return      {boolean}          true if user located
    */
-  public userLocated() {
+  public userLocated(): boolean {
     return this.userPositioned;
   }
 
