@@ -23,10 +23,10 @@ export abstract class Activator<ExtraEvents = void> extends EventEmitter<EventMa
   /**
    * When `true`, indicates that the listener should activate / become visible.
    */
-  abstract get activate(): boolean;
+  abstract get canActivate(): boolean;
 
   /**
-   * When `true` and `activate` is `false`, indicates that changing the value of `enabled`
+   * When `true` and `canActivate` is `false`, indicates that changing the value of `enabled`
    * will result in activation.
    */
   abstract get conditionsMet(): boolean;
@@ -41,7 +41,7 @@ export class StaticActivator extends Activator {
     // does nothing; it's static.
   }
 
-  get activate(): boolean {
+  get canActivate(): boolean {
     return true;
   }
 
