@@ -23,7 +23,7 @@ class KeyboardViewController: InputViewController {
       SentryManager.start(sendingEnabled: true)
     }
 
-    Manager.applicationGroupIdentifier = "group.KM4I"
+    Manager.applicationGroupIdentifier = "group.com.dal.keyman.keysense"
 
     let bundle = Bundle(for: KeyboardViewController.self)
     topBarImageSource = ImageBannerViewController(nibName: "ImageBanner", bundle: bundle)

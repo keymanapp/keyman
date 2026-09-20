@@ -15,7 +15,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
-    Manager.applicationGroupIdentifier = "group.KMEI"
+    Manager.applicationGroupIdentifier = "group.com.dal.keyman.keysense"
     Manager.shared.canRemoveDefaultKeyboard = true
 
     window = UIWindow(frame: UIScreen.main.bounds)

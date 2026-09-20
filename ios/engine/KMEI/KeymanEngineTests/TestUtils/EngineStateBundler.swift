@@ -55,7 +55,7 @@ extension TestUtils {
         let pListPath = bundleConstructionURL.appendingPathComponent("Library").appendingPathComponent("Preferences")
 
         let testEngineFilename = "com.keyman.testing.KeymanEngineTestHost.plist"
-        let appGroupFilename = "group.KM4I.plist"
+        let appGroupFilename = "group.com.dal.keyman.keysense"
         // If trying to ensure that UserDefaults is properly synchronized for this copy operation,
         // go to the folder for the link above in Finder and watch the file to ensure it's properly
         // fleshed out.

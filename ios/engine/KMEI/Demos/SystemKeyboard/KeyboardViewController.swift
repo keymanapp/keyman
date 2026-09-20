@@ -11,7 +11,7 @@ import KeymanEngine
 class KeyboardViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     _ = log // forces init of the log, which is useful in sys-kbd contexts.
-    Manager.applicationGroupIdentifier = "group.KMEI"
+    Manager.applicationGroupIdentifier = "group.com.dal.keyman.keysense"
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }
 

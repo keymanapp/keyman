@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -26,15 +26,11 @@
 		1645D5972036C9F80076C51B /* KMPKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5962036C9F80076C51B /* KMPKeyboard.swift */; };
 		165EB3A12098993900040A69 /* KeyboardError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3A02098993900040A69 /* KeyboardError.swift */; };
 		29084CAB2CD48B5D004070E7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 29084CAA2CD48B5D004070E7 /* Images.xcassets */; };
-		296EF2C72AFA26C700E3E384 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */; };
 		29B30C232B564F9900C342A4 /* KeymanEngineLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B30C222B564F9900C342A4 /* KeymanEngineLogger.swift */; };
 		29E202BD2CCB7541008B4740 /* KeyboardHeightViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E202BC2CCB7541008B4740 /* KeyboardHeightViewController.swift */; };
 		377D10DE26846B8900467431 /* SpacebarTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377D10DD26846B8900467431 /* SpacebarTextViewController.swift */; };
 		6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA8150F6DC8007A5DDE /* icon.png */; };
 		6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */; };
-		988B36B61ADF67290008752C /* inuktitut_pirurvik-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */; };
-		988B36B91ADF728A0008752C /* inuktitut_latin-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */; };
-		988B36BA1ADF728A0008752C /* inuktitut_naqittaut-1.0.js in Resources */ = {isa = PBXBuildFile; fileRef = 988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */; };
 		98D4190C17695E58008D2FF3 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 98D4190B17695E58008D2FF3 /* Default-568h@2x.png */; };
 		98F9D6A01954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */; };
 		9A079DCA222E050E00581263 /* LexicalModelKeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DC9222E050E00581263 /* LexicalModelKeymanPackage.swift */; };
@@ -121,7 +117,6 @@
 		CE46D65D247B93C9005FD506 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		CE5C8BE324B5B3BA00FAFB7F /* Queries+LexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */; };
 		CE5C8BE524B5BD1C00FAFB7F /* QueryModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */; };
-		CE5EDDC726522EAA001733AC /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC226522EAA001733AC /* Sentry.xcframework */; };
 		CE5EDDC826522EAA001733AC /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC326522EAA001733AC /* Reachability.xcframework */; };
 		CE5EDDD52652372A001733AC /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */; };
 		CE67D961228A6F190029F2B5 /* KeyboardCommandStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */; };
@@ -189,8 +184,25 @@
 		CEF888D323FE6ADF00667693 /* Simple 10.0 Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CEF888D123FE6ADF00667693 /* Simple 10.0 Migration.bundle */; };
 		CEF888D523FE786C00667693 /* KeyboardScaleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF888D423FE786C00667693 /* KeyboardScaleTests.swift */; };
 		CEF9367824D3B0B20031C70D /* PackageInstallView_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF9367724D3B0B20031C70D /* PackageInstallView_iPhone.xib */; };
+		DF4EA9EC305F76CD008CA65B /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = DF4EA9EB305F76CD008CA65B /* Sentry */; };
 		DF7EB3352FB55CC300E9C16E /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CEA1486F2407808F00C6ECD2 /* Localizable.strings */; };
 		DF7EB3362FB55CC900E9C16E /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = CE96E42D24D1229A005B8E5A /* Localizable.stringsdict */; };
+		DFAC17D8305F6CB800775ED6 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */; };
+		DFEC3DB2305F82C70036A3FF /* fv_stlatlimxec_kmw-9.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DAE305F82C70036A3FF /* fv_stlatlimxec_kmw-9.0 2.js */; };
+		DFEC3DB3305F82C70036A3FF /* inuktitut_naqittaut-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DB0305F82C70036A3FF /* inuktitut_naqittaut-1.0 2.js */; };
+		DFEC3DB4305F82C70036A3FF /* inuktitut_pirurvik-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DB1305F82C70036A3FF /* inuktitut_pirurvik-1.0 2.js */; };
+		DFEC3DB5305F82C70036A3FF /* inuktitut_latin-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DAF305F82C70036A3FF /* inuktitut_latin-1.0 2.js */; };
+		DFEC3DB6305F82C70036A3FF /* _031___delete_diacritics-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DAD305F82C70036A3FF /* _031___delete_diacritics-1.0 2.js */; };
+		DFEC3DB7305F82C70036A3FF /* fv_stlatlimxec_kmw-9.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DAE305F82C70036A3FF /* fv_stlatlimxec_kmw-9.0 2.js */; };
+		DFEC3DB8305F82C70036A3FF /* inuktitut_naqittaut-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DB0305F82C70036A3FF /* inuktitut_naqittaut-1.0 2.js */; };
+		DFEC3DB9305F82C70036A3FF /* inuktitut_pirurvik-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DB1305F82C70036A3FF /* inuktitut_pirurvik-1.0 2.js */; };
+		DFEC3DBA305F82C70036A3FF /* inuktitut_latin-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DAF305F82C70036A3FF /* inuktitut_latin-1.0 2.js */; };
+		DFEC3DBB305F82C70036A3FF /* _031___delete_diacritics-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DAD305F82C70036A3FF /* _031___delete_diacritics-1.0 2.js */; };
+		DFEC3DBC305F82C70036A3FF /* fv_stlatlimxec_kmw-9.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DAE305F82C70036A3FF /* fv_stlatlimxec_kmw-9.0 2.js */; };
+		DFEC3DBD305F82C70036A3FF /* inuktitut_naqittaut-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DB0305F82C70036A3FF /* inuktitut_naqittaut-1.0 2.js */; };
+		DFEC3DBE305F82C70036A3FF /* inuktitut_pirurvik-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DB1305F82C70036A3FF /* inuktitut_pirurvik-1.0 2.js */; };
+		DFEC3DBF305F82C70036A3FF /* inuktitut_latin-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DAF305F82C70036A3FF /* inuktitut_latin-1.0 2.js */; };
+		DFEC3DC0305F82C70036A3FF /* _031___delete_diacritics-1.0 2.js in Resources */ = {isa = PBXBuildFile; fileRef = DFEC3DAD305F82C70036A3FF /* _031___delete_diacritics-1.0 2.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -345,9 +357,6 @@
 		6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
 		984FA1F51974C0B30037EE5D /* Tavultesoft.KMEI.SystemKeyboard.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Tavultesoft.KMEI.SystemKeyboard.entitlements; sourceTree = "<group>"; };
 		984FA1F61974C0EF0037EE5D /* KMEI.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KMEI.entitlements; sourceTree = "<group>"; };
-		988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_pirurvik-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_pirurvik-1.0.js"; sourceTree = SOURCE_ROOT; };
-		988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_latin-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_latin-1.0.js"; sourceTree = SOURCE_ROOT; };
-		988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "inuktitut_naqittaut-1.0.js"; path = "KeymanEngineDemo/Keyboards/inuktitut_naqittaut-1.0.js"; sourceTree = SOURCE_ROOT; };
 		98D4190B17695E58008D2FF3 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		98F9D6971954112F0087AA43 /* Tavultesoft.KMEI.SystemKeyboard.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Tavultesoft.KMEI.SystemKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		98F9D69A1954112F0087AA43 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -433,7 +442,7 @@
 		CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Queries+LexicalModel.swift"; sourceTree = "<group>"; };
 		CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryModelTests.swift; sourceTree = "<group>"; };
 		CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<group>"; };
-		CE5EDDC226522EAA001733AC /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
+		CE5EDDC226522EAA001733AC /* Sentry.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:97JCY7859U:GetSentry LLC"; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
 		CE5EDDC326522EAA001733AC /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
 		CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCommandStructs.swift; sourceTree = "<group>"; };
 		CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceFileManager.swift; sourceTree = "<group>"; };
@@ -533,6 +542,11 @@
 		D88EC4042D7876650022CB80 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		D88EC4052D7876910022CB80 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		D88EC4062D7876990022CB80 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = vi; path = vi.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		DFEC3DAD305F82C70036A3FF /* _031___delete_diacritics-1.0 2.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "_031___delete_diacritics-1.0 2.js"; sourceTree = "<group>"; };
+		DFEC3DAE305F82C70036A3FF /* fv_stlatlimxec_kmw-9.0 2.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "fv_stlatlimxec_kmw-9.0 2.js"; sourceTree = "<group>"; };
+		DFEC3DAF305F82C70036A3FF /* inuktitut_latin-1.0 2.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "inuktitut_latin-1.0 2.js"; sourceTree = "<group>"; };
+		DFEC3DB0305F82C70036A3FF /* inuktitut_naqittaut-1.0 2.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "inuktitut_naqittaut-1.0 2.js"; sourceTree = "<group>"; };
+		DFEC3DB1305F82C70036A3FF /* inuktitut_pirurvik-1.0 2.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = "inuktitut_pirurvik-1.0 2.js"; sourceTree = "<group>"; };
 		F243887E14BBD43000A3E055 /* KeymanEngineDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphoneos.xcconfig"; sourceTree = "<group>"; };
 		F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphonesimulator.xcconfig"; sourceTree = "<group>"; };
@@ -562,10 +576,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				296EF2C72AFA26C700E3E384 /* ZIPFoundation.xcframework in Frameworks */,
 				CE5EDDD52652372A001733AC /* DeviceKit.xcframework in Frameworks */,
-				CE5EDDC726522EAA001733AC /* Sentry.xcframework in Frameworks */,
 				CE5EDDC826522EAA001733AC /* Reachability.xcframework in Frameworks */,
+				DFAC17D8305F6CB800775ED6 /* ZIPFoundation.xcframework in Frameworks */,
+				DF4EA9EC305F76CD008CA65B /* Sentry in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -644,9 +658,11 @@
 		988B36B41ADF67180008752C /* Keyboards */ = {
 			isa = PBXGroup;
 			children = (
-				988B36B71ADF728A0008752C /* inuktitut_latin-1.0.js */,
-				988B36B81ADF728A0008752C /* inuktitut_naqittaut-1.0.js */,
-				988B36B51ADF67290008752C /* inuktitut_pirurvik-1.0.js */,
+				DFEC3DAD305F82C70036A3FF /* _031___delete_diacritics-1.0 2.js */,
+				DFEC3DAE305F82C70036A3FF /* fv_stlatlimxec_kmw-9.0 2.js */,
+				DFEC3DAF305F82C70036A3FF /* inuktitut_latin-1.0 2.js */,
+				DFEC3DB0305F82C70036A3FF /* inuktitut_naqittaut-1.0 2.js */,
+				DFEC3DB1305F82C70036A3FF /* inuktitut_pirurvik-1.0 2.js */,
 			);
 			path = Keyboards;
 			sourceTree = "<group>";
@@ -1216,6 +1232,9 @@
 				vi,
 			);
 			mainGroup = F243887314BBD43000A3E055;
+			packageReferences = (
+				DF4EA9EA305F76CD008CA65B /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
+			);
 			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1235,6 +1254,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DFEC3DB7305F82C70036A3FF /* fv_stlatlimxec_kmw-9.0 2.js in Resources */,
+				DFEC3DB8305F82C70036A3FF /* inuktitut_naqittaut-1.0 2.js in Resources */,
+				DFEC3DB9305F82C70036A3FF /* inuktitut_pirurvik-1.0 2.js in Resources */,
+				DFEC3DBA305F82C70036A3FF /* inuktitut_latin-1.0 2.js in Resources */,
+				DFEC3DBB305F82C70036A3FF /* _031___delete_diacritics-1.0 2.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1269,6 +1293,11 @@
 				C06D37601F82095200F61AE0 /* Keyman.bundle in Resources */,
 				29084CAB2CD48B5D004070E7 /* Images.xcassets in Resources */,
 				9ADC459F22E1895D004C78C6 /* LanguageLMDetailViewController.xib in Resources */,
+				DFEC3DB2305F82C70036A3FF /* fv_stlatlimxec_kmw-9.0 2.js in Resources */,
+				DFEC3DB3305F82C70036A3FF /* inuktitut_naqittaut-1.0 2.js in Resources */,
+				DFEC3DB4305F82C70036A3FF /* inuktitut_pirurvik-1.0 2.js in Resources */,
+				DFEC3DB5305F82C70036A3FF /* inuktitut_latin-1.0 2.js in Resources */,
+				DFEC3DB6305F82C70036A3FF /* _031___delete_diacritics-1.0 2.js in Resources */,
 				CEA14870240780E100C6ECD2 /* ResourceInfoView.xib in Resources */,
 				CEF9367824D3B0B20031C70D /* PackageInstallView_iPhone.xib in Resources */,
 				9AD4F53D229F85AC007992D3 /* LanguageSettingsViewController.xib in Resources */,
@@ -1288,14 +1317,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				988B36BA1ADF728A0008752C /* inuktitut_naqittaut-1.0.js in Resources */,
 				6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */,
 				6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */,
-				988B36B61ADF67290008752C /* inuktitut_pirurvik-1.0.js in Resources */,
 				98D4190C17695E58008D2FF3 /* Default-568h@2x.png in Resources */,
 				CEA1486D2407808F00C6ECD2 /* Localizable.strings in Resources */,
 				CE7A26D423CEE71B0005955C /* Keyboard Colors.xcassets in Resources */,
-				988B36B91ADF728A0008752C /* inuktitut_latin-1.0.js in Resources */,
+				DFEC3DBC305F82C70036A3FF /* fv_stlatlimxec_kmw-9.0 2.js in Resources */,
+				DFEC3DBD305F82C70036A3FF /* inuktitut_naqittaut-1.0 2.js in Resources */,
+				DFEC3DBE305F82C70036A3FF /* inuktitut_pirurvik-1.0 2.js in Resources */,
+				DFEC3DBF305F82C70036A3FF /* inuktitut_latin-1.0 2.js in Resources */,
+				DFEC3DC0305F82C70036A3FF /* _031___delete_diacritics-1.0 2.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1712,7 +1743,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = SystemKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1758,7 +1789,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = SystemKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1806,7 +1837,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = KeymanEngineTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1850,7 +1881,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = KeymanEngineTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1900,7 +1931,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = KeymanEngine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1908,6 +1939,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dal.keyman.keysense.engine;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1954,7 +1986,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = KeymanEngine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1962,6 +1994,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dal.keyman.keysense.engine;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2020,7 +2053,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "KeymanEngine/resources/Keyman.bundle/Contents/Resources/KeymanEngine-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2057,7 +2090,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "KeymanEngine/resources/Keyman.bundle/Contents/Resources/KeymanEngine-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2100,7 +2133,7 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/";
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -2112,7 +2145,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = NO_SENTRY;
 			};
 			name = "Debug + Sentry";
 		};
@@ -2149,7 +2182,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = KeymanEngine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2157,6 +2190,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.dal.keyman.keysense.engine;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2192,7 +2226,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = PSFC7N6PSZ;
 				ENABLE_BITCODE = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2242,7 +2276,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = SystemKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2290,7 +2324,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = KeymanEngineTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2331,7 +2365,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "KeymanEngine/resources/Keyman.bundle/Contents/Resources/KeymanEngine-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2374,7 +2408,7 @@
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/";
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -2386,7 +2420,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG NO_SENTRY";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = NO_SENTRY;
 			};
 			name = Debug;
 		};
@@ -2417,7 +2451,7 @@
 				DEFINES_MODULE = YES;
 				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../Carthage/Build/";
+				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -2447,7 +2481,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = PSFC7N6PSZ;
 				ENABLE_BITCODE = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2480,7 +2514,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = PSFC7N6PSZ;
 				ENABLE_BITCODE = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2572,6 +2606,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DF4EA9EA305F76CD008CA65B /* XCRemoteSwiftPackageReference "sentry-cocoa" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/getsentry/sentry-cocoa.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.29.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DF4EA9EB305F76CD008CA65B /* Sentry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DF4EA9EA305F76CD008CA65B /* XCRemoteSwiftPackageReference "sentry-cocoa" */;
+			productName = Sentry;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F243887514BBD43000A3E055 /* Project object */;
 }

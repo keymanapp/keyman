@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import Sentry
+//import Sentry
 import os.log
 
 private let userInfoKey = "value"

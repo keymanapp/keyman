@@ -73,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       UIApplication.shared.open(url)
     }
 
-    Manager.applicationGroupIdentifier = "group.KM4I"
+    Manager.applicationGroupIdentifier = "group.com.dal.keyman.keysense"
 
     // TODO:  Assign a subclassed version of InputViewController that implements the image stuff.
     Manager.shared.inputViewController = KeyboardViewController(forSystem: false)
@@ -187,7 +187,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   class func activeUserDefaults() -> UserDefaults {
-    if let userDefaults = UserDefaults(suiteName: "group.KM4I") {
+    if let userDefaults = UserDefaults(suiteName: "group.com.dal.keyman.keysense") {
       return userDefaults
     }
     return UserDefaults.standard

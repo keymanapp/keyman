@@ -14,8 +14,6 @@
 		162E2C9F2092D36800F40769 /* UIDevice+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */; };
 		165EB39A2097165B00040A69 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3992097165B00040A69 /* UIColor+Extensions.swift */; };
 		165EB39C2097181D00040A69 /* KMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB39B2097181D00040A69 /* KMView.swift */; };
-		296EF2C42AFA267500E3E384 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C32AFA267500E3E384 /* ZIPFoundation.xcframework */; };
-		296EF2C52AFA267500E3E384 /* ZIPFoundation.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C32AFA267500E3E384 /* ZIPFoundation.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		29B30C212B56325D00C342A4 /* KeymanLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29CA9A612B4F9B0B00EAB099 /* KeymanLogger.swift */; };
 		29CA9A622B4F9B0B00EAB099 /* KeymanLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29CA9A612B4F9B0B00EAB099 /* KeymanLogger.swift */; };
 		981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725518E4F0930014DF0C /* 724-info@2x.png */; };
@@ -152,12 +150,12 @@
 		CEBD343C2654FEB400EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD343F2654FEB400EB2EA8 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */; };
 		CEBD34402654FEB400EB2EA8 /* Reachability.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD34412654FEB400EB2EA8 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */; };
-		CEBD34422654FEB400EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEF4E55623E95B7B0065B9C7 /* ImageBanner.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */; };
 		CEF4E55723E95B7B0065B9C7 /* ImageBanner.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */; };
 		CEF4E55923E967140065B9C7 /* ImageBannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */; };
 		CEF4E55A23E967140065B9C7 /* ImageBannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */; };
+		DFEC3DAB305F7AF20036A3FF /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C32AFA267500E3E384 /* ZIPFoundation.xcframework */; };
+		DFEC3DAC305F7AF20036A3FF /* ZIPFoundation.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C32AFA267500E3E384 /* ZIPFoundation.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -179,9 +177,8 @@
 			dstSubfolderSpec = 10;
 			files = (
 				CEBD34402654FEB400EB2EA8 /* Reachability.xcframework in Embed Frameworks */,
-				296EF2C52AFA267500E3E384 /* ZIPFoundation.xcframework in Embed Frameworks */,
 				CEBD343C2654FEB400EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */,
-				CEBD34422654FEB400EB2EA8 /* Sentry.xcframework in Embed Frameworks */,
+				DFEC3DAC305F7AF20036A3FF /* ZIPFoundation.xcframework in Embed Frameworks */,
 				CE80AD34257F2B4B008D2150 /* KeymanEngine.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -353,9 +350,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEBD343F2654FEB400EB2EA8 /* Reachability.xcframework in Frameworks */,
-				296EF2C42AFA267500E3E384 /* ZIPFoundation.xcframework in Frameworks */,
 				CEBD343B2654FEB400EB2EA8 /* DeviceKit.xcframework in Frameworks */,
-				CEBD34412654FEB400EB2EA8 /* Sentry.xcframework in Frameworks */,
+				DFEC3DAB305F7AF20036A3FF /* ZIPFoundation.xcframework in Frameworks */,
 				CE80AD33257F2B4A008D2150 /* KeymanEngine.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -644,8 +640,8 @@
 				98CD127619CA866B0089385F /* SWKeyboard.entitlements */,
 				98CD125E19CA85710089385F /* Supporting Files */,
 				C0FF769A1F5D368C00BD23C3 /* KeyboardViewController.swift */,
-				CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */,
 				CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */,
+				CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */,
 			);
 			path = SWKeyboard;
 			sourceTree = "<group>";
@@ -1120,6 +1116,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1130,13 +1127,13 @@
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = Keyman/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dal.keyman.keysense;
 				PRODUCT_NAME = Keyman;
@@ -1157,6 +1154,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1166,13 +1164,13 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				INFOPLIST_FILE = Keyman/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dal.keyman.keysense;
 				PRODUCT_NAME = Keyman;
@@ -1237,7 +1235,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG NO_SENTRY";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = NO_SENTRY;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -1320,7 +1318,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1364,7 +1362,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1438,7 +1436,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = NO_SENTRY;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = "Debug + Sentry";
@@ -1448,6 +1446,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Keyman/Keyman.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -1458,13 +1457,13 @@
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = Keyman/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.dal.keyman.keysense;
 				PRODUCT_NAME = Keyman;
@@ -1503,7 +1502,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

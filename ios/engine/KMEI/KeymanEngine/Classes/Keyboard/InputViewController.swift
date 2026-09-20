@@ -43,9 +43,9 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
 
   public func destroy() {
     // In app-extension mode, there are scenarios in which this class does not properly
-    // deallocate!  We need to help that process along.  In particular, doing this allows
+    // deallocate! We need to help that process along. In particular, doing this allows
     // us to guarantee that the WebView is allowed to be GC'd, even when Apple fails to GC
-    // this (`CustomInputView`) instance - which actually happens.  (Refer to #12216.)
+    // this (`CustomInputView`) instance - which actually happens. (Refer to #12216.)
     keymanWeb.removeFromParent()
     keymanWeb.destroy()
     keymanWeb = nil
@@ -60,7 +60,7 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
 
   override var intrinsicContentSize: CGSize {
     /*
-     * This function is the motivating reason for this class to exist as-is.  If we return the default value
+     * This function is the motivating reason for this class to exist as-is. If we return the default value
      * for this property, we cannot properly control the keyboard's scale in a manner consistent across both
      * use cases: in-app and system-wide.
      */
@@ -131,7 +131,7 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     let innerView = keymanWeb.view!
 
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight +  keymanWeb.readKeyboardHeight(isPortrait: true)!)
+    let portraitHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight + keymanWeb.readKeyboardHeight(isPortrait: true)!)
     portraitHeightConstraint.identifier = "Height constraint for portrait mode"
     portraitHeightConstraint.priority = .defaultHigh
 
@@ -168,7 +168,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   var _isSystemKeyboard: Bool
   var isSystemKeyboard: Bool {
-    return _isSystemKeyboard;
+    return _isSystemKeyboard
   }
 
   // Constraints dependent upon the device's current rotation state.
@@ -192,11 +192,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   private var keyboardListCount: Int {
-    return Storage.active.userDefaults.userKeyboards?.count ?? 0
+    let activeUserDef = Storage.active.userDefaults
+    return activeUserDef.userKeyboards?.count ?? 0
   }
 
   var expandedHeight: CGFloat {
-    return keymanWeb.keyboardSize.height   + InputViewController.topBarHeight
+    return keymanWeb.keyboardSize.height + InputViewController.topBarHeight
   }
 
   public convenience init() {
@@ -301,7 +302,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     super.viewDidAppear(animated)
 
     // When using the system keyboard, sets the system-initialized version of the keyboard
-    // as Manager.shared's inputViewController.
+    // as Manager.shared.inputViewController.
     Manager.shared.inputViewController = self
 
     setOuterConstraints()
@@ -313,7 +314,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   open override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     // Necessary for existing infrastructure to resend info for the keyboard after reloading
-    // as system keyboard.  Do NOT perform if in-app, as this unnecessarily resets the WebView.
+    // as system keyboard. Do NOT perform if in-app, as this unnecessarily resets the WebView.
     if(Manager.shared.isSystemKeyboard) {
       keymanWeb.shouldReload = true
     }
@@ -354,7 +355,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // We should NOT call .resetContext() here for this reason.
   }
 
-  // Pre-condition:  no text is selected.  As this is currently only called by `insertText`
+  // Pre-condition: no text is selected. As this is currently only called by `insertText`
   // below, this condition is met.
   func sendContextUpdate() {
     let preCaretContext = textDocumentProxy.documentContextBeforeInput ?? ""
@@ -371,24 +372,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     updater(preCaretContext, postCaretContext)
 
     if preCaretContext == "" {
-      /* The `textDocumentProxy` abstraction is documented (in passing) as involving
-       * inter-process communication.  It is thus asynchronous.  Despite all attempts to prod
-       * it, the context window is only ever updated if an attempt to make an actual *edit*
-       * outside of the context window occurs.  The first such edit will NOT have
-       * available synchronous data... but a bit of an async wait will usually succeed in
-       * getting the update.
-       *
-       * 33ms seemed sufficient.  Can we go lower? (~30 Hz rate)
-       * Success with 20ms. (50 Hz rate)
-       * 1ms is not sufficient, nor is 10ms.   :(
-       *
-       * Note:  these notes were taken via Simulator, not on a physical device;
-       * there's no guarantee (yet) that the times will be the same.
-       * But something refresh-rate related is a fairly reasonable assumption.
-       */
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.033) { // 33 msec; contrast: held backspace - every 100 msec.
-
-        // Does NOT update after half a second if there's no context manipulation.
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.033) {
         let preCaretAsyncContext = self.textDocumentProxy.documentContextBeforeInput ?? ""
         let postCaretAsyncContext = self.textDocumentProxy.documentContextAfterInput ?? ""
 
@@ -399,44 +383,13 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
   func deleteSelection() -> Bool {
     if let selected = textDocumentProxy.selectedText, selected.count > 0 {
-      /*
-        Since we're doing some funky text manipulation, it's best to add
-        a "canary" check in case something does go awry with it in
-        the future.
-      */
       let beforeManipulation = textDocumentProxy.documentContextBeforeInput ?? ""
 
-      /*
-        We have a problem to resolve here: we cannot simply delete the selection
-        with either .deleteBackward() or .insertText(""):
-
-        - If there is selected text immediately following a space (U+0020),
-          .deleteBackward() will delete that space IN ADDITION to the selected text.
-        - Unlike .insertText("-any-string-here"), .insertText("") does nothing;
-          it does not replace the selection with the new string.
-
-        Our policy (#9073) on handling the backspace key when there is a
-        text selection is to just delete the selection. We have to override
-        the special case of space being deleted by .deleteBackward() ourselves.
-        Additionally, the internal Web engine cannot anticipate the special
-        case and requires precise and consistent backspace handling in line
-        with our policy in order to keep the context on both sides synchronized.
-
-        As .insertText() does not delete the selection if the string to
-        be inserted is empty, we insert something that won't combine,
-        like a ZWNJ, and then delete it.
-
-        iOS does not allow users to select text in a way that splits
-        character clusters.  This implies that it's impossible for an
-        inserted ZWNJ to combine with existing context, making this
-        operation safe.
-      */
       textDocumentProxy.insertText("\u{200c}")
       textDocumentProxy.deleteBackward()
 
       let afterManipulation = textDocumentProxy.documentContextBeforeInput ?? ""
 
-      // And now to finish our 'canary' check.
       if beforeManipulation != afterManipulation {
         os_log(.error, log: KeymanEngineLogger.engine, "Could not cleanly execute backspace for selected text")
       }
@@ -450,16 +403,12 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     if isInputClickSoundEnabled {
       UIDevice.current.playInputClick()
 
-      // Disable input click sound for 0.1 second to ensure it plays for single key stroke.
       isInputClickSoundEnabled = false
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
 
-    // `true` if there was selected text to be deleted
     let deletedSelection = self.deleteSelection()
 
-    // If text was selected, we generally act as if the context is nil - no back
-    // deletions allowed, so we skip that section.
     if numCharsToDelete <= 0 || deletedSelection {
       textDocumentProxy.insertText(newText)
       sendContextUpdate()
@@ -479,28 +428,16 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
       let unitsInPoint = InputViewController.isSurrogate(oldContext.utf16.last ?? 0) ? 2 : 1
 
-      // This CAN happen when a surrogate pair is deleted.
-      // For example, the emoji 👍🏻 is made of TWO surrogate pairs.
-      // Apple's .deleteBackward() implementation will delete both simultaneously,
-      // but our internal KMW engine can't do that b/c it's not emoji-aware.
       if unitsDeleted > unitsInPoint {
-        // Delete only that many units.
         let lowerIndex = oldContext.utf16.index(oldContext.utf16.startIndex,
                                                 offsetBy: newContext.utf16.count)
         let upperIndex = oldContext.utf16.index(lowerIndex, offsetBy: unitsDeleted - unitsInPoint)
         textDocumentProxy.insertText(String(oldContext[lowerIndex..<upperIndex]))
       }
 
-      // Refer to `func textDidChange()` and https://github.com/keymanapp/keyman/pull/2770 for context.
       if textDocumentProxy.documentContextBeforeInput == nil ||
          (textDocumentProxy.documentContextBeforeInput == "\n" && Manager.shared.isSystemKeyboard) {
         if(self.swallowBackspaceTextChange) {
-          // A single keyboard processing command should never trigger two of these in a row;
-          // only one output function will perform deletions.
-
-          // This should allow us to debug any failures of this assumption.
-          // So far, only occurs when debugging a breakpoint during a touch event on BKSP,
-          // so all seems good.
           os_log("Failed to swallow a recent textDidChange call!", log: KeymanEngineLogger.ui, type: .default)
         }
         self.swallowBackspaceTextChange = true
@@ -530,7 +467,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       case .doNothing:
         break
       }
-    } else { // Use in-app keyboard behavior instead.
+    } else {
       if !(Manager.shared.currentResponder?.showKeyboardPicker() ?? false) {
         _ = Manager.shared.switchToNextKeyboard
       }
@@ -547,15 +484,13 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       case .showAlways,
            .showIfMultipleKeyboards where keyboardListCount > 1:
         keymanWeb.showKeyboardMenu(self, closeButtonTitle: menuCloseButtonTitle)
-      case .showIfMultipleKeyboards, // keyboardListCount() <= 1
+      case .showIfMultipleKeyboards,
       .showNever:
         break
       }
     }
   }
 
-  // These require the view to appear - parent and our relationship with it must exist!
-  // ... wait, is THIS possibly a leak source?
   private func setOuterConstraints() {
     guard outerWidthConstraint == nil else {
       outerWidthConstraint!.isActive = true
@@ -582,10 +517,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     fixLayout()
   }
 
-  /**
-   * Due to new custom keyboard height as chosen by the user.
-   * The value for the new keyboard height originates from KeyboardHeightViewController.
-   */
   func keyboardHeightChanged() {
     os_log("InputViewController keyboardHeightChanged", log: KeymanEngineLogger.ui, type: .debug)
     if let customInputView = self.inputView as? CustomInputView {
@@ -684,25 +615,16 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb.setSentryState(enabled: enabled)
   }
 
-  /**
-   * Facilitates context synchronization with the KMW-app/webview side.
-   *
-   * The range's components should be SMP-aware, as the embedded engine
-   * will be expecting SMP-aware measurements.  Swift's `.unicodeScalars`
-   * property on `String`s lines up best with this.
-   */
   func setContextState(text: String?, range: NSRange, doSync: Bool = false) {
-    // Check for any LTR or RTL marks at the context's start; if they exist, we should
-    // offset the selection range.
-    var offsetPrefix = false;
+    var offsetPrefix = false
 
     let context = trimDirectionalMarkPrefix(text)
     if context.count != (text?.count ?? 0) {
       offsetPrefix = true
     }
 
-    var selRange = range;
-    if(offsetPrefix) { // If we have a character ordering mark, offset range location to hide it.
+    var selRange = range
+    if(offsetPrefix) {
       selRange = NSRange(location: selRange.location - 1, length: selRange.length)
     }
 
