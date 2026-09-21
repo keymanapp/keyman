@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 19.0.288 alpha 2026-09-18
+
+* change(web): remove TokenizationCorrector class only used in epic/boundary-correction (#16581)
+
+## 19.0.287 alpha 2026-09-17
+
+* fix(web): support autocorrection of transposed text (#16450)
+* fix(web): allow to set default keyboard to 'off' (#16524)
+
+## 19.0.286 alpha 2026-09-16
+
+* fix(developer): trim new words entered into the wordlist editor (#16538)
+* chore(windows): remove references to unused extensions .kma and .kxx (#16569)
+* refactor(web): add header to osk views files (#16568)
+
 ## 19.0.285 alpha 2026-09-11
 
 * fix(web): handle 'unload' message while attempting model 'load' (#16548)
