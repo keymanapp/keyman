@@ -278,21 +278,25 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
   /**
    * Associate control with independent keyboard settings initialized to a specific keyboard.
-   * The pair of `keyboard` and `languageCode` (if not `null`) must refer to a
+   * The pair of `keyboardId` and `languageCode` (if not `null` or empty string) must refer to a
    * registered keyboard stub.
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/setKeyboardForControl
    *
-   * @param       {Element}       elem          The control element to be managed manually
-   * @param       {string|null=}  keyboard      The id of a keyboard, consisting of the word
-   *                                            `Keyboard_` followed by the internal keyboard
-   *                                            name. For a keyboard with the internal name
-   *                                            `laokeys` this would be `Keyboard_laokeys`.
-   *                                            If `null` clears the set keyboard.
-   * @param       {string|null=}  languageCode  A BCP47 language code which was used when
-   *                                            registering the keyboard stub.
+   * @param  {Element}       elem          The control element to be managed manually
+   * @param  {string|null=}  keyboardId    The id of a keyboard, consisting of the word
+   *                                       `Keyboard_` followed by the internal keyboard name.
+   *                                       For a keyboard with the internal name `laokeys` this
+   *                                       would be `Keyboard_laokeys`.
+   *                                       If keyboardId and languageCode are both null, the
+   *                                       control will use the global keyboard.
+   *                                       If both are the empty string, the control will use the
+   *                                       system keyboard (on desktop), or the first installed
+   *                                       keyboard (on touch devices).
+   * @param  {string|null=}  languageCode  A BCP47 language code which was used when registering
+   *                                       the keyboard stub.
    */
-  public setKeyboardForControl(elem: HTMLElement, keyboard?: string, languageCode?: string): void {
+  public setKeyboardForControl(elem: HTMLElement, keyboardId?: string | null, languageCode?: string | null): void {
     if(elem instanceof elem.ownerDocument.defaultView.HTMLIFrameElement) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
@@ -304,43 +308,56 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     }
 
     let stub = null;
-    if(keyboard) {
-      stub = this.keyboardRequisitioner.cache.getStub(keyboard, languageCode);
+    if(keyboardId) {
+      stub = this.keyboardRequisitioner.cache.getStub(keyboardId, languageCode);
       if(!stub) {
-        throw new Error(`No keyboard has been registered with id ${keyboard} and language code ${languageCode}.`);
+        throw new Error(`No keyboard has been registered with id ${keyboardId} and language code ${languageCode}.`);
       }
     }
 
-    this.contextManager.setKeyboardForTextStore(elem._kmwAttachment.textStore, keyboard, languageCode);
+    this.contextManager.setKeyboardForTextStore(elem._kmwAttachment.textStore, keyboardId, languageCode);
   }
 
   /**
-   * Function     getKeyboardForControl
-   * Scope        Public
-   * @param       {Element}    Pelem    Control element
-   * @return      {string|null}         The independently-managed keyboard for the control.
-   * Description  Returns the keyboard ID of the current independently-managed keyboard for this control.
-   *              If it is currently following the global keyboard setting, returns null instead.
+   * Returns the keyboard ID of the current independently-managed keyboard for this control.
+   * If it is currently following the global keyboard setting, returns null instead.
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboardForControl
+   *
+   * @param       {Element}      elem   Control element
+   * @return      {string|null}         The independently-managed keyboard for the control,
+   *                                    '' for independently-managed but set to system
+   *                                    keyboard, or null if it is following the global keyboard
+   *                                    setting.
    */
-  public getKeyboardForControl(Pelem: HTMLElement): string | null{
-    const textStore = textStoreForElement(Pelem);
-    return this.contextManager.getKeyboardStubForTextStore(textStore).id;
+  public getKeyboardForControl(elem: HTMLElement): string | null{
+    if(!elem || !this.contextManager.isElementInIndependentMode(elem)) {
+      return null;
+    }
+    const keyboardId = elem._kmwAttachment.keyboard;
+    if(keyboardId === '') {
+      return '';
+    }
+    const stub = this.keyboardRequisitioner.cache.getStub(keyboardId, elem._kmwAttachment.languageCode);
+    return stub?.KI ?? keyboardId;
   }
 
   // Is not currently published API... but it exists.
   /**
-   * Function     getLanguageForControl
-   * Scope        Public
-   * @param       {Element}    Pelem    Control element
-   * @return      {string|null}         The independently-managed keyboard for the control.
-   * Description  Returns the language code used with the current independently-managed keyboard for this control.
-   *              If it is currently following the global keyboard setting, returns null instead.
+   * Returns the language code used with the current independently-managed keyboard
+   * for this control. If it is currently following the global keyboard setting,
+   * returns null instead.
+   *
+   * @param       {Element}      elem  Control element
+   * @return      {string|null}        The language code for the control (or '' for the system-
+   *                                   specified language) if independently managed, or null if
+   *                                   using global mode.
    */
-  public getLanguageForControl(Pelem: HTMLElement): string | null {
-    const textStore = textStoreForElement(Pelem);
-    return this.contextManager.getKeyboardStubForTextStore(textStore).langId;
+  public getLanguageForControl(elem: HTMLElement): string | null {
+    if(!elem || !this.contextManager.isElementInIndependentMode(elem)) {
+      return null;
+    }
+    return elem._kmwAttachment.languageCode ?? '';
   }
 
   public isAttached(x: HTMLElement): boolean {

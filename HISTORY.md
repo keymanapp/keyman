@@ -1,5 +1,45 @@
 # Keyman Version History
 
+## 19.0.288 alpha 2026-09-18
+
+* change(web): remove TokenizationCorrector class only used in epic/boundary-correction (#16581)
+
+## 19.0.287 alpha 2026-09-17
+
+* fix(web): support autocorrection of transposed text (#16450)
+* fix(web): allow to set default keyboard to 'off' (#16524)
+
+## 19.0.286 alpha 2026-09-16
+
+* fix(developer): trim new words entered into the wordlist editor (#16538)
+* chore(windows): remove references to unused extensions .kma and .kxx (#16569)
+* refactor(web): add header to osk views files (#16568)
+
+## 19.0.285 alpha 2026-09-11
+
+* fix(web): handle 'unload' message while attempting model 'load' (#16548)
+* fix(android): load KMP files from app-external sources (#16392)
+
+## 19.0.284 alpha 2026-09-10
+
+* maint(developer): remove unused ajv dependency from kmc-convert (#16539)
+* fix(web): remove scroll-to-top on page load (#16531)
+
+## 19.0.283 alpha 2026-09-09
+
+* change(web): allow autocorrection on input of basic whitespaces (#16541)
+
+## 19.0.282 alpha 2026-09-08
+
+* refactor(web): clarify function scope and update some function comments (#16532)
+
+## 19.0.281 alpha 2026-09-07
+
+* chore(deps): bump fast-uri from 3.1.5 to 3.1.7 (#16511)
+* chore(deps): bump nanoid from 3.3.11 to 3.3.18 (#16512)
+* chore(deps): bump qs and express (#16513)
+* chore(web): adjust types in guide-examples tests (#16523)
+
 ## 19.0.280 alpha 2026-09-05
 
 * fix(windows): open chm external links in user's browser (#16515)

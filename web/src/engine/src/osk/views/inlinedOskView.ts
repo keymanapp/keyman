@@ -1,13 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { DeviceSpec } from 'keyman/common/web-utils';
 
 import { OSKView, OSKPos, OSKRect } from './oskView.js';
 import { VisualKeyboard } from '../visualKeyboard.js';
 import { ViewConfiguration } from '../config/viewConfiguration.js';
 import { SimpleActivator } from './simpleActivator.js';
-
-/*
- * Keyman is copyright (c) SIL International.  MIT License.
- */
 
 /**
  * Defines a version of the OSK that produces an element designed for site-controlled
