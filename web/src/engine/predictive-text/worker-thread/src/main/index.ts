@@ -248,6 +248,8 @@ export default class LMLayerWorker {
     try {
       this._importScripts(url);
     } catch (err) {
+      // Does not catch errors thrown within the imported script.
+      // Does catch errors with the model script's file-path.
       // #13862: attempt to mitigate NetworkError on Chrome by retrying before giving up
       tryCount++;
       if(err instanceof Error && err.name == 'NetworkError') {
@@ -261,6 +263,7 @@ export default class LMLayerWorker {
       } else {
         this.error("Error occurred when attempting to load dictionary", err);
       }
+      // Remain in the model-unloaded state; the load attempt was unsuccessful.
     }
   }
 
@@ -305,7 +308,14 @@ export default class LMLayerWorker {
     this.state = {
       name: 'modelless',
       handleMessage: (payload) => {
-        // ...that message must have been 'load'!
+        // It is possible to remain in this state after a model loading error.
+        // In such cases, the hosting engine may signal a model-unload.
+        if (payload.message === 'unload') {
+          // We are already in a "model unloaded" state; no work needed!
+          return;
+        }
+
+        // ...otherwise, that message must have been 'load'!
         if (payload.message !== 'load') {
           throw new Error(`invalid message; expected 'load' but got ${payload.message}`);
         }
