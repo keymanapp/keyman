@@ -165,7 +165,7 @@ describe('LMLayerWorker', function() {
 
     it('should send back an "error" message and recover when given an invalid filepath', function () {
       var fakePostMessage = sinon.fake();
-      var context: MockedContext = {
+      var context = {
         postMessage: fakePostMessage
       };
       context.importScripts = importScriptsWith(context);
