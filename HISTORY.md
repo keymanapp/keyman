@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.251 stable 2026-09-21
+
+* maint(android): update Android Target API to 36 (#16620)
+
 ## 18.0.250 stable 2026-09-21
 
 * fix(linux): fix memory problem (#15828)
