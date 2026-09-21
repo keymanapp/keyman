@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.288 alpha 2026-09-18
+
+* change(web): remove TokenizationCorrector class only used in epic/boundary-correction (#16581)
+
 ## 19.0.287 alpha 2026-09-17
 
 * fix(web): support autocorrection of transposed text (#16450)
@@ -1738,6 +1742,18 @@
 ## 18.0.251 stable 2026-09-21
 
 * maint(android): update Android Target API to 36 (#16620)
+* 
+## 18.0.250 stable 2026-09-21
+
+* fix(linux): fix memory problem (#15828)
+* chore: update fast-xml-parser to 5.8.0 (#15953)
+* fix(linux): add dependency on `procps` (#15980)
+* chore(ios): update first voices distribution certificate (#16007)
+* chore(linux): release v18 on Ubuntu 26.04 Resolute (#16078)
+* chore: update multi-labeler to 5.0.0 (#16101)
+* chore(android): log legacy cloud keyboards (#16243)
+* fix(web): handle 'unload' message while attempting model 'load' (#16609)
+* fix(web): retry importScripts NetworkErrors in attempt to mitigate errors loading models (#16604)
 
 ## 18.0.249 stable 2026-03-27
 
