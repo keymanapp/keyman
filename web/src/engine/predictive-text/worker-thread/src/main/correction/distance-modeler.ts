@@ -4,7 +4,7 @@ import { PriorityQueue } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
-import { CORRECTION_QUEUE_COMPARATOR, CorrectionSearchable } from './correction-searchable.js';
+import { PREDICTION_QUEUE_COMPARATOR, CorrectionSearchable } from './correction-searchable.js';
 import { CorrectionResultMapping } from './correction-result-mapping.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
 import { SearchQuotientNode } from './search-quotient-node.js';
@@ -262,7 +262,7 @@ export class SearchNode {
    * The correction search evaluates Nodes in cost-ascending order based on this property's
    * return value.
    */
-  get currentCost(): number {
+  get correctionCost(): number {
     // - We reintrepret 'known cost' as a psuedo-probability.
     //   - Noting that 1/e = 0.367879441, an edit-distance cost of 1 may be intepreted as -ln(1/e) - a log-space 'likelihood'.
     //     - Not exactly normalized, though.
@@ -276,6 +276,14 @@ export class SearchNode {
     // p = 1 / (e^5) = 0.00673794699.  Strikes a good balance.
     // Should easily give priority to neighboring keys before edit-distance kicks in (when keys are a bit ambiguous)
     return EDIT_DISTANCE_COST_SCALE * this.editCount + this.inputSamplingCost;
+  }
+
+  get predictionCost(): number {
+    return -Math.log(this.currentTraversal.p);
+  }
+
+  get currentCost(): number {
+    return this.correctionCost + this.predictionCost;
   }
 
   addEdit() {
@@ -625,7 +633,7 @@ export async function *getBestMatches<
   // If no filter function is provided, default to one that always returns true.
   filter ??= () => true;
 
-  let spaceQueue = new PriorityQueue<Correctable>(CORRECTION_QUEUE_COMPARATOR);
+  let spaceQueue = new PriorityQueue<Correctable>(PREDICTION_QUEUE_COMPARATOR);
 
   // Stage 1 - if we already have extracted results, build a queue just for them
   // and iterate over it first.
@@ -633,7 +641,7 @@ export async function *getBestMatches<
   // Does not get any results that another iterator pulls up after this is
   // created - and those results won't come up later in stage 2, either.  Only
   // intended for restarting a search, not searching twice in parallel.
-  const priorResultsQueue = new PriorityQueue<ResultMapping>((a, b) => a.totalCost - b.totalCost);
+  const priorResultsQueue = new PriorityQueue<ResultMapping>(PREDICTION_QUEUE_COMPARATOR);
   priorResultsQueue.enqueueAll(searchModules.map((space) => space.previousResults).flat());
 
   // With potential prior results re-queued, NOW enqueue.  (Not before - the heap may reheapify!)
@@ -642,7 +650,7 @@ export async function *getBestMatches<
   // Stage 2:  the fun part; actually searching!
   do {
     const entry: ResultMapping = timer.time(() => {
-      if((priorResultsQueue.peek()?.totalCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
+      if((priorResultsQueue.peek()?.currentCost ?? Number.POSITIVE_INFINITY) <= spaceQueue.peek().currentCost) {
         const result = priorResultsQueue.dequeue();
 
         // There's no guarantee that the filter closure is the same instance as
@@ -669,7 +677,7 @@ export async function *getBestMatches<
       let lowestCostSource = spaceQueue.dequeue();
       const newResult = lowestCostSource.handleNextNode();
       spaceQueue.enqueue(lowestCostSource);
-      spaceQueue = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR, spaceQueue.toArray());
+      spaceQueue = new PriorityQueue(PREDICTION_QUEUE_COMPARATOR, spaceQueue.toArray());
 
       if(newResult.type == 'none') {
         return null;
