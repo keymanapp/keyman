@@ -235,8 +235,8 @@ begin
   dlgOpen := TOpenDialog.Create(nil);
   try
     dlgOpen.Filter :=
-      'Keyman files (*.kmx, *.kxx, *.kmp)|*.kmx;*.kxx;*.kmp|Keyman keyboards (*.kmx,*.kxx)' +
-      '|*.kmx;*.kxx|Keyman packages (*.kmp)|*.kmp|All files (*.*)|*.*';
+      'Keyman files (*.kmx, *.kmp)|*.kmx;*.kmp|Keyman keyboards (*.kmx)' +
+      '|*.kmx|Keyman packages (*.kmp)|*.kmp|All files (*.*)|*.*';
     dlgOpen.Title := 'Install Keyman Keyboard';
 
     if dlgOpen.Execute then
