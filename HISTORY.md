@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.289 alpha 2026-09-21
+
+* fix(android): suppress autocorrection of hardware keystroke input (#16606)
+* change(web): add lexical weighting to prediction search (#16600)
+
 ## 19.0.288 alpha 2026-09-18
 
 * change(web): remove TokenizationCorrector class only used in epic/boundary-correction (#16581)
