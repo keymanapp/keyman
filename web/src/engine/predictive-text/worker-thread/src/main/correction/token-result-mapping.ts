@@ -33,8 +33,8 @@ export function initTokenResultFilterer() {
       return false;
     }
 
-    if((priorReturnCosts.get(searchResult.matchString) ?? Number.MAX_VALUE) > searchResult.totalCost) {
-      priorReturnCosts.set(searchResult.matchString, searchResult.totalCost);
+    if((priorReturnCosts.get(searchResult.matchString) ?? Number.MAX_VALUE) > searchResult.correctionCost) {
+      priorReturnCosts.set(searchResult.matchString, searchResult.correctionCost);
 
       return true;
     } else {
@@ -118,6 +118,14 @@ export class TokenResultMapping implements CorrectionResultMapping<SearchNode> {
    * multiplied by the 'probability' induced by needed Damerau-Levenshtein edits
    * to the resulting output.
    */
+  get correctionCost(): number {
+    return this.node.correctionCost;
+  }
+
+  get currentCost(): number {
+    return this.node.currentCost;
+  }
+
   get totalCost(): number {
     return this.node.currentCost;
   }
