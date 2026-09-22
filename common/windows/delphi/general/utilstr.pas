@@ -1,18 +1,18 @@
 (*
   Name:             utilstr
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    8 Jun 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Refactor util functions into multiple units
                     23 Aug 2006 - mcdurdin - Add StringToExtString and WideQuotedStr functions
                     14 Sep 2006 - mcdurdin - Add RectToString, StringToRect, use widestrings for some functions
@@ -58,8 +58,6 @@ function GetTokenFromCaret(line: string; var selx, sellen: Integer): string;
 
 function WideQuotedStr(const str: WideString): WideString; deprecated;  // I3310
 
-
-
 implementation
 
 uses
@@ -78,7 +76,7 @@ begin
     Result := '';
     Exit;
   end;
-  
+
   if s[1] = '"' then
   begin
     Delete(s,1,1);
