@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# MAC-CONFIG-TODO: change to builder script and find a way to deploy locally with shared data support
+# does not produce an input method and config app that can communicate
+# when built locally -- to access app group settings, each app must
+# be signed with 'Developer ID Application' certificate 
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 if [[ "${OSTYPE}" != "darwin"* ]]; then
