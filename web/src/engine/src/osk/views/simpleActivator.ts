@@ -12,14 +12,14 @@ export class SimpleActivator extends Activator {
 
   set enabled(value: boolean) {
     // Enabled + activated are the same thing for this class.
-    this.activate = value;
+    this.canActivate = value;
   }
 
-  get activate(): boolean {
+  get canActivate(): boolean {
     return this.flag;
   }
 
-  set activate(value: boolean) {
+  set canActivate(value: boolean) {
     if(this.flag != value) {
       this.flag = value;
       this.emit('activate', value);
