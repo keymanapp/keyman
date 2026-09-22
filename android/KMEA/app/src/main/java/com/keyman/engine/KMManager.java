@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2017 SIL International. All rights reserved.
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
  */
 
 package com.keyman.engine;
@@ -401,6 +401,10 @@ public final class KMManager {
     return getResourceRoot() + KMDefault_LexicalModelPackages + File.separator;
   }
 
+  public static String getLexicalModelsUrl() {
+    return WebViewUtils.buildAssetUrl(KMDefault_LexicalModelPackages + "/");
+  }
+
   public static String getCloudDir() {
     return getResourceRoot() + KMDefault_UndefinedPackageID + File.separator;
   }
@@ -489,6 +493,19 @@ public final class KMManager {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Check if the given font is the default font or the default OSK font.
+   * @param fontName  String - The font name and extension
+   * @return boolean  true if `fontName` is DejaVuSans.ttf or keymanweb-osk.ttf
+   *                  or null or empty string, false otherwise
+   */
+  public static boolean isDefaultFont(String fontName) {
+    if (fontName == null || fontName.isEmpty()) {
+      return true;
+    }
+    return fontName.equals(KMDefault_KeyboardFont) || fontName.equals(KMFilename_Osk_Ttf_Font);
   }
 
   public static void initialize(final Context context, KeyboardType keyboardType) {
@@ -1608,6 +1625,16 @@ public final class KMManager {
    */
   public static Typeface getFontTypeface(Context context, String fontFilename) {
     try {
+      if (fontFilename == null || fontFilename.isEmpty()) {
+        return null;
+      }
+      if (fontFilename.startsWith("http://") || fontFilename.startsWith("https://")
+        || fontFilename.startsWith("file://")) {
+        // Font file is not local, so cannot load Typeface
+        KMLog.LogError(TAG, "Font file is not local: " + fontFilename);
+        return null;
+      }
+
       if ((fontFilename != null) && FileUtils.hasFontExtension(fontFilename)) {
         // Ignore .woff files if Android 7.0 / 7.1 (Issue #4896)
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) &&
@@ -1646,8 +1673,9 @@ public final class KMManager {
     String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
     String languageID = lexicalModelInfo.get(KMKey_LanguageID);
     boolean modelFileExists = true;
-    File modelFile = new File(getLexicalModelsDir(), pkgID + File.separator + modelID + ".model.js");
-    String path = "file://" + modelFile.getAbsolutePath();
+    String modelFilename = pkgID + File.separator + modelID + ".model.js";
+    File modelFile = new File(getLexicalModelsDir(), modelFilename);
+    String url = getLexicalModelsUrl() + modelFilename;
 
     // Disable sugestions if lexical-model file doesn't exist
     if (!modelFile.exists()) {
@@ -1662,7 +1690,7 @@ public final class KMManager {
       modelObj.put("id", modelID);
       languageJSONArray.put(languageID);
       modelObj.put("languages", languageJSONArray);
-      modelObj.put("path", path);
+      modelObj.put("path", url);
       modelObj.put("CustomHelpLink", lexicalModelInfo.get(KMKey_CustomHelpLink));
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Invalid lexical model to register", e);
@@ -2221,7 +2249,12 @@ public final class KMManager {
       File kmpJSONFile = new File(path);
       if (!kmpJSONFile.exists()) {
         if (!KMManager.isTestMode()) {
-          KMLog.LogError(TAG, path + " not found. Returning version 1.0");
+          if (packageID.equals(KMDefault_PackageID)) {
+            // Suppress error log for the default fallback keyboard if it's not installed
+            Log.d(TAG, path + " not found. Returning version 1.0");
+          } else {
+            KMLog.LogError(TAG, path + " not found. Returning version 1.0");
+          }
         }
         return "1.0";
       }

@@ -134,6 +134,7 @@ dependencies {
     api(name: 'keyman-engine', ext: 'aar')
     implementation 'io.sentry:sentry-android:7.22.6'
     implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.webkit:webkit:1.14.0'
 }
 
 apply plugin: 'com.android.application'
