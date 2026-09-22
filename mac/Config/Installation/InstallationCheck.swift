@@ -250,7 +250,8 @@ public class InstallationCheck {
       name: NSNotification.Name.accessibilityStateResponse,
       object: nil // Observe notifications from any sender
     )
-    // MAC-CONFIG-TODO: add timeout?
+    // TODO: add timeout in case response is not received
+    // see issue #16579
   }
     
   /**

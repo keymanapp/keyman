@@ -4,23 +4,6 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
-	<key>CFBundleDocumentTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>kmp</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>keyman</string>
-			<key>CFBundleTypeName</key>
-			<string>Keyman Package</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>KMPackage</string>
-		</dict>
-	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIconFile</key>
@@ -54,8 +37,6 @@
 	<string>Keyman_Input_Connection</string>
 	<key>InputMethodServerControllerClass</key>
 	<string>KMInputController</string>
-	<key>InputMethodServerPreferencesWindowControllerClass</key>
-	<string>KMConfigurationWindowController</string>
 	<key>Keyman</key>
 	<dict>
 		<key>SentryEnvironment</key>
