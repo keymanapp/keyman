@@ -1744,6 +1744,11 @@
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
 
+## 18.0.252 stable 2026-09-22
+
+* change(android): use webview asset loader (#16628)
+* chore: revert "fix(web): retry importScripts NetworkErrors in attempt to mitigate errors loading models" (#16630)
+
 ## 18.0.251 stable 2026-09-21
 
 * maint(android): update Android Target API to 36 (#16620)
