@@ -42,7 +42,6 @@ uses
 
 
 function ConfigureAndSetBaseKeyboard(WindowHandle: THandle): Boolean;
-var BaseKeyboardID: Integer;
 begin
   with TfrmBaseKeyboard.Create(nil) do
   try

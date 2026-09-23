@@ -163,9 +163,18 @@ begin
       inf := nil;
       FZip := TZipFile.Create;
       try
-        FZip.Open(FileName, TZipMode.zmRead);
+        try
+          FZip.Open(FileName, TZipMode.zmRead);
+        except
+          on E:EZipException do
+          begin
+            ErrorFmt(KMN_E_Install_InvalidFile, VarArrayOf([ExtractFileName(FileName), E.Message, 0]));
+            raise;
+          end;
+        end;
 
-        InfFile := '';
+        try
+          InfFile := '';
 
           for i := 0 to FZip.FileCount - 1 do
           begin
