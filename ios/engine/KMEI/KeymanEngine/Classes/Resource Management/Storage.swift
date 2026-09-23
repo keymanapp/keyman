@@ -239,7 +239,15 @@ extension Storage {
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
+                     resourceName: "keymanweb-webview.js.map",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
+    try Storage.copy(from: bundle,
                      resourceName: "worker-thread.js",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
+    try Storage.copy(from: bundle,
+                     resourceName: "worker-thread.js.map",
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
