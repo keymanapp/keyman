@@ -666,8 +666,6 @@ end;
  ------------------------------------------------------------------------------}
 
 procedure TfrmMain.Options_BaseKeyboard;   // I4169
-var
-  BaseKeyboardID: Integer;
 begin
   if ConfigureAndSetBaseKeyboard(Handle) then
   begin
