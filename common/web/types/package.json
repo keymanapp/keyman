@@ -31,8 +31,8 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/ldml-keyboard-constants": "*",
     "@keymanapp/keyman-version": "*",
+    "@keymanapp/ldml-keyboard-constants": "*",
     "restructure": "3.0.1"
   },
   "devDependencies": {

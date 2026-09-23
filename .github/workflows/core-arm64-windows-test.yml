@@ -36,7 +36,7 @@ jobs:
   core-arm64-windows-test:
     name: Keyman Core ARM64/Windows test
     if: github.repository == 'keymanapp/keyman' || github.event.client_payload.force
-    runs-on: windows-11-arm
+    runs-on: windows-11-vs2026-arm
 
     steps:
     - name: Checkout

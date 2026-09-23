@@ -138,7 +138,7 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode);
-KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets);
+KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &targets);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -1155,6 +1155,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     else if (u16ncmp(p, u"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
     else if (u16ncmp(p, u"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
     else if (u16ncmp(p, u"17.0", 4) == 0)  fk->version = VERSION_170; // Flicks and gestures
+    else if (u16ncmp(p, u"19.0", 4) == 0)  fk->version = VERSION_190; // Deprecations - fix, clearcontext
 
     else {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidVersion);
@@ -1331,7 +1332,16 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
   return TRUE;
 }
 
-KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets) {
+/**
+ * Extract the compile targets from the &targets store, and rewrite the
+ * &targets dpString value to remove unnecessary whitespace. Does not
+ * reallocate sp->dpString, but overwrites its value with a string the
+ * same length or shorter.
+ * @param store       store value to rewrite
+ * @param targets     (output)
+ * @return FALSE if no targets found or invalid targets found
+ */
+KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &targets) {
   // Compile to .kmx
   const std::vector<std::u16string> KMXKeymanTargets{
     u"windows", u"macosx", u"linux", u"desktop"
@@ -1347,10 +1357,17 @@ KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets)
 
   targets = 0;
   auto p = new KMX_WCHAR[u16len(store)+1];
-  u16cpy(p, store);
+  auto q = p;
+  *p = 0;
   KMX_WCHAR* ctx;
-  auto token = u16tok(p, u" ", &ctx);
+  auto token = u16tok(store, u" ", &ctx);
   while(token) {
+    if(q > p) {
+      // Insert a delimiter between tokens, if
+      // more than one token
+      *q++ = ' ';
+      *q = 0;
+    }
     bool found = false;
     if(*token) {
       if(AnyTarget == token) {
@@ -1378,9 +1395,16 @@ KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets)
         targets = 0;
         return FALSE;
       }
+
+      // Append the token to the output, we know it is long enough
+      // because the buffer is the same length as the input
+      u16cpy(q, token);
+      q = const_cast<KMX_WCHAR*>(u16chr(q, 0));
+      *q = 0;
     }
     token = u16tok(nullptr, u" ", &ctx);
   }
+  u16cpy(store, p);
   delete[] p;
 
   if(targets == 0) {
@@ -1582,7 +1606,7 @@ const KMX_BOOL CODE__IS_TEXTUAL[] = {
   -1,     // CODE_EXTENDEDEND         0x0B (unused)
   FALSE,  // CODE_SWITCH              0x0C
   -1,     // CODE_KEY                 0x0D (never used)
-  FALSE,  // CODE_CLEARCONTEXT        0x0E
+  FALSE,  // CODE_CLEARCONTEXT        0x0E (deprecated in 19.0)
   FALSE,  // CODE_CALL                0x0F // may trigger text effects but indirectly
   -1,     // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
   TRUE,   // CODE_CONTEXTEX           0x11
@@ -2079,7 +2103,7 @@ int LineTokenType(PKMX_WCHAR *str)
   switch (towupper(*p))
   {
   case 'C':
-    if (iswspace(*(p + 1))) return T_COMMENT;
+    if (iswspace(*(p + 1)) || *(p + 1) == 0) return T_COMMENT;
     break;
   case 0:
     return T_BLANK;
@@ -2376,6 +2400,10 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else if (u16nicmp(p, u"clearcontext", 12) == 0)
       {
+        // deprecated in 19.0
+        if(fk->version >= VERSION_190) {
+          ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedStatement, {"clearcontext", "19.0"});  // I3438
+        }
         p += 12;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_CLEARCONTEXT;
@@ -2699,6 +2727,10 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 15:
       if (u16nicmp(p, u"fix", 3) == 0)
       {
+        if(fk->version >= VERSION_190) {
+          // deprecated in 19.0
+          ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedStatement, {"fix", "19.0"});  // I3438
+        }
         p += 3;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_CLEARCONTEXT;

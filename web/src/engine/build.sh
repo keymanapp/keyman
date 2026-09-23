@@ -72,11 +72,11 @@ run_tests() {
   # So we first run all javascript tests except languageProcessor.tests.js
   # with coverage, and then in a second step run languageProcessor.tests.js
   # without coverage.
-  test-headless engine "" "--exclude" "**/languageProcessor.tests.js"
-  SKIP_C8=1 test-headless engine/main/headless/languageProcessor.tests.js
+  test-headless-typescript engine "" "--exclude" "**/languageProcessor.tests.js"
+  SKIP_C8=1 test-headless-typescript "engine/main/languageProcessor.tests.js"
 
-  # Run typescript tests
-  test-headless-typescript engine
+  # # Run typescript tests
+  # test-headless-typescript engine
 }
 
 builder_run_action clean rm -rf "${KEYMAN_ROOT}/web/build/engine"

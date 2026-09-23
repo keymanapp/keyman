@@ -146,5 +146,7 @@ function test-headless() {
 function test-headless-typescript() {
   # tests.js - ensure any plain-js files that exist as test resources, but not test defs,
   # aren't treated by Mocha as tests.
-  test-headless "$1" "tests.js"
+  local TEST_FOLDER=$1
+  shift $(( $# < 1 ? $# : 1 ))
+  test-headless "$TEST_FOLDER" "tests.js" "$@"
 }

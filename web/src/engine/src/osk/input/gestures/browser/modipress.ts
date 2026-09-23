@@ -1,9 +1,10 @@
 import { type KeyElement } from '../../../keyElement.js';
 import { VisualKeyboard } from '../../../visualKeyboard.js';
 
-import { KeyDistribution, ActiveKeyBase } from 'keyman/engine/keyboard';
+import { KeyDistribution } from 'keyman/engine/keyboard';
 import { GestureSequence } from 'keyman/engine/gesture-processor';
 import { GestureHandler } from '../gestureHandler.js';
+import { CorrectionDistanceMap } from '../../../corrections.js';
 
 /**
  * Represents a potential modipress gesture's implementation within KeymanWeb, including
@@ -76,7 +77,7 @@ export class Modipress implements GestureHandler {
 
   readonly hasModalVisualization = false;
 
-  currentStageKeyDistribution(baseDistMap: Map<ActiveKeyBase, number>): KeyDistribution {
+  currentStageKeyDistribution(baseDistanceMap: CorrectionDistanceMap): KeyDistribution {
     return null;
   }
 }

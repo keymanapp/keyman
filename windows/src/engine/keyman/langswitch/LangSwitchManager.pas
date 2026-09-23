@@ -186,6 +186,7 @@ type
     procedure Refresh;
     function FindKeyboard(FHKL: HKL; FProfileGuid: TGUID): TLangSwitchKeyboard; overload;
     function FindKeyboard(id: string): TLangSwitchKeyboard; overload;
+    function FindKeyboardByKeymanID(id: Integer): TLangSwitchKeyboard; overload;
     property Languages[Index: Integer]: TLangSwitchLanguage read GetLanguage;
     property LanguageCount: Integer read GetLanguageCount;
     property TotalKeyboardCount: Integer read GetTotalKeyboardCount;   // I4606
@@ -591,6 +592,20 @@ begin
     for j := 0 to FLanguages[i].KeyboardCount - 1 do
       if FLanguages[i].Keyboards[j].ID = id then
         Exit(FLanguages[i].Keyboards[j]);
+  Result := nil;
+end;
+
+function TLangSwitchManager.FindKeyboardByKeymanID(
+  id: Integer): TLangSwitchKeyboard;
+var
+  lang: TLangSwitchLanguage;
+  kbd: TLangSwitchKeyboard;
+begin
+  for lang in FLanguages do
+    for kbd in lang.FKeyboards do
+      if kbd.KeymanID = id then
+        Exit(kbd);
+
   Result := nil;
 end;
 

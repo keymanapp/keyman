@@ -370,7 +370,7 @@ public final class KMManager {
   public static int KeyboardHeight_Context_Landscape_Current = 0; // Current landscape height
 
   // Default prediction/correction setting
-  public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_CORRECTIONS.toInt();
+  public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_AUTO_CORRECT.toInt();
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";

@@ -1,5 +1,159 @@
 # Keyman Version History
 
+## 19.0.289 alpha 2026-09-21
+
+* fix(android): suppress autocorrection of hardware keystroke input (#16606)
+* change(web): add lexical weighting to prediction search (#16600)
+
+## 19.0.288 alpha 2026-09-18
+
+* change(web): remove TokenizationCorrector class only used in epic/boundary-correction (#16581)
+
+## 19.0.287 alpha 2026-09-17
+
+* fix(web): support autocorrection of transposed text (#16450)
+* fix(web): allow to set default keyboard to 'off' (#16524)
+
+## 19.0.286 alpha 2026-09-16
+
+* fix(developer): trim new words entered into the wordlist editor (#16538)
+* chore(windows): remove references to unused extensions .kma and .kxx (#16569)
+* refactor(web): add header to osk views files (#16568)
+
+## 19.0.285 alpha 2026-09-11
+
+* fix(web): handle 'unload' message while attempting model 'load' (#16548)
+* fix(android): load KMP files from app-external sources (#16392)
+
+## 19.0.284 alpha 2026-09-10
+
+* maint(developer): remove unused ajv dependency from kmc-convert (#16539)
+* fix(web): remove scroll-to-top on page load (#16531)
+
+## 19.0.283 alpha 2026-09-09
+
+* change(web): allow autocorrection on input of basic whitespaces (#16541)
+
+## 19.0.282 alpha 2026-09-08
+
+* refactor(web): clarify function scope and update some function comments (#16532)
+
+## 19.0.281 alpha 2026-09-07
+
+* chore(deps): bump fast-uri from 3.1.5 to 3.1.7 (#16511)
+* chore(deps): bump nanoid from 3.3.11 to 3.3.18 (#16512)
+* chore(deps): bump qs and express (#16513)
+* chore(web): adjust types in guide-examples tests (#16523)
+
+## 19.0.280 alpha 2026-09-05
+
+* fix(windows): open chm external links in user's browser (#16515)
+
+## 19.0.279 alpha 2026-09-03
+
+* chore(web): tweak error message (#16495)
+* change(web): stage construction of CorrectionPredictionTuple instances (#16429)
+* change(web): narrow the range of suggestions examined to determine autocompletion (#16436)
+* fix(web): remove deprecated `onunload` handler (#16504)
+* docs(developer): add comment to test fixtures to clarify expectations (#16505)
+* fix(developer): hide keyboard uninstall confirmation (#16506)
+* fix(developer): remember presentation and layer when switching platforms in touch layout editor (#16509)
+* fix(developer): ensure JSON regenerated after undo in touch layout editor (#16516)
+* fix(developer): improve validation of minDeviceWidth to match spec (#16501)
+* chore(developer): improve kmc-ldml test messages (#16502)
+* chore(web): add const for cookie name (#16519)
+* refactor(web): clarify scope of PageContextAttachment functions (#16521)
+
+## 19.0.278 alpha 2026-09-02
+
+* feat(developer): support output folder and `--continue-on-error` (#16453)
+* fix(developer): validate the number of hardware layers only in Layr compiler (#16455)
+* fix(developer): validate id and modifiers attributes in Layr compiler (#16456)
+* fix(developer): disable Copy Link in Model Editor if no link to copy (#16475)
+* fix(developer): open context help when F1 pressed in Project window (#16481)
+* chore(web): update file headers (#16497)
+
+## 19.0.277 alpha 2026-09-01
+
+* fix(developer): handle comment without trailing whitespace (#16479)
+* fix(developer): improve scroll wheel behavior in Character Map (#16474)
+* fix(developer): call 'Show Console' twice to make the console actually show on first use (#16483)
+* fix(developer): use path not dependent on pwd for starting Server (#16476)
+* chore(developer): remove duplicated versioning information from Server (#16478)
+* fix(developer): handle leading delimiters correctly in `u16tok()` (#16446)
+* chore(android): upload webview source map during android and ios build (#16449)
+* refactor(windows): rename `GetCapsAndNumlockState()` to `RefreshModifierState()` (#16444)
+* chore(developer): strip out defunct printing support (#16480)
+* fix(developer): make tool windows non-topmost when TIKE is deactivated (#16482)
+* fix(windows): simplify keyboard refresh and make it more on-demand (#16435)
+* refactor(windows): cleanup unused wm_keyman_control values (#16439)
+* maint(windows): remove `koSwitchLanguageForAllApplications`, `koAutoSwitchOSKPages`, osVista, osWin7, osWin8, cleanup (#16443)
+* change(developer): deprecate `fix`, `clearcontext`, bump max .kmx version to 19.0 (#16445)
+* fix(developer): add missing message parameters and cleanup kmc-kmn messages further (#16493)
+
+## 19.0.276 alpha 2026-08-28
+
+* fix(windows): add manifest to insthelper and set trustinfo to asInvoker (#16430)
+* fix(windows): resync caps lock state when Keyman keyboard is activated (#16423)
+
+## 19.0.275 alpha 2026-08-27
+
+* docs(mac): refresh build/setup docs and remove APPSTORECONNECT_PROVIDER (#16432)
+* chore(mac): update setup document (#16415)
+* change(web): enhance missing-stubs error (#16437)
+
+## 19.0.274 alpha 2026-08-24
+
+* maint(windows): move to vs2026 arm runner for GHA (#16418)
+* chore(web): skip guide-examples.tests.ts until race is fixed (#16427)
+
+## 19.0.273 alpha 2026-08-22
+
+* feat(linux): use display language for keyboard search (#16393)
+
+## 19.0.272 alpha 2026-08-21
+
+* chore(mac): put coreutils on path on mac and improve docs (#16409)
+* docs(mac): add XCode version requirement (#16408)
+* fix(developer): clean kmc-convert build.sh with new publish patterns (#16412)
+* feat(developer): kmc convert follow-up tasks (#16420)
+* docs(android): document autocorrect toggle within Android help (#16405)
+* docs(ios): document autocorrect toggle within iOS help (#16406)
+
+## 19.0.271 alpha 2026-08-20
+
+* feat(ios): pass current display language to keyboard download (#16401)
+* epic: kmc-convert (#12191)
+* chore(deps): bump multer from 2.1.1 to 2.2.0 (#16109)
+* fix(developer): tighten touch layout file structural validity checks (#16347)
+* chore(deps): bump ws from 8.20.1 to 8.21.0 (#16104)
+* chore(deps): bump ip-address from 10.2.0 to 10.4.0 (#16301)
+* chore(deps): bump ip-address from 10.2.0 to 10.5.0 in /developer/src/server/src/win32/trayicon/addon-src (#16302)
+* chore(deps): bump fast-uri from 3.1.2 to 3.1.5 (#16309)
+* chore: refresh package-lock.json after dependabot merges (#16410)
+
+## 19.0.270 alpha 2026-08-19
+
+* fix(windows): support .png format icon in tray icon (#16362)
+* fix(windows): handle font and package .zip format errors during package installation (#16363)
+* chore(deps-dev): bump form-data from 4.0.4 to 4.0.6 (#16103)
+* chore(deps-dev): bump js-yaml from 4.1.1 to 4.3.0 in /resources/build/pr-build-status (#16240)
+* epic: autocorrect (#12893)
+* change(android): enable autocorrect by default (#16403)
+
+## 19.0.269 alpha 2026-08-18
+
+* chore(deps): bump body-parser from 1.20.5 to 1.20.6 (#16275)
+* maint(android): update FV Android Target API to 36 (#16355)
+* fix(web): cancel gestures on relayouts and context resets (#16384)
+
+## 19.0.268 alpha 2026-08-17
+
+* feat(windows): pass UI language to keyboard download page (#16364)
+* fix(developer): mark touch layout file as modified after applying template (#16370)
+* chore(resources): update langtags to 2026-06-09, iso639-3 to current, language-subtag-registry to 2026-08-08, cleanup and add download scripts (#16371)
+* chore(common): disable strictNullChecks for TypeScript for now (#16387)
+
 ## 19.0.267 alpha 2026-08-14
 
 * chore(common): add missing history (#16369)
@@ -1589,6 +1743,27 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.252 stable 2026-09-22
+
+* change(android): use webview asset loader (#16628)
+* chore: revert "fix(web): retry importScripts NetworkErrors in attempt to mitigate errors loading models" (#16630)
+
+## 18.0.251 stable 2026-09-21
+
+* maint(android): update Android Target API to 36 (#16620)
+* 
+## 18.0.250 stable 2026-09-21
+
+* fix(linux): fix memory problem (#15828)
+* chore: update fast-xml-parser to 5.8.0 (#15953)
+* fix(linux): add dependency on `procps` (#15980)
+* chore(ios): update first voices distribution certificate (#16007)
+* chore(linux): release v18 on Ubuntu 26.04 Resolute (#16078)
+* chore: update multi-labeler to 5.0.0 (#16101)
+* chore(android): log legacy cloud keyboards (#16243)
+* fix(web): handle 'unload' message while attempting model 'load' (#16609)
+* fix(web): retry importScripts NetworkErrors in attempt to mitigate errors loading models (#16604)
 
 ## 18.0.249 stable 2026-03-27
 

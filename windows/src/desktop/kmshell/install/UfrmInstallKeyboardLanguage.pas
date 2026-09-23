@@ -474,7 +474,7 @@ begin
     end;
   end;
 
-  if not (GetOs = osWin7) and not FFoundCustomTag then
+  if not FFoundCustomTag then
   begin
     if IsValidLocaleName(PChar(FText)) then
     begin

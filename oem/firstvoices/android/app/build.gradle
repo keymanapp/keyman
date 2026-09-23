@@ -14,7 +14,7 @@ java {
 }
 
 android {
-    compileSdk 35
+    compileSdk 36
     namespace="com.firstvoices.keyboards"
 
     buildFeatures {
@@ -24,7 +24,7 @@ android {
     defaultConfig {
         applicationId "com.firstvoices.keyboards"
         minSdkVersion 21
-        targetSdkVersion 35
+        targetSdkVersion 36
 
         // KEYMAN_VERSION_CODE and KEYMAN_VERSION_NAME from version.gradle
         versionCode KEYMAN_VERSION_CODE as Integer

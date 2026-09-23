@@ -1,6 +1,6 @@
 import { keyAddress, KmnCompilerMessages } from "../compiler/kmn-compiler-messages.js";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageDef as def, CompilerMessageSpec as m } from "@keymanapp/developer-utils";
-import { KeyAddress } from "./validate-layout-file.js";
+import { KeyAddress } from "./compile-layout-file.js";
 
 const Namespace = CompilerErrorNamespace.KmwCompiler;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;

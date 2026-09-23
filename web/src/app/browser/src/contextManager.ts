@@ -13,6 +13,7 @@ import {
 import { BrowserConfiguration } from './configuration.js';
 import { FocusAssistant } from './context/focusAssistant.js';
 
+export const KeyboardCookieName = 'KeymanWeb_Keyboard';
 export interface KeyboardCookie {
   current: string;
 }
@@ -46,7 +47,7 @@ function setTargetTextDirection(elem: HTMLElement, activeKeyboard: Keyboard): vo
 
 export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   private _activeKeyboard: KeyboardInfoPair;
-  private cookieManager = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
+  private cookieManager = new CookieSerializer<KeyboardCookie>(KeyboardCookieName);
   readonly focusAssistant = new FocusAssistant(() => this.activeTextStore?.isForcingScroll());
   readonly page: PageContextAttachment;
   private mostRecentTextStore: AbstractElementTextStore<any>;
@@ -231,7 +232,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     }
   }
 
-  public setActiveTextStore(textStore: AbstractElementTextStore<any>, sendEvents?: boolean) {
+  public setActiveTextStore(textStore: AbstractElementTextStore<any>, sendEvents?: boolean): void {
     const previousTextStore = this.mostRecentTextStore;
     const originalTextStore = this.activeTextStore; // may differ, depending on focus state.
 
@@ -365,21 +366,21 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   protected currentKeyboardSrcTextStore(): AbstractElementTextStore<any> | null {
     const textStore = this.currentTextStore || this.mostRecentTextStore;
 
-    if(this.isTextStoreKeyboardIndependent(textStore)) {
+    if(this.isElementInIndependentMode(textStore?.getElement())) {
       return textStore;
     }
     return null;
   }
 
-  private isTextStoreKeyboardIndependent(textStore: AbstractElementTextStore<any>): boolean {
-    const attachment = textStore?.getElement()._kmwAttachment;
+  public isElementInIndependentMode(element: HTMLElement | null): boolean {
+    const attachment = element?._kmwAttachment;
 
     // If null or undefined, we're in 'global' mode.
-    return !!(attachment?.keyboard || attachment?.keyboard === '');
+    return attachment?.keyboard !== undefined && attachment.keyboard !== null;
   }
 
   // Note:  is part of the keyboard activation process.  Not to be called directly by published API.
-  public activateKeyboardForTextStore(kbd: KeyboardInfoPair, textStore: AbstractElementTextStore<any>): void {
+  protected activateKeyboardForTextStore(kbd: KeyboardInfoPair, textStore: AbstractElementTextStore<any>): void {
     const attachment = textStore?.getElement()._kmwAttachment;
 
     if(!attachment) {
@@ -409,17 +410,25 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
    * activates the keyboard if the specified control represents the
    * currently-active context.
    *
+   * If kbdId and langId are both null, the control will use the global
+   * keyboard. If both are the empty string, the control will use the
+   * system keyboard (on desktop), or the first installed keyboard (on
+   * touch devices).
+   *
    * This is the core method that backs
    * https://help.keyman.com/developer/engine/web/current-version/reference/core/setKeyboardForControl.
    * @param textStore
    * @param kbdId
    * @param langId
    */
-  public setKeyboardForTextStore(textStore: AbstractElementTextStore<any>, kbdId: string, langId: string): void {
+  public setKeyboardForTextStore(textStore: AbstractElementTextStore<any>, kbdId?: string | null, langId?: string | null): void {
     if(textStore instanceof DesignIFrameElementTextStore) {
       console.warn("'keymanweb.setKeyboardForControl' cannot set keyboard on iframes.");
       return;
     }
+
+    kbdId ??= null;
+    langId ??= null;
 
     const attachment = textStore.getElement()._kmwAttachment;
 
@@ -430,20 +439,25 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     if(!attachment) {
       return;
     } else {
+      if(wasPriorTextStore && kbdId === null) {
+        this.findAndPopActivation(textStore);
+      }
+
       // Either establishes or cancels independent-keyboard mode by setting the
       // associated metadata.  This will have direct effects on the results
       // of .currentKeyboardSrcTextStore().
-      attachment.keyboard = kbdId || null;
-      attachment.languageCode = langId || null;
+      attachment.keyboard = kbdId;
+      attachment.languageCode = langId;
 
       // If it has just entered independent-keyboard mode, we need the second check.
       if(wasPriorTextStore || this.currentKeyboardSrcTextStore() == textStore) {
         const globalKbd = this.globalKeyboard.metadata;
 
-        // The `||` bits below - in case we're cancelling independent-keyboard mode.
+        // `??` preserves empty-string values for an explicit "system keyboard" state,
+        // while falling back to the global keyboard only when the control is truly unset.
         this.activateKeyboard(
-          attachment.keyboard || globalKbd.id,
-          attachment.languageCode || globalKbd.langId,
+          attachment.keyboard ?? globalKbd.id,
+          attachment.languageCode ?? globalKbd.langId,
           true
         );
       }
@@ -451,7 +465,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
   }
 
   public getKeyboardStubForTextStore(textStore: AbstractElementTextStore<any>) {
-    if(!this.isTextStoreKeyboardIndependent(textStore)) {
+    if(!this.isElementInIndependentMode(textStore?.getElement())) {
       return this.globalKeyboard.metadata;
     } else {
       const attachment = textStore.getElement()._kmwAttachment;
@@ -531,8 +545,8 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
 
       this.engineConfig.alertHost?.wait(); // clear the wait message box, either way.
 
-      const message = (err as Error)?.message ||
-                      'Sorry, the ' + keyboardId + ' keyboard for ' + languageCode + ' is not currently available.';
+
+      const message = `Activation of '${keyboardId}' failed: ${(err as Error)?.message ?? err?.toString() ?? 'unknown error'}`;
 
       if(err instanceof KeyboardScriptError) {
         // We get signaled about error log messages if the site is connected to our Sentry error reporting
@@ -572,7 +586,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
       langCode = lgCode;
     }
 
-    if(lastElem && lastElem._kmwAttachment.keyboard != null) {
+    if (lastElem && this.isElementInIndependentMode(lastElem)) {
       lastElem._kmwAttachment.keyboard = keyboardID;
       lastElem._kmwAttachment.languageCode = langCode;
     } else {
@@ -592,8 +606,10 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     const attachment = lastElem._kmwAttachment;
     const global = this.globalKeyboard;
 
-    if(attachment.keyboard != null) {
-      this.activateKeyboard(attachment.keyboard, attachment.languageCode, true);
+    if (this.isElementInIndependentMode(lastElem)) {
+      const keyboardId = attachment.keyboard ?? global?.metadata.id ?? '';
+      const languageCode = attachment.languageCode ?? global?.metadata.langId ?? '';
+      this.activateKeyboard(keyboardId, languageCode, true);
     } else if(!blockGlobalChange && (global?.metadata != this._activeKeyboard?.metadata)) {
       // TODO:  can we drop `!blockGlobalChange` in favor of the latter check?
       this.activateKeyboard(global?.metadata.id, global?.metadata.langId, true);
@@ -748,8 +764,8 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
    * Gets the 'saved keyboard' cookie value for the last keyboard used in the
    * iser's previous session.
    **/
-  public getSavedKeyboardRaw(): string {
-    const cookie = new CookieSerializer<KeyboardCookie>('KeymanWeb_Keyboard');
+  public getSavedKeyboardRaw(): string | null {
+    const cookie = new CookieSerializer<KeyboardCookie>(KeyboardCookieName);
     const v = cookie.load(decodeURIComponent);
 
     if(typeof(v.current) != 'string') {

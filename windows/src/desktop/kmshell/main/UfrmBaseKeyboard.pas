@@ -18,15 +18,14 @@ type
     procedure FireCommand(const command: WideString; params: TStringList); override;
   end;
 
-
 (**
-  Form for the user to select a base keyboard. If the user selects a base
-  keyboard, the KLID of the selected base keyboard is returned in
-  BaseKeyboardID.
-  @param  [out] BaseKeyboardID  KLID of the base keyboard selected by the user.
-  @returns  True  if the user selected a base keyboard.
-*)
-function ConfigureBaseKeyboard(out BaseKeyboardID: Integer): Boolean;
+ * Displays a form for the user to select a base keyboard. If the user selects a base
+ * keyboard, the KLID is used to Set the Base Keyboard.
+ *
+ * @returns  True  if the user selected base keyboard has been set.
+ *)
+function ConfigureAndSetBaseKeyboard(WindowHandle: THandle): Boolean;
+
 
 implementation
 
@@ -37,16 +36,19 @@ uses
   ErrorControlledRegistry,
   RegistryKeys,
   keymanapi_TLB,
+  Keyman.Configuration.System.BaseKeyboard,
   kmint,
   utilkmshell;
 
-function ConfigureBaseKeyboard(out BaseKeyboardID: Integer): Boolean;
+
+function ConfigureAndSetBaseKeyboard(WindowHandle: THandle): Boolean;
+var BaseKeyboardID: Integer;
 begin
   with TfrmBaseKeyboard.Create(nil) do
   try
     Result := ShowModal = mrOk;
     if Result then
-      BaseKeyboardID := FBaseKeyboardID;
+      SetBaseKeyboard(WindowHandle, FBaseKeyboardID)
   finally
     Free;
   end;

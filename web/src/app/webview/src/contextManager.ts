@@ -62,11 +62,6 @@ export class HostTextStore extends SyntheticTextStore {
     this.savedState = SyntheticTextStore.from(this);
   }
 
-  restoreTo(original: TextStore): void {
-    this.savedState = SyntheticTextStore.from(this);
-    super.restoreTo(original);
-  }
-
   updateContext(text: string, selStart: number, selEnd: number): boolean {
     let shouldResetContext = false;
     const tempTextStore = new SyntheticTextStore(text, selStart ?? KMWString.length(text), selEnd ?? KMWString.length(text));
@@ -141,7 +136,7 @@ export class ContextManager extends ContextManagerBase<WebviewConfiguration> {
     return this._activeKeyboard;
   }
 
-  activateKeyboardForTextStore(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, textStore: TextStore) {
+  protected activateKeyboardForTextStore(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, textStore: TextStore) {
     // `textStore` is irrelevant for `app/webview`, as it'll only ever use 'global' keyboard settings.
 
     // Clone the object to prevent accidental by-reference changes.
