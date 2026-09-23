@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.290 alpha 2026-09-23
+
+* fix(windows): set basekeyboard as current user not the admin user on an elevated process (#16162)
+* fix(windows): add non-admin user install with different base keyboard (#16528)
+
 ## 19.0.289 alpha 2026-09-21
 
 * fix(android): suppress autocorrection of hardware keystroke input (#16606)
