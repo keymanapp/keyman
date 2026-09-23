@@ -126,7 +126,7 @@ export class KeymanEngineBase<
     const processorConfiguration = processorConfigInitializer(this);
     processorConfiguration.baseLayout = determineBaseLayout();
     this.interface = processorConfiguration.keyboardInterface as KeyboardInterfaceBase<ContextManagerT>;
-    this.core = new InputProcessor(config.hostDevice, config.sourcePath, workerFactory, processorConfiguration);
+    this.core = new InputProcessor(config.hostDevice, workerFactory, processorConfiguration);
 
     this.core.languageProcessor.on('statechange', (state) => {
       // The banner controller cannot directly trigger a layout-refresh at this time,

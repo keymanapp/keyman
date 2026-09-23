@@ -53,7 +53,7 @@ export class InputProcessor {
 
   private readonly contextCache = new TranscriptionCache();
 
-  constructor(device: DeviceSpec, sourcePath: string, predictiveWorkerFactory: WorkerFactory, options: ProcessorInitOptions) {
+  constructor(device: DeviceSpec, predictiveWorkerFactory: WorkerFactory, options: ProcessorInitOptions) {
     if(!device) {
       throw new Error('device must be defined');
     }
@@ -61,7 +61,7 @@ export class InputProcessor {
     this.contextDevice = device;
     this.jsKbdProcessor = new JSKeyboardProcessor(device, options);
     this._keyboardProcessor = this.jsKbdProcessor;
-    this._languageProcessor = new LanguageProcessor(predictiveWorkerFactory, sourcePath, this.contextCache);
+    this._languageProcessor = new LanguageProcessor(predictiveWorkerFactory, this.contextCache);
   }
 
   public async init(paths: PathConfiguration, storeSerializer: VariableStoreSerializer): Promise<void> {

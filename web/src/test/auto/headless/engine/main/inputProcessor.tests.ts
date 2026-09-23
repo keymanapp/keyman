@@ -7,7 +7,7 @@ import * as sinon from 'sinon';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KeyboardTest, RecordedPhysicalKeystroke, RecordedSequenceTestSet } from '@keymanapp/recorder-core';
-import { nodePredictiveTextWorkerFactory } from '@keymanapp/lexical-model-layer/node';
+import { NodePredictiveTextWorkerFactory } from '@keymanapp/lexical-model-layer/node';
 import { DeviceSpec, KMWString } from 'keyman/common/web-utils';
 
 import { InputProcessor } from 'keyman/engine/main';
@@ -58,7 +58,7 @@ KMWString.enableSupplementaryPlane(false);
 describe('InputProcessor', function() {
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
-      let core = new InputProcessor(device, null, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
+      let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
       assert.isNotNull(core);
     });
 
@@ -68,7 +68,7 @@ describe('InputProcessor', function() {
         // Can construct without the second parameter; if so, the final assertion - .mayPredict
         // will be invalidated.  (No worker, no ability to predict.)
         // @ts-ignore
-        core = new InputProcessor(device, '', nodePredictiveTextWorkerFactory, {
+        core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {
           baseLayout: 'us',
           keyboardInterface: new JSKeyboardInterface({}, null, new VariableStoreTestSerializer()),
           defaultOutputRules: new DefaultOutputRules()
@@ -140,7 +140,7 @@ describe('InputProcessor', function() {
 
       it('with minimal context (no fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, '', null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
         let context = new SyntheticTextStore("", 0);
 
         let keyboard = keyboardWithHarness.activeKeyboard;
@@ -160,7 +160,7 @@ describe('InputProcessor', function() {
                                           // These often run on VMs, so we'll be a bit generous.
 
         // I mean, it IS long context, and time thresholding is disabled within Node.
-        let core = new InputProcessor(device, '', null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
 
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
@@ -179,7 +179,7 @@ describe('InputProcessor', function() {
 
       it('with minimal context (with fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, '', null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
         let context = new SyntheticTextStore("", 0);
 
         let keyboard = keyboardWithHarness.activeKeyboard;
@@ -203,7 +203,7 @@ describe('InputProcessor', function() {
                                           // 'without fat-fingers' test.
 
         // It IS long context, and time thresholding is disabled within Node.
-        let core = new InputProcessor(device, '', null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
 
         let keyboard = keyboardWithHarness.activeKeyboard;
         let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
@@ -239,7 +239,7 @@ describe('InputProcessor', function() {
     for (let testSet of testsToRun.testSet) {
       it(testSet.msg ?? 'test', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, '', null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
         let context = new SyntheticTextStore("", 0);
 
         let keyboard = keyboardWithHarness.activeKeyboard as JSKeyboard;
@@ -309,7 +309,7 @@ describe('InputProcessor', function() {
     });
 
     it('replaces appended whitespace when a manually-applied suggestion is followed by a K_SPACE (dummy models)', async () => {
-      const core = new InputProcessor(device, '', nodePredictiveTextWorkerFactory, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -366,7 +366,7 @@ describe('InputProcessor', function() {
     });
 
     it('replaces appended whitespace when a manually-applied suggestion is followed by a K_SPACE (trie models)', async () => {
-      const core = new InputProcessor(device, '', nodePredictiveTextWorkerFactory, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -424,7 +424,7 @@ describe('InputProcessor', function() {
     });
 
     it('auto-applies a suggestion properly when available and triggered appropriately', async () => {
-      const core = new InputProcessor(device, '', nodePredictiveTextWorkerFactory, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -476,7 +476,7 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after manually applying a suggestion and immediately backspacing', async () => {
-      const core = new InputProcessor(device, '', nodePredictiveTextWorkerFactory, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -533,7 +533,7 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after returning to the whitespace after a manually-applied suggestion', async () => {
-      const core = new InputProcessor(device, '', nodePredictiveTextWorkerFactory, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -594,7 +594,7 @@ describe('InputProcessor', function() {
     });
 
     it("displays a reversion after returning to the end of a manually-applied suggestion's body", async () => {
-      const core = new InputProcessor(device, '', nodePredictiveTextWorkerFactory, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -656,7 +656,7 @@ describe('InputProcessor', function() {
     });
 
     it("does not display a reversion after backspacing part of an applied suggestion", async () => {
-      const core = new InputProcessor(device, '', nodePredictiveTextWorkerFactory, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -720,7 +720,7 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after auto-applying a suggestion and immediately backspacing', async () => {
-      const core = new InputProcessor(device, '', nodePredictiveTextWorkerFactory, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -775,7 +775,7 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after returning to the whitespace after a auto-applied suggestion', async () => {
-      const core = new InputProcessor(device, '', nodePredictiveTextWorkerFactory, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -829,7 +829,7 @@ describe('InputProcessor', function() {
     });
 
     it("displays a reversion after returning to the end of an auto-applied suggestion's body", async () => {
-      const core = new InputProcessor(device, '', nodePredictiveTextWorkerFactory, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {

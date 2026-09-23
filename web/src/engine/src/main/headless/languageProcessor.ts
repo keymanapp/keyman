@@ -25,7 +25,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   private _state: StateChangeEnum = 'inactive';
 
-  public constructor(predictiveWorkerFactory: WorkerFactory, sourcePath: string, transcriptionCache: TranscriptionCache, supportsRightDeletions: boolean = false) {
+  public constructor(predictiveWorkerFactory: WorkerFactory, transcriptionCache: TranscriptionCache, supportsRightDeletions: boolean = false) {
     super();
 
     this.recentTranscriptions = transcriptionCache;
@@ -44,7 +44,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
     let workerInstance: Worker;
     try {
-      workerInstance = predictiveWorkerFactory?.constructInstance(sourcePath);
+      workerInstance = predictiveWorkerFactory?.constructInstance();
     } catch(e) {
       // We can condition on `lmEngine` being null/undefined.
       console.warn('Web workers are not available: ' + (e ?? '').toString());

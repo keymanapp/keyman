@@ -4,4 +4,4 @@
 
 export { LMLayer } from '../lmlayer.js';
 export { type WorkerFactory } from '../worker-factory.js';
-export { nodePredictiveTextWorkerFactory, NodePredictiveTextWorkerFactory } from './node-worker-factory.js';
+export { NodePredictiveTextWorkerFactory } from './node-predictive-text-worker-factory.js';

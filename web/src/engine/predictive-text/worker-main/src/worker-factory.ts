@@ -3,5 +3,5 @@
  */
 
 export interface WorkerFactory {
-  constructInstance(rootPath?: string): Worker;
+  constructInstance(): Worker;
 };
