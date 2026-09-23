@@ -444,6 +444,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
 
     if (textView != null) {
+      KMManager.setAutocorrectionsSuspended(textView.getInputType(), KeyboardType.KEYBOARD_TYPE_INAPP);
       // Reset inAppPredictionsSuspendedForSensitiveInput flag
       KMManager.setPredictionsSuspended(textView.getInputType(), KeyboardType.KEYBOARD_TYPE_INAPP);
     }

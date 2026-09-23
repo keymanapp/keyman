@@ -6,7 +6,6 @@ package com.keyman.engine;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.RectF;
 import android.net.Uri;
 import android.util.Log;
 import android.webkit.WebResourceRequest;
@@ -18,17 +17,12 @@ import androidx.webkit.WebViewAssetLoader;
 import androidx.webkit.WebViewAssetLoader.InternalStoragePathHandler;
 
 import com.keyman.engine.KeyboardEventHandler.EventType;
-import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
-import com.keyman.engine.KMManager.SuggestionType;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.util.WebViewUtils;
 
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public final class KMKeyboardWebViewClient extends WebViewClient {
   public static final String TAG = "KMKeyboardWebViewClient";
@@ -175,15 +169,7 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       // for the rest of the lifetime of this keyboard instance.
       kmKeyboard.setShouldShowHelpBubble(false);
     } else if (url.indexOf("refreshBannerHeight") >= 0) {
-      // appContext instead of context?
-      SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-      boolean modelPredictionPref = false;
-      if (!KMManager.getPredictionsSuspended(keyboardType) && KMManager.currentLexicalModel != null) {
-        modelPredictionPref = prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(
-          KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), KMManager.KMDefault_Suggestion)
-          != SuggestionType.SUGGESTIONS_DISABLED.toInt();
-      }
-      KMManager.setBannerOptions(modelPredictionPref, keyboardType);
+      KMManager.setBannerOptions(KMManager.determinePredictionConfig(context, keyboardType), keyboardType);
       RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
       kmKeyboard.setLayoutParams(params);
     } else if (url.indexOf("suggestPopup") >= 0) {

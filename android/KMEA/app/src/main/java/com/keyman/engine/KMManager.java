@@ -42,7 +42,6 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.WindowMetrics;
 import android.view.inputmethod.EditorInfo;
@@ -54,7 +53,6 @@ import android.widget.RelativeLayout;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
-import androidx.core.view.DisplayCutoutCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -80,7 +78,6 @@ import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.KMString;
 import com.keyman.engine.util.MapCompat;
 import com.keyman.engine.util.WebViewUtils;
-import com.keyman.engine.util.WebViewUtils.SystemWebViewStatus;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -272,6 +269,13 @@ public final class KMManager {
   // API added Keyman 18.0
   private static boolean inAppPredictionsSuspendedForSensitiveInput = false;
   private static boolean systemPredictionsSuspendedForSensitiveInput = false;
+
+  // Special flags to temporarily disable autocorrect when editing fields it
+  // would interfere with.  These are maintained independently for inapp keyboard
+  // and system keyboard.
+  // API added Keyman 19.0
+  private static boolean inAppAutocorrectionsSuspended = false;
+  private static boolean systemAutocorrectionsSuspended = false;
 
   // Determine how system keyboard handles ENTER key
   public static EnterModeType enterMode = EnterModeType.DEFAULT;
@@ -1535,6 +1539,7 @@ public final class KMManager {
   private static boolean shouldSuspendPredictions(int inputType) {
     return ((inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) ||
       (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD)) ||
+      (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)) ||
       isNumericField(inputType));
   }
 
@@ -1567,6 +1572,62 @@ public final class KMManager {
       return inAppPredictionsSuspendedForSensitiveInput;
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       return systemPredictionsSuspendedForSensitiveInput;
+    }
+    return false;
+  }
+
+  private static boolean shouldSuspendAutocorrections(int inputType) {
+    // Do not autocorrect contexts where text-format data is not expected.
+    // (Disable for Numbers and DateTime formats.)
+    if((inputType & InputType.TYPE_CLASS_TEXT) == 0) {
+      return true;
+    }
+
+    switch(inputType & InputType.TYPE_MASK_VARIATION) {
+      case InputType.TYPE_TEXT_VARIATION_FILTER:
+      case InputType.TYPE_TEXT_VARIATION_NORMAL:
+      case InputType.TYPE_TEXT_VARIATION_SHORT_MESSAGE:
+      case InputType.TYPE_TEXT_VARIATION_LONG_MESSAGE:
+      case InputType.TYPE_TEXT_VARIATION_EMAIL_SUBJECT:
+      case InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT:
+        return false;
+
+      // TODO:  return false for the following case once epic/user-dict lands!
+      case InputType.TYPE_TEXT_VARIATION_PERSON_NAME:
+      default:
+        return true;
+    }
+  }
+
+  // Do within the setPredictionsSuspended part, probably?
+  /**
+   * Sets autocorrectionsSuspended true if the given InputType field for the keyboard
+   * should not be corrected, as with email and address/URL bar fields.
+   * Also true for numeric text fields.
+   * This is to temporarily disable automatic application of suggestions in these text fields.
+   * API added Keyman 18.0
+   * @param inputType android.text.InputType
+   * @param {KeyboardType} keyboard
+   */
+  public static void setAutocorrectionsSuspended(int inputType, KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      inAppAutocorrectionsSuspended = shouldSuspendAutocorrections(inputType);
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      systemAutocorrectionsSuspended = shouldSuspendAutocorrections(inputType);
+    }
+  }
+
+  /**
+   * Get the value of autocorrectionsSuspended based on KeyboardType.
+   * API added in Keyman 18.0
+   * @param {KeyboardType} keyboard
+   * @return boolean of autocorrectionsSuspended or systemPredictionsSuspendedForSensitiveInput
+   */
+  public static boolean getAutocorrectionsSuspended(KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      return inAppAutocorrectionsSuspended;
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      return systemAutocorrectionsSuspended;
     }
     return false;
   }
@@ -1706,26 +1767,15 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
-    // When entering password field, maySuggest should override to disabled
-    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
-    int suggestionPreference = prefs.getInt(getLanguageAutoCorrectionPreferenceKey(languageID), KMDefault_Suggestion);
-
-    RelativeLayout.LayoutParams params;
+    currentLexicalModel = lexicalModelInfo;
+    // *** refactor to use common settings-detection with the setBannerOptions route. ***
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange() && modelFileExists) {
-      params = getKeyboardLayoutParams();
-
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      int inappMaySuggest = inAppPredictionsSuspendedForSensitiveInput ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
-        suggestionPreference;
-      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, inappMaySuggest));
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, determinePredictionConfig(appContext, KeyboardType.KEYBOARD_TYPE_INAPP).toInt()));
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
-      params = getKeyboardLayoutParams();
-
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      int maySuggest = systemPredictionsSuspendedForSensitiveInput ? SuggestionType.SUGGESTIONS_DISABLED.toInt() :
-        suggestionPreference;
-      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, maySuggest));
+      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, determinePredictionConfig(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM).toInt()));
     }
     return true;
   }
@@ -1757,6 +1807,34 @@ public final class KMManager {
     KeyboardPickerActivity.deleteLexicalModel(context, position, silenceNotification);
   }
 
+  static SuggestionType determinePredictionConfig(Context context, KeyboardType keyboardType) {
+    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+
+    // When entering password field, maySuggest should override to disabled
+    if (KMManager.getPredictionsSuspended(keyboardType) || KMManager.currentLexicalModel == null) {
+      return SuggestionType.SUGGESTIONS_DISABLED;
+    }
+
+    SuggestionType selectedType = SuggestionType.fromInt(
+      prefs.getInt(
+        KMManager.getLanguageAutoCorrectionPreferenceKey(
+          KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)
+        ),
+        KMManager.KMDefault_Suggestion)
+    );
+
+    if(selectedType == SuggestionType.SUGGESTIONS_DISABLED) {
+      return selectedType;
+    }
+
+    if (KMManager.getAutocorrectionsSuspended(keyboardType) && selectedType == SuggestionType.PREDICTIONS_WITH_AUTO_CORRECT) {
+      // Suspend autocorrection while still allowing corrections.
+      return SuggestionType.PREDICTIONS_WITH_CORRECTIONS;
+    }
+
+    return selectedType;
+  }
+
   /**
    * setBannerOptions - Update KMW whether to generate predictions.
    *                    For now, also display banner
@@ -1764,7 +1842,27 @@ public final class KMManager {
    * @return boolean - Success
    */
   public static boolean setBannerOptions(boolean mayPredict) {
-    String url = KMString.format("setBannerOptions(%s)", mayPredict);
+    setBannerOptions(
+      mayPredict ? determinePredictionConfig(appContext, KeyboardType.KEYBOARD_TYPE_INAPP) : SuggestionType.SUGGESTIONS_DISABLED,
+      KeyboardType.KEYBOARD_TYPE_INAPP
+    );
+    setBannerOptions(
+      mayPredict ? determinePredictionConfig(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM) : SuggestionType.SUGGESTIONS_DISABLED,
+      KeyboardType.KEYBOARD_TYPE_SYSTEM
+    );
+
+    return true;
+  }
+
+  /**
+   * setBannerOptions - Update KMW whether to generate predictions.
+   *                    For now, also display banner
+   * @param predictSetting - the SuggestionType that should be utilized for the current input Context
+   * @return boolean - Success
+   */
+  public static boolean setBannerOptions(SuggestionType predictSetting) {
+    // why here and not within the WebViewClient class?
+    String url = KMString.format("setBannerOptions(%s)", predictSetting.toInt());
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
     }
@@ -1784,7 +1882,30 @@ public final class KMManager {
    * @return boolean - Success
    */
   public static boolean setBannerOptions(boolean mayPredict, KeyboardType keyboard) {
-    String url = KMString.format("setBannerOptions(%s)", mayPredict);
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      SuggestionType predictConfig = mayPredict ? determinePredictionConfig(appContext, KeyboardType.KEYBOARD_TYPE_INAPP) : SuggestionType.SUGGESTIONS_DISABLED;
+      String url = KMString.format("setBannerOptions(%s)", predictConfig);
+      InAppKeyboard.loadJavascript(url);
+    }
+
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      SuggestionType predictConfig = mayPredict ? determinePredictionConfig(appContext, KeyboardType.KEYBOARD_TYPE_SYSTEM) : SuggestionType.SUGGESTIONS_DISABLED;
+      String url = KMString.format("setBannerOptions(%s)", predictConfig);
+      SystemKeyboard.loadJavascript(url);
+    }
+
+    return true;
+  }
+
+  /**
+   * setBannerOptions - Update KMW for inapp/system keyboard whether to generate predictions.
+   *                    For now, also display banner
+   * @param predictSetting - the SuggestionType that should be utilized for the current input Context
+   * @param {KeyboardType} keyboard
+   * @return boolean - Success
+   */
+  public static boolean setBannerOptions(SuggestionType predictSetting, KeyboardType keyboard) {
+    String url = KMString.format("setBannerOptions(%s)", predictSetting.toInt());
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
     }
