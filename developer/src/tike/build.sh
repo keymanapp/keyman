@@ -30,7 +30,7 @@ function do_configure() {
 
   mkdir -p "$DEVELOPER_PROGRAM"
   cp "$KEYMAN_ROOT/common/schemas/kps/kps.xsd" "$DEVELOPER_PROGRAM"
-  cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$DEVELOPER_ROOT/src/tike/xml/layoutbuilder/keymanweb-osk.ttf"
+  cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$DEVELOPER_ROOT/src/tike/xml/layoutbuilder/src/assets/fonts/keymanweb-osk.ttf"
   run_in_vs_env rc icons.rc
 }
 

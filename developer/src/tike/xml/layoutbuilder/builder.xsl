@@ -13,10 +13,10 @@
   <script src="/app/lib/sentry/bundle.min.js"><xsl:text> </xsl:text></script>
   <script src="/app/lib/sentry/init.js"><xsl:text> </xsl:text></script>
   <title>On Screen Keyboard Builder</title>
-  <link rel="stylesheet" type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui/jquery-ui.css</xsl:attribute></link>
+  <link rel="stylesheet" type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>ext/jquery-ui/jquery-ui.css</xsl:attribute></link>
   <link rel='stylesheet' type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder.css</xsl:attribute></link>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-1.10.2.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui/jquery-ui.js</xsl:attribute></script>
+  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>ext/jquery-1.10.2.js</xsl:attribute></script>
+  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>ext/jquery-ui/jquery-ui.js</xsl:attribute></script>
   <script>
     var KVKL = <xsl:value-of select='/TouchLayoutBuilder/LayoutJS' />;
     window.builder = {};

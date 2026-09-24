@@ -2,7 +2,7 @@
   font-family: KeymanwebOsk;
   font-style:  normal;
   font-weight: normal;
-  src: url('keymanweb-osk.ttf')  format('truetype');
+  src: url('assets/fonts/keymanweb-osk.ttf')  format('truetype');
 }
 
 * {
@@ -37,7 +37,7 @@ body {
 }
 
 #kbd.tablet-ipad-landscape {
-  background: url('tablet-ipad-landscape.png') no-repeat white;
+  background: url('assets/images/tablet-ipad-landscape.png') no-repeat white;
   background-position: 0px -390px;
   background-attachment: scroll;
   padding-top: 30px;
@@ -48,7 +48,7 @@ body {
 }
 
 #kbd.tablet-ipad-portrait {
-  background: url('tablet-ipad-portrait.png') no-repeat white;
+  background: url('assets/images/tablet-ipad-portrait.png') no-repeat white;
   background-position: 0px -562px;
   background-attachment: scroll;
   padding-top: 34px;
@@ -59,7 +59,7 @@ body {
 }
 
 #kbd.phone-iphone5-landscape {
-  background: url('phone-iphone5-landscape.png') no-repeat white;
+  background: url('assets/images/phone-iphone5-landscape.png') no-repeat white;
   background-position: 0px -186px;
   background-attachment: scroll;
   padding-left: 144px;
@@ -70,7 +70,7 @@ body {
 }
 
 #kbd.phone-iphone5-portrait {
-  background: url('phone-iphone5-portrait.png') no-repeat white;
+  background: url('assets/images/phone-iphone5-portrait.png') no-repeat white;
   background-position: 0px -800px;
   background-attachment: scroll;
   padding-left: 92px;
@@ -208,7 +208,7 @@ body {
 }
 
 .has-multitap {
-  background: no-repeat url('multitap.svg') 0 0 / 100%;
+  background: no-repeat url('assets/images/multitap.svg') 0 0 / 100%;
   position: absolute;
   right: 2px;
   bottom: 12px;
@@ -217,7 +217,7 @@ body {
 }
 
 .has-longpress {
-  background: no-repeat url('longpress.svg') 0 0 / 100%;
+  background: no-repeat url('assets/images/longpress.svg') 0 0 / 100%;
   position: absolute;
   margin-left: 50%;
   left: -5px;
@@ -239,26 +239,26 @@ body {
 }
 
 .has-flick-nw {
-  background:no-repeat url('flick-nw.svg') 0 0 / 100%;
+  background:no-repeat url('assets/images/flick-nw.svg') 0 0 / 100%;
   left: 1px;
   top: 1px;
 }
 
 .has-flick-n {
-  background:no-repeat url('flick-n.svg') 0 0 / 100%;
+  background:no-repeat url('assets/images/flick-n.svg') 0 0 / 100%;
   left: 50%;
   margin-left: -2.5px;
   top: 1px;
 }
 
 .has-flick-ne {
-  background:no-repeat url('flick-ne.svg') 0 0 / 100%;
+  background:no-repeat url('assets/images/flick-ne.svg') 0 0 / 100%;
   right: 1px;
   top: 1px;
 }
 
 .has-flick-w {
-  background:no-repeat url('flick-w.svg') 0 0 / 50%;
+  background:no-repeat url('assets/images/flick-w.svg') 0 0 / 50%;
   left: 1px;
   top: 50%;
   width: 7.5px;
@@ -267,7 +267,7 @@ body {
 }
 
 .has-flick-e {
-  background:no-repeat url('flick-e.svg') 0 0 / 50%;
+  background:no-repeat url('assets/images/flick-e.svg') 0 0 / 50%;
   right: -1px;
   top: 50%;
   width: 7.5px;
@@ -276,20 +276,20 @@ body {
 }
 
 .has-flick-sw {
-  background:no-repeat url('flick-sw.svg') 0 0 / 100%;
+  background:no-repeat url('assets/images/flick-sw.svg') 0 0 / 100%;
   left: 1px;
   bottom: 1px;
 }
 
 .has-flick-s {
-  background:no-repeat url('flick-s.svg') 0 0 / 100%;
+  background:no-repeat url('assets/images/flick-s.svg') 0 0 / 100%;
   left: 50%;
   margin-left: -2.5px;
   bottom: -1px;
 }
 
 .has-flick-se {
-  background:no-repeat url('flick-se.svg') 0 0 / 100%;
+  background:no-repeat url('assets/images/flick-se.svg') 0 0 / 100%;
   right: 1px;
   bottom: 1px;
 }
