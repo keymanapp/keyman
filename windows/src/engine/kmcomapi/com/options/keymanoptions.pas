@@ -1,18 +1,18 @@
 (*
   Name:             keymanoptions
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    6 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Add AutoRefershKeyman call
                     12 Aug 2008 - mcdurdin - Avoid crash with missing options
@@ -67,6 +67,7 @@ uses
   ErrorControlledRegistry,
   RegistryKeys,
   Glossary,
+  isadmin,
   Keyman.System.BaseKeyboard,
   KeymanOptionNames,
   keymanerrorcodes;
@@ -111,29 +112,8 @@ begin
 end;
 
 procedure TKeymanOptions.Apply;
-var
-  I, FOldBaseLayout: Integer;
 begin
-  with TRegistryErrorControlled.Create do   // I3717
-  try
-    if OpenKey(SRegKey_KeymanEngine_CU, True) then
-    begin
-      if ValueExists(SRegValue_UnderlyingLayout)
-        then FOldBaseLayout := StrToIntDef('$'+ReadString(SRegValue_UnderlyingLayout),0)   // I3759
-        else FOldBaseLayout := TBaseKeyboard.GetDefaultBaseLayoutID;
-    end
-    else
-      FOldBaseLayout := TBaseKeyboard.GetDefaultBaseLayoutID;
-  finally
-    Free;
-  end;
-
   FInternalOptions.Save(Context);
-
-  if FOldBaseLayout <> Get_Items('koBaseLayout').Value then
-    for I := 0 to Context.Keyboards.Count - 1 do   // I4169
-      (Context.Keyboards.Items[I] as IIntKeymanKeyboardInstalled).UpdateBaseLayout;
-
   Context.Control.AutoApplyKeyman;
 end;
 

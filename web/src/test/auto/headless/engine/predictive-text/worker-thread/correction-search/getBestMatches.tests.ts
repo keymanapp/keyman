@@ -18,7 +18,8 @@ import {
   models,
   LegacyQuotientRoot,
   SearchQuotientCluster,
-  TokenResultMapping
+  TokenResultMapping,
+  CORRECTION_QUEUE_COMPARATOR
 } from '@keymanapp/lm-worker/test-index';
 
 import TrieModel = models.TrieModel;
@@ -32,74 +33,31 @@ function buildTestTimer() {
 describe('Correction Searching', () => {
   describe('without multi-tokenization; using a single SearchPath sequence', () => {
     const checkRepeatableResults_teh = async (iter: AsyncGenerator<Readonly<TokenResultMapping>, any, any>) => {
-      const firstIterResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(firstIterResult.done);
-
-      const firstResult: TokenResultMapping = firstIterResult.value; // Retrieves <actual value>
-      // No checks on the first set's cost.
-      assert.equal(firstResult.matchString, "ten");
-
-      // All start with 'te' but one, and invoke one edit of the same cost.
-      // 'th' has an 'h' at the same cost (input 3) of the 'e' (input 2).
-      const secondBatch = [
-        'tec', 'tel', 'tem',
-        'ter', 'tes', 'th',
-        'te'
+      const expectedFirstTwenty = [
+        'ten', // no edits required whatsoever
+        'th',  // one edit (deletion), but gets to ignore the cost of a keystroke and still prefixes 'the'
+        'the', // one edit (transposition), incurs the cost of all three keystrokes
+        'te',  // one edit (deletion), but gets to ignore the cost of a keystroke
+        'tel', 'beh', // both cost one edit (hard character replacement:  n/h -> l vs t -> b)
+        // Other edits, generally of one edit cost, predicting words of varying frequency.
+        'ter', 'tha', 'thi', 'thr', 'tho', 'tem', 'thu', 'then', 'men', 'wen', 'gen', 'en', 'sen', 'tec'
       ];
 
-      async function checkBatch(batch: string[], prevCost: number) {
-        let cost;
-        while(batch.length > 0) {
-          const iter_result = await iter.next();
-          assert.isFalse(iter_result.done);
-
-          const result = iter_result.value;
-          assert.isAbove(result.totalCost, prevCost);
-          if(cost !== undefined) {
-            assert.equal(result.totalCost, cost);
-          } else {
-            cost = result.totalCost;
-          }
-
-          const matchIndex = batch.findIndex((entry) => entry == result.matchString);
-          assert.notEqual(matchIndex, -1, `'${result.matchString}' received as prediction too early`);
-          batch.splice(matchIndex, 1);
-        }
-
-        return cost;
+      let results: TokenResultMapping[] = [];
+      for(let i = 0; i < expectedFirstTwenty.length; i++) {
+        const iterResult = await iter.next();
+        results.push(iterResult.value as TokenResultMapping);
       }
 
-      const secondCost = await checkBatch(secondBatch, firstResult.totalCost);
+      assert.sameOrderedMembers(results.map((r) => r.matchString), expectedFirstTwenty);
+      for(let i=0; i < expectedFirstTwenty.length - 1; i++) {
+        assert.isAtLeast(results[i+1].totalCost, results[i].totalCost);
+      }
 
-      // Single hard edit, all other input probability aspects are equal
-      const thirdBatch = [
-        // 't' -> 'b' (sub)
-        'beh',
-        // '' -> 'c' (insertion)
-        'tech',
-        // 'eh' -> 'he' (transposition)
-        'the'
-      ];
-
-      await checkBatch(thirdBatch, secondCost);
-
-      // All replace the low-likelihood case for the third input.
-      const fourthBatch = [
-        'thi', 'tho', 'thr',
-        'thu', 'tha'
-      ];
-
-      await checkBatch(fourthBatch, secondCost);
-
-      // Replace the _first_ input's char OR insert an extra char,
-      // also matching the low-likelihood third-char option.
-      const fifthBatch = [
-        'cen', 'en',  'gen',
-        'ken', 'len', 'men',
-        'sen', 'then', 'wen'
-      ];
-
-      await checkBatch(fifthBatch, secondCost);
+      // The results will not be in the order as raw correction likelihood because some words
+      // are more frequent than others.
+      results.sort(CORRECTION_QUEUE_COMPARATOR);
+      assert.notSameOrderedMembers(results.map((r) => r.matchString), expectedFirstTwenty);
     }
 
     it('Empty search root, loaded model', async () => {
@@ -113,12 +71,13 @@ describe('Correction Searching', () => {
 
       // While there's no input, insertion operations can produce suggestions.
       const resultState = await iter.next();
-      const result = resultState.value;
+      const result = resultState.value as TokenResultMapping;
 
       // Just one suggestion root should be returned as the first result.
-      assert.equal(result.totalCost, 0);             // Gives a perfect match
+      assert.equal(result.correctionCost, 0);             // Gives a perfect match
       assert.equal(result.matchString, '');          // an empty match string.
       assert.isFalse(resultState.done);
+      assert.isAbove(result.totalCost, 0);
     });
 
     // Hmm... how best to update this...
@@ -423,9 +382,9 @@ describe('Correction Searching', () => {
           // paths of lower total cost.
           pathsResults.push(nextFromPaths);
 
-          assert.isAtLeast(nextFromCluster.totalCost, baseCost);
-          assert.isAtLeast(nextFromPaths.totalCost, baseCost);
-          baseCost = Math.max(baseCost, nextFromCluster.totalCost, nextFromPaths.totalCost);
+          assert.isAtLeast(nextFromCluster.correctionCost, baseCost);
+          assert.isAtLeast(nextFromPaths.correctionCost, baseCost);
+          baseCost = Math.max(baseCost, nextFromCluster.correctionCost, nextFromPaths.correctionCost);
         }
 
         assert.deepEqual(genResults.map(r => r.matchString), pathsResults.map(r => r.matchString));
@@ -434,22 +393,13 @@ describe('Correction Searching', () => {
         assert.sameDeepMembers(pathsResults.slice(0, 3).map(r => r.matchString), ['th', 'to', 'tr']);
         // These involve likely-enough corrections that should show, given the model fixture.
         assert.includeDeepMembers(pathsResults.map(r => r.matchString), [
-          'ty', // 'type' is quite frequent according to the text fixture.
           't',  // Deleting the second keystroke outright lands here.
           'oth', // What if we insert an 'o' early on?  'other' is a very common English word
-          'ti' // 'time' is pretty common too.
+          'ti', // 'time' is pretty common too.
+          'thi', // 'this' is common enough to show up early despite inserting the 'i'.
+          'wh', // "which" is a super-frequent English word, worthy of being a forced correction
+          'sh'  // "she" is also strong enough to force an early appearance.
         ]);
-
-        // NOTE:  this level of corrections does not yet consider the word likelihood - only
-        // the raw correction cost.  No ordering of "likely word" to "unlikely word" should
-        // occur yet.
-
-        // 'time':  weight 934
-        // 'type':  weight 540
-        const timeResult = pathsResults.find(r => r.matchString == 'ti');
-        const typeResult = pathsResults.find(r => r.matchString == 'ty');
-        // Correction to either should be equally likely.
-        assert.equal(timeResult.totalCost, typeResult.totalCost);
       });
     });
   });

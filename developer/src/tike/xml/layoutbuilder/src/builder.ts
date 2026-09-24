@@ -513,7 +513,6 @@ export const builder: Builder = {
     if(val !== null && val !== undefined) {
       $('#selLayer').val(val);
     }
-
     builder.lastLayerIndex = $('#selLayer').val();
     if(builder.lastLayerIndex === null) {
       // If the layer has just been deleted, go to the first layer

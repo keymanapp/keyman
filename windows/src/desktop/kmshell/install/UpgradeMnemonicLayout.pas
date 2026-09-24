@@ -46,7 +46,8 @@ uses
   kmint,
   RegistryKeys,
   utilexecute,
-  utilkmshell;
+  utilkmshell,
+  utilfiletypes;
 
 const
   { CurrentMnemonicLayoutVersion = 476;  // First 9.0 build with fixes for mnemonic layouts }
@@ -170,7 +171,7 @@ begin
   FBaseKeyboardIDHex := IntToHex(BaseKeyboardID, 8);
   FBaseFileName := Keyboard.Filename;
   FDestFileName := OutputFileName;
-  FDestDeadkeyFileName := ChangeFileExt(FDestFileName, '') + '-d.kmx';   // I4552
+  FDestDeadkeyFileName := BuildKeyboardFilenameWithBaseKeyboardIDAndDeadkey(FBaseFileName, FBaseKeyboardIDHex);   // I4552
   FMCompilePath := TKeymanPaths.KeymanEngineInstallPath(TKeymanPaths.S_MCompileExe);
   FDestPath := ExtractFileDir(Keyboard.Filename);
 
