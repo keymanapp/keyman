@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 19.0.291 alpha 2026-09-24
+
+* chore(common): fix TC reporter reporting failures (#16643)
+* chore(android): remove unused map-polyfill.js and es6-shim.min.js polyfills (#16637)
+* fix(developer): address crashes in touch layout editor (#16572)
+* feat(mac): remove obsolete configuration UI (#16570)
+* change(developer): reorganize touch layout editor files (#16517)
+* change(developer): move touch layout editor to typescript (#16520)
+
 ## 19.0.290 alpha 2026-09-23
 
 * fix(windows): set basekeyboard as current user not the admin user on an elevated process (#16162)
