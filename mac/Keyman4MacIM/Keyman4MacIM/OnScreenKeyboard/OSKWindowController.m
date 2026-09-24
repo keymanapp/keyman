@@ -98,7 +98,7 @@
 }
 
 - (void)resetOSK {
-  os_log_debug([KMLogs oskLog], "OSKWindowController windowDidLoad");
+  os_log_debug([KMLogs oskLog], "OSKWindowController resetOSK");
   [self.oskView setKvk:[self.AppDelegate kvk]];
   [self.oskView resetOSK];
   if (_helpButton) {
