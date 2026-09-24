@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 19.0.292 alpha 2026-09-24
+
+* chore(windows): use ✕ U+2715 consistently in localizations (#16566)
+* docs(windows): replace 'keep in touch' tab with 'update' tab to help … (#16544)
+* chore(web): improve reporting on dictionary load errors (#16647)
+* maint(mac): use build/upload as upload path for downloads.keyman.com (#16654)
+
 ## 19.0.291 alpha 2026-09-24
 
 * chore(common): fix TC reporter reporting failures (#16643)
