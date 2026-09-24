@@ -64,7 +64,7 @@ $(function() {
                 key.sk.forEach(k => fixup(k));
               }
               if (key.flick) {
-                key.flick.forEach(k => fixup(k));
+                Object.keys(key.flick).forEach(k => fixup(key.flick[k]));
               }
               if (key.multitap) {
                 key.multitap.forEach(k => fixup(k));

@@ -1,5 +1,40 @@
 # Keyman Version History
 
+## 19.0.290 alpha 2026-09-23
+
+* fix(windows): set basekeyboard as current user not the admin user on an elevated process (#16162)
+* fix(windows): add non-admin user install with different base keyboard (#16528)
+
+## 19.0.289 alpha 2026-09-21
+
+* fix(android): suppress autocorrection of hardware keystroke input (#16606)
+* change(web): add lexical weighting to prediction search (#16600)
+
+## 19.0.288 alpha 2026-09-18
+
+* change(web): remove TokenizationCorrector class only used in epic/boundary-correction (#16581)
+
+## 19.0.287 alpha 2026-09-17
+
+* fix(web): support autocorrection of transposed text (#16450)
+* fix(web): allow to set default keyboard to 'off' (#16524)
+
+## 19.0.286 alpha 2026-09-16
+
+* fix(developer): trim new words entered into the wordlist editor (#16538)
+* chore(windows): remove references to unused extensions .kma and .kxx (#16569)
+* refactor(web): add header to osk views files (#16568)
+
+## 19.0.285 alpha 2026-09-11
+
+* fix(web): handle 'unload' message while attempting model 'load' (#16548)
+* fix(android): load KMP files from app-external sources (#16392)
+
+## 19.0.284 alpha 2026-09-10
+
+* maint(developer): remove unused ajv dependency from kmc-convert (#16539)
+* fix(web): remove scroll-to-top on page load (#16531)
+
 ## 19.0.283 alpha 2026-09-09
 
 * change(web): allow autocorrection on input of basic whitespaces (#16541)
@@ -1713,6 +1748,27 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.252 stable 2026-09-22
+
+* change(android): use webview asset loader (#16628)
+* chore: revert "fix(web): retry importScripts NetworkErrors in attempt to mitigate errors loading models" (#16630)
+
+## 18.0.251 stable 2026-09-21
+
+* maint(android): update Android Target API to 36 (#16620)
+* 
+## 18.0.250 stable 2026-09-21
+
+* fix(linux): fix memory problem (#15828)
+* chore: update fast-xml-parser to 5.8.0 (#15953)
+* fix(linux): add dependency on `procps` (#15980)
+* chore(ios): update first voices distribution certificate (#16007)
+* chore(linux): release v18 on Ubuntu 26.04 Resolute (#16078)
+* chore: update multi-labeler to 5.0.0 (#16101)
+* chore(android): log legacy cloud keyboards (#16243)
+* fix(web): handle 'unload' message while attempting model 'load' (#16609)
+* fix(web): retry importScripts NetworkErrors in attempt to mitigate errors loading models (#16604)
 
 ## 18.0.249 stable 2026-03-27
 

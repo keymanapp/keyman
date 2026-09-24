@@ -83,8 +83,6 @@ compile_and_copy() {
       "$script" "$sourcemap" --clean
   done
 
-  node map-polyfill-bundler.js
-
   cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.js" "${BUILD_ROOT}/debug/worker-thread.js"
   cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.js.map" "${BUILD_ROOT}/debug/worker-thread.js.map"
   cp "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-thread/build/lib/worker-thread.d.ts" "${BUILD_ROOT}/debug/worker-thread.d.ts"
