@@ -7,17 +7,12 @@ import { KMX, KmxFileReader } from '@keymanapp/common-types';
 
 describe('Keyboard compiler features', function() {
   let compiler: KmnCompiler = null;
-  let callbacks: TestCompilerCallbacks = null;
+  const callbacks = new TestCompilerCallbacks(this);
 
   this.beforeAll(async function() {
     compiler = new KmnCompiler();
-    callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, {saveDebug: true}));
     assert(compiler.verifyInitialized());
-  });
-
-  beforeEach(function() {
-    callbacks.clear();
   });
 
   // Test each Keyman file version target

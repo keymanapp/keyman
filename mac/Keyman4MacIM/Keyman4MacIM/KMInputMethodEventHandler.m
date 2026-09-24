@@ -8,6 +8,7 @@
 #import "KMInputMethodEventHandler.h"
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
+#import <CoreFoundation/CoreFoundation.h>
 #import "KeySender.h"
 #import "TextApiCompliance.h"
 #import "KMSettingsRepository.h"
@@ -370,7 +371,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
           contextString = attributedString.string;
           
           //only uncomment for testing as we do not want to write context in logs
-          //os_log_debug([KMLogs testLog], " length: %lu result: %{public}@", contextString.length, contextString);
+          //os_log_debug([KMLogs keyTraceLog], " length: %lu result: %{public}@", contextString.length, contextString);
         }
       }
     }
@@ -405,18 +406,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
     [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
     [self insertAndReplaceTextForOutput:output client:client];
   } else if (output.isDeleteOnlyScenario) {
-    if ((event.keyCode == kVK_Delete) && output.codePointsToDeleteBeforeInsert == 1) {
-      // let the delete pass through in the original event rather than sending a new delete
-      NSString *message = @"applyOutputToTextInputClient, delete only scenario with passthrough";
-      os_log_debug([KMLogs keyTraceLog], "%@", message);
-      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
-      handledEvent = NO;
-    } else {
-      NSString *message = @"applyOutputToTextInputClient, delete only scenario";
-      os_log_debug([KMLogs keyTraceLog], "%@", message);
-      [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
-      [self sendEvents:event forOutput:output];
-    }
+    handledEvent = [self handleDeleteOnlyScenario:output keyDownEvent:event client:client];
   } else if (output.isDeleteAndInsertScenario) {
     // TODO: fix issue #10246
     /*
@@ -509,6 +499,220 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   if ((self.apiCompliance.isComplianceUncertain) && (text != nil)) {
     [self.apiCompliance checkComplianceAfterInsert:text deleted:textToDelete];
   }
+}
+
+/**
+ * Handles deleting without an associated insert in one of three methods:
+ * 1. delete via replace: do the delete by replacing two (or more) characters with one.
+ * 2. backspace passthrough : if the original keydown event was a backspace, pass it through unhandled
+ * 3. generate event: generate keydown backspace events as necessary
+ */
+-(BOOL)handleDeleteOnlyScenario:(CoreKeyOutput*)output keyDownEvent:(nonnull NSEvent *)event client:(id) client {
+  
+  // attempt to delete by replacing -- for compliant apps only
+  if ([self handleDeleteWithReplacement:output keyDownEvent:event client:client]) {
+    return YES;
+  }
+  
+  // pass through if this was a backspace keydown event
+  if (event.keyCode == kVK_Delete && output.codePointsToDeleteBeforeInsert == 1) {
+    // let the delete pass through in the original event rather than sending a new delete
+    NSString *message = @"handleDeleteOnlyForOutput, delete only scenario with passthrough";
+    os_log_debug([KMLogs keyTraceLog], "%@", message);
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
+    
+    // instruct system to handle the event
+    return NO;
+  }
+  else {
+    // otherwise generate a backspace
+    NSString *message = @"handleDeleteOnlyForOutput, send backspace event";
+    os_log_debug([KMLogs keyTraceLog], "%@", message);
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
+    [self sendEvents:event forOutput:output];
+    
+    return YES;
+  }
+}
+
+/**
+ * For compliant apps only.
+ * 
+ * This an attempt to make sure that deletion removes only the expected codepoints.
+ * When handling a transform which only deletes a character, or when allowing a
+ * backspace to pass through, the OS or application may not use the same rules
+ * around deletion as Keyman -- especially when deleting clusters such as letter +
+ * combining diacritic (e.g. `U+0062 U+0301`), where some applications may delete
+ * both together as they represent a single 'grapheme cluster'. 
+ * 
+ * (Note, the question of whether it is appropriate for backspace to delete a
+ * cluster rather than a codepoint from an end-user perspective is not relevant
+ * here, because what is important is that we match the rules that the keyboard has
+ * provided, which means we need a method of deleting a precise number of
+ * codepoints. The keyboard author can and should include rules for cluster
+ * deletion that meet end-user expectations.)
+ * 
+ * The `insertText` API takes two parameters: a string to insert, and a range to
+ * replace with that string. However, we cannot simply pass through a zero-length
+ * insertion string along with the range to delete, because the `insertText` API
+ * treats this as an invalid call and ignores it.
+ * 
+ * Instead, we can delete the desired number of codepoints only by using the
+ * `insertText` API to replace e.g. two codepoints with one.
+ * 
+ * This method only works for compliant apps because non-compliant apps do not
+ * support the `insertText` API.
+ * 
+ * Ref: https://developer.apple.com/documentation/appkit/nstextinputclient/inserttext(_:replacementrange:)
+ */
+-(BOOL)handleDeleteWithReplacement:(CoreKeyOutput*)output keyDownEvent:(nonnull NSEvent *)event client:(id) client {
+  BOOL handledEvent = NO;
+  NSString *context = [self readContext:event forClient:client];
+  
+  // guard: only for compliant apps with sufficient context
+  if (!(self.apiCompliance.canReplaceText) || ([context length] <= output.textToDelete.length)) {
+    os_log_debug([KMLogs keyTraceLog], "cannot replace text, non-compliant or insufficient context");
+    return NO; // return without deleting/replacing
+  }
+  
+  // guard: the logic of this method depends on locating textToDelete in the context
+  if (![self stringToDeleteMatchesContextSuffix:output.textToDelete context:context]) {
+    os_log_debug([KMLogs keyTraceLog], "cannot replace text, textToDelete not found at end of context");
+    return NO; // return without deleting/replacing
+  }
+
+  NSUInteger deletionTargetLength = output.textToDelete.length;
+  NSUInteger deletionTargetLocation = context.length-deletionTargetLength;
+  NSUInteger precedingCharacterLocation = deletionTargetLocation - 1;
+
+  // if the preceding character is the trailing half of a surrogate pair
+  // then delete by replacing with the entire surrogate pair
+  if ([self precededBySurrogatePair:precedingCharacterLocation context:context]) {
+    handledEvent = [self deleteByReplacingWithPrecedingSurrogate:precedingCharacterLocation deleteLength:deletionTargetLength context:context client:client];
+  } else {
+    // otherwise replace with only the preceding character
+    handledEvent = [self deleteByReplacingWithPrecedingCharacter:precedingCharacterLocation deleteLength:deletionTargetLength context:context client:client];
+  }
+      
+  return handledEvent;
+}
+
+/**
+ * Check whether the string to be deleted is found at the tail end of the current context.
+ */
+-(BOOL) stringToDeleteMatchesContextSuffix:(NSString*)textToDelete context:(NSString*) context {
+  BOOL doesMatch = NO;
+  
+  // get length of string to delete and compare to end of context
+  NSUInteger deleteLength = textToDelete.length;
+  NSUInteger locationOfDeletionTarget = context.length-deleteLength;
+  NSUInteger locationOfPrecedingCharacter = locationOfDeletionTarget - 1;
+  NSString *contextSuffix = [context substringFromIndex:context.length-deleteLength];
+
+  os_log_debug([KMLogs keyTraceLog], "stringToDeleteMatchesSuffix, textToDelete: '%{public}@', contextSuffix: '%{public}@', locationOfDeletionTarget: %u, locationOfprecedingCharacter: %u", textToDelete, contextSuffix, (int)locationOfDeletionTarget, (int)locationOfPrecedingCharacter);
+
+  doesMatch = [textToDelete isEqualToString:contextSuffix];
+  os_log_debug([KMLogs keyTraceLog], "stringToDeleteMatchesSuffix: %{public}@", doesMatch?@"YES":@"NO");
+  return doesMatch;
+}
+
+/**
+ * Check whether the preceding character, which is to be used for the replacement,
+ * is part of a surrogate pair that is distinct from the character being deleted.
+ */
+-(BOOL) precededBySurrogatePair: (NSUInteger)precedingLocation context:(NSString*) context {
+  BOOL precedingCharacterIsLowSurrogate = false;
+  unichar precedingCharacter  = [context characterAtIndex:precedingLocation];
+  
+  if (CFStringIsSurrogateHighCharacter(precedingCharacter)) {
+    // preceding character is high character -- unexpected from Keyman Core
+    // write to log and return false
+    precedingCharacterIsLowSurrogate = false;
+    NSString *message = [NSString stringWithFormat:@"Unexpected high surrogate found for preceding character at %ld", (long)precedingCharacter];
+    os_log_debug([KMLogs keyTraceLog], "%{public}@", message);
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
+  } else if (CFStringIsSurrogateLowCharacter(precedingCharacter)) {
+    // preceding character is low surrogate
+      precedingCharacterIsLowSurrogate = true;
+  }
+
+  return precedingCharacterIsLowSurrogate;
+}
+
+/**
+ * Replace both the text to delete and the character preceding it solely with the character that precedes it.
+ * Returns YES if executing the replace/delete and NO otherwise.
+ */
+-(BOOL) deleteByReplacingWithPrecedingCharacter:(NSUInteger)precedingCharacterLocation deleteLength:(NSUInteger)deleteLength context:(NSString*) context client:(id) client {
+  
+  os_log_debug([KMLogs keyTraceLog], "deleteByReplacingWithPrecedingCharacter");
+  // get the preceding character
+  NSRange precedingCharacterRange = NSMakeRange(precedingCharacterLocation, 1);
+  NSString *replacementString = [context substringWithRange:precedingCharacterRange];
+  
+  // guard: if preceding character is a control character, return NO
+  if ([self containsControlCharacter:replacementString]) {
+    NSString *message = @"replacementString contains control characters, cannot delete with replace";
+    os_log_debug([KMLogs keyTraceLog], "%@", message);
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
+    return NO;
+  }
+
+  // perform the replacement
+  NSUInteger replacementLength = [replacementString length] + deleteLength;
+  NSRange replacementRange = NSMakeRange(precedingCharacterLocation, replacementLength);
+  os_log_debug([KMLogs keyTraceLog], "replacementRange: %{public}@", NSStringFromRange(replacementRange));
+  [client insertText:replacementString replacementRange:replacementRange];
+
+  return YES;
+}
+
+/**
+ * Replace both the text to delete and the surrogate pair preceding it with the surrogate pair preceding it.
+ * Returns YES if executing the replace/delete and NO otherwise.
+ */
+-(BOOL) deleteByReplacingWithPrecedingSurrogate:(NSUInteger)precedingCharacterLocation deleteLength:(NSUInteger)deleteLength context:(NSString*) context client:(id) client {
+  
+  os_log_debug([KMLogs keyTraceLog], "deleteByReplacingWithPrecedingSurrogate");
+
+  // guard: return NO if there is no character before the precedingCharacterLocation
+  if (precedingCharacterLocation <= 0) {
+    NSString *message = @"no characters exist before precedingCharacterLocation, so it cannot be a surrogate pair";
+    os_log_debug([KMLogs keyTraceLog], "%@", message);
+    return NO;
+  }
+
+  // get the preceding character
+  NSRange precedingCharacterRange = NSMakeRange(precedingCharacterLocation - 1, 2);
+  NSString *replacementString = [context substringWithRange:precedingCharacterRange];
+
+  unichar highCharacter = [replacementString characterAtIndex:0];
+  unichar lowCharacter = [replacementString characterAtIndex:1];
+
+  // verify that preceding characters comprise a surrogate pair
+  if ((CFStringIsSurrogateHighCharacter(highCharacter)) && (CFStringIsSurrogateLowCharacter(lowCharacter))) {
+    // found preceding surrogate as expected
+  } else {
+    NSString *message = [NSString stringWithFormat:@"Preceding characters of string do not comprise a surrogate pair: 0x%02x, 0x%02x", (unsigned int)highCharacter, (unsigned int)lowCharacter];
+    os_log_debug([KMLogs keyTraceLog], "%@", message);
+    [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
+    return NO;
+  }
+
+  // perform the replacement
+  NSUInteger replacementLength = [replacementString length] + deleteLength;
+  NSRange replacementRange = NSMakeRange(precedingCharacterRange.location, replacementLength);
+  os_log_debug([KMLogs keyTraceLog], "replacementRange: %{public}@", NSStringFromRange(replacementRange));
+  [client insertText:replacementString replacementRange:replacementRange];
+
+  return YES;
+}
+
+-(BOOL) containsControlCharacter:(NSString*)text {
+  NSCharacterSet *controlSet = [NSCharacterSet controlCharacterSet];
+  NSRange range = [text rangeOfCharacterFromSet:controlSet];
+  
+  return (range.location != NSNotFound);
 }
 
 /**

@@ -214,7 +214,7 @@ export interface CopierOptions extends CompilerBaseOptions {
     relocateExternalFiles?: boolean;
 }
 
-// @public (undocumented)
+// @public
 export class KeymanProjectCopier implements KeymanCompiler {
     // Warning: (ae-forgotten-export) The symbol "CopierAsyncCallbacks" needs to be exported by the entry point main.d.ts
     //

@@ -86,6 +86,7 @@ type
     procedure memoClick(Sender: TObject);   // I4808
     procedure memoKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
+    procedure memoDblClick(Sender: TObject);
   private
 
     FDebugVisible: Boolean;
@@ -118,6 +119,7 @@ type
     function GetStatusText: string;
     procedure SetStatusText(Value: string);
     procedure UpdateDebugStatusForm;   // I4809
+    procedure UpdateMemoSelection;
 
   private
     FDebugCore: TDebugCore;
@@ -147,6 +149,7 @@ type
     procedure SetCurrentEvent(Value: Integer);
     procedure FinishBatch;
     procedure StartBatch;
+    procedure RecordBreadcrumb(const message: string);
 
   protected
     function GetHelpTopic: string; override;
@@ -306,13 +309,13 @@ begin
   if UIStatus = duiReadyForInput then
     UIStatus := duiFocusedForInput;
 
-  memoSelMove(memo);
+  UpdateMemoSelection;
 end;
 
 procedure TfrmDebug.memoKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  memoSelMove(memo);
+  UpdateMemoSelection;
 end;
 
 procedure TfrmDebug.memoLostFocus(Sender: TObject);
@@ -463,9 +466,8 @@ begin
     modifier := modifier and not KM_CORE_MODIFIER_LCTRL;
   end;
 
-  TKeymanSentryClient.Instance.Breadcrumb('default',
-    Format('ProcessKeyEvent: vk=%x mod=%x scan=%x beforeText="%s" beforeSelection=%s',[vkey, modifier, scan, Copy(memo.GetTextCR, 1, 256), memo.Selection.ToString]),
-    'debugger');
+  RecordBreadcrumb(
+    Format('ProcessKeyEvent: vk=%x mod=%x scan=%x beforeText="%s" beforeSelection=%s savedSelection=%s',[vkey, modifier, scan, Copy(memo.GetTextCR, 1, 256), memo.Selection.ToString, FSavedSelection.ToString]));
 
   if not SetKeyEventContext then
     Exit(False);
@@ -601,12 +603,17 @@ end;
 
 { Stores }
 
+procedure TfrmDebug.RecordBreadcrumb(const message: string);
+begin
+  // TODO(v20): eliminate breadcrumbs once underlying bug #11706 is confirmed fixed
+  TKeymanSentryClient.Instance.Breadcrumb('default', message, 'debugger');
+  // OutputDebugString(PChar(message));
+end;
+
 procedure TfrmDebug.ExecuteEvent(n: Integer);
 begin
-  TKeymanSentryClient.Instance.Breadcrumb('default',
-    Format('ExecuteEvent(%d/%d): [%s]; b:%s; s:%s',
-      [n, FEvents.Count, FEvents[n].ToString, memo.Selection.ToString, FSavedSelection.ToString]),
-      'debugger');
+  RecordBreadcrumb(Format('ExecuteEvent(%d/%d): [%s] beforeSelection=%s savedSelection=%s',
+      [n, FEvents.Count, FEvents[n].ToString, memo.Selection.ToString, FSavedSelection.ToString]));
 
   memo.ReadOnly := False;
   memo.Selection := FSavedSelection;
@@ -1323,22 +1330,32 @@ end;
 procedure TfrmDebug.memoChange(Sender: TObject);
 begin
   UpdateDeadkeys;
-  memoSelMove(memo);
+  UpdateMemoSelection;
 end;
 
 procedure TfrmDebug.memoClick(Sender: TObject);
 begin
-  memoSelMove(memo);
+  UpdateMemoSelection;
+end;
+
+procedure TfrmDebug.memoDblClick(Sender: TObject);
+begin
+  UpdateMemoSelection;
 end;
 
 procedure TfrmDebug.memoSelMove(Sender: TObject);
+begin
+  UpdateMemoSelection;
+end;
+
+procedure TfrmDebug.UpdateMemoSelection;
 begin
   if memo.Focused then
   begin
     frmKeymanDeveloper.barStatus.Panels[0].Text := 'Debugger Active';
   end;
 
-  if not memo.ReadOnly and not memo.SelectionChanging then
+  if not memo.ReadOnly then
   begin
     FSavedSelection := memo.Selection;
     UpdateCharacterGrid;   // I4808
@@ -1363,7 +1380,7 @@ begin
     len := t.Length - start;
   end;
 
-  TCharacterGridRenderer.Fill(sgChars, t, FDeadkeys, start, len, memo.Selection.Anchor);
+  TCharacterGridRenderer.Fill(sgChars, t, FDeadkeys, start, len, memo.Selection.Caret);
   TCharacterGridRenderer.Size(sgChars, memo.Font);
 end;
 

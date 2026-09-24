@@ -7,3 +7,13 @@ increment.
 
 It is wrappered by ../../teamcity/triggers/trigger-release-builds.sh for normal CI
 usage.
+
+## Reporting on pending changes to stable
+
+This script will give you a report on the pending changes to the most recent
+Keyman stable release, based on recently merged pull requests on the stable-x.y
+branch:
+
+```bash
+./build.sh report-stable-changes
+```

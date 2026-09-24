@@ -7,9 +7,9 @@
     <key>teamID</key>
     <string>D7TR486TEH</string>
     <key>signingCertificate</key>
-    <string>D7B7973A30C90C1A04666667F24B4D5C7E913923</string>
+    <string>D2FEB39A439B44ACC1E5A710D20C17587EEE29E1</string>
     <key>installerSigningCertificate</key>
-    <string>D7B7973A30C90C1A04666667F24B4D5C7E913923</string>
+    <string>D2FEB39A439B44ACC1E5A710D20C17587EEE29E1</string>
     <key>provisioningProfiles</key>
     <dict>
         <key>com.firstvoices.keyboards</key>

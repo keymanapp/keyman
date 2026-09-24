@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { assert } from 'chai';
 import 'mocha';
@@ -10,10 +13,7 @@ interface MessageTest {input: string, result: CompilerMessageOverride};
 interface InvalidMessageTest {input: string, code: number};
 
 describe('commandOptionsMessageToCompilerOptionsMessage', function () {
-  const callbacks = new TestCompilerCallbacks();
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
+  const callbacks = new TestCompilerCallbacks(this);
 
   const valid: MessageTest[] = [
     // Test the allowable coercions

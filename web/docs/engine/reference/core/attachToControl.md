@@ -8,7 +8,7 @@ Attach KeymanWeb to HTML element (or IFrame).
 
 ## Syntax
 
-```c
+```js
 keyman.attachToControl(Pelem)
 ```
 

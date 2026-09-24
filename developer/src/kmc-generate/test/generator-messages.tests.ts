@@ -22,17 +22,7 @@ import { LexicalModelGenerator } from '../src/lexical-model-generator.js';
 import { options } from './shared-options.js';
 
 describe('GeneratorMessages', function () {
-  const callbacks = new TestCompilerCallbacks();
-
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest.isFailed()) {
-      callbacks.printMessages();
-    }
-  });
+  const callbacks = new TestCompilerCallbacks(this);
 
   it('should have a valid GeneratorMessages object', function() {
     return verifyCompilerMessagesObject(GeneratorMessages, CompilerErrorNamespace.Generator);
@@ -78,7 +68,6 @@ describe('GeneratorMessages', function () {
       targets: ['invalid']
     };
     const bg = new BasicGenerator();
-    const callbacks = new TestCompilerCallbacks();
     assert(await bg.init(callbacks, testOptions));
     assert.isFalse(bg.test_preGenerate());
     assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_InvalidTarget));
@@ -89,7 +78,6 @@ describe('GeneratorMessages', function () {
       id: '???invalid',
     };
     const kkg = new KeymanKeyboardGenerator();
-    const callbacks = new TestCompilerCallbacks();
     assert.isTrue(await kkg.init(callbacks, testOptions));
     assert.isNull(await kkg.run());
     assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_InvalidKeymanKeyboardId));
@@ -100,7 +88,6 @@ describe('GeneratorMessages', function () {
       id: '???invalid',
     };
     const lkg = new LdmlKeyboardGenerator();
-    const callbacks = new TestCompilerCallbacks();
     assert.isTrue(await lkg.init(callbacks, testOptions));
     assert.isNull(await lkg.run());
     assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_InvalidLdmlKeyboardId));
@@ -111,7 +98,6 @@ describe('GeneratorMessages', function () {
       id: 'example.???.invalid',
     };
     const lmg = new LexicalModelGenerator();
-    const callbacks = new TestCompilerCallbacks();
     assert.isTrue(await lmg.init(callbacks, testOptions));
     assert.isNull(await lmg.run());
     assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_InvalidLexicalModelId));

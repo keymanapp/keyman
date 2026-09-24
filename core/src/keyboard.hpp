@@ -26,8 +26,6 @@ namespace core
   {
     std::u16string      _keyboard_id;
     std::u16string      _version_string;
-    // unused and deprecated
-    core::path           _folder_path;
     std::vector<option> _default_opts;
 
     void render();
@@ -36,7 +34,7 @@ namespace core
     using options_store = decltype(_default_opts);
 
     keyboard_attributes()
-    : km_core_keyboard_attrs {nullptr, nullptr, nullptr, nullptr} {}
+    : km_core_keyboard_attrs {nullptr, nullptr, nullptr} {}
     keyboard_attributes(keyboard_attributes const &) = delete;
     keyboard_attributes(keyboard_attributes &&);
 

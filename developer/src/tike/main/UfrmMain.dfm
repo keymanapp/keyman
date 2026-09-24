@@ -184,7 +184,7 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
       object ToolBar1: TToolBar
         Left = 0
         Top = 0
-        Width = 301
+        Width = 270
         Height = 23
         Align = alNone
         AutoSize = True
@@ -216,36 +216,23 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
           ImageIndex = 3
           Style = tbsSeparator
         end
-        object ToolButton5: TToolButton
-          Left = 77
-          Top = 0
-          Action = modActionsMain.actFilePrint
-        end
-        object ToolButton6: TToolButton
-          Left = 100
-          Top = 0
-          Width = 8
-          Caption = 'ToolButton6'
-          ImageIndex = 4
-          Style = tbsSeparator
-        end
         object ToolButton7: TToolButton
-          Left = 108
+          Left = 77
           Top = 0
           Action = modActionsMain.actEditCut
         end
         object ToolButton8: TToolButton
-          Left = 131
+          Left = 100
           Top = 0
           Action = modActionsMain.actEditCopy
         end
         object ToolButton9: TToolButton
-          Left = 154
+          Left = 123
           Top = 0
           Action = modActionsMain.actEditPaste
         end
         object ToolButton10: TToolButton
-          Left = 177
+          Left = 146
           Top = 0
           Width = 8
           Caption = 'ToolButton10'
@@ -253,17 +240,17 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
           Style = tbsSeparator
         end
         object ToolButton11: TToolButton
-          Left = 185
+          Left = 154
           Top = 0
           Action = modActionsMain.actEditUndo
         end
         object ToolButton12: TToolButton
-          Left = 208
+          Left = 177
           Top = 0
           Action = modActionsMain.actEditRedo
         end
         object ToolButton19: TToolButton
-          Left = 231
+          Left = 200
           Top = 0
           Width = 8
           Caption = 'ToolButton19'
@@ -271,12 +258,12 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
           Style = tbsSeparator
         end
         object ToolButton14: TToolButton
-          Left = 239
+          Left = 208
           Top = 0
           Action = modActionsMain.actViewExpandEditor
         end
         object ToolButton15: TToolButton
-          Left = 262
+          Left = 231
           Top = 0
           Width = 8
           Caption = 'ToolButton15'
@@ -284,12 +271,12 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
           Style = tbsSeparator
         end
         object ToolButton16: TToolButton
-          Left = 270
+          Left = 239
           Top = 0
           Action = modActionsKeyboardEditor.actKeyboardCompile
         end
         object ToolButton13: TToolButton
-          Left = 293
+          Left = 262
           Top = 0
           Width = 8
           Caption = 'ToolButton13'
@@ -2792,18 +2779,6 @@ inherited frmKeymanDeveloper: TfrmKeymanDeveloper
         Action = modActionsMain.actWindowClose
       end
       object N6: TMenuItem
-        Caption = '-'
-      end
-      object PageSetup1: TMenuItem
-        Action = modActionsMain.actFilePageSetup
-      end
-      object PrintPreview1: TMenuItem
-        Action = modActionsMain.actFilePrintPreview
-      end
-      object Print1: TMenuItem
-        Action = modActionsMain.actFilePrint
-      end
-      object N9: TMenuItem
         Caption = '-'
       end
       object mnuFileRecent: TMenuItem

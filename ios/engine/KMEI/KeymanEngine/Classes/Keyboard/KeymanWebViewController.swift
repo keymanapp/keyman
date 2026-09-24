@@ -38,7 +38,8 @@ class KeymanWebViewController: UIViewController {
   let storage: Storage
   weak var delegate: KeymanWebDelegate?
   private var useSpecialFont = false
-  private var userContentController = WKUserContentController()
+  private let userContentController = WKUserContentController()
+  private let schemeHandler: WebViewSchemeHandler
   private let keymanWebViewName: String = "keyman"
 
   // Views
@@ -69,8 +70,9 @@ class KeymanWebViewController: UIViewController {
 
   init(storage: Storage) {
     self.storage = storage
+    self.schemeHandler = WebViewSchemeHandler(storage: storage)
+    
     super.init(nibName: nil, bundle: nil)
-
     _ = view
   }
 
@@ -122,6 +124,7 @@ class KeymanWebViewController: UIViewController {
     config.preferences = prefs
     config.suppressesIncrementalRendering = false
     config.userContentController = self.userContentController
+    config.setURLSchemeHandler(schemeHandler, forURLScheme: schemeHandler.scheme)
 
     webView = KeymanWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
     webView!.isOpaque = false
@@ -182,7 +185,7 @@ extension KeymanWebViewController {
     }
     view = nil
   }
-  
+
   func languageMenuPosition(_ completion: @escaping (CGRect) -> Void) {
     webView!.evaluateJavaScript("langMenuPos();") { result, _ in
       guard let result = result as? String, !result.isEmpty else {
@@ -279,20 +282,28 @@ extension KeymanWebViewController {
     // family does not have to match the name in the font file. It only has to be unique.
     return [
       "family": "\(keyboard.id)__\(isOsk ? "osk" : "display")",
-      "files": font.source.map { storage.fontURL(forResource: keyboard, filename: $0)!.absoluteString }
+      "files": font.source.map {
+        schemeHandler.buildUrlForFile(
+          fileURL: storage.fontURL(forResource: keyboard, filename: $0)!
+        ).absoluteString
+      }
     ]
   }
 
   func setKeyboard(_ keyboard: InstallableKeyboard) throws  {
     let fileURL = storage.keyboardURL(for: keyboard)
+    let loadingURL = schemeHandler.buildUrlForFile(
+      fileURL: storage.keyboardURL(for: keyboard)
+    )
+    
     var stub: [String: Any] = [
       "KI": "Keyboard_\(keyboard.id)",
       "KN": keyboard.name,
       "KLC": keyboard.languageID,
       "KL": keyboard.languageName,
-      "KF": fileURL.absoluteString
+      "KF": loadingURL.absoluteString
     ]
-
+    
     if let packageID = keyboard.packageID {
       stub["KP"] = packageID
     }
@@ -367,7 +378,7 @@ extension KeymanWebViewController {
     let stub: [String: Any] = [
       "id": lexicalModel.id,
       "languages": [lexicalModel.languageID], // Change when InstallableLexicalModel is updated to store an array
-      "path": fileURL.absoluteString
+      "path": schemeHandler.buildUrlForFile(fileURL: fileURL).absoluteString
     ]
 
     guard FileManager.default.fileExists(atPath: fileURL.path) else {
@@ -422,10 +433,11 @@ extension KeymanWebViewController {
 
       let predict = userDefaults.predictSettingForLanguage(languageID: lexicalModel.languageID)
       let correct = userDefaults.correctSettingForLanguage(languageID: lexicalModel.languageID)
+      let autocorrect = userDefaults.autocorrectSettingForLanguage(languageID: lexicalModel.languageID)
 
       // Pass these off to KMW!
       // We do these first so that they're automatically set for the to-be-registered model in advance.
-      webView!.evaluateJavaScript("enableSuggestions(\(stubString), \(predict), \(correct))")
+      webView!.evaluateJavaScript("enableSuggestions(\(stubString), \(predict), \(correct), \(autocorrect))")
       self.activeModel = predict
     } else {  // We're registering a model in the background - don't change settings.
       webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)
@@ -861,7 +873,9 @@ extension KeymanWebViewController {
 
   // MARK: - Show/hide views
   func reloadKeyboard() {
-    webView!.loadFileURL(Storage.active.kmwURL, allowingReadAccessTo: Storage.active.baseDir)
+    let hostPageFileUrl = URL(fileURLWithPath: Resources.kmwFilename, relativeTo: storage.baseDir)
+    let hostPageUrl = schemeHandler.buildUrlForFile(fileURL: hostPageFileUrl)
+    webView!.load(URLRequest(url: hostPageUrl))
     isLoading = true
 
     updateSpacebarText()

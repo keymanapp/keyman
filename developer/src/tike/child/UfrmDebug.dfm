@@ -37,9 +37,11 @@ inherited frmDebug: TfrmDebug
     TabOrder = 0
     OnChange = memoChange
     OnClick = memoClick
+    OnDblClick = memoDblClick
     OnEnter = memoGotFocus
     OnExit = memoLostFocus
     OnKeyUp = memoKeyUp
+    OnSelectionChange = memoSelMove
     OnMessage = memoMessage
     IsDebugging = False
   end

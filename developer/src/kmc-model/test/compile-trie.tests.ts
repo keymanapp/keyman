@@ -11,10 +11,7 @@ import { TrieModel } from '@keymanapp/models-templates';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 describe('LexicalModelCompiler', function () {
-  const callbacks = new TestCompilerCallbacks();
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
+  const callbacks = new TestCompilerCallbacks(this);
 
   describe('#generateLexicalModelCode', function () {
     it('should compile a trivial word list', async function () {

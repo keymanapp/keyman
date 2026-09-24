@@ -7,6 +7,27 @@
 _utils_inc_sh=1
 
 #
+# Download a file using curl, retrying 5 times as needed; will abort script if
+# download fails
+#
+# Parameters:
+#   1:  SRC   URL to download
+#   2:  DEST  Output file to write to
+#
+util_curl_download_file_with_retry() {
+  local SRC="$1"
+  local DEST="$2"
+
+  local RETRY=5       # Curl retries this number of times before giving up
+  local RETRY_DELAY=5 # Make curl sleep this amount of time before each retry when a transfer has failed
+
+  builder_echo "Downloading ${SRC} - ${RETRY} attempts"
+  curl --fail --retry "$RETRY" --retry-delay "$RETRY_DELAY" --silent "$SRC" --output "$DEST" || {
+    builder_die "Downloading $SRC failed with error $?"
+  }
+}
+
+#
 # Write ${UPLOAD_DIR}/${ARTIFACT_FILENAME}.download_info file for the target
 # artifact
 #
@@ -14,7 +35,7 @@ _utils_inc_sh=1
 #   1: UPLOAD_DIR          Directory where artifact can be found
 #   2: ARTIFACT_FILENAME   Filename (without path) of artifact
 #   3: ARTIFACT_NAME       Descriptive name of artifact
-#   4: ARTIFACT_TYPE       File extension of artifact, without initial period (e.g. tar.gz)
+#   4: ARTIFACT_TYPE       File extension of artifact, without initial period (e.g. tar.xz)
 #   5: PLATFORM            Target platform for artifact
 #
 # TODO: Move to CI include?

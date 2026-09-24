@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/developer-utils";
 
 const Namespace = CompilerErrorNamespace.Infrastructure;
@@ -87,10 +90,6 @@ export class InfrastructureMessages {
   static HINT_ProjectIsVersion10 = SevHint | 0x0014;
   static Hint_ProjectIsVersion10 = () => m(this.HINT_ProjectIsVersion10,
     `The project file is an older version and can be upgraded to version 17.0`);
-
-  static ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile = SevError | 0x0015;
-  static Error_OutFileCanOnlyBeSpecifiedWithSingleInfile = () => m(this.ERROR_OutFileCanOnlyBeSpecifiedWithSingleInfile,
-    `Parameter --out-file can only be used with a single input file.`);
 
   static ERROR_InvalidMessageFormat = SevError | 0x0016;
   static Error_InvalidMessageFormat = (o:{message:string}) => m(this.ERROR_InvalidMessageFormat,
@@ -196,6 +195,37 @@ export class InfrastructureMessages {
     this.INFO_ProjectNotGeneratedSuccessfully,
     `Failed to generate new project '${def(o.id)}'.`,
   )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ValidatingProject = SevInfo | 0x0029;
+  static Info_ValidatingProject = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_ValidatingProject,
+    `Validating ${def(o.relativeFilename)}`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectValidatedSuccessfully = SevInfo | 0x002A;
+  static Info_ProjectValidatedSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_ProjectValidatedSuccessfully,
+    `${def(o.relativeFilename)} validated successfully.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  static INFO_ProjectNotValidatedSuccessfully = SevInfo | 0x002B;
+  static Info_ProjectNotValidatedSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_ProjectNotValidatedSuccessfully,
+    `${def(o.relativeFilename)} failed to validate.`
+  )});
+
+  static ERROR_OutFileMustBeAFolder = SevError | 0x002C;
+  static Error_OutFileMustBeAFolder = () => m(
+    this.ERROR_OutFileMustBeAFolder,
+    `Parameter --out-file must refer to a folder.`, `
+    If multiple input files are specified, or if the parameter --out-file ends
+    with a slash (/) or backslash (\\), or if the folder referenced by the
+    parameter already exists, then kmc will treat the parameter as a folder.
+    However, as a file already exists with the same name, kmc cannot continue.
+  `);
 
 }
 

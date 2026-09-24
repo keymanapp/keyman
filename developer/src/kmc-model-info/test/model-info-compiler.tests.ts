@@ -6,13 +6,9 @@ import { makePathToFixture } from './helpers/index.js';
 import { ModelInfoCompiler } from '../src/model-info-compiler.js';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 
-const callbacks = new TestCompilerCallbacks();
-
-beforeEach(function() {
-  callbacks.clear();
-});
-
 describe('model-info-compiler', function () {
+  const callbacks = new TestCompilerCallbacks(this);
+
   it('compile a .model_info file correctly', async function() {
     const kpjFilename = makePathToFixture('sil.cmo.bw', 'sil.cmo.bw.model.kpj');
     const kpsFilename = makePathToFixture('sil.cmo.bw', 'source', 'sil.cmo.bw.model.kps');

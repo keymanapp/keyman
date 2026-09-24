@@ -8,13 +8,13 @@ Save focus: Temporarily saves keyboard processing data for the currently-focused
 
 ## Syntax
 
-```c
+```js
 keyman.interface.saveFocus()
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KSF() // Shorthand
 ```
 

@@ -44,7 +44,7 @@ Build-Depends:
  python3-xdg,
  xserver-xephyr,
  xvfb,
-Standards-Version: 4.7.2
+Standards-Version: 4.7.3
 Vcs-Git: https://github.com/keymanapp/keyman.git -b beta [linux/debian]
 Vcs-Browser: https://github.com/keymanapp/keyman/tree/beta/linux/debian
 Homepage: https://www.keyman.com
@@ -90,6 +90,7 @@ Depends:
  dconf-cli,
  gir1.2-webkit2-4.1,
  keyman-engine,
+ procps,
  python3-bs4,
  python3-fonttools,
  python3-gi,

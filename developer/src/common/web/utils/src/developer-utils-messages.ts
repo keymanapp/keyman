@@ -79,4 +79,10 @@ export class DeveloperUtilsMessages {
     this.ERROR_ProjectFileCouldNotBeRead,
     `Project file could not be read`
   );
+
+  static ERROR_NotAPackageFile = SevError | 0x000D;
+  static Error_NotAPackageFile = () => m(
+    this.ERROR_NotAPackageFile,
+    `Package source file is not a valid .kps file because it is missing the <Package> root element.`,
+  );
 };

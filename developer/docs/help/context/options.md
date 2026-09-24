@@ -125,42 +125,73 @@ Update database
 
 ![Options dialog - Server tab](../images/ui/frmOptions_Server.png)
 
-There are two configurations in the Keyman Developer Server section:
-1. Configure Server...
-2. List local URLs for Server
+### Configure Server dialog
 
-Configure Server...
+After clicking the **Configure Server...** button, a new window will pop-up:
 
-:   After clicking the button, a new window will pop-up
+![Keyman Developer Server Options dialog](../images/ui/frmKeyman_Developer_Server_Options.png)
 
-    ![Keyman Developer Server Options dialog](../images/ui/frmKeyman_Developer_Server_Options.png)
+You can customize the Keyman Developer Server for testing your keyboard online
+and on other devices. Features of the Keyman Developer Server include:
 
-    You can customize the Keyman Developer server for testing the usability of your keyboard. Features of the Keyman Developer server include:
+* Seamless integration with the IDE (Start, Stop, Live reload, Recompile...)
+* Sharing keyboards for testing online and on other devices
+* Allowing testing across devices and networks
 
-    * Seamless integration with the IDE (Start, Stop, Live reload, Recompile...)
-    * Port configuration
-    * Allow testing cross devices
-    * Wider range support for NGROK...
+Keyman Developer Server integrates with a free tool called
+[ngrok](https://ngrok.com) that provides a public URL to your instance of Keyman
+Developer Server. This URL is dynamic and can change over time, and is only
+available while Keyman Developer Server is running. This URL can be accessed
+from any mobile device that is online, whether or not it is on your local
+network. This means you can also quickly share keyboards, packages, and models
+with other users, with a minimum of difficulty.
 
-    [Find out more](https://github.com/keymanapp/keyman/pull/6073)
+* [Learn more about ngrok](server#ngrok)
 
-    Understanding the three tick boxes will enhance the usability of Keyman Developer:
-    - **Leave Server running after closing IDE**: allows keyboard testing on local URLs after closing Keyman Developer.
-    - **Use ngrok to provide public url for web debugger**: configure NGROK as instructed, once it looks something like this:
-    ![Keyman Developer NGROK](../images/ui/frmNGROK_Config.png)
+**Options available in this dialog:**
 
-        Please restart the machine, and the URL (*link ending in .ngrok-free.app*) will appear in the specified locations:
-        ![Keyman Developer NGROK URL 1](../images/ui/frmNGROK_Server_1.png)
-        ![Keyman Developer NGROK URL 2](../images/ui/frmNGROK_Server_2.png)
+- **Leave Server running after closing IDE**: allows keyboard testing on local
+  URLs even if Keyman Developer is not running.
 
-        Now, freely share it across multiple devices using the link or QR code.
-        ![Keyboard Test on Mobile](../images/ui/NGROK_Phone.png)
+- **Use ngrok to provide public url for web debugger**: enable ngrok
+  integration; you may need to download additional components; see below:
 
-    - **Show server console window on start**: once ticked, Keyman Developer's server console will appear as an independent window as a node application with the default message:
-        `Starting Keyman Developer Server 17.0.290-beta, listening on port 8008.`
+- **Download or update ngrok**: If the text next to this button shows 'Not
+  installed', press the button to download the required component
 
-List local URLs for Server
-:   Below Configure Server, untick the box, and it will quit displaying any local URLs for keyboard testing.
-    ![Keyman Developer Server Options dialog](../images/ui/frmList_Local_URLs.png)
+- **Install required redistributable**: ngrok requires an additional Microsoft
+  VC++ redistributable component; if the text next to this button shows 'Not
+  installed', press the button and follow the prompts to install the
+  redistributable component.
 
-Explore more: [Keyman Developer Server](server#toc-configuring-keyman-developer-server)
+After enabling ngrok, a URL with ending a domain such as `.ngrok-free.app` will
+appear in the Tools/Server menu and the Web and Mobile debugger pages in the
+Keyboard Editor and the Package Editor:
+
+![Tools/Options/Server menu showing ngrok](../images/ui/tools_options_server_ngrok.png)
+
+![Web and Mobile test showing ngrok](../images/ui/web_and_mobile_test_ngrok.png)
+
+Once this is active, you can access Keyman Developer Server across multiple
+devices and networks using the link or QR code.
+
+- **Show server console window on start**: once ticked, Keyman Developer's
+  server console will appear as an independent window as a node application,
+  which may be helpful if you encounter errors as they will appear in the
+  console.
+
+  A default message will appear when the server console starts, similar to:
+  `Starting Keyman Developer Server <version>-beta, listening on port 8008.`
+
+### List local URLs for Server
+
+When selected, Keyman Developer will show you more local URLs in the
+Tools/Server menu for accessing Keyman Developer Server from your browser. Some
+of these URLs will work only on your local computer, and will not work on other
+devices. Deselect this option in order to show only the most relevant access
+URLs. (On some networks, it may be helpful to see all the available URLs.)
+
+
+## Related links
+
+* [Keyman Developer Server](server#toc-configuring-keyman-developer-server)

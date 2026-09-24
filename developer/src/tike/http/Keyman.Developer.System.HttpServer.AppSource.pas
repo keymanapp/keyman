@@ -76,11 +76,22 @@ var
 begin
   T := FSources.LockList;
   try
-    // Note: Unlike regular functions, Assert has short-circuit evaluation
-    // intrinsics on the first param which makes it safe to dereference T[0] in
-    // the second parameter.
-    Assert(T.Count = 0, 'TAppSourceHttpResponder.Sources should be empty at destruction '+
-      '(T.Count='+IntToStr(T.Count)+', T[0].Filename='+T[0].Filename+')');
+    // There is a race where RegisterSource is called on the server side
+    // where a request is started in the form but the server does not respond
+    // before the form is destroyed:
+    //  1. http request starts on form
+    //  2. Form destroyed, calls UnregisterSource
+    //  3. http request received in TAppSourceHttpResponder,
+    //     RespondTouchEditorState calls RegisterSource
+    //  4. Ooops
+
+    // There is another race somewhere with unsaved text editors, or else a
+    // resource leak. For now, we'll report this as a message rather than crash.
+    if T.Count > 0 then
+    begin
+      TKeymanSentryClient.Instance.ReportMessage('TAppSourceHttpResponder.Sources should be empty at destruction '+
+       '(T.Count='+IntToStr(T.Count)+', T[0].Filename='+T[0].Filename+')', True);
+    end;
   finally
     FSources.UnlockList;
   end;

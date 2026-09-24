@@ -207,12 +207,8 @@ void _OutputThreadDebugString(char* s);
 /* Keyboard selection functions */
 
 void HandleRefresh(int code, LONG tag);
-void RefreshKeyboards(BOOL Initialising);
-void CheckScheduledRefresh();
-void ScheduleRefresh();
+void RefreshThreadKeyboardsIfRequired();
 void ReleaseKeyboards(BOOL Lock);
-void CheckScheduledRefresh();
-void ScheduleRefresh();
 
 /* Glossary conversion functions */
 
@@ -245,7 +241,7 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "keystate.h"
 
 #include "calldll.h"
-#include "keymancontrol.h"
+#include "..\..\..\include\keymancontrol.h"
 #include "keyboardoptions.h"
 #include "kmprocessactions.h"
 #include "appcontext.h"
@@ -256,8 +252,6 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "testkeymanfunctioning.h"
 #include "..\..\..\..\common\windows\cpp\include\keynames.h"
 #include "..\..\..\include\kmtip_guids.h"
-
-#include "..\..\..\..\common\windows\cpp\include\crc32.h"
 
 #include "k32_tsf.h"
 #include "k32_visualkeyboardinterface.h"

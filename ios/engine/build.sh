@@ -9,14 +9,16 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$KEYMAN_ROOT/resources/build/mac/mac.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
+. "${KEYMAN_ROOT}/resources/build/ci/sentry-control.inc.sh"
 
 builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad." \
   "@/web/src/app/webview        build" \
-  "@/web/src/engine/sentry-manager  build" \
+  "@/common/web/sentry-manager  build" \
   "clean" \
   "configure" \
   "build" \
-  "--sim-artifact  Also outputs a simulator-friendly test artifact corresponding to the build"
+  "publish-symbols  Publishes symbols to Sentry." \
+  "--sim-artifact   Also outputs a simulator-friendly test artifact corresponding to the build"
 
 builder_parse "$@"
 
@@ -102,11 +104,12 @@ function update_bundle ( ) {
   KMW_PRODUCT="$KEYMAN_ROOT/web/build/app/webview/$CONFIG"
   KMW_RESOURCES="$KEYMAN_ROOT/web/build/app/resources"
 
-  #Copy over the relevant resources!  It's easiest to do if we navigate to the resulting folder.
+  # Copy relevant KeymanWeb resources; this list is also in Storage.swift
+  cp "$KMW_RESOURCES/osk/globe-hint.css"        "$BUNDLE_PATH/globe-hint.css"
   cp "$KMW_RESOURCES/osk/kmwosk.css"            "$BUNDLE_PATH/kmwosk.css"
   cp "$KMW_RESOURCES/osk/keymanweb-osk.ttf"     "$BUNDLE_PATH/keymanweb-osk.ttf"
   cp "$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
-  cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
+  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
 }
 
 # First things first - update our dependencies.
@@ -137,6 +140,13 @@ function build_engine() {
   fi
 }
 
-builder_run_action clean         do_clean
-builder_run_action configure     do_configure
-builder_run_action build         build_engine
+do_publish_symbols() {
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    sentry_upload_web "${KEYMAN_ROOT}/web/build/app/webview/release/"
+  fi
+}
+
+builder_run_action clean            do_clean
+builder_run_action configure        do_configure
+builder_run_action build            build_engine
+builder_run_action publish-symbols  do_publish_symbols

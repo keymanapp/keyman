@@ -1,5 +1,5 @@
 ---
-title: rgba
+title: rgba (deprecated)
 ---
 
 ## Summary
@@ -8,7 +8,7 @@ Browser-independent alpha-channel management.
 
 ## Syntax
 
-```c
+```js
 keyman.util.rgba(s, r, g, b, a);
 ```
 
@@ -41,4 +41,13 @@ keyman.util.rgba(s, r, g, b, a);
 
 ## Description
 
-This function returns the required string value for setting background transparency, and applies an appropriate `a` filter to the element for IE versions before IE9.
+This function returns the required string value for setting background
+transparency, and applies an appropriate `a` filter to the element for IE
+versions before IE9.
+
+This function has been deprecated and will be removed in a future version of
+KeymanWeb.
+
+## History
+
+19.0: deprecated

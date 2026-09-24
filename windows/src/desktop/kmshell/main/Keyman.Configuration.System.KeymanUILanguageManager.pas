@@ -48,7 +48,6 @@ class function TKeymanUILanguageManager.GetKeymanUILanguages: TStrings;
 begin
   Result := TStringList.Create;
   Result.Text := LowerCase(KeymanCustomisation.CustMessages.GetAvailableLanguages);
-  Result.Insert(0, LowerCase(KeymanCustomisation.CustMessages.MessageFromID('SKDefaultLanguageCode')));
 end;
 
 end.

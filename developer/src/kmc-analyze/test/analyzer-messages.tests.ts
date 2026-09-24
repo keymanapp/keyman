@@ -11,17 +11,7 @@ import { AnalyzeOskCharacterUse } from '../src/osk-character-use/index.js';
 
 describe('AnalyzerMessages', function () {
 
-  const callbacks = new TestCompilerCallbacks();
-
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest?.isFailed()) {
-      callbacks.printMessages();
-    }
-  });
+  const callbacks = new TestCompilerCallbacks(this);
 
   it('should have a valid AnalyzerMessages object', function() {
     return verifyCompilerMessagesObject(AnalyzerMessages, CompilerErrorNamespace.Analyzer);

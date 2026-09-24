@@ -203,6 +203,7 @@ void PrintPlatform(int platform) {
   switch (platform) {
   case 1: fwprintf(fp, L"\tx86"); break;
   case 2: fwprintf(fp, L"\tx64"); break;
+  case 3: fwprintf(fp, L"\tarm64"); break;
   default: fwprintf(fp, L"\t%d", platform); break;
   }
 }

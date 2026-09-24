@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+
+  <!-- Set the viewport width to match phone and tablet device widths -->
+  <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+  <title>KeymanWeb Core Stress Test</title>
+
+  <!--
+    Import map defines where we can find KeymanWeb compiled modules; this must
+    be specified inline.
+  -->
+  <script type="importmap">
+    {
+      "imports": {
+        "keyman/": "../../../../../build/"
+      }
+    }
+  </script>
+
+  <script module="es6" type="module">
+    import { KM_Core } from 'keyman/engine/core-adapter/lib/index.mjs';
+    import { CORE_WASM } from './paths.js';
+    import { loadKeyboardBlob } from './load-keyboard-blob.js';
+
+    let intervalId = null;
+
+    function stress() {
+      if (intervalId) {
+        window.clearInterval(intervalId);
+        intervalId = null;
+        console.log('Stopping stress');
+        return;
+      }
+      intervalId = window.setInterval(doStress, 10);
+    }
+
+    async function doStress() {
+      console.log('Starting to stress');
+      const km_core = await KM_Core.createCoreProcessor(CORE_WASM);
+      const blob = await loadKeyboardBlob('./test_8568_deadkeys.kmx')
+      const result = km_core.keyboard_load_from_blob('test', blob);
+      result.delete();
+    }
+
+    window.addEventListener('load', function () {
+      document.getElementById('stress').addEventListener('click', stress);
+    });
+
+  </script>
+</head>
+
+<body>
+  <h2>KeymanWeb Sample Page - Core Testing</h2>
+  <p>This page is designed to stress-test the loading a KMX keyboard from blob. It will repeatedly load a .kmx using the KM_Core loader.</p>
+  <p>Be sure to reference the developer console for additional feedback. </p>
+  <button id="stress">Stress Test</button>
+  <hr />
+  <h3><a href="../index.html">Return to testing home page</a></h3>
+</body>
+
+</html>

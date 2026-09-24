@@ -2,7 +2,7 @@
 const source: LexicalModelSource = {
   format: 'custom-1.0',
   wordBreaker: 'ascii',
-  sources: ['foo.tsv', 'bar.tsv']
+  sources: ['CustomModel.ts']
 };
 
 export default source;

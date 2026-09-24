@@ -8,13 +8,13 @@ Returns an object with extended information about a specified keystroke event.
 
 ## Syntax
 
-```c
+```js
 keyman.interface.keyInformation(e);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KKI(e); // Shorthand
 ```
 

@@ -27,8 +27,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
+import androidx.preference.PreferenceManager;
 
 import com.keyman.engine.BaseActivity;
+import com.keyman.engine.DisplayLanguages;
 import com.keyman.engine.KeyboardPickerActivity;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.ModelPickerActivity;
@@ -110,11 +112,11 @@ public final class LanguageSettingsActivity extends BaseActivity {
     RadioGroup radioGroup = (RadioGroup) findViewById(R.id.suggestion_radio_group);
     radioGroup.clearCheck();
 
-    // Auto-correct disabled for Keyman 18.0 #12767
     int[] RadioButtonArray = {
       R.id.suggestion_radio_0,
       R.id.suggestion_radio_1,
-      R.id.suggestion_radio_2};
+      R.id.suggestion_radio_2,
+      R.id.suggestion_radio_3};
     RadioButton radioButton = (RadioButton)radioGroup.findViewById(RadioButtonArray[maySuggest]);
     radioButton.setChecked(true);
 
@@ -151,7 +153,7 @@ public final class LanguageSettingsActivity extends BaseActivity {
     updateActiveLexicalModel();
 
     ImageView imageView = (ImageView) layout.findViewById(R.id.image1);
-    imageView.setImageResource(R.drawable.ic_action_forward);
+    imageView.setImageResource(R.drawable.ic_action_forward_mode);
     layout.setEnabled(true);
     layout.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -201,11 +203,19 @@ public final class LanguageSettingsActivity extends BaseActivity {
         if (KMManager.hasConnection(context)){
           // Scenario 1: Connection to keyman.com catalog
           // Pass the BCP47 language code to the KMPBrowserActivity
+          SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+          String languageTag = prefs.getString(DisplayLanguages.displayLanguageKey, "");
+
           Intent i = new Intent(context, KMPBrowserActivity.class);
           i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
           i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
           i.putExtra("languageCode", lgCode);
           i.putExtra("languageName", lgName);
+          if (languageTag != null && !languageTag.isEmpty()) {
+            Bundle bundle = new Bundle();
+            bundle.putString("lang", languageTag);
+            i.putExtras(bundle);
+          }
           context.startActivity(i);
         /*
         } else if (KeyboardPickerActivity.hasKeyboardFromPackage()) {
@@ -323,7 +333,7 @@ public final class LanguageSettingsActivity extends BaseActivity {
       }
 
       holder.text.setText(kbd.getResourceName());
-      holder.img.setImageResource(R.drawable.ic_action_forward);
+      holder.img.setImageResource(R.drawable.ic_action_forward_mode);
 
       return convertView;
     }

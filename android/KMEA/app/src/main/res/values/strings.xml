@@ -123,13 +123,9 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">
       FileProvider library needed to view help file: %1$s</string>
 
-    <!-- Context: Fatal keyboard error. Will load default keyboard -->
-    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">
-      Fatal keyboard error with %1$s:%2$s for %3$s language. Loading default keyboard.</string>
-
     <!-- Context: Fatal keyboard error.  -->
-    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">
-      Error in keyboard %1$s:%2$s for %3$s language.</string>
+    <string name="fatal_keyboard_error" comment="Displays as a toast. Generally caused by a script error in keyboard view context, may be caused by keyboard or KeymanWeb.">
+      Keyman encountered an error and will restart</string>
 
     <!-- Context: Alert Dialog body: System WebView not installed -->
     <string name="body_install_webview" comment="Notification when WebView not installed">

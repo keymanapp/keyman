@@ -1,7 +1,6 @@
 // Page-global variable definitions.
 {
 var inputCounter = 0;
-var kmw = keyman;
 }
 
 function generateDiagnosticDiv(elem) {
@@ -23,8 +22,8 @@ function generateDiagnosticDiv(elem) {
   attachBtn.type     = 'button';
   attachBtn.id       = 'attach_' + elemId;
   attachBtn.onclick = function() {
-    kmw.attachToControl(document.getElementById(elemId));
-    var attached = kmw.isAttached(elem);
+    keyman.attachToControl(document.getElementById(elemId));
+    var attached = keyman.isAttached(elem);
     document.getElementById('attachment_' + elemId).textContent = " Currently " + (attached ? "attached." : "detached.");
     const indepLabel = document.getElementById("independence_" + elemId);
     // does not exist for iframes
@@ -40,8 +39,8 @@ function generateDiagnosticDiv(elem) {
   detachBtn.type     = 'button';
   detachBtn.id       = 'detach_' + elemId;
   detachBtn.onclick = function() {
-    kmw.detachFromControl(document.getElementById(elemId));
-    var attached = kmw.isAttached(elem);
+    keyman.detachFromControl(document.getElementById(elemId));
+    var attached = keyman.isAttached(elem);
     document.getElementById('attachment_' + elemId).textContent = " Currently " + (attached ? "attached." : "detached.");
     const indepLabel = document.getElementById("independence_" + elemId);
     // does not exist for iframes
@@ -58,7 +57,7 @@ function generateDiagnosticDiv(elem) {
   var attachLabel = document.createElement("a");
   attachLabel.id  = 'attachment_' + elemId;
   window.setTimeout(function() {
-    attachLabel.textContent = " Currently " + (kmw.isAttached(elem) ? "attached." : "detached.");
+    attachLabel.textContent = " Currently " + (keyman.isAttached(elem) ? "attached." : "detached.");
   }, attachTimer);
   div.appendChild(attachLabel);
 
@@ -69,7 +68,7 @@ function generateDiagnosticDiv(elem) {
   enableBtn.type     = 'button';
   enableBtn.id       = 'enable_' + elemId;
   enableBtn.onclick = function() {
-    kmw.enableControl(document.getElementById(elemId));
+    keyman.enableControl(document.getElementById(elemId));
   };
   enableBtn.value   = 'Enable';
   div.appendChild(enableBtn);
@@ -79,7 +78,7 @@ function generateDiagnosticDiv(elem) {
   disableBtn.type     = 'button';
   disableBtn.id       = 'disable_' + elemId;
   disableBtn.onclick = function() {
-    kmw.disableControl(document.getElementById(elemId));
+    keyman.disableControl(document.getElementById(elemId));
   };
   disableBtn.value   = 'Disable';
   div.appendChild(disableBtn);
@@ -107,9 +106,9 @@ function generateDiagnosticDiv(elem) {
     setBtn.type     = 'button';
     setBtn.id       = 'set_' + elemId;
     setBtn.onclick = function() {
-      kmw.setKeyboardForControl(document.getElementById(elemId), 'dzongkha', 'dz');
+      keyman.setKeyboardForControl(document.getElementById(elemId), 'dzongkha', 'dz');
 
-      if(kmw.isAttached(elem)) {
+      if(keyman.isAttached(elem)) {
         kbdLabel.textContent = " Using independently-tracked keyboard.";
       }
     };
@@ -121,9 +120,9 @@ function generateDiagnosticDiv(elem) {
     clearBtn.type     = 'button';
     clearBtn.id       = 'clear_' + elemId;
     clearBtn.onclick = function() {
-      kmw.setKeyboardForControl(document.getElementById(elemId), null, null);
+      keyman.setKeyboardForControl(document.getElementById(elemId), null, null);
 
-      if(kmw.isAttached(elem)) {
+      if(keyman.isAttached(elem)) {
         kbdLabel.textContent = " Using globally-selected keyboard.";
       }
     };
@@ -133,8 +132,8 @@ function generateDiagnosticDiv(elem) {
     var kbdLabel = document.createElement("a");
     kbdLabel.id  = 'independence_' + elemId;
     window.setTimeout(function () {
-      if(kmw.isAttached(elem)) {
-        var attached = kmw.isAttached(elem);
+      if(keyman.isAttached(elem)) {
+        var attached = keyman.isAttached(elem);
         kbdLabel.textContent = attached ? " Using globally-selected keyboard." : '';
       }
     }, 1);

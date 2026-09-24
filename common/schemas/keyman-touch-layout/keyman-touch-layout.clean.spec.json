@@ -85,9 +85,9 @@
         "text": { "type": "string" },
         "layer": { "$ref": "#/definitions/layer-id" },
         "nextlayer": { "$ref": "#/definitions/layer-id" },
-        "font": { "$ref": "#/definitions/font-spec" },
         "fontsize": { "$ref": "#/definitions/fontsize-spec" },
-        "sp": { "$ref": "#/definitions/key-sp" },
+        "font": { "$ref": "#/definitions/font-spec" },
+        "sp": { "$ref" : "#/definitions/key-sp" },
         "pad": { "$ref" : "#/definitions/key-pad" },
         "width": { "$ref" : "#/definitions/key-width" },
         "sk": { "$ref": "#/definitions/subkeys" },
@@ -140,11 +140,12 @@
         "text": { "type": "string" },
         "layer": { "$ref": "#/definitions/layer-id" },
         "nextlayer": { "$ref": "#/definitions/layer-id" },
-        "font": { "$ref": "#/definitions/font-spec" },
-        "fontsize": { "$ref": "#/definitions/fontsize-spec" },
-        "sp": { "$ref": "#/definitions/key-sp" },
+        "sp": { "$ref" : "#/definitions/key-sp" },
         "pad": { "$ref" : "#/definitions/key-pad" },
-        "width": { "$ref" : "#/definitions/key-width" }
+        "width": { "$ref" : "#/definitions/key-width" },
+        "fontsize": { "$ref": "#/definitions/fontsize-spec" },
+        "font": { "$ref": "#/definitions/font-spec" },
+        "default": { "type": "boolean" }
       },
       "required": ["id"],
       "additionalProperties": false

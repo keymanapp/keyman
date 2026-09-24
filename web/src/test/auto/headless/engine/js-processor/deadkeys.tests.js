@@ -1,16 +1,19 @@
-import { assert } from 'chai';
-import fs from 'fs';
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import fs from 'node:fs';
 
+import { assert } from 'chai';
 import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
 
 import { MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface } from 'keyman/engine/js-processor';
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
+import { NodeKeyboardLoader, getKeymanRoot } from 'keyman/test/resources';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 
-import { env } from 'node:process';
-const KEYMAN_ROOT = env.KEYMAN_ROOT;
+const require = createRequire(import.meta.url);
+const KEYMAN_ROOT = getKeymanRoot();
 
 describe('Engine - Deadkeys', function() {
   let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/deadkeys.json'));
@@ -27,7 +30,7 @@ describe('Engine - Deadkeys', function() {
 
   before(async function() {
     // -- START: Standard Recorder-based unit test loading boilerplate --
-    let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
+    let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
     let keyboard = await keyboardLoader.loadKeyboardFromPath(KEYMAN_ROOT + '/common/test/' + testSuite.keyboard.filename);
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;

@@ -22,7 +22,7 @@ type
 
     class procedure Fill(grid: TStringGrid; const text: string;
       deadkeys: TDebugDeadkeyInfoList;
-      SelStart, SelLength, SelAnchor: Integer;
+      SelStart, SelLength, Caret: Integer;
       DeadkeysAreCalledMarkers: Boolean = False); static;
     class procedure Render(grid: TStringGrid; ACol, ARow: Integer;
       Rect: TRect; State: TGridDrawState; CharFont: TFont); static;
@@ -37,7 +37,7 @@ uses
 
 class procedure TCharacterGridRenderer.Fill(grid: TStringGrid;
   const text: string; deadkeys: TDebugDeadkeyInfoList;
-  SelStart, SelLength, SelAnchor: Integer;
+  SelStart, SelLength, Caret: Integer;
   DeadkeysAreCalledMarkers: Boolean);
 type
   TCellType = (ctChar, ctDeadkey);
@@ -171,10 +171,10 @@ begin
 
   X := 0;
   FillGrid(Before, 0, X);
-  if SelAnchor = SelStart then
+  if Caret = SelStart then
     FillGridCursor(X);
   FillGrid(Selection, CELL_SELECTED, X);
-  if SelAnchor <> SelStart then
+  if Caret <> SelStart then
     FillGridCursor(X);
   FillGrid(After, 0, X);
 end;

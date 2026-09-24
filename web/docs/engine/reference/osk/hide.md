@@ -8,7 +8,7 @@ Hides the OSK.
 
 ## Syntax
 
-```c
+```js
 keyman.osk.hide()
 ```
 

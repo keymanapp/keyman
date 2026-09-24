@@ -84,8 +84,6 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">FilProvider library bindawar ley fakkakanal shu\'ul da: %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">Mushkila kabirey bey %1$s:%2$s layl %3$s lugga. Dassasan shabal keyboard hanal gabul.</string>
-    <!-- Context: Fatal keyboard error.  -->
-    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">Mushkila fyl keyboard %1$s:%2$s layl %3$s lugga.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Shafiyan kakkad abu kalimat shaba da ley dassasana</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>

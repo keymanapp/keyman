@@ -302,11 +302,15 @@ typedef uint8_t (*km_core_keyboard_imx_platform)(km_core_state*, uint32_t, void*
 
 ## Description
 
-An error code mechanism similar to COM’s `HRESULT` scheme (unlike COM, any
+An error code mechanism similar to COM's `HRESULT` scheme (unlike COM, any
 non-zero value is an error).
 
 ## Specification
 
+-->
+// keep in sync with web/src/engine/src/core-adapter/KM_Core.ts
+// (see https://github.com/emscripten-core/emscripten/issues/18585)
+<!--
 ```c */
 enum km_core_status_codes {
   KM_CORE_STATUS_OK = 0,
@@ -576,15 +580,17 @@ typedef struct {
 
 `emit_keystroke`
 : Emit the (unmodified) input keystroke to the application, 0 = no, 1 = yes.
+  On most platforms this signals whether the processor handled the event
+  (0) or not (1). See also [key handling](keyhandling).
 
 `new_caps_lock_state`
 : -1=unchanged, 0=off, 1=on
 
 `deleted_context`
 : Reference copy of actual UTF32 codepoints deleted from end of context
-  (closest to caret) exactly code_points_to_delete in length (plus null
+  (closest to caret) exactly `code_points_to_delete` in length (plus null
   terminator). Used to determine encoding conversion differences when
-  deleting; only set when using [km_core_state_get_actions], otherwise nullptr.
+  deleting; only set when using [km_core_state_get_actions], otherwise `nullptr`.
 
 -------------------------------------------------------------------------------
 
@@ -744,7 +750,7 @@ title: Options - Keyman Core API
 ---
 
 A state’s default options are set from the keyboard at creation time and the
-environment. The Platform layer is then is expected to apply any persisted
+environment. The Platform layer is then expected to apply any persisted
 options it is maintaining.  Options are passed into and out of API functions as
 simple C arrays of [km_core_option_item] terminated with a `KM_CORE_OPTIONS_END`
 sentinel value. A state's options are exposed and manipulatable via the
@@ -1007,11 +1013,6 @@ Provides read-only information about a keyboard.
 typedef struct {
   km_core_cu const * version_string;
   km_core_cu const * id;
-
-  // TODO-web-core: Deprecate this field (#12497)
-  // KMN_DEPRECATED
-  km_core_path_name  folder_path;
-
   km_core_option_item const * default_options;
 } km_core_keyboard_attrs;
 
@@ -1024,9 +1025,6 @@ typedef struct {
 
 `id`
 : Keyman keyboard ID string.
-
-`folder_path`
-: Path to the unpacked folder containing the keyboard and associated resources (deprecated).
 
 `default_options`
 : Set of default values for any options included in the keyboard.
@@ -1162,7 +1160,7 @@ returned by [km_core_keyboard_load_from_blob].
 ```c */
 KMN_API
 void
-km_core_keyboard_dispose(km_core_keyboard *keyboard);
+km_core_keyboard_dispose(km_core_keyboard const* keyboard);
 
 /*
 ```
@@ -1380,7 +1378,7 @@ the environment passed.
 ```c */
 KMN_API
 km_core_status
-km_core_state_create(km_core_keyboard *keyboard,
+km_core_state_create(km_core_keyboard const *keyboard,
                     km_core_option_item const *env,
                     km_core_state **out);
 
@@ -1466,7 +1464,7 @@ invalid.
 ```c */
 KMN_API
 void
-km_core_state_dispose(km_core_state *state);
+km_core_state_dispose(km_core_state const *state);
 
 /*
 ```
@@ -1534,7 +1532,7 @@ Returns a debug formatted string of the context from the state.
 ```c */
 KMN_API
 km_core_cu *
-km_core_state_context_debug(km_core_state *state, km_core_debug_context_type context_type);
+km_core_state_context_debug(const km_core_state *state, km_core_debug_context_type context_type);
 
 /*
 ```
@@ -1673,7 +1671,7 @@ the state may also be modified.
 ```c */
 KMN_API
 km_core_status
-km_core_process_event(km_core_state *state,
+km_core_process_event(km_core_state const *state,
                      km_core_virtual_key vk,
                      uint16_t modifier_state,
                      uint8_t is_key_down,
@@ -1729,7 +1727,7 @@ the state may also be modified.
 KMN_API
 km_core_status
 km_core_event(
-  km_core_state *state,
+  km_core_state const *state,
   uint32_t event,
   void* data
 );

@@ -76,6 +76,7 @@ type
     procedure cefBeforeBrowse(Sender: TObject; const Url: string; isPopup, wasHandled: Boolean);
     procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; isPopup: Boolean; out Handled: Boolean);
     procedure cefCommand(Sender: TObject; const command: string; params: TStringList);
+    procedure cefHelpTopic(Sender: TObject);
 
     procedure ProjectRefresh(Sender: TObject);
     procedure ProjectRefreshCaption(Sender: TObject);
@@ -189,6 +190,7 @@ begin
   cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
   cef.OnCommand := cefCommand;
   cef.OnLoadEnd := cefLoadEnd;
+  cef.OnHelpTopic := cefHelpTopic;
   RefreshHTML;
 end;
 
@@ -286,6 +288,11 @@ end;
 procedure TfrmProject.cefCommand(Sender: TObject; const command: string; params: TStringList);
 begin
   WebCommand(LowerCase(command), params);
+end;
+
+procedure TfrmProject.cefHelpTopic(Sender: TObject);
+begin
+  frmKeymanDeveloper.HelpTopic(Self);
 end;
 
 procedure TfrmProject.CompileAll;

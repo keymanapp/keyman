@@ -78,8 +78,6 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      ត្រូវការបណ្ណាល័យ FileProvider ដើម្បី​មើលឯកសារជំនួយ៖ %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      មាន​បញ្ហាធ្ងន់ធ្ងរចំពោះក្ដារចុច %1$s:%2$s សម្រាប់​ភាសា %3$s។ កំពុង​ផ្ទុក​ក្ដារចុច​លំនាំដើម។</string>
-    <!-- Context: Fatal keyboard error.  -->
-    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      បញ្ហាក្នុងក្ដារចុច %1$s:%2$s សម្រាប់ភាសា %3$s។</string>
     <!-- Context: Alert Dialog body: System WebView not installed -->
     <string name="body_install_webview" comment="Notification when WebView not installed">Keyman តម្រូវឱ្យដំឡើង WebView ។\"</string>
     <!-- Context: Alert Dialog body: System WebView installed but not enabled -->

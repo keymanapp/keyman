@@ -29,6 +29,7 @@ clean_action() {
   rm -rf dist make_deb build ./*.egg-info keyman_config/version.py
   find . \( -name __pycache__ -o -name keyman-config.mo \) -exec rm -rf {} +
   rm -rf ../docs/help/reference/km-*.md
+  rm -rf keyman_config/.pc
 
   # Don't delete this file during a package build because they are
   # part of the source package. We can't generate it during a package
@@ -80,7 +81,7 @@ build_action() {
       version.py.in > version.py
   popd
   pushd buildtools
-  if [ -f build-langtags.py ]; then
+  if [[ -f build-langtags.py ]]; then
     builder_echo "Create lang_tags_map.py"
     python3 ./build-langtags.py
   else

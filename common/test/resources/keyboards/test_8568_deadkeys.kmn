@@ -1,6 +1,6 @@
 store(&NAME) 'Testcases for deadkeys bug (#8568)'
 c Description: Tests deadkey backspacing
-c See also common/test/keyboards/baseline/k_020___deadkeys_and_backspace.kmn
+c See also common/test/keyboards/baseline/k_0302___deadkeys_and_backspace.kmn
 c 1. One deadkey in context                   dk(1) + BKSP = nul
 c 2. One char and one deadkey in context      'a' dk(2) + BKSP = nul
 c 3. One deadkey and one char in context      dk(3) 'a' + BKSP = nul

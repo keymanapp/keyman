@@ -6,7 +6,7 @@
  * Abstraction for XML reading and writing
  */
 
-import { XMLParser, XMLBuilder, XMLMetaData, X2jOptions, XmlBuilderOptions } from 'fast-xml-parser';
+import { XMLParser, XMLBuilder, XMLMetaData, X2jOptions, XmlBuilderOptions, JPathOrMatcher } from 'fast-xml-parser';
 import { SymbolUtils } from "./symbol-utils.js";
 
 /** Symbol giving the start offset, in chars, of the node */
@@ -15,8 +15,9 @@ const XML_META_DATA_SYMBOL = XMLParser.getMetaDataSymbol();
 export const XML_FILENAME_SYMBOL = Symbol("XML Filename");
 
 export type KeymanXMLType =
-  'keyboard3'           // LDML <keyboard3>
+  'keyboard3'             // LDML <keyboard3>
   | 'keyboardTest3'       // LDML <keyboardTest3>
+  | 'keylayout'           // keylayout
   | 'kps'                 // <Package>
   | 'kvks'                // <visualkeyboard>
   | 'kpj'                 // <KeymanDeveloperProject>
@@ -33,9 +34,9 @@ const PARSER_COMMON_OPTIONS: X2jOptions = {
   ignoreAttributes: false,
   ignorePiTags: true,
   numberParseOptions: { // TODO: query is this option really necessary?
-    eNotation: null,
-    hex: null,
-    leadingZeros: null,
+    eNotation: false,
+    hex: false,
+    leadingZeros: false,
     skipLike: /(?:)/, // parse numbers as strings
   },
   textNodeName: '_',
@@ -47,7 +48,7 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     attributeNamePrefix: '@__', // We'll use this to convert attributes to strings and subobjects to arrays, when empty.
     htmlEntities: true,
     ignoreAttributes: false, // We'd like attributes, please
-    tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
+    tagValueProcessor: (_tagName: string, tagValue: string /*, _jPathOrMatcher: JPathOrMatcher, _hasAttributes: boolean, _isLeafNode: boolean*/) => {
       // since trimValues: false, we need to zap any element values that would be trimmed.
       // currently, the LDML spec doesn't have any element values, but this
       // future-proofs us a little in that element values are allowed, just trimmed.
@@ -64,6 +65,17 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     ignorePiTags: true,
     preserveOrder: true,     // Gives us a 'special' format
   },
+  'keylayout': {
+    attributeNamePrefix: '@__',
+    htmlEntities: true,
+    ignoreAttributes: false, // use attributes
+    tagValueProcessor: (_tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
+      // since trimValues: false, we need to zap any element values that would be trimmed.
+      return tagValue?.trim();
+    },
+    trimValues: false, // preserve spaces, but see tagValueProcessor
+
+  },
   'kps': {
     ...PARSER_COMMON_OPTIONS,
   },
@@ -73,11 +85,11 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
   },
   'kvks': {
     ...PARSER_COMMON_OPTIONS,
-    tagValueProcessor: (_tagName: string, tagValue: string, _jPath: string, _hasAttributes: boolean, isLeafNode: boolean) : string | undefined => {
+    tagValueProcessor: (_tagName: string, tagValue: string, _jPathOrMatcher: JPathOrMatcher, _hasAttributes: boolean, isLeafNode: boolean) : unknown => {
       if (!isLeafNode) {
         return tagValue?.trim(); // trimmed value
       } else {
-        return null;  // no change to leaf nodes
+        return undefined;  // no change to leaf nodes
       }
     },
     trimValues: false, // preserve spaces
@@ -126,20 +138,20 @@ export class KeymanXMLReader {
   }
 
   /** Get metadata on a node if not already set */
-  static getMetaData(o: any) : KeymanXMLMetadata {
-    if(!o) return o;
-    const metadata : KeymanXMLMetadata = o[XML_META_DATA_SYMBOL as any];
+  static getMetaData(o: any): KeymanXMLMetadata {
+    if (!o) return o;
+    const metadata: KeymanXMLMetadata = o[XML_META_DATA_SYMBOL as any];
     return metadata;
   }
 
   /** Set metadata if not already set */
-  public static setMetaData(o: any, metadata: KeymanXMLMetadata) : KeymanXMLMetadata {
-    let m : KeymanXMLMetadata = KeymanXMLReader.getMetaData(o);
+  public static setMetaData(o: any, metadata: KeymanXMLMetadata): KeymanXMLMetadata {
+    let m: KeymanXMLMetadata = KeymanXMLReader.getMetaData(o);
     if (!m) {
       m = {};
     }
     // copy non-symbols
-    m = {...metadata, ...m};
+    m = { ...metadata, ...m };
     // copy symbols
     SymbolUtils.copySymbols(m, metadata);
     o[XML_META_DATA_SYMBOL as any] = m;
@@ -157,21 +169,21 @@ export class KeymanXMLReader {
       }
       if (Array.isArray(data)) {
         data.forEach(e => KeymanXMLReader.setDefaultFilename(e, filename));
-      } else for(const k of Object.keys(data)) {
+      } else for (const k of Object.keys(data)) {
         KeymanXMLReader.setDefaultFilename(data[k], filename);
       }
     }
   }
 
   /** move `{ $abc: 4 }` into `{ $: { abc: 4 } }` */
-  private static fixupDollarAttributes(data: any) : any {
+  private static fixupDollarAttributes(data: any): any {
     if (typeof data === 'object') {
       if (Array.isArray(data)) {
         return data.map(v => KeymanXMLReader.fixupDollarAttributes(v));
       }
       // object
-      const e : any = [];
-      const attrs : any = [];
+      const e: any = [];
+      const attrs: any = [];
       Object.entries(data).forEach(([k, v]) => {
         if (k[0] === '$') {
           k = k.slice(1);
@@ -193,7 +205,7 @@ export class KeymanXMLReader {
    * Requires attribute prefix @__ (double underscore)
    * For attributes, just remove @__ and continue.
    * For objects, replace any empty string "" with an empty object {} */
-  private static fixupEmptyStringToEmptyObject(data: any) : any {
+  private static fixupEmptyStringToEmptyObject(data: any): any {
     if (typeof data === 'object') {
       // For arrays of objects, we map "" to {}
       // "" means an empty object
@@ -238,7 +250,6 @@ export class KeymanXMLReader {
    * @param data input data
    */
   private static fixupPreserveOrder(data: any): any {
-
     // we need to extract the root name specially
     if (!Array.isArray(data)) {
       throw Error(`Internal Error: XML parser preserveOrder did not yield an array.`);
@@ -258,10 +269,10 @@ export class KeymanXMLReader {
   /** takes an 'object' with a property `:@` containing attrs, and one other property with the object name */
   private static fixupPreserveOrderObject(data: any): any {
     const attrs = data[':@'];
-    const mainEntry : any = Object.entries(data).filter(([k,v]) => k !== ':@');
+    const mainEntry: any = Object.entries(data).filter(([k, v]) => k !== ':@');
     const [elementName, subItems] = mainEntry[0];
-    const out : any = {};
-    if ( attrs ) {
+    const out: any = {};
+    if (attrs) {
       out['$'] = attrs;
     }
     if (!elementName) {
@@ -276,7 +287,7 @@ export class KeymanXMLReader {
       for (const o of out['$$']) {
         const subElementName = o['#name'];
         const nonPreservedElements = out[subElementName] = out[subElementName] ?? [];
-        const oWithoutName = {...o};
+        const oWithoutName = { ...o };
         delete oWithoutName['#name']; // #name is only there in the preserved-order form.
         nonPreservedElements.push(oWithoutName);
       }
@@ -315,19 +326,18 @@ const PROLOGUE = { '?xml': { '$version': '1.0', '$encoding': 'utf-8' } };
 
 /** wrapper for XML generation support */
 export class KeymanXMLWriter {
-
-  private static fixDataForWrite(data: any) : any {
-    if(typeof data === 'object') {
+  private static fixDataForWrite(data: any): any {
+    if (typeof data === 'object') {
       if (Array.isArray(data)) {
         // just fixup each item of the array
         return data.map(d => KeymanXMLWriter.fixDataForWrite(d));
       }
       // else object
-      const e : any = [];
-      Object.entries(data).forEach(([k,v]) => {
+      const e: any = [];
+      Object.entries(data).forEach(([k, v]) => {
         if (k === '$') {
           /* convert $: { a: 1, b: 2 } to { $a: 1, $b: 2} */
-          Object.entries(v).forEach(([k,v]) => {
+          Object.entries(v).forEach(([k, v]) => {
             e.push([`\$${k}`, KeymanXMLWriter.fixDataForWrite(v)]);
           });
         } else {
@@ -366,12 +376,12 @@ export class KeymanXMLWriter {
  * @param path ajv split instancePath, such as '/keyboard3/layers/0'.split('/')
  * @returns undefined if the path was not present, null if path went to something that wasn't an object, otherwise the compileContext object is returned.
  */
-export function findInstanceObject(source: any, path: string[]) : any {
-  if(!path || !source || path.length == 0) {
+export function findInstanceObject(source: any, path: string[]): any {
+  if (!path || !source || path.length == 0) {
     return source;
-  } else if(path[0] == '') {
+  } else if (path[0] == '') {
     return findInstanceObject(source, path.slice(1));
-  } else if(Array.isArray(source) || typeof source == 'object') {
+  } else if (Array.isArray(source) || typeof source == 'object') {
     const child = source[path[0]];
     if (child == undefined) return child; // nothing here
     if (!child || typeof child == 'string') {
@@ -389,7 +399,7 @@ export function findInstanceObject(source: any, path: string[]) : any {
  * @param c number for the offset setting
  * @param x if set, this object will be used as the base object instead of {}
  */
-export function withOffset(c: number, compileContext?: any) : KeymanXMLMetadata {
+export function withOffset(c: number, compileContext?: any): KeymanXMLMetadata {
   // set metadata on an empty object
   const o = Object.assign({}, compileContext);
   KeymanXMLReader.setMetaData(o, {

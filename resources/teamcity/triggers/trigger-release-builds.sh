@@ -98,7 +98,7 @@ echo "trigger-release-builds.sh: building resources/build/version"
 pushd "$KEYMAN_ROOT"
 npm ci
 
-builder_launch /resources/build/version/build.sh
+"$KEYMAN_ROOT/resources/build/version/build.sh"
 
 echo "trigger-release-builds.sh: running resources/build/version"
 pushd "$KEYMAN_ROOT"

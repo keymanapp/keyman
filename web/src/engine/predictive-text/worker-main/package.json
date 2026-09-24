@@ -50,7 +50,6 @@
     "@keymanapp/models-templates": "*",
     "@keymanapp/models-wordbreakers": "*",
     "@keymanapp/keyman-version": "*",
-    "@keymanapp/web-utils": "*",
     "es6-shim": "^0.35.5",
     "string.prototype.codepointat": "^0.2.1"
   }

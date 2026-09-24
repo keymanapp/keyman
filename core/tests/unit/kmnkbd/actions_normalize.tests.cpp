@@ -312,6 +312,17 @@ void run_actions_normalize_tests() {
   );
 
   test_actions_normalize(
+    "One backspace to delete last NFD character (#15487)",
+    /* app context pre transform: */     u"abcê", // NFC
+    /* cached context post transform: */ u"abce",
+    /* cached context post transform: */ nullptr,
+    /* action del, output: */            1, U"",  // NFD input;  delete 1: \u0302
+    // ---- results ----
+    /* action del, output: */            1, U"e",             // NFC output; delete 1: e
+    /* app_context: */                   u"abce"
+  );
+
+  test_actions_normalize(
     "One backspace for NFD converts into one char in NFC (ê) and recombine",
     /* app context pre transform: */     u"abcê",
     /* cached context post transform: */ u"abce\u0323\u0302",
@@ -345,6 +356,18 @@ void run_actions_normalize_tests() {
     // ---- results ----
     /* action del, output: */            1, U"\u0323\u0300\u0302",  // NFC output is still decomposed because there is no base
     /* app_context: */                   u"\u0323\u0300\u0302"
+  );
+
+  // #15505 - normalization of Bengali characters
+  test_actions_normalize(
+    "Bengali normalization of U+09C7 U+09D7 -> U+09CC",
+    /* app context pre transform: */     u"\u0995\u09C7",
+    /* cached context post transform: */ u"\u0995\u09C7\u09D7",
+    /* cached context post transform: */ nullptr,
+    /* action del, output: */            0, U"\u09D7",
+    // ---- results ----
+    /* action del, output: */            1, U"\u09CC",
+    /* app_context: */                   u"\u0995\u09CC"
   );
 
   // Modifies the base as well as diacritic

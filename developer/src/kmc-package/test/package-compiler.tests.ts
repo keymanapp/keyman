@@ -21,20 +21,12 @@ describe('KmpCompiler', function () {
     'example.qaa.sencoten',
     'withfolders.qaa.sencoten',
   ];
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
   let kmpCompiler: KmpCompiler = null;
 
   this.beforeAll(async function() {
-    callbacks.clear();
     kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, null));
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest?.isFailed()) {
-      callbacks.printMessages();
-    }
-    callbacks.clear();
   });
 
   for (const modelID of MODELS) {
@@ -144,8 +136,6 @@ describe('KmpCompiler', function () {
    */
 
   it(`should transform a .kps file for a keyboard package to a correct kmp.json`, function () {
-    callbacks.clear();
-
     const kpsPath = makePathToFixture('kmp.json', 'ahom_star.kps');
     const kmpJsonRefPath = makePathToFixture('kmp.json', 'kmp.json');
 
@@ -171,12 +161,8 @@ describe('KmpCompiler', function () {
   });
 
   it(`should support .kps 17.0 metadata correctly`, function () {
-    callbacks.clear();
-
     const kpsPath = makePathToFixture('kmp_2.0', 'khmer_angkor.kps');
     const kmpJsonRefPath = makePathToFixture('kmp_2.0', 'kmp.json');
-
-    debugger;
 
     const kmpJsonActual = kmpCompiler.transformKpsToKmpObject(kpsPath);
     if(kmpJsonActual == null) {
@@ -205,8 +191,6 @@ describe('KmpCompiler', function () {
   it('should warn on absolute paths', async function() {
     this.timeout(10000); // building a zip file can sometimes be slow
 
-    callbacks.clear();
-
     const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, null));
@@ -232,8 +216,6 @@ describe('KmpCompiler', function () {
 
   it('should normalize DOS pathnames from \\ to /', async function() {
     // this.timeout(10000); // building a zip file can sometimes be slow
-
-    callbacks.clear();
 
     const kpsPath = makePathToFixture('normalize_paths', 'source', 'khmer_angkor.kps');
     const kmpCompiler = new KmpCompiler();
@@ -315,7 +297,7 @@ describe('KmpCompiler', function () {
     assert.isFalse(validation.validate(inputFilename, outputFilename, kmpJson));
   });
 
-  it(`should reject an package that contains itself`, function () {
+  it(`should reject a package that contains itself`, function () {
     const inputFilename = makePathToFixture('invalid', 'error_package_must_not_contain_itself.kps');
     const outputFilename = makePathToFixture('invalid', 'error_package_must_not_contain_itself.kmp');
     const kmpJson = kmpCompiler.transformKpsToKmpObject(inputFilename);

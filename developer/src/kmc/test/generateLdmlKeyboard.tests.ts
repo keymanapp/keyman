@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -28,17 +31,15 @@ describe('generateLdmlKeyboard', function() {
     description: 'Sample Keyboard Test',
   };
 
-  const callbacks: TestCompilerCallbacks = new TestCompilerCallbacks();
+  const callbacks: TestCompilerCallbacks = new TestCompilerCallbacks(this);
   let outPath: string = null;
 
   this.beforeEach(function() {
-    callbacks.clear();
     outPath = fs.mkdtempSync(path.join(os.tmpdir(), 'kmc-'));
   });
 
   this.afterEach(function() {
     if(this.currentTest.isFailed()) {
-      callbacks.printMessages();
       console.error(`Output kept at ${outPath}`);
     } else {
       if(outPath) fs.rmSync(outPath, {recursive: true, force: true});

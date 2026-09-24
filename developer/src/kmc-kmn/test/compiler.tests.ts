@@ -1,16 +1,33 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
 import 'mocha';
 import { assert } from 'chai';
-import { KmnCompiler } from '../src/main.js';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+import { KmxFileReader } from '@keymanapp/common-types';
+import { compileTestKeyboard } from './helpers/index.js';
+import { KmnCompiler } from '../src/main.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
 const keyboardsDir = __dirname + '/../../../../../common/test/keyboards/';
 const baselineDir = keyboardsDir + 'baseline/';
 
 describe('Compiler class', function() {
+  const callbacks = new TestCompilerCallbacks(this);
+
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest?.isFailed()) {
+      callbacks.printMessages();
+    }
+  });
+
   it('should throw on failure', async function() {
     const compiler = new KmnCompiler();
     const callbacks : any = null; // ERROR
@@ -25,20 +42,18 @@ describe('Compiler class', function() {
 
   it('should start', async function() {
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, null));
     assert(compiler.verifyInitialized());
   });
 
   it('should compile a basic keyboard', async function() {
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
     assert(compiler.verifyInitialized());
 
-    const fixtureName = baselineDir + 'k_000___null_keyboard.kmx';
-    const infile = baselineDir + 'k_000___null_keyboard.kmn';
-    const outFile = __dirname + '/k_000___null_keyboard.kmx';
+    const fixtureName = baselineDir + 'k_0000___null_keyboard.kmx';
+    const infile = baselineDir + 'k_0000___null_keyboard.kmn';
+    const outFile = __dirname + '/k_0000___null_keyboard.kmx';
 
     if(fs.existsSync(outFile)) {
       fs.rmSync(outFile);
@@ -60,7 +75,6 @@ describe('Compiler class', function() {
   it('should build all baseline fixtures', async function() {
     this.timeout(10000); // there are quite a few fixtures, sometimes CI agents are slow
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));
     assert(compiler.verifyInitialized());
 
@@ -90,7 +104,6 @@ describe('Compiler class', function() {
 
   it('should compile a keyboard with visual keyboard', async function() {
     const compiler = new KmnCompiler();
-    const callbacks = new TestCompilerCallbacks();
     assert.isTrue(await compiler.init(callbacks, {
       saveDebug: true,
       shouldAddCompilerVersion: false,
@@ -129,6 +142,22 @@ describe('Compiler class', function() {
     const kvkFixtureData = fs.readFileSync(kvkFixture);
     assert.equal(kvkData.byteLength, kvkFixtureData.byteLength);
     assert.deepEqual(kvkData, kvkFixtureData);
+  });
+
+  it('should trim all whitespace for `&targets` store', async function() {
+    const result = await compileTestKeyboard(callbacks, ['keyboards', 'targets-with-whitespace.kmn']);
+    assert.isNotNull(result);
+
+    // Verify implictly that `&targets` store was interpreted correctly as 'any'
+    // because the compiler generated both JS and KMX targets (#13721)
+    assert.isNotNull(result.artifacts.js);
+    assert.isNotNull(result.artifacts.kmx);
+
+    // Then verify directly that the `&targets` store was trimmed by looking at
+    // the final value in the kmx data
+    const reader = new KmxFileReader();
+    const keyboard = reader.read(result.artifacts.kmx.data);
+    assert.equal(keyboard.targets, 'any');
   });
 
 });

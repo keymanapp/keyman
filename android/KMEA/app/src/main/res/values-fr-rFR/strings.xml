@@ -80,8 +80,6 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      Librairie FileProvider nécessaire pour afficher le fichier d\'aide : %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Erreur fatale de clavier avec %1$s:%2$s pour %3$s langue. Chargement du clavier par défaut.</string>
-    <!-- Context: Fatal keyboard error.  -->
-    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Erreur dans le clavier %1$s:%2$s pour la langue %3$s.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Vérification du dictionnaire associé à télécharger</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Impossible de se connecter au serveur Keyman pour chercher un dictionnaire à télécharger</string>
