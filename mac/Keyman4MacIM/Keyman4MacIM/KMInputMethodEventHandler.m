@@ -37,14 +37,6 @@ CGKeyCode _keyCodeOfOriginalEvent;
 CGEventSourceRef _sourceFromOriginalEvent = nil;
 CGEventSourceRef _sourceForGeneratedEvent = nil;
 
-// used to perform delete by inserting with replacement
-typedef struct {
-  BOOL canDeleteWithReplacement;
-  NSUInteger replacementLocation;
-  NSUInteger replacementLength;
-  NSString *replacementString;
-} ReplacementInfo;
-
 /**
  *  The public initializer
  */
@@ -583,7 +575,6 @@ typedef struct {
  * Ref: https://developer.apple.com/documentation/appkit/nstextinputclient/inserttext(_:replacementrange:)
  */
 -(BOOL)handleDeleteWithReplacement:(CoreKeyOutput*)output keyDownEvent:(nonnull NSEvent *)event client:(id) client {
-  BOOL handledEvent = NO;
   NSRange currentSelection;
   NSString *context = [self readContext:client at:&currentSelection];
  
@@ -655,7 +646,6 @@ typedef struct {
  * that describes how to perform the replacement.
  */
 - (ReplacementInfo)evaluateForReplaceability:(NSString*) context textStoreLocation:(NSUInteger)textStoreLocation deleteLength:(NSUInteger)deleteLength locationOfDeletionTarget:(NSUInteger)deletionLocation {
-  BOOL canReplace = NO;
   
   ReplacementInfo replacementInfo;
 

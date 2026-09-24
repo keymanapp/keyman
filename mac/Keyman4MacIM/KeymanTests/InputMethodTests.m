@@ -23,6 +23,7 @@ id testClient = nil;
 @interface InputMethodTests : XCTestCase
 @end
 
+// redeclare private properties and functions to expose for testing
 @interface KMInputMethodEventHandler (Testing)
 @property (nonatomic, retain) TextApiCompliance* apiCompliance;
 @property (nonatomic, retain) NSString* clientApplicationId;
@@ -30,7 +31,10 @@ id testClient = nil;
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender;
 - (NSRange) calculateInsertRangeForDeletedText:(NSString*)textToDelete selectionRange:(NSRange) selection;
 - (void)checkTextApiCompliance:(id)client;
-
+- (ReplacementInfo)evaluateForReplaceability:(NSString*) context
+                           textStoreLocation:(NSUInteger)textStoreLocation
+                                deleteLength:(NSUInteger)deleteLength
+                    locationOfDeletionTarget:(NSUInteger)deletionLocation;
 @end
 
 @implementation InputMethodTests
@@ -90,6 +94,16 @@ id testClient = nil;
   NSRange insertRange = [testEventHandler calculateInsertRangeForDeletedText:@"'" selectionRange:selectionRange];
   BOOL correctResult = (insertRange.location == 1) && (insertRange.length == 2);
   XCTAssertTrue(correctResult, @"insert or replacement range expected to be {1,2}");
+}
+
+- (void)testEvaluateReplacement_precededByControlCharacter_canReplaceFalse {
+  NSString *context = @"test\ta";
+  NSUInteger storeLocation = 10;
+  NSUInteger deletionLength = 1;
+  NSUInteger locationOfDeletion = 5;
+
+  ReplacementInfo replacementInfo = [testEventHandler evaluateForReplaceability: context textStoreLocation:storeLocation deleteLength:deletionLength locationOfDeletionTarget:locationOfDeletion];
+  XCTAssertFalse(replacementInfo.canDeleteWithReplacement, @"target preceded by control character, canDelete should be false");
 }
 
 /**
