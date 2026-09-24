@@ -575,20 +575,19 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
  * Ref: https://developer.apple.com/documentation/appkit/nstextinputclient/inserttext(_:replacementrange:)
  */
 -(BOOL)handleDeleteWithReplacement:(CoreKeyOutput*)output keyDownEvent:(nonnull NSEvent *)event client:(id) client {
-  NSRange currentSelection;
-  NSString *context = [self readContext:client at:&currentSelection];
- 
-  os_log_debug([KMLogs keyTraceLog], "handleDeleteWithReplacement, currentSelection: %{public}@: ", NSStringFromRange(currentSelection));
-
   // guard: only for compliant apps
-  if (!self.apiCompliance.canReplaceText) {
+  if (!self.apiCompliance.canReadText) {
     os_log_debug([KMLogs keyTraceLog], "cannot replace text, non-compliant");
     return NO; // return without deleting/replacing
   }
 
+  NSRange currentSelection;
+  NSString *context = [self readContext:client at:&currentSelection];
+  os_log_debug([KMLogs keyTraceLog], "handleDeleteWithReplacement, currentSelection: %{public}@: ", NSStringFromRange(currentSelection));
+
   // guard: if text is currently selected, then accept default delete behavior of removing selected text
   if (currentSelection.length > 0) {
-    os_log_debug([KMLogs keyTraceLog], "text is currently selected, accept default system handling of deleting it");
+    os_log_debug([KMLogs keyTraceLog], "text is currently selected, accept default system handling to delete it");
     return NO; // return without deleting/replacing
   }
 
@@ -616,6 +615,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
     NSRange replacementRange = NSMakeRange(replacementInfo.replacementLocation, replacementInfo.replacementLength);
 
     // perform the delete with replacement
+    os_log_debug([KMLogs keyTraceLog], "insertText with replacementString: %{public}@, replacementRange.location: %lu, replacementRange.length: %lu", replacementInfo.replacementString, replacementRange.location, replacementRange.length);
     [textInputClient insertText:replacementInfo.replacementString replacementRange:replacementRange];
   }
 
