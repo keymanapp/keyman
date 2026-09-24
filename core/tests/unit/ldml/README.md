@@ -1,10 +1,12 @@
 # LDML unit tests
 
-This directory contains unit tests that test the LDML keyboard processing.
+This directory contains unit tests that test the LDML keyboard processing and
+related functions.
 
-The driver (`ldml.cpp`) loads and executes the tests. Each test consist of a
-Keyman keyboard source file (`*.xml`) and the compiled KMXPlus keyboard.
-The source file contains rules and defines the setup, input and expected results.
+For the fixture-based tests, the driver (`ldml.tests.cpp`) loads and executes
+the tests. Each test consist of a Keyman keyboard source file (`*.xml`) and the
+compiled KMXPlus keyboard. The source file contains rules and defines the setup,
+input and expected results.
 
 ## Defining tests in the `.xml` file
 
@@ -53,11 +55,11 @@ define the setup, input and expected results.
 
 ## Running the tests
 
-All tests can be run at once with `./build.sh --debug tests`.
+All tests can be run at once with `./core/build.sh test'.
 
 Alternatively it's possible to run a single test with:
 
 ```bash
 cd core
-build/arch/debug/tests/unit/ldml/ldml 'tests/unit/ldml/000_test_zero.xml' 'tests/unit/ldml/000_test_zero.kmx'
+build/<arch>/<configuration>/tests/unit/ldml/ldml-tests 'tests/unit/ldml/fixtures/keyboards/000_test_zero.xml' 'tests/unit/ldml/fixtures/keyboards/000_test_zero.kmx'
 ```
