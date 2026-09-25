@@ -2,8 +2,6 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Created by Ross Cruickshank on 2026-09-18
- *
- *
  * This unit assists in determining whether Keyman is enabled to start with Windows in the Windows startup settings.
  *)
 unit Keyman.Configuration.System.StartupSettings;
@@ -26,8 +24,6 @@ uses
 const
   StartupEnabled: Byte = $02;
   StartupDisabled: Byte = $03;
-
-
 
 class function TWindowsStartupSettings.IsWindowsStartupDisabled: Boolean;
 var

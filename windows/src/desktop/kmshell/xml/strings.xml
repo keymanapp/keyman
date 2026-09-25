@@ -407,7 +407,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 19.0.286.0 -->
-  <string name="S_StartupDisabledWarning" comment="Startup options - Windows has disabled Keyman startup">Windows has disabled Keyman from starting automatically. Enable Keyman in Windows Startup settings.</string>
+  <string name="S_StartupDisabledWarning" comment="Startup options - Windows has disabled Keyman startup">Windows has disabled Keyman from starting automatically. Enable Keyman Configuration in Windows Startup settings.</string>
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
