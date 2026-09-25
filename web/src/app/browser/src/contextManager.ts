@@ -94,7 +94,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
       const noPropagation = (event: Event) => event.stopPropagation()
 
       // For any elements being attached, or being enabled after having been disabled...
-      this.page.on('enabled', (elem) => {
+      this.page.on('enabled', async (elem) => {
         if(!(elem._kmwAttachment.textStore instanceof DesignIFrameElementTextStore)) {
           // For anything attached but (design-mode) iframes...
 
@@ -129,12 +129,12 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
         }
 
         if(elem.ownerDocument.activeElement == elem) {
-          this.setActiveTextStore(textStoreForElement(elem), true);
+          await this.setActiveTextStore(textStoreForElement(elem), true);
         }
       });
 
       // For any elements being detached, disabled, or deliberately not being attached (b/c nonKMWTouchHandler)...
-      this.page.on('disabled', (elem) => {
+      this.page.on('disabled', async (elem) => {
         // Note:  we may not actually be attached at this point.
         if(!(nestedInstanceOf(elem, "HTMLIFrameElement"))) {
           // For anything attached but (design-mode) iframes...
@@ -169,7 +169,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
         // This block:  has to do with maintaining focus (and consequences)
         const lastElem = this.mostRecentTextStore?.getElement();
         if(lastElem && lastElem == elem) {
-          this.forgetActiveTextStore(); // should already auto-hide the OSK while at it via event.
+          await this.forgetActiveTextStore(); // should already auto-hide the OSK while at it via event.
         }
       });
 
@@ -191,7 +191,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     return this.mostRecentTextStore;
   }
 
-  public deactivateCurrentTextStore() {
+  public async deactivateCurrentTextStore() {
     const priorTextStore = this.activeTextStore || this.lastActiveTextStore;
 
     /* During integrated tests, it was possible in the past for a `beforeAll`
@@ -209,11 +209,11 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
 
     // Because of focus-maintenance effects
     if(!this.activeTextStore) {
-      this.setActiveTextStore(null, true);
+      await this.setActiveTextStore(null, true);
     }
   }
 
-  public forgetActiveTextStore() {
+  public async forgetActiveTextStore() {
     this.focusAssistant.maintainingFocus = false;
     this.focusAssistant.restoringFocus = false;
 
@@ -224,7 +224,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
 
     // Will ensure that the element is no longer active.  Does not erase
     // it from being the `lastActiveTextStore`, though.
-    this.setActiveTextStore(null, true);
+    await this.setActiveTextStore(null, true);
 
     // So we erase it here.
     if(priorTextStore == this.lastActiveTextStore) {
@@ -232,7 +232,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     }
   }
 
-  public setActiveTextStore(textStore: AbstractElementTextStore<any>, sendEvents?: boolean): void {
+  public async setActiveTextStore(textStore: AbstractElementTextStore<any>, sendEvents?: boolean): Promise<void> {
     const previousTextStore = this.mostRecentTextStore;
     const originalTextStore = this.activeTextStore; // may differ, depending on focus state.
 
@@ -283,20 +283,20 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     if(this.focusAssistant.restoringFocus) {
       this._BlurKeyboardSettings(textStore.getElement());
     } else if(textStore) {
-      this._FocusKeyboardSettings(textStore.getElement(), !hadRecentElement);
+      await this._FocusKeyboardSettings(textStore.getElement(), !hadRecentElement);
     }
 
-    // Always do the common focus stuff, instantly returning if we're in an editable iframe.
-    if(this._CommonFocusHelper(textStore)) {
-      return;
-    };
+    this._CommonFocusHelper(textStore);
 
     // Set element directionality (but only if element is empty)
     let focusedElement = textStore?.getElement();
     if(textStore instanceof DesignIFrameElementTextStore) {
       focusedElement = textStore.docRoot;
     }
-    if(focusedElement && focusedElement.ownerDocument && focusedElement instanceof focusedElement.ownerDocument.defaultView.HTMLElement) {
+    if (focusedElement && focusedElement.ownerDocument &&
+      focusedElement.ownerDocument.defaultView &&
+      focusedElement instanceof focusedElement.ownerDocument.defaultView.HTMLElement
+    ) {
       setTargetTextDirection(focusedElement, this.activeKeyboard?.keyboard);
     }
 
@@ -601,30 +601,26 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
    *                      whenever a KMW-enabled page element gains control, but only once the prior
    *                      element's loss of control is guaranteed.
    */
-  private _FocusKeyboardSettings(lastElem: HTMLElement, blockGlobalChange: boolean): void {
+  private async _FocusKeyboardSettings(elem: HTMLElement, blockGlobalChange: boolean): Promise<void> {
     // Important pre-condition:  the newly-focused element must be set as active.
-    const attachment = lastElem._kmwAttachment;
+    const attachment = elem._kmwAttachment;
     const global = this.globalKeyboard;
 
-    if (this.isElementInIndependentMode(lastElem)) {
+    if (this.isElementInIndependentMode(elem)) {
       const keyboardId = attachment.keyboard ?? global?.metadata.id ?? '';
       const languageCode = attachment.languageCode ?? global?.metadata.langId ?? '';
-      this.activateKeyboard(keyboardId, languageCode, true);
+      await this.activateKeyboard(keyboardId, languageCode, true);
     } else if(!blockGlobalChange && (global?.metadata != this._activeKeyboard?.metadata)) {
       // TODO:  can we drop `!blockGlobalChange` in favor of the latter check?
-      this.activateKeyboard(global?.metadata.id, global?.metadata.langId, true);
+      await this.activateKeyboard(global?.metadata.id, global?.metadata.langId, true);
     }
   }
 
   /**
-   * Function             _CommonFocusHelper
-   * @param   {Element}   textStore
-   * @returns {boolean}
-   * Description          Performs common state management for the various focus events of KeymanWeb.
-   *                      The return value indicates whether (true) or not (false) the calling event handler
-   *                      should be terminated immediately after the call.
+   * Performs common state management for the various focus events of KeymanWeb.
+   * @param   textStore
    */
-  private _CommonFocusHelper(textStore: AbstractElementTextStore<any>): boolean {
+  private _CommonFocusHelper(textStore: AbstractElementTextStore<any>): void {
     const {focusAssistant} = this;
 
     const activeKeyboard = this.activeKeyboard?.keyboard;
@@ -642,14 +638,12 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     // (Note that the active keyboard will have been updated by a method called before this one; the newly-focused
     // context should now be 100% ready.)
     this.resetContext();
-
-    return false;
   }
 
   /**
    * Respond to KeymanWeb-aware input element receiving focus
    */
-  private _ControlFocus = (e: FocusEvent): boolean => {
+  private _ControlFocus = async (e: FocusEvent): Promise<boolean> => {
     // Step 1: determine the corresponding TextStore instance.
     const textStore = textStoreForEvent(e);
     if(!textStore) {
@@ -666,7 +660,7 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     // }
 
     // Step 2:  Make the newly-focused control the active control, and thus the active context.
-    this.setActiveTextStore(textStore, true);
+    await this.setActiveTextStore(textStore, true);
 
     return true;
   }
@@ -846,10 +840,10 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
    * Scope        Private
    * Description  A handler for KMW-touch-disabled elements when operating on touch devices.
    */
-  public nonKMWTouchHandler = (x: Event) => {
+  public nonKMWTouchHandler = async (x: Event) => {
     this.focusAssistant.focusing=false;
     clearTimeout(this.focusAssistant.focusTimer);
-    this.forgetActiveTextStore();
+    await this.forgetActiveTextStore();
     // this.keyman.osk.hideNow(); // TODO:  is more aggressive than the default - how to migrate this tidbit?
   };
 

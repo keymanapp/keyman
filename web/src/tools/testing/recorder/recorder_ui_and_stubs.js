@@ -9,13 +9,13 @@ var ta_inputJSON;
 var in_output;
 var recorderScribe;
 
-window.focusReceiver = () => {
+window.focusReceiver = async () => {
   var receiver = document.getElementById('receiver');
   receiver.focus();
 
   if(keyman.config.hostDevice.touchable) {
     // At present, touch doesn't 'focus' properly.
-    keyman.setActiveElement(receiver);
+    await keyman.setActiveElement(receiver);
     keyman.osk.show(true);
   }
 }
@@ -305,8 +305,8 @@ window.convertSet = (testSet) => {
   let currentPromise = Promise.resolve();
   for(let i = 0; i < testSet.testSet.length; i++) { // Cannot use for(let sequence of ...) b/c not Promise-compatible.
     let sequence = testSet.testSet[i];
-    currentPromise = currentPromise.then(function() {
-      keyman.setActiveElement(in_output); // Ensure it's the active element; some of the recorder/conversion process will change this!
+    currentPromise = currentPromise.then(async function() {
+      await keyman.setActiveElement(in_output); // Ensure it's the active element; some of the recorder/conversion process will change this!
       proctor.simulateSequence(sequence);
 
       // Copy over any custom error messages that would be displayed on unit test failure.
