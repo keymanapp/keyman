@@ -3,13 +3,13 @@
  *
  * Created by Dr Mark C. Sinclair on 2026-09-24
  *
- * Tests for KMC KMN Next Generation Semantic Model Builder
+ * Tests for KMC KMN Next Generation Semantic Model Builder (KmxBuilder)
  */
 
 import 'mocha';
 import { assert } from 'chai';
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
-import { SemanticModelBuilder } from '../../src/ng-compiler/sm-builder.js';
+import { KmxBuilder } from '../../src/ng-compiler/kmx-builder.js';
 import { existsSync } from 'node:fs';
 import { baselineKeyboardNames, PATH_TO_BASELINE} from './keyboard-names.js';
 import { readFile } from './token-buffer.tests.js';
@@ -21,12 +21,12 @@ import { Parser } from '../../src/ng-compiler/kmn-analyzer.js';
 let tokenBuffer: TokenBuffer = null;
 let root: ASTNode            = null;
 
-describe("Semantic Model Builder Tests", () => {
+describe("KmxBuilder Tests", () => {
   beforeEach(() => {
     root = new ASTNode();
   });
-  it("can construct a SemanticModelBuilder", () => {
-    const builder: SemanticModelBuilder = new SemanticModelBuilder(root);
+  it("can construct a KmxBuilder", () => {
+    const builder: KmxBuilder = new KmxBuilder(root);
     assert.isNotNull(builder);
   });
   it("can provide in-memory model for baseline keyboards", function() {
@@ -38,7 +38,7 @@ describe("Semantic Model Builder Tests", () => {
       tokenBuffer = stringToTokenBuffer(buffer);
       const parser: Parser = new Parser(tokenBuffer);
       root = parser.parse();
-      const builder: SemanticModelBuilder = new SemanticModelBuilder(root);
+      const builder: KmxBuilder = new KmxBuilder(root);
       assert.isNotNull(builder.build(), `${name}.kmn`);
     });
   });
