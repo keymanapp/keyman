@@ -256,7 +256,7 @@ function make-kmc-install-zip() {
     add_zip_files "${KMCOMP_ZIP}" -q -r \
       kmconvert.exe \
       keyboard_info.schema.json \
-      xml/layoutbuilder/*.keyman-touch-layout \
+      xml/layoutbuilder/templates/*.keyman-touch-layout \
       projects/ \
       server/
   )
