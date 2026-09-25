@@ -12,9 +12,6 @@
 #include <cassert>
 #include "keyman_core.h"
 
-// Forward declarations
-class json;
-
 namespace km {
 namespace core
 {
@@ -50,9 +47,6 @@ km_core_status set_context_from_string(km_core_context *context, km_core_cu cons
 
 } // namespace core
 } // namespace km
-
-json & operator << (json &, km::core::context const &);
-json & operator << (json &, km_core_context_item const &);
 
 
 struct km_core_context : public km::core::context

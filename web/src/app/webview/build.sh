@@ -61,6 +61,10 @@ compile_and_copy() {
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
 
+  # Copy Keyman Core build artifacts for local reference
+  cp "${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/webview/debug/"
+  cp "${KEYMAN_ROOT}/web/build/engine/obj/core-adapter/import/core/"km-core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/webview/release/"
+
   # Clean the sourcemaps of .. and . components
   for script in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/debug/"*.js; do
     if [[ "${script}" == *"/km-core.js" ]]; then

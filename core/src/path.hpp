@@ -14,7 +14,6 @@
 
 #include "keyman_core.h"
 
-#include "jsonpp.hpp"
 #include "utfcodec.hpp"
 
 // Forward declarations
@@ -137,8 +136,6 @@ namespace core
     path  operator / (path const & rhs) const {
       auto r = *this; return r /= rhs;
     }
-
-    friend json & operator << (json &, path const &);
   };
 
   template<typename T>
@@ -146,11 +143,6 @@ namespace core
 
   template<typename T>
   bool operator != (T const * lhs, path const & rhs) { return rhs != lhs; }
-
-  inline
-  json & operator << (json &j, path const &p) {
-    return j << static_cast<std::string>(p);
-  }
 
   template<typename C>
   auto & operator << (std::basic_ostream<C> &os, path const &p) {

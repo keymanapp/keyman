@@ -11,6 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Build Keyman Developer web utility module" \
   "@/common/web/types" \
+  "@/common/tools/hextobin" \
   "clean" \
   "configure" \
   "build" \
@@ -47,4 +48,4 @@ function do_build() {
 builder_run_action clean       rm -rf ./build/
 builder_run_action configure   node_select_version_and_npm_ci
 builder_run_action build       do_build
-builder_run_action test        typescript_run_eslint_mocha_tests 40
+builder_run_action test        typescript_run_eslint_mocha_tests 55

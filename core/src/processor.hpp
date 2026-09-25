@@ -124,11 +124,7 @@ namespace core
 
     virtual bool
     supports_normalization() const = 0;
-
-    friend json & operator << (json &j, abstract_processor const &opts);
   };
-
-  json & operator << (json &j, abstract_processor const &opts);
 
 } // namespace core
 } // namespace km

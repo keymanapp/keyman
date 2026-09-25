@@ -55,8 +55,8 @@ function do_monaco_copy() {
   popd
 }
 
-KEYMANCORE_DLL=keymancore-2.dll
-KEYMANCORE_PDB=keymancore-2.pdb
+KEYMANCORE_DLL=keymancore-3.dll
+KEYMANCORE_PDB=keymancore-3.pdb
 
 function do_build_touch_layout_editor() {
   # TODO: this could be a configure step but leaving it here while changes are in flux

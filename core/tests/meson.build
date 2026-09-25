@@ -1,16 +1,38 @@
-# Copyright:    © 2018 SIL International.
-# Description:  Cross platform build script to compile unit tests.
-# Create Date:  2 Oct 2018
-# Authors:      Tim Eves (TSE)
-# History:      2  Oct 2018 - TSE - Added tests for utfcodec & json.
-#               19 Oct 2018 - TSE - Added kmnkbd directory for API unit tests.
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# Created by Tim Eves (TSE) on 2018-10-02
+#
+# Cross platform build script to compile unit tests.
 #
 
-# Note: this version of cmpfiles ignores line endings, which is better for platform independence
-cmpfiles = ['-c', 'import sys; a = open(sys.argv[1], \'r\').read(); b = open(sys.argv[2], \'r\').read(); sys.exit(not (a==b))']
-stnds = join_paths(meson.current_source_dir(), 'standards')
+# Include Google Test
 
-libsrc = include_directories('../src')
+gtest = subproject('gtest')
+gtest_dep = gtest.get_variable('gtest_dep')
+gmock_dep = gtest.get_variable('gmock_dep')
+
+# Shared test variables
+
+test_includes = [inc, include_directories('../src')]
+test_dependencies = [icu_uc, icu_i18n, gtest_dep, gmock_dep]
+test_warns = []
+test_link_args = []
+
+if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
+  # TODO: these two flags should be cleaned up
+  # -Wno-missing-field-initializers --> action_items.cpp
+  # -Wno-unused-parameter --> state_api.tests.cpp for test_imx_callback
+  test_warns = [
+     '-Wno-missing-field-initializers',
+     '-Wno-unused-parameter'
+  ]
+ endif
+
+
+if cpp_compiler.get_id() == 'emscripten'
+  test_link_args += ['-lnodefs.js', wasm_exported_runtime_methods]
+endif
 
 # kmx_test_source is required for linux builds, so always enable it even when we
 # disable all other tests
@@ -18,16 +40,6 @@ subdir('kmx_test_source')
 
 if get_option('keyman_core_tests')
   message('option "keyman_core_tests" is true, enabling tests')
-
-  if get_option('default_library') != 'static'
-    ctypes_void_p_size = ['-c', 'import ctypes; print(ctypes.sizeof(ctypes.c_void_p))']
-    r = run_command(python, ctypes_void_p_size, check: true)
-    python_ctypes_compatible = r.stdout().to_int() == cpp_compiler.sizeof('void *')
-    if not python_ctypes_compatible
-      message('Python ctypes is incompatible with built shared object. Disabling some tests.')
-    endif
-  endif
-
   subdir('unit')
 else
   message('option "keyman_core_tests" is false, disabling tests')

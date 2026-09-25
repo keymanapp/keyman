@@ -15,7 +15,6 @@
 
 #include "processor.hpp"
 
-#include "jsonpp.hpp"
 #include "state.hpp"
 
 
@@ -84,38 +83,3 @@ km_core_state_options_update(km_core_state *state, km_core_option_item const *op
   return KM_CORE_STATUS_OK;
 }
 
-// This function doesn't need to use the json pretty printer for such a simple
-//  list of key:value pairs but it's a good introduction to it.
-km_core_status
-km_core_state_options_to_json(km_core_state const *state, char *buf, size_t *space)
-{
-  assert(state); assert(space);
-  if (!state || !space)
-    return KM_CORE_STATUS_INVALID_ARGUMENT;
-
-  std::stringstream _buf;
-  json jo(_buf);
-
-  try
-  {
-// TODO: Fix
-//    jo << state->options();
-  }
-  catch (std::bad_alloc &)
-  {
-    *space = 0;
-    return KM_CORE_STATUS_NO_MEM;
-  }
-
-  // Fetch the finished doc and copy it to the buffer if there enough space.
-  auto const doc = _buf.str();
-  if (buf && *space > doc.size())
-  {
-    doc.copy(buf, *space);
-    buf[doc.size()] = 0;
-  }
-
-  // Return space needed/used.
-  *space = doc.size()+1;
-  return KM_CORE_STATUS_OK;
-}
