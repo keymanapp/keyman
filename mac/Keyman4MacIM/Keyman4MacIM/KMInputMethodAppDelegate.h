@@ -15,7 +15,6 @@
 #import "KMModifierMapping.h"
 #import "KMPackageReader.h"
 #import "KMInputController.h"
-#import "KMAboutWindowController.h"
 #import "KMKeyboardHelpWindowController.h"
 #import "OSKWindowController.h"
 #import "NSWindow+SuppMethods.h"
@@ -76,7 +75,6 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, assign) BOOL contextChangedByLowLevelEvent;
 @property (nonatomic, strong) OSKWindowController *oskWindow;
 @property (nonatomic, weak) KMInputController *inputController;
-@property (nonatomic, strong) KMAboutWindowController *aboutWindow;
 @property (nonatomic, strong) KMKeyboardHelpWindowController *kbHelpWindow;
 
 - (NSMenu *)menu;
@@ -89,7 +87,6 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 - (void)loadKeyboardFromKmxFile:(KMXFile *)kmx;
 - (void)resetKmx;
 - (NSEventModifierFlags) determineModifiers;
-- (NSWindowController *)aboutWindow_;
 - (NSWindowController *)kbHelpWindow_;
 - (NSString *)packageFolderFromPath:(NSString *)path;
 - (KMPackageInfo *)loadPackageInfo:(NSString *)path;

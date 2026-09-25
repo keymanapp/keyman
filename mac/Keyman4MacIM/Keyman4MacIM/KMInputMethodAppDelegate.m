@@ -989,18 +989,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  */
 
 // TODO: rewrite confusing pattern, multiple methods differing only by underscore
-- (NSWindowController *)aboutWindow_ {
-  return _aboutWindow;
-}
-
-- (NSWindowController *)aboutWindow {
-  if (_aboutWindow.window == nil) {
-    _aboutWindow = [[KMAboutWindowController alloc] initWithWindowNibName:@"KMAboutWindowController"];
-    [self observeCloseFor:_aboutWindow.window];
-  }
-  
-  return _aboutWindow;
-}
 
 - (NSWindowController *)kbHelpWindow_ {
   return _kbHelpWindow;
