@@ -1,20 +1,20 @@
 (*
   Name:             UfrmSelectTouchLayoutTemplate
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      10 Jan 2014
 
   Modified Date:    10 Jan 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          10 Jan 2014 - mcdurdin - I4021 - V9.0 - Redesign Keyboard Wizard to integrate V9 features
-                    
+
 *)
 unit UfrmSelectTouchLayoutTemplate;
 
@@ -69,7 +69,7 @@ var
   f: TSearchRec;
   Error, Root: string;
 begin
-  Root := GetLayoutBuilderPath;
+  Root := GetLayoutBuilderTemplatePath;
   if FindFirst(Root + '*'+Ext_KeymanTouchLayout, 0, f) = 0 then
   begin
     repeat
@@ -87,7 +87,7 @@ end;
 
 function TfrmSelectTouchLayoutTemplate.GetTemplateFilename: string;
 begin
-  Result := GetLayoutBuilderPath + lbTemplate.Items[lbTemplate.ItemIndex];
+  Result := GetLayoutBuilderTemplatePath + lbTemplate.Items[lbTemplate.ItemIndex];
 end;
 
 end.

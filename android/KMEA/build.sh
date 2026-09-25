@@ -55,15 +55,11 @@ do_build() {
   builder_echo "Copying Keyman Web artifacts"
   cp "$KEYMAN_ROOT/web/build/app/webview/$BUILDER_CONFIGURATION/keymanweb-webview.js" "$ENGINE_ASSETS/"
   cp "$KEYMAN_ROOT/web/build/app/webview/$BUILDER_CONFIGURATION/keymanweb-webview.js.map" "$ENGINE_ASSETS/"
-  cp "$KEYMAN_ROOT/web/build/app/webview/$BUILDER_CONFIGURATION/map-polyfill.js" "$ENGINE_ASSETS/"
   cp "$KEYMAN_ROOT/web/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/"
   cp "$KEYMAN_ROOT/web/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/"
   cp "$KEYMAN_ROOT/web/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/"
   cp "$KEYMAN_ROOT/web/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/"
   cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
-
-  builder_echo "Copying es6-shim polyfill"
-  cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$ENGINE_ASSETS/"
 
   builder_echo "BUILD_FLAGS $BUILD_FLAGS"
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Keyman</key>
+	<dict>
+		<key>SentryEnvironment</key>
+		<string>$(SENTRY_ENVIRONMENT)</string>
+		<key>Tier</key>
+		<string>$(TIER)</string>
+		<key>VersionGitTag</key>
+		<string>$(VERSION_GIT_TAG)</string>
+		<key>VersionRelease</key>
+		<string>$(VERSION_RELEASE)</string>
+		<key>VersionTag</key>
+		<string>$(VERSION_TAG)</string>
+		<key>VersionWithTag</key>
+		<string>$(VERSION_WITH_TAG)</string>
+	</dict>
+</dict>
+</plist>
