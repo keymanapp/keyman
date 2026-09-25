@@ -976,6 +976,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSWindow *alertWindow = [alert window];
     [alertWindow setLevel:NSFloatingWindowLevel];
     [alertWindow orderFrontRegardless];
+    [alertWindow center];
 
     [alert runModal];
   });
