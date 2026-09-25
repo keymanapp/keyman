@@ -453,15 +453,10 @@ final class KMKeyboard extends WebView {
   public void onResume() {
     DisplayMetrics dms = context.getResources().getDisplayMetrics();
     int kbWidth = (int) (dms.widthPixels / dms.density);
+
     // Refresh the setting whenever the view is reloaded;
     // we may have swapped between app and system keyboards.
-    if(this.keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      // Within the main engine, we'll assume that it's always used for text.
-      // We don't currently support a way to adjust that for the in-app keyboard.
-      KMManager.setPredictionsSuspended(InputType.TYPE_CLASS_TEXT, this.keyboardType);
-      KMManager.setAutocorrectionsSuspended(InputType.TYPE_CLASS_TEXT, this.keyboardType);
-    }
-    KMManager.setBannerOptions(true);
+    KMManager.refreshSuggestionType(this.keyboardType);
 
     // Get the correct keyboard height for current orientation
     int kbHeight = KMManager.getKeyboardHeight(context);

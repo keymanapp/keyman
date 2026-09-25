@@ -169,7 +169,7 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       // for the rest of the lifetime of this keyboard instance.
       kmKeyboard.setShouldShowHelpBubble(false);
     } else if (url.indexOf("refreshBannerHeight") >= 0) {
-      KMManager.setBannerOptions(KMManager.determinePredictionConfig(context, keyboardType), keyboardType);
+      KMManager.refreshSuggestionType(keyboardType);
       RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
       kmKeyboard.setLayoutParams(params);
     } else if (url.indexOf("suggestPopup") >= 0) {

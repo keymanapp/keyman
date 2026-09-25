@@ -172,7 +172,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     Context appContext = getApplicationContext();
     // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
     inputType = attribute.inputType;
-    KMManager.setAutocorrectionsSuspended(inputType, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     KMManager.setPredictionsSuspended(inputType, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     if (KMManager.getPredictionsSuspended(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       KMManager.setBannerOptions(false);
