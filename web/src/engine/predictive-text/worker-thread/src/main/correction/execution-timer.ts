@@ -369,7 +369,7 @@ export class ExecutionTimer {
     // By using the state field, we'll get an error if we somehow call other
     // class methods during the defer.
     this.activeSpan = new ExecutionSpan(this.deferBucket, () => this.activeSpan = null);
-    // WebWorker messages appear to come in via the macrotask queue.
+    // Worker messages appear to come in via the macrotask queue.
     await timedPromise(minWait);
     this.activeSpan.end();
 

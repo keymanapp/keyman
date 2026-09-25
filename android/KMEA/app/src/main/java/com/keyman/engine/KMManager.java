@@ -375,6 +375,7 @@ public final class KMManager {
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
+  protected static final String KMFilename_LMWorker = "worker-thread.js";
   protected static final String KMFilename_JSSentry = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
@@ -1073,10 +1074,12 @@ public final class KMManager {
     AssetManager assetManager = context.getAssets();
 
     try {
+      // TODO: these files should be in a constant array, not enumerated separately here (see also iOS)
       // Copy KMW files
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
 
       copyAsset(context, KMFilename_JSEngine, "", true);
+      copyAsset(context, KMFilename_LMWorker, "", true);
       copyAsset(context, KMFilename_JSSentry, "", true);
       copyAsset(context, KMFilename_AndroidHost, "", true);
       copyAsset(context, KMFilename_KmwCss, "", true);

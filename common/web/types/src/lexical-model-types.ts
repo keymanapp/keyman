@@ -259,8 +259,8 @@ export interface Transform {
    * transition event - say, the resulting effects of neighbor keys that may
    * have been missed due to "fat fingering".
    *
-   * Also note that the Transform reference cannot be preserved across WebWorker
-   * boundaries, but this ID may.
+   * Also note that the Transform reference cannot be preserved across
+   * WebPredictiveTextWorker boundaries, but this ID may.
    *
    * This is *separate* from any LMLayer-internal identification values.
    */
