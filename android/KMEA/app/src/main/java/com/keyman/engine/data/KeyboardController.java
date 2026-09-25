@@ -188,16 +188,15 @@ public class KeyboardController {
    * If no match, returns INDEX_NOT_FOUND
    * @param key - String of the key to find
    * @return int - Index of the matching keyboard
+   *
+   * Note: do not perform logging here because KMLog.tagDebugInfo can call this, causing recursion
    */
   public int getKeyboardIndex(String key) {
-    int index = INDEX_NOT_FOUND;
     if (!isInitialized || list == null) {
-      KMLog.LogError(TAG, "getKeyboardIndex while KeyboardController() not initialized");
-      return index;
+      return INDEX_NOT_FOUND;
     }
     if (key == null || key.isEmpty()) {
-      KMLog.LogError(TAG, "getKeyboardIndex while key is null");
-      return index;
+      return INDEX_NOT_FOUND;
     }
 
     synchronized (list) {
@@ -209,11 +208,7 @@ public class KeyboardController {
       }
     }
 
-    // We'll only log if key isn't for fallback keyboard
-    if (!KMManager.isDefaultKey(key)) {
-      KMLog.LogError(TAG, "getKeyboardIndex failed for key " + key);
-    }
-    return index;
+    return INDEX_NOT_FOUND;
   }
 
   /**
