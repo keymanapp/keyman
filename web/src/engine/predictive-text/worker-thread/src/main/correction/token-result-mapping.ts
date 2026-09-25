@@ -12,7 +12,6 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import { CorrectionResultMapping } from './correction-result-mapping.js';
 import { SearchNode, TraversableToken } from "./distance-modeler.js";
-import { TokenResult } from './tokenization-corrector.js';
 
 // Circular type reference; do not actually require direct use of the prototype
 // or constructor!
@@ -34,8 +33,8 @@ export function initTokenResultFilterer() {
       return false;
     }
 
-    if((priorReturnCosts.get(searchResult.matchString) ?? Number.MAX_VALUE) > searchResult.totalCost) {
-      priorReturnCosts.set(searchResult.matchString, searchResult.totalCost);
+    if((priorReturnCosts.get(searchResult.matchString) ?? Number.MAX_VALUE) > searchResult.correctionCost) {
+      priorReturnCosts.set(searchResult.matchString, searchResult.correctionCost);
 
       return true;
     } else {
@@ -46,7 +45,7 @@ export function initTokenResultFilterer() {
   return closure;
 }
 
-export class TokenResultMapping implements CorrectionResultMapping<SearchNode>, TokenResult {
+export class TokenResultMapping implements CorrectionResultMapping<SearchNode> {
   readonly matchingSpace: SearchQuotientNode;
   private readonly node: SearchNode;
   readonly spaceId: number;
@@ -119,6 +118,14 @@ export class TokenResultMapping implements CorrectionResultMapping<SearchNode>, 
    * multiplied by the 'probability' induced by needed Damerau-Levenshtein edits
    * to the resulting output.
    */
+  get correctionCost(): number {
+    return this.node.correctionCost;
+  }
+
+  get currentCost(): number {
+    return this.node.currentCost;
+  }
+
   get totalCost(): number {
     return this.node.currentCost;
   }

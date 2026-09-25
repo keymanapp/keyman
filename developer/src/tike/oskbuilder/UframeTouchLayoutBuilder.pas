@@ -218,7 +218,7 @@ procedure TframeTouchLayoutBuilder.FormCreate(Sender: TObject);
 begin
   inherited;
   FDisplayScriptErrors := True;   // I4047
-  FTemplateFileName := GetLayoutBuilderPath + 'template-basic' + Ext_KeymanTouchLayout;   // I4226
+  FTemplateFileName := GetLayoutBuilderTemplatePath + CTouchLayout_BasicTemplate;   // I4226
 
   cef := TframeCEFHost.Create(Self);
   cef.Parent := Self;
