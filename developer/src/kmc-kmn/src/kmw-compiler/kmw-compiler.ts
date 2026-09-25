@@ -286,12 +286,6 @@ export function WriteCompiledKeyboard(
     result += WriteBeginStatement(keyboard, 'gpk', rec.Use.GroupIndex);
   }
 
-  const fgp = keyboard.groups[keyboard.startGroup.unicode];
-  result +=
-    `${FTabStop}this.gs=function(t,e) {${nl}` +
-    `${FTabStop+FTabStop}return this.g${JavaScript_Name(keyboard.startGroup.unicode, fgp.dpName)}(t,e);${nl}` +
-    `${FTabStop}};${nl}`; // I3681
-
 	for(let i = 0; i < keyboard.groups.length; i++) {  // I1964
     const fgp = keyboard.groups[i];
     /*
