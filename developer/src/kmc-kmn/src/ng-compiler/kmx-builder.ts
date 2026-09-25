@@ -3,17 +3,22 @@
  *
  * Created by Dr Mark C. Sinclair on 2026-09-24
  *
- * KMC KMN Next Generation Semantic Model Builder
+ * KMC KMN Next Generation Semantic Model Builder (KmxBuilder)
  */
 
-import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
+import { ASTNode } from './tree-construction.js';
+import { DwFileVersion } from './kmx-enums.js';
+import { NodeType } from './node-type.js';
 
 /**
- * The Next Generation KMX Builder for the Keyman Keyboard Language.
+ * The Next Generation Semantic Model Builder for the Keyman Keyboard Language.
  *
  * The KMX Builder builds an in-memory model from the supplied Abstract Syntax Tree (AST).
  */
 export class KmxBuilder {
+  /** the KmxModel to be built */
+  private model = new KmxModel();
+
   /**
    * Construct a KmxBuilder
    */
@@ -26,7 +31,21 @@ export class KmxBuilder {
   /**
    * Uses the AST to build an in-memory model of a KMN file.
    */
-  public build(): ASTNode {
-    return this.root;
+  public build(): KmxModel {
+    this.buildHeader();
+    return this.model;
   }
+
+  private buildHeader() {
+    if (this.root.hasSoleChildOfType(NodeType.STORES)) {
+      this.model.dwFileVersion = DwFileVersion.VERSION_190;
+    }
+  }
+}
+
+/*
+ * KmxModel is an in-memory model of a KMX file.
+ */
+export class KmxModel {
+  dwFileVersion: DwFileVersion;
 }
