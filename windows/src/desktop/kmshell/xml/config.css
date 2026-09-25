@@ -738,17 +738,29 @@ table tr
 }
 .options_startup_warning
 {
-  background: #FFF4CE;
-  border: 1px solid #D6B656;
-  color: #4A3B00;
+  background: #FFFFFF;
+  border: 2px solid #CC3846;
+  color: #000000;
+  display: flex;
+  align-items: flex-start;
   margin: 4px 8px 8px 32px;
   padding: 8px;
 }
-.options_startup_warning input,
-.options_startup_warning button
+.options_startup_warning_icon
 {
-  margin-left: 0;
-  margin-top: 6px;
+  flex: 0 0 auto;
+  height: 32px;
+  margin: 8px 8px 0 0;
+  width: 32px;
+}
+.options_startup_warning_content
+{
+  flex: 1 1 auto;
+}
+#options .options_startup_warning input,
+#options .options_startup_warning button
+{
+  margin: 6px 0 0;
 }
 #options_control
 {
