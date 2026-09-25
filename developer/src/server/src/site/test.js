@@ -207,7 +207,7 @@ window.onload = function() {
 function setupKeyman() {
   window.setTimeout(
     function () {
-      keyman.moveToElement('ta1');
+      ta1.focus();
     }, 10
   );
 

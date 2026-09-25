@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 19.0.293 alpha 2026-09-25
+
+* fix(mac): change .pkg name to lower case (#16659)
+* chore(deps-dev): bump grunt from 1.4.1 to 1.5.3 in /developer/src/tike/xml/layoutbuilder/src/ext/jquery-ui (#16648)
+* chore(deps): bump multer from 2.2.0 to 2.3.0 (#16543)
+* chore(web): clarify `LanguageProcessorSpec` usage (#16662)
+* docs(web): deprecate `keyman.moveToElement(elem)` API (#16661)
+* chore(developer): cleanup tike build.sh for touch-layout-editor (#16665)
+* change(mac): remove unused minizip code (#16639)
+
 ## 19.0.292 alpha 2026-09-24
 
 * chore(windows): use ✕ U+2715 consistently in localizations (#16566)
