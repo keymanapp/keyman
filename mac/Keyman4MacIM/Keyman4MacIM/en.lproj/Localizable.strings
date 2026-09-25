@@ -80,3 +80,11 @@
 /* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
 "no-keyboard-configured-menu-placeholder" = "(No Keyboard Configured)";
 
+/* title of alert for configuration app not found */
+"alert-title-config-app-not-found" = "Keyman Configuration not found";
+
+/* text of alert for configuration app not found */
+"alert-text-config-app-not-found" = "Keyman Configuration could not be found in your Applications folder or elsewhere on your Mac.";
+
+/* OK button label */
+"ok-button-label" = "OK";
