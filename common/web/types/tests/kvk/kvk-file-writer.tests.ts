@@ -68,7 +68,7 @@ describe('Test of KVK-File-Writer', () => {
       const binary: BUILDER_KVK_FILE = writer['build'](vk);
       checkBuilderKvkFile(binary, vk);
     });
-    it.skip('can handle a null associatedKeyboard', () => {
+    it('can handle a null associatedKeyboard', () => {
       const vk_associatedKeyboard: string = null;
       const vk = initVisualKeyboard([
           initVisualKeyboardKey(0),
@@ -86,7 +86,7 @@ describe('Test of KVK-File-Writer', () => {
       const binary: BUILDER_KVK_FILE = writer['build'](vk);
       checkBuilderKvkFile(binary, vk);
     });
-    it.skip('can handle a null ansiFont name', () => {
+    it('can handle a null ansiFont name', () => {
       const vk_ansiFont_name: string = null;
       const vk = initVisualKeyboard([
           initVisualKeyboardKey(0),
@@ -104,7 +104,7 @@ describe('Test of KVK-File-Writer', () => {
       const binary: BUILDER_KVK_FILE = writer['build'](vk);
       checkBuilderKvkFile(binary, vk);
     });
-    it.skip('can handle a null unicodeFont name', () => {
+    it('can handle a null unicodeFont name', () => {
       const vk_unicodeFont_name: string = null;
       const vk = initVisualKeyboard([
           initVisualKeyboardKey(0),
