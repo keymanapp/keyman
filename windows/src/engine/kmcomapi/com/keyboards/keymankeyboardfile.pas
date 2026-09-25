@@ -37,7 +37,7 @@ uses
   keymankeyboard, keymancontext, Classes, PackageInfo, keymankeyboardlanguagesfile;
 
 type
-  TKeymanKeyboardFile = class(TKeymanKeyboard, IKeymanKeyboardFile, IKeymanKeyboardFile2)
+  TKeymanKeyboardFile = class(TKeymanKeyboard, IKeymanKeyboardFile, IKeymanKeyboardFile2, IKeymanKeyboardFile3)
   private
     FFileName: WideString;
     FError: Boolean;
@@ -52,6 +52,7 @@ type
     { IKeymanKeyboardFile }
     procedure Install(Force: WordBool); safecall;
     function Install2(Force: WordBool): IKeymanKeyboardInstalled; safecall;
+    function Install3(Force: WordBool; BaseKeyboardID: Integer): IKeymanKeyboardInstalled; safecall;
 
     { IKeymanKeyboard }
     function Get_Copyright: WideString; override; safecall;
@@ -252,7 +253,7 @@ procedure TKeymanKeyboardFile.Install(Force: WordBool);
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FFileName, '', [ikLegacyRegisterAndInstallProfiles], nil, Force);
+    Execute(FFileName, '', [ikLegacyRegisterAndInstallProfiles], nil, Force, 0);
   finally
     Free;
   end;
@@ -264,7 +265,23 @@ var
 begin
   with TKPInstallKeyboard.Create(Context) do
   try
-    Execute(FFileName, '', [], nil, Force);
+   Execute(FFileName, '', [], nil, Force, 0);
+  finally
+    Free;
+  end;
+
+  kki := Context.Keyboards as IKeymanKeyboardsInstalled;
+  kki.Refresh;
+  Result := kki.Items[FFileName];
+end;
+
+function TKeymanKeyboardFile.Install3(Force: WordBool; BaseKeyboardID: Integer): IKeymanKeyboardInstalled;
+var
+  kki: IKeymanKeyboardsInstalled;
+begin
+  with TKPInstallKeyboard.Create(Context) do
+  try
+    Execute(FFileName, '', [], nil, Force, BaseKeyboardID);
   finally
     Free;
   end;
