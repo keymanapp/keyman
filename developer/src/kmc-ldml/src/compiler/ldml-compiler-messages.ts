@@ -40,7 +40,7 @@ export class LdmlCompilerMessages {
   static ERROR_KeyNotFoundInKeyBag = SevError | 0x0005;
   static Error_KeyNotFoundInKeyBag = (o: { keyId: string, col: number, row: number, layer: string, form: string }, compileContext?: ObjectWithCompileContext) => mx(
     this.ERROR_KeyNotFoundInKeyBag, compileContext,
-    `Key '${def(o.keyId)}' in position #${def(o.col)} on row #${def(o.row)} of layer ${def(o.layer)}, form '${def(o.form)}' not found in key bag`,
+    `Key '${def(o.keyId)}' in position #${def(o.col)} on row #${def(o.row)} of layer '${def(o.layer)}', form '${def(o.form)}' not found in key bag`,
   );
 
   static HINT_OneOrMoreRepeatedLocales = SevHint | 0x0006;
@@ -277,7 +277,7 @@ export class LdmlCompilerMessages {
   );
 
   static ERROR_InvalidLayerWidth = SevError | 0x002D;
-  static Error_InvalidLayerWidth = (o: { minDeviceWidth: number }, compileContext?: ObjectWithCompileContext) => mx(
+  static Error_InvalidLayerWidth = (o: { minDeviceWidth: number | string }, compileContext?: ObjectWithCompileContext) => mx(
     this.ERROR_InvalidLayerWidth, compileContext,
     `Invalid Layers minDeviceWidth=${def(o.minDeviceWidth)}`,
     `Width must be between 1-999 (millimeters), inclusive.` // sync with layr_max_minDeviceWidth / layr_max_maxDeviceWidth (from spec)
@@ -292,7 +292,51 @@ export class LdmlCompilerMessages {
     `**Hint**: Use "${def(o.recommended)}"`,
   );
 
-  static ERROR_InvalidTargetVersion = SevError | 0x0031;
+  static ERROR_TouchLayerRequiresId = SevError | 0x0031;
+  static Error_TouchLayerRequiresId = (o: { minDeviceWidth: number }, compileContext?: ObjectWithCompileContext) => mx(
+    this.ERROR_TouchLayerRequiresId, compileContext,
+    `Layer for touch form with minDeviceWidth=${def(o.minDeviceWidth)} requires an "id" attribute`, `
+    Touch layers must have an \`id\` attribute, but should not have a \`modifiers\`
+    attribute, and conversely, hardware layers must have a \`modifiers\` attribute
+    and should not have an \`id\` attribute.
+  `);
+
+  static HINT_TouchLayerHasModifiers = SevHint | 0x0032;
+  static Hint_TouchLayerHasModifiers = (o: { minDeviceWidth: number, id: string }, compileContext?: ObjectWithCompileContext) => mx(
+    this.HINT_TouchLayerHasModifiers, compileContext,
+    `Touch layer with id "${def(o.id)}" for touch form with minDeviceWidth=${def(o.minDeviceWidth)} should not have a "modifiers" attribute`, `
+    Touch layers must have an \`id\` attribute, but should not have a \`modifiers\`
+    attribute, and conversely, hardware layers must have a \`modifiers\` attribute
+    and should not have an \`id\` attribute.
+  `);
+
+  static HINT_HardwareLayerHasId = SevHint | 0x0033;
+  static Hint_HardwareLayerHasId = (o: { formId: string, id: string }, compileContext?: ObjectWithCompileContext) => mx(
+    this.HINT_HardwareLayerHasId, compileContext,
+    `Layer for hardware form "${def(o.formId)}" should not have an "id" attribute (currently "${def(o.id)}")`, `
+    Touch layers must have an \`id\` attribute, but should not have a \`modifiers\`
+    attribute, and conversely, hardware layers must have a \`modifiers\` attribute
+    and should not have an \`id\` attribute.
+  `);
+
+  static ERROR_HardwareLayerRequiresModifiers = SevError | 0x0034;
+  static Error_HardwareLayerRequiresModifiers = (o: { formId: string }, compileContext?: ObjectWithCompileContext) => mx(
+    this.ERROR_HardwareLayerRequiresModifiers, compileContext,
+    `Layers for hardware form "${def(o.formId)}" require a "modifiers" attribute`, `
+    Touch layers must have an \`id\` attribute, but should not have a \`modifiers\`
+    attribute, and conversely, hardware layers must have a \`modifiers\` attribute
+    and should not have an \`id\` attribute.
+  `);
+
+  static HINT_MultipleTouchFormsWithoutMinDeviceWidth = SevHint | 0x0035;
+  static Hint_MultipleTouchFormsWithoutMinDeviceWidth = (compileContext?: ObjectWithCompileContext) => mx(
+    this.HINT_MultipleTouchFormsWithoutMinDeviceWidth, compileContext,
+    `When multiple touch forms are present, 'minDeviceWidth' is required to differentiate them`, `
+    Touch forms are differentiated by their minimum device width, so when there is
+    more than one, at most one form may omit the \`minDeviceWidth\` attribute.
+  `);
+
+  static ERROR_InvalidTargetVersion = SevError | 0x0036;
   static Error_InvalidTargetVersion = (o: {version: number}) => m(
     this.ERROR_InvalidTargetVersion,
     `Target version ${def(o.version)} is not a valid version. Only 17.0 and 19.0 target versions are currently supported for LDML keyboards."`,
