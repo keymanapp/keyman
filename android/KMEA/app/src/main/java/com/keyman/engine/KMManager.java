@@ -1736,7 +1736,11 @@ public final class KMManager {
     // Disable sugestions if lexical-model file doesn't exist
     if (!modelFile.exists()) {
       modelFileExists = false;
-      setBannerOptions(false);
+      if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange()) {
+        setSuggestionType(KeyboardType.KEYBOARD_TYPE_INAPP, SuggestionType.SUGGESTIONS_DISABLED);
+      } else if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange()) {
+        setSuggestionType(KeyboardType.KEYBOARD_TYPE_SYSTEM, SuggestionType.SUGGESTIONS_DISABLED);
+      }
       KMLog.LogError(TAG, modelFile.getAbsolutePath() + " does not exist");
     }
 
