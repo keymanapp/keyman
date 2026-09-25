@@ -80,6 +80,22 @@ run_in_delphi_env() {
   )
 }
 
+#
+# If map2pdb is on the path, then run it. Note: we do not include it in the repo
+# because it can have false positives in malware scans. map2pdb is used to
+# generate .pdb files for Delphi-generated executables, which can then be used
+# in debuggers such as WinDbg, or profilers such as VTune.
+#
+do_map2pdb() {
+  local map="$1"
+  local exe="$2"
+  # echo "prev '$map'"
+  map="${map//\//\\}"
+  if hash map2pdb 2>/dev/null; then
+    map2pdb "${map}" -bind:"${exe}"
+  fi
+}
+
 sentrytool_delphiprep() {
   if builder_is_ci_build && builder_is_ci_build_level_build; then
     builder_echo "Skipping sentrytool_delphiprep - buildLevel=build: $@"
