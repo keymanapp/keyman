@@ -33,6 +33,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.InputType;
 import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -452,6 +453,10 @@ final class KMKeyboard extends WebView {
   public void onResume() {
     DisplayMetrics dms = context.getResources().getDisplayMetrics();
     int kbWidth = (int) (dms.widthPixels / dms.density);
+
+    // Refresh the setting whenever the view is reloaded;
+    // we may have swapped between app and system keyboards.
+    KMManager.refreshSuggestionType(this.keyboardType);
 
     // Get the correct keyboard height for current orientation
     int kbHeight = KMManager.getKeyboardHeight(context);
