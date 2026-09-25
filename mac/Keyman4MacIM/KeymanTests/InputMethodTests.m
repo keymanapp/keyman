@@ -23,6 +23,7 @@ id testClient = nil;
 @interface InputMethodTests : XCTestCase
 @end
 
+// redeclare private properties and functions to expose for testing
 @interface KMInputMethodEventHandler (Testing)
 @property (nonatomic, retain) TextApiCompliance* apiCompliance;
 @property (nonatomic, retain) NSString* clientApplicationId;
@@ -30,7 +31,10 @@ id testClient = nil;
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender;
 - (NSRange) calculateInsertRangeForDeletedText:(NSString*)textToDelete selectionRange:(NSRange) selection;
 - (void)checkTextApiCompliance:(id)client;
-
+- (ReplacementInfo)evaluateForReplaceability:(NSString*) context
+                           textStoreLocation:(NSUInteger)textStoreLocation
+                                deleteLength:(NSUInteger)deleteLength
+                    locationOfDeletionTarget:(NSUInteger)deletionLocation;
 @end
 
 @implementation InputMethodTests
@@ -90,6 +94,112 @@ id testClient = nil;
   NSRange insertRange = [testEventHandler calculateInsertRangeForDeletedText:@"'" selectionRange:selectionRange];
   BOOL correctResult = (insertRange.location == 1) && (insertRange.length == 2);
   XCTAssertTrue(correctResult, @"insert or replacement range expected to be {1,2}");
+}
+
+- (void)testEvaluateReplacement_precededByControlCharacter_canReplaceFalse {
+  NSString *context = @"test\ta";
+  NSUInteger storeLocation = 100;
+  NSUInteger deletionLength = 1;
+  NSUInteger locationOfDeletion = 5;
+
+  ReplacementInfo replacementInfo = [testEventHandler evaluateForReplaceability: context textStoreLocation:storeLocation deleteLength:deletionLength locationOfDeletionTarget:locationOfDeletion];
+  XCTAssertFalse(replacementInfo.canDeleteWithReplacement, @"target preceded by control character, canDelete should be false");
+}
+
+- (void)testEvaluateReplacement_precededByLatinCharacter_canReplaceTrue {
+  NSString *context = @"testxa";
+  NSUInteger storeLocation = 100;
+  NSUInteger deletionLength = 1;
+  NSUInteger locationOfDeletion = 5;
+  
+  ReplacementInfo replacementInfo = [testEventHandler evaluateForReplaceability: context textStoreLocation:storeLocation deleteLength:deletionLength locationOfDeletionTarget:locationOfDeletion];
+  
+  XCTAssertTrue([replacementInfo.replacementString isEqualToString:@"x"], @"replacementString should be == 'x'");
+  XCTAssertTrue(replacementInfo.replacementLength == 2, @"replacementLength should be 2");
+}
+
+//𑒏𑒹
+
+- (void)testEvaluateReplacement_latinCharacterPrecededBySurrogatePair_replacementLengthThree {
+  NSString *context = @"test.𑒏a";
+  NSString *stringToDelete = @"a";
+  
+  NSRange range = [context rangeOfString:stringToDelete];
+  
+  NSUInteger storeLocation = 100;
+  NSUInteger deletionLength = stringToDelete.length;
+  NSUInteger locationOfDeletion = range.location;
+  
+  ReplacementInfo replacementInfo = [testEventHandler evaluateForReplaceability: context textStoreLocation:storeLocation deleteLength:deletionLength locationOfDeletionTarget:locationOfDeletion];
+  
+  XCTAssertTrue([replacementInfo.replacementString isEqualToString:@"𑒏"], @"replacementString is incorrect");
+  XCTAssertTrue(replacementInfo.replacementLength == 3, @"replacementLength should == 3");
+}
+
+- (void)testEvaluateReplacement_surrogatePairPrecededByLatinCharacter_replacementLengthThree {
+  NSString *context = @"test.a𑒏";
+  NSString *stringToDelete = @"𑒏";
+  
+  NSRange range = [context rangeOfString:stringToDelete];
+  
+  NSUInteger storeLocation = 100;
+  NSUInteger deletionLength = stringToDelete.length;
+  NSUInteger locationOfDeletion = range.location;
+  
+  ReplacementInfo replacementInfo = [testEventHandler evaluateForReplaceability: context textStoreLocation:storeLocation deleteLength:deletionLength locationOfDeletionTarget:locationOfDeletion];
+  
+  XCTAssertTrue([replacementInfo.replacementString isEqualToString:@"a"], @"replacementString is incorrect");
+  XCTAssertTrue(replacementInfo.replacementLength == 3, @"replacementLength should == 3");
+}
+
+- (void)testEvaluateReplacement_latinCharacterPrecededByCheckeredFlag_replacementLengthThree {
+  NSString *context = @"test🏁a";
+  NSString *stringToDelete = @"a";
+  
+  NSRange range = [context rangeOfString:stringToDelete];
+  
+  NSUInteger storeLocation = 100;
+  NSUInteger deletionLength = stringToDelete.length;
+  NSUInteger locationOfDeletion = range.location;
+  
+  ReplacementInfo replacementInfo = [testEventHandler evaluateForReplaceability: context textStoreLocation:storeLocation deleteLength:deletionLength locationOfDeletionTarget:locationOfDeletion];
+  
+  XCTAssertTrue([replacementInfo.replacementString isEqualToString:@"🏁"], @"replacementString should be == '🏁'");
+  XCTAssertTrue(replacementInfo.replacementLength == 3, @"replacementLength should == 3");
+}
+
+- (void)testEvaluateReplacement_checkeredFlagPrecededByLatinCharacter_replacementLengthThree {
+  NSString *context = @"testa🏁";
+  NSString *stringToDelete = @"🏁";
+  
+  NSRange range = [context rangeOfString:stringToDelete];
+  
+  NSUInteger storeLocation = 100;
+  NSUInteger deletionLength = stringToDelete.length;
+  NSUInteger locationOfDeletion = range.location;
+  
+  ReplacementInfo replacementInfo = [testEventHandler evaluateForReplaceability: context textStoreLocation:storeLocation deleteLength:deletionLength locationOfDeletionTarget:locationOfDeletion];
+  
+  XCTAssertTrue([replacementInfo.replacementString isEqualToString:@"a"], @"replacementString should be == 'a'");
+  XCTAssertTrue(replacementInfo.replacementLength == 3, @"replacementLength should == 3");
+}
+
+// Note: though this test checks the calculation, deleting the jolly roger emoji will currently not behave as expected.
+// Keyman core instructs only part of the emoji to be deleted. The same happens with emoji with skin tones.
+- (void)testEvaluateReplacement_jollyRogerPrecededByLatinCharacter_replacementLengthSix {
+  NSString *context = @"testa🏴‍☠️";
+  NSString *stringToDelete = @"🏴‍☠️";
+  
+  NSRange range = [context rangeOfString:stringToDelete];
+  
+  NSUInteger storeLocation = 100;
+  NSUInteger deletionLength = stringToDelete.length;
+  NSUInteger locationOfDeletion = range.location;
+  
+  ReplacementInfo replacementInfo = [testEventHandler evaluateForReplaceability: context textStoreLocation:storeLocation deleteLength:deletionLength locationOfDeletionTarget:locationOfDeletion];
+  
+  XCTAssertTrue([replacementInfo.replacementString isEqualToString:@"a"], @"replacementString should be == 'a'");
+  XCTAssertTrue(replacementInfo.replacementLength == 6, @"replacementLength should == 6");
 }
 
 /**

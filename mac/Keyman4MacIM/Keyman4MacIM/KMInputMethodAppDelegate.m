@@ -330,7 +330,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
     // Too many of these to be useful for most debugging sessions, but we'll keep this around to be
     // un-commented when needed.
-    os_log_debug([KMLogs keyTraceLog], "System Event: %{public}@", sysEvent);
+//    os_log_debug([KMLogs keyTraceLog], "System Event: %{public}@", sysEvent);
     
     switch (type) {
       case kCGEventFlagsChanged:
