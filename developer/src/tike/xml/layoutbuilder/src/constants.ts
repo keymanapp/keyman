@@ -1,5 +1,3 @@
-/// <reference path="ext/index.d.cts"/>
-/// <reference path="ext/jquery-ui/index.d.cts"/>
 
 const standardKeyNames = [
   'K_?00',      // &H0
