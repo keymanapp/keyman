@@ -30,6 +30,10 @@ NSString *const kKeyboardsChanged = @"com.keyman.keyboards.changed";
 NSString *const kAccessibilityCheckedRequest = @"com.keyman.accessibility.check.request";
 NSString *const kAccessibilityRequest = @"com.keyman.accessibility.request";
 
+// information for launching Keyman Configuration app
+NSString *const kConfigBundleId = @"com.keyman.config";
+NSString *const kDefaultConfigPath = @"/Applications/Keyman Configuration.app";
+
 @implementation NSString (VersionNumbers)
 /**
  * Returns a minimal version number by removing all '.0' from end of string,
@@ -702,7 +706,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [osk setAction:@selector(menuAction:)];
   }
   
-  NSMenuItem *about = [self.menu itemWithTag:ABOUT_MENUITEM_TAG];
+  NSMenuItem *about = [self.menu itemWithTag:CONFIG_MENUITEM_TAG];
   if (about) {
     [about setAction:@selector(menuAction:)];
   }
@@ -925,10 +929,56 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [KMSentryHelper addOskVisibleTag:[self.oskWindow.window isVisible]];
 }
 
-- (void)showAboutWindow {
-  [self.aboutWindow.window centerInParent];
-  [self.aboutWindow.window makeKeyAndOrderFront:nil];
-  [self.aboutWindow.window setLevel:NSFloatingWindowLevel];
+/**
+ * Launch the Keyman Configuration app.
+ * First try the Applications folder, and if it isn't there, use the bundleID to open it wherever it is.
+ */
+- (void)launchKeymanConfiguration {
+  NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  
+  // first try to find the app in the Applications directory
+  NSURL *appURL = [NSURL fileURLWithPath:kDefaultConfigPath];
+  
+  if ([fileManager fileExistsAtPath:kDefaultConfigPath]) {
+    [workspace openURL:appURL options:NSWorkspaceLaunchDefault configuration:@{} error:nil];
+    return;
+  }
+  
+  // if app was not located in the Applications directory, search by bundleID
+  NSURL *fallbackURL = [workspace URLForApplicationWithBundleIdentifier:kConfigBundleId];
+  if (fallbackURL) {
+    [workspace openURL:fallbackURL options:NSWorkspaceLaunchDefault configuration:@{} error:nil];
+  } else {
+    [self showConfigAppNotFoundAlert];
+  }
+}
+
+/**
+ * Display alert in the case that the config app could not be found
+ */
+- (void)showConfigAppNotFoundAlert {
+  // ensure that UI updates are executed on the main thread
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSAlert *alert = [[NSAlert alloc] init];
+    NSString *alertTitle = NSLocalizedString(@"alert-title-config-app-not-found", nil);
+    NSString *alertText = NSLocalizedString(@"alert-text-config-app-not-found", nil);
+    NSString *submitText = NSLocalizedString(@"ok-button-label", nil);
+
+    // configure the alert text
+    [alert setMessageText:alertTitle];
+    [alert setInformativeText:alertText];
+    [alert addButtonWithTitle:submitText];
+
+    [alert setAlertStyle:NSAlertStyleCritical];
+    
+    NSWindow *alertWindow = [alert window];
+    [alertWindow setLevel:NSFloatingWindowLevel];
+    [alertWindow orderFrontRegardless];
+    [alertWindow center];
+
+    [alert runModal];
+  });
 }
 
 /*
@@ -938,18 +988,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  */
 
 // TODO: rewrite confusing pattern, multiple methods differing only by underscore
-- (NSWindowController *)aboutWindow_ {
-  return _aboutWindow;
-}
-
-- (NSWindowController *)aboutWindow {
-  if (_aboutWindow.window == nil) {
-    _aboutWindow = [[KMAboutWindowController alloc] initWithWindowNibName:@"KMAboutWindowController"];
-    [self observeCloseFor:_aboutWindow.window];
-  }
-  
-  return _aboutWindow;
-}
 
 - (NSWindowController *)kbHelpWindow_ {
   return _kbHelpWindow;

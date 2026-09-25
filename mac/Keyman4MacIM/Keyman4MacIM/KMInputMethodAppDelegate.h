@@ -15,7 +15,6 @@
 #import "KMModifierMapping.h"
 #import "KMPackageReader.h"
 #import "KMInputController.h"
-#import "KMAboutWindowController.h"
 #import "KMKeyboardHelpWindowController.h"
 #import "OSKWindowController.h"
 #import "NSWindow+SuppMethods.h"
@@ -37,7 +36,7 @@ typedef struct {
 // tags for default menu items, displayed whether keyboards are active or not
 static const int DIVIDER_MENUITEM_TAG = -3;
 static const int OSK_MENUITEM_TAG = -2;
-static const int ABOUT_MENUITEM_TAG = -1;
+static const int CONFIG_MENUITEM_TAG = -1;
 
 // the number of menu items that do not represent active keyboards
 static const int DEFAULT_KEYMAN_MENU_ITEM_COUNT = 3;
@@ -76,20 +75,18 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, assign) BOOL contextChangedByLowLevelEvent;
 @property (nonatomic, strong) OSKWindowController *oskWindow;
 @property (nonatomic, weak) KMInputController *inputController;
-@property (nonatomic, strong) KMAboutWindowController *aboutWindow;
 @property (nonatomic, strong) KMKeyboardHelpWindowController *kbHelpWindow;
 
 - (NSMenu *)menu;
 - (void)saveEnabledKeyboards;
 - (void)applyPersistedOptions;
-- (void)showAboutWindow;
+- (void)launchKeymanConfiguration;
 - (void)showOSK;
 - (void)selectKeyboardFromMenu:(NSInteger)tag;
 - (void)handleKeyEvent:(NSEvent *)event;
 - (void)loadKeyboardFromKmxFile:(KMXFile *)kmx;
 - (void)resetKmx;
 - (NSEventModifierFlags) determineModifiers;
-- (NSWindowController *)aboutWindow_;
 - (NSWindowController *)kbHelpWindow_;
 - (NSString *)packageFolderFromPath:(NSString *)path;
 - (KMPackageInfo *)loadPackageInfo:(NSString *)path;
