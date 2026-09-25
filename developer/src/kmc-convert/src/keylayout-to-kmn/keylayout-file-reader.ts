@@ -24,7 +24,7 @@ export class KeylayoutFileReader {
    * @param  keyMapSelect the keyMapSelect element to find in keyMapSet
    * @return true if the keyMapSet element is found, false if not
    */
-  public findMapIndexinKeymap(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMapSelect: Keylayout.KL_KeyMapSelect): boolean {
+  private findMapIndexinKeymap(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMapSelect: Keylayout.KL_KeyMapSelect): boolean {
     for (const keyMapSet of jsonObj.keyboard.keyMapSet) {
       for (const keyMap of keyMapSet.keyMap) {
         if (keyMap['index'] === keyMapSelect.mapIndex) {
@@ -43,7 +43,7 @@ export class KeylayoutFileReader {
    * @param  keyMap the keyMap element to find in modifierMap
    * @return true if the keyMap element is found, false if not
    */
-  public findIndexinKeymapSelect(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMap: Keylayout.KL_KeyMap): boolean {
+  private findIndexinKeymapSelect(jsonObj: Keylayout.KeylayoutXMLSourceFile, keyMap: Keylayout.KL_KeyMap): boolean {
     for (const modifierMap of jsonObj.keyboard.modifierMap) {
       for (const keyMapSelect of modifierMap.keyMapSelect) {
         if (keyMapSelect['mapIndex'] === keyMap.index) {
@@ -61,7 +61,7 @@ export class KeylayoutFileReader {
    * @param  jsonObj the read keylayout data to be checked
    * @return true if all keyMapSelect elements have a corresponding keyMap element, false if not
    */
-  public checkForCorrespondingElements(jsonObj: Keylayout.KeylayoutXMLSourceFile): boolean {
+  private checkForCorrespondingElements(jsonObj: Keylayout.KeylayoutXMLSourceFile): boolean {
     let available = true;
 
     // check if all keyMapSelect elements have a corresponding keyMap element in the .keylayout file
@@ -83,7 +83,7 @@ export class KeylayoutFileReader {
   /**
    * @returns true if valid, false if invalid
    */
-  public validate(source: Keylayout.KeylayoutXMLSourceFile, inputFilename: string): boolean {
+  private validate(source: Keylayout.KeylayoutXMLSourceFile, inputFilename: string): boolean {
     if (!source) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ inputFilename: inputFilename }));
       return false;
@@ -110,7 +110,7 @@ export class KeylayoutFileReader {
    * @param  source the object to be changed
    * @return object that contain only boxed arrays
    */
-  public boxArray(source: any) {
+  private boxArray(source: any) {
 
     boxXmlArray(source, 'modifierMap');
 
@@ -172,4 +172,13 @@ export class KeylayoutFileReader {
       return null;
     }
   }
+
+  /** @internal */
+  public unitTestEndpoints = {
+    findMapIndexinKeymap: this.findMapIndexinKeymap.bind(this),
+    findIndexinKeymapSelect: this.findIndexinKeymapSelect.bind(this),
+    checkForCorrespondingElements: this.checkForCorrespondingElements.bind(this),
+    validate: this.validate.bind(this),
+    boxArray: this.boxArray.bind(this),
+  };
 };
