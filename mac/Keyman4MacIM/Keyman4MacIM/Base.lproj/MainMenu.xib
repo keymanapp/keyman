@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24765" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24765"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -19,8 +19,7 @@
         </customObject>
         <menu id="Uod-T8-nBO">
             <items>
-                <menuItem isSeparatorItem="YES" tag="-4" id="uqs-C7-aK3"/>
-                <menuItem title="Configuration..." tag="-3" id="P1b-lE-yFw"/>
+                <menuItem isSeparatorItem="YES" tag="-3" id="uqs-C7-aK3"/>
                 <menuItem title="On-Screen Keyboard" tag="-2" id="s96-JI-YDh">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>

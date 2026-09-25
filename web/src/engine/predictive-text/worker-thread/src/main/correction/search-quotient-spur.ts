@@ -12,7 +12,7 @@ import { KMWString, PriorityQueue } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
-import { CORRECTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';
+import { PREDICTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable.js';
 import { EDIT_DISTANCE_COST_SCALE, SearchNode } from './distance-modeler.js';
 import { generateSpaceSeed, InputSegment, PathInputProperties, SearchQuotientNode } from './search-quotient-node.js';
 import { generateSubsetId } from './tokenization-subsets.js';
@@ -34,7 +34,7 @@ export const MAX_EDIT_THRESHOLD_FACTOR = 2.5;
 // The set of search spaces corresponding to the same 'context' for search.
 // Whenever a wordbreak boundary is crossed, a new instance should be made.
 export abstract class SearchQuotientSpur extends SearchQuotientNode {
-  private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(CORRECTION_QUEUE_COMPARATOR);
+  private selectionQueue: PriorityQueue<SearchNode> = new PriorityQueue(PREDICTION_QUEUE_COMPARATOR);
 
   /**
    * Holds all incoming Nodes generated from a parent `SearchSpace` that have not yet been
@@ -152,7 +152,7 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
     entries.forEach(function(edge) { edge.calculation = edge.calculation.increaseMaxDistance(); });
 
     // Since we just modified the stored instances, and the costs may have shifted, we need to re-heapify.
-    this.selectionQueue = new PriorityQueue<SearchNode>(CORRECTION_QUEUE_COMPARATOR, entries);
+    this.selectionQueue = new PriorityQueue<SearchNode>(PREDICTION_QUEUE_COMPARATOR, entries);
   }
 
   /**
@@ -419,7 +419,7 @@ export abstract class SearchQuotientSpur extends SearchQuotientNode {
     // Allows a little 'wiggle room' + 2 "hard" edits.
     // Can be important if needed characters don't actually exist on the keyboard
     // ... or even just not the then-current layer of the keyboard.
-    if(currentNode.currentCost > this.lowestPossibleSingleCost + MAX_EDIT_THRESHOLD_FACTOR * EDIT_DISTANCE_COST_SCALE) {
+    if(currentNode.correctionCost > this.lowestPossibleSingleCost + MAX_EDIT_THRESHOLD_FACTOR * EDIT_DISTANCE_COST_SCALE) {
       return unmatchedResult;
     }
 
