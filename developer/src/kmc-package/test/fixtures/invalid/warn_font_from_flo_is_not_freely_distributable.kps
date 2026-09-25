@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>15.0.266.0</KeymanDeveloperVersion>
+    <FileVersion>18.0</FileVersion>
+  </System>
+  <Info>
+    <Name URL="">warn_font_from_flo_is_not_freely_distributable</Name>
+    <Copyright URL="">© 2019 National Research Council Canada</Copyright>
+    <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
+    <Version>1.0</Version>
+  </Info>
+  <Files>
+    <File>
+      <Name>basic.kmx</Name>
+      <Description>Keyboard Basic</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <!-- warn_font_from_flo_is_not_freely_distributable: this uses a mismatching font, but
+         we won't get that far. This handles the scenario where a font is not freely
+         distributable but is listed in the repo -->
+    <File>
+      <Name>https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf</Name>
+      <Source>flo:angsananew</Source>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Basic</Name>
+      <ID>basic</ID>
+      <Version>1.0</Version>
+      <Languages>
+        <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+</Package>

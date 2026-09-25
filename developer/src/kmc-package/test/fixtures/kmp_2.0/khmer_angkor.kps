@@ -63,25 +63,25 @@ Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically c
       <FileType>.htm</FileType>
     </File>
     <File>
-      <Name>..\shared\fonts\khmer\mondulkiri\FONTLOG.txt</Name>
+      <Name>.\shared\fonts\khmer\mondulkiri\FONTLOG.txt</Name>
       <Description>File FONTLOG.txt</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.txt</FileType>
     </File>
     <File>
-      <Name>..\shared\fonts\khmer\mondulkiri\Mondulkiri-R.ttf</Name>
+      <Name>.\shared\fonts\khmer\mondulkiri\Mondulkiri-R.ttf</Name>
       <Description>Font Khmer Mondulkiri</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.ttf</FileType>
     </File>
     <File>
-      <Name>..\shared\fonts\khmer\mondulkiri\OFL.txt</Name>
+      <Name>.\shared\fonts\khmer\mondulkiri\OFL.txt</Name>
       <Description>File OFL.txt</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.txt</FileType>
     </File>
     <File>
-      <Name>..\shared\fonts\khmer\mondulkiri\OFL-FAQ.txt</Name>
+      <Name>.\shared\fonts\khmer\mondulkiri\OFL-FAQ.txt</Name>
       <Description>File OFL-FAQ.txt</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.txt</FileType>
@@ -111,7 +111,7 @@ Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically c
       <FileType>.png</FileType>
     </File>
     <File>
-      <Name>..\shared\fonts\khmer\busrakbd\khmer_busra_kbd.ttf</Name>
+      <Name>.\shared\fonts\khmer\busrakbd\khmer_busra_kbd.ttf</Name>
       <Description>Font KhmerBusraKbd</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.ttf</FileType>
@@ -138,8 +138,8 @@ Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically c
       <Name>Khmer Angkor</Name>
       <ID>khmer_angkor</ID>
       <Version>1.3</Version>
-      <OSKFont>..\shared\fonts\khmer\busrakbd\khmer_busra_kbd.ttf</OSKFont>
-      <DisplayFont>..\shared\fonts\khmer\mondulkiri\Mondulkiri-R.ttf</DisplayFont>
+      <OSKFont>.\shared\fonts\khmer\busrakbd\khmer_busra_kbd.ttf</OSKFont>
+      <DisplayFont>.\shared\fonts\khmer\mondulkiri\Mondulkiri-R.ttf</DisplayFont>
       <Languages>
         <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
       </Languages>
