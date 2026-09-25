@@ -109,7 +109,7 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
     },
     preserveOrder: true,     // Gives us a 'special' format
     trimValues: false, // preserve spaces, but:
-    tagValueProcessor: (tagName: string, tagValue: string, jPath: string, hasAttributes: boolean, isLeafNode: boolean) : string | undefined => {
+    tagValueProcessor: (tagName: string, tagValue: string, jPath: JPathOrMatcher, hasAttributes: boolean, isLeafNode: boolean) : string | undefined => {
       if (!isLeafNode) {
         return tagValue?.trim(); // trimmed value
       } else {
