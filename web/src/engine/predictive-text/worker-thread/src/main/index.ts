@@ -269,7 +269,7 @@ export class LMLayerWorker {
     } catch (err) {
       // Does not catch errors thrown within the imported script.
       // Does catch errors with the model script's file-path.
-      this.error("Error occurred when attempting to load dictionary", err);
+      this.error(`Error occurred when attempting to load dictionary at '${url}'`, err);
 
       // Remain in the model-unloaded state; the load attempt was unsuccessful.
     }

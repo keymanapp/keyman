@@ -1,0 +1,1 @@
+* index.d.cts from https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/jqueryui

@@ -41,6 +41,8 @@ type
     procedure cmdDeleteRowClick(Sender: TObject);
     procedure gridWordlistClick(Sender: TObject);
     procedure cmdSortByFrequencyClick(Sender: TObject);
+    procedure gridWordlistSelectCell(Sender: TObject; ACol, ARow: Integer;
+      var CanSelect: Boolean);
   private
     FWordlist: TWordlistTsvFile;
     frameSource: TframeTextEditor;
@@ -313,6 +315,25 @@ begin
     ARect.Top+((ARect.Height - gridWordlist.Canvas.TextHeight(LText)) div 2), LText);
 end;
 
+procedure TframeWordlistEditor.gridWordlistSelectCell(Sender: TObject; ACol,
+  ARow: Integer; var CanSelect: Boolean);
+var
+  Value: string;
+begin
+  if gridWordlist.Col = 0 then
+  begin
+    // The value is trimmed in the backing data but trim it here also when
+    // we exit a cell, so the visible text matches
+    Value := Trim(gridWordlist.Cells[gridWordlist.Col, gridWordlist.Row]);
+    gridWordlist.Cells[gridWordlist.Col, gridWordlist.Row] := Value;
+    if (gridWordlist.Row = gridWordlist.RowCount - 1) and (Value = '') then
+    begin
+      // And if the last row was just whitespace, show the hint text again
+      FillGridNewRow;
+    end;
+  end;
+end;
+
 procedure TframeWordlistEditor.gridWordlistSetEditText(Sender: TObject; ACol,
   ARow: Integer; const Value: string);
 var
@@ -324,12 +345,14 @@ begin
 
   Inc(FSetup);
   try
+    TrimmedValue := Value.Trim;
+
     if ARow = gridWordlist.RowCount - 1 then
     begin
-      if (Value = '') or (Value = S_AddRowText) then
+      if (TrimmedValue = '') or (TrimmedValue = S_AddRowText) then
         Exit;
 
-      w.Word := Value;
+      w.Word := TrimmedValue;
       w.Frequency := 0;
       w.Comment := '';
       FWordlist.AddWord(w);
@@ -338,7 +361,6 @@ begin
     end
     else
     begin
-      TrimmedValue := Value.Trim;
       Frequency := StrToIntDef(TrimmedValue.Replace(',', '', [rfReplaceAll]), 0);
       w := FWordlist.Word[ARow-1];
       case ACol of
