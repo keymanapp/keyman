@@ -1,14 +1,15 @@
 ---
-title: toNzString
+title: toNzString (deprecated)
 ---
 
 ## Summary
 
-Returns string value for the item, or the default string value if the argument is null, false, an empty string, or undefined.
+Returns string value for the item, or the default string value if the argument
+is null, false, an empty string, or undefined.
 
 ## Syntax
 
-```c
+```js
 keyman.util.toNzString(item, dflt);
 ```
 
@@ -20,7 +21,8 @@ keyman.util.toNzString(item, dflt);
 
 `dflt`
 :   Type: `*` *optional*
-:   Value to use of the converted variable is null, false, the empty string, or undefined.
+:   Value to use of the converted variable is null, false, the empty string, or
+    undefined.
 
 ### Return Value
 
@@ -29,4 +31,8 @@ keyman.util.toNzString(item, dflt);
 
 ## Description
 
-...
+This function has been deprecated and will be removed in a future version of KeymanWeb.
+
+## History
+
+19.0: deprecated

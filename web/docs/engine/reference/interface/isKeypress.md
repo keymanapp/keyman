@@ -8,13 +8,13 @@ Returns `true` if the input event corresponds to a keypress event resulting in c
 
 ## Syntax
 
-```c
+```js
 keyman.interface.isKeypress(e);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KIK(e); // Shorthand
 ```
 

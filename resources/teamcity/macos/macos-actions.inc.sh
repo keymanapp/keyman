@@ -9,6 +9,6 @@ macos_clean_action() {
 macos_build_action() {
   builder_echo start "build" "Building Keyman for macOS"
   # shellcheck disable=SC2154
-  "${KEYMAN_ROOT}/mac/build.sh" configure build test publish
+  builder_launch /mac/build.sh configure build test publish
   builder_echo end "build" success "Finished building Keyman for macOS"
 }

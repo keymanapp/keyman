@@ -8,7 +8,7 @@ Get the absolute x-coordinate of an element.
 
 ## Syntax
 
-```c
+```js
 keyman.util.getAbsoluteX(Pelem);
 ```
 
@@ -25,6 +25,6 @@ keyman.util.getAbsoluteX(Pelem);
 
 ## Description
 
-See also: 
+See also:
 - [`keyman.util.getAbsolute()`](getAbsolute)
 - [`keyman.util.getAbsoluteY()`](getAbsoluteY)

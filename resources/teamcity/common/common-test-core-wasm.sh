@@ -19,4 +19,4 @@ builder_describe \
 
 builder_parse "$@"
 
-builder_run_action all  "${KEYMAN_ROOT}/core/build.sh" configure,build,test:wasm
+builder_run_action all  builder_launch /core/build.sh configure,build,test:wasm

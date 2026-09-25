@@ -315,10 +315,6 @@
   <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">Kǝlara saka ncangtǝ On Screen Keyboard Window saka tǝ mdǝ car keyboard ar Keyman</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">Pali On Screen Keyboard/Help na kalkal ka kǝrni sakatǝ mdǝ car keyboard laga</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Debugging</string>
   <!-- Context: Configuration Dialog - Options tab -->
@@ -627,10 +623,6 @@ Keyboard natǝ ga ana hara kǝthlǝr kari akwa Windows. Keyboardyeri ar Keyman a
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKLanguageCode" comment="The language code for the current translation">en</string>
-  <!-- Context: _LanguageInfo -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDefaultLanguageCode" comment="The default language code for this product.  This should be the language that the product is created in. For Keyman this must stay 'en', for all translations.">en</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->

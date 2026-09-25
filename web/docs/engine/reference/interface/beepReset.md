@@ -8,13 +8,13 @@ Cancels previous feedback [`beep`](/developer/language/reference/beep) operation
 
 ## Syntax
 
-```c
+```js
 keyman.interface.beepReset();
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KBR(); // Shorthand
 ```
 

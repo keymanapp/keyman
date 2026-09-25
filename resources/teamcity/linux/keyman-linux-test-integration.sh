@@ -33,7 +33,7 @@ cd "${KEYMAN_ROOT}/linux"
 function clean_action() {
   builder_heading "Cleaning up"
   # shellcheck disable=SC2154
-  "${KEYMAN_ROOT}/linux/build.sh" clean
+  builder_launch /linux/build.sh clean
 }
 
 if builder_has_action all; then

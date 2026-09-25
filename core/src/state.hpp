@@ -10,6 +10,7 @@
 
 #include <cassert>
 #include <vector>
+#include <deque>
 
 #include "keyman_core.h"
 
@@ -27,7 +28,7 @@ using action = km_core_action_item;
 
 class actions : public std::vector<action>
 {
-  std::vector<option> _option_items_stack;
+  std::deque<option> _option_items_stack;
 
   template<km_core_action_type V>
   void _push_vkey(km_core_virtual_key);
@@ -35,6 +36,10 @@ class actions : public std::vector<action>
 public:
   template<typename... Args>
   actions(Args&&... args);
+  actions(actions const &other);
+  // If the operator is needed in the future, it shall be implemented.
+  // Currently blocking accidental use of it for now.
+  actions &operator=(actions const &) = delete;
 
   void push_character(km_core_usv usv);
   void push_marker(uint32_t marker);
@@ -130,11 +135,12 @@ protected:
     core::debug_items          _debug_items;
     km_core_keyboard_imx_platform _imx_callback;
     void *_imx_object;
+    bool _backspace_handled_internally;
 
 public:
     state(core::abstract_processor & kb, km_core_option_item const *env);
 
-    state(state const &) = default;
+    state(state const &other);
     state(state const &&) = delete;
 
     ~state();
@@ -174,6 +180,22 @@ public:
       km_core_actions const &actions
     );
     void apply_actions_and_merge_app_context();
+
+    /**
+     * This is used to track whether the backspace key was handled internally
+     * during the keydown event. This is needed so that we can return the same
+     * value from the keyup event as we did for the keydown event.
+     *
+     * Backspace is the only key that we sometimes handle internally (if we
+     * have enough context) and sometimes not. By the time we get the keyup
+     * event the context already got updated and so we have no way of knowing
+     * whether or not the keydown handled it internally. Therefore this
+     * flag exists.
+     *
+     *  Only used when processing KM_CORE_VKEY_BKSP with LDML keyboards.
+     */
+    void set_backspace_handled_internally(bool handled) { _backspace_handled_internally = handled; }
+    bool backspace_handled_internally() const { return _backspace_handled_internally; }
   };
 } // namespace core
 } // namespace km

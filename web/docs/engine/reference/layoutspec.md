@@ -2,13 +2,19 @@
 title: Layout Specifications
 ---
 
-Touch-screen layouts for *KeymanWeb 17* are specified as JSON objects containing a member object for each specified device type. Currently supported device types are *tablet* and *phone*. Layouts for *desktop*  computers may also be specified but desktop on-screen keyboard design is normally managed by the
-standard *Keyman Developer* on-screen keyboard tool rather than the keyboard layout designer. If the same
-layout is appropriate for both *tablet* and *phone* devices only one need be specified, and will be used for either type of device.
+Touch-screen layouts for *KeymanWeb* are specified as JSON objects containing a member object for
+each specified device type. Currently supported device types are *tablet* and *phone*. Layouts
+for *desktop*  computers may also be specified but desktop on-screen keyboard design is normally
+managed by the standard *Keyman Developer* on-screen keyboard tool rather than the keyboard
+layout designer. If the same layout is appropriate for both *tablet* and *phone* devices only one
+need be specified, and will be used for either type of device.
 
-File encoding for manually-created layout files may use either UTF-8 or 7-bit ANSI coding, but must not include a BOM. For easier editing and management without requiring special fonts, embedded Unicode characters with values above 127 may use the *\uXXXX* notation.
+File encoding for manually-created layout files may use either UTF-8 or 7-bit ANSI coding, but
+must not include a BOM. For easier editing and management without requiring special fonts,
+embedded Unicode characters with values above 127 may use the *\uXXXX* notation.
 
-For details of the JSON specification, see [The JSON Data Interchange Format(ECMA-404)](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+For details of the JSON specification, see [The JSON Data Interchange
+Format(ECMA-404)](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 
 <table data-border="1">
     <thead>
@@ -249,7 +255,7 @@ Details of key member specifications are given below:
         </tr>
     </thead>
     <tbody>
-        <tr>    
+        <tr>
             <td class="rowhead" style="text-align: left;">id</td>
             <td style="text-align: left;">Each key id must start with <i>>K_</i> , for keys mapped to standard Keyman virtual key names, e.g.  <i>K_HYPHEN</i> , or either  <i>U_</i>  or <i>T_</i>  for user-defined names. Keys identified as  <i>U_xxxx[_xxxx...]</i> specify one or more Unicode characters in hex format, e.g. <i>U_1363</i>  for the Ethiopic Comma character, and will insert those characters if the key id is not matched by a rule. Other user-defined keys, such as <i>T_ZZZ</i> , will be ignored unless matched by a rule. The key id is required except for key styles 9 or 10 (blank or spacer keys).</td>
         </tr>
@@ -330,7 +336,11 @@ Details of key member specifications are given below:
     </tbody>
 </table>
 
-For many keyboards, it is helpful to associate some keyboard layers with physical keyboard modifier states. This is reflected in the layer name, where a layer name of *shift* means that when a key in that layer is touched, the keystroke will be processed as if the keyboard Shift key is held.
+For many keyboards, it is helpful to associate some keyboard layers with physical keyboard
+modifier states. This is reflected in the layer name, where a layer name of *shift* means that
+when a key in that layer is touched, the keystroke will be processed as if the keyboard Shift key
+is held.
+
 
 The special layer names of:  
    *leftalt* ,
@@ -364,7 +374,9 @@ The following special key identifiers have been added to simplify layer selectio
 | K_SHIFTED    | 264   |
 | K_ALTGR      | 265   |
 
-A special font is used to provide easily recognizable key graphics for various special purpose keys. The following key text strings will be recognized and cause the appropriate graphic to be used for the key cap instead of the actual text:
+A special font is used to provide easily recognizable key graphics for various special purpose
+keys. The following key text strings will be recognized and cause the appropriate graphic to be
+used for the key cap instead of the actual text:
 
 | Text string       | Key purpose                                             |
 |:------------------|:--------------------------------------------------------|

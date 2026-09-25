@@ -1,14 +1,14 @@
 ---
-title: version
+title: version (deprecated)
 ---
 
 ## Summary
 
-The version number of the loaded KeymanWeb instance.
+Returns the major and minor components of the KeymanWeb version (major.minor.patch) as a string.
 
 ## Syntax
 
-```c
+```js
 keyman.version
 ```
 
@@ -22,8 +22,17 @@ Read only
 
 ### Return Value
 
-`'19.0'` (for KeymanWeb 19.0)
+The major and minor components of the version, e.g. if the version is `"18.0.249"`, then returns `"18.0"`.
 
 ## Description
 
-...
+This function is deprecated; to get the full KeymanWeb version string, use [`keyman.versionInfo`](versionInfo).
+
+## History
+
+19.0: deprecated
+
+## See also
+
+* [`keyman.build`](build)
+* [`keyman.versionInfo`](versionInfo)

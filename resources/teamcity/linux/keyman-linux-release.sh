@@ -57,15 +57,15 @@ function _cleanup_before_creating_source_package() {
 function _make_release_source_tarball() {
   builder_echo start "make source tarball" "Make source tarball"
   rm -rf dist
+  mkdir -p "upload/${KEYMAN_VERSION}"
   ./scripts/reconf.sh
   PKG_CONFIG_PATH="${KEYMAN_ROOT}/core/build/arch/release/meson-private" ./scripts/dist.sh
-  mkdir -p "upload/${KEYMAN_VERSION}"
-  cp -a dist/*.tar.gz "upload/${KEYMAN_VERSION}"
+  mv dist/*.tar.xz "upload/${KEYMAN_VERSION}/"
   (
     cd "upload/${KEYMAN_VERSION}"
-    sha256sum ./*.tar.gz > SHA256SUMS
-    builder_echo end "make source tarball" success "Make source tarball"
+    sha256sum ./*.tar.xz > SHA256SUMS
   )
+  builder_echo end "make source tarball" success "Make source tarball"
 }
 
 function _sign_source_tarball() {
@@ -75,7 +75,7 @@ function _sign_source_tarball() {
 
     eval "$(gpg-agent -vv --daemon --allow-preset-passphrase --debug-level 9)"
     /usr/lib/gnupg/gpg-preset-passphrase --passphrase "${GPGKEYPW}" --preset "${GPGKEYGRIP}"
-    for f in ./*.tar.gz; do gpg --output "${f}.asc" -a --detach-sig "${f}"; done
+    for f in ./*.tar.xz; do gpg --output "${f}.asc" -a --detach-sig "${f}"; done
     /usr/lib/gnupg/gpg-preset-passphrase --forget "${GPGKEYGRIP}" || true
     builder_echo end "sign source tarball" success "Sign source tarball"
   )
@@ -84,10 +84,9 @@ function _sign_source_tarball() {
 function _publish_to_downloads() {
   builder_echo start "publish to downloads" "Publish to downloads.keyman.com"
 
-  local UPLOAD_DIR KEYMAN_TGZ
+  local UPLOAD_DIR
 
   UPLOAD_DIR="upload/${KEYMAN_VERSION}"
-  KEYMAN_TGZ="keyman-${KEYMAN_VERSION}.tar.gz"
 
   # Set permissions as required on download site
   builder_echo "Setting upload file permissions for downloads.keyman.com"
@@ -96,7 +95,7 @@ function _publish_to_downloads() {
   chmod g+w  "${UPLOAD_DIR}"/*
   chmod a+r  "${UPLOAD_DIR}"/*
 
-  write_download_info "${UPLOAD_DIR}" "${KEYMAN_TGZ}" "Keyman for Linux" tar.gz linux
+  write_download_info "${UPLOAD_DIR}" "keyman-${KEYMAN_VERSION}.tar.xz" "Keyman for Linux source tarball" tar.xz linux
   tc_rsync_upload "${UPLOAD_DIR}" "linux/${KEYMAN_TIER}"
 
   builder_echo end "publish to downloads" success "Publish to downloads.keyman.com"
@@ -108,7 +107,7 @@ function _publish_to_launchpad() {
   git reset --hard
 
   /usr/lib/gnupg/gpg-preset-passphrase --passphrase "${GPGKEYPW}" --preset "${GPGKEYGRIP}"
-  UPLOAD=yes "${KEYMAN_ROOT}/linux/scripts/launchpad.sh"
+  "${KEYMAN_ROOT}/linux/scripts/launchpad.sh" --upload
   /usr/lib/gnupg/gpg-preset-passphrase --forget "${GPGKEYGRIP}" || true
 
   builder_echo end "upload to launchpad" success "Upload to launchpad"
@@ -117,8 +116,10 @@ function _publish_to_launchpad() {
 function _publish_linux_help() {
   builder_echo start "upload linux help" "Upload new Keyman Linux help to help.keyman.com"
 
+  cd "${HELP_KEYMAN_COM}"
   # shellcheck disable=SC2016
   git config credential.helper '!f() { sleep 1; echo "username=${GITHUB_USER}"; echo "password=${GITHUB_TOKEN}"; }; f'
+  cd "${KEYMAN_ROOT}/resources/build"
   "${KEYMAN_ROOT}/resources/build/ci/help-keyman-com.sh" linux
 
   builder_echo end "upload linux help" success "Upload new Keyman Linux help to help.keyman.com"

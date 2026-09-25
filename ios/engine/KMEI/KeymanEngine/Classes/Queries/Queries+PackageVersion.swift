@@ -52,10 +52,10 @@ extension Queries {
         func dictionaryReducer(container: KeyedDecodingContainer<Queries.IDCodingKey>, category: String) -> ([String: ResultComponent], Queries.IDCodingKey) throws -> [String: ResultComponent] {
           return { (dict, id) -> [String: ResultComponent] in
             var dict = dict
-            if let entry = try? container.decode(ResultEntry.self, forKey: id) {
-              dict[id.stringValue] = entry
-            } else if let error = try? container.decode(ResultError.self, forKey: id) {
+            if let error = try? container.decode(ResultError.self, forKey: id) {
               dict[id.stringValue] = error
+            } else if let entry = try? container.decode(ResultEntry.self, forKey: id) {
+              dict[id.stringValue] = entry
             } else {
               throw FetchError.decodingError(category, id.stringValue)
             }
@@ -116,7 +116,10 @@ extension Queries {
         return URLQueryItem(name: resourceField, value: key.id)
       }
 
-      urlComponents.queryItems = queryItems + [URLQueryItem(name: "platform", value: "ios")]
+      urlComponents.queryItems = queryItems + [
+        URLQueryItem(name: "platform", value: "ios"),
+        URLQueryItem(name: "keyman-version", value: Version.current.plainString)
+      ]
       let message = "Querying package versions through API endpoint: \(urlComponents.url!)"
       os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
       SentryManager.breadcrumb(message)

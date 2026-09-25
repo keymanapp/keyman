@@ -85,7 +85,7 @@ export class PageIntegrationHandlers {
    **/
   private pageFocusHandler: (e: FocusEvent) => boolean = () => {
     if(!this.focusAssistant.maintainingFocus && this.engine.osk?.vkbd) {
-      this.engine.contextManager.deactivateCurrentTarget();
+      this.engine.contextManager.deactivateCurrentTextStore();
       this.engine.contextManager.resetContext();
     }
     return false;
@@ -138,7 +138,7 @@ export class PageIntegrationHandlers {
   private touchMoveActivationHandler: (e: TouchEvent) => boolean = (e) => {
     if(this.deactivateOnScroll) {  // Android / Chrone case.
       this.focusAssistant.focusing = false;
-      this.engine.contextManager.deactivateCurrentTarget();
+      this.engine.contextManager.deactivateCurrentTextStore();
     }
 
     const y = e.touches[0].screenY;
@@ -153,31 +153,11 @@ export class PageIntegrationHandlers {
     // Should not hide OSK if simply closing the language menu (30/4/15)
     // or if the focusing timer (focusAssistant.setFocusTimer) is still active.
     if(this.deactivateOnRelease && !this.engine.touchLanguageMenu && !this.focusAssistant.focusing) {
-      this.engine.contextManager.deactivateCurrentTarget();
+      this.engine.contextManager.deactivateCurrentTextStore();
     }
     this.deactivateOnRelease=false;
     return false;
   };
-
-
-  private _WindowLoad: (e: Event) => void = () => {
-    // Always return to top of page after a page reload
-    document.body.scrollTop=0;
-    if(typeof document.documentElement != 'undefined') {
-      document.documentElement.scrollTop=0;
-    }
-  }
-
-  /**
-   * Function     _WindowUnload
-   * Scope        Private
-   * Description  Remove handlers before detaching KMW window
-   */
-  private _WindowUnload: () => void = () => {
-    // Future note:  should restrict this to anything for the corresponding document if on a
-    // child iframe, not the whole engine.
-    this.engine.shutdown();
-  }
 
   private attachHandlers() {
     const eventTracker = this.domEventTracker;
@@ -202,9 +182,6 @@ export class PageIntegrationHandlers {
       eventTracker.attachDOMEvent(docBody, 'touchend',   this.touchEndActivationHandler,  false);
     }
 
-    eventTracker.attachDOMEvent(window, 'load',   this._WindowLoad,  false);
-    eventTracker.attachDOMEvent(window, 'unload', this._WindowUnload,false);
-
     eventTracker.attachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
   }
 
@@ -228,9 +205,6 @@ export class PageIntegrationHandlers {
 
       this.mobilePageTrailer?.parentElement.removeChild(this.mobilePageTrailer);
     }
-
-    eventTracker.detachDOMEvent(window, 'load',   this._WindowLoad,  false);
-    eventTracker.detachDOMEvent(window, 'unload', this._WindowUnload,false);
 
     eventTracker.detachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
   }

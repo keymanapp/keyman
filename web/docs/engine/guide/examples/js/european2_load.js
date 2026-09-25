@@ -1,1 +1,0 @@
-KeymanWeb.KRS(new Stub_Keyboard_european2()); function Stub_Keyboard_european2() {this.KF="european2-1.6.js";this.KI="Keyboard_european2";this.KN="EuroLatin2 Keyboard";}

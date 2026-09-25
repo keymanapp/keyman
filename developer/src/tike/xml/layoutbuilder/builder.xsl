@@ -13,26 +13,29 @@
   <script src="/app/lib/sentry/bundle.min.js"><xsl:text> </xsl:text></script>
   <script src="/app/lib/sentry/init.js"><xsl:text> </xsl:text></script>
   <title>On Screen Keyboard Builder</title>
-  <link rel="stylesheet" type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui/jquery-ui.css</xsl:attribute></link>
-  <link rel='stylesheet' type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder.css</xsl:attribute></link>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-1.10.2.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>jquery-ui/jquery-ui.js</xsl:attribute></script>
+  <link rel="stylesheet" type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>ext/jquery-ui/jquery-ui.css</xsl:attribute></link>
+  <link rel='stylesheet' type='text/css'><xsl:attribute name="href"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>assets/stylesheets/builder.css</xsl:attribute></link>
+  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>ext/jquery-1.10.2.js</xsl:attribute></script>
+  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>ext/jquery-ui/jquery-ui.js</xsl:attribute></script>
   <script>
     var KVKL = <xsl:value-of select='/TouchLayoutBuilder/LayoutJS' />;
     window.builder = {};
   </script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>constants.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>undo.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>prepare-key.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>subkeys.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>view-controls.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>platform-controls.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>layer-controls.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>builder-charmap.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>drag-drop.js</xsl:attribute></script>
-  <script><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>cleanup.js</xsl:attribute></script>
-  <script>initBuilder();</script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/constants.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/builder.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/undo.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/prepare-key.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/subkeys.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/view-controls.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/platform-controls.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/layer-controls.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/builder-charmap.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/drag-drop.js</xsl:attribute></script>
+  <script type="module"><xsl:attribute name="src"><xsl:value-of select="/TouchLayoutBuilder/LibPath"/>src/cleanup.js</xsl:attribute></script>
+  <script type="module">
+    import { initBuilder } from "./toucheditor/lib/src/builder.js";
+    window.builder = initBuilder();
+  </script>
 </head>
 <body class='text-controls-in-toolbar'>
   <div id='toolbar'>
@@ -264,7 +267,7 @@
   </div>
 
   <div id='addPlatformDialog' title='Add platform'>
-    <form>
+    <form id='addPlatformForm'>
       <fieldset>
         Platform: <select id='selAddPlatform'></select>
       </fieldset>
@@ -276,7 +279,7 @@
   </div>
 
   <div id='addLayerDialog' title='Add layer'>
-    <form>
+    <form id='addLayerForm'>
       <fieldset>
         <label for='addLayerList'>Modifier-based layer:</label> <select id='addLayerList'></select><br />
       </fieldset>
@@ -292,7 +295,7 @@
   </div>
 
   <div id='viewOptionsDialog' title='View options'>
-    <form>
+    <form id='viewOptionsForm'>
       <fieldset>
         <div>By default, only common modifiers are shown in the modifier lists. If
           access to more unusual modifier combinations are required, check this option.<br/><br/>
@@ -305,7 +308,7 @@
   </div>
 
   <div id='platformPropertiesDialog' title='Platform properties'>
-    <form>
+    <form id='platformPropertiesForm'>
       <fieldset>
         <div>Displays the underlying keyboard label on top-left of the key<br/><br/></div>
         <input type='checkbox' id='chkDisplayUnderlying'/>
@@ -337,7 +340,7 @@
   </div>
 
   <div id='layerPropertiesDialog' title='Layer properties'>
-    <form>
+    <form id='layerPropertiesForm'>
       <fieldset>
         Name: <input type='text' id='layerName' size='16' maxlength='64' />
       </fieldset>

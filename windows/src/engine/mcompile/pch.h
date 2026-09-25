@@ -11,7 +11,6 @@
 #include "mcompile.h"
 #include "mc_kmxfile.h"
 #include "mc_syskbd.h"
-#include "../../../../common/windows/cpp/include/crc32.h"
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "../../../../common/windows/cpp/include/xstring.h"
 #include "../../../../common/windows/cpp/include/keymansentry.h"

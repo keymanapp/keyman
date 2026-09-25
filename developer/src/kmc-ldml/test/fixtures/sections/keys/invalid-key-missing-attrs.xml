@@ -8,7 +8,7 @@
   </keys>
 
   <layers formId="us">
-    <layer id="base">
+    <layer modifiers="none">
       <!-- beware: this is mapping `! -->
       <row keys="Q" />
     </layer>

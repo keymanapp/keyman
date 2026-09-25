@@ -95,6 +95,7 @@ type
     procedure CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
     procedure UnregisterSources;
+    procedure TouchLayoutMessage(Sender: TObject; const Message: string);
   protected
     function GetHelpTopic: string; override;
 
@@ -117,6 +118,7 @@ type
     { Public declarations }
     procedure SetFocus; override;
     procedure SetupCharMapDrop;
+    procedure ApplyTemplate;
     function Load(const AFilename: string; ALoadFromTemplate, ALoadFromString: Boolean): Boolean;
     procedure Save(const AFilename: string);
     function SaveToString: string;
@@ -140,7 +142,9 @@ uses
   xmldoc,
 
   Keyman.Developer.System.HelpTopics,
+  Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter,
+  Keyman.Developer.UI.Project.ProjectFileUI,
 
   CharacterDragObject,
   CharMapDropTool,
@@ -214,7 +218,7 @@ procedure TframeTouchLayoutBuilder.FormCreate(Sender: TObject);
 begin
   inherited;
   FDisplayScriptErrors := True;   // I4047
-  FTemplateFileName := GetLayoutBuilderPath + 'template-basic' + Ext_KeymanTouchLayout;   // I4226
+  FTemplateFileName := GetLayoutBuilderTemplatePath + CTouchLayout_BasicTemplate;   // I4226
 
   cef := TframeCEFHost.Create(Self);
   cef.Parent := Self;
@@ -309,6 +313,21 @@ begin
     else Result := s <> FSavedLayoutJS;
 end;
 
+procedure TframeTouchLayoutBuilder.TouchLayoutMessage(Sender: TObject; const Message: string);
+begin
+  LogMessage(plsError, FFilename, Message, 0, 0);
+end;
+
+(**
+ * Apply the template referenced by TemplateFileName to the current
+ * layout, and mark the file as modified.
+ *)
+procedure TframeTouchLayoutBuilder.ApplyTemplate;
+begin
+  Load('', True, False);   // applies the template
+  FSavedLayoutJS := '';    // marks the file as dirty
+end;
+
 function TframeTouchLayoutBuilder.Load(const AFilename: string; ALoadFromTemplate, ALoadFromString: Boolean): Boolean;
 var
   FLastFilename: string;
@@ -372,6 +391,7 @@ begin
 
   FTouchLayout := TTouchLayout.Create;   // I3642
   try
+    FTouchLayout.OnMessage := TouchLayoutMessage;
     if not FTouchLayout.Load(FNewLayoutJS) then
     begin
       FLastError := FTouchLayout.LoadError;   // I4083

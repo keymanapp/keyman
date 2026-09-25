@@ -35,6 +35,7 @@
     "@keymanapp/keyman-version": "*",
     "@keymanapp/kmc-analyze": "*",
     "@keymanapp/kmc-copy": "*",
+    "@keymanapp/kmc-convert": "*",
     "@keymanapp/kmc-generate": "*",
     "@keymanapp/kmc-keyboard-info": "*",
     "@keymanapp/kmc-kmn": "*",
@@ -53,10 +54,8 @@
   ],
   "devDependencies": {
     "@sentry/cli": "^2.31.0",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^20.4.1",
     "c8": "^7.12.0",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.1",
     "typescript": "^5.4.5"
   },
   "mocha": {

@@ -18,6 +18,8 @@ DELPHI_MSBUILD_FLAG_DEBUG="//p:Config=$TARGET_PATH"
 # Visual C++ x86, x64; Delphi x86
 WIN32_TARGET_PATH=bin/Win32/$TARGET_PATH
 X64_TARGET_PATH=bin/x64/$TARGET_PATH
+ARM64_TARGET_PATH=bin/arm64/$TARGET_PATH
+ARM64EC_TARGET_PATH=bin/ARM64EC/$TARGET_PATH
 
 # Delphi x86, x64
 # WIN32_TARGET_PATH=...
@@ -30,4 +32,5 @@ DEVELOPER_DEBUGPATH="$DEVELOPER_ROOT/debug"
 # Delphi build tool macros
 
 SENTRYTOOL="$COMMON_ROOT/tools/sentrytool/$WIN32_TARGET_PATH/sentrytool.exe"
+TDS2DBG="$KEYMAN_ROOT/common/windows/bin/tools/tds2dbg"
 DEVTOOLS="$COMMON_ROOT/tools/devtools/$WIN32_TARGET_PATH/devtools.exe"

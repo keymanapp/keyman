@@ -26,8 +26,6 @@
    // I3623   // I4169   // I4575   // I4575
 #include "pch.h"
 
-WORD USVKToScanCodeToLayoutVK(WORD VKey);   // I3762
-
 struct PreservedKey
 {
   GUID guid;

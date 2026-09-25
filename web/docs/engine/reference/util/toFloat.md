@@ -1,5 +1,5 @@
 ---
-title: toFloat
+title: toFloat (deprecated)
 ---
 
 ## Summary
@@ -8,7 +8,7 @@ Floating conversion with default.
 
 ## Syntax
 
-```c
+```js
 keyman.util.toFloat(s, dflt);
 ```
 
@@ -29,4 +29,11 @@ keyman.util.toFloat(s, dflt);
 
 ## Description
 
-...
+This is a simple wrapper around `parseFloat` to handle invalid inputs, for which
+`dflt` will be returned instead.
+
+This function has been deprecated and will be removed in a future version of KeymanWeb.
+
+## History
+
+19.0: deprecated

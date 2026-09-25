@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2017 SIL International. All rights reserved.
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
  */
 
 package com.keyman.engine;
@@ -308,6 +308,12 @@ public final class KMManager {
   private static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
   private static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
 
+  // Preference keys for tracking pending keyboard height updates per keyboard type and orientation
+  private static final String KMKey_PendingHeightUpdate_InappPortrait = "pendingHeightUpdate_inapp_portrait";
+  private static final String KMKey_PendingHeightUpdate_InappLandscape = "pendingHeightUpdate_inapp_landscape";
+  private static final String KMKey_PendingHeightUpdate_SystemPortrait = "pendingHeightUpdate_system_portrait";
+  private static final String KMKey_PendingHeightUpdate_SystemLandscape = "pendingHeightUpdate_system_landscape";
+
   public static final String KMKey_LongpressDelay = "longpressDelay";
 
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
@@ -364,7 +370,7 @@ public final class KMManager {
   public static int KeyboardHeight_Context_Landscape_Current = 0; // Current landscape height
 
   // Default prediction/correction setting
-  public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_CORRECTIONS.toInt();
+  public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_AUTO_CORRECT.toInt();
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
@@ -374,9 +380,7 @@ public final class KMManager {
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_KmwGlobeHintCss = "globe-hint.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
-  protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
   protected static final String KMFilename_JSPolyfill2 = "other-polyfills.js";
-  protected static final String KMFilename_JSPolyfill3 = "map-polyfill.js";
 
   // Deprecated by KeyboardController.KMFilename_Installed_KeyboardsList
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
@@ -398,6 +402,10 @@ public final class KMManager {
 
   public static String getLexicalModelsDir() {
     return getResourceRoot() + KMDefault_LexicalModelPackages + File.separator;
+  }
+
+  public static String getLexicalModelsUrl() {
+    return WebViewUtils.buildAssetUrl(KMDefault_LexicalModelPackages + "/");
   }
 
   public static String getCloudDir() {
@@ -488,6 +496,19 @@ public final class KMManager {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Check if the given font is the default font or the default OSK font.
+   * @param fontName  String - The font name and extension
+   * @return boolean  true if `fontName` is DejaVuSans.ttf or keymanweb-osk.ttf
+   *                  or null or empty string, false otherwise
+   */
+  public static boolean isDefaultFont(String fontName) {
+    if (fontName == null || fontName.isEmpty()) {
+      return true;
+    }
+    return fontName.equals(KMDefault_KeyboardFont) || fontName.equals(KMFilename_Osk_Ttf_Font);
   }
 
   public static void initialize(final Context context, KeyboardType keyboardType) {
@@ -1606,6 +1627,16 @@ public final class KMManager {
    */
   public static Typeface getFontTypeface(Context context, String fontFilename) {
     try {
+      if (fontFilename == null || fontFilename.isEmpty()) {
+        return null;
+      }
+      if (fontFilename.startsWith("http://") || fontFilename.startsWith("https://")
+        || fontFilename.startsWith("file://")) {
+        // Font file is not local, so cannot load Typeface
+        KMLog.LogError(TAG, "Font file is not local: " + fontFilename);
+        return null;
+      }
+
       if ((fontFilename != null) && FileUtils.hasFontExtension(fontFilename)) {
         // Ignore .woff files if Android 7.0 / 7.1 (Issue #4896)
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) &&
@@ -1644,8 +1675,9 @@ public final class KMManager {
     String modelID = lexicalModelInfo.get(KMKey_LexicalModelID);
     String languageID = lexicalModelInfo.get(KMKey_LanguageID);
     boolean modelFileExists = true;
-    File modelFile = new File(getLexicalModelsDir(), pkgID + File.separator + modelID + ".model.js");
-    String path = "file://" + modelFile.getAbsolutePath();
+    String modelFilename = pkgID + File.separator + modelID + ".model.js";
+    File modelFile = new File(getLexicalModelsDir(), modelFilename);
+    String url = getLexicalModelsUrl() + modelFilename;
 
     // Disable sugestions if lexical-model file doesn't exist
     if (!modelFile.exists()) {
@@ -1660,7 +1692,7 @@ public final class KMManager {
       modelObj.put("id", modelID);
       languageJSONArray.put(languageID);
       modelObj.put("languages", languageJSONArray);
-      modelObj.put("path", path);
+      modelObj.put("path", url);
       modelObj.put("CustomHelpLink", lexicalModelInfo.get(KMKey_CustomHelpLink));
     } catch (JSONException e) {
       KMLog.LogException(TAG, "Invalid lexical model to register", e);
@@ -2219,7 +2251,12 @@ public final class KMManager {
       File kmpJSONFile = new File(path);
       if (!kmpJSONFile.exists()) {
         if (!KMManager.isTestMode()) {
-          KMLog.LogError(TAG, path + " not found. Returning version 1.0");
+          if (packageID.equals(KMDefault_PackageID)) {
+            // Suppress error log for the default fallback keyboard if it's not installed
+            Log.d(TAG, path + " not found. Returning version 1.0");
+          } else {
+            KMLog.LogError(TAG, path + " not found. Returning version 1.0");
+          }
         }
         return "1.0";
       }
@@ -2415,12 +2452,11 @@ public final class KMManager {
       }
       height = defaultHeightForContext;
     } else {
-      // Applying gating to 50%-200% of default height (following Keyman)
-      if (height < (defaultHeightForContext / 2)) {
-        height = (int) (defaultHeightForContext / 2);
-      } else if (height > (defaultHeightForContext * 2)) {
-        height = (int) (defaultHeightForContext * 2);
-      }
+      // Ensure keyboard height stay within min/max bounds
+      int minKeyboardHeight = KMManager.getKeyboardHeightMin(context, orientation);
+      int maxKeyboardHeight = KMManager.getKeyboardHeightMax(context, orientation);
+      height = Math.max(minKeyboardHeight, height);
+      height = Math.min(maxKeyboardHeight, height);
 
       // Store the new height based on the current orientation
       if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -2437,16 +2473,22 @@ public final class KMManager {
       KeyboardHeight_Context_Portrait_Current = height;
     }
     editor.commit();
+
     // Confirm new LayoutParams for in-app or system keyboards
+    // If keyboard is not currently loaded, set a pending flag so height gets applied when keyboard loads
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
+    } else {
+      setPendingHeightUpdate(KeyboardType.KEYBOARD_TYPE_INAPP, orientation);
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
+    } else {
+      setPendingHeightUpdate(KeyboardType.KEYBOARD_TYPE_SYSTEM, orientation);
     }
   }
 
@@ -2517,6 +2559,157 @@ public final class KMManager {
     int resourceId = context.getResources().getIdentifier(
       "navigation_bar_height", "dimen", "android");
     return (resourceId > 0) ? context.getResources().getDimensionPixelSize(resourceId) : 0;
+  }
+
+  /**
+   * Returns the maximum allowed height of the keyboard frame for the current device orientation.
+   * The maximum height is calculated as twice the default keyboard height for the orientation.
+   * Use this method to get the upper bound for keyboard height adjustments.
+   *
+   * @param context The context.
+   * @return The maximum allowed keyboard height in density-independent pixels (dp),
+   *         or {@link #KeyboardHeight_Reset} (0) if orientation is invalid.
+   * @see #getKeyboardHeightMax(Context, int)
+   * @see #getKeyboardHeightMin(Context)
+   * @see #applyKeyboardHeight(Context, int)
+   */
+  public static int getKeyboardHeightMax(Context context) {
+    int orientation = getOrientation(context);
+    return getKeyboardHeightMax(context, orientation);
+  }
+
+  /**
+   * Returns the maximum allowed height of the keyboard frame for the specified orientation.
+   * The maximum height is calculated as twice the default keyboard height for the orientation.
+   * Use this method to get the upper bound for keyboard height adjustments.
+   *
+   * @param context The context.
+   * @param orientation The screen orientation: {@link Configuration#ORIENTATION_PORTRAIT}
+   *                    or {@link Configuration#ORIENTATION_LANDSCAPE}.
+   * @return The maximum allowed keyboard height in density-independent pixels (dp),
+   *         or {@link #KeyboardHeight_Reset} (0) if orientation is invalid.
+   * @see #getKeyboardHeightMin(Context, int)
+   * @see #applyKeyboardHeight(Context, int, int)
+   */
+  public static int getKeyboardHeightMax(Context context, int orientation) {
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      return (int) KMManager.KeyboardHeight_Context_Landscape_Default * 2;
+    } else /* orientation == Configuration.ORIENTATION_PORTRAIT */ {
+      return (int) KMManager.KeyboardHeight_Context_Portrait_Default * 2;
+    }
+  }
+
+  /**
+   * Returns the minimum allowed height of the keyboard frame for the current device orientation.
+   * The minimum height is calculated as half the default keyboard height for the orientation.
+   * Use this method to get the lower bound for keyboard height adjustments.
+   *
+   * @param context The context.
+   * @return The minimum allowed keyboard height in density-independent pixels (dp),
+   *         or {@link #KeyboardHeight_Reset} (0) if orientation is invalid.
+   * @see #getKeyboardHeightMin(Context, int)
+   * @see #getKeyboardHeightMax(Context)
+   * @see #applyKeyboardHeight(Context, int)
+   */
+  public static int getKeyboardHeightMin(Context context) {
+    int orientation = getOrientation(context);
+    return getKeyboardHeightMin(context, orientation);
+  }
+
+  /**
+   * Returns the minimum allowed height of the keyboard frame for the specified orientation.
+   * The minimum height is calculated as half the default keyboard height for the orientation.
+   * Use this method to get the lower bound for keyboard height adjustments.
+   *
+   * @param context The context.
+   * @param orientation The screen orientation: {@link Configuration#ORIENTATION_PORTRAIT}
+   *                    or {@link Configuration#ORIENTATION_LANDSCAPE}.
+   * @return The minimum allowed keyboard height in density-independent pixels (dp),
+   *         or {@link #KeyboardHeight_Reset} (0) if orientation is invalid.
+   * @see #getKeyboardHeightMax(Context, int)
+   * @see #applyKeyboardHeight(Context, int, int)
+   */
+  public static int getKeyboardHeightMin(Context context, int orientation) {
+    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+      return (int) KMManager.KeyboardHeight_Context_Landscape_Default / 2;
+    } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+      return (int) KMManager.KeyboardHeight_Context_Portrait_Default / 2;
+    } else {
+      return KMManager.KeyboardHeight_Reset;
+    }
+  }
+
+  /**
+   * Returns the preference key for tracking pending keyboard height updates.
+   * This allows separate tracking for each keyboard type (in-app/system) and orientation.
+   *
+   * @param keyboardType The keyboard type: {@link KeyboardType#KEYBOARD_TYPE_INAPP}
+   *                     or {@link KeyboardType#KEYBOARD_TYPE_SYSTEM}.
+   * @param orientation The screen orientation: {@link Configuration#ORIENTATION_PORTRAIT}
+   *                    or {@link Configuration#ORIENTATION_LANDSCAPE}.
+   * @return The preference key string, or null if parameters are invalid.
+   */
+  private static String getPendingHeightKey(KeyboardType keyboardType, int orientation) {
+    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        return KMKey_PendingHeightUpdate_InappPortrait;
+      } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        return KMKey_PendingHeightUpdate_InappLandscape;
+      }
+    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+        return KMKey_PendingHeightUpdate_SystemPortrait;
+      } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        return KMKey_PendingHeightUpdate_SystemLandscape;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Sets a flag indicating that a keyboard height update is pending for the specified
+   * keyboard type and orientation. This is used when the keyboard is not currently loaded,
+   * so the height update will be applied when the keyboard loads.
+   *
+   * @param keyboardType The keyboard type: {@link KeyboardType#KEYBOARD_TYPE_INAPP}
+   *                     or {@link KeyboardType#KEYBOARD_TYPE_SYSTEM}.
+   * @param orientation The screen orientation: {@link Configuration#ORIENTATION_PORTRAIT}
+   *                    or {@link Configuration#ORIENTATION_LANDSCAPE}.
+   */
+  private static void setPendingHeightUpdate(KeyboardType keyboardType, int orientation) {
+    String pendingKey = getPendingHeightKey(keyboardType, orientation);
+    if (pendingKey == null) {
+      return;
+    }
+    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putBoolean(pendingKey, true);
+    editor.commit();
+  }
+
+  /**
+   * Checks if there is a pending keyboard height update for the specified keyboard type
+   * and orientation, and clears the flag if present.
+   *
+   * @param keyboardType The keyboard type: {@link KeyboardType#KEYBOARD_TYPE_INAPP}
+   *                     or {@link KeyboardType#KEYBOARD_TYPE_SYSTEM}.
+   * @param orientation The screen orientation: {@link Configuration#ORIENTATION_PORTRAIT}
+   *                    or {@link Configuration#ORIENTATION_LANDSCAPE}.
+   * @return true if there was a pending height update (which has been cleared), false otherwise.
+   */
+  protected static boolean getAndClearPendingHeightUpdate(KeyboardType keyboardType, int orientation) {
+    String pendingKey = getPendingHeightKey(keyboardType, orientation);
+    if (pendingKey == null) {
+      return false;
+    }
+    SharedPreferences prefs = appContext.getSharedPreferences(KMManager.KMEngine_PrefsKey, Context.MODE_PRIVATE);
+    boolean hasPending = prefs.getBoolean(pendingKey, false);
+    if (hasPending) {
+      SharedPreferences.Editor editor = prefs.edit();
+      editor.remove(pendingKey);
+      editor.commit();
+    }
+    return hasPending;
   }
 
   /**

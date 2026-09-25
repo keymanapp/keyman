@@ -1,0 +1,43 @@
+﻿c banne generated from template at 2024-07-12 10:16:50
+c with name "Banne"
+store(&VERSION) '10.0'
+store(&NAME) 'javascript_error'
+store(&COPYRIGHT) 'Copyright © SIL'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'any'
+store(&VISUALKEYBOARD) 'javascript_error.kvks'
+store(&LAYOUTFILE) 'javascript_error.keyman-touch-layout'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c ------------------------------------------------------------------------------
+c punctuation characters
+c ------------------------------------------------------------------------------
+
+c Toggle between ‹ and › by continuing to input '
+"'" + "'" > U+2039 c ‹
+U+2039 + "'" > U+203A c ›
+U+203A + "'" > U+2039 c ‹
+
+c Toggle between « and » by continuing to input "
++ '"' > U+00AB c «
+U+00AB + '"' > U+00BB c »
+U+00BB + '"' > U+00AB c «
+
+c Revert to default " character
+";"    + '"' > '"'
+
+c Use angle brackets to type characters
+"<"    + "'" > U+2039 c ‹
+">"    + "'" > U+203A c ›
+"<"    + "<" > U+00AB c «
+">"    + ">" > U+00BB c »
+
+c ------------------------------------------------------------------------------
+c s with caron
+c ------------------------------------------------------------------------------
+
+"s" + "'" > U+0161 c š
+"S" + "'" > U+0160 c Š

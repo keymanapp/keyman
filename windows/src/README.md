@@ -1,5 +1,11 @@
 # Keyman for Windows
 
+## Platforms
+
+* x86 (most host processes)
+* x64
+* ARM
+
 ## Build Prerequisites
 
 * See [Windows Build Environment Configuration](../../docs/build/windows.md).

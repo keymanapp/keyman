@@ -33,7 +33,14 @@ wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR
   UNREFERENCED_PARAMETER(lpCmdLine);
 
   // Initialize global strings
-  LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+#if defined(_M_ARM64)
+  LoadStringW(hInstance, IDS_APP_TITLE_ARM64, szTitle, MAX_LOADSTRING);
+#elif defined(_M_X64)
+  LoadStringW(hInstance, IDS_APP_TITLE_X64, szTitle, MAX_LOADSTRING);
+#else // x86
+  LoadStringW(hInstance, IDS_APP_TITLE_X86, szTitle, MAX_LOADSTRING);
+#endif
+
   LoadStringW(hInstance, IDC_EDITOR, szWindowClass, MAX_LOADSTRING);
   MyRegisterClass(hInstance);
 

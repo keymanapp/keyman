@@ -72,7 +72,7 @@
     <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp">
       <Filter>Source Files\Framework</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\common\windows\cpp\src\vkeys.cpp">
+    <ClCompile Include="..\..\..\..\common\cpp\vkeys.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
   </ItemGroup>
@@ -81,6 +81,12 @@
       <Filter>Source Files\Framework</Filter>
     </None>
     <None Include="kmtip64.def">
+      <Filter>Source Files\Framework</Filter>
+    </None>
+    <None Include="kmtiparm64.def">
+      <Filter>Source Files\Framework</Filter>
+    </None>
+    <None Include="kmtiparm64x.def">
       <Filter>Source Files\Framework</Filter>
     </None>
   </ItemGroup>
@@ -114,7 +120,7 @@
     <ClInclude Include="..\..\..\include\kmtip_guids.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\vkeys.h">
+    <ClInclude Include="$(KEYMAN_ROOT)\common\include\vkeys.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

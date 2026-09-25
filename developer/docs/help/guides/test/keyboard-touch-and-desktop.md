@@ -133,17 +133,3 @@ installed, across all apps.
 You can test multiple keyboards just by clicking **Test Keyboard on
 web** in each keyboard editor.
 
-## Related articles
-
-Other articles on developing touch layouts:
-
--   [Creating a touch keyboard layout for Amharic - part
-    1](../develop/creating-a-touch-keyboard-layout-for-amharic)
--   [Creating a touch keyboard layout for Amharic - the nitty
-    gritty](../develop/creating-a-touch-keyboard-layout-for-amharic-the-nitty-gritty)
-
-You can distribute your keyboard to other users by following the
-instructions in this article:
-
--   [Distribute keyboards to Keyman
-    applications](../distribute/packages)

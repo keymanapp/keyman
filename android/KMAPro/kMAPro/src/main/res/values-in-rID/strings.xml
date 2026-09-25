@@ -113,9 +113,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Semua bahasa telah terpasang</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Drag the keyboard to resize the height</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Rotate the device to adjust portrait and landscape</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">Drag the keyboard to resize the height. Rotate the device to adjust portrait and landscape.</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Reset to Defaults</string>
   <!-- Context: Keyman Web Browser -->

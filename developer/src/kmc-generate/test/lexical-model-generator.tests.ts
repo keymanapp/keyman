@@ -35,6 +35,8 @@ function getFilenames(p: string, base?: string): string[] {
 describe('LexicalModelGenerator', function () {
   let clock: sinon.SinonFakeTimers;
 
+  const callbacks = new TestCompilerCallbacks(this);
+
   before(function() {
     // We will always be 12 April 2024 to match test fixtures
     clock = sinon.useFakeTimers(new Date(2024, 3, 12));
@@ -46,7 +48,6 @@ describe('LexicalModelGenerator', function () {
 
   it('should generate a lexical model from provided options', async function() {
     const generator = new LexicalModelGenerator();
-    const callbacks = new TestCompilerCallbacks();
     const opts: GeneratorOptions = {...options};
     opts.id = 'sample.en.sample';
     opts.targets = [KeymanTargets.KeymanTarget.any];

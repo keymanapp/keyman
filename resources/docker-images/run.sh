@@ -44,6 +44,9 @@ else
 fi
 
 run_android() {
+  if [[ -n ${RELEASE_OEM:-} ]] && [[ -n ${RELEASE_OEM_FIRSTVOICES:-} ]]; then
+    DOCKER_RUN_ARGS+=(-e "RELEASE_OEM=${RELEASE_OEM:-}" -e "RELEASE_OEM_FIRSTVOICES=${RELEASE_OEM_FIRSTVOICES:-}")
+  fi
   docker_wrapper run "${DOCKER_RUN_ARGS[@]}" -i --rm -v "${KEYMAN_ROOT}":/home/build/build \
     -v "${KEYMAN_ROOT}/core/build/docker-core/${build_dir}":/home/build/build/core/build \
     "${registry_slash}keymanapp/keyman-android-ci:${image_version}" \

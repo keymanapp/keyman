@@ -93,7 +93,7 @@ namespace core
     return key == nullptr;
   }
 
-
+  km_core_option_item * clone_options(km_core_option_item const *src);
 
 } // namespace core
 } // namespace km

@@ -236,9 +236,6 @@ Entries not in this file will be sourced from the default locale.xml file in the
 	<String Type="FormatString" Id="SKUILanguageNameWithEnglish">Tamil</String>
 	<!--   The language code for the current translation -->
 	<String Type="FormatString" Id="SKLanguageCode">அ</String>
-	<!--   The default language code for this product.  This should be the language that the product is created in.
-       For Keyman Desktop (all editions) this must stay "en", for all translations. -->
-	<String Type="FormatString" Id="SKDefaultLanguageCode">அ</String>
 	<!--   This message is shown during the package installation process when an existingpackage with the same name is already installed. -->
 	<!--   Parameters: %0:s = Package to be uninstalled -->
 	<String Type="FormatString" Id="SKPackageAlreadyInstalled">'%0:s' தட்டசு பலகை ஏற்கனவே நிறுவப்பட்டுள்ளது. தொடர்ந்தால் ஏற்கனவே உள்ளதை நீக்கி விட்டு, புதியதை நிறுவவா?</String>

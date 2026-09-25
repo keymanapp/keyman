@@ -9,7 +9,7 @@ import { AnalyzerMessages } from '../src/analyzer-messages.js';
 import { makePathToFixture } from './helpers/index.js';
 
 describe('AnalyzeOskCharacterUse warnings', function() {
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   const MOCK_MAP_NO_COUNTS = makePathToFixture(
     'osk-character-use',
@@ -20,16 +20,6 @@ describe('AnalyzeOskCharacterUse warnings', function() {
     'mock-map-with-counts.json'
   );
 
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if (this.currentTest?.isFailed()) {
-      callbacks.printMessages();
-    }
-  });
-
   it('warns if previous map did not include counts but includeCounts=true', function() {
     const a = new AnalyzeOskCharacterUse(callbacks, {
       includeCounts: true
@@ -37,7 +27,7 @@ describe('AnalyzeOskCharacterUse warnings', function() {
 
     const result = a.unitTestEndPoints.loadPreviousMap(MOCK_MAP_NO_COUNTS);
     assert.isNotNull(result, 'Expected map to be loaded successfully');
-    
+
     assert.isTrue(
       callbacks.hasMessage(AnalyzerMessages.WARN_PreviousMapDidNotIncludeCounts),
       'Expected Warn_PreviousMapDidNotIncludeCounts warning'

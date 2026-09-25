@@ -13,6 +13,7 @@ uses
   uCEFTypes,
 
   KeymanDeveloperOptions,
+  Keyman.Developer.System.ServerAPI,
   Keyman.Developer.System.TikeCommandLine,
   Keyman.System.CEFManager,
   Keyman.System.KeymanSentryClient,
@@ -68,6 +69,7 @@ begin
     begin
       InitThemeLibrary;
       SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
+      TServerDebugAPI.CleanupOldNgrok;
       Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
       try
         Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);

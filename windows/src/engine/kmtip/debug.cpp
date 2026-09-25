@@ -49,10 +49,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#ifdef _WIN64
-#define DEBUG_PLATFORM_STRING "x64"
+#if defined(_M_ARM64)
+  #define DEBUG_PLATFORM_STRING "arm64"
+#elif defined(_M_X64)
+  #define DEBUG_PLATFORM_STRING "x64"
 #else
-#define DEBUG_PLATFORM_STRING "x86"
+  #define DEBUG_PLATFORM_STRING "x86"
 #endif
 
 

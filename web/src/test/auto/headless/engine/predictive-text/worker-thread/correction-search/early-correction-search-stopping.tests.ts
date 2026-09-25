@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { CORRECTION_SEARCH_THRESHOLDS, CorrectionPredictionTuple, ModelCompositor, shouldStopSearchingEarly } from "@keymanapp/lm-worker/test-index";
+import { CORRECTION_SEARCH_THRESHOLDS, CorrectionPredictionTupleCore, ModelCompositor, shouldStopSearchingEarly } from "@keymanapp/lm-worker/test-index";
 
 describe('correction-search: shouldStopSearchingEarly', () => {
   it('stops early once new corrections are less likely than currently discovered predictions', () => {
@@ -16,7 +16,7 @@ describe('correction-search: shouldStopSearchingEarly', () => {
     const predictions = predictionProbs.map((entry) => {
       return {
         totalProb: entry
-      } as CorrectionPredictionTuple
+      } as CorrectionPredictionTupleCore
     });
 
     // Thresholding is performed in log-space.
@@ -33,12 +33,16 @@ describe('correction-search: shouldStopSearchingEarly', () => {
     //
     // Can technically run the method with an empty array, but the actual scenario would have
     // at least one prediction present in the "found predictions" array.
-    assert.isFalse(shouldStopSearchingEarly(baseCost, baseCost + expectedThreshold - 0.01, [{ totalProb: Math.exp(-1) } as CorrectionPredictionTuple]));
-    assert.isTrue(shouldStopSearchingEarly( baseCost, baseCost + expectedThreshold + 0.01, [{ totalProb: Math.exp(-1) } as CorrectionPredictionTuple]));
+    assert.isFalse(shouldStopSearchingEarly(baseCost, baseCost + expectedThreshold - 0.01, [{ totalProb: Math.exp(-1) } as CorrectionPredictionTupleCore]));
+    assert.isTrue(shouldStopSearchingEarly( baseCost, baseCost + expectedThreshold + 0.01, [{ totalProb: Math.exp(-1) } as CorrectionPredictionTupleCore]));
   });
 
   it('stops checking corrections earlier when enough predictions have been found', () => {
-    const predictionProbs = [.010, .009, .008, .008, .0075, .0075, .007, .007, .006, .006, .005, .005];
+    // Thresholding is performed in log-space.
+    const baseCost = 1;
+    const expectedThreshold = CORRECTION_SEARCH_THRESHOLDS.REPLACEMENT_SEARCH_THRESHOLD;
+
+    const predictionProbs = [.010, .009, .008, .008, .0075, .007, .006, .005, .004, .003, .002, Math.exp(- baseCost - expectedThreshold)];
     assert.isAtLeast(predictionProbs.length, ModelCompositor.MAX_SUGGESTIONS, "test setup no longer valid");
 
     // The only part for each entry we actually care about here:  .totalProb.
@@ -46,15 +50,11 @@ describe('correction-search: shouldStopSearchingEarly', () => {
     const predictions = predictionProbs.map((entry) => {
       return {
         totalProb: entry
-      } as CorrectionPredictionTuple
+      } as CorrectionPredictionTupleCore
     });
 
-    const baseCost = 1;
-
-    // Thresholding is performed in log-space.
-    const expectedThreshold = CORRECTION_SEARCH_THRESHOLDS.REPLACEMENT_SEARCH_THRESHOLD;
-
+    // The actual assertions.
     assert.isFalse(shouldStopSearchingEarly(baseCost, baseCost + expectedThreshold - 0.01, predictions));
-    assert.isTrue(shouldStopSearchingEarly( baseCost, baseCost + expectedThreshold + 0.01, predictions));
+    assert.isTrue(shouldStopSearchingEarly(baseCost, baseCost + expectedThreshold + 0.01, predictions));
   });
 });

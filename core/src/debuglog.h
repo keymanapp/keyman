@@ -32,6 +32,7 @@ extern const char *s_key_names[];
 
 int DebugLog_1(const char *file, int line, const char *function, const char *fmt, ...);
 const char *Debug_VirtualKey(KMX_WORD vk);
+const char *Debug_VirtualKey_Always(KMX_WORD vk);
 /**
  * @param s PKMX_WCHAR to output
  * @param x temporary buffer (0 or 1) to write to

@@ -26,23 +26,22 @@ builder_describe_outputs \
 function do_build() {
   create-windows-output-folders
   build_version.res
-  # TODO: why no manifest?
-  # build_manifest.res
+  build_manifest.res
   delphi_msbuild insthelp.dproj "//p:Platform=Win32"
-  do_map2pdb "$WIN32_TARGET_PATH/insthelp.map" "$WIN32_TARGET"
+  sentrytool_delphiprep "$WIN32_TARGET" insthelp.dpr
+  tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_APP"
-  cp_if_exists "$WIN32_TARGET_PATH/insthelp.pdb" "$WINDOWS_DEBUGPATH_APP"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/insthelp.dbg" "$WINDOWS_DEBUGPATH_APP/insthelp.dbg"
 }
 
 function do_publish() {
   # test that (a) linked manifest exists and correct
-  # TODO: no manifest included?
-  # wrap-mt -nologo -inputresource:"$WINDOWS_PROGRAM_APP/insthelp.exe" -validate_manifest
+  wrap-mt -nologo -inputresource:"$WINDOWS_PROGRAM_APP/insthelp.exe" -validate_manifest
 
   wrap-signcode //d "Keyman for Windows Install Helper" "$WINDOWS_PROGRAM_APP/insthelp.exe"
   wrap-symstore "$WINDOWS_PROGRAM_APP/insthelp.exe" //t keyman-windows
-  wrap-symstore "$WINDOWS_DEBUGPATH_APP/insthelp.pdb" //t keyman-windows
+  wrap-symstore "$WINDOWS_DEBUGPATH_APP/insthelp.dbg" //t keyman-windows
 }
 
 builder_run_action clean:project        clean_windows_project_files

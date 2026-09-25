@@ -44,6 +44,7 @@ type
     class function KeyboardsInstallDir: string; static;
     class function KeymanConfigStaticHttpFilesPath(const filename: string = ''): string; static;
     class function KeymanCustomisationPath: string; static;
+    class function KeymanLocalePath: string; static;
     class function KeymanCoreLibraryPath(const Filename: string): string; static;
     class function CEFPath: string; static; // Chromium Embedded Framework
     class function CEFDataPath(const mode: string): string; static;
@@ -387,6 +388,20 @@ begin
   end;
 
   Result := Result + filename;
+end;
+
+class function TKeymanPaths.KeymanLocalePath: string;
+var
+  keyman_root: string;
+begin
+  // Look up KEYMAN_ROOT development variable -- if found and executable
+  // within that path then use that as source path
+  if TKeymanPaths.RunningFromSource(keyman_root) then
+  begin
+    Exit(keyman_root + 'windows\src\desktop\kmshell\locale\');
+  end;
+
+  Result := TKeymanPaths.KeymanDesktopInstallPath('locale\');
 end;
 
 class function TKeymanPaths.KeymanCustomisationPath: string;

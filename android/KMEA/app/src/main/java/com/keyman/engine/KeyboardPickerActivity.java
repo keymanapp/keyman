@@ -263,14 +263,14 @@ public final class KeyboardPickerActivity extends BaseActivity {
 
 
     // Determine the index to the current keyboard position to highlight as the selected keyboard
-    int currentKeyboardIndex; 
+    int currentKeyboardIndex;
     String currentKeyboardKey = KMKeyboard.currentKeyboard();
     if (currentKeyboardKey == null) {
       SharedPreferences prefs = this.getSharedPreferences(this.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
       currentKeyboardIndex = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
     } else {
       currentKeyboardIndex = KeyboardController.getInstance().getKeyboardIndex(currentKeyboardKey);
-    }     
+    }
     setSelection(currentKeyboardIndex);
 
     imeList = getIMEList(this);
@@ -754,6 +754,32 @@ public final class KeyboardPickerActivity extends BaseActivity {
     }
 
     return index;
+  }
+
+  /**
+   * Get an array list with all lexical model hashmaps matching the lexical model ID.
+   * @param context
+   * @param lexicalModelId - ID of the lexical model
+   * @return Array of lexical model hashmaps with lexicalModelId. Otherwise empty.
+   */
+  public static ArrayList<HashMap<String, String>> getLexicalModelsMatchingId(Context context, String lexicalModelId) {
+    ArrayList<HashMap<String, String>> lexicalModels = new ArrayList<>();
+
+    if (lexicalModelsList == null) {
+      lexicalModelsList = getLexicalModelsList(context);
+    }
+
+    if (lexicalModelsList != null) {
+      int length = lexicalModelsList.size();
+      for (int i=0; i < length; i++) {
+        HashMap<String, String> lmInfo = lexicalModelsList.get(i);
+        if (lexicalModelId.equals(lmInfo.get(KMManager.KMKey_LexicalModelID))) {
+          lexicalModels.add(lmInfo);
+        }
+      }
+    }
+
+    return lexicalModels;
   }
 
   public static HashMap<String, String> getLexicalModelInfo(Context context,int index) {

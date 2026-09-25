@@ -108,7 +108,7 @@ var
 begin
   with kmint.KeymanCustomisation.CustMessages do
   begin
-    FLanguagesAvailableString := MsgFromId(SKDefaultLanguageCode)+#13#10+GetAvailableLanguages;
+    FLanguagesAvailableString := GetAvailableLanguages;
     FLanguages.Text := FLanguagesAvailableString;
 
     for i := 0 to FLanguages.Count - 1 do

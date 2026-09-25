@@ -35,7 +35,7 @@
 
 //
 // Server application functionality
-// This runs only in the host applications keyman.exe and keymanx64.exe
+// This runs only in the host applications keyman.exe, keymanhp.x64.exe and keymanhp.arm64.exe
 //
 
 // TODO: refactor this into the SerialKeyEventServer class and provide getters for them

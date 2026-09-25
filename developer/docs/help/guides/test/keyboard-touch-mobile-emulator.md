@@ -47,15 +47,5 @@ You can now test the keyboard layout and get an idea of how it will feel
 on a real touch device. Rotation, or changing device types will require
 a page load (F5) in order to render correctly.
 
--   [Creating a touch keyboard layout for Amharic - part
-    1](../develop/creating-a-touch-keyboard-layout-for-amharic)
--   [Creating a touch keyboard layout for Amharic - the nitty
-    gritty](../develop/creating-a-touch-keyboard-layout-for-amharic-the-nitty-gritty)
 -   [How to test your keyboard layout — touch and
     desktop](keyboard-touch-and-desktop)
-
-You can distribute your keyboard to other users by following the
-instructions in this article:
-
--   [Distribute keyboards to Keyman
-    applications](../distribute/packages)

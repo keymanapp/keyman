@@ -116,9 +116,7 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">ሁሉም ቋንቋዎች ቀደም ሲል ተጭኗል</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">የፊደል ገበታ ሰሌዳውን በመጎተት ቁመቱን አስተካክል</string>
-  <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">ዲቫይሱን በማሽከርከር ፖርትሬቱንና ላንድስኬፑን አስተካክል</string>
+  <string name="adjust_keyboard_instructions" comment="Instructions for adjusting keyboard height">የፊደል ገበታ ሰሌዳውን በመጎተት ቁመቱን አስተካክል ዲቫይሱን በማሽከርከር ፖርትሬቱንና ላንድስኬፑን አስተካክል</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">ወደ ቀደመው ሴቲንግ መልስ</string>
   <!-- Context: Keyman Web Browser -->

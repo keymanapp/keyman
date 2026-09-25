@@ -80,10 +80,27 @@ public:
 
 /**
  * ProcessToggleChange
- * Toggles the state of FLAGS in the Globals::ShiftState bit mask
+ * Sets or clears the state of FLAGS in the Globals::ShiftState bit mask
+ * Using the status of the key as determined by GetKeyState,
+ * ensuring it is consistent with the actual state of the key.
  * Supports VK_CAPITAL and VK_NUMLOCK
  * It DOES NOT generate a system event change for these flags
  * @param  key
  */
 void ProcessToggleChange(UINT key);
+
+// Forward declaration - final in globals.h
+struct tagKEYMAN64THREADDATA;
+typedef struct tagKEYMAN64THREADDATA *PKEYMAN64THREADDATA;
+
+/**
+ * Update the cache of the last key event received, this is set here - TIP processing, and by
+ * the GetMessage hook.
+ * @param  _td      Thread data to update
+ * @param  wParam   WPARAM of the key event
+ * @param  scan     Scan code of the key event
+ * @param  keyTransition   Transition state of the key event (00b = key down, 01b = repeat, 11b = keyup)
+ */
+void UpdateLastKeyCache(PKEYMAN64THREADDATA _td, WPARAM wParam, BYTE scan, BYTE keyTransition);
+
 #endif

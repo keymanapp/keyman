@@ -18,4 +18,4 @@ builder_describe \
 
 builder_parse "$@"
 
-builder_run_action all  "${KEYMAN_ROOT}/common/web/build.sh" configure build test
+builder_run_action all  builder_launch /common/web/build.sh configure build test

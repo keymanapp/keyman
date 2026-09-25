@@ -36,6 +36,19 @@ void actions::push_capslock(bool turnOn) {
   emplace_back(std::move(ai));
 }
 
+actions::actions(actions const &other)
+: std::vector<action>(other)
+, _option_items_stack(other._option_items_stack)
+{
+  // Update all option pointers to point to the new stack.
+  size_t opt_index = 0;
+  for (auto &item : *this) {
+    if (item.type == KM_CORE_IT_PERSIST_OPT) {
+      assert(opt_index < _option_items_stack.size());
+      item.option = &_option_items_stack[opt_index++];
+    }
+  }
+}
 
 state::state(km::core::abstract_processor & ap, km_core_option_item const *env)
   : _processor(ap)
@@ -52,9 +65,13 @@ state::state(km::core::abstract_processor & ap, km_core_option_item const *env)
                      env->key,
                      env->value);
   }
+  _backspace_handled_internally = false;
   _imx_callback = nullptr;
   _imx_object = nullptr;
   memset(const_cast<km_core_actions*>(&_action_struct), 0, sizeof(km_core_actions));
+  // Ensure _action_struct is initialized to the default values
+  km_core_action_item no_actions = {KM_CORE_IT_END, {0,}, {0}};
+  action_item_list_to_actions_object(&no_actions, &this->_action_struct);
 }
 
 void state::imx_register_callback(
@@ -79,6 +96,19 @@ void state::imx_callback(uint32_t imx_id) {
     return;
   }
   _imx_callback(static_cast<km_core_state *>(this), imx_id, _imx_object);
+}
+
+state::state(state const &other)
+  : _ctxt(other._ctxt)
+  , _app_ctxt(other._app_ctxt)
+  , _processor(other._processor)
+  , _actions(other._actions)
+  , _action_struct(clone_actions_object(other._action_struct))
+  , _debug_items(other._debug_items)
+  , _imx_callback(other._imx_callback)
+  , _imx_object(other._imx_object)
+  , _backspace_handled_internally(other._backspace_handled_internally)
+{
 }
 
 state::~state() {

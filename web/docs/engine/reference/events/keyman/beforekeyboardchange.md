@@ -8,7 +8,7 @@ Called when keyboard input language is about to change.
 
 ## Syntax
 
-```
+```js
 keyman.addEventListener('beforekeyboardchange', function(keyboardProperties) {
   ...
 });

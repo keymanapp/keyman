@@ -28,10 +28,11 @@ function do_build() {
   build_version.res
   build_manifest.res
   delphi_msbuild kmdbrowserhost.dproj "//p:Platform=Win32"
-  do_map2pdb "$WIN32_TARGET_PATH/kmdbrowserhost.map" "$WIN32_TARGET"
+  sentrytool_delphiprep "$WIN32_TARGET" kmdbrowserhost.dpr
+  tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$DEVELOPER_PROGRAM"
-  cp_if_exists "$WIN32_TARGET_PATH/kmdbrowserhost.pdb" "$DEVELOPER_DEBUGPATH"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmdbrowserhost.dbg" "$DEVELOPER_DEBUGPATH"
 }
 
 function do_publish() {
@@ -40,12 +41,7 @@ function do_publish() {
 
   wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/kmdbrowserhost.exe"
   wrap-symstore "$DEVELOPER_PROGRAM/kmdbrowserhost.exe" //t keyman-developer
-  wrap-symstore "$DEVELOPER_DEBUGPATH/kmdbrowserhost.pdb" //t keyman-developer
-}
-
-function do_install() {
-  cp "$DEVELOPER_PROGRAM/kmdbrowserhost.exe" "$INSTALLPATH_KEYMANDEVELOPER/kmdbrowserhost.exe"
-  cp_if_exists "$DEVELOPER_DEBUGPATH/kmdbrowserhost.pdb" "$INSTALLPATH_KEYMANDEVELOPER/kmdbrowserhost.pdb"
+  wrap-symstore "$DEVELOPER_DEBUGPATH/kmdbrowserhost.dbg" //t keyman-developer
 }
 
 builder_run_action clean:project        clean_windows_project_files
@@ -53,6 +49,6 @@ builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 # builder_run_action test:project         do_test
 builder_run_action publish:project      do_publish
-builder_run_action install:project      do_install
+builder_run_action install:project      cp "$DEVELOPER_PROGRAM/kmdbrowserhost.exe" "$INSTALLPATH_KEYMANDEVELOPER/kmdbrowserhost.exe"
 builder_run_action edit:project         start kmdbrowserhost.dproj
 

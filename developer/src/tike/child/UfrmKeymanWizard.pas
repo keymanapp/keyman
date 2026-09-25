@@ -159,7 +159,7 @@ type
     Filename: string;
   end;
 
-  TfrmKeymanWizard = class(TfrmTikeEditor, IKMDPrintActions {TODO:, IKMDPrintPreviewActions})
+  TfrmKeymanWizard = class(TfrmTikeEditor)
     dlgBrowseBitmap: TOpenPictureDialog;
     dlgSaveExport: TSaveDialog;
     dlgSaveBitmap: TSavePictureDialog;
@@ -461,7 +461,7 @@ type
     procedure FeatureModified(Sender: TObject);
     function SaveFeature(ID: TKeyboardParser_FeatureID): Boolean;
     procedure SelectTouchLayoutTemplate(APromptChange: Boolean);
-    function LoadTouchLayout: Boolean;   // I4034
+    procedure LoadTouchLayout;   // I4034
     function GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
     procedure SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057
 
@@ -523,11 +523,6 @@ type
 
     function CanChangeView(FView: TCodeDesignView): Boolean; override;   // I4678
     procedure ChangeView(FView: TCodeDesignView); override;   // I4678
-
-    { IKMDPrintActions }
-    function PrintFile: Boolean;
-    { IKMDPrintPreviewActions }
-    //TODO: function PrintPreview: Boolean;
 
     function CanReloadAsTextFileFormatClick: Boolean; override;   // I3637
     procedure ReloadAsTextFileFormatClick(TextFileFormat: TTextFileFormat);   // I3637
@@ -1508,16 +1503,6 @@ begin
   Result := True;
 end;
 
-function TfrmKeymanWizard.PrintFile: Boolean;
-begin
-  Result := frameSource.PrintFile(FileName);
-end;
-
-{TODO: function TfrmKeymanWizard.PrintPreview: Boolean;
-begin
-  Result := frameSource.PrintPreview(FileName);
-end;}
-
 function TfrmKeymanWizard.GetCurrentRule: TKeyboardParser_LayoutRule;
 var
   i: Integer;
@@ -1659,8 +1644,7 @@ begin
       end;
     kfTouchLayout:
       begin
-        if not LoadTouchLayout then
-          Exit(False);
+        LoadTouchLayout;
       end;
     else
     begin
@@ -3202,17 +3186,15 @@ begin
   FFeature[kfTouchLayout].Modified := True;
 end;
 
-function TfrmKeymanWizard.LoadTouchLayout: Boolean;   // I4034
+procedure TfrmKeymanWizard.LoadTouchLayout;   // I4034
 begin
   if pagesTouchLayout.ActivePage = pageTouchLayoutDesign then
   begin
-    Result := frameTouchLayout.Load(FFeature[kfTouchLayout].Filename, False, False);
-  end
-  else
-  begin
-    frameTouchLayoutSource.LoadFromFile(FFeature[kfTouchLayout].Filename, tffUTF8);
-    Result := True;
+    if frameTouchLayout.Load(FFeature[kfTouchLayout].Filename, False, False) then
+      Exit;
+    pagesTouchLayout.ActivePage := pageTouchLayoutCode;
   end;
+  frameTouchLayoutSource.LoadFromFile(FFeature[kfTouchLayout].Filename, tffUTF8);
 end;
 
 procedure TfrmKeymanWizard.SaveTouchLayout;   // I3885
@@ -3339,7 +3321,7 @@ begin
     begin
       frameTouchLayout.SaveToString;
       frameTouchLayout.TemplateFileName := TemplateFileName;
-      frameTouchLayout.Load('', True, False);   // I4034
+      frameTouchLayout.ApplyTemplate;
       Self.Modified := True;
     end;
   finally

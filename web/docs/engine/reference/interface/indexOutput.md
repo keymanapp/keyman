@@ -8,13 +8,13 @@ Index-based output: Outputs a mapped character according to a previous selection
 
 ## Syntax
 
-```c
+```js
 keyman.interface.indexOutput(nd, store, index, Pelem);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KIO(nd, store, index, Pelem);
 ```
 
@@ -50,7 +50,7 @@ facilitates mapping the characters `'abcde'` to their respective entry in the ou
 
 In order to output the desired character corresponding to `'a'` in the `output` store above, the code
 
-```c
+```js
 keyman.interface.indexOutput(0, 'αβγδε', 1, Pelem)
 ```
 

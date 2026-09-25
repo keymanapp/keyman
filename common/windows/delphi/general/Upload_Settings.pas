@@ -66,11 +66,11 @@ const
   URLPath_Community = '/go/'+SKeymanVersion+'/community';
 
   // Keyboard download and installation
-  URLPath_RegEx_MatchKeyboardsInstall = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.local)?/keyboards/install/([^?/]+)(?:\?(.+))?$';
+  URLPath_RegEx_MatchKeyboardsInstall = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.localhost)?/keyboards/install/([^?/]+)(?:\?(.+))?$';
                                   // e.g. https://keyman.com/keyboards/install/foo
-  UrlPath_RegEx_MatchKeyboardsRoot = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.local)?/keyboards([/?].*)?$';
-                               // e.g. http://keyman.com.local/keyboards/foo
-  UrlPath_RegEx_MatchKeyboardsGo = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.local)?/go/windows/[^/]+/download-keyboards';
+  UrlPath_RegEx_MatchKeyboardsRoot = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.localhost)?/keyboards([/?].*)?$';
+                               // e.g. http://keyman.com.localhost/keyboards/foo
+  UrlPath_RegEx_MatchKeyboardsGo = '^http(?:s)?://keyman(?:-staging)?\.com(?:\.localhost)?/go/windows/[^/]+/download-keyboards';
                              // e.g. https://keyman-staging.com/go/windows/14.0/download-keyboards?version=14.0.146.0
 
   // Cloning keyboards - Keyman Developer
@@ -85,6 +85,8 @@ function API_Server: string; // = 'api.keyman.com';
 function API_UserAgent: string; // = 'Keyman for Windows/<ver>...'
 function API_UserAgent_Developer: string; // = 'Keyman Developer/<ver>...'
 function API_UserAgent_Diagnostics: string;
+
+function API_Path_Keyboard(const id: string): string;
 
 function KeymanCom_Protocol_Server: string; // = 'https://keyman.com';
 
@@ -120,6 +122,8 @@ const
   // servers have resource constraints but should be okay for limited use.
   S_KeymanCom_Staging = 'https://keyman.com';  // #7227 disabling: 'https://keyman-staging.com';
   S_APIServer_Staging = 'api.keyman.com';  // #7227 disabling: 'api.keyman-staging.com';
+
+  S_API_Path_Keyboard = '/keyboard/%0:s';
 
 const
   URLPath_PackageDownload_Format = '/go/package/download/%0:s?platform=windows&tier=%1:s&bcp47=%2:s&update=%3:d';
@@ -185,6 +189,11 @@ end;
 function URL_KmcMessage(const id: string): string;
 begin
    Result := Format(URL_KeymanDeveloper_HelpKmcMessage_Format, [id.ToLower]);
+end;
+
+function API_Path_Keyboard(const id: string): string;
+begin
+  Result := Format(S_API_Path_Keyboard, [id]);
 end;
 
 end.

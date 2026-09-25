@@ -1,0 +1,22 @@
+{
+  "extends": "../../../../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "outDir": "build/src/",
+    "rootDir": "src/",
+    "allowJs": true,
+    "preserveConstEnums": true,
+    "noImplicitAny": false, // TODO: remove this once we complete type cleanup
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/ext/jquery-ui/index.d.cts",
+    "src/ext/index.d.cts",
+  ],
+  "exclude": [
+    "src/ext/*",
+  ],
+  "references": [
+  ]
+}

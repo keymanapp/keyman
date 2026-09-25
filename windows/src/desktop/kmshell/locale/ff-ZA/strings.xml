@@ -339,10 +339,6 @@
   <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">Hollir Tappirde Yaynirde tuma kala nde tappirde  Keyman suɓaa</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">Lomtin  Tappirde Yaynirde/Ballal jaaɓdunde e jaajol so tappirde Keyman suɓaama</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Buggitagol</string>
   <!-- Context: Configuration Dialog - Options tab -->
@@ -651,10 +647,6 @@ Jokku\?</string>
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKLanguageCode" comment="The language code for the current translation">ful</string>
-  <!-- Context: _LanguageInfo -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDefaultLanguageCode" comment="The default language code for this product.  This should be the language that the product is created in. For Keyman this must stay 'en', for all translations.">en</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->

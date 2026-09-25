@@ -226,6 +226,24 @@
 /* Text showing name of spacebar caption - language + keyboard */
 "menu-settings-spacebar-item-languageKeyboard" = "Sprache und Tastatur";
 
+/* Label for the "Adjust Keyboard Height" item on the main settings screen */
+"menu-settings-adjust-keyboard-height" = "Tastaturhöhe anpassen";
+
+/* Title for the "Adjust Keyboard Height" settings child screen */
+"adjust-keyboard-height-title" = "Tastatur anpassen";
+
+/* Label for "Reset to Default Keyboard Height" button on the adjust height screen */
+"button-label-reset-default-keyboard-height" = "Zurücksetzen auf Standard-Tastaturhöhe";
+
+/* Instruction text to drag keyboard to resize */
+"keyboard-drag-instructions" = "Ziehen Sie die Pfeil-Steuerfläche, um die Höhe der Tastatur anzupassen.";
+
+/* Instruction to rotate to adjust landscape keyboard height (displayed when device is portrait) */
+"portrait-keyboard-rotate-instructions" = "Drehen Sie das Gerät um für Querformat anzupassen.";
+
+/* Instruction to rotate to adjust portrait keyboard height (displayed when device is landscape) */
+"landscape-keyboard-rotate-instructions" = "Drehen Sie das Gerät um für Hochformat anzupassen.";
+
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "Download der Tastatur fehlgeschlagen";
 

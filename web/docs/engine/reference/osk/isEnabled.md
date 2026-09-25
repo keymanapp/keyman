@@ -8,7 +8,7 @@ Return the user-defined OSK visibility as set by prior calls to [`show`](show) o
 
 ## Syntax
 
-```c
+```js
 keyman.osk.isEnabled();
 ```
 

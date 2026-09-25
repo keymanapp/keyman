@@ -7,22 +7,12 @@ import { AnalyzeOskCharacterUse } from '../src/osk-character-use/index.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 describe('AnalyzeOskCharacterUse output formats', function() {
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   const dummyStrings = {
     'a': [{ filename: 'file1.kvks', count: 1 }],
     'b': [{ filename: 'file2.kvks', count: 2 }]
   };
-
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if (this.currentTest?.isFailed()) {
-      callbacks.printMessages();
-    }
-  });
 
   it('generates .txt format correctly', function() {
     const a = new AnalyzeOskCharacterUse(callbacks, { includeCounts: true });

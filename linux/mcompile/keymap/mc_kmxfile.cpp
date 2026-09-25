@@ -28,7 +28,7 @@ const int CODE__SIZE[] = {
    -1,   // CODE_EXTENDEDEND         0x0B (unused)
     1,   // CODE_SWITCH              0x0C
    -1,   // CODE_KEY                 0x0D (never used)
-    0,   // CODE_CLEARCONTEXT        0x0E
+    0,   // CODE_CLEARCONTEXT        0x0E (deprecated in 19.0)
     1,   // CODE_CALL                0x0F
    -1,   // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
     1,   // CODE_CONTEXTEX           0x11
@@ -346,7 +346,7 @@ LPKMX_KEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
  * @return pointer to the keyboard
  */
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
-  UNREFERENCED_PARAMETER(dwFileSize);
+  // UNREFERENCED_PARAMETER(dwFileSize);
 
   KMX_DWORD i, j;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD)base;
@@ -369,9 +369,9 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
   for (gp = kbp->dpGroupArray, cgp = (PCOMP_GROUP)gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++) {
     gp->dpName = KMX_StringOffset(base, cgp->dpName);
     gp->dpKeyArray = (LPKMX_KEY)(base + cgp->dpKeyArray);
-    if (cgp->dpMatch != NULL)
+    if (cgp->dpMatch != 0)
       gp->dpMatch = (PKMX_WCHAR)(base + cgp->dpMatch);
-    if (cgp->dpNoMatch != NULL)
+    if (cgp->dpNoMatch != 0)
       gp->dpNoMatch = (PKMX_WCHAR)(base + cgp->dpNoMatch);
 
     for (kp = gp->dpKeyArray, ckp = (PCOMP_KEY)kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++) {

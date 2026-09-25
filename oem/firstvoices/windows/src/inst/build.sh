@@ -74,7 +74,7 @@ function do_publish() {
     -sice:ICE82 -sice:ICE80 \
     -dWixUILicenseRtf=License.rtf \
     -out firstvoices.msi \
-    -ext WixUIExtension firstvoices.wixobj desktopui.wixobj
+    -ext WixUIExtension -ext WixUtilExtension firstvoices.wixobj desktopui.wixobj
 
   #
   # Sign the installation archive

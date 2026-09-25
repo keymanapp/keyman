@@ -8,9 +8,11 @@ import java.util.HashMap;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.preference.PreferenceManager;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,11 +21,11 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.os.Bundle;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.keyman.engine.BaseActivity;
+import com.keyman.engine.DisplayLanguages;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.data.KeyboardController;
 import com.keyman.engine.util.MapCompat;
@@ -68,13 +70,13 @@ public class KeymanSettingsInstallActivity extends BaseActivity {
     final String noIcon = "0";
     HashMap<String, String> hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.install_from_keyman_dot_com));
-    String icon = String.valueOf(R.drawable.ic_content_add);
+    String icon = String.valueOf(R.drawable.ic_content_add_mode);
     hashMap.put(iconKey, icon);
     installOptionList.add(hashMap);
 
     hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.install_from_local_file));
-    icon = String.valueOf(R.drawable.ic_folder_open);
+    icon = String.valueOf(R.drawable.ic_folder_open_mode);
     hashMap.put(iconKey, icon);
     hashMap.put(isEnabledKey, "true");
     installOptionList.add(hashMap);
@@ -92,7 +94,7 @@ public class KeymanSettingsInstallActivity extends BaseActivity {
     hashMap = new HashMap<>();
     hashMap.put(titleKey, getString(R.string.add_languages_to_installed_keyboard));
     hashMap.put(subtitleKey, getString(R.string.add_language_subtext));
-    icon = String.valueOf(R.drawable.ic_content_add);
+    icon = String.valueOf(R.drawable.ic_content_add_mode);
     hashMap.put(iconKey, icon);
     hashMap.put(isEnabledKey, "true");
     installOptionList.add(hashMap);
@@ -127,12 +129,19 @@ public class KeymanSettingsInstallActivity extends BaseActivity {
         HashMap<String, String> hashMap = (HashMap<String, String>) parent.getItemAtPosition(position);
         String itemTitle = MapCompat.getOrDefault(hashMap, titleKey, "");
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String languageTag = prefs.getString(DisplayLanguages.displayLanguageKey, "");
         // Install from keyman.com
         if (itemTitle.equals(getString(R.string.install_from_keyman_dot_com))) {
           if (KMManager.hasConnection(context)) {
             Intent i = new Intent(context, KMPBrowserActivity.class);
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             i.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            if (languageTag != null && !languageTag.isEmpty()) {
+              Bundle bundle = new Bundle();
+              bundle.putString("lang", languageTag);
+              i.putExtras(bundle);
+            }
             context.startActivity(i);
           }  else {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);

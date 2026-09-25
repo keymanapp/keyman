@@ -2,53 +2,42 @@
 # Keyman is copyright (C) SIL Global. MIT License.
 
 function checkPrerequisites() {
-  if [[ "${UPLOAD:=}" == "yes" ]]; then
-    SIM=""
-  else
-    SIM="-s"
-  fi
-
   # Check the tier
   if [[ -z "${KEYMAN_TIER:=}" ]]; then
     echo "TIER.md or \${KEYMAN_TIER} must be set to (alpha, beta, stable) to use this script"
     exit 1
   fi
 
-  if ! command -v xmllint > /dev/null; then
+  if ! builder_has_option --no-download && ! command -v xmllint > /dev/null; then
     echo "you must install xmllint (libxml2-utils package) to use this script"
     exit 1
   fi
-
-  # shellcheck disable=SC2034
-  projects="${PROJECT:=keyman}"
 }
 
 function downloadSource() {
   local packageDir
   packageDir=$1
 
-  if [[ "${proj:=}" == "keyman" ]]; then
-    # shellcheck disable=SC2154
-    cd "${BASEDIR}" || exit
-    ./build.sh clean
-  fi
+  # shellcheck disable=SC2154
+  cd "${KEYMAN_ROOT}/linux" || exit
+  ./build.sh clean
 
   # Update tier in Debian watch files (replacing any previously set tier) and remove comment
-  sed -e "s/\$tier\|alpha\|beta\|stable/${KEYMAN_TIER}/g" -e "s/^# .*$//" "${BASEDIR}"/scripts/watch.in > debian/watch
+  sed -e "s/\$tier\|alpha\|beta\|stable/${KEYMAN_TIER}/g" -e "s/^# .*$//" "${KEYMAN_ROOT}/linux/scripts/watch.in" > debian/watch
 
   version=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-version/text()" -)
   dirversion=$(uscan --report --dehs|xmllint --xpath "//dehs/upstream-url/text()" - | cut -d/ -f6)
-  echo "${proj} version is ${version}"
-  uscan || (echo "ERROR: No new version available for ${proj}" >&2 && exit 1)
+  echo "Keyman version is ${version}"
+  uscan || (echo "ERROR: No new version available for keyman" >&2 && exit 1)
   cd ..
-  mv "${proj}-${version}" "${BASEDIR}/${packageDir}"
-  mv "${proj}_${version}.orig.tar.gz" "${BASEDIR}/${packageDir}"
-  mv "${proj}-${version}.tar.gz" "${BASEDIR}/${packageDir}"
-  mv "${proj}"*.asc "${BASEDIR}/${packageDir}"
-  rm "${proj}"*.debian.tar.xz
-  cd "${BASEDIR}/${packageDir}" || exit
+  mv "keyman-${version}" "${KEYMAN_ROOT}/linux/${packageDir}"
+  mv "keyman_${version}.orig.tar.xz" "${KEYMAN_ROOT}/linux/${packageDir}"
+  mv "keyman-${version}.tar.xz" "${KEYMAN_ROOT}/linux/${packageDir}"
+  mv "keyman"*.asc "${KEYMAN_ROOT}/linux/${packageDir}"
+  rm "keyman"*.debian.tar.xz
+  cd "${KEYMAN_ROOT}/linux/${packageDir}" || exit
   wget -N "https://downloads.keyman.com/linux/${KEYMAN_TIER}/${dirversion}/SHA256SUMS"
-  sha256sum -c --ignore-missing SHA256SUMS | grep "${proj}"
+  sha256sum -c --ignore-missing SHA256SUMS | grep "keyman"
 }
 
 function wait_for_apt_deb {
@@ -91,78 +80,135 @@ function generate_tar_ignore_list() {
   local list_var="$4"
   local prefix="$5"
   local includes_array="${includes_var}[@]"
+  # shellcheck disable=SC2034
   local includes=("${!includes_array}")
   local excludes_array="${excludes_var}[@]"
   local excludes=("${!excludes_array}")
-  local dir all_dirs found_match inc
 
-  mapfile -t all_dirs < <(find "${directory}" -mindepth 1 -maxdepth 1 -type d | sort)
-  for dir in "${all_dirs[@]}"; do
-    found_match=false
-    for inc in "${includes[@]}"; do
-      if [[ "./${inc}" =~ ^${dir} ]]; then
-        found_match=true
-        if [[ "./${inc}" != "${dir}" ]]; then
-          # check subdirectories
-          generate_tar_ignore_list "${dir}" "${includes_var}" "${excludes_var}" "${list_var}" "${prefix}"
-        fi
-        # check if files/subdir in $dir are in excludes list
-        _generate_excludes_for_dir "${dir}" "${includes_var}" "${excludes_var}" "${list_var}"
-        break
-      fi
-    done
-    if ! ${found_match}; then
-      _add_to_list "${list_var}" "${dir}"
+  # Loop through excludes and put all without path in single_excludes
+  local single_excludes=()
+  for item in "${excludes[@]}"; do
+    if [[ ${item} != */* ]]; then
+        single_excludes+=("${item}")
     fi
+  done
+
+  local ignore_list=()
+  _process_directory "${directory}" false
+
+  for item in "${ignore_list[@]}"; do
+    eval "${list_var}+=(\"--tar-ignore=${item}\")"
   done
 }
 
-function _generate_excludes_for_dir() {
+function _process_directory() {
   local directory="$1"
-  local includes_var="$2"
-  local excludes_var="$3"
-  local list_var="$4"
-  local includes_array="${includes_var}[@]"
-  local includes=("${!includes_array}")
-  local excludes_array="${excludes_var}[@]"
-  local excludes=("${!excludes_array}")
-  local file all_files excluded included is_match
+  local isParentIncluded="$2"
+  local all_items item
 
-  mapfile -t all_files < <(find "${directory}" -mindepth 1 -maxdepth 1 | sort)
-  is_match=false
-  for file in "${all_files[@]}"; do
-    for included in "${includes[@]}"; do
-      if [[ "${file}" == ./${included} ]]; then
-        is_match=true
-        break
+  mapfile -t all_items < <(find "${directory}" -mindepth 1 -maxdepth 1 | sort)
+  for item in "${all_items[@]}"; do
+    debug "Checking item: ${item}"
+    if _is_exact_match "includes" "${item}"; then
+      debug "  Including (full match): ${item}"
+      if [[ -d "${item}" ]]; then
+        _process_directory "${item}" true
       fi
-    done
-    if ${is_match} ; then
-      if [[ "${file}" != ./${included} ]] && [[ -f "${file}" ]]; then
-      _add_to_list "${list_var}" "${file}"
+    elif _starts_with "includes" "${item}"; then
+      debug "  Including (partial match): ${item}"
+      if [[ -d "${item}" ]]; then
+        _process_directory "${item}" "${isParentIncluded}"
       fi
+    elif _is_exact_match "excludes" "${item}"; then
+      debug "  Excluding (full match): ${item}"
+      _add_to_list "${item}"
+    elif _ends_with "single_excludes" "${item}" || _is_wildcard_match "single_excludes" "${item}"; then
+      debug "  Excluding (single exclude): ${item}"
+      _add_to_list "${item}"
+    elif [[ "${isParentIncluded}" == "false" ]]; then
+      debug "  Excluding (not included): ${item}"
+      _add_to_list "${item}"
     else
-      for excluded in "${excludes[@]}"; do
-        if [[ "${file}" == ./${excluded} ]]; then
-          _add_to_list "${list_var}" "${file}"
-          break
-        elif [[ "./${excluded}" =~ ^${file} ]]; then
-          # check subdirectories
-          _generate_excludes_for_dir "${file}" "${includes_var}" "${excludes_var}" "${list_var}"
-          break
-        fi
-      done
+      debug "  Including (parent included): ${item}"
+      if [[ -d "${item}" ]]; then
+        _process_directory "${item}" "${isParentIncluded}"
+      fi
     fi
   done
 }
 
 function _add_to_list() {
-  local list_var="$1"
-  local filename="$2"
+  local item="$1"
+  ignore_list+=("${prefix}/${item#./}")
+}
 
-  # Note: the files end up in subdirectories under `keyman` (or rather
-  # the directory name of $KEYMAN_ROOT), so we can
-  # include that when matching files and directories to ignore.
-  # shellcheck disable=SC2154
-  eval "${list_var}+=(\"--tar-ignore=${prefix}/${filename#./}\")"
+# Returns true if one of the values in the $1 array equals ${file} ($2)
+# Example: will return true for array=(path1/path2) file=./path1/path2
+function _is_exact_match() {
+  local array_var="$1"
+  local file="$2"
+  local array_name="${array_var}[@]"
+  local haystack=("${!array_name}")
+  local item
+  for item in "${haystack[@]}"; do
+    if [[ "./${item#./}" == "${file}" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Returns true if one of the values in the $1 array starts with ${file} ($2)
+# Example: will return true for array=(path1/path2) file=./path1
+function _starts_with() {
+  local array_var="$1"
+  local file="$2"
+  local array_name="${array_var}[@]"
+  local array_values=("${!array_name}")
+  local array_item
+  for array_item in "${array_values[@]}"; do
+    if [[ "./${array_item#./}" == ${file}* ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Returns true if ${file} ($2) ends with one of the values in the $1 array
+# Example: will return true for array=(path2) file=./path1/path2
+function _ends_with() {
+  local array_var="$1"
+  local file="$2"
+  local array_name="${array_var}[@]"
+  local array_values=("${!array_name}")
+  local array_item
+  for array_item in "${array_values[@]}"; do
+    if [[ "${file}" == */${array_item#./} ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Returns true if ${file} ($2) matches one of the values of the $1 array.
+# These values may contain wildcards.
+# Example: will return true for array=(*.sh) file=./path1/build.sh
+function _is_wildcard_match() {
+  local array_var="$1"
+  local file="$2"
+  local array_name="${array_var}[@]"
+  local array_values=("${!array_name}")
+  local array_item
+  for array_item in "${array_values[@]}"; do
+    array_item=${array_item/./\\.}
+    if [[ "${file}" =~ /${array_item/\*/.\*}$ ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+function debug() {
+  # echo "$@"
+  return 0
 }

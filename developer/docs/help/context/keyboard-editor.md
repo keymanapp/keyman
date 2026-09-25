@@ -209,24 +209,24 @@ Display 102nd Key (as on European keyboards)
 :   European keyboards (ISO layout) have one extra key that is not on US keyboards (ANSI layout).
     This key is positioned to the right of the left shift key. Some
     other keyboards have additional keys; these are not shown on the
-    layout designer. 
-    
+    layout designer.
+
     If you have a European layout selected as your
     Windows layout, the 102nd key will always be visible in the
     designer; ensure you select this checkbox if you want the 102nd key
     to always be visible to end users of the layout, irrespective of
-    their selected base layout. 
-    
+    their selected base layout.
+
     When a European layout is selected as
     your Windows layout, the shape of the Enter key will also change to
     take two rows, and the backslash key will move down one row, but not
-    otherwise change in behaviour. 
+    otherwise change in behaviour.
 
     <img src="../images/ui/OnScreenKeyboard_ISO.png" style="width:100%" alt="Keyboard Editor - On-Screen tab with ISO layout"/>
     *See the difference between the two layouts in Keyman Developer.*
 
     > [!NOTE]
-    > The "Display 102nd Key (as on European keyboards)" checkbox can be left unchecked. 
+    > The "Display 102nd Key (as on European keyboards)" checkbox can be left unchecked.
     > To ensure compatibility, the extra key shouldn't be assigned since it won't be accessible on an ANSI physical keyboard.
 
 Auto-fill underlying layout
@@ -270,20 +270,20 @@ Template...
     be lost. Therefore, selecting an appropriate template early in the
     development process is suggested.
 
-    - template-basic: has only a phone layout (4 rows of keys), with three layers: default (K_A through K_Z 
-    plus some punctuation), shift (Shift K_A through Shift K_Z, plus some punctuation), numeric (K_0 through 
+    - template-basic: has only a phone layout (4 rows of keys), with three layers: default (K_A through K_Z
+    plus some punctuation), shift (Shift K_A through Shift K_Z, plus some punctuation), numeric (K_0 through
     K_9 unshifted and shifted, plus other non-alphanumerice keys).
 
-    - template-latin: has both phone and tablet layouts (which are identical except for some key spacing, 
-    each with 4 rows of keys), with four layers: default, shift, numeric, symbol. The first three layers 
-    are similar to those of template-basic, with the addition of longpress keys for accented characters. 
+    - template-latin: has both phone and tablet layouts (which are identical except for some key spacing,
+    each with 4 rows of keys), with four layers: default, shift, numeric, symbol. The first three layers
+    are similar to those of template-basic, with the addition of longpress keys for accented characters.
     The symbol layer has many symbols not usually seen on a physical keyboard.
 
-    - template-traditional: has both phone (4 rows of keys) and tablet (5 rows of keys) layouts. The phone 
-    layout is similar to the template-basic layout. The tablet layout has eight layers: default, shift, ctrl, 
-    shift-ctrl, alt, shift-alt, ctrl-alt, shift-ctrl-alt. The default layer has the keys from the default layer 
+    - template-traditional: has both phone (4 rows of keys) and tablet (5 rows of keys) layouts. The phone
+    layout is similar to the template-basic layout. The tablet layout has eight layers: default, shift, ctrl,
+    shift-ctrl, alt, shift-alt, ctrl-alt, shift-ctrl-alt. The default layer has the keys from the default layer
     of the desktop layout, the shift layer has the keys from the shift layer of the desktop layout, and so on.
-    
+
 Import from On Screen
 :   If you have an existing On-Screen Keyboard for your keyboard layout,
     importing the design from the On-Screen Keyboard can reduce the
@@ -413,7 +413,7 @@ ID
 -   `U_####[_####]` is used as a shortcut for a key that
     will output those Unicode values, if no rule matches it. This is
     similar to the overloaded behaviour for `K_` ids. Thus `####`
-    must be valid Unicode characters. 
+    must be valid Unicode characters.
     The square bracket characters `[` and `]` indicate an optional portion of the sequence
     and are not to be included in the shortcut. E.g. `U_0259` would generate a
     schwa if no rule matches. It is still valid to have a rule such
@@ -479,7 +479,7 @@ file. This makes certain operations simpler, such as batched rearranging
 of keys, or using another text editor to make bulk changes. The Code
 view uses the standard [editor](editor).
 
-The format of the layout file is described in [Creating a touch keyboard layout guide](../guides/develop/creating-a-touch-keyboard-layout-for-amharic-the-nitty-gritty).
+The format of the layout file is described in [.keyman-touch-layout file format](../reference/file-types/keyman-touch-layout).
 
 #### Long-press, Flicks, and Multitaps controls
 

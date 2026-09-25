@@ -6,7 +6,7 @@ package com.tavultesoft.kmapro;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -167,7 +167,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
       if (!excludeInstalledLanguages && !isInstallingPackage && KeyboardController.getInstance().keyboardExists(
           k.getPackageID(), k.getKeyboardID(), k.getLanguageID())) {
         // If Activity is listing an installed keyboard package, mark installed keyboards with a check
-        icon = String.valueOf(R.drawable.ic_check);
+        icon = String.valueOf(R.drawable.ic_check_mode);
         enable = "false";
       } else {
         // Update title

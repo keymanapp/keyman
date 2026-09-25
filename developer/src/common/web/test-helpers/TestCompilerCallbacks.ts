@@ -5,6 +5,7 @@ import { CompilerEvent, CompilerCallbacks, CompilerPathCallbacks, CompilerFileSy
   CompilerFileSystemAsyncCallbacks,
   CompilerErrorSeverity} from '@keymanapp/developer-utils';
 import { fileURLToPath } from 'url';
+import { Suite } from 'mocha';
 
 const { TEST_SAVE_FIXTURES } = process.env;
 
@@ -12,15 +13,26 @@ const { TEST_SAVE_FIXTURES } = process.env;
  * A CompilerCallbacks implementation for testing
  */
 export class TestCompilerCallbacks implements CompilerCallbacks {
-  /* TestCompilerCallbacks */
-
+  private readonly suite: Suite;
   messages: CompilerEvent[] = [];
   readonly _net: TestCompilerNetAsyncCallbacks;
   readonly _fsAsync: DefaultCompilerFileSystemAsyncCallbacks = new DefaultCompilerFileSystemAsyncCallbacks(this);
 
-  constructor(basePath?: string) {
+  constructor(suite?: Suite, basePath?: string) {
     if(basePath) {
       this._net = new TestCompilerNetAsyncCallbacks(basePath);
+    }
+    this.suite = suite;
+    if(this.suite) {
+      const _this = this;
+      this.suite.beforeEach(function() {
+        _this.clear();
+      });
+      this.suite.afterEach(function() {
+        if(this.currentTest?.isFailed()) {
+          _this.printMessages();
+        }
+      })
     }
   }
 
@@ -55,7 +67,7 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
 
   loadFile(filename: string): Uint8Array {
     try {
-      return fs.readFileSync(filename);
+      return fs.readFileSync(filename) as Uint8Array;
     } catch(e) {
       if (e.code === 'ENOENT') {
         return null;
@@ -162,7 +174,7 @@ class TestCompilerNetAsyncCallbacks implements CompilerNetAsyncCallbacks {
       // missing file, this is okay
       return null;
     }
-    const data: Uint8Array = fs.readFileSync(p);
+    const data = fs.readFileSync(p) as Uint8Array;
     return data;
   }
 

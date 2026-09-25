@@ -8,7 +8,7 @@ Move input focus to user specified element.
 
 ## Syntax
 
-```c
+```js
 keyman.moveToElement(Pelem);
 ```
 

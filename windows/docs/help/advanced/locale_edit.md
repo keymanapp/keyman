@@ -43,12 +43,7 @@ messages (these mostly start with SK) and with the Menu strings.
 
 First, edit the translation's language information - SKUILanguageName,
 SKUILanguageNameWithEnglish, and SKLanguageCode. The SKLanguageCode
-should be the same as the language code you chose earlier. You will also
-see a String with id SKDefaultLanguageCode. For Keyman for Windows, this
-should remain "en" for all translations. When developing a custom
-product using the Keyman Engine for Windows, you may change your
-product's default language, and this would then entail changing
-SKDefaultLanguageCode.
+should be the same as the language code you chose earlier.
 
 **Note:** Any entries missing from the translation will be retrieved from the
 default file.

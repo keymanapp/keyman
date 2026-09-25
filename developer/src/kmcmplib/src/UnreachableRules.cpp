@@ -3,7 +3,7 @@
 
 #include "compfile.h"
 #include <kmn_compiler_errors.h>
-#include "../../../../common/windows/cpp/include/vkeys.h"
+#include "../../../../common/include/vkeys.h"
 #include "kmcmplib.h"
 
 #include <unordered_map>

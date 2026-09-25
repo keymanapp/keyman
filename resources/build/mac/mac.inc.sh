@@ -117,13 +117,16 @@ function _mac_generate_xcode_environment_definition_script() {
 # If there is no logfile, then this function will not emit anything.
 #
 mac_print_xcode_build_script_logs() {
+  local ret_code="$1"
   local SCRIPT_LOG="$KEYMAN_ROOT/xcodebuild-scripts.log"
   if [ -f "$SCRIPT_LOG" ]; then
-    builder_echo "mac_print_xcode_build_script_logs: reporting script results from previous xcode build"
+    builder_echo "mac_print_xcode_build_script_logs: reporting script results from previous xcode build (exit code $ret_code)"
     cat "$SCRIPT_LOG"
     rm "$SCRIPT_LOG"
     builder_echo "mac_print_xcode_build_script_logs: done"
     echo
+  elif [[ $1 != 0 ]]; then
+    builder_echo error "mac_print_xcode_build_script_logs: build failed with $ret_code; expected $SCRIPT_LOG to exist"
   fi
 }
 
@@ -133,6 +136,9 @@ mac_print_xcode_build_script_logs() {
 mac_xcodebuild() {
   typeset cmnd="$*"
   typeset ret_code
+
+  builder_echo "mac_xcodebuild: start xcodebuild $cmnd"
+
   local hasSetErrExit=false
   if [ -o errexit ]; then
     hasSetErrExit=true
@@ -144,7 +150,10 @@ mac_xcodebuild() {
     set -e
   fi
 
-  mac_print_xcode_build_script_logs
+  mac_print_xcode_build_script_logs $ret_code
+
+  builder_echo "mac_xcodebuild: finish xcodebuild $cmnd"
+
   if [ $ret_code != 0 ]; then
     builder_die "Build failed! Error: [$ret_code] when executing command: 'xcodebuild $cmnd'"
   fi

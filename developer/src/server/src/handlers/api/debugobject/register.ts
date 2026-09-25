@@ -2,7 +2,7 @@ import * as express from 'express';
 import { DebugObject, isValidId, simplifyId } from "../../../data.js";
 import * as fs from 'fs';
 import * as crypto from 'crypto';
-import { configuration } from '../../../config.js';
+import { standardPaths } from '../../../standardPaths.js';
 import chalk from 'chalk';
 
 // We allow only 12 objects of each type in the cache
@@ -41,7 +41,7 @@ export function apiRegisterFile<O extends DebugObject> (intf: new () => O, root:
 
   o.lastUse = new Date();
   o.id = id;
-  o.filename = configuration.cachePath + o.filenameFromId(id);
+  o.filename = standardPaths.cachePath + o.filenameFromId(id);
   fs.writeFileSync(o.filename, file);
   o.sha256 = crypto.createHash('sha256').update(file).digest('hex');
 
