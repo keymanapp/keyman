@@ -109,7 +109,7 @@ hamburger menu in the Keyman app.
 **Web**: copy khmer_angkor.js to your website, then [load it with KeymanWeb][load-keymanweb-keyboard]:
 
 ```js
-keyman.addKeyboards({
+await keyman.addKeyboards({
   id:'khmer_angkor',        // The keyboard's unique identification code.
   name:'Khmer Angkor',      // The keyboard's user-readable name.
   language:{
@@ -174,14 +174,6 @@ parameters will do the default action, which is `build`.
 The temp_path must be a path outside the repository to avoid npm getting
 confused by the root package.json. This is called by inst/download.in.mak
 normally when building the Keyman Developer installer.
-
-## Publishing to NPM
-
-```shell
-./build.sh publish [--dry-run]
-```
-
-Publishes the current release to NPM. This should only be run from CI.
 
 
 [kmc]: https://help.keyman.com/developer/current-version/reference/kmc/cli

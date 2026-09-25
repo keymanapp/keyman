@@ -184,8 +184,8 @@ In bash, run the following commands:
 cd /c/Projects/keyman
 git clone https://github.com/emscripten-core/emsdk
 cd emsdk
-emsdk install 3.1.58
-emsdk activate 3.1.58
+./emsdk install 3.1.58
+./emsdk activate 3.1.58
 cd upstream/emscripten
 npm install
 ```
@@ -267,17 +267,35 @@ of appropriate node versions during builds.
     copying the relevant Delphi-built components into windows/bin folders from a
     compatible installed version of Keyman for testing and debugging purposes.
 
-* Visual C++ 2019 Community or Professional
+* Visual Studio 2022 Community (C++ native desktop workload)
 
-  ```ps1
-  choco install visualstudio2019community visualstudio2019-workload-nativedesktop visualstudio2019buildtools
+  ```cmd
+  winget install --id=Microsoft.VisualStudio.2022.Community -e --override "--passive --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 --add Microsoft.VisualStudio.Component.CppBuildInsights --add Microsoft.VisualStudio.Component.Debugger.JustInTime --add Microsoft.VisualStudio.Component.VC.ASAN --add Microsoft.VisualStudio.Component.VC.DiagnosticTools --add Microsoft.VisualStudio.Component.VC.TestAdapterForGoogleTest --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --add Microsoft.VisualStudio.Component.Windows11SDK.26100 --add Microsoft.VisualStudio.Component.Windows11Sdk.WindowsPerformanceToolkit --add Microsoft.VisualStudio.Component.Windows10SDK.19041"
   ```
 
-  * Verify required build tools are installed
-    * Run `Visual Studio Installer`
-    * Check the `Individual components` tab
-    * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed.
-      If not, install it.
+  * You can omit the `--passive` parameter to open the installer dialog and
+    modify the selection before continuing with the install.
+
+  * You can replace `--passive` with `--quiet` for a silent install (note that
+    the winget command returns before the Visual Studio Installer finishes, so
+    you won't be able to easily tell when installation completes; check Task
+    Manager for setup.exe).
+
+  * If you prefer to use the Visual Studio Installer instead of the command
+    line install, then the following workloads and components should be included:
+    * Visual Studio core editor
+    * Desktop development with C++
+      - C++ core desktop features
+      - MSVC v143 - VS 2022 C++ x64/x86 build tools (latest)
+      - C++ Build Insights
+      - Just-In-Time debugger
+      - C++ profiling tools
+      - Test Adapter for Google Test
+      - C++ AddressSanitizer
+      - Windows 10 SDK (10.0.19041.0)
+      - Windows 11 SDK (10.0.26100.6584)
+    * Under individual components, add:
+      - MSVC v143 - VS 2022 C++ ARM64/ARM64EC build tools (latest)
 
   Recommended: configure Visual Studio to use two-space tab stops:
   1. Open the options dialog: Tools > Options.
@@ -287,7 +305,7 @@ of appropriate node versions during builds.
 
 * Windows SDK (C++ Desktop Development)
 
-  https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/
+  This should be installed as a part of Visual Studio above
 
 **Required environment variables**:
 * `PATH`
@@ -327,7 +345,7 @@ SETX KEYMAN_CEF4DELPHI_ROOT "c:\Projects\keyman\CEF4Delphi_Binary"
 ```ps1
 # Elevated PowerShell
 choco install 7zip html-help-workshop
-choco install wixtoolset --version=3.11.1
+choco install wixtoolset --version=3.14.1
 git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4Delphi_Binary
 ```
 
@@ -342,23 +360,23 @@ git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4
 * Ant
 * Gradle
 * Maven
-* JDK 11 (Temurin11)
+* JDK 21
 
 #### JDK 11
 
-Use Powershell + Chocolatey to install JDK 11:
+Use Powershell + winget to install JDK:
 
 ```ps1
 # Elevated PowerShell
-
-# for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
-$ProgressPreference = 'SilentlyContinue'
-choco install temurin11
+# For Keyman 17:
+winget install Microsoft.OpenJDK.11
+# For Keyman 18+:
+winget install Microsoft.OpenJDK.21
 ```
 
-**Multiple versions of Java:** If you need to build Keyman for Android 16.0 or
+**Multiple versions of Java:** If you need to build Keyman for Android 17.0 or
 older versions, you can set `JAVA_HOME_11` to the JDK 11 path and
-`JAVA_HOME` to the JDK 8 path. This will build both versions correctly
+`JAVA_HOME_21` to the JDK 21 path. This will build both versions correctly
 from command line. But note that you do need to update your `JAVA_HOME` env
 var to the associated version before opening Android Studio and loading any
 Android projects. `JAVA_HOME_11` is mostly used by CI.
@@ -393,9 +411,5 @@ certificates for the build.
 
 * sentry-cli (optional)
   - Uploading symbols for Sentry-based error reporting
-
-  bash:
-  ```bash
-  # bash
-  curl -sL https://sentry.io/get-cli/ | bash
-  ```
+  - https://github.com/getsentry/sentry-cli/releases/tag/1.70.0
+    (TODO: update to newer version)

@@ -203,7 +203,7 @@ describe('test of util/util.ts', () => {
       }), [constants.keys_mod_alt | constants.keys_mod_shift]);
     });
     it('should round trip each possible modifier', () => {
-      for(let str of constants.keys_mod_map.keys()) {
+      for(const str of constants.keys_mod_map.keys()) {
         const layer : LDMLKeyboard.LKLayer = {
           id: str,
           modifiers: `${str}`,
@@ -213,7 +213,7 @@ describe('test of util/util.ts', () => {
       }
     });
     it('should round trip each possible modifier with altL', () => {
-      for(let str of constants.keys_mod_map.keys()) {
+      for(const str of constants.keys_mod_map.keys()) {
         const layer : LDMLKeyboard.LKLayer = {
           id: str,
           modifiers: `${str} altL`,
@@ -225,14 +225,14 @@ describe('test of util/util.ts', () => {
   });
   describe('isValidModifier()', () => {
     it('should treat falsy values as valid', () => {
-      for(let str of [
+      for(const str of [
         null, undefined, '', 'none'
       ]) {
         assert.ok(validModifier(str), `validModifier(${JSON.stringify(str)})`);
       }
     });
     it('should treat bad values as invalid', () => {
-      for(let str of [
+      for(const str of [
         'asdfasdf', 'shift asdfasdf', 'altR-shift', 'altR-shift shift'
       ]) {
         assert.notOk(validModifier(str), `validModifier(${JSON.stringify(str)})`);

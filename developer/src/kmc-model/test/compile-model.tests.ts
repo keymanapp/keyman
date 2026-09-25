@@ -7,7 +7,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KeymanFileTypes } from '@keymanapp/common-types';
 
 describe('LexicalModelCompiler', function () {
-  let callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   this.timeout(5000);
 
@@ -19,10 +19,11 @@ describe('LexicalModelCompiler', function () {
     'example.qaa.wordbreaker',
     'example.qaa.joinwordbreaker',
     'example.qaa.scriptusesspaces',
+    'example.qaa.custom',
   ];
 
-  for (let modelID of MODELS) {
-    let modelPath = makePathToFixture(modelID, modelID + KeymanFileTypes.Source.Model);
+  for (const modelID of MODELS) {
+    const modelPath = makePathToFixture(modelID, modelID + KeymanFileTypes.Source.Model);
 
     it(`should compile ${modelID}`, async function () {
       const compiler = new LexicalModelCompiler();
@@ -32,12 +33,16 @@ describe('LexicalModelCompiler', function () {
       assert.isNotNull(result);
       const decoder = new TextDecoder();
       const code = decoder.decode(result.artifacts.js.data);
-      let r = compileModelSourceCode(code);
-      let compilation = r as CompilationResult;
+      const r = compileModelSourceCode(code);
+      const compilation = r as CompilationResult;
 
       assert.isFalse(compilation.hasSyntaxError, 'model code had syntax error');
       assert.isNull(compilation.error, `compilation error: ${compilation.error}`);
-      assert.equal(compilation.modelConstructorName, 'TrieModel');
+      if(modelID == 'example.qaa.custom') {
+        assert.isNull(compilation.modelConstructorName);
+      } else {
+        assert.equal(compilation.modelConstructorName, 'TrieModel');
+      }
     });
   }
 });

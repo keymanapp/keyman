@@ -1,5 +1,6 @@
 package com.keyman.engine.cloud;
 
+import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -60,6 +61,7 @@ public class CloudDownloadMgr{
    * Append downloadreceiver to the main context.
    * @param aContext the context
    */
+  @SuppressLint("UnspecifiedRegisterReceiverFlag")
   public synchronized void initialize(Context aContext)
   {
     if(isInitialized)
@@ -73,6 +75,7 @@ public class CloudDownloadMgr{
         aContext.registerReceiver(completeListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
           Context.RECEIVER_EXPORTED);
       } else {
+        // Needs @SuppressLint UnspecifiedRegisterReceiverFlag
         aContext.registerReceiver(completeListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
       }
     } catch (IllegalArgumentException e) {

@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Diagnostics (32-bit)" \
@@ -36,7 +36,7 @@ function do_build() {
 
   # Embed tsysinfox64 into a resource; we have to do a special signcode for
   # tsysinfox64.exe as we embed the executable into tsysinfo.exe
-  ../tsysinfox64/build.sh publish --no-deps
+  builder_launch /windows/src/engine/tsysinfox64/build.sh publish
   cp "$WINDOWS_PROGRAM_ENGINE/tsysinfox64.exe" tsysinfox64.bin
   run_in_vs_env rc tsysinfo_x64.rc
   rm -f tsysinfox64.bin
@@ -47,7 +47,7 @@ function do_build() {
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
   cp *.xslt "$WINDOWS_PROGRAM_ENGINE/"
-  cp "$WIN32_TARGET_PATH/tsysinfo.dbg" "$WINDOWS_DEBUGPATH_ENGINE/tsysinfo.dbg"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/tsysinfo.dbg" "$WINDOWS_DEBUGPATH_ENGINE/tsysinfo.dbg"
 }
 
 function do_publish() {

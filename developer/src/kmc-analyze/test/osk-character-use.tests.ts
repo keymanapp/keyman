@@ -17,17 +17,7 @@ const SIL_KHMER_KVKS = makePathToFixture('khmer', "sil_khmer.kvks");
 const KBDKHMR_WITH_SIL_KHMER_JSON = makePathToFixture('khmer', "KbdKhmr-with-sil_khmer.json");
 
 describe('AnalyzeOskCharacterUse', function () {
-  const callbacks = new TestCompilerCallbacks();
-
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest?.isFailed()) {
-      callbacks.printMessages();
-    }
-  });
+  const callbacks = new TestCompilerCallbacks(this);
 
   it('generates a mapping file from 2 input files', async function() {
     // functional test

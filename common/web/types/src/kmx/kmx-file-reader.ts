@@ -60,14 +60,13 @@ export class KmxFileReader {
   }
 
   public read(source: Uint8Array): KEYBOARD {
-    let binaryKeyboard: BUILDER_COMP_KEYBOARD;
-    let kmx = new KMXFile();
-    binaryKeyboard = kmx.COMP_KEYBOARD.fromBuffer(source);
+    const kmx = new KMXFile();
+    const binaryKeyboard = kmx.COMP_KEYBOARD.fromBuffer(source);
     if(binaryKeyboard.dwIdentifier != KMXFile.FILEID_COMPILED) {
       throw new KmxFileReaderError(`Not a .kmx file: header does not contain FILEID_COMPILED`);
     }
 
-    let result = new KEYBOARD();
+    const result = new KEYBOARD();
     result.fileVersion = binaryKeyboard.dwFileVersion;
     result.flags = binaryKeyboard.dwFlags;
     result.hotkey = binaryKeyboard.dwHotKey;
@@ -88,7 +87,7 @@ export class KmxFileReader {
     this.readGroupsAndRules(binaryKeyboard, kmx, source, result);
 
     // Process system stores once we have all stores and groups loaded
-    for(let store of result.stores) {
+    for(const store of result.stores) {
       this.processSystemStore(store, result);
     }
 
@@ -109,8 +108,8 @@ export class KmxFileReader {
     let offset = binaryKeyboard.dpGroupArray;
     for (let i = 0; i < binaryKeyboard.cxGroupArray; i++) {
       const data = new Uint8Array(source.buffer, source.byteOffset + offset);
-      let binaryGroup = kmx.COMP_GROUP.fromBuffer(data);
-      let group = new GROUP();
+      const binaryGroup = kmx.COMP_GROUP.fromBuffer(data);
+      const group = new GROUP();
       group.dpMatch = this.readString(source, binaryGroup.dpMatch);
       group.dpName = this.readString(source, binaryGroup.dpName);
       group.dpNoMatch = this.readString(source, binaryGroup.dpNoMatch);
@@ -120,8 +119,8 @@ export class KmxFileReader {
       let keyOffset = binaryGroup.dpKeyArray;
       for (let j = 0; j < binaryGroup.cxKeyArray; j++) {
         const keyData = new Uint8Array(source.buffer, source.byteOffset + keyOffset);
-        let binaryKey = kmx.COMP_KEY.fromBuffer(keyData);
-        let key = new KEY();
+        const binaryKey = kmx.COMP_KEY.fromBuffer(keyData);
+        const key = new KEY();
         key.Key = binaryKey.Key;
         key.Line = binaryKey.Line;
         key.ShiftFlags = binaryKey.ShiftFlags;
@@ -140,8 +139,8 @@ export class KmxFileReader {
     let offset = binaryKeyboard.dpStoreArray;
     for (let i = 0; i < binaryKeyboard.cxStoreArray; i++) {
       const data = new Uint8Array(source.buffer, source.byteOffset + offset);
-      let binaryStore = kmx.COMP_STORE.fromBuffer(data);
-      let store = new STORE();
+      const binaryStore = kmx.COMP_STORE.fromBuffer(data);
+      const store = new STORE();
       store.dwSystemID = binaryStore.dwSystemID;
       store.dpName = this.readString(source, binaryStore.dpName);
       store.dpString = this.readString(source, binaryStore.dpString);

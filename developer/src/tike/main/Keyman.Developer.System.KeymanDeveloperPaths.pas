@@ -20,7 +20,6 @@ type
     const S_Kmc = 'kmc.cmd';
     class function KmcPath: string; static;
 
-    const S_ServerConfigJson = 'config.json';
     class function ServerDataPath: string; static;
     class function ServerPath: string; static;
 

@@ -5,12 +5,14 @@
  */
 import { SchemaValidators, util } from '@keymanapp/common-types';
 import { DeveloperUtilsMessages } from '../../developer-utils-messages.js';
-import { CompilerCallbacks } from "../../compiler-callbacks.js";
+import { CompilerCallbacks, EventResolver } from "../../compiler-callbacks.js";
+import { CompilerEvent } from "../../compiler-interfaces.js";
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
-import { KeymanXMLReader } from '@keymanapp/developer-utils';
 import boxXmlArray = util.boxXmlArray;
+import { LineFinderEventResolver } from '../../line-utils.js';
+import { XML_FILENAME_SYMBOL, KeymanXMLReader, findInstanceObject } from '../../xml-utils.js';
 
 interface NameAndProps  {
   '$'?: any; // content
@@ -25,28 +27,44 @@ export class LDMLKeyboardXMLSourceFileReaderOptions {
   localImportsPaths: string[];
 };
 
-export class LDMLKeyboardXMLSourceFileReader {
+export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
+  /** for resolving messages involving line numbers */
+  private eventResolver: LineFinderEventResolver = new LineFinderEventResolver();
+
   constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
+  }
+  resolve(event: CompilerEvent): void {
+    this.eventResolver.resolve(event);
   }
 
   static get defaultImportsURL(): [string,string] {
     return ['../import/', import.meta.url];
   }
 
-  readImportFile(version: string, subpath: string): Uint8Array {
-    const importPath = this.callbacks.resolveFilename(this.options.cldrImportsPath, `${version}/${subpath}`);
-    return this.callbacks.loadFile(importPath);
+  /** bottleneck for reading keyboard XML files */
+  public readFile(path: string): Uint8Array {
+    const data = this.callbacks.loadFile(path);
+    if (data) {
+      this.eventResolver.addFile(path, new TextDecoder().decode(data));
+    }
+    return data;
   }
 
-  readLocalImportFile(path: string): Uint8Array {
+  /** @returns [data, filename] */
+  private readImportFile(version: string, subpath: string): [Uint8Array, string] {
+    const importPath = this.callbacks.resolveFilename(this.options.cldrImportsPath, `${version}/${subpath}`);
+    return [this.readFile(importPath), importPath];
+  }
+
+  private readLocalImportFile(path: string): [Uint8Array, string] {
     // try each of the local imports paths
     for (const localPath of this.options.localImportsPaths) {
       const importPath = this.callbacks.path.join(localPath, path);
       if(this.callbacks.fs.existsSync(importPath)) {
-        return this.callbacks.loadFile(importPath);
+        return [this.readFile(importPath), importPath];
       }
     }
-    return null; // was not able to load from any of the paths
+    return [null, null]; // was not able to load from any of the paths
   }
 
   /**
@@ -82,31 +100,31 @@ export class LDMLKeyboardXMLSourceFileReader {
     boxXmlArray(source?.keyboard3?.locales, 'locale');
     boxXmlArray(source?.keyboard3, 'transforms');
     if(source?.keyboard3?.layers) {
-      for(const layers of source?.keyboard3?.layers) {
+      for(const layers of source.keyboard3.layers) {
         boxXmlArray(layers, 'layer');
-        if(layers?.layer) {
-          for(const layer of layers?.layer) {
+        if(layers.layer) {
+          for(const layer of layers.layer) {
             boxXmlArray(layer, 'row');
           }
         }
       }
     }
     if(source?.keyboard3?.forms?.form) {
-      boxXmlArray(source?.keyboard3?.forms, 'form');
-      for(const form of source?.keyboard3?.forms?.form) {
+      boxXmlArray(source.keyboard3.forms, 'form');
+      for(const form of source.keyboard3.forms.form) {
         boxXmlArray(form, 'scanCodes');
       }
     }
     if(source?.keyboard3?.flicks) {
-      boxXmlArray(source?.keyboard3?.flicks, 'flick');
-      for(const flick of source?.keyboard3?.flicks?.flick) {
+      boxXmlArray(source.keyboard3.flicks, 'flick');
+      for(const flick of source.keyboard3.flicks.flick) {
         boxXmlArray(flick, 'flickSegment');
       }
     }
     if(source?.keyboard3?.variables) {
-      boxXmlArray(source?.keyboard3?.variables, 'set');
-      boxXmlArray(source?.keyboard3?.variables, 'string');
-      boxXmlArray(source?.keyboard3?.variables, 'uset');
+      boxXmlArray(source.keyboard3.variables, 'set');
+      boxXmlArray(source.keyboard3.variables, 'string');
+      boxXmlArray(source.keyboard3.variables, 'uset');
     }
     if(source?.keyboard3?.transforms) {
       for(const transforms of source.keyboard3.transforms)  {
@@ -223,6 +241,7 @@ export class LDMLKeyboardXMLSourceFileReader {
       return false;
     }
     let importData: Uint8Array;
+    let importPath: string;
 
     if (base === constants.cldr_import_base) {
       // CLDR import
@@ -235,10 +254,10 @@ export class LDMLKeyboardXMLSourceFileReader {
         /** There's no data or DTD change in 45, 46, 46.1, 47 so map them all to 46 at present. */
         paths[0] = constants.cldr_version_latest;
       }
-      importData = this.readImportFile(paths[0], paths[1]);
+      [importData, importPath] = this.readImportFile(paths[0], paths[1]);
     } else {
       // local import
-      importData = this.readLocalImportFile(path);
+      [importData, importPath] = this.readLocalImportFile(path);
     }
     if (!importData || !importData.length) {
       this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportReadFail({base, path, subtag}));
@@ -246,6 +265,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     }
     const importXml: any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
     const importRootNode = importXml[subtag]; // e.g. <keys/>
+    this.eventResolver.addFile(importPath, new TextDecoder().decode(importData)); // TODO: double decode
 
     // importXml will have one property: the root element.
     if (!importRootNode) {
@@ -263,7 +283,11 @@ export class LDMLKeyboardXMLSourceFileReader {
         return false;
       }
       // Mark all children as an import
-      subsubval.forEach(o => o[ImportStatus.import] = basePath);
+      subsubval.forEach(o => {
+        o[ImportStatus.import] = basePath;
+        KeymanXMLReader.setMetaData(o, {[XML_FILENAME_SYMBOL as any]: importPath}); // mark overriding import path
+      });
+
       if (implied) {
         // mark all children as an implied import
         subsubval.forEach(o => o[ImportStatus.impliedImport] = basePath);
@@ -286,19 +310,20 @@ export class LDMLKeyboardXMLSourceFileReader {
   public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile): boolean {
     if(!SchemaValidators.default.ldmlKeyboard3(source)) {
       for (const err of (<any>SchemaValidators.default.ldmlKeyboard3).errors) {
+        const context = findInstanceObject(source, err?.instancePath?.split('/'));
         this.callbacks.reportMessage(DeveloperUtilsMessages.Error_SchemaValidationError({
           instancePath: err.instancePath,
           keyword: err.keyword,
           message: err.message || 'Unknown AJV Error', // docs say 'message' is optional if 'messages:false' in options
           params: Object.entries(err.params || {}).sort().map(([k,v])=>`${k}="${v}"`).join(' '),
-        }));
+        }, context));
       }
       return false;
     }
     return true;
   }
 
-  loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
+  private loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
     const data = new TextDecoder().decode(file);
     const source = new KeymanXMLReader('keyboard3')
       .parse(data) as LDMLKeyboardXMLSourceFile;
@@ -330,9 +355,15 @@ export class LDMLKeyboardXMLSourceFileReader {
     return null;
   }
 
-  loadTestDataUnboxed(file: Uint8Array): any {
-    const source = new KeymanXMLReader('keyboardTest3')
-      .parse(new TextDecoder().decode(file)) as any;
+  private loadTestDataUnboxed(file: Uint8Array): any {
+    let source: any;
+    try {
+      source = new KeymanXMLReader('keyboardTest3')
+        .parse(new TextDecoder().decode(file)) as any;
+    } catch(e) {
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({e}));
+      return null;
+    }
     return source;
   }
 
@@ -342,7 +373,7 @@ export class LDMLKeyboardXMLSourceFileReader {
    * @param subtag subtag to filter on
    * @returns
    */
-  findSubtagArray(source: NameAndProps[], subtag: string): NameAndProps[]  {
+  private findSubtagArray(source: NameAndProps[], subtag: string): NameAndProps[]  {
     return source?.filter(o => o['#name'] === subtag);
   }
 
@@ -352,7 +383,7 @@ export class LDMLKeyboardXMLSourceFileReader {
    * @param subtag
    * @returns
    */
-  findSubtag(source: NameAndProps[], subtag: string): NameAndProps | null {
+  private findSubtag(source: NameAndProps[], subtag: string): NameAndProps | null {
     const r = this.findSubtagArray(source, subtag);
     if (!r || r.length === 0) {
       return null;
@@ -380,7 +411,7 @@ export class LDMLKeyboardXMLSourceFileReader {
    * @param subtag name to extract
    * @param mapper custom mapper function
    */
-  stuffBoxes(obj: any, source: NameAndProps[], subtag: string, asArray?: boolean, mapper?: (v: NameAndProps, r: LDMLKeyboardXMLSourceFileReader) => any) {
+  private stuffBoxes(obj: any, source: NameAndProps[], subtag: string, asArray?: boolean, mapper?: (v: NameAndProps, r: LDMLKeyboardXMLSourceFileReader) => any) {
     if (!mapper) {
       mapper = LDMLKeyboardXMLSourceFileReader.defaultMapper;
     }
@@ -392,7 +423,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     }
   }
 
-  boxTestDataArrays(raw: any) : LDMLKeyboardTestDataXMLSourceFile | null {
+  private boxTestDataArrays(raw: any) : LDMLKeyboardTestDataXMLSourceFile | null {
     if (!raw) return null;
     const a : LDMLKeyboardTestDataXMLSourceFile = {
       keyboardTest3: {

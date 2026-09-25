@@ -251,6 +251,8 @@ begin
     except
       on E:EKeyboardProjectTemplate do
         Exit(Fail('Unable to generate template: '+E.Message));
+      on E:EFOpenError do
+        Exit(Fail('Unable to create project; template files may be missing: '+E.Message));
     end;
 
     FProjectFilename := FTemplate.ProjectFilename;

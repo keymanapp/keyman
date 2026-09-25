@@ -101,6 +101,12 @@ The KMManager is the core class which provides most of the methods and constants
 [`getKeyboardHeight()`](getKeyboardHeight)
 : returns the height of the keyboard frame
 
+[`getKeyboardHeightMax()`](getKeyboardHeightMax)
+: returns the maximum allowed height of the keyboard frame
+
+[`getKeyboardHeightMin()`](getKeyboardHeightMin)
+: returns the minimum allowed height of the keyboard frame
+
 [`getKeyboardIndex()`](getKeyboardIndex)
 : returns index number of the specified keyboard in keyboards list
 
@@ -148,6 +154,9 @@ The KMManager is the core class which provides most of the methods and constants
 
 [`getMaySendCrashReport()`](getMaySendCrashReport)
 : returns whether Keyman Engine is allowed to send crash reports over the network to Sentry
+
+[`getNavigationBarHeight()`](getNavigationBarHeight)
+: returns the height of the navigation bar system inset
 
 [`getOrientation()`](getOrientation)
 : returns the device's current orientation (Portrait vs Landscape)

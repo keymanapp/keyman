@@ -1,5 +1,5 @@
 // @ts-check
-import { devices, playwrightLauncher } from '@web/test-runner-playwright';
+import { /*devices,*/ playwrightLauncher } from '@web/test-runner-playwright';
 import { defaultReporter, summaryReporter } from '@web/test-runner';
 import { LauncherWrapper, sessionStabilityReporter } from '@keymanapp/common-test-resources/test-runner-stability-reporter.mjs';
 import named from '@keymanapp/common-test-resources/test-runner-rename-browser.mjs'
@@ -7,14 +7,17 @@ import { importMapsPlugin } from '@web/dev-server-import-maps';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { esbuildPlugin } from '@web/dev-server-esbuild';
+import { platform } from 'node:process';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 const KEYMAN_ROOT = resolve(dir, '../../../../../');
 
-/** @type {import('@web/test-runner').TestRunnerConfig} */
-export default {
-  // debug: true,
-  browsers: [
+const allBrowsers = platform === 'win32'
+  ? [
+    new LauncherWrapper(playwrightLauncher({ product: 'chromium' })),
+    new LauncherWrapper(playwrightLauncher({ product: 'firefox' })),
+    // no testing on webkit on Windows, see #14858
+  ] : [
     new LauncherWrapper(playwrightLauncher({ product: 'chromium' })),
     new LauncherWrapper(playwrightLauncher({ product: 'firefox' })),
     new LauncherWrapper(playwrightLauncher({ product: 'webkit', concurrency: 1 })),
@@ -28,7 +31,12 @@ export default {
     //     return browser.newContext({ ...devices['Pixel 4'] })
     //   }
     // })), 'Android Phone (emulated)'),
-  ],
+  ];
+
+/** @type {import('@web/test-runner').TestRunnerConfig} */
+export default {
+  // debug: true,
+  browsers: allBrowsers,
   concurrency: 10,
   nodeResolve: true,
   // Top-level, implicit 'default' group
@@ -51,19 +59,14 @@ export default {
       files: ['web/build/test/dom/cases/browser/**/*.tests.mjs']
     },
     {
-      name: 'engine/core-processor',
-      // Relative, from the containing package.json
-      files: ['web/src/test/auto/dom/cases/core-processor/*.tests.ts']
-    },
-    {
       name: 'engine/dom-utils',
       // Relative, from the containing package.json
       files: ['web/build/test/dom/cases/dom-utils/**/*.tests.mjs']
     },
     {
-      name: 'engine/element-wrappers',
+      name: 'engine/element-text-stores',
       // Relative, from the containing package.json
-      files: ['web/build/test/dom/cases/element-wrappers/**/*.tests.mjs']
+      files: ['web/build/test/dom/cases/element-text-stores/**/*.tests.mjs']
     },
     {
       name: 'engine/gesture-processor',
@@ -82,10 +85,15 @@ export default {
       files: ['web/build/test/dom/cases/keyboard-storage/**/*.tests.mjs']
     },
     {
+      name: 'engine/main',
+      // Relative, from the containing package.json
+      files: ['web/build/test/dom/cases/main/**/*.tests.mjs']
+    },
+    {
       name: 'engine/osk',
       // Relative, from the containing package.json
       files: ['web/build/test/dom/cases/osk/**/*.tests.mjs']
-    }
+    },
   ],
   middleware: [
     // Rewrites short-hand paths for test resources, making them fully relative to the repo root.

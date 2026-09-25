@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="firstvoices_red">#ffaa1225</color>
+    <color name="firstvoices_red">#ff8d2a1d</color>
     <color name="firstvoices_gold">#ffa77a24</color>
 
     <color name="activated_bg">@color/firstvoices_gold</color>

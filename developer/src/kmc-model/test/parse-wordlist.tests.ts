@@ -22,11 +22,10 @@ const SENCOTEN_WORDLIST = {
 
 
 describe('parsing a word list', function () {
-  let testCallbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(this);
 
   beforeEach(function () {
-    testCallbacks.clear();
-    setCompilerCallbacks(testCallbacks);
+    setCompilerCallbacks(callbacks);
   });
 
   afterEach(function () {
@@ -34,48 +33,48 @@ describe('parsing a word list', function () {
   });
 
   it('should remove the UTF-8 byte order mark from files', function () {
-    let word = 'hello';
-    let count = 1;
-    let expected: WordList = {};
+    const word = 'hello';
+    const count = 1;
+    const expected: WordList = {};
     expected[word] = count;
 
-    let file = `# this is a comment\n${word}\t${count}`;
-    let withoutBOM: WordList = {};
+    const file = `# this is a comment\n${word}\t${count}`;
+    const withoutBOM: WordList = {};
     parseWordListFromContents(withoutBOM, file);
     assert.deepEqual(withoutBOM, expected, "expected regular file to parse properly");
-    assert.isEmpty(testCallbacks.messages);
+    assert.isEmpty(callbacks.messages);
 
-    let withBOM: WordList = {};
+    const withBOM: WordList = {};
     parseWordListFromContents(withBOM, `${BOM}${file}`)
     assert.deepEqual(withBOM, expected, "expected BOM to be ignored");
-    assert.isEmpty(testCallbacks.messages);
+    assert.isEmpty(callbacks.messages);
   });
 
   it('should read word lists in UTF-8', function () {
     // N.B.: this is the format exported by Google Drive when selecting "TSV".
     const filename = makePathToFixture('example.qaa.sencoten', 'wordlist.tsv');
-    let wordlist: WordList = {};
+    const wordlist: WordList = {};
     parseWordListFromFilename(wordlist, filename);
 
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
-    assert.isEmpty(testCallbacks.messages);
+    assert.isEmpty(callbacks.messages);
   });
 
   it('should read word lists in UTF-16 little-endian (with BOM)', function () {
     // N.B.: this is the format exported by MS Excel when selecting
     // "UTF-16" text (tested on Excel for macOS).
     const filename = makePathToFixture('example.qaa.utf16le', 'wordlist.txt');
-    let wordlist: WordList = {};
+    const wordlist: WordList = {};
     parseWordListFromFilename(wordlist, filename);
 
     assert.deepEqual(wordlist, SENCOTEN_WORDLIST);
-    assert.isEmpty(testCallbacks.messages);
+    assert.isEmpty(callbacks.messages);
   });
 
   it('should NOT read word lists in UTF-16 big-endian (with BOM)', function () {
     // N.B.: Does anything output this format...?
     const filename = makePathToFixture('example.qaa.utf16be', 'wordlist.txt');
-    let wordlist: WordList = {};
+    const wordlist: WordList = {};
     assert.throws(() => {
       parseWordListFromFilename(wordlist, filename);
     }, 'UTF-16BE is unsupported');
@@ -101,27 +100,27 @@ describe('parsing a word list', function () {
     for(let i = 0; i < words.length; i++) {
       file += `${words[i]}\t${i+1}\n`;
     }
-    let repeatedWords: WordList = {};
+    const repeatedWords: WordList = {};
     parseWordListFromContents(repeatedWords, file);
 
     assert.deepEqual(repeatedWords, expected);
 
-    assert.lengthOf(testCallbacks.messages, 4);
+    assert.lengthOf(callbacks.messages, 4);
     // hello has been seen multiple times:
-    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.HINT_DuplicateWordInSameFile));
+    assert.isTrue(callbacks.hasMessage(ModelCompilerMessages.HINT_DuplicateWordInSameFile));
     // helló and hello + U+0301 have both been seen:
-    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.HINT_MixedNormalizationForms));
+    assert.isTrue(callbacks.hasMessage(ModelCompilerMessages.HINT_MixedNormalizationForms));
 
     // Let's parse another file:
 
-    testCallbacks.clear();
+    callbacks.clear();
     // Now, parse a DIFFERENT file, but with an NFD entry.
     parseWordListFromContents(repeatedWords, "hello\u0301\t5\n");
-    assert.lengthOf(testCallbacks.messages, 1);
+    assert.lengthOf(callbacks.messages, 1);
     // hello + U+0301 (NFD) has been seen, but...
-    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.HINT_MixedNormalizationForms));
+    assert.isTrue(callbacks.hasMessage(ModelCompilerMessages.HINT_MixedNormalizationForms));
     // BUT! We have not seen a duplicate **within the same file**
-    assert.isFalse(testCallbacks.hasMessage(ModelCompilerMessages.HINT_DuplicateWordInSameFile));
+    assert.isFalse(callbacks.hasMessage(ModelCompilerMessages.HINT_DuplicateWordInSameFile));
 
     assert.deepEqual(repeatedWords, {
       hello: expected['hello'],

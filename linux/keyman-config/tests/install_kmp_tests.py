@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import os
 import tempfile
 import unittest
@@ -200,47 +200,6 @@ class InstallKeyboardsToGnomeTests(InstallKmpBase):
         mockGnomeKeyboardsUtilInstance.write_input_sources.assert_called_once_with(
             [('xkb', 'en'), ('ibus', 'de:fooDir/foo1.kmx')])
         self.mockRestartIbus.assert_not_called()
-
-
-class NormalizeLanguageTests(InstallKmpBase):
-    def test_normalizeLanguage(self):
-        # Setup
-        languages = [
-            {'id': 'de'},
-            {'id': 'esi-Latn'},
-            {'id': 'dyo'},
-            {'id': 'fuh-Arab'}
-        ]
-
-        for testcase in [
-            {'given': 'de', 'expected': 'de'},
-            {'given': 'esi', 'expected': 'esi'},
-            {'given': 'esi-Latn', 'expected': 'esi'},
-            {'given': 'es', 'expected': None},
-            {'given': 'en', 'expected': None},
-            {'given': None, 'expected': None},
-            # #3399
-            {'given': 'dyo-latn', 'expected': 'dyo'},
-            {'given': 'dyo', 'expected': 'dyo'},
-            {'given': 'fuh-Arab', 'expected': 'fuh-Arab'},
-            {'given': 'fuh', 'expected': None},
-        ]:
-            with self.subTest(data=testcase):
-                # Execute
-                result = InstallKmp()._normalize_language(languages, testcase['given'])
-
-                # Verify
-                self.assertEqual(result, testcase['expected'])
-
-    def test_normalizeLanguage_noLanguages(self):
-        # Setup
-        languages = []
-
-        # Execute
-        result = InstallKmp()._normalize_language(languages, 'en')
-
-        # Verify
-        self.assertEqual(result, '')
 
 
 class InstallKmpTests(InstallKmpBase):

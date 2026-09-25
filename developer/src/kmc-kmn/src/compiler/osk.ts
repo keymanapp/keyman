@@ -1,18 +1,30 @@
-import { TouchLayout } from "@keymanapp/common-types";
+import { KvkFileReader, TouchLayout } from "@keymanapp/common-types";
 import { VisualKeyboard } from "@keymanapp/common-types";
 import { SchemaValidators } from "@keymanapp/common-types";
+import { KmnCompilerMessages } from "./kmn-compiler-messages.js";
+import { CompilerCallbacks, KvksFileReader } from "@keymanapp/developer-utils";
 
+/**
+ * @public
+ * Records the number of references to an OSK key cap string for a specific
+ * file
+ */
 export interface StringRefUsage {
   filename: string;
   count: number;
 };
 
+/**
+ * @public
+ * Tracks usage of a single OSK key cap string across multiple files
+ */
 export interface StringRef {
   str: string;
   usages: StringRefUsage[];
 };
 
 /**
+ * @public
  * Represents a single key cap found by `AnalyzeOskCharacterUse`
  */
 export interface StringResult {
@@ -23,13 +35,23 @@ export interface StringResult {
   /** hexadecimal single character in PUA range, without 'U+' prefix, e.g. 'F100' */
   pua: string;
   /** files in which the string is referenced; will be an array of
-   * {@link StringRefUsage} if includeCounts is true, otherwise will be an array
+   * {@link @keymanapp/kmc-kmn#Osk.StringRefUsage} if includeCounts is true, otherwise will be an array
    * of strings listing files in which the key cap may be found */
   usages: StringRefUsage[] | string[];
 };
 
+/**
+ * @public
+ * Maps a source OSK key cap string to a PUA character
+ */
 export type PuaMap = {[index:string]: string};
 
+/**
+ * @public
+ * Parse a map object loaded from a displaymap file into a PuaMap
+ * @param mapping - source object to parse, must be in displayMap JSON format
+ * @returns
+ */
 export function parseMapping(mapping: any) {
   if(!SchemaValidators.default.displayMap(<any>mapping))
   /* c8 ignore next 3 */
@@ -60,6 +82,13 @@ function remap(text: string, map: PuaMap) {
   return text;
 }
 
+/**
+ * @public
+ * Remap key caps in the `vk` visual keyboard object to use PUA characters from `map`
+ * @param vk  - source visual keyboard object to remap, updated in place
+ * @param map - PUA string mapping to apply
+ * @returns
+ */
 export function remapVisualKeyboard(vk: VisualKeyboard.VisualKeyboard, map: PuaMap): boolean {
   let dirty = false;
   for(const key of vk.keys) {
@@ -73,6 +102,13 @@ export function remapVisualKeyboard(vk: VisualKeyboard.VisualKeyboard, map: PuaM
   return dirty;
 }
 
+/**
+ * @public
+ * Remap key caps in the `source` touch layout object to use PUA characters from `map`
+ * @param source - source touch layout object to remap, updated in place
+ * @param map    - PUA string mapping to apply
+ * @returns
+ */
 export function remapTouchLayout(source: TouchLayout.TouchLayoutFile, map: PuaMap) {
   let dirty = false;
   const scanKey = (key: TouchLayout.TouchLayoutKey | TouchLayout.TouchLayoutSubKey) => {
@@ -122,4 +158,42 @@ export function remapTouchLayout(source: TouchLayout.TouchLayoutFile, map: PuaMa
   scanPlatform(source.tablet);
 
   return dirty;
+}
+
+export function loadKvkFile(kvksFilename: string, callbacks: CompilerCallbacks): VisualKeyboard.VisualKeyboard {
+  const data = callbacks.loadFile(kvksFilename);
+  if(!data) {
+    callbacks.reportMessage(KmnCompilerMessages.Error_FileNotFound({filename: kvksFilename}));
+    return null;
+  }
+
+  const filename = callbacks.path.basename(kvksFilename);
+  let vk: VisualKeyboard.VisualKeyboard = null;
+  if(filename.endsWith('.kvk')) {
+    /* Legacy keyboards may reference a binary .kvk. That's not an error */
+    // TODO: (lowpri) add hint to convert to .kvks?
+    const reader = new KvkFileReader();
+    try {
+      vk = reader.read(data);
+    } catch(e) {
+      callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvkFile({filename, e}));
+      return null;
+    }
+  } else {
+    const reader = new KvksFileReader();
+    let kvks = null;
+    try {
+      kvks = reader.read(data);
+      reader.validate(kvks);
+    } catch(e) {
+      callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e}));
+      return null;
+    }
+    const invalidVkeys: string[] = [];
+    vk = reader.transform(kvks, invalidVkeys);
+    for(const invalidVkey of invalidVkeys) {
+      callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
+    }
+  }
+  return vk;
 }

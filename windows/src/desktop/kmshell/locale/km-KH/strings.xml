@@ -465,15 +465,23 @@
   <!-- Context: Configuration Dialog - Update tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">មាន​ការអាប់ដេតដែលនឹងអនុវត្ពពេលវីនដូដំណើរការជាថ្មី:</string>
+  <string name="S_Updates_Available" comment="Update tab - informs user updates are available ">មានការអាប់ដេតដែលនឹងអនុវត្តនៅពេល Windows បិទរួចបើកពេលបន្ទាប់:</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_Current_Version" comment="Update tab Currently Installed Version">ជំនាន់ដែលបានដំឡើងពេលនេះ</string>
+  <!-- Context: Configuration Dialog - Update tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Update_New_Version" comment="Update tab New Version">ជំនាន់ថ្មី</string>
   <!-- Context: Configuration Dialog - Update tab pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">អាប់ដេតឥឡូវនឹងត្រូវឲកុំព្យូទ័រដំណើរការជាថ្មី</string>
+  <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">ដំឡើងការអាប់ដេតឥឡូវនឹងតម្រូវ​ឱ្យបិទ​រួច​បើកកុំព្យូទ័រមុននឹងអាចប្រើប្រាស់ Keyman បានវិញ​។ អាប់ដេតឥឡូវនេះ?</string>
   <!-- Context: Configuration Dialog - Update on boot pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
-  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">ការអាប់ដេត Keyman ត្រៀមរួចរាល់សម្រាប់ដំឡើង។</string>
+  <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">ការអាប់ដេតសម្រាប់ Keyman ត្រូវបានទាញយក និងត្រៀមរួចរាល់សម្រាប់ការដំឡើង។</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -569,6 +577,10 @@
   <string name="S_Update" comment="Update tab name">អាប់ដេត</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.230.0 -->
+  <string name="S_Update_Now" comment="Update now button">អាប់ដេតឥឡូវ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">មាន​សមាសភាគ Keyman ដែល​បាន​អាប់ដេត</string>
   <!-- Context: Online Update Dialog -->
@@ -638,10 +650,18 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.288.0 -->
   <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">បិទ​ការ​ពិនិត្យ​រក​ការអាប់ដេត​អនឡាញ</string>
+  <!-- Context: Install Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0233.0 -->
+  <string name="S_Later" comment="Apply Update Later">ពេលក្រោយ</string>
   <!-- Context: Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0233.0 -->
   <string name="S_Button_Update_ApplyNow" comment="Apply update now button - update dialog">អនុវត្ដការអាប់ដេតឥឡូវ</string>
+  <!-- Context: Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.217 -->
+  <string name="S_Button_Update_InstallNow" comment="Install update now button - update dialog">ដំឡើងការអាប់ដេតឥឡូវ</string>
   <!-- Context: Update Dialog -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 17.0233.0 -->
@@ -693,10 +713,6 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKLanguageCode" comment="The language code for the current translation">km</string>
-  <!-- Context: _LanguageInfo -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDefaultLanguageCode" comment="The default language code for this product.  This should be the language that the product is created in. For Keyman this must stay 'en', for all translations.">en</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
@@ -928,7 +944,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា​ Keyman នឹង​ត្រូវ​បាន​រក្សា​ទុក​ក្នុង​ឯកសារ​កំណត់ហេតុ​ដែល​មាន​ឈ្មោះ​ថា %LOCALAPPDATA%\Keyman\Diag\system#.etl (# ជា​តួ​លេខ)។ អ្នក​គួរ​តែ​បិទ Keyman មុន​ពេល​លុប​ឯកសារ​នេះ។\n\nការព្រមាន៖ ឯកសារ​នេះ​អាច​មាន​ទំហំ​ធំទៅៗ យ៉ាង​លឿន។ ការបើក​ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា (debugging) អាច​ធ្វើ​ឱ្យ​កុំព្យូទ័រ​របស់​អ្នក​ដើរ​យឺត ដូច្នេះ​អ្នក​គួរ​តែ​បើក​វា​តែ​នៅ​ពេល​ដែល​អ្នក​ជំនាញ​បច្ចេកទេសប្រាប់​អ្នក​ឱ្យបើក​ប៉ុណ្ណោះ។\n\nការព្រមាន​អំពី​ឯកជនភាព៖ សូម​ចំណាំ​ថា​ឯកសារកំណត់ហេតុ​ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា​រក្សា​ទុក​គ្រប់​ការចុចទាំង​អស់​របស់​អ្នក។ អ្នក​គួរ​បើក​វា​តែ​នៅ​ក្នុង​អំឡុង​ពេល​ដែល​អ្នក​កំពុង​ដោះស្រាយ​បញ្ហា ឬ​វិភាគ​បញ្ហា​ប៉ុណ្ណោះ។</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា​ Keyman នឹង​ត្រូវ​បាន​រក្សា​ទុក​ក្នុង​ឯកសារ​កំណត់ហេតុ​ដែល​មាន​ឈ្មោះ​ថា %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (# ជា​តួ​លេខ)។ អ្នក​គួរ​តែ​បិទ Keyman មុន​ពេល​លុប​ឯកសារ​នេះ។\n\nការព្រមាន៖ ឯកសារ​នេះ​អាច​មាន​ទំហំ​ធំទៅៗ យ៉ាង​លឿន។ ការបើក​ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា (debugging) អាច​ធ្វើ​ឱ្យ​កុំព្យូទ័រ​របស់​អ្នក​ដើរ​យឺត ដូច្នេះ​អ្នក​គួរ​តែ​បើក​វា​តែ​នៅ​ពេល​ដែល​អ្នក​ជំនាញ​បច្ចេកទេសប្រាប់​អ្នក​ឱ្យបើក​ប៉ុណ្ណោះ។\n\nការព្រមាន​អំពី​ឯកជនភាព៖ សូម​ចំណាំ​ថា​ឯកសារកំណត់ហេតុ​ព័ត៌មាន​សម្រាប់​ដោះស្រាយ​បញ្ហា​រក្សា​ទុក​គ្រប់​ការចុចទាំង​អស់​របស់​អ្នក។ អ្នក​គួរ​បើក​វា​តែ​នៅ​ក្នុង​អំឡុង​ពេល​ដែល​អ្នក​កំពុង​ដោះស្រាយ​បញ្ហា ឬ​វិភាគ​បញ្ហា​ប៉ុណ្ណោះ។</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

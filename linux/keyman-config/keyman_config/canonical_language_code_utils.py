@@ -57,3 +57,18 @@ class CanonicalLanguageCodeUtils():
             bcp47Tag.region = langTag['region']
 
         return bcp47Tag.tag
+
+    @staticmethod
+    def normalize_language(supportedLanguages, language):
+        if len(supportedLanguages) <= 0:
+            return ''
+
+        if not language:
+            language = supportedLanguages[0]['id']
+
+        language = CanonicalLanguageCodeUtils.findBestTag(language, False, False)
+        for supportedLanguage in supportedLanguages:
+            tag = CanonicalLanguageCodeUtils.findBestTag(supportedLanguage['id'], False, False)
+            if tag == language:
+                return tag
+        return None

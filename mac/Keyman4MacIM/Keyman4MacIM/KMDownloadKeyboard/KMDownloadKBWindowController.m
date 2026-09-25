@@ -22,15 +22,15 @@
 
 - (void)windowDidLoad {
   [super windowDidLoad];
-  
+
   [self.webView setFrameLoadDelegate:(id<WebFrameLoadDelegate>)self];
   [self.webView setGroupName:@"KMDownloadKB"];
   [self.webView setPolicyDelegate:(id<WebPolicyDelegate>)self];
-  
+
   NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
   KeymanVersionInfo keymanVersionInfo = [[self AppDelegate] versionInfo];
   NSString *url = [NSString stringWithFormat:@"https://%@/go/macos/14.0/download-keyboards/?version=%@", keymanVersionInfo.keymanCom, version];
-  
+
   os_log_debug([KMLogs uiLog], "KMDownloadKBWindowController opening url = %@, version = '%@'", url, version);
   [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
 }
@@ -45,21 +45,21 @@
   os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, navigating to %@", url);
 
   // The pattern for matching links matches work in #3602
-  NSString* urlPathMatchKeyboardsInstall = @"^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.local)?/keyboards/install/([^?/]+)(?:\\?(.+))?$";
+  NSString* urlPathMatchKeyboardsInstall = @"^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.localhost)?/keyboards/install/([^?/]+)(?:\\?(.+))?$";
   // e.g. https://keyman.com/keyboards/install/foo
-  NSString* urlPathMatchKeyboardsRoot = @"^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.local)?/keyboards([/?].*)?$";
-  // http://keyman.com.local/keyboards/foo
-  NSString* urlPathMatchKeyboardsGo = @"^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.local)?/go/macos/[^/]+/download-keyboards";
+  NSString* urlPathMatchKeyboardsRoot = @"^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.localhost)?/keyboards([/?].*)?$";
+  // http://keyman.com.localhost/keyboards/foo
+  NSString* urlPathMatchKeyboardsGo = @"^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.localhost)?/go/macos/[^/]+/download-keyboards";
   // https://keyman-staging.com/go/macos/14.0/download-keyboards?version=14.0.146.0
   NSRange range = NSMakeRange(0, url.length);
-  
+
   NSError* error;
   NSRegularExpression* regexInstall = [NSRegularExpression regularExpressionWithPattern: urlPathMatchKeyboardsInstall options: 0 error: &error];
   NSRegularExpression* regexRoot = [NSRegularExpression regularExpressionWithPattern: urlPathMatchKeyboardsRoot options: 0 error: &error];
   NSRegularExpression* regexGo = [NSRegularExpression regularExpressionWithPattern: urlPathMatchKeyboardsGo options: 0 error: &error];
-  
+
   NSArray* matchesInstall = [regexInstall matchesInString:url options:0 range:range];
-  
+
   if(matchesInstall.count > 0) {
     os_log_debug([KMLogs uiLog], "Delegating download to app delegate.");
     [listener ignore];

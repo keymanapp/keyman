@@ -5,7 +5,7 @@
 
 _hu_base_dir=$(dirname "$BASH_SOURCE")/../../..
 
-. $_hu_base_dir/resources/shellHelperFunctions.sh
+. $_hu_base_dir/resources/build/utils.inc.sh
 
 _hu_debug() {
   if [[ ! -z ${DEBUG+x} ]] && [[ $DEBUG == 1 ]]; then echo "$1"; fi

@@ -73,7 +73,7 @@ function ci_repo_has_cached_changes {
 #   * hub
 #   * uuidgen (or TeamCity `$BUILD_NUMBER` if `uuidgen` not present on system)
 # Example:
-#   ci_open_pull_request "$S_KEYMAN_COM" auto/keymanweb/release "auto: KeymanWeb release $VERSION_RELEASE""
+#   ci_open_pull_request "$S_KEYMAN_COM" auto/keymanweb/release "auto: KeymanWeb release $KEYMAN_VERSION_RELEASE""
 #
 function ci_open_pull_request {
   local repo="$1"
@@ -107,7 +107,7 @@ function ci_open_pull_request {
   git push origin "$branch"
   builder_echo "Push complete"
 
-  hub pull-request --force --message "$commit_message" --labels auto
+  hub pull-request --force --message "$commit_message" --labels auto,automerge
   builder_echo "Pull request created"
 
   git switch "$current_branch"

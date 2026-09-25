@@ -6,6 +6,7 @@ title: Keyman for Android 19.0 Help
 * [Welcome to Keyman](about/welcome)
 * [What's New](about/whatsnew)
 * [System Requirements](about/system-requirements)
+* [Does Keyman include adware or spyware?](about/adware)
 * [Data Privacy Policy](about/privacy)
 * [Version History](about/history)
 
@@ -28,7 +29,7 @@ title: Keyman for Android 19.0 Help
 * [How To - Integrating Keyman for Android](troubleshooting/integrating)
 
 ### [Using Keyman for Android](basic/)
-* [Using the Banner on the Keyboard](basic/using-the-banner)
+* [Predictive-Text Settings and the Banner](basic/using-the-banner)
 * [Switching Between Keyboards](basic/switching-between-keyboards)
 * [Installing Custom Keyboards/Dictionaries](basic/installing-custom-packages)
 * [Adding Dictionaries](basic/installing-dictionaries)

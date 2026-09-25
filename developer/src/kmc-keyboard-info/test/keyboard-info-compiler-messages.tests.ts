@@ -8,8 +8,6 @@ import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler } from '../src/keyboard-info-compiler.js';
 import { KeyboardInfoFile } from '../src/keyboard-info-file.js';
 
-const callbacks = new TestCompilerCallbacks();
-
 const KHMER_ANGKOR_JS  = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
 const KHMER_ANGKOR_KPS = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
 const KHMER_ANGKOR_KMP = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
@@ -24,15 +22,7 @@ const KHMER_ANGKOR_SOURCES = {
 
 describe('KeyboardInfoCompilerMessages', function () {
 
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest?.isFailed()) {
-      callbacks.printMessages();
-    }
-  })
+  const callbacks = new TestCompilerCallbacks(this);
 
   it('should have a valid KeyboardInfoCompilerMessages object', function() {
     return verifyCompilerMessagesObject(KeyboardInfoCompilerMessages, CompilerErrorNamespace.KeyboardInfoCompiler);
@@ -296,6 +286,27 @@ describe('KeyboardInfoCompilerMessages', function () {
   it('should generate ERROR_DescriptionIsMissing if there is no description in .kps', async function() {
     await testMessage(KeyboardInfoCompilerMessages.ERROR_DescriptionIsMissing,'error_description_is_missing', false);
   });
+
+  // WARN_LanguageTagNotFound
+
+  it('should generate WARN_LanguageTagNotFound if a language tag is not found (and no other subtags)', async function() {
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources: KHMER_ANGKOR_SOURCES}));
+    const result = compiler.unitTestEndPoints.fillLanguageMetadata({}, 'grk-Latn', null, null);
+    assert.isOk(result);
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.WARN_LanguageTagNotFound));
+  });
+
+  // WARN_LanguageTagNotFound2
+
+  it('should generate WARN_LanguageTagNotFound2 if a language tag is not found', async function() {
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources: KHMER_ANGKOR_SOURCES}));
+    const result = compiler.unitTestEndPoints.fillLanguageMetadata({}, 'grk', null, null);
+    assert.isOk(result);
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.WARN_LanguageTagNotFound2));
+  });
+
 });
 
 function nodeCompilerMessage(ncb: TestCompilerCallbacks, code: number): string {

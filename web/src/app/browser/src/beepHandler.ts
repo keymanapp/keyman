@@ -1,6 +1,5 @@
-import { type JSKeyboardInterface } from 'keyman/engine/js-processor';
-import { JSKeyboard, type KeyboardMinimalInterface } from 'keyman/engine/keyboard';
-import { DesignIFrame, OutputTargetElementWrapper } from 'keyman/engine/element-wrappers';
+import { type KeyboardMinimalInterface } from 'keyman/engine/keyboard';
+import { DesignIFrameElementTextStore, AbstractElementTextStore } from 'keyman/engine/element-text-stores';
 
 // Utility object used to handle beep (keyboard error response) operations.
 class BeepData {
@@ -33,15 +32,15 @@ export class BeepHandler {
    * @param       {Object}      Pelem     element to flash
    * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
    */
-  beep(outputTarget: OutputTargetElementWrapper<any>) {
-    if (!(outputTarget instanceof OutputTargetElementWrapper)) {
+  beep(textStore: AbstractElementTextStore<any>) {
+    if (!(textStore instanceof AbstractElementTextStore)) {
       return;
     }
 
     // All code after this point is DOM-based, triggered by the beep.
-    let  Pelem: HTMLElement = outputTarget.getElement();
-    if(outputTarget instanceof DesignIFrame) {
-      Pelem = outputTarget.docRoot; // I1446 - beep sometimes fails to flash when using OSK and rich control
+    let Pelem: HTMLElement = textStore.getElement();
+    if(textStore instanceof DesignIFrameElementTextStore) {
+      Pelem = textStore.docRoot; // I1446 - beep sometimes fails to flash when using OSK and rich control
     }
 
     if(!Pelem) {
@@ -52,7 +51,7 @@ export class BeepHandler {
       return;
     }
 
-    for(var Lbo=0; Lbo<this._BeepObjects.length; Lbo++) { // I1446 - beep sometimes fails to return background color to normal
+    for(let Lbo=0; Lbo<this._BeepObjects.length; Lbo++) { // I1446 - beep sometimes fails to return background color to normal
                                                                 // I1511 - array prototype extended
       if(this._BeepObjects[Lbo].e == Pelem) {
         return;
@@ -76,11 +75,6 @@ export class BeepHandler {
    * Description  Reset/terminate beep or flash (not currently used: Aug 2011)
    */
   readonly reset = () => {
-    // TODO-web-core: implement for KMX keyboards if needed
-    if (this.keyboardInterface.activeKeyboard instanceof JSKeyboard) {
-      (this.keyboardInterface as JSKeyboardInterface).resetContextCache();
-    }
-
     this._BeepTimeout = 0;
     for(let Lbo=0;Lbo<this._BeepObjects.length;Lbo++) { // I1511 - array prototype extended
       this._BeepObjects[Lbo].reset();

@@ -303,7 +303,7 @@ end;
 function TframeCEFHost.HasFocus: Boolean;
 begin
   AssertVclThread;
-  Result := cefwp.HandleAllocated and IsChild(cefwp.Handle, GetFocus);
+  Result := Assigned(cefwp) and cefwp.HandleAllocated and IsChild(cefwp.Handle, GetFocus);
 end;
 
 procedure TframeCEFHost.Handle_CEF_SHOW(var message: TMessage);
@@ -373,7 +373,7 @@ end;
 procedure TframeCEFHost.SetFocus;
 begin
   AssertVclThread;
-  if not FIsClosing and cefwp.CanFocus and Assigned(cef) then
+  if not FIsClosing and Assigned(cefwp) and Assigned(cef) and cefwp.CanFocus then
   begin
     GetParentForm(Self).ActiveControl := Self;
     cef.SetFocus(True);
@@ -574,7 +574,8 @@ end;
 procedure TframeCEFHost.Handle_CEF_DESTROY(var Message: TMessage);
 begin
   AssertVclThread;
-  cefwp.DestroyChildWindow;
+  if Assigned(cefwp) then
+    cefwp.DestroyChildWindow;
   FreeAndNil(cefwp);
 end;
 

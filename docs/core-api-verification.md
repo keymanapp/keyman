@@ -99,6 +99,17 @@ the API version number in `CORE_API_VERSION.md`. If the API version
 numbers in `CORE_API_VERSION.md` and in `libkeymancore.symbols` don't
 match the API verification will fail.
 
+## Skipping the API check
+
+Sometimes we have a PR that intentionally does not change the API version
+number. To skip the API checks in this case, the trailer
+
+```text
+Keyman-Api-Check: skip
+```
+
+can be added to the PR description.
+
 ## How this works
 
 `.github/workflows/api-verification.yml` contains a `Verify API` step

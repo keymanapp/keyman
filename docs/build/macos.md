@@ -28,6 +28,8 @@ The following projects **cannot** be built on macOS:
 ## System Requirements
 
 * Minimum macOS version: macOS Catalina 10.15 or Big Sur 11.0
+(For using Xcode 26.2 or 26.3 macOS Sequoia 15.6 or later is required.
+Make sure bash 4.0 is installed and used as modern macOS defaults to Zsh as its primary system shell)
 
 **Note:** to make a fully M1-compatible release build of Keyman for macOS (for
 the setup Applescript), Big Sur 11.0 is required, as osacompile on earlier
@@ -39,8 +41,9 @@ Rosetta 2 installed.
 
 Many dependencies are only required for specific projects.
 
-* XCode (iOS, macOS) 12.4 or later is needed only for Keyman for macOS and Keyman
-  for iOS.
+* XCode (iOS, macOS) 26.2 or 26.3 (not higher at this time, see #16416) 
+  is needed only for Keyman for macOS and Keyman for iOS ().
+
   * Install from App Store
   * Accept the Xcode license: `sudo xcodebuild -license accept`
 
@@ -50,9 +53,37 @@ The remaining dependencies can be installed via script:
 This script will also update your environment to the values in:
   `resources/devbox/macos/keyman.macos.env.sh`
 
-It will also add these environment settings to your `~/.bashrc`.
-
 These dependencies are also listed below if you'd prefer to install manually.
+
+### Example shell profile script
+
+`keyman.macos.env.sh` may be `source`d within your `~/.bashrc` / `~/.zprofile` in
+order to regularly apply its path settings to the terminal during local development.
+
+For a `.zprofile`...
+
+```zsh
+# Adds homebrew-managed dependencies to $PATH
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Replace right-hand side with the path to your local copy of the repo
+export KEYMAN_ROOT=~/keymanapp/keyman
+
+# May be called to apply build-path settings, such as those allowing
+# direct call of npm scripts without `npm run`.
+set_keyman_standard_build_path() {
+  PATH="${KEYMAN_ROOT}/node_modules/.bin:$PATH"
+}
+
+# builder-script tab autocompletion
+autoload -Uz compinit && compinit
+autoload bashcompinit
+bashcompinit
+source "${KEYMAN_ROOT}/resources/builder_completion.inc.sh"
+
+# environment variable initialization
+source "${KEYMAN_ROOT}/resources/devbox/macos/keyman.macos.env.sh"
+```
 
 ## Shared Dependencies
 
@@ -77,7 +108,7 @@ PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
 
 ## KeymanWeb Dependencies
 
-* node.js, emscripten 3.1.46 or later
+* node.js 20.0, emscripten 3.1.64
 
 ### node.js
 
@@ -99,8 +130,8 @@ To install emscripten, `cd` to an appropriate path, and then:
 ```bash
 git clone https://github.com/emscripten-core/emsdk
 cd emsdk
-emsdk install 3.1.58
-emsdk activate 3.1.58
+./emsdk install 3.1.64
+./emsdk activate 3.1.64
 cd upstream/emscripten
 npm install
 export EMSCRIPTEN_BASE="$(pwd)"
@@ -113,7 +144,8 @@ If you are updating an existing install of Emscripten:
 cd emsdk
 git pull
 emsdk install 3.1.58
-emsdk activate 3.1.58
+./emsdk install 3.1.64
+./emsdk activate 3.1.64
 cd upstream/emscripten
 npm install
 ```
@@ -155,10 +187,10 @@ brew install carthage cocoapods
 
 ## Keyman for Android Dependencies
 
-* openjdk 11, Android SDK, Android Studio, Ant, Gradle, Maven
+* openjdk 21, Android SDK, Android Studio, Ant, Gradle, Maven
 
 ```shell
-brew install openjdk@11 android-sdk android-studio ant gradle maven
+brew install openjdk@21 android-sdk android-studio ant gradle maven
 # update path
 source ../resources/devbox/macos/keyman.macos.env.sh
 # optionally install sdk images
@@ -176,7 +208,9 @@ components such as emulator images and SDK updates.
 
 ```shell
 brew install node emscripten
-```
+* node.js 20.0, emscripten 3.1.64
+
+See section KeymanWeb Dependencies for installation
 
 ## Optional Tools
 

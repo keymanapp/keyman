@@ -1,11 +1,23 @@
 import { CompilerCallbacks } from "./compiler-callbacks.js";
+import { KMX, ObjectWithCompileContext } from '@keymanapp/common-types';
+import { KeymanXMLReader, XML_FILENAME_SYMBOL } from "./xml-utils.js";
 
 /**
  * Abstract interface for compiler error and warning messages
  */
 export interface CompilerEvent {
   filename?: string;
+  /** line where a message applies */
   line?: number;
+  /**
+   * column where a message applies.
+   */
+  column?: number;
+  /**
+   * offset where a message applies.
+   * If set, encompasses line and column.
+   */
+  offset?: number;
   code: number;
   message: string;
   /**
@@ -196,6 +208,27 @@ export class CompilerError {
     }
     return null;
   }
+
+    /**
+   * Get an offset from o and set event's offset field
+   * @param event a compiler event, such as from functions in this class
+   * @param x any object parsed from XML or with the XML_META_DATA_SYMBOL symbol copied over
+   * @returns modified event object
+   */
+  public static setFromMetadata(event: CompilerEvent, compileContext?: ObjectWithCompileContext): CompilerEvent {
+    if (compileContext) {
+      const metadata = KeymanXMLReader.getMetaData(compileContext) || {};
+      const offset = metadata?.startIndex;
+      if (offset) {
+        event.offset = offset;
+      }
+      const filename = event.filename || metadata[XML_FILENAME_SYMBOL];
+      if (filename) {
+        event.filename = filename;
+      }
+    }
+    return event;
+  }
 };
 
 /** @deprecated use `CompilerError.severity` instead */
@@ -281,9 +314,13 @@ export enum CompilerErrorNamespace {
    */
   Copier = 0xB000,
   /**
-   * kmc-test 0xC000…0xBFFF
+   * kmc-convert 0xC000…0xCFFF
    */
-  Tester = 0xC000,
+  Converter = 0xC000,
+  /**
+   * kmc-test 0xD000…0xDFFF
+   */
+  Tester = 0xD000,
 };
 
 type CompilerErrorSeverityOverride = CompilerErrorSeverity | 'disable';
@@ -377,6 +414,11 @@ export interface CompilerOptions extends CompilerBaseOptions {
    * Check filename conventions in packages
    */
   checkFilenameConventions?: boolean;
+  /**
+   * Target version of Keyman for compiled objects; default is minimum Keyman
+   * version that supports all features in the object
+   */
+  targetVersion?: KMX.KMX_Version;
 };
 
 export const defaultCompilerOptions: CompilerOptions = {
@@ -388,6 +430,7 @@ export const defaultCompilerOptions: CompilerOptions = {
   compilerWarningsAsErrors: false,
   warnDeprecatedCode: true,
   checkFilenameConventions: false,
+  targetVersion: undefined,
 }
 
 /**
@@ -416,6 +459,40 @@ export function dedentCompilerMessageDetail(event: CompilerEvent) {
   // non-zero whitespace line as amount to dedent
   return (event.detail ?? '').replace(/^[ ]+/gm, '');
 }
+
+/**
+ * Convenience function for constructing CompilerEvents with line numbers.
+ * Use it as below: (abbreviated as mx())
+ *
+ * ```js
+ *  // Note: Indentation makes "InvalidScanCode" line up thrice
+ *  static ERROR_InvalidScanCode = SevError | 0x0009;
+ *  // Note:
+ *  //   1. All parameters are passed in 'o', the context object is only used for context even if
+ *  //      it contains redundant info.
+ *  //   2. No code execution within the arrow function other than the 'mx' call, string interpolation,
+ *  //      with `${def(o.property)}` as the max complexity of interpolation.
+ *  static Error_InvalidScanCode = (o:{id: string, invalidCodeList: string}, compileContext: ObjectWithCompileContext) => mx(
+ *    this.ERROR_InvalidScanCode, compileContext,
+ *  `Form '${def(o.id)}' has invalid/unknown scancodes '${def(o.codes)}'`,
+ *  // Note: If detail is omitted, leave the trailing comma on the prior line to leave room for it
+ *  `…additional markdown detail…`
+ *  );
+ * ```
+ *
+ * @param code     Unique numeric value of the event
+ * @param message  A short description of the error presented to the user
+ * @param context  Object to be used as a source for line number information
+ * @param detail   Detailed Markdown-formatted description of the error
+ *                 including references to documentation, remediation options.
+ * @see CompilerMessageSpec
+ * @returns the event
+ */
+export function CompilerMessageObjectSpec(code: number, context: ObjectWithCompileContext, message: string, detail?: string): CompilerEvent {
+  let evt = CompilerMessageSpec(code, message, detail); // constructs raw message
+  evt = CompilerError.setFromMetadata(evt, context); // updates with offset from context
+  return evt;
+};
 
 export const CompilerMessageDef = (param: any) => String(param ?? `<param>`);
 

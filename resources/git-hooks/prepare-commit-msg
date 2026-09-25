@@ -114,18 +114,25 @@ function prepend_scope() {
       fi
     fi
 
+    commentchar="#"
+    if [[ -n "$(git config core.commentString)" ]]; then
+      commentchar="$(git config core.commentString)"
+    elif [[ -n "$(git config core.commentChar)" ]]; then
+      commentchar="$(git config core.commentChar)"
+    fi
+
     postfix=$(
       cat <<EOF
-\n# Keyman Conventional Commit suggestions:
-#
-# - Link to a Sentry issue with git trailer:
-#     Fixes: _MODULE_-_ID_
-# - Give credit to co-authors:
-#     Co-authored-by: _Name_ <_email_>
-# - Use imperative, present tense ('attach' not 'attaches', 'attached' etc)
-# - Don't include a period at the end of the title
-# - Always include a blank line before trailers
-# - More: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
+\n${commentchar} Keyman Conventional Commit suggestions:
+${commentchar}
+${commentchar} - Link to a Sentry issue with git trailer:
+${commentchar}     Fixes: _MODULE_-_ID_
+${commentchar} - Give credit to co-authors:
+${commentchar}     Co-authored-by: _Name_ <_email_>
+${commentchar} - Use imperative, present tense ('attach' not 'attaches', 'attached' etc)
+${commentchar} - Don't include a period at the end of the title
+${commentchar} - Always include a blank line before trailers
+${commentchar} - More: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
 EOF
     )
 

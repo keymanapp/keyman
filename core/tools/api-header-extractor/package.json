@@ -2,5 +2,9 @@
   "name": "@keymanapp/api-header-extractor",
   "private": true,
   "type": "module",
-  "main": "build/src/index.js"
+  "scripts": {},
+  "main": "build/src/index.js",
+  "devDependencies": {
+    "@types/node": "^25.6.0"
+  }
 }

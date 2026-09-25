@@ -119,27 +119,20 @@ BOOL __stdcall DllMain(HINSTANCE hinstDll, DWORD fdwReason, LPVOID reserved)
 	switch(fdwReason)
 	{
 	case DLL_PROCESS_ATTACH:
-    //OutputThreadDebugString("DLL_PROCESS_ATTACH");
     if(!Globals_InitProcess()) return FALSE;
 		break;
 	case DLL_PROCESS_DETACH:
     if (reserved == NULL) {
       // If reserved == NULL, that means the library is being unloaded, but
       // the process is not terminating.
-      //OutputThreadDebugString("DLL_PROCESS_DETACH not terminating");
       UninitialiseProcess(FALSE);
       Globals_UninitProcess();
     }
-    else {
-      //OutputThreadDebugString("DLL_PROCESS_DETACH terminating");
-    }
 		break;
 	case DLL_THREAD_ATTACH:
-    //OutputThreadDebugString("DLL_THREAD_ATTACH");
     Globals_InitThread();
 		break;
 	case DLL_THREAD_DETACH:
-    //OutputThreadDebugString("DLL_THREAD_DETACH");
     UninitialiseProcess(FALSE);
     Globals_UninitThread();
 		break;
@@ -279,6 +272,24 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_GetInitialised(BOOL *FSingleA
 	return Globals::get_Keyman_Initialised();
 }
 
+#ifndef _WIN64
+BOOL InitLowLevelHook() {
+  HINSTANCE hinst = GetModuleHandle(LIBRARY_NAME);
+
+  *Globals::hhookLowLevelKeyboardProc() = SetWindowsHookExW(WH_KEYBOARD_LL, (HOOKPROC) kmnLowLevelKeyboardProc, hinst, Globals::get_FSingleThread());   // I4124
+  return Globals::get_hhookLowLevelKeyboardProc() != NULL;
+}
+
+BOOL UninitLowLevelHook() {
+  BOOL RetVal = TRUE;
+  if(Globals::get_hhookLowLevelKeyboardProc() && !UnhookWindowsHookEx(Globals::get_hhookLowLevelKeyboardProc()))    // I4124
+    RetVal = FALSE;
+
+  *Globals::hhookLowLevelKeyboardProc() = NULL;
+  return RetVal;
+}
+#endif
+
 BOOL InitHooks()
 {
   HINSTANCE hinst = GetModuleHandle(LIBRARY_NAME);
@@ -286,7 +297,7 @@ BOOL InitHooks()
 	*Globals::hhookGetMessage()   = SetWindowsHookExW(WH_GETMESSAGE,  (HOOKPROC) kmnGetMessageProc, hinst, Globals::get_FSingleThread());
   *Globals::hhookCallWndProc()  = SetWindowsHookExW(WH_CALLWNDPROC, (HOOKPROC) kmnCallWndProc,    hinst, Globals::get_FSingleThread());
 #ifndef _WIN64
-  *Globals::hhookLowLevelKeyboardProc() = SetWindowsHookExW(WH_KEYBOARD_LL, (HOOKPROC) kmnLowLevelKeyboardProc, hinst, Globals::get_FSingleThread());   // I4124
+  InitLowLevelHook();
 #endif;
 
   return
@@ -304,19 +315,14 @@ BOOL UninitHooks()
 
   if(Globals::get_hhookGetMessage() && !UnhookWindowsHookEx(Globals::get_hhookGetMessage()))
       RetVal = FALSE;
-  else
-      *Globals::hhookGetMessage() = NULL;
+  *Globals::hhookGetMessage() = NULL;
 
 	if(Globals::get_hhookCallWndProc() && !UnhookWindowsHookEx(Globals::get_hhookCallWndProc()))
     RetVal = FALSE;
-  else
-    *Globals::hhookCallWndProc() = NULL;
+  *Globals::hhookCallWndProc() = NULL;
 
 #ifndef _WIN64
-  if(Globals::get_hhookLowLevelKeyboardProc() && !UnhookWindowsHookEx(Globals::get_hhookLowLevelKeyboardProc()))    // I4124
-    RetVal = FALSE;
-  else
-    *Globals::hhookLowLevelKeyboardProc() = NULL;
+  RetVal = UninitLowLevelHook() && RetVal;
 #endif
 
 	return RetVal;
@@ -473,6 +479,31 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_RestartEngine()
   return TRUE;
 }
 
+BOOL RestartLowLevelHook() {
+  BOOL result=true;
+
+#ifndef _WIN64
+  if(!Globals::get_Keyman_Initialised()) {
+    return FALSE;
+  }
+
+  if(!UninitLowLevelHook()) {
+    DWORD error = GetLastError();
+    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_UNINIT_FAILURE), error);
+    SendDebugMessageFormat("Failed to uninstall low level hook.  GetLastError = %d", error);
+    result = FALSE;
+  }
+  if(!InitLowLevelHook()) {
+    DWORD error = GetLastError();
+    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_INIT_FAILURE), error);
+    SendDebugMessageFormat("Failed to install low level hook.  GetLastError = %d", error);
+    result = FALSE;
+  }
+
+#endif
+  return result;
+}
+
 //---------------------------------------------------------------------------------------------------------
 //
 // Utility guff functions
@@ -602,7 +633,7 @@ void HandleRefresh(int code, LONG tag)
     if (UpdateRefreshTag(tag)) {
 #ifdef _WIN64
       if (Globals::get_InitialisingThread() == GetCurrentThreadId()) {
-        // If this is the keymanx64 thread, then we should
+        // If this is the keyman.x64 or keymanarm64 thread, then we should
         // go ahead and process the refresh immediately so
         // that global settings are updated
         RefreshKeyboards(FALSE);
@@ -838,7 +869,7 @@ void RefreshKeyboards(BOOL Initialising)
 
 void ReleaseKeyboards(BOOL Lock)
 {
-  OutputThreadDebugString("ReleaseKeyboards");
+  // OutputThreadDebugString("ReleaseKeyboards");
   PKEYMAN64THREADDATA _td = ThreadGlobals();
 	if(!_td || !_td->lpKeyboards) return;
 

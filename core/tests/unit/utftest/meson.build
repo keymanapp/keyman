@@ -1,10 +1,17 @@
-# Copyright:    © 2018 SIL International.
-# Description:  Cross platform build script to compile utfcode unit test.
-# Create Date:  2 Oct 2018
-# Authors:      Tim Eves (TSE)
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# Created by Tim Eves (TSE) on 2018-10-02
+#
+# Cross platform build script to compile utfcodec unit test.
 #
 
-e = executable('utftest', 'utftest.tests.cpp',
-               objects: lib.extract_objects('../../common/cpp/utfcodec.cpp'),
-               include_directories: [inc, libsrc])
-test('utftest', e)
+utftest_tests = executable('utftest_tests',
+  ['utftest.tests.cpp', '../helpers/main.cpp', '../helpers/emscripten_filesystem.cpp'],
+  objects: lib.extract_objects('../../common/cpp/utfcodec.cpp'),
+  dependencies: test_dependencies,
+  include_directories: test_includes,
+  link_args: links + test_link_args,
+)
+
+test('utftest_tests', utftest_tests, suite: 'utf', protocol: 'gtest')

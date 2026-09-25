@@ -120,15 +120,15 @@ export function allUsedKeyIdsInFlick(flick? : LDMLKeyboard.LKFlick) : Set<string
  * @param onInvalid callback with array of invalid values, deduped
  * @returns true if all OK
  */
-export function verifyValidAndUnique(
-  values: string[],
-  onDuplicate: (duplicates: string[]) => void,
-  allowed?: Set<string>,
-  onInvalid?: (invalids: string[]) => void)
+export function verifyValidAndUnique<T>(
+  values: T[],
+  onDuplicate: (duplicates: T[]) => void,
+  allowed?: Set<T>,
+  onInvalid?: (invalids: T[]) => void)
   : boolean {
-  const dups: string[] = [];
-  const invalids: string[] = [];
-  const seen = new Set<string>();
+  const dups: T[] = [];
+  const invalids: T[] = [];
+  const seen = new Set<T>();
   for (const value of values) {
     if (allowed && !allowed.has(value)) {
       invalids.push(value);
@@ -140,7 +140,7 @@ export function verifyValidAndUnique(
     }
   }
 
-  function dedupedSortedArray(values: string[]) : string[] {
+  function dedupedSortedArray(values: T[]) : T[] {
     return Array.from(new Set(values)).sort();
   }
 
@@ -171,7 +171,7 @@ function translateModifierSubsetToLayer(modifiers: string) : number {
       throw Error(`translateModifierSubsetToLayer only takes a single subset of the modifiers`);
     }
     let mod = constants.keys_mod_none;
-    for (let str of modifiers.split(' ')) {
+    for (const str of modifiers.split(' ')) {
       const submod = constants.keys_mod_map.get(str);
       mod |= submod;
     }
@@ -188,8 +188,8 @@ function translateModifierSubsetToLayer(modifiers: string) : number {
 export function validModifier(modifier?: string) : boolean {
   if (!modifier) return true;  // valid to have no modifier, == none
   // TODO-LDML: enforce illegal combinations per spec.
-  for (let sub of modifier.trim().split(',')) {
-    for (let str of sub.trim().split(' ')) {
+  for (const sub of modifier.trim().split(',')) {
+    for (const str of sub.trim().split(' ')) {
       if (!constants.keys_mod_map.has(str)) {
         return false;
       }

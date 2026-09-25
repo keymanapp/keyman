@@ -2,8 +2,10 @@
 #include <kmcmplibapi.h>
 #include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
-#include "../../../../common/windows/cpp/include/ConvertUTF.h"
 #include "CompileKeyboardBuffer.h"
+
+#define UTF8Sig "\xEF\xBB\xBF"
+#define UTF16Sig "\xFF\xFE"
 
 EXTERN bool kmcmp_CompileKeyboard(
   const char* pszInfile,
@@ -22,6 +24,7 @@ EXTERN bool kmcmp_CompileKeyboard(
   AWarnDeprecatedCode_GLOBAL_LIB = options.warnDeprecatedCode;
   kmcmp::FShouldAddCompilerVersion = options.shouldAddCompilerVersion;
   kmcmp::CompileTarget = options.target;
+  kmcmp::TargetVersion = options.targetVersion;
 
   if (!messageProc || !loadFileProc || !pszInfile) {
     ReportCompilerMessage(KmnCompilerMessages::FATAL_BadCallParams);

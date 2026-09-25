@@ -3,7 +3,7 @@
 	<name>org.freedesktop.IBus.Keyman</name>
 	<description>Keyman Component</description>
 	<exec>@LIBEXECDIR@/ibus-engine-keyman --ibus</exec>
-	<version>@VERSION@</version>
+	<version>@KEYMAN_VERSION@</version>
 	<author>Keyman Team &lt;support@keyman.com&gt;</author>
 	<license>GPL</license>
 	<homepage>https://keyman.com</homepage>

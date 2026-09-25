@@ -4,7 +4,7 @@ title: IKeymanControl::OpenHelp() Method
 
 ## Introduction
 
-The `IKeymanControl::OpenHelp()` method opens Keyman Desktop help at the
+The `IKeymanControl::OpenHelp()` method opens Keyman for Windows help at the
 specified topic.
 
 ## Specification

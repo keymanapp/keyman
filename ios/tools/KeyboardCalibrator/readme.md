@@ -19,11 +19,15 @@ This tool was designed to facilitate collection of values for use with `KeymanEn
 5.  Note that the height displayed by the keyboard should match the value displayed beside "Keyboard: " within the app.  If so, click **Calibrate**.
     - If not, something's broken... likely with the App Group permissions necessary to forward the calibration value from the app to the keyboard.
 6.  New values should appear, and the keyboard height value may have been adjusted.  Calibration is now complete; the _Check_ setting will allow you to display the calibration keyboard in-app and examine how each component of the calculation lines up against the default system keyboard.
-    - You may want to revisit a previous setting and set it back to the default system keyboard for comparison; _Check_ will only ever display the calibration keyboard, so this will allow for easier visual confirmation.
-    
+    - You may want to revisit a previous setting and set it back to the default system keyboard (without the banner active) for comparison; _Check_ will only ever display the calibration keyboard, so this will allow for easier visual confirmation.
+
 ![iPhone SE complete](readme_imgs/iPhone-SE-complete.png)
 
 7.  Repeat steps 2 through 6 for the other device orientation.
+
+![Example calibration run](readme_imgs/keyboard-calibration-run.gif)
+
+Note how the green ("system inset") and blue ("inset") areas beneath the red ("keyboard") perfectly match the area reserved for the system globe key on notched devices when in portrait.  That is not space available to the keyboard - only the red area is.
 
 ## Notes
 

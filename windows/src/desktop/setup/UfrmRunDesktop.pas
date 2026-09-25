@@ -51,6 +51,7 @@ uses
   System.SysUtils,
   System.UITypes,
   System.Variants,
+  System.Math,
   Vcl.AppEvnts,
   Vcl.ComCtrls,
   Vcl.Controls,
@@ -64,7 +65,6 @@ uses
   Keyman.Setup.System.InstallInfo,
   RunTools,
   UfrmDownloadProgress;
-
 type
   TfrmRunDesktop = class(TForm)
     imgTitle: TImage;
@@ -584,17 +584,23 @@ end;
 
 procedure TfrmRunDesktop.FillLanguageList;
 var
-  item: TPair<string,string>;
+  item: TPair<string,TLanguageName>;
   n: Integer;
+  m: Integer; // width of ComboBox when it is dropped
 begin
-  for item in TSetupUILanguageManager.Locales do
+  cbLanguage.Canvas.Font.Assign(cbLanguage.Font);
+  m := cbLanguage.Width;
+  for item in TSetupUILanguageManager.SortedValues do
   begin
-    n := cbLanguage.Items.Add(item.Value);
+    n := cbLanguage.Items.Add(item.Value.ExtendedLanguageName);
+    m := Max(cbLanguage.Canvas.TextWidth(item.Value.ExtendedLanguageName), m);
     if TSetupUILanguageManager.ActiveLocale = item.Key then
       cbLanguage.ItemIndex := n;
   end;
   cbLanguage.Visible := cbLanguage.Items.Count > 1;
   lblGlobe.Visible := cbLanguage.Visible;
+  // set width of ComboBox when it is dropped (also consider width of vertical scroll bar)
+  SendMessage(cbLanguage.Handle,CB_SETDROPPEDWIDTH,m+GetSystemMetrics(SM_CXVSCROLL)+4,0);
 end;
 
 procedure TfrmRunDesktop.FillActionText;
@@ -958,8 +964,11 @@ begin
 end;
 
 procedure TfrmRunDesktop.cbLanguageClick(Sender: TObject);
+var
+  n :  Integer;
 begin
-  TSetupUILanguageManager.ActiveLocale := TSetupUILanguageManager.Locales.Keys.ToArray[cbLanguage.ItemIndex];
+  n := TSetupUILanguageManager.IndexMapping[cbLanguage.ItemIndex];
+  TSetupUILanguageManager.ActiveLocale := TSetupUILanguageManager.Locales.Keys.ToArray[n];
   FillStrings;
 end;
 

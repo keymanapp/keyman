@@ -3,11 +3,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder-full.inc.sh"
 
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 . "$THIS_SCRIPT_PATH/commands.inc.sh"
 
 ################################ Main script ################################
@@ -32,6 +32,7 @@ case $BUILDER_OS in
       ":win    Both x86 and x64"
       ":x86    32-bit Windows (x86) build"
       ":x64    64-bit Windows (x64) build"
+      ":arm64  64-bit Windows (arm64) build"
     )
     ;;
   mac)
@@ -61,6 +62,7 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "@/common/tools/hextobin" \
   "@/common/web/keyman-version" \
   "@/developer/src/kmc" \
+  "@/core/tools/api-header-extractor" \
   "clean" \
   "configure" \
   "build" \
@@ -69,7 +71,8 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "uninstall                       uninstall libraries from current system" \
   "${archtargets[@]}" \
   "--no-tests                      do not configure tests (used by other projects)" \
-  "--test,-t=opt_tests             test[s] to run (space separated)"
+  "--test,-t=opt_tests             test[s] to run (space separated)" \
+  "--no-werror                     don't report warnings as errors"
 
 builder_parse "$@"
 
@@ -78,7 +81,7 @@ builder_parse "$@"
 # if we don't plan to run them, for example when doing a dependency build
 # in CI
 #
-MESON_OPTION_keyman_core_tests=
+MESON_OPTION_keyman_core_tests="-Dkeyman_core_tests=true"
 BUILD_BAT_keyman_core_tests=
 
 if builder_is_dep_build || builder_has_option --no-tests; then
@@ -95,12 +98,14 @@ builder_describe_internal_dependency \
   build:mac build:mac-x86_64 \
   build:mac build:mac-arm64 \
   build:win build:x86 \
-  build:win build:x64
+  build:win build:x64 \
+  build:win build:arm64 \
 
 builder_describe_outputs \
   configure:win             /core/build/win/$BUILDER_CONFIGURATION/ \
   configure:x86             /core/build/x86/$BUILDER_CONFIGURATION/build.ninja \
   configure:x64             /core/build/x64/$BUILDER_CONFIGURATION/build.ninja \
+  configure:arm64           /core/build/arm64/$BUILDER_CONFIGURATION/build.ninja \
   configure:mac             /core/build/mac/$BUILDER_CONFIGURATION/ \
   configure:mac-x86_64      /core/build/mac-x86_64/$BUILDER_CONFIGURATION/build.ninja \
   configure:mac-arm64       /core/build/mac-arm64/$BUILDER_CONFIGURATION/build.ninja \
@@ -109,24 +114,28 @@ builder_describe_outputs \
   build:win                 /core/build/win/$BUILDER_CONFIGURATION/BUILT \
   build:x86                 /core/build/x86/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:x64                 /core/build/x64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:arm64               /core/build/arm64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:mac                 /core/build/mac/$BUILDER_CONFIGURATION/libkeymancore.a \
   build:mac-x86_64          /core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:mac-arm64           /core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:arch                /core/build/arch/$BUILDER_CONFIGURATION/src/libkeymancore.a \
   build:wasm                /core/build/wasm/$BUILDER_CONFIGURATION/src/libkeymancore.a
 
-# Import our standard compiler defines; this is copied from
-# /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
-# allow us to reference a file outside its root
+MESON_ARGS=--werror
+if builder_has_option --no-werror; then
+  MESON_ARGS=
+fi
+
 if builder_has_action configure; then
-  mkdir -p "$THIS_SCRIPT_PATH/resources"
-  cp "$KEYMAN_ROOT/resources/build/meson/standard.meson.build" "$THIS_SCRIPT_PATH/resources/meson.build"
+  # Import our standard compiler defines
+  source "$KEYMAN_ROOT/resources/build/meson/standard_meson_build.inc.sh"
+  standard_meson_build
 fi
 
 # Iterate through all possible targets; note that targets that cannot be built
 # on the current platform have already been excluded through the archtargets
 # settings above
-targets=(wasm x86 x64 mac-x86_64 mac-arm64 arch)
+targets=(wasm x86 x64 arm64 mac-x86_64 mac-arm64 arch)
 
 do_action() {
   local action_function=do_$1
@@ -169,6 +178,8 @@ if builder_has_option --test; then
   testparams="$opt_tests $testparams"
 fi
 
+JUNIT_RESULTS=()
+
 do_action test
 
 if builder_start_action test:mac; then
@@ -178,16 +189,36 @@ if builder_start_action test:mac; then
   target=mac-`uname -m`
   MESON_PATH="$KEYMAN_ROOT/core/build/$target/$BUILDER_CONFIGURATION"
   meson test -C "$MESON_PATH" $testparams
+  JUNIT_RESULTS+=("##teamcity[importData type='junit' path='keyman/core/build/$target/$BUILDER_CONFIGURATION/meson-logs/testlog.junit.xml']")
   builder_finish_action success test:mac
 fi
 
 if builder_start_action test:win; then
-  # We can assume that build:win has run so both architectures will be available
-  MESON_PATH="$KEYMAN_ROOT/core/build/x86/$BUILDER_CONFIGURATION"
-  meson test -C "$MESON_PATH" $testparams
-  MESON_PATH="$KEYMAN_ROOT/core/build/x64/$BUILDER_CONFIGURATION"
-  meson test -C "$MESON_PATH" $testparams
+  if ! builder_has_action test:x86; then
+    # We can assume that build:win has run so both architectures will be available
+    MESON_PATH="$KEYMAN_ROOT/core/build/x86/$BUILDER_CONFIGURATION"
+    meson test -C "$MESON_PATH" $testparams
+    JUNIT_RESULTS+=("##teamcity[importData type='junit' path='keyman/core/build/x86/$BUILDER_CONFIGURATION/meson-logs/testlog.junit.xml']")
+  fi
+
+  if ! builder_has_action test:x64; then
+    MESON_PATH="$KEYMAN_ROOT/core/build/x64/$BUILDER_CONFIGURATION"
+    meson test -C "$MESON_PATH" $testparams
+    JUNIT_RESULTS+=("##teamcity[importData type='junit' path='keyman/core/build/x64/$BUILDER_CONFIGURATION/meson-logs/testlog.junit.xml']")
+  fi
+
+  # We do not yet have CI/build hardware support for arm64 Windows testing
+  #MESON_PATH="$KEYMAN_ROOT/core/build/arm64/$BUILDER_CONFIGURATION"
+  #meson test -C "$MESON_PATH" $testparams
+
   builder_finish_action success test:win
+fi
+
+# Report JUnit test results to CI
+if builder_has_action test; then
+  if builder_is_ci_build; then
+    printf '%s\n' "${JUNIT_RESULTS[@]}"
+  fi
 fi
 
 # -------------------------------------------------------------------------------

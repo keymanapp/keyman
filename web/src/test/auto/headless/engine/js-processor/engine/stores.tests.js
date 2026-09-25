@@ -1,10 +1,9 @@
 import { assert } from 'chai';
 
+import { KMWString } from 'keyman/common/web-utils';
 import { JSKeyboard } from 'keyman/engine/keyboard';
 import { JSKeyboardProcessor } from 'keyman/engine/js-processor';
-import { extendString } from '@keymanapp/web-utils';
-
-extendString();
+import { DEFAULT_PROCESSOR_INIT_OPTIONS } from 'keyman/test/resources';
 
 let device = {
   formFactor: 'desktop',
@@ -21,7 +20,7 @@ describe('Engine - Stores', function() {
   }
 
   it('Store \'Explosion\'', function() {
-    let processor = new JSKeyboardProcessor(device);
+    let processor = new JSKeyboardProcessor(device, DEFAULT_PROCESSOR_INIT_OPTIONS);
     // A 'hollow' Keyboard that only follows default rules.  That said, we need a Keyboard
     // instance to host cache data for our exploded store tests.
     processor.activeKeyboard = new JSKeyboard();
@@ -42,11 +41,11 @@ describe('Engine - Stores', function() {
     for(var i=0; i < STORES.length; i++) {
       var s = STORES[i];
 
-      String.kmwEnableSupplementaryPlane(s.smp);
+      KMWString.enableSupplementaryPlane(s.smp);
       var result = processor.keyboardInterface._ExplodeStore(s.in);
       assert.sameOrderedMembers(result, s.out, "Failure exploding " + (s.smp ? "SMP" : "non-SMP") + " string value \"" + s.in + "\"");
     }
-    String.kmwEnableSupplementaryPlane(false);
+    KMWString.enableSupplementaryPlane(false);
   });
 
   // TODO:  Migrate a Node-based copy of the variable store tests here as well.

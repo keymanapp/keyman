@@ -64,7 +64,7 @@ export class KmpInfWriter {
     }
     this.addSection('StartMenuEntries');
     let hasIcon = false, hasLocation = false;
-    for(let item of this.data.startMenu.items) {
+    for(const item of this.data.startMenu.items) {
       this.addString(item.name, `"${item.filename}","${item.arguments ?? ''}"`);
       hasIcon = hasIcon || !!item.icon;
       hasLocation = hasLocation || (item.location??'psmelStartMenu') != 'psmelStartMenu';
@@ -75,7 +75,7 @@ export class KmpInfWriter {
 
     if(hasIcon) {
       this.addSection('StartMenuEntries_Icon');
-      for(let item of this.data.startMenu.items) {
+      for(const item of this.data.startMenu.items) {
         if(item.icon) {
           this.addString(item.name, item.icon);
         }
@@ -84,7 +84,7 @@ export class KmpInfWriter {
 
     if(hasLocation) {
       this.addSection('StartMenuEntries_Location');
-      for(let item of this.data.startMenu.items) {
+      for(const item of this.data.startMenu.items) {
         if(item.location != 'psmelStartMenu') {
           this.addString(item.name, '1'); // psmelDesktop ordinal = 1 is the only other supported value
         }
@@ -138,7 +138,7 @@ export class KmpInfWriter {
 
   private saveKeyboards() {
     // keyboards
-    for(let i = 0; i < this.data.keyboards?.length ?? 0; i++) {
+    for(let i = 0; i < (this.data.keyboards?.length ?? 0); i++) {
       const keyboard = this.data.keyboards[i];
       this.addSection('Keyboard'+i.toString());
       this.addString('Name', keyboard.name);
@@ -154,7 +154,7 @@ export class KmpInfWriter {
         this.addString('DisplayFont', keyboard.displayFont);
       }
 
-      for(let j = 0; j < keyboard.languages?.length ?? 0; j++) {
+      for(let j = 0; j < (keyboard.languages?.length ?? 0); j++) {
         const language = keyboard.languages[j];
         this.addString('Language'+j.toString(), language.id+','+language.name);
       }

@@ -6,7 +6,7 @@ import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { testCompilationCases } from './helpers/index.js';
 import { KMXPlus, KMX } from '@keymanapp/common-types';
 import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
-import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { constants, KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 
 // now that 'everything' depends on vars, we need an explicit dependency here
 const varsDependencies = BASIC_DEPENDENCIES.filter(c => c !== VarsCompiler);
@@ -112,13 +112,14 @@ describe('vars', function () {
     {
       subpath: 'sections/vars/dup0.xml',
       errors: [
-        LdmlCompilerMessages.Error_DuplicateVariable({ids: 'y'})
+        LdmlCompilerMessages.Error_DuplicateVariable({id: 'y'})
       ],
     },
     {
       subpath: 'sections/vars/dup1.xml',
       errors: [
-        LdmlCompilerMessages.Error_DuplicateVariable({ids: 'upper, y'})
+        LdmlCompilerMessages.Error_DuplicateVariable({id: 'upper'}),
+        LdmlCompilerMessages.Error_DuplicateVariable({id: 'y'}),
       ],
     },
     {
@@ -208,7 +209,7 @@ describe('vars', function () {
       ],
       strictErrors: true
     },
-], varsDependencies);
+], KMXPlusVersion.Version17, varsDependencies);
   describe('should match some marker constants', () => {
     // neither of these live here, but, common/web/types does not import ldml-keyboard-constants otherwise.
 
@@ -237,10 +238,10 @@ describe('vars', function () {
               'doesnt_exist_1',
               'doesnt_exist_2',
               'doesnt_exist_3',
-            ]
+            ].join(',')
           }),
         ],
       },
-    ], varsDependencies);
+    ], KMXPlusVersion.Version17, varsDependencies);
   });
 });

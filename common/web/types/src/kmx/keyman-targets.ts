@@ -54,7 +54,7 @@ export const
 
 
   export function keymanTargetsFromString(targets: string, options?: {expandTargets?: boolean}): KeymanTarget[] {
-    let result = new Set<KeymanTarget>(<KeymanTarget[]>targets.split(/ +/));
+    const result = new Set<KeymanTarget>(<KeymanTarget[]>targets.split(/ +/));
     if(options?.expandTargets) {
       if(result.has(KeymanTarget.any)) {
         return AllKeymanTargets;

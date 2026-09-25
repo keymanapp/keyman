@@ -4,7 +4,7 @@
  */
 
 import { minKeymanVersion } from "./min-keyman-version.js";
-import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguageFont, KeyboardInfoFilePlatform } from "./keyboard-info-file.js";
+import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguage, KeyboardInfoFileLanguageFont, KeyboardInfoFilePlatform } from "./keyboard-info-file.js";
 import { KeymanFileTypes, KmpJsonFile, KmxFileReader, KMX, KeymanTargets } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./keyboard-info-compiler-messages.js";
 import { getLangtagByTag } from "@keymanapp/langtags";
@@ -473,6 +473,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     }
 
     let commonScript = null;
+    let firstBcp47 = null;
 
     for(const bcp47 of Object.keys(keyboard_info.languages)) {
       const language = keyboard_info.languages[bcp47];
@@ -526,49 +527,97 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
         }
       }
 
-      //
-      // Add locale description
-      //
-      const locale = new Intl.Locale(bcp47);
-      // DisplayNames.prototype.of will throw a RangeError if it doesn't understand
-      // the format of the bcp47 tag. This happens with Node 18.14.1, for example, with:
-      //   new Intl.DisplayNames(['en'], {type: 'language'}).of('und-fonipa');
-      const mapName = (code: string, dict: Intl.DisplayNames) => {
-        try {
-           return dict.of(code);
-        } catch(e) {
-          if(e instanceof RangeError) {
-            return code;
-          } else {
-            throw e;
-          }
-        }
-      }
-      const tag = getLangtagByTag(bcp47) ?? getLangtagByTag(locale.language);
-      language.languageName = tag ? tag.name : bcp47;
-      language.regionName = mapName(locale.region, regionNames);
-      language.scriptName = mapName(locale.script, scriptNames);
+      ({ commonScript, firstBcp47 } = this.fillLanguageMetadata(language, bcp47, commonScript, firstBcp47));
 
-      language.displayName = language.languageName + (
-        (language.scriptName && language.regionName) ?
-        ` (${language.scriptName}, ${language.regionName})` :
-        language.scriptName ?
-        ` (${language.scriptName})` :
-        language.regionName ?
-        ` (${language.regionName})` :
-        ''
-      );
+    }
+    return true;
+  }
 
-      const resolvedScript = locale.script ?? getLangtagByTag(bcp47)?.script ?? getLangtagByTag(locale.language)?.script ?? undefined;
-      if(commonScript === null) {
-        commonScript = resolvedScript;
-      } else {
-        if(resolvedScript !== commonScript) {
-          this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Hint_ScriptDoesNotMatch({commonScript, bcp47, script: resolvedScript}))
+  private fillLanguageMetadata(language: KeyboardInfoFileLanguage, bcp47: string, commonScript: string, firstBcp47: string) {
+    //
+    // Add locale description
+    //
+
+    // #13160: Workaround for missing 'und' language tag.
+    //
+    // `(new Intl.Locale('und')).language` returns `undefined` in V8, as of 31
+    // March 2025. This means we cannot rely on `Intl.Locale` to parse the bcp47
+    // string for us. The implemented workaround is to replace `und` with a
+    // known-good language subtag, and then swap it back out in later
+    // processing.
+    const isUndefined = bcp47.startsWith('und');
+    const searchBcp47 = isUndefined ? ('mul' + bcp47.substring(3)) : bcp47;
+    const locale = new Intl.Locale(searchBcp47);
+    const localeLanguage = isUndefined ? 'und' : locale.language;
+
+    // DisplayNames.prototype.of will throw a RangeError if it doesn't understand
+    // the format of the bcp47 tag. This happens with Node 18.14.1, for example, with:
+    //   new Intl.DisplayNames(['en'], {type: 'language'}).of('und-fonipa');
+    const mapName = (code: string, dict: Intl.DisplayNames) => {
+      try {
+          return dict.of(code);
+      } catch(e) {
+        if(e instanceof RangeError) {
+          return code;
+        } else {
+          throw e;
         }
       }
     }
-    return true;
+    const tag = getLangtagByTag(bcp47) ?? getLangtagByTag(localeLanguage);
+    language.languageName = tag ? tag.name : bcp47;
+    language.regionName = mapName(locale.region, regionNames);
+    language.scriptName = mapName(locale.script, scriptNames);
+
+    language.displayName = language.languageName + (
+      (language.scriptName && language.regionName) ?
+      ` (${language.scriptName}, ${language.regionName})` :
+      language.scriptName ?
+      ` (${language.scriptName})` :
+      language.regionName ?
+      ` (${language.regionName})` :
+      ''
+    );
+
+    if(firstBcp47 === null) {
+      firstBcp47 = bcp47;
+    }
+
+    if(tag === undefined) {
+      if(this.isPrivateUseLanguageSubtag(localeLanguage.toLowerCase())) {
+        // Private use language subtag [BCP 47 2.2.1.3]. TODO: consider a hint
+      } else {
+        if(bcp47 == localeLanguage) {
+          this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Warn_LanguageTagNotFound2({bcp47}));
+        } else {
+          this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Warn_LanguageTagNotFound({
+            bcp47,
+            langSubtag: localeLanguage
+          }));
+        }
+        return { commonScript, firstBcp47 };
+      }
+    }
+
+    const resolvedScript = locale.script ?? tag?.script ?? undefined;
+    if(commonScript === null) {
+      commonScript = resolvedScript;
+    } else {
+      if(resolvedScript !== commonScript) {
+        this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Hint_ScriptDoesNotMatch({
+          commonScript: commonScript,
+          bcp47,
+          script: resolvedScript ?? '(undefined)',
+          firstBcp47
+        }));
+      }
+    }
+
+    return { commonScript, firstBcp47 };
+  }
+
+  private isPrivateUseLanguageSubtag(tag: string) {
+    return tag >= 'qaa' && tag <= 'qtz';
   }
 
   /**
@@ -619,5 +668,10 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     }
     return result;
   }
+
+  /** @internal */
+  public unitTestEndPoints = {
+    fillLanguageMetadata: this.fillLanguageMetadata.bind(this),
+  };
 
 }

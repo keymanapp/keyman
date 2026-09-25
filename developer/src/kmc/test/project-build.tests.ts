@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { assert } from 'chai';
 import 'mocha';
@@ -6,14 +9,15 @@ import { makePathToFixture } from './helpers/index.js';
 import { InfrastructureMessages } from '../src/messages/infrastructureMessages.js';
 import { clearOptions } from '../src/util/options.js';
 
-const callbacks = new TestCompilerCallbacks();
 
 describe('BuildProject', function () {
+  const callbacks = new TestCompilerCallbacks(this);
+
   it('should build a keyboard project', async function() {
     clearOptions();
     const builder = new BuildProject();
     const path = makePathToFixture('relative_paths', 'k_000___null_keyboard.kpj');
-    let result = await builder.build(path, null, callbacks, {
+    const result = await builder.build(path, null, callbacks, {
       shouldAddCompilerVersion: false,
       compilerWarningsAsErrors: true,
       saveDebug: false,

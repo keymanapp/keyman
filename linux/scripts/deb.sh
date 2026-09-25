@@ -15,14 +15,14 @@ mkdir -p builddebs
 
 # make the source packages
 cd builddebs
-vers=$(ls ../dist/keyman_*.orig.tar.gz)
+vers=$(ls ../dist/keyman_*.orig.tar.xz)
 #echo "vers1:${vers}"
 vers=${vers##*_}
 #echo "vers2:${vers}"
-vers=${vers%*.orig.tar.gz}
+vers=${vers%*.orig.tar.xz}
 #echo "vers3:${vers}"
-cp -a "../dist/keyman_${vers}.orig.tar.gz" .
-tar xfz "keyman_${vers}.orig.tar.gz"
+cp -a "../dist/keyman_${vers}.orig.tar.xz" .
+tar xfJ "keyman_${vers}.orig.tar.xz"
 cp -a ../../debian "keyman-${vers}"
 cd "keyman-${vers}"
 dch -v "${vers}-1" "local build"

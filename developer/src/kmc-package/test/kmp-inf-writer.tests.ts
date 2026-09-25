@@ -20,8 +20,8 @@ describe('KmpInfWriter', function () {
     const fixtureANSI = new TextDecoder('cp1252').decode(fixtureKmpInf);
     const testANSI = new TextDecoder('cp1252').decode(test);
 
-    let testItems = parseInf(testANSI);
-    let fixtureItems = parseInf(fixtureANSI);
+    const testItems = parseInf(testANSI);
+    const fixtureItems = parseInf(fixtureANSI);
     assert.deepEqual(testItems, fixtureItems);
   });
 });
@@ -36,8 +36,9 @@ type InfFile = {[name:string]: Section};
  * which never repeats
  */
 function parseInf(inf: string): InfFile {
-  let items = inf.replaceAll(/\r\n/g, '\n').split('\n');
-  let sections: InfFile = {}, newSection: Section = {};
+  const items = inf.replaceAll(/\r\n/g, '\n').split('\n');
+  const sections: InfFile = {};
+  let newSection: Section = {};
   sections[0] = newSection;
   for(let item of items) {
     item = item.trim();

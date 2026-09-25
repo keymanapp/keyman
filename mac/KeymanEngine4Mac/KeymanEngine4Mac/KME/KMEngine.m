@@ -8,10 +8,6 @@
 
 #import "KMEngine.h"
 #import "KMBinaryFileFormat.h"
-#import "KMCompStore.h"
-#import "KMCompGroup.h"
-#import "KMCompKey.h"
-#import "NSString+XString.h"
 #import "WindowsVKCodes.h"
 #import "MacVKCodes.h"
 #import "CoreWrapper.h"

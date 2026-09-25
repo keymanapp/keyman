@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import unittest
 
 from keyman_config.bcp47tag import Bcp47Tag

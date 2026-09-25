@@ -70,7 +70,6 @@
 
 #include "compfile.h"
 #include <kmn_compiler_errors.h>
-#include "../../../../common/windows/cpp/include/vkeys.h"
 #include <cuchar>
 #include "versioning.h"
 #include "kmcmplib.h"
@@ -78,11 +77,11 @@
 #include "cp1252.h"
 #include "virtualcharkeys.h"
 
-// TODO: These three should be under common/cpp/include -- not windows specific
-#include "../../../../common/windows/cpp/include/keymanversion.h"
-#include "../../../../common/windows/cpp/include/crc32.h"
-#include "../../../../common/windows/cpp/include/ConvertUTF.h"
+#include "km_vkey.h"
+#include "vkeys.h"
+#include "keymanversion.h"
 
+#include "crc32.h"
 #include "debugstore.h"
 #include "NamedCodeConstants.h"
 
@@ -103,6 +102,7 @@
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 #include "km_u16.h"
+#include "validation.h"
 
 /* These macros are adapted from winnt.h and legacy use only */
 #define MAKELANGID(p, s)       ((((uint16_t)(s)) << 10) | (uint16_t)(p))
@@ -120,6 +120,7 @@ namespace kmcmp{
   KMX_BOOL FOldCharPosMatching = FALSE;
   int CompileTarget;
   int BeginLine[4];
+  int TargetVersion;
 
   KMX_BOOL IsValidCallStore(PFILE_STORE fs);
   void CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
@@ -238,6 +239,9 @@ kmcmp_LoadFileProc kmcmp::loadfileproc = NULL;
 int kmcmp::currentLine = 0;
 
 kmcmp::NamedCodeConstants *kmcmp::CodeConstants = NULL;
+
+DefaultCompilerMessage compilerMessage;
+Validation validation(compilerMessage);
 
 PKMX_WCHAR strtowstr(PKMX_STR in)
 {
@@ -675,6 +679,10 @@ KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
       gp->fUsingKeys = TRUE;
   }
 
+  if(!validation.ValidateIdentifier(q, SZMAX_GROUPNAME)) {
+    return FALSE;
+  }
+
   safe_wcsncpy(gp->szName, q, SZMAX_GROUPNAME);
 
   gp->Line = kmcmp::currentLine;
@@ -793,6 +801,10 @@ KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
   sp->fIsStore = FALSE;
   sp->fIsDebug = FALSE;
   sp->fIsCall = FALSE;
+
+  if(!validation.ValidateIdentifier(q, SZMAX_STORENAME)) {
+    return FALSE;
+  }
 
   safe_wcsncpy(sp->szName, q, SZMAX_STORENAME);
   {
@@ -1120,6 +1132,12 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     break;
 
   case TSS_VERSION:
+    if(kmcmp::TargetVersion != 0) {
+      // If the targetVersion option is passed in, then we don't use automatic
+      // versioning, and we ignore the &VERSION store
+      // TODO-EMBED-OSK-IN-KMX: consider a compiler hint?
+      return TRUE;
+    }
     if ((fk->dwFlags & KF_AUTOMATICVERSION) == 0) {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_VersionAlreadyIncluded);
       return FALSE;
@@ -1144,6 +1162,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     else if (u16ncmp(p, u"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
     else if (u16ncmp(p, u"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
     else if (u16ncmp(p, u"17.0", 4) == 0)  fk->version = VERSION_170; // Flicks and gestures
+    else if (u16ncmp(p, u"19.0", 4) == 0)  fk->version = VERSION_190; // Embedded OSK
 
     else {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidVersion);
@@ -1188,6 +1207,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
       sp->dpString = q;
     }
     break;
+
   case TSS_KMW_RTL:
   case TSS_KMW_HELPTEXT:
     if(!VerifyKeyboardVersion(fk, VERSION_70)) {
@@ -1278,6 +1298,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
       return FALSE;
     }
     // Used by KMW compiler
+    fk->extra->touchLayoutFilename = string_from_u16string(sp->dpString);
     break;
 
   case TSS_KEYBOARDVERSION:   // I4140
@@ -2082,9 +2103,6 @@ int LineTokenType(PKMX_WCHAR *str)
   return T_UNKNOWN;
 }
 
-KMX_WCHAR const * DeadKeyChars =
-u"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
-
 KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
 {
   for (; *q; q++)
@@ -2185,7 +2203,12 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_DEADKEY;
-        if (!StrValidChrs(q, DeadKeyChars)) return KmnCompilerMessages::ERROR_InvalidDeadkey;
+
+        if(!validation.ValidateIdentifier(q, SZMAX_DEADKEYNAME)) {
+          // Note, this means 2 messages will be generated for invalid deadkey names
+          return KmnCompilerMessages::ERROR_InvalidDeadkey;
+        }
+
         tstr[mx++] = GetDeadKey(fk, q); //atoiW(q); 7-5-01: named deadkeys
         tstr[mx] = 0;
       }
@@ -3341,6 +3364,12 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataS
     wcslen(fk->szMessage)*2 + 2 +*/
     fk->dwBitmapSize;
 
+  if(fk->version >= VERSION_190) {
+    // For version 19+, we always reserve space for the KMX+
+    // header, but we'll write it out as null in kmcmplib
+    size += sizeof(COMP_KEYBOARD_KMXPLUSINFO);
+  }
+
   for (i = 0, fgp = fk->dpGroupArray; i < fk->cxGroupArray; i++, fgp++)
   {
     if (kmcmp::FSaveDebug) size += u16len(fgp->szName) * 2 + 2;
@@ -3382,21 +3411,13 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataS
 
   offset = sizeof(COMP_KEYBOARD);
 
-  /*ck->dpLanguageName = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szLanguageName);
-  offset += wcslen(fk->szLanguageName)*2 + 2;
-
-  ck->dpName = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szName);
-  offset += wcslen(fk->szName)*2 + 2;
-
-  ck->dpCopyright = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szCopyright);
-  offset += wcslen(fk->szCopyright)*2 + 2;
-
-  ck->dpMessage = offset;
-  wcscpy((PWSTR)(buf + offset), fk->szMessage);
-  offset += wcslen(fk->szMessage)*2 + 2;*/
+  if(fk->version >= VERSION_190) {
+    // Reserved space for KMX+ data
+    COMP_KEYBOARD_KMXPLUSINFO *kmxPlusInfo = reinterpret_cast<COMP_KEYBOARD_KMXPLUSINFO *>(buf + offset);
+    kmxPlusInfo->dpKMXPlus = 0;
+    kmxPlusInfo->dwKMXPlusSize = 0;
+    offset += sizeof(COMP_KEYBOARD_KMXPLUSINFO);
+  }
 
   ck->dpStoreArray = (KMX_DWORD)offset;
   sp = (PCOMP_STORE)(buf + offset);
@@ -3863,17 +3884,68 @@ bool hasPreamble(std::u16string result) {
   return result.size() > 0 && result[0] == 0xFEFF;
 }
 
+bool isValidUtf8(KMX_BYTE* str, int sz) {
+  int i = 0;
+  while (i < sz) {
+    int remaining = sz - i;
+    if (str[i] <= 0x7F) {
+      // ASCII
+      i++;
+    } else if ((str[i] & 0xE0) == 0xC0) {
+      // 2-byte sequence
+      if (remaining < 2 ||
+          (str[i + 1] & 0xC0) != 0x80 ||
+          str[i] == 0xC0 || // C0 and C1 are illegal values
+          str[i] == 0xC1) {
+        return false;
+      }
+      i += 2;
+    } else if ((str[i] & 0xF0) == 0xE0) {
+      // 3-byte sequence
+      if (remaining < 3 ||
+          (str[i+1] & 0xC0) != 0x80 ||
+          (str[i+2] & 0xC0) != 0x80) {
+        return false;
+      }
+      if (str[i] == 0xE0 && (str[i + 1] & 0xE0) == 0x80) {
+        return false;
+      }
+      if (str[i] == 0xED && (str[i + 1] & 0xE0) == 0xA0) {
+        return false;
+      }
+      i += 3;
+    } else if ((str[i] & 0xF8) == 0xF0) {
+      // 4-byte sequence
+      if (remaining < 4 ||
+          (str[i+1] & 0xC0) != 0x80 ||
+          (str[i+2] & 0xC0) != 0x80 ||
+          (str[i+3] & 0xC0) != 0x80) {
+        return false;
+      }
+      if (str[i] == 0xF0 && (str[i + 1] & 0xF0) == 0x80) {
+        return false;
+      }
+      if (str[i] > 0xF4 || (str[i] == 0xF4 && str[i + 1] > 0x8F)) {
+        return false;
+      }
+      i += 4;
+    } else {
+      return false;
+    }
+  }
+  return true;
+}
+
 bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16) {
   if(sz == 0) {
     return FALSE;
   }
 
   std::u16string result;
-
-  try {
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
-    result = converter.from_bytes((char*)infile, (char*)infile+sz);
-  } catch(std::range_error& e) {
+  if (isValidUtf8(infile, sz)) {
+    std::string infileStr(reinterpret_cast<const char*>(infile), sz);
+    result = u16string_from_string(infileStr);
+  } else {
     ReportCompilerMessage(KmnCompilerMessages::HINT_NonUnicodeFile);
     result.resize(sz);
     for(int i = 0; i < sz; i++) {

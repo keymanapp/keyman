@@ -28,8 +28,7 @@ import Distribution = LexicalModelTypes.Distribution;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import USVString = LexicalModelTypes.USVString;
-import PromiseStore from "./promise-store.js";
+import { PromiseStore } from "./promise-store.js";
 import { OutgoingMessage } from '@keymanapp/lm-message-types';
 
 /// <reference types="worker-interface.d.ts" />
@@ -54,7 +53,7 @@ import { OutgoingMessage } from '@keymanapp/lm-message-types';
  * The top-level LMLayer will automatically starts up its own Web Worker.
  */
 
-export default class LMLayer {
+export class LMLayer {
   /**
    * The underlying worker instance. By default, this is the LMLayerWorker.
    */
@@ -62,7 +61,7 @@ export default class LMLayer {
   /** Call this when the LMLayer has sent us the 'ready' message! */
   private _declareLMLayerReady: (conf: Configuration) => void;
   private _predictPromises: PromiseStore<Suggestion[]>;
-  private _wordbreakPromises: PromiseStore<USVString>;
+  private _wordbreakPromises: PromiseStore<string>;
   private _acceptPromises: PromiseStore<Reversion>;
   private _revertPromises: PromiseStore<Suggestion[]>;
   private _nextToken: number;
@@ -152,7 +151,7 @@ export default class LMLayer {
     });
   }
 
-  wordbreak(context: Context): Promise<USVString> {
+  wordbreak(context: Context): Promise<string> {
     let token = this._nextToken++;
     return new Promise((resolve, reject) => {
       this._wordbreakPromises.make(token, resolve, reject);
@@ -178,7 +177,7 @@ export default class LMLayer {
     });
   }
 
-  revertSuggestion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
+  revertSuggestion(reversion: Reversion, context: Context, appendedOnly?: boolean): Promise<Suggestion[]> {
     let token = this._nextToken++;
     return new Promise((resolve, reject) => {
       this._revertPromises.make(token, resolve, reject);
@@ -186,15 +185,17 @@ export default class LMLayer {
         message: 'revert',
         token: token,
         reversion: reversion,
-        context: context
+        context: context,
+        appendedOnly: appendedOnly
       })
     });
   }
 
-  resetContext(context: Context) {
+  resetContext(context: Context, stateId: number) {
     this._worker.postMessage({
       message: 'reset-context',
-      context: context
+      context: context,
+      stateId: stateId
     });
   }
 
@@ -202,11 +203,12 @@ export default class LMLayer {
   //       Worker code must recognize message and call self.close().
 
   private onMessage(event: MessageEvent): void {
-    let payload: OutgoingMessage = event.data;
+    const payload: OutgoingMessage = event.data;
     if (payload.message === 'error') {
-      console.error(payload.log);
-      if(payload.error) {
-        console.error(payload.error);
+      if (payload.error) {
+        console.error(`${payload.log}\n${payload.error}`);
+      } else {
+        console.error(payload.log);
       }
     }
     else if (payload.message === 'ready') {

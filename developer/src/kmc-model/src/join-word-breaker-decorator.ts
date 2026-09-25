@@ -15,7 +15,7 @@ export function decorateWithJoin(breaker: WordBreakingFunction, joiners: string[
   const delimiters = joiners.concat();
 
   return function (input: string): Span[] {
-    let originalSpans = breaker(input);
+    const originalSpans = breaker(input);
 
     // Implements a finite-state transducer (FST) where:
     //  - Transductions are pushed onto a stack
@@ -28,8 +28,8 @@ export function decorateWithJoin(breaker: WordBreakingFunction, joiners: string[
     //   (hence the for-loop over the input tape)
     // - each state is a JavaScript callback (function)
     let state = emptyStack;
-    let stack: Span[] = [];
-    for (let span of originalSpans) {
+    const stack: Span[] = [];
+    for (const span of originalSpans) {
       state = state(span);
     }
 
@@ -83,10 +83,10 @@ export function decorateWithJoin(breaker: WordBreakingFunction, joiners: string[
 
     /****************** Helpers ******************/
     function concatLastSpanInStackWith(span: Span) {
-      let lastIndex = stack.length - 1;
+      const lastIndex = stack.length - 1;
 
-      let top = stack[lastIndex];
-      let joinedSpan = concatenateSpans(top, span);
+      const top = stack[lastIndex];
+      const joinedSpan = concatenateSpans(top, span);
       stack[lastIndex] = joinedSpan;
     }
   }
@@ -120,7 +120,7 @@ export function decorateWithJoin(breaker: WordBreakingFunction, joiners: string[
    * When Array.prototype.include() doesn't exist:
    */
   function includes<T>(haystack: T[], needle: T): boolean {
-    for (let item of haystack) {
+    for (const item of haystack) {
       if (item === needle)
         return true;
     }

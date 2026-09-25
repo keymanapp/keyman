@@ -228,7 +228,6 @@
   <string name="SKCouldNotPrintKeyboard" comment="/FormatString: ">Klavye başarıyla yazdırılamadı. Lütfen bir web sayfasına kaydedin ve manuel olarak yazdırın.</string>
   <string name="SKDamagedKeyboard" comment="/FormatString: ">&lt;Klavye zarar görmüş&gt;</string>
   <string name="SKDebuggingWarning" comment="/FormatString: ">Keyman hata ayıklama bilgileri masaüstünüzde keymanlog\system.log adlı metin dosyasında saklanır.  Bu dosyayı okumadan ve silmeden önce Keyman çıkış yapmalısınız. UYARI: Bu dosya çok hızlı büyür.  Hata ayıklamayı etkinleştirmek sisteminizi yavaşlatır ve yalnızca Tavultesoft destek birimi tarafından tavsiye edilirse yapılmalıdır. GİZLİLİK UYARISI: Hata ayıklama günlük dosyası yazdığınız tuş vuruşlarının tamamını kaydeder.  Hata ayıklama günlüğünü sadece hata ayıklama veya tanılama oturumunun süresi için açmalısınız ve [masaüstü]\keymanlog\system.log dosyanızı en kısa sürede silmeniz gerekir.</string>
-  <string name="SKDefaultLanguageCode" comment="/FormatString: ">en</string>
   <string name="SKDialogSelectLanguage" comment="/FormatString: ">Kullanıcı Arabirimi Dili Seçin</string>
   <string name="SKDialogUILanguageCreateTranslation" comment="/FormatString: ">Çevrimiçi olarak yeni bir çeviri hazırla</string>
   <string name="SKDownloadProgress_Title" comment="/FormatString: ">Dosya İndiriyor</string>

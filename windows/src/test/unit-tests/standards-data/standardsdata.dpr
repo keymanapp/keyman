@@ -11,6 +11,7 @@ uses
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
+  DUnitX.Loggers.TeamCity in '..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas',
   Keyman.Test.System.Standards.LangTagsRegistryTest in 'Keyman.Test.System.Standards.LangTagsRegistryTest.pas',
   Keyman.Test.System.CanonicalLanguageCodeUtilsTest in 'Keyman.Test.System.CanonicalLanguageCodeUtilsTest.pas',
   Keyman.System.CanonicalLanguageCodeUtils in '..\..\..\..\..\common\windows\delphi\general\Keyman.System.CanonicalLanguageCodeUtils.pas',
@@ -64,6 +65,8 @@ begin
       System.Readln;
     end;
     {$ENDIF}
+
+    DUnitX.Loggers.TeamCity.ReportToTeamCity;
   except
     on E: Exception do
       System.Writeln(E.ClassName, ': ', E.Message);

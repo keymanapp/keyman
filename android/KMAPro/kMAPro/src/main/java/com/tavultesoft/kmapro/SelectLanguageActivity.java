@@ -8,11 +8,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
+import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.packages.PackageProcessor;
@@ -29,7 +29,7 @@ import java.util.List;
  * Also available during keyboard package installation that involves a language choice.
  * Displays a list of available language names for the user to add for a given installed packageID/keyboardID.
  */
-public class SelectLanguageActivity extends AppCompatActivity implements
+public class SelectLanguageActivity extends BaseActivity implements
     StepperLayout.StepperListener, SelectLanguageFragment.OnLanguagesSelectedListener {
   private final static String TAG = "SelectLanguageActivity";
   private File packagePath;
@@ -43,6 +43,7 @@ public class SelectLanguageActivity extends AppCompatActivity implements
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_select_language);
+    setupEdgeToEdge(R.id.select_language_layout);
 
     Bundle bundle = getIntent().getExtras();
     keyboard = (Keyboard)bundle.getSerializable("keyboard");

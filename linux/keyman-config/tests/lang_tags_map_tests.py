@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import unittest
 
 from keyman_config.standards.lang_tags_map import LangTagsMap
@@ -18,7 +18,7 @@ class LangTagsMapTests(unittest.TestCase):
         # Execute
         tag = LangTagsMap.lookupLangTags('sga')
         # Verify
-        self.assertEqual('sga-Ogam-IE', tag['full'])
+        self.assertEqual('sga-Latn-IE', tag['full'])
         self.assertFalse(tag['suppress'])
 
     def test_LookupLangTags_ScriptSuppress(self):

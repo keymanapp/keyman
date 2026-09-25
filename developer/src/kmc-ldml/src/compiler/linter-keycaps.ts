@@ -35,13 +35,13 @@ export class LinterKeycaps extends Linter {
                 const disp = this.findDisp(id.value, to.value);
 
                 if (!disp) {
-                    this.callbacks.reportMessage(LdmlCompilerMessages.Hint_NoDisplayForSwitch({ id: id.value }));
+                    this.callbacks.reportMessage(LdmlCompilerMessages.Hint_NoDisplayForSwitch({ id: id.value }, key));
                 }
             } else if (to.value !== '' && nonMarkerOutput === '') {
                 // has output, but only markers
                 const disp = this.findDisp(id.value, to.value);
                 if (!disp) {
-                    this.callbacks.reportMessage(LdmlCompilerMessages.Hint_NoDisplayForMarker({ id: id.value }));
+                    this.callbacks.reportMessage(LdmlCompilerMessages.Hint_NoDisplayForMarker({ id: id.value }, key));
                 }
             }
         }

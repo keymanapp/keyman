@@ -1,0 +1,11 @@
+c Description: Verifies that kmc reports an error with invalid names in groups, stores, and deadkeys
+
+c Note: currently generates ERROR_InvalidDeadkey
+
+store(&NAME) 'error_name_must_be_at_least_one_char_long-deadkey'
+
+begin unicode > use(main)
+
+group(main) using keys
+  deadkey() + [K_A] > 'a'
+

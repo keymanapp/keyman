@@ -6,6 +6,7 @@
     "docs",
     "feat",
     "fix",
+    "maint",
     "refactor",
     "style",
     "test"

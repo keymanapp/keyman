@@ -14,7 +14,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-basic.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 cd "$KEYMAN_ROOT/developer"
@@ -57,6 +57,7 @@ sourcemap_paths=(
   ./src/kmc/build
   ./src/kmc-analyze/build
   ./src/kmc-copy/build
+  ./src/kmc-convert/build
   ./src/kmc-generate/build
   ./src/kmc-keyboard-info/build
   ./src/kmc-kmn/build
@@ -80,7 +81,7 @@ upload_sourcemap() {
     --no-dedupe \
     --org keyman \
     --project keyman-developer \
-    --release "$VERSION_GIT_TAG"  \
+    --release "$KEYMAN_VERSION_GIT_TAG"  \
     --ext js --ext mjs --ext ts --ext map \
     "$smpath"
 }

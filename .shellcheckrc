@@ -1,5 +1,6 @@
 external-sources=true
 
-# If you get SC1091 for sourced files, add the following setting to
-# your .vscode/settings.json file:
-# "shellcheck.useWorkspaceRootAsCwd": false
+source-path=resources/build/
+source-path=resources/
+source-path=SCRIPTDIR
+source-path=linux/ibus-keyman/tests/scripts/

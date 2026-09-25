@@ -120,8 +120,8 @@
   </LanguageReference>
 
   <LanguageReference Name="beep" Title="beep">
-    <p>The beep statement produces a beep with the system speaker when the rule is matched. 
-    In Keyman Desktop, beep will produce the sound specified by "Asterisk" in Windows Sounds 
+    <p>The beep statement produces a beep with the system speaker when the rule is matched.
+    In Keyman for Windows, beep will produce the sound specified by "Asterisk" in Windows Sounds
     configuration.</p><br></br>
     <p>Syntax</p>
     <div class="code">
@@ -417,11 +417,6 @@
 
     <Control Name="cmdKMWBrowseHelpFile" Title="Browse Help File">
       <p>Choose a help file to include in the keyboard</p>
-    </Control>
-
-    <Control Name="cmdCompileKeymanWeb" Title="Compile to Web">
-      <p>Compiles the keyboard for KeymanWeb.  Two output files will be generated: [filename].js and [filename]_load.js.  The KeymanWeb Tutorial
-      contains more information about the difference between the two output files.</p>
     </Control>
 
     <Control Name="cmdTestKeymanWeb" Title="Test KeymanWeb Keyboard">

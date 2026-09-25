@@ -10,8 +10,9 @@
   ],
   "dependencies": {
     "@keymanapp/common-types": "*",
+    "@keymanapp/ldml-keyboard-constants": "*",
     "eventemitter3": "^5.0.0",
-    "fast-xml-parser": "^5.0.9",
+    "fast-xml-parser": "5.8.0",
     "path-browserify": "^1.0.1",
     "restructure": "^3.0.1",
     "sax": ">=0.6.0",
@@ -19,13 +20,13 @@
     "xmlbuilder": "~11.0.0"
   },
   "devDependencies": {
+    "@keymanapp/hextobin": "*",
     "@types/git-diff": "^2.0.3",
     "@types/node": "^20.4.1",
     "@types/path-browserify": "^1.0.3",
     "@types/semver": "^7.3.12",
     "c8": "^7.12.0",
     "git-diff": "^2.0.6",
-    "mocha": "^8.4.0",
     "typescript": "^5.4.5"
   },
   "scripts": {
@@ -44,6 +45,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keymanapp/keyman.git"
+    "url": "git+https://github.com/keymanapp/keyman.git",
+    "directory": "developer/src/common/web/utils"
   }
 }

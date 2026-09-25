@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (os_log_t)keyboardLog;
 + (os_log_t)keyLog;
 + (os_log_t)oskLog;
++ (os_log_t)keyTraceLog;
 + (os_log_t)testLog;
 
 @end

@@ -49,7 +49,7 @@ describe('The default searchTermToKey() function', function () {
       ['Ǆ', 'DZ'],
     ];
 
-    for (let [input, expected] of testCases) {
+    for (const [input, expected] of testCases) {
       it(`should normalize '${input}' to '${expected}'`, function() {
         assert.equal(defaultSearchTermToKey(input), expected);
       });
@@ -102,7 +102,7 @@ describe('The default searchTermToKey() function', function () {
     // as U+0130's default handling is... not ideal in Turkish.
     //
     // Instead, we can get a simple-enough test with inverted casing.
-    let customCasing = function(caseToApply: LexicalModelTypes.CasingForm,
+    const customCasing = function(caseToApply: LexicalModelTypes.CasingForm,
                                 text: string,
                                 defaultApplyCasing: LexicalModelTypes.CasingFunction): string {
       switch(caseToApply) {
@@ -117,11 +117,11 @@ describe('The default searchTermToKey() function', function () {
         }
     }
 
-    let customCasingClosure = function(caseToApply: LexicalModelTypes.CasingForm, text: string): string {
+    const customCasingClosure = function(caseToApply: LexicalModelTypes.CasingForm, text: string): string {
       return customCasing(caseToApply, text, defaultApplyCasing);
     }
 
-    for (let [input, expected] of testCases) {
+    for (const [input, expected] of testCases) {
       it(`should normalize '${input}' to '${expected}'`, function() {
         assert.equal(defaultCasedSearchTermToKey(input, customCasingClosure as LexicalModelTypes.CasingFunction), expected);
       });
@@ -173,7 +173,7 @@ describe('The default searchTermToKey() function', function () {
       ['Ǆ', 'dz'],
     ];
 
-    for (let [input, expected] of testCases) {
+    for (const [input, expected] of testCases) {
       it(`should normalize '${input}' to '${expected}'`, function() {
         assert.equal(defaultCasedSearchTermToKey(input, defaultApplyCasing), expected);
       });

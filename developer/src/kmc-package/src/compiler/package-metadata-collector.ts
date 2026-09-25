@@ -17,13 +17,13 @@ export class PackageMetadataCollector {
   constructor(private callbacks: CompilerCallbacks) {}
 
   public collectKeyboardMetadata(kpsFilename: string, kmp: KmpJsonFile.KmpJsonFile): KeyboardMetadataCollection {
-    let result: KeyboardMetadataCollection = {};
+    const result: KeyboardMetadataCollection = {};
 
     if(!kmp.keyboards) {
       return result;
     }
 
-    for(let keyboard of kmp.keyboards) {
+    for(const keyboard of kmp.keyboards) {
       result[keyboard.id] = this.getKeyboardFileData(kpsFilename, kmp, keyboard);
       if(!result[keyboard.id]) {
         // Warnings or errors will have been raised by getKeyboardFileData

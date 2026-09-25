@@ -45,6 +45,8 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   messages: CompilerEvent[] = [];
   messageCount = 0;
   messageFilename: string = '';
+  /** cache of the contentes of the text */
+  messageFiletext: string = '';
   maxLogMessages = MaxMessagesDefault;
 
   constructor(private options: CompilerCallbackOptions) {
@@ -55,6 +57,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     this.messages = [];
     this.messageCount = 0;
     this.messageFilename = '';
+    this.messageFiletext = '';
   }
 
   /**
@@ -154,6 +157,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
       // Reset max message limit when a new file is being processed
       this.messageFilename = event.filename;
       this.messageCount = 0;
+      this.messageFiletext = '';
     }
 
     const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);
@@ -238,22 +242,26 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
    * We treat a few certain infrastructure messages with special colours
    * @param event
    * @returns
+   * Keep in sync with: UfrmMessages.pas, TfrmMessages.Add
    */
   messageSpecialColor(event: CompilerEvent) {
     switch(event.code) {
       case InfrastructureMessages.INFO_BuildingFile:
       case InfrastructureMessages.INFO_CopyingProject:
       case InfrastructureMessages.INFO_GeneratingProject:
+      case InfrastructureMessages.INFO_ValidatingProject:
         return color.whiteBright;
       case InfrastructureMessages.INFO_FileNotBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectNotBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectNotCopiedSuccessfully:
       case InfrastructureMessages.INFO_ProjectNotGeneratedSuccessfully:
+      case InfrastructureMessages.INFO_ProjectNotValidatedSuccessfully:
         return color.red;
       case InfrastructureMessages.INFO_FileBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectCopiedSuccessfully:
       case InfrastructureMessages.INFO_ProjectGeneratedSuccessfully:
+      case InfrastructureMessages.INFO_ProjectValidatedSuccessfully:
         return color.green;
     }
     return null;

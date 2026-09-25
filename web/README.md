@@ -1,5 +1,5 @@
 # Keyman Engine for Web
-The Original Code is (C) SIL International
+The Original Code is (C) SIL Global
 
 ## Prerequisites
 See [build configuration](../docs/build/index.md) for details on how to
@@ -85,7 +85,7 @@ graph TD;
     KeyboardSpec["/web/src/engine/keyboard"];
     JSProc["/web/src/engine/js-processor"];
     OSK-->KeyboardSpec;
-    WebUtils["@keymanapp/web-utils<br>(/web/src/engine/common/web-utils)"];
+    WebUtils["/web/src/common/web-utils"];
     KeyboardSpec---->WebUtils;
     Wordbreakers["@keymanapp/models-wordbreakers<br>(/web/src/engine/predictive-text/wordbreakers)"];
     Models["@keymanapp/models-templates<br>(/web/src/engine/predictive-text/templates/)"];
@@ -95,7 +95,7 @@ graph TD;
     LMWorker-->Wordbreakers;
     LMLayer["@keymanapp/lexical-model-layer<br>(/web/src/engine/predictive-text/worker-main)"];
     LMLayer-->LMWorker;
-    Gestures["@keymanapp/gesture-recognizer<br>(/web/src/engine/osk/gesture-recognizer)"];
+    Gestures["/web/src/engine/gesture-processor"];
     Gestures-->WebUtils;
 
     subgraph PredText["PredText: WebWorker + its interface"]
@@ -117,7 +117,7 @@ graph TD;
 
     subgraph ClassicWeb["`**ClassicWeb**
     Intermediate-level engine modules`"]
-        Elements["/web/src/engine/element-wrappers"];
+        Elements["/web/src/engine/element-text-stores"];
         Elements-->JSProc;
         KeyboardStorage["/web/src/engine/keyboard-storage"];
         KeyboardStorage-->Interfaces;

@@ -41,14 +41,6 @@ object Messages: TStockMessages
           Parameters = <>
         end
         item
-          Name = 'SKDefaultLanguageCode'
-          DefStr = 'en'
-          Comment =
-            'The default language code for this product.  This should be the ' +
-            'language that the product is created in'
-          Parameters = <>
-        end
-        item
           Name = 'SKButtonUILanguageDownload'
           DefStr = 'More Languages Online...'
           Parameters = <>

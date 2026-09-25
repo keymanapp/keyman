@@ -27,6 +27,7 @@ export function declareBuild(program: Command) {
     .option('-W, --no-compiler-warnings-as-errors', 'Warnings do not fail the build; overrides project-level warnings-as-errors option')
     .option('-m, --message <number>', 'Adjust severity of info, hint or warning message to Disable (default), Info, Hint, Warn or Error (option can be repeated)',
       (value, previous) => previous.concat([value]), [])
+    .option('--target-version <number>', 'Target version of Keyman for compiled objects (default is minimum version that supports all features in the object)')
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles');
 
@@ -35,6 +36,7 @@ export function declareBuild(program: Command) {
   buildCommand.command('file [infile...]', {isDefault: true})
     .description(`Compile one or more source files or projects ('file' subcommand is default).`)
     .option('--for-publishing', 'Verify that project meets @keymanapp repository requirements')
+    .option('--publish-only', 'Only run the for-publishing validation, skip all other build steps')
     .addHelpText('after', `
 Supported file types:
 * folder: Keyman project in folder
@@ -103,7 +105,7 @@ async function buildFile(filenames: string[], _options: any, commander: any): Pr
     return await exitProcess(1);
   }
 
-  for(let filename of filenames) {
+  for(const filename of filenames) {
     if(!await build(filename, commanderOptions.outFile, callbacks, options)) {
       // Once a file fails to build, we bail on subsequent builds
       return await exitProcess(1);
@@ -135,7 +137,7 @@ async function build(filename: string, outfile: string, parentCallbacks: NodeCom
       builder = new BuildProject();
     } else {
       // Otherwise, if it's one of our known file extensions, we build it
-      let extensions: string[] = [];
+      const extensions: string[] = [];
       builder = buildActivities.find(build => {
         extensions.push(build.sourceExtension);
         return filename.toLowerCase().endsWith(build.sourceExtension);

@@ -29,8 +29,8 @@ the images on the right, please check the following:
 -   If you copy and paste text that you have typed in KeymanWeb into
     another application such as Microsoft Word, you may find that it
     does not display. In this case, you will need to installing the
-    Keyman Desktop package for the keyboard onto your computer. You can
-    download the Keyman Desktop package by clicking the "Help on this
+    Keyman for Windows package for the keyboard onto your computer. You can
+    download the Keyman for Windows package by clicking the "Help on this
     keyboard" link in the On Screen Keyboard.
 -   An [embedded font test page](embedded_fonts) is available for further testing of embedded font support on your computer.
 
@@ -43,8 +43,8 @@ the images on the right, please check the following:
 If you find that you can see the characters for a language on screen,
 but they don't display quite right, you may be experiencing a limitation
 in your operating system. An example of this is visible in the Tibetan
-script on the right. Installing Keyman Desktop or Keyman for Mac may
-help resolve these issues.
+script on the right. Installing Keyman for Windows, Keyman for Linux,
+or Keyman for macOS may help resolve these issues.
 
 <span id="two"></span>
 
@@ -89,4 +89,4 @@ please check the following:
 
 If you are experiencing continued difficulty in using KeymanWeb and have not been able to find a solution on this page, [click here](/contact).
 
-  
+

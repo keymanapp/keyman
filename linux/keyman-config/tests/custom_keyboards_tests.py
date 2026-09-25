@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import unittest
 from unittest.mock import patch
 from keyman_config import __version__

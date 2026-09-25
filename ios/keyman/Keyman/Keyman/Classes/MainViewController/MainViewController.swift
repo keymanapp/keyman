@@ -67,6 +67,10 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var keyboardPickerDismissedObserver: NotificationObserver?
   private var keyboardChangedObserver: NotificationObserver?
   private var keyboardRemovedObserver: NotificationObserver?
+  
+  var shouldKeyboardBeVisible: Bool {
+    return navigationController?.visibleViewController == self
+  }
 
   var appDelegate: AppDelegate! {
     return UIApplication.shared.delegate as? AppDelegate
@@ -498,7 +502,9 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     // queue is complete.  There are still ongoing calculations - including within the
     // keyboard's WebView itself!  (This function's call is actually triggered _by_ it!)
     DispatchQueue.main.async {
-      self.textView.becomeFirstResponder()
+      if self.shouldKeyboardBeVisible {
+        self.textView.becomeFirstResponder()
+      }
     }
     if shouldShowGetStarted {
       perform(#selector(self.showGetStartedView), with: nil, afterDelay: 1.0)

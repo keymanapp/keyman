@@ -36,12 +36,11 @@
 
 #include "pch.h"
 
-extern WCHAR CharFromVK_NT(WORD *VKey, UINT ShiftFlags);   // I4582
-
 WORD VkToVkByScanCode[256] = {0};
 WORD USVkToVkByScanCode[256] = {0};   // I3762
 
-extern BOOL KeyboardGivesCtrlRAltForRAlt_NT();
+WORD VKToScanCodeToVK(WORD VKey);
+WCHAR MapVirtualKeys(WORD keyCode, UINT shiftFlags);
 
 /************************************************************************/
 /* CharFromVK: Return a character code from a virtual key code          */
@@ -55,8 +54,6 @@ WCHAR CharFromVK(WORD *VKey, UINT ShiftFlags)   // I4582
 
 	*VKey = VKToScanCodeToVK(*VKey);
 	return MapVirtualKeys(*VKey, ShiftFlags);
-
-  //return CharFromVK_NT(VKey, ShiftFlags);
 }
 
 /* I3358 - reserved keys for mapping.  Note that some of these will not get here in AIWin2000Unicode mode due to being blocked in KeyboardProc.  They'll still get here via TSF though */   // I3535
@@ -228,15 +225,4 @@ WCHAR MapVirtualKeys(WORD keyCode, UINT shiftFlags)
 	}
 	return 0;
 	//keyCode;
-}
-
-/*
- For some reason, keyboards that use RAlt as a shifter modify it internally to Ctrl+RAlt, which
- just confuses the heck out of keyboards that use RAlt.  So we work around by recognising this and
- adding Ctrl to the tests for these layouts.
-*/
-
-BOOL KeyboardGivesCtrlRAltForRAlt()
-{
-	return KeyboardGivesCtrlRAltForRAlt_NT();
 }

@@ -1,18 +1,22 @@
-// Is not `extend`ed by any tsconfigs; this is solely to build all app/ targets.
-// Doesn't bundle them, though, so there are limits to the usefulness of this file.
+// This file lists all the child modules, for completeness. However, there are
+// steps like bundling and sourcing external resources that are not performed by
+// tsc, so there are limits to the usefulness of this file.
 {
-  "extends": "../tsconfig.base.json",
-
-  "compilerOptions": {
-    "baseUrl": "./",
-    "outDir": "../build",
-    "tsBuildInfoFile": "../build/tsconfig.all.tsbuildinfo",
-    "rootDir": "./"
-  },
-  "files": [],
   "references": [
     { "path": "app/browser" },
     { "path": "app/webview" },
-    { "path": "app/ui" }
+    { "path": "app/ui" },
+
+    { "path": "common/web-utils" },
+    { "path": "engine/" },
+    { "path": "engine/predictive-text/types/" },
+    { "path": "engine/predictive-text/templates" },
+    { "path": "engine/predictive-text/wordbreakers" },
+    { "path": "engine/predictive-text/worker-main/tsconfig.all.json" },
+    { "path": "engine/predictive-text/worker-thread" },
+    { "path": "tools/testing/gesture-processor/unit-test-resources" },
+
+    { "path": "tools/testing/recorder" },
+    // { "path": "tools/sourcemap-root/tsconfig.json" },
   ],
 }

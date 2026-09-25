@@ -62,7 +62,7 @@ const
     'Keyman Developer Setup',
     'Keyman Developer %0:s Setup',
     'Setup will install %0:s',
-    'Created by SIL International',
+    'Created by SIL Global',
     'Check for &updates online before installing',
     '&Install Keyman Developer',
     'E&xit',

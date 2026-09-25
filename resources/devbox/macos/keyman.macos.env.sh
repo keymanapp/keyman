@@ -15,13 +15,13 @@ export PATH=$ANDROID_HOME/platform-tools:$PATH
 export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
 export PATH=$ANDROID_HOME/build-tools/30.0.3:$PATH
 
-if [ -z "$HOMEBREW_PREFIX" ]; then
+if [ -z "${HOMEBREW_PREFIX+x}" ]; then
   HOMEBREW_PREFIX=`brew --prefix`
 fi
 
 export PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
-export PATH="$HOMEBREW_PREFIX/opt/java11/bin:$PATH"
-export JAVA_HOME="$HOMEBREW_PREFIX/opt/java11"
+export PATH="$HOMEBREW_PREFIX/opt/openjdk@21/bin:$PATH"
+export JAVA_HOME="$HOMEBREW_PREFIX/opt/openjdk@21"
 
 # Python 2.7
 eval "$(pyenv init --path)"

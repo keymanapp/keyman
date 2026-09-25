@@ -9,13 +9,13 @@ describe('Model definition pseudoclosures', function () {
     describe('languageUsesCasing == true', function() {
       // We don't need a complete spec for this, given the (currently) limited range of what
       // the ModelPseudoclosure covers.
-      let modelSource: LexicalModelSource = {
+      const modelSource: LexicalModelSource = {
         languageUsesCasing: true,
         sources: [],
         format: 'trie-1.0'
       };
 
-      let pseudoclosure = new ModelDefinitions(modelSource);
+      const pseudoclosure = new ModelDefinitions(modelSource);
 
       const testCases: [string, string, string][] = [
         // Note:  not written the Turkish way.  Turns out 'İ'.toLowerCase() decomposes the result,
@@ -45,7 +45,7 @@ describe('Model definition pseudoclosures', function () {
         ["‘", "‘", "'"]
       ];
 
-      for (let [input, cased, keyed] of testCases) {
+      for (const [input, cased, keyed] of testCases) {
         it(`should case '${input}' as '${cased}'`, function() {
           assert.equal(pseudoclosure.applyCasing('lower', input), cased);
         });
@@ -59,13 +59,13 @@ describe('Model definition pseudoclosures', function () {
     describe('languageUsesCasing == false', function() {
       // We don't need a complete spec for this, given the (currently) limited range of what
       // the ModelPseudoclosure covers.
-      let modelSource: LexicalModelSource = {
+      const modelSource: LexicalModelSource = {
         languageUsesCasing: false,
         sources: [],
         format: 'trie-1.0'
       };
 
-      let pseudoclosure = new ModelDefinitions(modelSource);
+      const pseudoclosure = new ModelDefinitions(modelSource);
 
       const testCases: [string, string][] = [
         // Note:  not written the Turkish way.  Turns out 'İ'.toLowerCase() decomposes the result,
@@ -91,7 +91,7 @@ describe('Model definition pseudoclosures', function () {
         ["‘", "'"]
       ];
 
-      for (let [input, keyed] of testCases) {
+      for (const [input, keyed] of testCases) {
         it(`should key  '${input}' as '${keyed}'`, function() {
           assert.equal(pseudoclosure.searchTermToKey(input), keyed);
         });
@@ -101,12 +101,12 @@ describe('Model definition pseudoclosures', function () {
   describe('Pre 14.0 defaults (languageUsesCasing == undefined)', function() {
     // We don't need a complete spec for this, given the (currently) limited range of what
     // the ModelPseudoclosure covers.
-    let modelSource: LexicalModelSource = {
+    const modelSource: LexicalModelSource = {
       sources: [],
       format: 'trie-1.0'
     };
 
-    let pseudoclosure = new ModelDefinitions(modelSource);
+    const pseudoclosure = new ModelDefinitions(modelSource);
 
     const testCases: [string, string][] = [
       // Note:  not written the Turkish way.  Turns out 'İ'.toLowerCase() decomposes the result,
@@ -129,7 +129,7 @@ describe('Model definition pseudoclosures', function () {
       ['1234.?!', '1234.?!']
     ];
 
-    for (let [input, keyed] of testCases) {
+    for (const [input, keyed] of testCases) {
       it(`should key  '${input}' as '${keyed}'`, function() {
         assert.equal(pseudoclosure.searchTermToKey(input), keyed);
       });
@@ -139,7 +139,7 @@ describe('Model definition pseudoclosures', function () {
   describe('Model-defined applyCasing + (dependent) searchTermToKey', function() {
     // Note:  this test only implements enough Turkish-related stuff to facilitate
     // a functional test.  Not guaranteed to be sufficient for actual Turkish use.
-    let turkishCasing = function(form: LexicalModelTypes.CasingForm, text: string, defaultApplyCasing: (form: LexicalModelTypes.CasingForm, text: string) => string): string {
+    const turkishCasing = function(form: LexicalModelTypes.CasingForm, text: string, defaultApplyCasing: (form: LexicalModelTypes.CasingForm, text: string) => string): string {
       switch(form) {
       case 'lower':
         return defaultApplyCasing(form, text
@@ -156,7 +156,7 @@ describe('Model definition pseudoclosures', function () {
       }
     }
 
-    let modelSource: LexicalModelSource = {
+    const modelSource: LexicalModelSource = {
       languageUsesCasing: true,
       applyCasing: turkishCasing,
       searchTermToKey: function(wordform: string, applyCasing: LexicalModelTypes.CasingFunction): string {
@@ -170,7 +170,7 @@ describe('Model definition pseudoclosures', function () {
       format: 'trie-1.0'
     };
 
-    let pseudoclosure = new ModelDefinitions(modelSource);
+    const pseudoclosure = new ModelDefinitions(modelSource);
 
     const testCases: [string, string, string][] = [
       ['İstanbul', 'istanbul', 'istanbul'],
@@ -186,7 +186,7 @@ describe('Model definition pseudoclosures', function () {
       ['1234.?!', '1234.?!', '1234.?!']
     ];
 
-    for (let [input, cased, keyed] of testCases) {
+    for (const [input, cased, keyed] of testCases) {
       it(`should case '${input}' as '${cased}'`, function() {
         assert.equal(pseudoclosure.applyCasing('lower', input), cased);
       });

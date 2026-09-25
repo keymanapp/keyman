@@ -75,11 +75,11 @@ namespace km {
     mock_processor::mock_processor(core::path const & path)
     : abstract_processor(
         keyboard_attributes(path.stem(), u"3.145", {
-          option{KM_CORE_OPT_KEYBOARD, u"__test_point", u"not tiggered"},
+          option{KM_CORE_OPT_KEYBOARD, u"test_keyboard_option", u"default_value"},
         })),
       _options({
-          {u"\x01__test_point", u"not tiggered"},
-          {u"\x02hello", u"-"}
+          {u"\x01test_keyboard_option", u"default_value"},
+          {u"\x02test_env_option", u"-"}
       })
     {
     }
@@ -125,8 +125,16 @@ namespace km {
     {
       assert(state);
       assert(action_item);
-      if ((!state) || (!action_item))
+      if ((!state) || (!action_item)) {
         return false;
+      }
+      // For this mock processor we only support queuing PERSIST_OPT action items.
+      if (action_item->type == KM_CORE_IT_PERSIST_OPT && action_item->option) {
+        state->actions().push_persist(update_option(static_cast<km_core_option_scope>(action_item->option->scope),
+                        action_item->option->key,
+                        action_item->option->value));
+        return true;
+      }
       return false;
     }
 
@@ -162,8 +170,20 @@ namespace km {
         {
           state->actions().push_persist(
             update_option(KM_CORE_OPT_KEYBOARD,
-                        u"__test_point",
+                        u"test_keyboard_option",
                         u"F2 pressed test save."));
+          break;
+        }
+        case KM_CORE_VKEY_F3:
+        {
+          state->actions().push_persist(
+            update_option(KM_CORE_OPT_KEYBOARD,
+                        u"__test_point_3",
+                        u"F3 pressed test save 1."));
+          state->actions().push_persist(
+            update_option(KM_CORE_OPT_KEYBOARD,
+                        u"__test_point_4",
+                        u"F3 pressed test save 2."));
           break;
         }
 

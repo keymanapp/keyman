@@ -2,8 +2,17 @@ plugins {
     id 'com.android.application'
 }
 
+ext.rootPath = '../../../'
+apply from: "$rootPath/version.gradle"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 android {
-    compileSdk 34
+    compileSdk 36
     namespace="com.keyman.kmsample2"
 
     // Don't compress kmp files so they can be copied via AssetManager
@@ -11,32 +20,46 @@ android {
         noCompress "kmp"
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId "com.keyman.kmsample2"
         minSdkVersion 21
-        targetSdkVersion 34
-        versionCode 1
-        versionName "1.0"
+        targetSdkVersion 36
+
+        // KEYMAN_VERSION_CODE, KEYMAN_VERSION_NAME, KEYMAN_VERSION_FOR_FILENAME from version.gradle
+        versionCode KEYMAN_VERSION_CODE as Integer
+        versionName KEYMAN_VERSION_NAME
+        buildConfigField "String", "KEYMAN_VERSION_ENVIRONMENT", "\""+KEYMAN_VERSION_ENVIRONMENT+"\""
+        archivesBaseName = "KMSample2-$KEYMAN_VERSION_FOR_FILENAME"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
 }
 
 repositories {
-    flatDir {
-        dirs 'libs'
-    }
     google()
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'com.google.android.material:material:1.12.0'
-    api (name:'keyman-engine', ext:'aar')
+    implementation files('libs/keyman-engine.aar')
     implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.webkit:webkit:1.14.0'
 }

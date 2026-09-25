@@ -384,10 +384,11 @@ group.
 | `auto` | [search][search-auto] | For PRs only: automatically-opened PRs, e.g. opened by CI. |
 | `bug` | [search][search-bug] | For issues only: confirmed bugs or reports that are very likely to be bugs. PRs use `fix` to mark a bug fix. |
 | `change` | [search][search-change] | Minor change in functionality, but not new. |
-| `chore` | [search][search-chore] | Cleanup work, maintenance, without change in functionality. |
+| `chore` | [search][search-chore] | Cleanup work, without change in functionality. |
 | `docs` | [search][search-docs] | Relating to any type of documentation. |
 | `feat` | [search][search-feat] | Feature requests. |
 | `fix` | [search][search-fix] | For PRs only: a bug fix, corresponds to issue label `bug`. |
+| `maint` | [search][search-maint] | Maintenance work -- continuous integration, build scripts, infrastructure. |
 | `question` | [search][search-question] | Questions more than bug reports or feature requests (e.g. how do I do X). [**Usually better on the Keyman Community**](https://community.software.sil.org/c/keyman) |
 | `refactor` | [search][search-refactor] | Code reorganization and refactoring, without change in functionality. |
 | `spec` | [search][search-spec] | Issues which are specifications for a large scale feature. |
@@ -443,6 +444,7 @@ These labels also include sublabels, such as `windows/config/`.
 [search-docs]: https://github.com/keymanapp/keyman/labels/docs
 [search-feat]: https://github.com/keymanapp/keyman/labels/feat
 [search-fix]: https://github.com/keymanapp/keyman/labels/fix
+[search-maint]: https://github.com/keymanapp/keyman/labels/maint
 [search-question]: https://github.com/keymanapp/keyman/labels/question
 [search-spec]: https://github.com/keymanapp/keyman/labels/spec
 [search-style]: https://github.com/keymanapp/keyman/labels/style

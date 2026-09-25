@@ -1,11 +1,20 @@
 import * as models from '@keymanapp/models-templates';
-
-import TransformUtils from './transformUtils.js';
-import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
-import { ContextTracker, TrackedContextState } from './correction/context-tracker.js';
-import { ExecutionTimer } from './correction/execution-timer.js';
-import ModelCompositor from './model-compositor.js';
+import { KMWString } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
+import { searchForProperty, WordBreakProperty } from '@keymanapp/models-wordbreakers';
+
+import { TransformUtils } from './transformUtils.js';
+import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
+import { ContextTokenization } from './correction/context-tokenization.js';
+import { ContextTracker } from './correction/context-tracker.js';
+import { ContextToken } from './correction/context-token.js';
+import { ContextState, determineContextSlideTransform } from './correction/context-state.js';
+import { ContextTransition, TransitionReversionView } from './correction/context-transition.js';
+import { ExecutionTimer } from './correction/execution-timer.js';
+import { ModelCompositor } from './model-compositor.js';
+import { getBestTokenMatches } from './correction/distance-modeler.js';
+
+import CasingForm = LexicalModelTypes.CasingForm;
 import Context = LexicalModelTypes.Context;
 import Distribution = LexicalModelTypes.Distribution;
 import Keep = LexicalModelTypes.Keep;
@@ -23,6 +32,12 @@ import Transform = LexicalModelTypes.Transform;
  */
 
 export const AUTOSELECT_PROPORTION_THRESHOLD = .66;
+
+/**
+ * Standard probability rules - the maximum probability something can
+ * have is 100%, or a simple '1'.
+ */
+const MAX_PROB = 1;
 
 /**
  * Defines thresholds used to determine when it is appropriate to stop searching
@@ -57,30 +72,440 @@ export const CORRECTION_SEARCH_THRESHOLDS = {
   REPLACEMENT_SEARCH_THRESHOLD: 4 as const // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
 }
 
+/**
+ * Collates information related to suggestions during the suggestion generation
+ * process.
+ */
 export type CorrectionPredictionTuple = {
-  prediction: ProbabilityMass<Suggestion>,
+  /**
+   * The potential Suggestion (or Keep)
+   */
+  prediction: ProbabilityMass<Suggestion | Keep>,
+  /**
+   * The correction upon which the Suggestion (or Keep) is based
+   */
   correction: ProbabilityMass<string>,
+  /**
+   * The likelihood of the prediction - its lexical-model likelihood multiplied
+   * by the keystroke-sequence + correction likelihood.
+   */
   totalProb: number;
-  matchLevel: SuggestionSimilarity;
+  /**
+   * How directly the prediction matches the current token in the context.
+   *
+   * This is determined later in the suggestion-analysis project and is not
+   * available upon initial construction of this type.
+   */
+  matchLevel?: SuggestionSimilarity;
+  /**
+   * Text from the triggering input that should _not_ be affected by the
+   * prediction.
+   */
   preservationTransform?: Transform;
 };
 
+/**
+ * An enum to be used when categorizing the level of similarity between
+ * generated Suggestions and the actual text upon which a Suggestion is
+ * based.
+ *
+ * Note that Suggestions require .exact matching to stand-in as the Keep
+ * option.
+ */
 export enum SuggestionSimilarity {
+  /**
+   * The keyed form for the current token / word does not match
+   * the keyed form of the suggestion.
+   */
   none = 0,
+
+  /**
+   * The keyed form for the current token / word matches the
+   * the keyed form of the suggestion, but they do not match
+   * in a case-insensitive manner.
+   */
   sameKey = 1,
+
+  /**
+   * The current token / word has a case-insensitive match with
+   * the suggestion, but not a case-sensitive match.  Both share
+   * the same keyed form.
+   */
   sameText = 2,
+
+  /**
+   * The current token / word has a case-sensitive match with
+   * the suggestion in addition to sharing the same keyed form.
+   */
   exact = 3
 }
 
 export function tupleDisplayOrderSort(a: CorrectionPredictionTuple, b: CorrectionPredictionTuple) {
   // Similarity distance
-  const simDist = b.matchLevel - a.matchLevel;
+  const simDist = (b.matchLevel ?? 0) - (a.matchLevel ?? 0);
   if(simDist != 0) {
     return simDist;
   }
 
   // Probability distance
   return b.totalProb - a.totalProb;
+}
+
+export async function correctAndEnumerateWithoutTraversals(
+  lexicalModel: LexicalModel,
+  transformDistribution: Distribution<Transform>,
+  context: Context
+): Promise<{
+  /**
+   * For models that support correction-search caching, this provides the
+   * cached object corresponding to this method's operation.
+   *
+   * Otherwise, is `null`.
+   */
+  postContextState?: ContextState;
+
+  /**
+   * The suggestions generated based on the user's input state.
+   */
+  rawPredictions: CorrectionPredictionTuple[];
+
+  /**
+   * The id of a prior ContextTransition event that triggered a Suggestion found
+   * at the end of the Context.  Will be undefined if no edits have occurred
+   * since the Suggestion was applied.
+   */
+  revertableTransitionId?: number
+}> {
+  const inputTransform = transformDistribution[0].sample;
+  let rawPredictions: CorrectionPredictionTuple[] = [];
+
+  let predictionRoots: ProbabilityMass<Transform>[];
+
+  // Only allow new-word suggestions if space was the most likely keypress.
+  const allowSpace = TransformUtils.isWhitespace(inputTransform);
+  const allowBksp = TransformUtils.isBackspace(inputTransform);
+
+  // Generates raw prediction distributions for each valid input.  Can only 'correct'
+  // against the final input.
+  //
+  // This is the old, 12.0-13.0 'correction' style.
+  if(allowSpace) {
+    // Detect start of new word; prevent whitespace loss here.
+    predictionRoots = [{sample: inputTransform, p: 1.0}];
+  } else {
+    predictionRoots = transformDistribution.map((alt) => {
+      let transform = alt.sample;
+
+      // Filter out special keys unless they're expected.
+      if(TransformUtils.isWhitespace(transform) && !allowSpace) {
+        return null;
+      } else if(TransformUtils.isBackspace(transform) && !allowBksp) {
+        return null;
+      }
+
+      return alt;
+    });
+  }
+
+  // Remove `null` entries.
+  predictionRoots = predictionRoots.filter(tuple => !!tuple);
+
+  // Running in bulk over all suggestions, duplicate entries may be possible.
+  rawPredictions = predictFromCorrections(lexicalModel, predictionRoots, context);
+  if(allowSpace) {
+    rawPredictions.forEach((entry) => entry.preservationTransform = inputTransform);
+  }
+
+  return {
+    postContextState: null,
+    rawPredictions: rawPredictions
+  };
+}
+
+/**
+ * Determines the most recent ContextState corresponding to the incoming
+ * Context, assuming no context-reset operations have occurred.  Their contents
+ * may not match perfectly, but they should be alignable with no edits not
+ * caused by the sliding context window.
+ *
+ * If no contexts align, this will trigger a warning and a context reset.
+ * @param contextTracker  The cache for previously-analyzed context states
+ * @param context The incoming context
+ * @param inputTransform The ID for the incoming context transition (only used
+ * if a context reset is necessary)
+ * @returns
+ */
+export function matchBaseContextState(
+  contextTracker: ContextTracker,
+  context: Context,
+  transitionId: number
+): ContextState {
+  const lastTransition = contextTracker.latest;
+  let contextState: ContextState;
+
+  // Note that the "final" context from the last operation will have any
+  // characters substituted - only insert (if context window was shortened) or
+  // delete (if lengthened).  No substitutions possible, as no rules will have
+  // occurred - the ONLY change is the amount of known text vs the context
+  // window's range.
+  if(determineContextSlideTransform(lastTransition.final.context, context)) {
+    contextState = lastTransition.final;
+  } else if(determineContextSlideTransform(lastTransition.base.context, context)) {
+    // Multitap case:  if we reverted back to the original underlying context,
+    // rather than using the previous output context.
+    //
+    // This may also arise for text input that triggers auto-correct, as the
+    // incoming text should be processed after applying the suggestion, as
+    // applying the suggestion also appends the incoming text.
+    contextState = lastTransition.base;
+  }
+
+  if(!contextState){
+    console.warn("Unexpected context state occurred as prediction base context");
+    contextTracker.reset(context, transitionId);
+    contextState = contextTracker.latest.base;
+  }
+
+  return contextState;
+}
+
+/**
+ * Determines the tokenization for the context after any incoming edits are
+ * applied.  The tokenization(s) then determine(s) what word/token is the root
+ * for any corrections or predictions to be generated.
+ *
+ * Any incoming fat-finger data is applied to its corresponding token(s) here.
+ * @param contextTracker
+ * @param baseContextState
+ * @param context
+ * @param transformDistribution
+ * @returns
+ */
+export function determineContextTransition(
+  contextTracker: ContextTracker,
+  baseContextState: ContextState,
+  context: Context,
+  transformDistribution: Distribution<Transform>
+): ContextTransition {
+  const inputTransform = transformDistribution[0].sample;
+
+  let transition = contextTracker.latest;
+  const inputIsEmpty = TransformUtils.isEmpty(inputTransform) && transformDistribution.length == 1;
+  const postContext = models.applyTransform(inputTransform, context);
+
+  // Don't replace any applied-suggestion data if we have a request to trigger with
+  // the current context state.
+  if(inputIsEmpty) {
+    // Directly build a simple empty transition that duplicates the last seen state.
+    // This should also clear the preservation transform if it exists!
+    const tokenization = new ContextTokenization(contextTracker.latest.final.tokenization.tokens);
+    const priorState = new ContextState(context, transition.final.model, tokenization);
+    transition = new ContextTransition(priorState, inputTransform.id);
+    transition.finalize(priorState, transformDistribution);
+  } else if(
+    // If the input matches something we've already seen (say, a ' ' or '.'
+    // that auto-applied a suggestion).
+    transition.transitionId == inputTransform.id &&
+    transition.final.context.left == postContext.left
+  ) {
+    // Retrieve the already-performed transition and abort.
+    transition.inputDistribution = transformDistribution;
+    return transition;
+  } else {
+    transition = baseContextState.analyzeTransition(context, transformDistribution);
+  }
+
+  contextTracker.latest = transition;
+  return transition;
+}
+
+/**
+ * Determines where the context for prediction-generation should be rooted and how
+ * much of the context it should replace.
+ * @param transition
+ * @param lexicalModel
+ * @returns
+ */
+export function determineSuggestionAlignment(
+  transition: ContextTransition,
+  tokenization: ContextTokenization,
+  lexicalModel: LexicalModel
+): {
+  /**
+   * The context to use directly for generating predictions from the model.
+   */
+  predictionContext: Context,
+  /**
+   * The total number of characters to delete from the token to be corrected.
+   */
+  correctionDeleteLeft: number
+  /**
+   * The number of characters deleted from tokens aside from the one being corrected.
+   */
+  committedDeleteLeft: number
+} {
+  const transitionEdits = tokenization.transitionEdits;
+  const context = transition.base.context;
+  const postContext = transition.final.context;
+  const inputTransform = transition.inputDistribution[0].sample;
+  let deleteLeft: number;
+
+  // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
+  const wordbreak = determineModelWordbreaker(lexicalModel);
+
+  // Is the token under construction newly-constructed / is there no pre-existing root?
+  if(tokenization.taillessTrueKeystroke && transitionEdits?.addedNewTokens) {
+    return {
+      // If the new token is due to whitespace or due to a different input type
+      // that would likely imply a tokenization boundary, infer 'new word' mode.
+      // Apply any part of the context change that is not considered to be up
+      // for correction.
+      predictionContext: models.applyTransform(tokenization.taillessTrueKeystroke, context),
+      // As the word/token being corrected/predicted didn't originally exist,
+      // there's no part of it to 'replace'.  (Suggestions are applied to the
+      // pre-transform state.)
+      correctionDeleteLeft: 0,
+      committedDeleteLeft: 0
+    };
+    // If the tokenized context length is shorter... sounds like a backspace (or similar).
+  } else if (transitionEdits?.removedOldTokens || TransformUtils.isBackspace(inputTransform)) {
+    /* Ooh, we've dropped context here.  Almost certainly from a backspace or
+     * similar effect.  Even if we drop multiple tokens... well, we know exactly
+     * how many chars were actually deleted - `inputTransform.deleteLeft`. Since
+     * we replace a word being corrected/predicted, we take length of the
+     * remaining context's tail token in addition to however far was deleted to
+     * reach that state.
+     */
+    return {
+      predictionContext: models.applyTransform({...inputTransform, insert: ''}, context),
+      // Pre-apply delete-lefts, but do not include any inserted portion.
+      correctionDeleteLeft: KMWString.length(wordbreak(postContext)) - KMWString.length(inputTransform.insert),
+      committedDeleteLeft: inputTransform.deleteLeft
+    };
+  } else {
+    // Suggestions are applied to the pre-input context, so get the token's original length.
+    // We're on the same token, so just delete its text for the replacement op.
+    deleteLeft = KMWString.length(wordbreak(context));
+  }
+
+  // Did the wordbreaker (or similar) append a blank token before the caret?  If so,
+  // preserve that by preventing corrections from triggering left-deletion.
+  if(tokenization.tail.isEmptyToken) {
+    deleteLeft = 0;
+  }
+
+  return {
+    predictionContext: context,
+    correctionDeleteLeft: deleteLeft,
+    committedDeleteLeft: 0
+  };
+}
+
+/**
+ * Given two ContextTokenizations related by context transition, this function
+ * determines the tail-end range of the tokenization affected by the transition.
+ * @param userContextTokenization
+ * @param variantForSuggestions
+ * @returns
+ */
+export function determineSuggestionRange(
+  userContextTokenization: ContextTokenization,
+  variantForSuggestions: ContextTokenization
+): { tokensToRemove: ContextToken[], tokensToPredict: ContextToken[] } {
+  // Assumption:  spaceIds monotonically increase as new ones are generated.
+  // Given this, we backtrace on the token tails until finding a spot where the
+  // spaceIds match, dropping any that are newer than the last found in the
+  // other.
+  //
+  // We full-replace all tokens affected by an applied suggestion, so if there's
+  // a mismatch between the final form of a token, that implies that suggestions
+  // would replace the original form of the token anyway.
+  const tokenSetA = userContextTokenization.tokens.slice();
+  const tokenSetB = variantForSuggestions.tokens.slice();
+
+  const tokensToRemove: ContextToken[] = [];
+  const tokensToPredict: ContextToken[] = [];
+
+  const tailIdFor = (tokens: ContextToken[]) => tokens[tokens.length-1]?.spaceId ?? -1;
+  let tailOfA = tailIdFor(tokenSetA);
+  let tailOfB = tailIdFor(tokenSetB);
+  while(tailOfA != tailOfB) {
+    if(tailOfA < tailOfB) {
+      tokensToPredict.push(tokenSetB.pop());
+      tailOfB = tailIdFor(tokenSetB);
+    } else {
+      tokensToRemove.push(tokenSetA.pop());
+      tailOfA = tailIdFor(tokenSetA);
+    }
+  }
+
+  tokensToPredict.reverse();
+
+  // Can occur when backspacing to the end of a previous word.
+  if(tokensToPredict.length == 0) {
+    if(tokenSetA.length == 0 || tokenSetB.length == 0) {
+      throw new Error("Invalid state - a tokenization is missing expected tokens");
+    }
+    tokensToRemove.push(tokenSetA.pop());
+    tokensToPredict.push(tokenSetB.pop());
+  }
+
+  tokensToRemove.reverse();
+
+  return {
+    tokensToRemove,
+    tokensToPredict
+  }
+}
+
+/**
+ * This function takes in metadata about generated corrections (for models that
+ * implement Traversals) and uses that to construct predictions based upon those
+ * corrections.
+ * @param transition    Context-transition data underlying the tokenization that led to the correction
+ * @param tokenization  The tokenization from which the correction was generated.
+ * @param match         The generated correction itself - the correction string and its cost
+ * @param costFactor    A multiplicative factor used to adjust the cost when building prediction probabilities.
+ * @returns
+ */
+export function buildAndMapPredictions(
+  transition: ContextTransition,
+  tokenization: ContextTokenization,
+  // Originally, Readonly<TokenResultMapping> - but we only need these two components here.
+  match: Readonly<{matchString: string, totalCost: number}>,
+  costFactor: number
+): CorrectionPredictionTuple[] {
+  const model = transition.final.model;
+
+  // No matter the prediction, once we know the root of the prediction, we'll
+  // always 'replace' the same amount of text.  We can handle this before the
+  // big 'prediction root' loop.
+  const { predictionContext, correctionDeleteLeft, committedDeleteLeft } = determineSuggestionAlignment(transition, tokenization, model);
+
+  let correction = match.matchString;
+  let rootCost = match.totalCost;
+
+  // Replace the existing context with the correction.
+  const correctionTransform: Transform = {
+    insert: correction,  // insert correction string
+    deleteLeft: correctionDeleteLeft,
+    id: transition.transitionId // The correction should always be based on the most recent external transform/transcription ID.
+  }
+
+  const predictionRoot = {
+    sample: correctionTransform,
+    p: Math.exp(-rootCost * costFactor)
+  };
+
+  // Worth considering:  extend Traversal to allow direct prediction lookups?
+  // let traversal = match.finalTraversal; // ...
+  let predictions = predictFromCorrections(model, [predictionRoot], predictionContext);
+  predictions.forEach((entry) => {
+    entry.preservationTransform = tokenization.taillessTrueKeystroke;
+    entry.prediction.sample.transform.deleteLeft += committedDeleteLeft;
+  });
+
+  return predictions;
 }
 
 /**
@@ -104,21 +529,20 @@ export async function correctAndEnumerate(
    *
    * Otherwise, is `null`.
    */
-  postContextState?: TrackedContextState;
+  postContextState?: ContextState;
 
   /**
    * The suggestions generated based on the user's input state.
    */
   rawPredictions: CorrectionPredictionTuple[];
+
+  /**
+   * The id of a prior ContextTransition event that triggered a Suggestion found
+   * at the end of the Context.  Will be undefined if no edits have occurred
+   * since the Suggestion was applied.
+   */
+  revertableTransitionId?: number
 }> {
-  const wordbreak = determineModelWordbreaker(lexicalModel);
-
-  // Assertion / pre-condition:  `transformDistribution` should be sorted!
-  const inputTransform = transformDistribution[0].sample;
-
-  const postContext = models.applyTransform(inputTransform, context);
-  let rawPredictions: CorrectionPredictionTuple[] = [];
-
   // If `this.contextTracker` does not exist, we don't have the
   // `LexiconTraversal` pattern available to us.  We're unable to efficiently
   // iterate through the lexicon as a result, so we use a far lazier pattern -
@@ -127,225 +551,74 @@ export async function correctAndEnumerate(
   // It's mostly here to support models compiled before Keyman 14.0, which was
   // when the `LexiconTraversal` pattern was established.
   if(!contextTracker) {
-    let predictionRoots: ProbabilityMass<Transform>[];
-
-    // Only allow new-word suggestions if space was the most likely keypress.
-    const allowSpace = TransformUtils.isWhitespace(inputTransform);
-    const allowBksp = TransformUtils.isBackspace(inputTransform);
-
-    // Generates raw prediction distributions for each valid input.  Can only 'correct'
-    // against the final input.
-    //
-    // This is the old, 12.0-13.0 'correction' style.
-    if(allowSpace) {
-      // Detect start of new word; prevent whitespace loss here.
-      predictionRoots = [{sample: inputTransform, p: 1.0}];
-    } else {
-      predictionRoots = transformDistribution.map((alt) => {
-        let transform = alt.sample;
-
-        // Filter out special keys unless they're expected.
-        if(TransformUtils.isWhitespace(transform) && !allowSpace) {
-          return null;
-        } else if(TransformUtils.isBackspace(transform) && !allowBksp) {
-          return null;
-        }
-
-        return alt;
-      });
-    }
-
-    // Remove `null` entries.
-    predictionRoots = predictionRoots.filter(tuple => !!tuple);
-
-    // Running in bulk over all suggestions, duplicate entries may be possible.
-    rawPredictions = predictFromCorrections(lexicalModel, predictionRoots, context);
-    if(allowSpace) {
-      rawPredictions.forEach((entry) => entry.preservationTransform = inputTransform);
-    }
-
-    return {
-      postContextState: null,
-      rawPredictions: rawPredictions
-    };
+    return correctAndEnumerateWithoutTraversals(lexicalModel, transformDistribution, context);
   }
 
   // 'else':  the current, 14.0+ pattern, which is able to leverage
   // `LexiconTraversal`s for greater search efficiency.  This pattern
   // facilitates a more thorough correction-search pattern.
-
-  // Token replacement benefits greatly from knowledge of the prior context state.
-  let { state: contextState } = contextTracker.analyzeState(
-    lexicalModel,
-    context,
-    null
-  );
+  const inputTransform = transformDistribution[0].sample;
+  let contextState = matchBaseContextState(contextTracker, context, inputTransform.id);
 
   // Corrections and predictions are based upon the post-context state, though.
-  const contextChangeAnalysis = contextTracker.analyzeState(
-    lexicalModel,
-    context,
-    !TransformUtils.isEmpty(inputTransform)
-      ? transformDistribution
-      : null
-  );
-  const postContextState = contextChangeAnalysis.state;
+  const baseTransition = contextTracker.latest;
+  const transition = determineContextTransition(contextTracker, contextState, context, transformDistribution);
+  if(transition == baseTransition) {
+    // Not yet done; we may want to consider saving the fat-finger distribution of
+    // incoming text for this case for correction-search - we didn't get it
+    // when applying a prior suggestion.
+
+    // Do NOT recurse; return none instead.
+    return {
+      rawPredictions: [],
+      postContextState: transition.final
+    }
+  }
 
   // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
 
-  // Rather than go "full hog" and make a priority queue out of the eventual, future competing search spaces...
-  // let's just note that right now, there will only ever be one.
-  //
   // The 'eventual' logic will be significantly more complex, though still manageable.
-  let searchSpace = postContextState.searchSpace[0];
-
-  // No matter the prediction, once we know the root of the prediction, we'll always 'replace' the
-  // same amount of text.  We can handle this before the big 'prediction root' loop.
-  let deleteLeft = 0;
-
-  // The amount of text to 'replace' depends upon whatever sort of context change occurs
-  // from the received input.
-  const postContextTokens = postContextState.tokens;
-  // Only use of `contextState`.
-  let contextLengthDelta = postContextTokens.length - contextState.tokens.length;
-  // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
-  if(contextChangeAnalysis.preservationTransform) {
-    // As the word/token being corrected/predicted didn't originally exist, there's no
-    // part of it to 'replace'.  (Suggestions are applied to the pre-transform state.)
-    deleteLeft = 0;
-
-    // If the new token is due to whitespace or due to a different input type that would
-    // likely imply a tokenization boundary, infer 'new word' mode.
-    // Apply any part of the context change that is not considered
-    // to be up for correction.
-    context = models.applyTransform(contextChangeAnalysis.preservationTransform, context);
-    // If the tokenized context length is shorter... sounds like a backspace (or similar).
-  } else if (contextLengthDelta < 0) {
-    /* Ooh, we've dropped context here.  Almost certainly from a backspace.
-      * Even if we drop multiple tokens... well, we know exactly how many chars
-      * were actually deleted - `inputTransform.deleteLeft`.
-      * Since we replace a word being corrected/predicted, we take length of the remaining
-      * context's tail token in addition to however far was deleted to reach that state.
-      */
-    deleteLeft = wordbreak(postContext).kmwLength() + inputTransform.deleteLeft;
-  } else {
-    // Suggestions are applied to the pre-input context, so get the token's original length.
-    // We're on the same token, so just delete its text for the replacement op.
-    deleteLeft = wordbreak(context).kmwLength();
-  }
-
-  // Is the token under construction newly-constructed / is there no pre-existing root?
-  // If so, we want to strongly avoid overcorrection, even for 'nearby' keys.
-  // (Strong lexical frequency differences can easily cause overcorrection when only
-  // one key's available.)
-  //
-  // NOTE:  we only want this applied word-initially, when any corrections 'correct'
-  // 100% of the word.  Things are generally fine once it's not "all or nothing."
-  let tailToken = postContextTokens[postContextTokens.length - 1];
-
-  // Did the wordbreaker (or similar) append a blank token before the caret?  If so,
-  // preserve that by preventing corrections from triggering left-deletion.
-  if(tailToken.raw == '') {
-    deleteLeft = 0;
-  }
-
-  const isTokenStart = tailToken.transformDistributions.length <= 1;
-
-  // TODO:  whitespace, backspace filtering.  Do it here.
-  //        Whitespace is probably fine, actually.  Less sure about backspace.
-
-  let bestCorrectionCost: number;
-  let correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
-
-  // If corrections are not enabled, bypass the correction search aspect entirely.
-  // No need to 'search' - just do a direct lookup.
-  if(!searchSpace.correctionsEnabled) {
-    const predictionRoot = {
-      sample: {
-        insert: wordbreak(postContext),  // insert correction string
-        deleteLeft: deleteLeft,
-        id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
-      },
-      p: 1.0
-    };
-
-    let predictions = predictFromCorrections(lexicalModel, [predictionRoot], context);
-    predictions.forEach((entry) => entry.preservationTransform = contextChangeAnalysis.preservationTransform);
-
-    // Only one 'correction' / prediction root is allowed - the actual text.
-    return {
-      postContextState: postContextState,
-      rawPredictions: predictions
-    }
-  }
+  const tokenizations = [transition.final.tokenization];
+  const searchModules = tokenizations.map(t => t.tail.searchModule);
 
   // Only run the correction search when corrections are enabled.
-  for await(let match of searchSpace.getBestMatches(timer)) {
+  let rawPredictions: CorrectionPredictionTuple[] = [];
+  let bestCorrectionCost: number;
+  const correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
+  for await(const match of getBestTokenMatches(searchModules, timer)) {
     // Corrections obtained:  now to predict from them!
-    const correction = match.matchString;
-
-    // If our 'match' results in fully deleting the new token, reject it and try again.
-    if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
-      continue;
-    }
+    const tokenization = tokenizations.find(t => t.spaceId == match.spaceId);
 
     // If our 'match' fully replaces the token, reject it and try again.
     if(match.matchSequence.length != 0 && match.matchSequence.length == match.knownCost) {
       continue;
     }
 
-    // Worth considering:  extend Traversal to allow direct prediction lookups?
-    // let traversal = match.finalTraversal;
-
-    // Replace the existing context with the correction.
-    const correctionTransform: Transform = {
-      insert: correction,  // insert correction string
-      deleteLeft: deleteLeft,
-      id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
+    if(match.editCount > 0 && !searchModules.find(s => s.correctionsEnabled)) {
+      continue;
     }
-
-    let rootCost = match.totalCost;
 
     /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
-      * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
-      * there are significantly more likely words.  We only need this to allow very minor fat-finger
-      * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
-      * key borders.
-      *
-      * Technically, the probabilities this produces won't be normalized as-is... but there's no
-      * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
-      * to apply it could become tricky, so it's simpler to leave out.
-      *
-      * Worst-case, it's possible to temporarily add normalization if a code deep-dive
-      * is needed in the future.
-      */
-    if(isTokenStart) {
-      /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
-        * ambiguous case that would only arise very near the center of the boundary between two keys.
-        * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
-        * That seems 'within reason' for correction very near boundaries.
-        *
-        * So, with the second-most-likely key being that close in probability, its best suggestion
-        * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
-        * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
-        * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
-        * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
-        */
-      rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
-    }
+     * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+     * there are significantly more likely words.  We only need this to allow very minor fat-finger
+     * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+     * key borders.
+     *
+     * Technically, the probabilities this produces won't be normalized as-is... but there's no
+     * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+     * to apply it could become tricky, so it's simpler to leave out.
+     *
+     * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+     * is needed in the future.
+     */
+    const costFactor = (tokenization.tail.inputCount <= 1) ? ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT : 1;
 
-    const predictionRoot = {
-      sample: correctionTransform,
-      p: Math.exp(-rootCost)
-    };
-
-    let predictions = predictFromCorrections(lexicalModel, [predictionRoot], context);
-    predictions.forEach((entry) => entry.preservationTransform = contextChangeAnalysis.preservationTransform);
+    const predictions = buildAndMapPredictions(transition, tokenization, match, costFactor);
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
-      bestCorrectionCost = rootCost;
+      bestCorrectionCost = match.totalCost * costFactor;
     }
 
     // If we're getting the same prediction again, it's lower-cost.  Update!
@@ -367,8 +640,9 @@ export async function correctAndEnumerate(
   // console.log(`execute: ${timer.executionTime}, deferred: ${timer.deferredTime}`); //, total since start: ${timer.timeSinceConstruction}`);
 
   return {
-    postContextState: postContextState,
-    rawPredictions: rawPredictions
+    postContextState: transition.final,
+    rawPredictions: rawPredictions,
+    revertableTransitionId: transition.revertableTransitionId
   };
 }
 
@@ -430,7 +704,7 @@ export function predictFromCorrections(
       // Let's not rely on the model to copy transform IDs.
       // Only bother is there IS an ID to copy.
       if(correctionTransform.id !== undefined) {
-        pair.sample.transformId = correctionTransform.id;
+        pair.sample.transform.id = correctionTransform.id;
       }
 
       let tuple: CorrectionPredictionTuple = {
@@ -449,6 +723,28 @@ export function predictFromCorrections(
   }
 
   return returnedPredictions;
+}
+
+/**
+ * Applies the specified casing-form to generated suggestions, leveraging the model's
+ * defined casing behaviors to do so.
+ * @param suggestion
+ * @param baseWord
+ * @param lexicalModel
+ * @param casingForm
+ */
+export function applySuggestionCasing(suggestion: Suggestion, baseWord: string, lexicalModel: LexicalModel, casingForm: CasingForm) {
+  // Step 1:  does the suggestion replace the whole word?  If not, we should extend the suggestion to do so.
+  let unchangedLength  = KMWString.length(baseWord) - suggestion.transform.deleteLeft;
+
+  if(unchangedLength > 0) {
+    suggestion.transform.deleteLeft += unchangedLength;
+    suggestion.transform.insert = KMWString.substr(baseWord, 0, unchangedLength) + suggestion.transform.insert;
+  }
+
+  // Step 2: Now that the transform affects the whole word, we may safely apply casing rules.
+  suggestion.transform.insert = lexicalModel.applyCasing(casingForm, suggestion.transform.insert);
+  suggestion.displayAs = lexicalModel.applyCasing(casingForm, suggestion.displayAs);
 }
 
 /**
@@ -502,30 +798,29 @@ export function dedupeSuggestions(
 
 /**
  * This function checks for any suggestions that directly match the actual
- * context in some manner and ranks suggestions accordingly.  Additionally, if
- * there is no such suggestion, a stand-in is generated and added to the list,
- * though marked as "not matching the model".
+ * context in some manner and ranks suggestions accordingly.
  *
  * The suggestion "ranks", from highest to lowest:
  * - the suggestion produces an exact match for the user's current text
  * - the suggestion produces a case-insensitive match for the user's current
  *   text
- * - the suggestion produces a case + diacritic insensitive match for the
- *   user's current text
+ * - the suggestion produces a case + diacritic insensitive match for the user's
+ *   current text
  * - any other suggestion
  *
  * @param suggestionDistribution
  * @param context
  * @param trueInput inputTransform + its assigned probability
- * @returns
+ * @returns true if an existing suggestion fulfills the role of 'keep';
+ * otherwise, false.
  */
 export function processSimilarity(
   lexicalModel: LexicalModel,
   suggestionDistribution: CorrectionPredictionTuple[],
   context: Context,
   trueInput: ProbabilityMass<Transform>
-) {
-  const { sample: inputTransform, p: inputTransformProb } = trueInput;
+): boolean {
+  const { sample: inputTransform } = trueInput;
   const wordbreak = determineModelWordbreaker(lexicalModel);
 
   const postContext = models.applyTransform(inputTransform, context);
@@ -541,7 +836,7 @@ export function processSimilarity(
   for(let tuple of suggestionDistribution) {
     // Don't set it unnecessarily; this can have side-effects in some automated tests.
     if(inputTransform.id !== undefined) {
-      tuple.prediction.sample.transformId = inputTransform.id;
+      tuple.prediction.sample.transform.id = inputTransform.id;
     }
 
     const predictedWord = wordbreak(models.applyTransform(tuple.prediction.sample.transform, context));
@@ -577,42 +872,97 @@ export function processSimilarity(
   }
 
   // If we already have a keep option, we're done!  Return and move on.
-  if(keepOption || truePrefix == '') {
-    return;
-  }
+  //
+  // No actual 'keep' needed if the current context token is empty, so we say we
+  // have a 'keep' for that case, even though there isn't really one.
+  return !!(keepOption || truePrefix == '');
+}
+
+/**
+ * Generates metadata for a new 'keep' suggestion based solely upon the existing
+ * context.
+ *
+ * This method is designed for use when no appropriate 'keep' suggestion was
+ * generated by the correction-search process.
+ * @param lexicalModel
+ * @param context
+ * @param trueInput
+ * @returns
+ */
+export function createDefaultKeep(
+  lexicalModel: LexicalModel,
+  context: Context,
+  trueInput: ProbabilityMass<Transform>
+): CorrectionPredictionTuple {
+  const { sample: inputTransform, p: inputTransformProb } = trueInput;
+  const wordbreak = determineModelWordbreaker(lexicalModel);
+
+  const postContext = models.applyTransform(inputTransform, context);
+  const truePrefix = wordbreak(postContext);
 
   // Generate a full-word 'keep' replacement like other suggestions when one is not otherwise
   // produced; we want to replace the full token in the same manner used for other suggestions.
-  const basePrefixLength = truePrefix.kmwLength() - inputTransform.insert.kmwLength() + inputTransform.deleteLeft;
+  const basePrefixLength = KMWString.length(truePrefix) - KMWString.length(inputTransform.insert) + inputTransform.deleteLeft;
   const keepTransform = {
     insert: truePrefix,
     deleteLeft: basePrefixLength
   };
 
-  // 1 is a filler value; goes unused b/c is for a 'keep'.
-  let keepSuggestion = models.transformToSuggestion(keepTransform, 1);
+  let keepSuggestion = models.transformToSuggestion(keepTransform);
   // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
   keepSuggestion.displayAs = truePrefix;
 
-  keepOption = toAnnotatedSuggestion(lexicalModel, keepSuggestion, 'keep');
+  let keepOption = toAnnotatedSuggestion(lexicalModel, keepSuggestion, 'keep');
   if(inputTransform.id !== undefined) {
-    keepOption.transformId = inputTransform.id;
+    keepOption.transform.id = inputTransform.id;
   }
   keepOption.matchesModel = false;
 
-  // Insert our synthetic keepOption as a prediction.
-  suggestionDistribution.unshift({
-    totalProb: keepOption.p,
+  // Insert our synthetic keepOption as a prediction tuple.
+  return {
+    // Product of the two p's below.
+    totalProb: inputTransformProb * MAX_PROB,
     prediction: {
       sample: keepOption,
-      p: keepOption.p,
+      // We always show the keep option if it doesn't directly match,
+      // so max probability is fine.
+      p: MAX_PROB,
     },
     correction: {
       sample: truePrefix,
-      p: inputTransformProb
+      p: inputTransformProb * MAX_PROB
     },
     matchLevel: SuggestionSimilarity.exact
-  });
+  };
+}
+
+/**
+ * This function may be used to prevent auto-selection/auto-correct from applying in
+ * unexpected ways.  For example, when typing numbers in English, we don't expect
+ * '5' to auto-correct to '5th' just because there are no pure-number entries in
+ * the lexicon rooted on '5'.
+ * @param correction
+ * @returns
+ */
+export function correctionValidForAutoSelect(correction: string) {
+  let chars = [...correction];
+
+  // If the _correction_ - the actual, existing text - does not include any letters,
+  // then predictions built upon it should not be considered valid for auto-correction.
+  for(let c of chars) {
+    // Found even one letter?  We'll consider it valid.
+    switch(searchForProperty(c.codePointAt(0))) {
+      case WordBreakProperty.ALetter:
+      case WordBreakProperty.Hebrew_Letter:
+      case WordBreakProperty.Katakana:
+        return true;
+      default:
+    }
+  }
+
+  // Only reached when the correction has nothing that passes as a letter in-context.
+  // (MidLet and MidNumLet only count when there are adjacent letters.)
+  return false;
 }
 
 export function predictionAutoSelect(suggestionDistribution: CorrectionPredictionTuple[]) {
@@ -622,9 +972,11 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
 
   const keepOption = suggestionDistribution[0].prediction.sample as Outcome<Keep>;
   if(keepOption.tag == 'keep' && keepOption.matchesModel) {
-    // Auto-select it for auto-acceptance; we don't correct away from perfectly-valid
-    // lexical entries, even if they are comparatively low-frequency.
-    keepOption.autoAccept = true;
+    // Do not auto-select 'keep' suggestions'; there's no need to apply them.
+    //
+    // Do, however, block auto-selection of any other suggestions if we would
+    // have auto-selected the 'keep'; even if it is comparatively unlikely /
+    // low-frequency, we 'keep' the current context.
     return;
   } else if(suggestionDistribution.length == 1) {
     return;
@@ -633,6 +985,11 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
   suggestionDistribution = suggestionDistribution.slice(1);
 
   if(suggestionDistribution.length == 1) {
+    // Prevent auto-acceptance when the root doesn't meet validation criteria.
+    if(!correctionValidForAutoSelect(suggestionDistribution[0].correction.sample)) {
+      return;
+    }
+
     // Mark for auto-acceptance; there are no alternatives.
     suggestionDistribution[0].prediction.sample.autoAccept = true;
     return;
@@ -676,6 +1033,10 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
     return;
   }
 
+  if(!correctionValidForAutoSelect(bestSuggestion.correction.sample)) {
+    return;
+  }
+
   // compare correction-cost aspects?  We disable if the base correction is lower than best,
   // but should we do other comparisons too?
 
@@ -704,7 +1065,7 @@ export function finalizeSuggestions(
   context: Context,
   inputTransform: Transform,
   verbose?: boolean
-) {
+): Outcome<Suggestion | Keep>[] {
   const punctuation = determinePunctuationFromModel(lexicalModel);
   const tokenize = determineModelTokenizer(lexicalModel);
 
@@ -716,8 +1077,16 @@ export function finalizeSuggestions(
     //
     // Note:  may need adjustment if/when supporting phrase-level correction.
     if(tuple.preservationTransform) {
-      let mergedTransform = models.buildMergedTransform(tuple.preservationTransform, prediction.sample.transform);
-      mergedTransform.id = prediction.sample.transformId;
+      const presDL = tuple.preservationTransform.deleteLeft;
+      const mergedTransform = models.buildMergedTransform(tuple.preservationTransform, prediction.sample.transform);
+      // Any preserved delete-left is applied early because it directly affects the suggestion
+      // root; we need to remove that preserved delete-left here.
+      if(presDL > 0) {
+        mergedTransform.deleteLeft -= presDL;
+      }
+      if(prediction.sample.transform.id !== undefined) {
+        mergedTransform.id = prediction.sample.transform.id;
+      }
 
       // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
       // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
@@ -733,11 +1102,7 @@ export function finalizeSuggestions(
         p: tuple.totalProb
       };
     } else {
-      const sample: Suggestion & {
-        p?: number,
-        "lexical-p"?: number,
-        "correction-p"?: number
-      } = {
+      const sample: Outcome<Suggestion | Keep> = {
         ...prediction.sample,
         p: tuple.totalProb,
         "lexical-p": prediction.p,
@@ -748,60 +1113,70 @@ export function finalizeSuggestions(
     }
   });
 
-  // Apply 'after word' punctuation and other post-processing, setting suggestion IDs.
-  // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
-  suggestions.forEach((suggestion) => {
-    // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
-    // for such cases.
+  if(punctuation.insertAfterWord !== "") {
+    // Apply 'after word' punctuation and other post-processing, setting suggestion IDs.
+    // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
+    suggestions.forEach((suggestion) => {
+      // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
+      // for such cases.
 
-    // If we're mid-word, delete its original post-caret text.
-    const tokenization = tokenize(context);
-    if(tokenization && tokenization.caretSplitsToken) {
-      // While we wait on the ability to provide a more 'ideal' solution, let's at least
-      // go with a more stable, if slightly less ideal, solution for now.
-      //
-      // A predictive text default (on iOS, at least) - immediately wordbreak
-      // on suggestions accepted mid-word.
-      suggestion.transform.insert += punctuation.insertAfterWord;
+      // If we're mid-word, delete its original post-caret text.
+      const tokenization = tokenize(context);
+      if(tokenization && tokenization.caretSplitsToken) {
+        // While we wait on the ability to provide a more 'ideal' solution, let's at least
+        // go with a more stable, if slightly less ideal, solution for now.
+        //
+        // A predictive text default (on iOS, at least) - immediately wordbreak
+        // on suggestions accepted mid-word.
+        suggestion.appendedTransform = {
+          insert: punctuation.insertAfterWord,
+          deleteLeft: 0
+        };
 
-      // Do we need to manipulate the suggestion's transform based on the current state of the context?
-    } else if(!context.right) {
-      suggestion.transform.insert += punctuation.insertAfterWord;
-    } else if(punctuation.insertAfterWord != '') {
-      if(context.right.indexOf(punctuation.insertAfterWord) != 0) {
-        suggestion.transform.insert += punctuation.insertAfterWord;
+        // Do we need to manipulate the suggestion's transform based on the current state of the context?
+      } else if(!context.right) {
+        suggestion.appendedTransform = {
+          insert: punctuation.insertAfterWord,
+          deleteLeft: 0
+        };
+      } else if(punctuation.insertAfterWord != '') {
+        if(context.right.indexOf(punctuation.insertAfterWord) != 0) {
+          suggestion.appendedTransform = {
+            insert: punctuation.insertAfterWord,
+          deleteLeft: 0
+          };
+        }
       }
-    }
-
-  });
+    });
+  };
 
   return suggestions;
 }
 
 export function toAnnotatedSuggestion(
   lexicalModel: LexicalModel,
-  suggestion: Outcome<Suggestion>,
+  suggestion: Suggestion,
   annotationType: SuggestionTag,
   quoteBehavior?: models.QuoteBehavior
-): Outcome<Suggestion>;
+): Suggestion;
 export function toAnnotatedSuggestion(
   lexicalModel: LexicalModel,
-  suggestion: Outcome<Suggestion>,
+  suggestion: Suggestion,
   annotationType: 'keep',
   quoteBehavior?: models.QuoteBehavior
-): Outcome<Keep>;
+): Keep;
 export function toAnnotatedSuggestion(
   lexicalModel: LexicalModel,
-  suggestion: Outcome<Suggestion>,
+  suggestion: Suggestion,
   annotationType: 'revert',
   quoteBehavior?: models.QuoteBehavior
-): Outcome<Reversion>;
+): Reversion;
 export function toAnnotatedSuggestion(
   lexicalModel: LexicalModel,
-  suggestion: Outcome<Suggestion>,
+  suggestion: Suggestion,
   annotationType: SuggestionTag,
   quoteBehavior: models.QuoteBehavior = models.QuoteBehavior.default
-): Outcome<Suggestion> {
+): Suggestion | Keep | Reversion {
   // A method-internal 'import' of the enum.
   let QuoteBehavior = models.QuoteBehavior;
   const punctuation = determinePunctuationFromModel(lexicalModel);
@@ -811,16 +1186,50 @@ export function toAnnotatedSuggestion(
     defaultQuoteBehavior = QuoteBehavior.useQuotes;
   }
 
-  const result: Outcome<Suggestion> = {
+  const result: Suggestion = {
     transform: suggestion.transform,
     displayAs: QuoteBehavior.apply(quoteBehavior, suggestion.displayAs, punctuation, defaultQuoteBehavior),
     tag: annotationType,
-    p: suggestion.p
   };
 
-  if(suggestion.transformId !== undefined) {
-    result.transformId = suggestion.transformId;
+  if(suggestion.appendedTransform) {
+    result.appendedTransform = suggestion.appendedTransform;
+  }
+
+  if(suggestion.transform.id !== undefined) {
+    result.transform.id = suggestion.transform.id;
   }
 
   return result;
+}
+
+/**
+ * For applicable scenarios, this mutates the passed-in suggestion array by
+ * prepending a predictive-text reversion that restores the context to a prior
+ * state.  Otherwise, it leaves the suggestion array unaltered.
+ * @param suggestions
+ * @param transitionToRevert
+ * @returns
+ */
+export function prependReversion(suggestions: Suggestion[], transitionToRevert: TransitionReversionView) {
+  if(transitionToRevert) {
+    const reversion = transitionToRevert.reversion;
+    if(reversion) {
+      if(suggestions[0]?.tag == 'keep') {
+        const appliedId = -reversion.id;
+        const appliedSuggestion = transitionToRevert.final.suggestions.find((s) => s.id == appliedId);
+        // If the selected suggestion was itself a `keep`, we don't need a
+        // reversion.  They'd do the same thing.
+        if(appliedSuggestion.tag != 'keep') {
+          const keep = suggestions.shift();
+          suggestions.unshift(reversion);
+          suggestions.unshift(keep);
+        }
+      } else {
+        suggestions.unshift(reversion);
+      }
+    }
+  }
+
+  return suggestions;
 }

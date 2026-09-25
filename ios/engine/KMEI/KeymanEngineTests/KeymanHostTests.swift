@@ -18,14 +18,14 @@ class KeymanHostTests: XCTestCase {
   }
 
   /**
-   * Ensures no accidental permanent edits to the .local variant URLs occur.
+   * Ensures no accidental permanent edits to the .localhost variant URLs occur.
    */
   func testLocalSitesUnchanged() {
     XCTAssertEqual(KeymanHosts.getApiSiteURL(forTier: .stable, useLocal: true),
-                   URL.init(string: "http://api.keyman.com.local"))
+                   URL.init(string: "http://api.keyman.com.localhost"))
     XCTAssertEqual(KeymanHosts.getHelpSiteURL(forTier: .stable, useLocal: true),
-                   URL.init(string: "http://help.keyman.com.local"))
+                   URL.init(string: "http://help.keyman.com.localhost"))
     XCTAssertEqual(KeymanHosts.getMainSiteURL(forTier: .stable, useLocal: true),
-                   URL.init(string: "http://keyman.com.local"))
+                   URL.init(string: "http://keyman.com.localhost"))
   }
 }

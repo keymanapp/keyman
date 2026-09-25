@@ -214,6 +214,6 @@ export function getLastPreCaretToken(wordBreaker: LexicalModelTypes.WordBreaking
 // While it is currently identical to getLastWord, this may change in the future.
 // It's best not to write ourselves into a corner on this one, as disambiguating later
 // would likely be pretty painful.
-export function wordbreak(wordBreaker: LexicalModelTypes.WordBreakingFunction, context: LexicalModelTypes.Context): LexicalModelTypes.USVString {
+export function wordbreak(wordBreaker: LexicalModelTypes.WordBreakingFunction, context: LexicalModelTypes.Context): string {
   return getLastPreCaretToken(wordBreaker, context);
 }

@@ -89,7 +89,6 @@ kmx_files = files(
   'km_core_state_context_set_if_needed.cpp',
   'km_core_debug_api.cpp',
   'km_core_processevent_api.cpp',
-  'jsonpp.cpp',
   'util_normalize.cpp',
   'util_regex.cpp',
   'core_icu.cpp',
@@ -130,7 +129,6 @@ core_files = files(
   'option.cpp',
   'keyboard.cpp',
   'state.cpp',
-  'jsonpp.cpp',
   '../../common/cpp/utfcodec.cpp',
 )
 
@@ -209,7 +207,7 @@ if cpp_compiler.get_id() == 'emscripten'
     name_suffix: 'mjs')
 
   if get_option('buildtype') == 'release'
-    # TODO: #12888
+    # TODO-WEB-CORE
     # Split debug symbols into separate wasm file for release builds only
     # as the release symbols will be uploaded to sentry
     # custom_target('core.wasm',

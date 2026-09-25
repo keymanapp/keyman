@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -81,12 +81,6 @@
     <ClCompile Include="syskbd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="syskbdnt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="syskbdnt64.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\unicode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -141,6 +135,15 @@
     <ClCompile Include="appcontext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="k32_visualkeyboardinterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LowLevelHookWatchDog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RightAltEmulationCheck.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="KEYMAN32.DEF">
@@ -155,6 +158,9 @@
     <None Include="keyman64.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="keymanarm64.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KEYMAN32.RC">
@@ -164,6 +170,9 @@
       <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="keyman64.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="keymanarm64.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -256,6 +265,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="appcontext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="k32_visualkeyboardinterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LowLevelHookWatchDog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

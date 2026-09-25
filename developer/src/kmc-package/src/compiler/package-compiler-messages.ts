@@ -207,6 +207,22 @@ export class PackageCompilerMessages {
     may violate this rule transitively.
   `);
 
+  static ERROR_MissingModelId = SevError | 0x0029;
+  static Error_MissingModelId = (o:{index:number}) => m(
+    this.ERROR_MissingModelId, `The lexical model at index ${def(o.index)} has a missing or empty ID field.`, `
+    Each LexicalModel element must have an ID sub-element and a Languages
+    sub-element. The content of the ID sub-element must correspond to the basename
+    of a .model.js file inside the Files element.
+  `);
+
+  static ERROR_MissingKeyboardId = SevError | 0x002A;
+  static Error_MissingKeyboardId = (o:{index:number}) => m(
+    this.ERROR_MissingKeyboardId, `The keyboard at index ${def(o.index)} has a missing or empty ID field.`, `
+    Each Keyboard element must have an ID sub-element sub-element. The content of
+    the ID sub-element must correspond to the basename of a keyboard .kmx or .js
+    file inside the Files element.
+  `);
+
   //------------------------------------------------------------------------------|
   // max length of detail message lines (checked by verifyCompilerMessagesObject) |
   //------------------------------------------------------------------------------|

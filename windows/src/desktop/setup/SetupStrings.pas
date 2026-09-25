@@ -26,6 +26,7 @@ interface
 type
   TInstallInfoText = (
     ssLanguageName,
+    ssLanguageNameInEnglish,
     ssApplicationTitle,
     ssTitle,
     ssInstallSuccess,

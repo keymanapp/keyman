@@ -2,6 +2,7 @@
 import contextlib
 import logging
 import os
+import subprocess
 
 import dbus
 import dbus.bus
@@ -12,6 +13,9 @@ from dbus import DBusException
 
 BUS_NAME = 'com.Keyman.Config'
 OBJECT_PATH = '/com/Keyman/Config'
+DBusSessionBusAddressValue = f'unix:path=/run/user/{os.environ.get("SUDO_UID")}/bus'
+DBusSessionBusAddress = f'DBUS_SESSION_BUS_ADDRESS={DBusSessionBusAddressValue}'
+XdgRuntimeDir = f'XDG_RUNTIME_DIR=/run/user/{os.environ.get("SUDO_UID")}'
 
 
 __keyman_config_service = None
@@ -34,6 +38,16 @@ class KeymanConfigService(dbus.service.Object):
         if self.__keyboard_list_changed_handler:
             self.__keyboard_list_changed_handler()
         self.KeyboardListChangedSignal()
+
+
+def keyboard_list_changed():
+    if os.environ.get('SUDO_USER'):
+        args = ['sudo', '-u', os.environ.get('SUDO_USER'), 'dbus-send',
+                f'--bus={DBusSessionBusAddressValue}',
+                '/com/Keyman/Config', 'com.Keyman.Config.keyboard_list_changed']
+        subprocess.run(args)
+    else:
+        get_keyman_config_service().keyboard_list_changed()
 
 
 class KeymanConfigServiceManager:

@@ -67,8 +67,11 @@
 /* copyright label in the Package Information window */
 "copyright-label" = "រក្សាសិទ្ធិ៖";
 
-/* message displayed to alert user to need grant accessibility permission */
+/* message displayed to alert user to grant accessibility permission in Preferences, pre-Ventura */
 "privacy-alert-text" = "ដើម្បីឱ្យដំណើរការសមស្រប, Keyman តម្រូវឱ្យមានលទ្ធភាពចូលប្រើ៖\n\nបើកការអនុញ្ញាតនៅក្នុង Security & Privacy នៃ System Preferences។\nបិទរួចបើកប្រព័ន្ធរបស់អ្នក។";
+
+/* message displayed to alert user to grant accessibility permission in Settings, for macOS Ventura and later */
+"privacy-alert-text-ventura" = "ដើម្បីឱ្យដំណើរការសមស្រប, Keyman តម្រូវឱ្យមានលទ្ធភាពចូលប្រើ៖\n\nបើកការអនុញ្ញាតនៅក្នុង System Settings, Privacy & Security។\nបិទរួចបើកប្រព័ន្ធរបស់អ្នក។";
 
 /* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
 "no-keyboard-configured-menu-placeholder" = "(គ្មានក្ដារចុច ដែលត្រូវបានកំណត់រចនាសម្ព័ន្ធទេ)";

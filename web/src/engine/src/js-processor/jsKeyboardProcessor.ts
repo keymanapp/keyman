@@ -1,0 +1,507 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Implementation of the JavaScript keyboard processor
+ */
+
+// #region Big ol' list of imports
+
+import { ModifierKeyConstants } from '@keymanapp/common-types';
+import {
+  Codes, type JSKeyboard, KeyEvent, Layouts,
+  DefaultOutputRules, EmulationKeystrokes, type MutableSystemStore,
+  TextStore, ProcessorAction, SystemStoreIDs, SyntheticTextStore,
+  AbstractKeyboardProcessor,
+} from "keyman/engine/keyboard";
+import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
+import { DeviceSpec, KMWString } from "keyman/common/web-utils";
+import { ProcessorInitOptions } from './processorInitOptions.js';
+
+// #endregion
+
+export type LogMessageHandler = (str: string) => void;
+
+export class JSKeyboardProcessor extends AbstractKeyboardProcessor<JSKeyboard, JSKeyboardInterface> {
+  public defaultOutputRules: DefaultOutputRules;
+
+  // Callbacks for various feedback types
+  public warningLogger?: LogMessageHandler;
+  public errorLogger?: LogMessageHandler;
+
+  constructor(device: DeviceSpec, options: ProcessorInitOptions) {
+    super(device, options.baseLayout, options.keyboardInterface);
+
+    this.defaultOutputRules = options.defaultOutputRules;
+  }
+
+  public get layerStore(): MutableSystemStore {
+    return this.keyboardInterface.systemStores[SystemStoreIDs.TSS_LAYER] as MutableSystemStore;
+  }
+
+  public get newLayerStore(): MutableSystemStore {
+    return this.keyboardInterface.systemStores[SystemStoreIDs.TSS_NEWLAYER] as MutableSystemStore;
+  }
+
+  public get oldLayerStore(): MutableSystemStore {
+    return this.keyboardInterface.systemStores[SystemStoreIDs.TSS_OLDLAYER] as MutableSystemStore;
+  }
+
+  public get layerId(): string {
+    return this.layerStore.value;
+  }
+
+  // Note:  will trigger an 'event' callback designed to notify the OSK of layer changes.
+  public set layerId(value: string) {
+    this.layerStore.set(value);
+  }
+
+  /**
+   * Get the default ProcessorAction for the specified key, attempting to mimic standard browser defaults
+   * where and when appropriate.
+   *
+   * @param   {KeyEvent}  Lkc           The pre-analyzed KeyEvent object
+   * @param   {TextStore} textStore     The textStore receiving the KeyEvent
+   * @param   {boolean}   readonly      True if the textStore is read-only
+   * @return  {string}
+   */
+  private defaultRuleBehavior(Lkc: KeyEvent, textStore: TextStore, readonly: boolean): ProcessorAction {
+    const preInput = SyntheticTextStore.from(textStore, readonly);
+    const ruleBehavior = new ProcessorAction();
+
+    let matched = false;
+    let char = '';
+    let special: EmulationKeystrokes;
+    if(Lkc.isSynthetic || textStore.isSynthetic) {
+      matched = true;  // All the conditions below result in matches until the final else, which restores the expected default
+                        // if no match occurs.
+
+      if(this.defaultOutputRules.isCommand(Lkc)) {
+        // Note this in the rule behavior, return successfully.  We'll consider applying it later.
+        ruleBehavior.triggersDefaultCommand = true;
+
+        // We'd rather let the browser handle these keys, but we're using emulated keystrokes, forcing KMW
+        // to emulate default behavior here.
+      } else if((special = this.defaultOutputRules.forSpecialEmulation(Lkc)) != null) {
+        switch(special) {
+          case EmulationKeystrokes.Backspace:
+            this.keyboardInterface.defaultBackspace(textStore);
+            break;
+          case EmulationKeystrokes.Enter:
+            textStore.handleNewlineAtCaret();
+            break;
+          // case '\u007f': // K_DEL
+            // // For (possible) future implementation.
+            // // Would recommend (conceptually) equaling K_RIGHT + K_BKSP, the former of which would technically be a 'command'.
+          default:
+            // In case we extend the allowed set, but forget to implement its handling case above.
+            ruleBehavior.errorLog = "Unexpected 'special emulation' character (\\u" + KMWString.charCodeAt(special as string, 0).toString(16) + ") went unhandled!";
+        }
+      } else {
+        // Back to the standard default, pending normal matching.
+        matched = false;
+      }
+    }
+
+    const isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
+
+    if(!matched) {
+      if((char = this.defaultOutputRules.forAny(Lkc, isMnemonic, ruleBehavior)) != null) {
+        special = this.defaultOutputRules.forSpecialEmulation(Lkc)
+        if(special == EmulationKeystrokes.Backspace) {
+          // A browser's default backspace may fail to delete both parts of an SMP character.
+          this.keyboardInterface.defaultBackspace(textStore);
+        } else if(special || this.defaultOutputRules.isCommand(Lkc)) { // Filters out 'commands' like TAB.
+          // We only do the "for special emulation" cases under the condition above... aside from backspace
+          // Let the browser handle those.
+          return null;
+        } else {
+          this.keyboardInterface.output(0, textStore, char);
+        }
+      } else {
+        // No match, no default ProcessorAction.
+        return null;
+      }
+    }
+
+    // Shortcut things immediately if there were issues generating this rule behavior.
+    if(ruleBehavior.errorLog) {
+      return ruleBehavior;
+    }
+
+    const transcription = textStore.buildTranscriptionFrom(preInput, Lkc, readonly);
+    ruleBehavior.transcription = transcription;
+
+    return ruleBehavior;
+  }
+
+  private processNewContextEvent(device: DeviceSpec, textStore: TextStore): ProcessorAction {
+    return this.activeKeyboard ?
+      this.keyboardInterface.processNewContextEvent(textStore, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
+      null;
+  }
+
+  public processPostKeystroke(device: DeviceSpec, textStore: TextStore): ProcessorAction {
+    return this.activeKeyboard ?
+      this.keyboardInterface.processPostKeystroke(textStore, this.activeKeyboard.constructNullKeyEvent(device, this.stateKeys)) :
+      null;
+  }
+
+  public processKeystroke(keyEvent: KeyEvent, textStore: TextStore): ProcessorAction {
+    let matchBehavior: ProcessorAction;
+
+    // Before keyboard rules apply, check if the left-context is empty.
+    const nothingDeletable = KMWString.length(textStore.getTextBeforeCaret()) == 0 && textStore.isSelectionEmpty();
+
+    // Pass this key code and state to the keyboard program
+    if(this.activeKeyboard && keyEvent.Lcode != 0) {
+      matchBehavior = this.keyboardInterface.processKeystroke(textStore, keyEvent);
+    }
+
+    // Final conditional component - if someone actually makes a keyboard rule that blocks output
+    // of K_BKSP with an empty left-context or does other really weird things... it's on them.
+    //
+    // We don't expect such rules to appear, but trying to override them would likely result in odd
+    // behavior in cases where such rules actually would appear.  (Though, _that_ should be caught
+    // in the keyboard-review process and heavily discouraged, so... yeah.)
+    if(nothingDeletable && keyEvent.Lcode == Codes.keyCodes.K_BKSP && matchBehavior.triggerKeyDefault) {
+      matchBehavior = this.defaultRuleBehavior(keyEvent, textStore, false);
+      matchBehavior.triggerKeyDefault = true;
+      // Force a single `deleteLeft`.
+      // @ts-ignore // force value override, because deleteLeft is marked readonly.
+      matchBehavior.transcription.transform.deleteLeft = 1;
+    } else if(!matchBehavior || matchBehavior.triggerKeyDefault) {
+      // Restore the virtual key code if a mnemonic keyboard is being used
+      // If no vkCode value was stored, maintain the original Lcode value.
+      keyEvent.Lcode=keyEvent.vkCode || keyEvent.Lcode;
+
+      // Handle unmapped keys, including special keys
+      // The following is physical layout dependent, so should be avoided if possible.  All keys should be mapped.
+      this.keyboardInterface.activeTextStore = textStore;
+
+      // Match against the 'default keyboard' - rules to mimic the default string output when typing in a browser.
+      // Many keyboards rely upon these 'implied rules'.
+      const defaultBehavior = this.defaultRuleBehavior(keyEvent, textStore, false);
+      if(defaultBehavior) {
+        if(!matchBehavior) {
+          matchBehavior = defaultBehavior;
+        } else {
+          this.mergeInOtherProcessorAction(matchBehavior, defaultBehavior);
+        }
+        matchBehavior.triggerKeyDefault = false; // We've triggered it successfully.
+      } // If null, we must rely on something else (like the browser, in DOM-aware code) to fulfill the default.
+
+      this.keyboardInterface.activeTextStore = null;
+    }
+
+    return matchBehavior;
+  }
+
+  protected getLayerId(modifier: number): string {
+    return Layouts.getLayerId(modifier);
+  }
+
+  /**
+   * Select the OSK's next keyboard layer based upon layer switching keys as a default
+   * The next layer will be determined from the key name unless otherwise specifed
+   *
+   *  @param  {string}                    keyName     key identifier
+   *  @return {boolean}                               return true if keyboard layer changed
+   */
+  public selectLayer(keyEvent: KeyEvent): boolean {
+    const keyName = keyEvent.kName;
+    let nextLayer = keyEvent.kNextLayer;
+    const isChiral = this.activeKeyboard && this.activeKeyboard.isChiral;
+
+    // Layer must be identified by name, not number (27/08/2015)
+    if(typeof nextLayer == 'number') {
+      nextLayer = this.getLayerId(nextLayer * 0x10);
+    }
+
+    // Identify next layer, if required by key
+    if(!nextLayer) {
+      switch(keyName) {
+        case 'K_LSHIFT':
+        case 'K_RSHIFT':
+        case 'K_SHIFT':
+          nextLayer = 'shift';
+          break;
+        case 'K_LCONTROL':
+        case 'K_LCTRL':
+          if(isChiral) {
+            nextLayer = 'leftctrl';
+            break;
+          }
+        case 'K_RCONTROL':
+        case 'K_RCTRL':
+          if(isChiral) {
+            nextLayer = 'rightctrl';
+            break;
+          }
+        case 'K_CTRL':
+          nextLayer = 'ctrl';
+          break;
+        case 'K_LMENU':
+        case 'K_LALT':
+          if(isChiral) {
+            nextLayer = 'leftalt';
+            break;
+          }
+        case 'K_RMENU':
+        case 'K_RALT':
+          if(isChiral) {
+            nextLayer = 'rightalt';
+            break;
+          }
+        case 'K_ALT':
+          nextLayer = 'alt';
+          break;
+        case 'K_ALTGR':
+          if(isChiral) {
+            nextLayer = 'leftctrl-rightalt';
+          } else {
+            nextLayer = 'ctrl-alt';
+          }
+          break;
+        case 'K_CURRENCIES':
+        case 'K_NUMERALS':
+        case 'K_SHIFTED':
+        case 'K_UPPER':
+        case 'K_LOWER':
+        case 'K_SYMBOLS':
+          nextLayer = 'default';
+          break;
+      }
+    }
+
+    // If no key corresponding to a layer transition is pressed, maintain the current layer.
+    if(!nextLayer) {
+      return false;
+    }
+
+    // Change layer and refresh OSK
+    this.updateLayer(keyEvent, nextLayer);
+
+    return true;
+  }
+
+  /**
+   * Sets the new layer id, allowing for toggling shift/ctrl/alt while preserving the remainder
+   * of the modifiers represented by the current layer id (where applicable)
+   *
+   * @param       {string}      id      layer id (e.g. ctrlshift)
+   */
+  private updateLayer(keyEvent: KeyEvent, id: string) {
+    const activeLayer = this.layerId;
+    let s = activeLayer;
+
+    // Do not change layer unless needed (27/08/2015)
+    if(id == activeLayer && keyEvent.device.formFactor != DeviceSpec.FormFactor.Desktop) {
+      return;
+    }
+
+    let idx=id;
+    let i;
+
+    if(keyEvent.device.formFactor == DeviceSpec.FormFactor.Desktop) {
+      // Need to test if target layer is a standard layer (based on the plain 'default')
+      const replacements= ['leftctrl', 'rightctrl', 'ctrl', 'leftalt', 'rightalt', 'alt', 'shift'];
+
+      for(i=0; i < replacements.length; i++) {
+        // Don't forget to remove the kebab-case hyphens!
+        idx=idx.replace(replacements[i] + '-', '');
+        idx=idx.replace(replacements[i],'');
+      }
+
+      // If we are presently on the default layer, drop the 'default' and go straight to the shifted mode.
+      // If on a common symbolic layer, drop out of symbolic mode and go straight to the shifted mode.
+      if(activeLayer == 'default' || activeLayer == 'numeric' || activeLayer == 'symbol' || activeLayer == 'currency' || idx != '') {
+        s = id;
+      }
+      // Otherwise, we are based upon a layer that accepts modifier variations.
+      // Modify the layer according to the current state and key pressed.
+      //
+      // TODO:  Consider:  should this ever be allowed for a base layer other than 'default'?  If not,
+      // if(idx == '') with accompanying if-else structural shift would be a far better test here.
+      else {
+        // Save our current modifier state.
+        let modifier=Codes.getModifierState(s);
+
+        // Strip down to the base modifiable layer.
+        for(i=0; i < replacements.length; i++) {
+          // Don't forget to remove the kebab-case hyphens!
+          s=s.replace(replacements[i] + '-', '');
+          s=s.replace(replacements[i],'');
+        }
+
+        // Toggle the modifier represented by our input argument.
+        switch(id) {
+          case 'shift':
+            modifier ^= ModifierKeyConstants.K_SHIFTFLAG;
+            break;
+          case 'leftctrl':
+            modifier ^= ModifierKeyConstants.LCTRLFLAG;
+            break;
+          case 'rightctrl':
+            modifier ^= ModifierKeyConstants.RCTRLFLAG;
+            break;
+          case 'ctrl':
+            modifier ^= ModifierKeyConstants.K_CTRLFLAG;
+            break;
+          case 'leftalt':
+            modifier ^= ModifierKeyConstants.LALTFLAG;
+            break;
+          case 'rightalt':
+            modifier ^= ModifierKeyConstants.RALTFLAG;
+            break;
+          case 'alt':
+            modifier ^= ModifierKeyConstants.K_ALTFLAG;
+            break;
+          default:
+            s = id;
+        }
+
+        // Combine our base modifiable layer and attach the new modifier variation info to obtain our destination layer.
+        if(s != 'default') {
+          if(s == '') {
+            s = this.getLayerId(modifier);
+          } else {
+            s = this.getLayerId(modifier) + '-' + s;
+          }
+        }
+      }
+
+      if(s == '') {
+        s = 'default';
+      }
+    } else {
+      // Mobile form-factor.  Either the layout is specified by a keyboard developer with direct layer name references
+      // or all layers are accessed via subkey of a single layer-shifting key - no need for modifier-combining logic.
+      s = id;
+    }
+
+    const layout = this.activeKeyboard.layout(keyEvent.device.formFactor);
+    if(layout.getLayer(s)) {
+      this.layerId = s;
+    } else {
+      this.layerId = 'default';
+    }
+
+    const baseModifierState = Codes.getModifierState(this.layerId);
+    this.modStateFlags = baseModifierState | keyEvent.Lstates;
+  }
+
+  /**
+   * Tell the currently active keyboard that a new context has been selected,
+   * e.g. by focus change, selection change, keyboard change, etc.
+   *
+   * @param    {Object}   textStore  The TextStore that has focus
+   * @returns  {Object}                 A ProcessorAction object describing the cumulative effects of
+   *                                    all matched keyboard rules
+   */
+  private performNewContextEvent(textStore: TextStore): ProcessorAction {
+    const ruleBehavior = this.processNewContextEvent(this.contextDevice, textStore);
+
+    if (ruleBehavior) {
+      this.finalizeProcessorAction(ruleBehavior, textStore);
+    }
+    return ruleBehavior;
+  }
+
+  public resetContext(textStore?: TextStore) {
+    this.layerId = 'default';
+
+    // Make sure all deadkeys for the context get cleared properly.
+    textStore?.resetContext();
+    this.keyboardInterface.resetContextCache();
+
+    // May be null if it's a keyboard swap.
+    // Performed before updateShiftState since the op may modify the displayed layer
+    // Also updates the layer for predictions.
+    if(textStore) {
+      this.performNewContextEvent(textStore);
+    }
+
+    if(!this.contextDevice.touchable) {
+      this.updateShiftState(null);
+    }
+  };
+
+  public setNumericLayer(device: DeviceSpec) {
+    if (this.activeKeyboard) {
+      const layout = this.activeKeyboard.layout(device.formFactor);
+      if(layout.getLayer('numeric')) {
+        this.layerId = 'numeric';
+      }
+    }
+  };
+
+  public finalizeProcessorAction(data: ProcessorAction, textStore: TextStore): void {
+    if (!data.transcription) {
+      throw "Cannot finalize a ProcessorAction with no transcription.";
+    }
+
+    if (this.beepHandler && data.beep) {
+      this.beepHandler(textStore);
+    }
+
+    for (const storeID in data.setStore) {
+      const sysStore = this.keyboardInterface.systemStores[storeID];
+      if (sysStore) {
+        try {
+          sysStore.set(data.setStore[storeID]);
+        } catch (error) {
+          if (this.errorLogger) {
+            this.errorLogger("Rule attempted to perform illegal operation - 'platform' may not be changed.");
+          }
+        }
+      } else if (this.warningLogger) {
+        this.warningLogger("Unknown store affected by keyboard rule: " + storeID);
+      }
+    }
+
+    this.keyboardInterface.applyVariableStores(data.variableStores);
+
+    for (const storeID in data.saveStores) {
+      this.keyboardInterface.variableStoreSerializer.saveStore(this.activeKeyboard.id, storeID, data.saveStores[storeID]);
+    }
+
+    if (data.triggersDefaultCommand) {
+      const keyEvent = data.transcription.keystroke;
+      this.defaultOutputRules.applyCommand(keyEvent, textStore);
+    }
+
+    if (this.warningLogger && data.warningLog) {
+      this.warningLogger(data.warningLog);
+    } else if (this.errorLogger && data.errorLog) {
+      this.errorLogger(data.errorLog);
+    }
+  }
+
+  /**
+   * Merges default-related behaviors from another ProcessorAction into this one.  Assumes that the current instance
+   * "came first" chronologically.  Both RuleBehaviors must be sourced from the same keystroke.
+   *
+   * Intended use:  merging rule-based behavior with default key behavior during scenarios like those described
+   * at https://github.com/keymanapp/keyman/pull/4350#issuecomment-768753852.
+   *
+   * This function does not attempt a "complete" merge for two fully-constructed RuleBehaviors!  Things
+   * WILL break for unintended uses.
+   * @param other
+   */
+  private mergeInOtherProcessorAction(first: ProcessorAction, other: ProcessorAction): void {
+    const keystroke = first.transcription.keystroke;
+    const keyFromOther = other.transcription.keystroke;
+    if (keystroke.Lcode != keyFromOther.Lcode || keystroke.Lmodifiers != keyFromOther.Lmodifiers) {
+      throw "ProcessorAction default-merge not supported unless keystrokes are identical!";
+    }
+
+    first.triggersDefaultCommand = first.triggersDefaultCommand || other.triggersDefaultCommand;
+
+    const mergingTextStore = SyntheticTextStore.from(first.transcription.preInput, false);
+    mergingTextStore.apply(first.transcription.transform);
+    mergingTextStore.apply(other.transcription.transform);
+
+    first.transcription = mergingTextStore.buildTranscriptionFrom(first.transcription.preInput, keystroke, false, first.transcription.alternates);
+  }
+
+}

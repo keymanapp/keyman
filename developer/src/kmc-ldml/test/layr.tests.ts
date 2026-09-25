@@ -4,10 +4,11 @@ import { LayrCompiler } from '../src/compiler/layr.js';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 import { compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
-import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { constants, KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 
 import Layr = KMXPlus.Layr;
 import LayrRow = KMXPlus.LayrRow;
+import { withOffset } from '@keymanapp/developer-utils';
 
 function allKeysOk(row : LayrRow, str : string, msg? : string) {
   const split = str.split(' ');
@@ -20,6 +21,8 @@ function allKeysOk(row : LayrRow, str : string, msg? : string) {
 describe('layr', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
+  // TODO-EMBED-OSK-IN-KMX: add v19 tests
+
   testCompilationCases(LayrCompiler, [
     {
       subpath: 'sections/keys/minimal.xml',
@@ -28,12 +31,12 @@ describe('layr', function () {
         assert.ok(layr);
         assert.equal(compilerTestCallbacks.messages.length, 0);
 
-        assert.equal(layr.lists?.length, 1);
-        const list0 = layr.lists[0];
-        assert.ok(list0);
-        assert.equal(list0.layers.length, 1);
-        assert.equal(list0.hardware.value, 'us');
-        const layer0 = list0.layers[0];
+        assert.equal(layr.forms?.length, 1);
+        const form0 = layr.forms[0];
+        assert.ok(form0);
+        assert.equal(form0.layers.length, 1);
+        assert.equal(form0.hardware.value, 'us');
+        const layer0 = form0.layers[0];
         assert.ok(layer0);
         assert.equal(layer0.rows.length, 1);
         const row0 = layer0.rows[0];
@@ -49,13 +52,13 @@ describe('layr', function () {
       subpath: 'sections/keys/maximal.xml',
       callback(sect) {
         const layr = <Layr> sect;
-        assert.equal(layr.lists?.length, 2);
+        assert.equal(layr.forms?.length, 2);
 
-        const listHardware = layr.lists.find(v => v.hardware.value === 'iso');
-        assert.ok(listHardware);
-        assert.equal(listHardware.minDeviceWidth, 0);
-        assert.equal(listHardware.layers.length, 2);
-        const hardware0 = listHardware.layers[0];
+        const formHardware = layr.forms.find(v => v.hardware.value === 'iso');
+        assert.ok(formHardware);
+        assert.equal(formHardware.minDeviceWidth, 0);
+        assert.equal(formHardware.layers.length, 2);
+        const hardware0 = formHardware.layers[0];
         assert.ok(hardware0);
         assert.equal(hardware0.id.value, 'base');
         assert.equal(hardware0.mod, constants.keys_mod_none);
@@ -63,7 +66,7 @@ describe('layr', function () {
         assert.ok(hardware0row0);
         assert.equal(hardware0row0.keys.length, 2);
         allKeysOk(hardware0row0,'Q W', 'hardware0row0');
-        const hardware1 = listHardware.layers[1];
+        const hardware1 = formHardware.layers[1];
         assert.ok(hardware1);
         assert.equal(hardware1.rows.length, 1);
         assert.equal(hardware1.id.value, 'shift');
@@ -73,11 +76,11 @@ describe('layr', function () {
         assert.equal(hardware1row0.keys.length, 3);
         allKeysOk(hardware1row0,'q w amarker', 'hardware1row0');
 
-        const listTouch = layr.lists.find(v => v.hardware.value === constants.layr_list_hardware_touch);
-        assert.ok(listTouch);
-        assert.equal(listTouch.minDeviceWidth, 300);
-        assert.equal(listTouch.layers.length, 1);
-        const touch0 = listTouch.layers[0];
+        const formTouch = layr.forms.find(v => v.hardware.value === constants.layr_form_hardware_touch);
+        assert.ok(formTouch);
+        assert.equal(formTouch.minDeviceWidth, 300);
+        assert.equal(formTouch.layers.length, 1);
+        const touch0 = formTouch.layers[0];
         assert.ok(touch0);
         assert.equal(touch0.rows.length, 1);
         assert.equal(touch0.id.value, 'base');
@@ -96,8 +99,7 @@ describe('layr', function () {
       subpath: 'sections/keys/invalid-bad-modifier.xml',
       errors: [
         LdmlCompilerMessages.Error_InvalidModifier({
-          layer: 'base',
-          modifiers: 'altR-shift'
+          modifiers: 'altR-shift',
         }),
       ],
     },
@@ -108,7 +110,14 @@ describe('layr', function () {
     {
       // missing layer element
       subpath: 'sections/layr/invalid-missing-layer.xml',
-      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement()],
+      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(withOffset(40))],
+      retainOffsetInMessages: true,
+    },
+    {
+      // missing layer element
+      subpath: 'sections/layr/invalid-missing-layer2.xml',
+      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement(withOffset(40))],
+      retainOffsetInMessages: true,
     },
     {
       // keep in sync with similar test in test-keys.ts
@@ -116,8 +125,8 @@ describe('layr', function () {
       callback(sect) {
         const layr = <Layr> sect;
         assert.ok(layr);
-        assert.equal(layr.lists.length, 1, 'layr.lists.length');
-        const layers = layr.lists[0];
+        assert.equal(layr.forms.length, 1, 'layr.forms.length');
+        const layers = layr.forms[0];
         const bymod = layers.layers.map(({id,mod,rows})=>([
           id.value, mod, rows[0].keys[0].value,
         ]));
@@ -132,7 +141,7 @@ describe('layr', function () {
     {
       subpath: 'sections/layr/error-bogus-modifiers.xml',
       errors: [
-        LdmlCompilerMessages.Error_InvalidModifier({ layer: '', modifiers: 'caps bogus'}),
+        LdmlCompilerMessages.Error_InvalidModifier({ modifiers: 'caps bogus' }),
       ]
     },
     {
@@ -142,12 +151,12 @@ describe('layr', function () {
         assert.ok(layr);
         assert.equal(compilerTestCallbacks.messages.length, 0);
 
-        assert.equal(layr.lists?.length, 1);
-        const list0 = layr.lists[0];
-        assert.ok(list0);
-        assert.equal(list0.layers.length, 1);
-        assert.equal(list0.hardware.value, 'us');
-        const layer0 = list0.layers[0];
+        assert.equal(layr.forms?.length, 1);
+        const form0 = layr.forms[0];
+        assert.ok(form0);
+        assert.equal(form0.layers.length, 1);
+        assert.equal(form0.hardware.value, 'us');
+        const layer0 = form0.layers[0];
         assert.ok(layer0);
         assert.equal(layer0.rows.length, 2);
         assert.equal(layer0.id.value, 'base');
@@ -160,5 +169,18 @@ describe('layr', function () {
         }
       },
     },
-  ]);
+    {
+      subpath: 'sections/layr/error-dup-width.xml',
+      errors: [
+        LdmlCompilerMessages.Error_DuplicateLayerWidth({ minDeviceWidth: 120}),
+      ]
+    },
+    ...[0, 1024, 1500, `x` as unknown as number].map(minDeviceWidth => ({
+      subpath: `sections/layr/error-bad-width-${minDeviceWidth}.xml`,
+      errors: [
+        //
+        LdmlCompilerMessages.Error_InvalidLayerWidth({ minDeviceWidth }),
+      ]
+    })),
+  ], KMXPlusVersion.Version17);
 });

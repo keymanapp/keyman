@@ -67,8 +67,11 @@
 /* copyright label in the Package Information window */
 "copyright-label" = "တၠမူ:";
 
-/* message displayed to alert user to need grant accessibility permission */
+/* message displayed to alert user to grant accessibility permission in Preferences, pre-Ventura */
 "privacy-alert-text" = "ဂွံကၠောန်ကမၠောန်ခိုဟ်ဟ်မာန်ှဂှ် ကဳမာန်ဒးသုၚ်စောဲ နဲကဲဆက်စၠောံအကြာစက်ဂမၠိုၚ်ရ။\n\nအာပ္ဍဲ တၚ်ပလေဝ်သၞောတ်စက်၊ ပရေၚ်ဂီုဂၠီု ကေုာံ ပရေၚ်ဂီုဂၠီုပူဂဵု တုဲ ကဵုအခေါၚ်ညိ။\nကလေၚ်ပံက်ကၟာတ်စက်ညိ။";
+
+/* message displayed to alert user to grant accessibility permission in Settings, for macOS Ventura and later */
+"privacy-alert-text-ventura" = "ဂွံကၠောန်ကမၠောန်ခိုဟ်ဟ်မာန်ှဂှ် Keyman ဒးသုၚ်စောဲ နဲကဲဆက်စၠောံအကြာစက်ဂမၠိုၚ်ရ။\n\nအာပ္ဍဲ တၚ်ပလေဝ်သၞောတ်စက်၊ ပရေၚ်ဂီုကၠီု ကေုာံ ပရေၚ်ဂီုကၠီုပူဂဵု တုဲ ကဵုအခေါၚ်ညိ။\nကလေၚ်ပံက်ကၟာတ်စက်ညိ";
 
 /* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
 "no-keyboard-configured-menu-placeholder" = "(ကဳဗုဒ် လဵုမွဲဟွံမွဲ)";

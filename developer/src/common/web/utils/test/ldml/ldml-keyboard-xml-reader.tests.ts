@@ -8,6 +8,7 @@ import { testReaderCases } from '../helpers/reader-callback-test.js';
 import CLDRScanToVkey = Constants.CLDRScanToVkey;
 import CLDRScanToKeyMap = Constants.CLDRScanToKeyMap;
 import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
+import { KeymanXMLReader, withOffset, XML_FILENAME_SYMBOL } from '../../src/xml-utils.js';
 
 function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
   return keys.filter(({id}) => ids.indexOf(id) !== -1);
@@ -24,7 +25,7 @@ describe('ldml keyboard xml reader tests', function () {
         keyword: 'required',
         message: `must have required property 'info'`,
         params: 'missingProperty="info"',
-      })],
+      }, withOffset(39))],
     },
     {
       subpath: 'invalid-conforms-to.xml',
@@ -33,7 +34,7 @@ describe('ldml keyboard xml reader tests', function () {
         keyword: 'enum',
         message: `must be equal to one of the allowed values`,
         params: 'allowedValues="45,46"', // this has to be kept in sync with the DTD
-      })],
+      }, withOffset(39))],
     },
     {
       subpath: 'import-minimal.xml',
@@ -140,10 +141,18 @@ describe('ldml keyboard xml reader tests', function () {
           { id: 'interrobang', output: '‽' },
           { id: 'snail', output: '@' },
         ]);
+        const snailKey = source?.keyboard3?.keys.key.find(({ id }) => id === 'snail');
         // all of the keys are implied imports here
-        assert.isFalse(ImportStatus.isImpliedImport(source?.keyboard3?.keys.key.find(({id}) => id === 'snail')));
-        assert.isTrue(ImportStatus.isImport(source?.keyboard3?.keys.key.find(({id}) => id === 'snail')));
-        assert.isTrue(ImportStatus.isLocalImport(source?.keyboard3?.keys.key.find(({id}) => id === 'snail')));
+        assert.isFalse(ImportStatus.isImpliedImport(snailKey));
+        assert.isTrue(ImportStatus.isImport(snailKey));
+        assert.isTrue(ImportStatus.isLocalImport(snailKey));
+        // get the actual filename of where the import was located
+        const metadata = KeymanXMLReader.getMetaData(snailKey);
+        assert.ok(metadata);
+        const snailFilename = (metadata)[XML_FILENAME_SYMBOL];
+        assert.ok(snailFilename);
+        assert.ok(/keys-Zyyy-morepunctuation.xml$/.test(snailFilename)
+          , `snail key filename is ${snailFilename}`);
       },
     },
     {

@@ -29,7 +29,7 @@ export class HotkeyManager {
    */
   addHotKey(keyCode: number, shiftState: number, handler: () => void) {
     // Test if existing handler for this code and replace it if so
-    for(var i=0; i<this.hotkeys.length; i++) {
+    for(let i=0; i<this.hotkeys.length; i++) {
       if(this.hotkeys[i].code == keyCode && this.hotkeys[i].shift == shiftState) {
         this.hotkeys[i].handler = handler;
         return;
@@ -48,7 +48,7 @@ export class HotkeyManager {
    * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
    */
   removeHotkey(keyCode: number, shiftState: number) {
-    for(var i=0; i<this.hotkeys.length; i++) {
+    for(let i=0; i<this.hotkeys.length; i++) {
       if(this.hotkeys[i].matches(keyCode, shiftState)) {
         this.hotkeys.splice(i,1);
         return;
@@ -67,18 +67,18 @@ export class HotkeyManager {
       e = window.event as KeyboardEvent;
     }
 
-    var _Lcode = _GetEventKeyCode(e);
+    const _Lcode = _GetEventKeyCode(e);
     if(_Lcode == null) {
       return false;
     }
 
     // Removed testing of e.shiftKey==null  I3363 (Build 301)
-    var _Lmodifiers =
+    const _Lmodifiers =
       (e.shiftKey ? 0x10 : 0) |
       (e.ctrlKey ? 0x20 : 0) |
       (e.altKey ? 0x40 : 0);
 
-    for(var i=0; i<this.hotkeys.length; i++) {
+    for(let i=0; i<this.hotkeys.length; i++) {
       if(this.hotkeys[i].matches(_Lcode, _Lmodifiers)) {
         this.hotkeys[i].handler();
         e.returnValue = false;

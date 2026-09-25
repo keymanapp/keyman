@@ -81,7 +81,7 @@ async function doCopy(callbacks: NodeCompilerCallbacks, sources: string | string
 
   const dest = options.outPath;
   callbacks.reportMessage(InfrastructureMessages.Info_CopyingProject({source, dest}));
-  const result = runCopier(callbacks, source, options);
+  const result = await runCopier(callbacks, source, options);
   if(result) {
     callbacks.reportMessage(InfrastructureMessages.Info_ProjectCopiedSuccessfully({source, dest}));
   } else {

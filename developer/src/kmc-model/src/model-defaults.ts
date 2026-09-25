@@ -1,3 +1,9 @@
+// Since methods in this file get written out via .toString to actual models,
+// and `var` is needed to support the initial version of Chrome loaded onto
+// the oldest Android devices we support, we relax the no-var rule here.
+
+/* eslint no-var: 0 */
+
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import CasingForm = LexicalModelTypes.CasingForm;
 import CasingFunction = LexicalModelTypes.CasingFunction;

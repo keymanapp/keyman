@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="ssLanguageName" comment="User interface language name in the UI language">Українська</string>
+  <string name="ssLanguageNameInEnglish" comment="User interface language name in English">Ukrainian</string>
   <string name="ssApplicationTitle">$APPNAME $VERSION налаштування</string>
   <string name="ssTitle">Встановити $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION було успішно встановлено.</string>

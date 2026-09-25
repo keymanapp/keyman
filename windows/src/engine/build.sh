@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe \
@@ -19,7 +19,7 @@ builder_describe \
   ":keyman                 Main host process (32 bit)" \
   ":keyman32               Keystroke processing engine (all archs)" \
   ":keymanmc               Message library" \
-  ":keymanx64              Host process (64 bit)" \
+  ":keymanhp              Host process (64 bit)" \
   ":kmcomapi               COM API library" \
   ":kmrefresh              Helper app to refresh Windows language settings" \
   ":kmtip                  Text Services Framework Text Input Processor" \

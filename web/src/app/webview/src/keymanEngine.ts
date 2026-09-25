@@ -1,13 +1,13 @@
-import { DeviceSpec, DefaultRules } from 'keyman/engine/keyboard';
-import { RuleBehavior } from 'keyman/engine/js-processor';
-import { KeymanEngineBase, KeyboardInterface } from 'keyman/engine/main';
+import { DeviceSpec } from 'keyman/common/web-utils';
+import { DefaultOutputRules, ProcessorAction } from 'keyman/engine/keyboard';
+import { KeymanEngineBase, KeyboardInterfaceBase } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
 import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 
 import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec } from './configuration.js';
-import ContextManager, { ContextHost } from './contextManager.js';
-import PassthroughKeyboard from './passthroughKeyboard.js';
+import { ContextManager, HostTextStore } from './contextManager.js';
+import { PassthroughKeyboard } from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
 import { WorkerFactory } from '@keymanapp/lexical-model-layer';
 
@@ -18,8 +18,8 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
   constructor(workerFactory: WorkerFactory, sourceUri: string) {
     const config = new WebviewConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
-    config.onRuleFinalization = (ruleBehavior: RuleBehavior) => {
-      (this.context as ContextHost).updateHost(ruleBehavior.transcription);
+    config.onRuleFinalization = (ruleBehavior: ProcessorAction) => {
+      (this.context as HostTextStore).updateHost(ruleBehavior.transcription);
     }
 
     config.stubNamespacer = (stub) => {
@@ -33,10 +33,9 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
 
     super(workerFactory, config, new ContextManager(config), (engine) => {
       return {
-        // The `engine` parameter cannot be supplied with the constructing instance before calling
-        // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
-        keyboardInterface: new KeyboardInterface(window, engine, config.stubNamespacer),
-        defaultOutputRules: new DefaultRules()
+        baseLayout: 'us',
+        keyboardInterface: new KeyboardInterfaceBase(window, engine, config.stubNamespacer),
+        defaultOutputRules: new DefaultOutputRules()
       };
     });
 
@@ -44,7 +43,7 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
   }
 
   async init(options: Required<WebviewInitOptionSpec>) {
-    let device = new DeviceSpec(
+    const device = new DeviceSpec(
       'native',
       options.embeddingApp.indexOf('Tablet') >= 0 ? 'tablet' : 'phone',
       this.config.hostDevice.OS,
@@ -125,7 +124,7 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
       key = child;
     }
 
-    var w=key.offsetWidth,
+    const w=key.offsetWidth,
         h=key.offsetHeight,
         // Since the full OSKManager '_Box' is displayed within the keyboards' WebViews,
         // these calculations should be performed with respect to that, rather than osk.vkbd.kbdDiv.
@@ -158,6 +157,6 @@ export class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, Context
   getOskWidth?: () => number = null;
 
   get context() {
-    return this.contextManager.activeTarget;
+    return this.contextManager.activeTextStore;
   }
 }

@@ -1,5 +1,5 @@
 
-WIXPATH="$ProgramFilesx86/WiX Toolset v3.11/bin"
+WIXPATH="$ProgramFilesx86/WiX Toolset v3.14/bin"
 
 # !IFDEF LINT
 WIXLIGHTLINT=()

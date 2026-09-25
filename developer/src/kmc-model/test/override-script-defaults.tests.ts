@@ -7,7 +7,7 @@ const THIN_SPACE = "\u2009";
 
 describe('The script overrides word breaker decorator', function () {
   it('should decorate an existing word breaker', function () {
-    let breakWords = decorateWithScriptOverrides(defaultWordBreaker, 'break-words-at-spaces')
+    const breakWords = decorateWithScriptOverrides(defaultWordBreaker, 'break-words-at-spaces')
     assert.isFunction(breakWords);
   });
 
@@ -19,11 +19,11 @@ describe('The script overrides word breaker decorator', function () {
   const expectedNumSpans = phraseSpans.length;
 
   it(`should break «${[phrase]}» as ${expectedNumSpans} spans`, function () {
-    let breakWords = decorateWithScriptOverrides(defaultWordBreaker, 'break-words-at-spaces');
-    let defaultResult = defaultWordBreaker(phrase);
+    const breakWords = decorateWithScriptOverrides(defaultWordBreaker, 'break-words-at-spaces');
+    const defaultResult = defaultWordBreaker(phrase);
 
     assert.isAbove(defaultResult.length, expectedNumSpans);
-    let actualResult = breakWords(phrase);
+    const actualResult = breakWords(phrase);
     assert.lengthOf(actualResult, expectedNumSpans);
     assert.deepEqual(actualResult.map(grabText), phraseSpans);
   });

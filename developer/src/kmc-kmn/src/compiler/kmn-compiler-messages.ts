@@ -1,7 +1,7 @@
-import { KeyAddress } from "../kmw-compiler/validate-layout-file.js";
+import { KeyAddress } from "../kmw-compiler/compile-layout-file.js";
 import { kmnfile } from "../kmw-compiler/compiler-globals.js";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException, KeymanUrls } from "@keymanapp/developer-utils";
-
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageObjectSpec as mx, CompilerMessageDef as def, CompilerMessageSpecWithException, KeymanUrls } from "@keymanapp/developer-utils";
+import { ObjectWithCompileContext } from "@keymanapp/common-types";
 const Namespace = CompilerErrorNamespace.KmnCompiler;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
 const SevHint = CompilerErrorSeverity.Hint | Namespace;
@@ -12,6 +12,9 @@ const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 // For messages from the KeymanWeb compiler, we need to construct our messages
 // slightly differently. This could be refactored in the future, as it is not
 // obvious which messages should use which function.
+// Specifically, this could perhaps use CompilerFileCallbacks which provides a
+// default filename.
+// Then, there could be a CompilerMessageSpecWithLine
 const mw = (code: number, message: string, o?: {filename?: string, line?: number}) : CompilerEvent => ({
   ...m(code, message),
   filename: o?.filename ?? kmnfile,
@@ -65,9 +68,10 @@ type KmcmpLibMessageParameters = {p:string[]};
  * ```
  */
 export class KmnCompilerMessages {
-  // TODO: v18.0 we should consider moving error message generation in kmcmplib to
-  // kmc-kmn, which would avoid a number of legacy issues. Questions about
-  // parameterisation.
+
+  //------------------------------------------------------------------------------|
+  // max length of detail message lines (checked by verifyCompilerMessagesObject) |
+  //------------------------------------------------------------------------------|
 
   static FATAL_UnexpectedException = SevFatal | 0x900;
   static Fatal_UnexpectedException = (o:{e: any}) => CompilerMessageSpecWithException(
@@ -104,9 +108,8 @@ export class KmnCompilerMessages {
   );
 
   static FATAL_UnicodeSetOutOfRange = SevFatal | 0x904;
-  static Fatal_UnicodeSetOutOfRange = () => CompilerMessageSpecWithException(
-    this.FATAL_UnicodeSetOutOfRange,
-    null,
+  static Fatal_UnicodeSetOutOfRange = (compileContext?: ObjectWithCompileContext) => mx(
+    this.FATAL_UnicodeSetOutOfRange, compileContext,
     `UnicodeSet buffer was too small`,
     `Raised when caller to UnicodeSet functions provides an invalid buffer. If
     you experience this error, it should be reported to the Keyman team for
@@ -116,8 +119,8 @@ export class KmnCompilerMessages {
   // TODO: rename the following functions to Error_UsetHasStrings etc
 
   static ERROR_UnicodeSetHasStrings = SevError | 0x905;
-  static Error_UnicodeSetHasStrings = () => m(
-    this.ERROR_UnicodeSetHasStrings,
+  static Error_UnicodeSetHasStrings = (compileContext?: ObjectWithCompileContext) => mx(
+    this.ERROR_UnicodeSetHasStrings, compileContext,
     `uset contains strings, not allowed`,
     `The provided uset uses multi-character strings, (\`{}\` notation, e.g.
     \`[żġħ{ie}{għ}]\`. ). Although full UnicodeSets support strings, LDML
@@ -128,8 +131,8 @@ export class KmnCompilerMessages {
   );
 
   static ERROR_UnicodeSetHasProperties = SevError | 0x906;
-  static Error_UnicodeSetHasProperties = () => m(
-    this.ERROR_UnicodeSetHasProperties,
+  static Error_UnicodeSetHasProperties = (compileContext?: ObjectWithCompileContext) => mx(
+    this.ERROR_UnicodeSetHasProperties, compileContext,
     `uset contains properties, not allowed`,
     `The provided uset uses property notation (\`\\p{…}\` or \`[:…:]\`). LDML
     keyboards do not support Unicode properties in usets, because that would
@@ -140,8 +143,8 @@ export class KmnCompilerMessages {
   );
 
   static ERROR_UnicodeSetSyntaxError = SevError | 0x907;
-  static Error_UnicodeSetSyntaxError = () => m(
-    this.ERROR_UnicodeSetSyntaxError,
+  static Error_UnicodeSetSyntaxError = (compileContext?: ObjectWithCompileContext) => mx(
+    this.ERROR_UnicodeSetSyntaxError, compileContext,
     `uset had a Syntax Error while parsing`,
     `The provided uset has a syntax error and could not be parsed. Verify the
     format of the uset against the specification.
@@ -195,10 +198,121 @@ export class KmnCompilerMessages {
   static ERROR_FileNotFound = SevError | 0x90C;
   static Error_FileNotFound = (o:{filename: string}) => m(
     this.ERROR_FileNotFound,
-    `File ${def(o.filename)} was not found`,
-    `The file was not found on the disk. Verify that you have the correct path
-    to the file.`
-  );
+    `File ${def(o.filename)} was not found`, `
+    The file was not found on the disk. Verify that you have the correct path
+    to the file.
+  `);
+
+  static WARN_EmbeddedOskDoesNotSupportBitmaps               = SevWarn | 0x90D;
+  static Warn_EmbeddedOskDoesNotSupportBitmaps               = (o:{keyId: string}) => m(
+    this.WARN_EmbeddedOskDoesNotSupportBitmaps,
+    `The On-Screen Keyboard key '${def(o.keyId)}' uses a bitmap, which is not supported in v19+ embedded On-Screen Keyboards`, `
+    The v19+ On-Screen Keyboard is embedded into the .kmx file. However, bitmap
+    images are not supported for key caps. To support arbitrary images, use a
+    custom font for the On-Screen Keyboard.
+  `);
+
+  static HINT_EmbeddedOskDoesNotSupportNonUnicode               = SevHint | 0x90E;
+  static Hint_EmbeddedOskDoesNotSupportNonUnicode               = (o:{keyId: string}) => m(
+    this.HINT_EmbeddedOskDoesNotSupportNonUnicode,
+    `The On-Screen Keyboard key '${def(o.keyId)}' is not Unicode, and will be ignored`, `
+    The v19+ On-Screen Keyboard is embedded into the .kmx file. However,
+    non-Unicode key caps are not supported in the .kmx embedded On-Screen
+    Keyboard. Only the first non-Unicode key cap found will be reported.
+  `);
+
+  static WARN_InvalidUnicodeKeyId_NaN           = SevWarn | 0x90F;
+  static Warn_InvalidUnicodeKeyId_NaN           = (o:{id: string, component: string}) => m(
+    this.WARN_InvalidUnicodeKeyId_NaN,
+    `The On-Screen Keyboard key '${def(o.id)}' identifier component '${def(o.component)}' is not a valid hexadecimal value`, `
+    The identifier should be in the form 'U_aaaa[_bbbb[...]]' where each
+    component ('aaaa' and 'bbbb' and so on) are permitted Unicode codepoints in
+    hexadecimal. Control codes and non-character codepoints are not permitted.
+    For more detail, see
+    https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
+  `);
+
+  static WARN_InvalidUnicodeKeyId_Control       = SevWarn | 0x910;
+  static Warn_InvalidUnicodeKeyId_Control       = (o:{id: string, component: string}) => m(
+    this.WARN_InvalidUnicodeKeyId_Control,
+    `The On-Screen Keyboard key '${def(o.id)}' identifier component '${def(o.component)}' is a control character`, `
+    The identifier should be in the form 'U_aaaa[_bbbb[...]]' where each
+    component ('aaaa' and 'bbbb' and so on) are permitted Unicode codepoints in
+    hexadecimal. Control codes and non-character codepoints are not permitted.
+    For more detail, see
+    https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
+  `);
+
+  static WARN_InvalidUnicodeKeyId_Noncharacter  = SevWarn | 0x911;
+  static Warn_InvalidUnicodeKeyId_Noncharacter  = (o:{id: string, component: string}) => m(
+    this.WARN_InvalidUnicodeKeyId_Noncharacter,
+    `The On-Screen Keyboard key '${def(o.id)}' identifier component '${def(o.component)}' is a reserved non-character`, `
+    The identifier should be in the form 'U_aaaa[_bbbb[...]]' where each
+    component ('aaaa' and 'bbbb' and so on) are permitted Unicode codepoints in
+    hexadecimal. Control codes and non-character codepoints are not permitted.
+    For more detail, see
+    https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
+  `);
+
+  static WARN_InvalidUnicodeKeyId_SurrogatePair = SevWarn | 0x912;
+  static Warn_InvalidUnicodeKeyId_SurrogatePair = (o:{id: string, component: string}) => m(
+    this.WARN_InvalidUnicodeKeyId_SurrogatePair,
+    `The On-Screen Keyboard key '${def(o.id)}' identifier component '${def(o.component)}' is a Unicode surrogate`, `
+    The identifier should be in the form 'U_aaaa[_bbbb[...]]' where each
+    component ('aaaa' and 'bbbb' and so on) are permitted Unicode codepoints in
+    hexadecimal. Control codes and non-character codepoints are not permitted.
+    Use the whole Unicode codepoint rather than a surrogate pair
+    (e.g. \`U_1F600\`). For more detail, see
+    https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
+  `);
+
+  static WARN_InvalidUnicodeKeyId_OutOfRange    = SevWarn | 0x913;
+  static Warn_InvalidUnicodeKeyId_OutOfRange    = (o:{id: string, component: string}) => m(
+    this.WARN_InvalidUnicodeKeyId_OutOfRange,
+    `The On-Screen Keyboard key '${def(o.id)}' identifier component '${def(o.component)}' is not a valid Unicode character`, `
+    The identifier should be in the form 'U_aaaa[_bbbb[...]]' where each
+    component ('aaaa' and 'bbbb' and so on) are permitted Unicode codepoints in
+    hexadecimal. Control codes and non-character codepoints are not permitted.
+    The range of characters permitted is from 0020 - 10FFFD. For more detail, see
+    https://help.keyman.com/developer/language/guide/virtual-keys#toc-key-codes
+  `);
+
+  static WARN_TouchLayoutSpecialLabelNotValid               = SevWarn | 0x914;
+  static Warn_TouchLayoutSpecialLabelNotValid               = (o:{id: string, text: string}) => m(
+    this.WARN_TouchLayoutSpecialLabelNotValid,
+    `The On-Screen Keyboard key '${def(o.id)}' has an invalid "special" key cap value '${def(o.text)}'`, `
+    Key cap values of the form '*TEXT*' are reserved; for more detail, see
+    https://help.keyman.com/developer/current-version/reference/file-types/keyman-touch-layout#toc-key-text
+  `);
+
+  static WARN_TouchLayoutKeyIdUsedMoreThanOnceInALayer               = SevWarn | 0x915;
+  static Warn_TouchLayoutKeyIdUsedMoreThanOnceInALayer               = (o:{id: string, layer: string, resolvedId: string}) => m(
+    this.WARN_TouchLayoutKeyIdUsedMoreThanOnceInALayer,
+    `The On-Screen Keyboard key id '${def(o.id)}' is used more than once on layer '${def(o.layer)}'. The resolved id for the duplicate is '${def(o.resolvedId)}'`, `
+    Key ids should not be re-used on the same layer, because each key should be
+    unique for a given layer. The compiler will de-duplicate the identifier but
+    the unique value it generates may change, so it cannot be safely used for
+    example with CSS rules to identify the key.
+
+    If you do want to use the same key rule for the same layer, for example if
+    you have a longpress and a flick with the same output, it is safer to use
+    two different ids and repeat the rule, or use \`store\` and \`any\` to
+    match both key ids in the one rule.
+    https://help.keyman.com/developer/current-version/reference/file-types/keyman-touch-layout#toc-key-code
+  `);
+
+  static WARN_TouchLayoutInvalidKeyId               = SevWarn | 0x916;
+  static Warn_TouchLayoutInvalidKeyId               = (o:{id: string, layerId: string}) => m(
+    this.WARN_TouchLayoutInvalidKeyId,
+    `The On-Screen Keyboard key id '${def(o.id)}' on layer '${def(o.layerId)}' is not valid.`, `
+    Key ids must start with 'K_', 'T_', or 'U_'. Keys starting with 'K_' must be
+    one of the reserved virtual key codes. For more information, see
+    https://help.keyman.com/developer/current-version/reference/file-types/keyman-touch-layout#toc-key-code
+  `);
+
+  //------------------------------------------------------------------------------|
+  // Messages below this point come from kmcmplib                                 |
+  //------------------------------------------------------------------------------|
 
   // static STATUS_None                                            = 0x000;   // This is not a real error
   // static STATUS_EndOfFile                                       = 0x001;   // This is not a real error
@@ -459,8 +573,8 @@ export class KmnCompilerMessages {
     `Virtual keys are not valid for mnemonic layouts`, o);
 
   static ERROR_InvalidTouchLayoutFile                         = SevError | 0x059;
-  static Error_InvalidTouchLayoutFile = (o:{filename:string}) => mw(this.ERROR_InvalidTouchLayoutFile,
-    `Touch layout file ${def(o.filename)} is not valid`);
+  static Error_InvalidTouchLayoutFile = (o:{filename:string, message: string}) => mw(this.ERROR_InvalidTouchLayoutFile,
+    `Touch layout file ${def(o.filename)} is not valid: ${def(o.message)}`);
 
   static ERROR_TouchLayoutInvalidIdentifier                   = SevError | 0x05A;
   static Error_TouchLayoutInvalidIdentifier = (o:{keyId:string, platformName: string, layerId:string, address:KeyAddress}) => mw(this.ERROR_TouchLayoutInvalidIdentifier,
@@ -769,6 +883,58 @@ export class KmnCompilerMessages {
     * [\`save()\`](https://help.keyman.com/developer/language/reference/save)
     * [\`set()\`](https://help.keyman.com/developer/language/reference/set)
     * [\`use()\`](https://help.keyman.com/developer/language/reference/use)`
+  );
+
+  static ERROR_NameMustBeAtLeastOneCharLong                   = SevError | 0x0B4;
+  static Error_NameMustBeAtLeastOneCharLong                   = () => m(
+    this.ERROR_NameMustBeAtLeastOneCharLong,
+    `The name parameter is required`,
+  );
+
+  static ERROR_NameMustBeAtMostNCharsLong                     = SevError | 0x0B5;
+  static Error_NameMustBeAtMostNCharsLong                     = (o:{name:string,length:string}) => m(
+    this.ERROR_NameMustBeAtMostNCharsLong,
+    `The referenced name '${def(o.name)}' must be at most ${def(o.length)} characters long`,
+  );
+
+  static ERROR_NameContainsInvalidCharacter                   = SevError | 0x0B6;
+  static Error_NameContainsInvalidCharacter                   = (o:{name:string}) => m(
+    this.ERROR_NameContainsInvalidCharacter,
+    `The referenced name '${def(o.name)}' contains an invalid character`,
+    `Names (or identifiers) must not contain spaces, commas, parentheses,
+    square brackets, control characters, or Unicode non-characters.`
+  );
+
+  static ERROR_NameMustNotContainSpaces                       = SevError | 0x0B7;
+  static Error_NameMustNotContainSpaces                       = (o:{name:string}) => m(
+    this.ERROR_NameMustNotContainSpaces,
+    `The referenced name '${def(o.name)}' must not contain spaces`,
+    `Names (or identifiers) must not contain spaces, commas, parentheses,
+    square brackets, control characters, or Unicode non-characters.`
+  );
+
+  static ERROR_NameMustNotContainComma                        = SevError | 0x0B8;
+  static Error_NameMustNotContainComma                        = (o:{name:string}) => m(
+    this.ERROR_NameMustNotContainComma,
+    `The referenced name '${def(o.name)}' must not contain commas`,
+    `Names (or identifiers) must not contain spaces, commas, parentheses,
+    square brackets, control characters, or Unicode non-characters.`
+  );
+
+  static ERROR_NameMustNotContainParentheses                  = SevError | 0x0B9;
+  static Error_NameMustNotContainParentheses                  = (o:{name:string}) => m(
+    this.ERROR_NameMustNotContainParentheses,
+    `The referenced name '${def(o.name)}' must not contain opening or closing parentheses`,
+    `Names (or identifiers) must not contain spaces, commas, parentheses,
+    square brackets, control characters, or Unicode non-characters.`
+  );
+
+  static ERROR_NameMustNotContainSquareBrackets               = SevError | 0x0BA;
+  static Error_NameMustNotContainSquareBrackets               = (o:{name:string}) => m(
+    this.ERROR_NameMustNotContainSquareBrackets,
+    `The referenced name '${def(o.name)}' must not contain opening or closing square brackets`,
+    `Names (or identifiers) must not contain spaces, commas, parentheses,
+    square brackets, control characters, or Unicode non-characters.`
   );
 
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;

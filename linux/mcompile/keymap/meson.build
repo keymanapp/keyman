@@ -1,5 +1,7 @@
 project(
   'mcompile', 'c', 'cpp',
+  version: files('../../../VERSION.md'),
+  default_options: ['cpp_std=c++17'],
   license: 'MIT',
   meson_version: '>=1.0',
 )

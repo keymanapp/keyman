@@ -45,8 +45,7 @@
  * @param {string | KeyboardStub | (string|KeyboardStub)[]} obj Info for adding a keyboard
  */
   function addKeyboards(...args) {
-    var kmw=keyman;
-    var promise = kmw.addKeyboards(args);
+    var promise = keyman.addKeyboards(args);
     promise.then(result => {
       if (result.length > 0 && !result[0].error) {
         console.log('Adding: ', result);
@@ -70,8 +69,7 @@
    * @param {string} languages. Could be comma-separated languages
    */
   function addKeyboardsForLanguage(languages) {
-    var kmw=keyman;
-    kmw.addKeyboardsForLanguage(languages.split(',').map(item => item.trim())).then(result => {
+    keyman.addKeyboardsForLanguage(languages.split(',').map(item => item.trim())).then(result => {
       console.log('Adding ' + languages + ': ', result);
     }).catch(errorStubs => {
       // Consumer decides how to handle errors
@@ -125,8 +123,8 @@
     // The following two optional calls should be delayed until language menus are fully loaded:
     //  (a) a specific mapped input element input is focused, to ensure that the OSK appears
     //  (b) a specific keyboard is loaded, rather than the keyboard last used.
-    //window.setTimeout(function(){kmw.setActiveElement('ta1',true);},2500);
-    //window.setTimeout(function(){kmw.setActiveKeyboard('Keyboard_french','fr');},3000);
+    //window.setTimeout(function(){keyman.setActiveElement('ta1',true);},2500);
+    //window.setTimeout(function(){keyman.setActiveKeyboard('Keyboard_french','fr');},3000);
 
     // Note that locally specified keyboards will be listed before keyboards
     // requested from the remote server by user interfaces that do not order
@@ -136,7 +134,7 @@
   // Script to allow a user to add any keyboard to the keyboard menu
   function addKeyboard(n)
   {
-    var sKbd,kmw=keyman;
+    var sKbd;
     switch(n)
     {
       case 1:
@@ -145,7 +143,7 @@
         break;
       case 2:
         sKbd=document.getElementById('kbd_id2').value.toLowerCase();
-        kmw.addKeyboards('@'+sKbd);
+        keyman.addKeyboards('@'+sKbd);
         break;
       case 3:
         // Add keyboard for comma-separated language name(s)

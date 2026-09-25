@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+Keys that don't show up in a row don't generate an output
+
+@@keys: [K_Q][K_W]
+@@expected: q
+
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info author="eb" layout="qwerty" name="k_000_minimal_keyboard" />
+
+  <keys>
+    <!-- no keys listed, keys-Latn-implied.xml will be implicitly imported -->
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <row keys="1" />
+      <row keys="q" />
+    </layer>
+  </layers>
+</keyboard3>

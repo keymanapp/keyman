@@ -1,20 +1,26 @@
 /*
-  Copyright:    © 2018 SIL International.
-  Description:  API declarations for modifier keys, handy access masks and
-                Keyman VKEY names.  These follow the same keytop->code
-                associations as the Windows API. This is a separate header to
-                maintain readability of the primary API header.
-  Create Date:  17 Oct 2018
-  Authors:      Tim Eves (TSE)
-  History:      17 Oct 2018 - TSE - Moved & refactored km_core_modifier_state
-                                    from keyman_core_api.h.
-                                  - Added VKey and mask definitions.
-                 6 Oct 2018 - TSE - Move into keyman folder.
-
-*/
-
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Created by Tim Eves (TSE) on 2018-10-17
+ */
 #pragma once
 
+/**
+---
+filename: virtual-keys.md
+title: Virtual Keys - Keyman Core API
+---
+
+API declarations for modifier keys, handy access masks and Keyman VKEY names.
+These follow the same keytop->code associations as the Windows API. This is a
+separate header to maintain readability of the primary API header.
+*/
+
+/**
+ * @name km_core_modifier_state enum
+ *
+ * An integral type bitmask representing the state of each modifier key.
+ */
 enum km_core_modifier_state {
   KM_CORE_MODIFIER_NONE        = 0,
   KM_CORE_MODIFIER_LCTRL       = 1 << 0,
@@ -41,6 +47,12 @@ enum km_core_modifier_state {
   */
 };
 
+/**
+ * @name km_core_modifier_mask
+ *
+ * An integral type bitmask representing common bitmask sets for
+ * km_core_modifier_state
+ */
 enum km_core_modifier_mask {
   KM_CORE_MODIFIER_MASK_ALL         = 0x7f,
   KM_CORE_MODIFIER_MASK_ALT_GR_SIM  = KM_CORE_MODIFIER_LCTRL|KM_CORE_MODIFIER_LALT,
@@ -52,12 +64,17 @@ enum km_core_modifier_mask {
   KM_CORE_MODIFIER_MASK_SCROLLLOCK  = 0x3000,*/
 };
 
-// These are Windows API VKEYs, using Keyman VKEY names.
-// Underlying values from winuser.h (https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
-// Note, some codes are defined here for parity with winuser.h, but are 
-// not available in .kmn language. These codes are marked as "internal"
-// by using `__` in the name: `KM_CORE_VKEY__<name>__`
-enum km_kpb_virtual_key {
+/**
+ * @name km_core_virtual_key_value
+ *
+ * These are Windows API VKEYs, using Keyman VKEY names. Underlying values from
+ * winuser.h
+ * (https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
+ * Note, some codes are defined here for parity with winuser.h, but are not
+ * available in .kmn language. These codes are marked as "internal" by using
+ * `__` in the name: `KM_CORE_VKEY__<name>__`
+ */
+enum km_core_virtual_key_value {
   KM_CORE_VKEY__00,
   KM_CORE_VKEY_LBUTTON,           // 0x01
   KM_CORE_VKEY_RBUTTON,           // 0x02
@@ -315,3 +332,5 @@ enum km_kpb_virtual_key {
   KM_CORE_VKEY__OEMCLEAR__,       // 0xfe
   KM_CORE_VKEY__FF,               // 0xff
 };
+
+/* $EOF */

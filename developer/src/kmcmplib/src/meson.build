@@ -4,8 +4,7 @@
 # Cross platform build script to compile kmcompx
 #
 
-# TODO: is this required? It should be Keyman Core only
-defns += ['-DKMN_KBP_EXPORTING']
+defns += ['-DUSE_CHAR16_T=']
 version_res = []
 lib_links = []
 
@@ -81,14 +80,14 @@ lib = library('kmcmplib',
   'NamedCodeConstants.cpp',
   'UnreachableRules.cpp',
   'uset-api.cpp',
+  'validation.cpp',
   'versioning.cpp',
   'virtualcharkeys.cpp',
   'xstring.cpp',
+  'crc32.cpp',
   '../../../../common/cpp/km_u16.cpp',
   '../../../../common/cpp/utfcodec.cpp',
-  '../../../../common/windows/cpp/src/ConvertUTF.c',
-  '../../../../common/windows/cpp/src/crc32.cpp',
-  '../../../../common/windows/cpp/src/vkeys.cpp',
+  '../../../../common/cpp/vkeys.cpp',
 
   version_res,
   cpp_args: defns + warns + flags,

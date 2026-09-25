@@ -1,6 +1,7 @@
 project('keyman-system-service', 'c', 'cpp',
-        version: run_command('cat', '../../VERSION.md', check: true).stdout().strip(),
-        license: 'GPL-2+',
+        version: files('../../VERSION.md'),
+        default_options: ['cpp_std=c++17'],
+        license: 'MIT',
         meson_version: '>=1.0')
 
 conf = configuration_data()
@@ -18,6 +19,10 @@ endif
 
 configure_file(output : 'config.h',
                configuration : conf)
+
+linux_include_dirs = [
+  include_directories('../include')
+]
 
 subdir('resources')
 subdir('src')

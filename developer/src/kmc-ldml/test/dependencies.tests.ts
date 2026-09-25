@@ -1,13 +1,13 @@
 import 'mocha';
 import {assert} from 'chai';
 import { SECTION_COMPILERS } from '../src/compiler/compiler.js';
-import { SectionIdent } from '@keymanapp/ldml-keyboard-constants';
+import { KMXPlusVersion, SectionIdent } from '@keymanapp/ldml-keyboard-constants';
 describe('test of section compiler dependencies', () => {
   it('should have dependencies in the right order', () => {
     const sects : Set<SectionIdent> = new Set();
     for (const sect of SECTION_COMPILERS) {
       // construct the compiler
-      const c = new sect({ keyboard3: null }, null); // For now, this is OK for the inspection
+      const c = new sect({ keyboard3: null }, null, KMXPlusVersion.Version17); // For now, this is OK for the inspection
       const id = c.id;
       assert.ok(id);
       assert.isFalse(sects.has(id), `Duplicate compiler ${id} in SECTION_COMPILERS`);

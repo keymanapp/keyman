@@ -22,7 +22,7 @@ export function JavaScript_Name(i: number, pwszName: string, KeepNameForPersiste
       ? ''   // Potential for overlap in theory but in practice we only use this for named option stores so can never overlap
       : '_'; // Ensures we cannot overlap numbered instances
     while(p.length) {
-      let ch = p.charAt(0);
+      const ch = p.charAt(0);
       if(SValidIdentifierCharSet.test(ch)) {  // I3681
         result += ch;
       } else {
@@ -49,7 +49,7 @@ export function JavaScript_Name(i: number, pwszName: string, KeepNameForPersiste
 export function JavaScript_Store(fk: KMX.KEYBOARD, line: number, pwsz: string): string {
   let ch: number, rec: TSentinelRecord, result: string;
   const wcsentinel: string = String.fromCharCode(KMX.KMXFile.UC_SENTINEL);
-  let n = pwsz.indexOf(wcsentinel);
+  const n = pwsz.indexOf(wcsentinel);
 
   // Start:  plain text store.  Always use for < 10.0, conditionally for >= 10.0.
   if(n < 0 || !isKeyboardVersion10OrLater()) {
@@ -129,7 +129,7 @@ export function JavaScript_String(ch: number): string {  // I2242
 }
 
 function JavaScript_Rule(FTabStops: string, FElse: string, fk: KMX.KEYBOARD, fgp: KMX.GROUP, fkp: KMX.KEY): string {
-  let predicate: string = '1', linecomment: string = '', FIndent: string;
+  let predicate: string = '1', linecomment: string = '';
   let result = '';
 
   if(fkp.Line > 0 && options.saveDebug) {   // I4384
@@ -140,7 +140,7 @@ function JavaScript_Rule(FTabStops: string, FElse: string, fk: KMX.KEYBOARD, fgp
     predicate = JavaScript_ContextMatch(fk, fkp, fkp.dpContext);
   }
 
-  FIndent = FTabStops+FTabStop;
+  const FIndent = FTabStops+FTabStop;
   result = `${FTabStops}${FElse}if(${predicate}){${nl}`;
 
   if(fgp.fUsingKeys) {
@@ -156,7 +156,7 @@ function JavaScript_Rule(FTabStops: string, FElse: string, fk: KMX.KEYBOARD, fgp
 
 
 export function JavaScript_Rules(keyboard: KMX.KEYBOARD, fMnemonic: boolean, fgp: KMX.GROUP): string {
-  let IsEqualKey = function(k1: KMX.KEY, k2: KMX.KEY): boolean {
+  const IsEqualKey = function(k1: KMX.KEY, k2: KMX.KEY): boolean {
     return (
       (JavaScript_Key(k1, FMnemonic) == JavaScript_Key(k2, FMnemonic)) &&
       (JavaScript_Shift(k1, FMnemonic) == JavaScript_Shift(k2, FMnemonic))
@@ -166,7 +166,7 @@ export function JavaScript_Rules(keyboard: KMX.KEYBOARD, fMnemonic: boolean, fgp
   let result = '';
   let HasRules = false;
 
-  let processed_rule = Array(fgp.keys.length);
+  const processed_rule = Array(fgp.keys.length);
   for(let j = 0; j < fgp.keys.length; j++) {
     processed_rule[j] = false;
   }
@@ -189,8 +189,8 @@ export function JavaScript_Rules(keyboard: KMX.KEYBOARD, fMnemonic: boolean, fgp
         Counter++;
 
         let LocalHasRules = false;
-        let fkp2 = fgp.keys[j];
-        let j2 = j;
+        const fkp2 = fgp.keys[j];
+        const j2 = j;
         let LocalCounter = 0;
         while (j < fgp.keys.length) {
           fkp = fgp.keys[j];
@@ -435,10 +435,9 @@ function GetCodeName(code: number): string {
 }
 
 function CheckStoreForInvalidFunctions(fk: KMX.KEYBOARD, key: KMX.KEY, store: KMX.STORE) {  // I1520
-  let n: number, rec: TSentinelRecord;
+  let rec: TSentinelRecord;
   const wcsentinel = String.fromCharCode(0xFFFF);
-
-  n = store.dpString.indexOf(wcsentinel);
+  const n = store.dpString.indexOf(wcsentinel);
 
   // Disable the check with versions >= 10.0, since we now support deadkeys in stores.
   if (n >= 0 && !isKeyboardVersion10OrLater()) {
@@ -453,12 +452,12 @@ function JavaScript_CompositeContextValue(fk: KMX.KEYBOARD, fkp: KMX.KEY, pwsz: 
   let Result = '';
 
   let InQuotes = false;
-  let Len = JavaScript_ContextLength(pwsz);
+  const Len = JavaScript_ContextLength(pwsz);
   let StartQuotes = -1;
   let x = 0, Cur = 0;
 
   while(x < pwsz.length) {
-    let rec = ExpandSentinel(fk, pwsz, x);
+    const rec = ExpandSentinel(fk, pwsz, x);
     if(rec.IsSentinel) {
       if(InQuotes) {
         Result += `",${Cur-StartQuotes})`;
@@ -544,7 +543,7 @@ function JavaScript_FullContextValue(fk: KMX.KEYBOARD, fkp: KMX.KEY, pwsz: strin
       FullContext += ',';
     }
 
-    let rec = ExpandSentinel(fk, pwsz, x);
+    const rec = ExpandSentinel(fk, pwsz, x);
     if(rec.IsSentinel) {
       switch(rec.Code) {
       case KMX.KMXFile.CODE_ANY:
@@ -626,8 +625,7 @@ function isGroupReadOnly(fk: KMX.KEYBOARD, fgp: KMX.GROUP) {
 }
 
 function CallFunctionName(s: string): string {
-  let n: number;
-  n = s.indexOf(':');
+  const n = s.indexOf(':');
   return s.substring(n+1); // not found gives -1, substring(0) is ok :grin:
 }
 
@@ -640,7 +638,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
     let Result = Index;
     let x = 0;
     for(let I = 1; I < Index; I++) {
-      let recContext = ExpandSentinel(fk, pwszContext, x);
+      const recContext = ExpandSentinel(fk, pwszContext, x);
 
       if(isKeyboardVersion10OrLater()) {
         if(recContext.IsSentinel && [KMX.KMXFile.CODE_IFOPT, KMX.KMXFile.CODE_IFSYSTEMSTORE].includes(recContext.Code)) {
@@ -660,7 +658,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
   const ContextChar = function(ContextIndex: number, pwszContext: string, xContext: number): string {   // I4611
     let Index: number;
     let Result = '';
-    let recContext = ExpandSentinel(fk, pwszContext, xContext);
+    const recContext = ExpandSentinel(fk, pwszContext, xContext);
     if(recContext.IsSentinel) {
       if(InQuotes) {   // I4611
         Result += '");';
@@ -710,17 +708,17 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
   let Result = '';
   InQuotes = false;
 
-  let pwsz = pwszOutput;
+  const pwsz = pwszOutput;
 
   if(fkp != null) {
     if(isKeyboardVersion10OrLater()) {
       // KMW >= 10.0 use the full, sentinel-based length for context deletions.
       len = xstrlen(fkp.dpContext);
-      let n = len;
+      const n = len;
 
       let x = 0;
       for(let i = 0; i < n; i++) {
-        let rec = ExpandSentinel(fk, fkp.dpContext, x);
+        const rec = ExpandSentinel(fk, fkp.dpContext, x);
         if(rec.IsSentinel && [KMX.KMXFile.CODE_NUL, KMX.KMXFile.CODE_IFOPT, KMX.KMXFile.CODE_IFSYSTEMSTORE].includes(rec.Code)) {
           len--;
         }
@@ -746,7 +744,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
   }
 
   while(x < pwsz.length) {
-    let rec = ExpandSentinel(fk, pwsz, x);
+    const rec = ExpandSentinel(fk, pwsz, x);
     if(rec.IsSentinel) {
       if(InQuotes) {
         if(!isGroupReadOnly(fk, fgp)) {
@@ -808,7 +806,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         // compiled in-between the original fix and I783 re-fix, and then happened to work due to
         // their simplicity.
 
-        let Index = AdjustIndex(fkp.dpContext, rec.Index.Index);   // I3910
+        const Index = AdjustIndex(fkp.dpContext, rec.Index.Index);   // I3910
 
         if(!isGroupReadOnly(fk, fgp)) {
           Result += nlt+`k.KIO(${len},this.s${JavaScript_Name(rec.Index.StoreIndex, rec.Index.Store.dpName)},${Index},t);`;
@@ -928,7 +926,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
 }
 
 export function zeroPadHex(n: number, len: number): string {
-  let result = n.toString(16).toUpperCase();
+  const result = n.toString(16).toUpperCase();
   if(result.length < len) {
     return '0'.repeat(len - result.length) + result;
   }

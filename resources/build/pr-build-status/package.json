@@ -1,0 +1,20 @@
+{
+  "description": "CHeck pull request build status - development area",
+  "type": "module",
+  "dependencies": {
+    "@actions/core": "^1.9.1",
+    "@actions/github": "^6.0.1"
+  },
+  "devDependencies": {
+    "chai": "^5.1.0",
+    "mocha": "^11.2.2",
+    "sinon": "22.1.0"
+  },
+  "license": "MIT",
+  "main": "pr-build-status.mjs",
+  "name": "@keymanapp/pr-build-status",
+  "private": true,
+  "scripts": {
+    "test": "mocha pr-build-status.tests.mjs"
+  }
+}

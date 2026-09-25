@@ -608,10 +608,20 @@
   <!-- Introduced: 18.0.168 -->
   <string name="S_Update_Restart_Req" comment="Update tab pop up - warns user restart will require restart ">Installing the update now will require a restart of your computer before you can use Keyman again. Update now anyway?</string>
 
-  <!-- Context: Configuration Dialog - Update on boot pop up -->
+  <!-- Context: Configuration Dialog - Update tab pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 19.0.146 -->
+  <string name="S_Update_Download_Required" comment="Update tab pop up - informs user update must be downloaded before installing">The update has not yet been downloaded. Keyman Configuration will close, and it will be downloaded in the background before continuing installation.</string>
+
+  <!-- Context: Configuration Dialog - Update on pop up -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.168 -->
   <string name="S_Ready_To_Install" comment="Update on boot pop up - inform user update about to install">An update to Keyman has been downloaded and is ready to install.</string>
+
+  <!-- Context: Configuration Dialog - Update on pop up -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 19.0.146 -->
+  <string name="S_Metered_Warning" comment="Update warning - inform user about being on a metered connection">You\'re on a metered connection. Downloading now may incur data charges.</string>
 
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
@@ -918,11 +928,6 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="SKLanguageCode" comment="The language code for the current translation">en</string>
-
-  <!-- Context: _LanguageInfo -->
-  <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDefaultLanguageCode" comment="The default language code for this product.  This should be the language that the product is created in. For Keyman this must stay 'en', for all translations.">en</string>
 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
@@ -1233,7 +1238,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug information will be stored in a log file called %LOCALAPPDATA%\Keyman\Diag\system#.etl (where # is a number). You should exit Keyman before attempting to delete this file.\n\n\WARNING: This file can grow large very quickly.  Enabling debugging may slow down your system and should only be done if advised by technical support.\n\nPRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">Keyman debug information will be stored in a log file called %LOCALAPPDATA%\\Keyman\\Diag\\system#.etl (where # is a number). You should exit Keyman before attempting to delete this file.\n\n\WARNING: This file can grow large very quickly.  Enabling debugging may slow down your system and should only be done if advised by technical support.\n\nPRIVACY WARNING: Please note that the debug logfile records all keystrokes that you type.  You should only turn on the debug log for the duration of a debugging or diagnostic session.</string>
 
 
 

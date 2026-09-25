@@ -138,12 +138,8 @@ type
     Label2: TLabel;
     Label3: TLabel;
     lblKeyboardFiles: TLabel;
-    lblKeyboardDescription: TLabel;
     lbKeyboards: TListBox;
-    editKeyboardDescription: TEdit;
     memoKeyboardFiles: TMemo;
-    lblKeyboardVersion: TLabel;
-    editKeyboardVersion: TEdit;
     lblKeyboardOSKFont: TLabel;
     cbKeyboardOSKFont: TComboBox;
     cbKeyboardDisplayFont: TComboBox;
@@ -153,8 +149,6 @@ type
     cmdKeyboardAddLanguage: TButton;
     cmdKeyboardRemoveLanguage: TButton;
     chkFollowKeyboardVersion: TCheckBox;
-    lblKeyboardRTL: TLabel;
-    editKeyboardRTL: TEdit;
     cmdKeyboardEditLanguage: TButton;
     panBuildMobile: TPanel;
     lblDebugHostCaption: TLabel;
@@ -172,15 +166,12 @@ type
     lblLexlicalModels: TLabel;
     lblLexicalModelsSubtitle: TLabel;
     lblLexicalModelFilename: TLabel;
-    lblLexicalModelDescription: TLabel;
     lblLexicalModelLanguages: TLabel;
     lbLexicalModels: TListBox;
-    editLexicalModelDescription: TEdit;
     gridLexicalModelLanguages: TStringGrid;
     cmdLexicalModelLanguageAdd: TButton;
     cmdLexicalModelLanguageRemove: TButton;
     cmdLexicalModelLanguageEdit: TButton;
-    chkLexicalModelRTL: TCheckBox;
     editLexicalModelFilename: TEdit;
     imgQRCode: TImage;
     panOpenInExplorer: TPanel;
@@ -644,21 +635,21 @@ end;
 procedure TfrmPackageEditor.editInfoNameChange(Sender: TObject);
 begin
   if FSetup > 0 then Exit;
-  pack.Info.Desc['Name'] := Trim(editInfoName.Text);
+  pack.Info.Desc[PackageInfo_Name] := Trim(editInfoName.Text);
   Modified := True;
 end;
 
 procedure TfrmPackageEditor.editInfoVersionChange(Sender: TObject);
 begin
   if FSetup > 0 then Exit;
-  pack.Info.Desc['Version'] := Trim(editInfoVersion.Text);
+  pack.Info.Desc[PackageInfo_Version] := Trim(editInfoVersion.Text);
   Modified := True;
 end;
 
 procedure TfrmPackageEditor.editInfoCopyrightChange(Sender: TObject);
 begin
   if FSetup > 0 then Exit;
-  pack.Info.Desc['Copyright'] := Trim(editInfoCopyright.Text);
+  pack.Info.Desc[PackageInfo_Copyright] := Trim(editInfoCopyright.Text);
   Modified := True;
 end;
 
@@ -672,7 +663,7 @@ end;
 procedure TfrmPackageEditor.editInfoAuthorChange(Sender: TObject);
 begin
   if FSetup > 0 then Exit;
-  pack.Info.Desc['Author'] := Trim(editInfoAuthor.Text);
+  pack.Info.Desc[PackageInfo_Author] := Trim(editInfoAuthor.Text);
   Modified := True;
 end;
 
@@ -680,16 +671,16 @@ procedure TfrmPackageEditor.editInfoEmailChange(Sender: TObject);
 begin
   if FSetup > 0 then Exit;
   if Trim(editInfoEmail.Text) = ''
-    then pack.Info.URL['Author'] := ''
-    else pack.Info.URL['Author'] := 'mailto:'+Trim(editInfoEmail.Text);
+    then pack.Info.URL[PackageInfo_Author] := ''
+    else pack.Info.URL[PackageInfo_Author] := 'mailto:'+Trim(editInfoEmail.Text);
   Modified := True;
 end;
 
 procedure TfrmPackageEditor.editInfoWebSiteChange(Sender: TObject);
 begin
   if FSetup > 0 then Exit;
-  pack.Info.Desc['WebSite'] := Trim(editInfoWebSite.Text);
-  pack.Info.URL['WebSite'] := Trim(editInfoWebSite.Text);
+  pack.Info.Desc[PackageInfo_WebSite] := Trim(editInfoWebSite.Text);
+  pack.Info.URL[PackageInfo_WebSite] := Trim(editInfoWebSite.Text);
   Modified := True;
 end;
 
@@ -743,7 +734,7 @@ begin
           try
             f.Description := 'Keyboard '+ki.KeyboardName;
             // Fill in some info stuff as well...
-            if pack.Info.Desc[PackageInfo_Version] = '' then   // I4690
+            if not pack.KPSOptions.FollowKeyboardVersion and (pack.Info.Desc[PackageInfo_Version] = '') then   // I4690
             begin
               pack.Info.Desc[PackageInfo_Version] := ki.KeyboardVersion;
             end;
@@ -1030,6 +1021,11 @@ procedure TfrmPackageEditor.chkFollowKeyboardVersionClick(Sender: TObject);
 begin
   if FSetup > 0 then Exit;
   pack.KPSOptions.FollowKeyboardVersion := chkFollowKeyboardVersion.Checked;
+  if chkFollowKeyboardVersion.Checked then
+  begin
+    editInfoVersion.Text := '';
+    pack.Info.Desc[PackageInfo_Version] := '';
+  end;
   EnableDetailsTabControls;
   Modified := True;
 end;
@@ -1091,7 +1087,7 @@ end;
 procedure TfrmPackageEditor.memoInfoDescriptionChange(Sender: TObject);
 begin
   if FSetup > 0 then Exit;
-  pack.Info.Desc['Description'] := Trim(memoInfoDescription.Text);
+  pack.Info.Desc[PackageInfo_Description] := Trim(memoInfoDescription.Text);
   Modified := True;
 end;
 
@@ -1628,10 +1624,7 @@ begin
     k := SelectedKeyboard;
     if not Assigned(k) then
     begin
-      editKeyboardDescription.Text := '';
-      editKeyboardVersion.Text := '';
       memoKeyboardFiles.Text := '';
-      editKeyboardRTL.Text := '';
       cbKeyboardOSKFont.ItemIndex := -1;
       cbKeyboardDisplayFont.ItemIndex := -1;
       gridKeyboardLanguages.RowCount := 1;
@@ -1645,12 +1638,6 @@ begin
     // Details
 
     memoKeyboardFiles.Text := '';
-    editKeyboardDescription.Text := k.Name;
-    editKeyboardVersion.Text := k.Version;
-
-    if k.RTL
-      then editKeyboardRTL.Text := 'True'
-      else editKeyboardRTL.Text := 'False (or not .js format)';
 
     for i := 0 to pack.Files.Count - 1 do
       if SameText(TKeyboardUtils.KeyboardFileNameToID(pack.Files[i].FileName), k.ID) then
@@ -1779,12 +1766,8 @@ var
   e: Boolean;
 begin
   e := lbKeyboards.ItemIndex >= 0;
-  lblKeyboardDescription.Enabled := e;
-  editKeyboardDescription.Enabled := e;
   lblKeyboardFiles.Enabled := e;
   memoKeyboardFiles.Enabled := e;
-  lblKeyboardVersion.Enabled := e;
-  editKeyboardVersion.Enabled := e;
   lblKeyboardOSKFont.Enabled := e;
   cbKeyboardOSKFont.Enabled := e;
   lblKeyboardDisplayFont.Enabled := e;
@@ -2330,18 +2313,13 @@ begin
     lm := SelectedLexicalModel;
     if not Assigned(lm) then
     begin
-      editLexicalModelDescription.Text := '';
       editLexicalModelFilename.Text := '';
-      chkLexicalModelRTL.Checked := False;
       gridLexicalModelLanguages.RowCount := 1;
       EnableLexicalModelTabControls;
       Exit;
     end;
 
     // Details
-
-    editLexicalModelDescription.Text := lm.Name;
-    chkLexicalModelRTL.Checked := lm.RTL;
 
     for i := 0 to pack.Files.Count - 1 do
       if TLexicalModelUtils.LexicalModelFileNameToID(pack.Files[i].FileName) = lm.ID then
@@ -2364,13 +2342,10 @@ var
   e: Boolean;
 begin
   e := lbLexicalModels.ItemIndex >= 0;
-  lblLexicalModelDescription.Enabled := e;
-  editLexicalModelDescription.Enabled := e;
   lblLexicalModelFilename.Enabled := e;
   editLexicalModelFilename.Enabled := e;
   lblLexicalModelLanguages.Enabled := e;
   cmdLexicalModelLanguageAdd.Enabled := e;
-  chkLexicalModelRTL.Enabled := e;
 
   e := e and (gridLexicalModelLanguages.Row > 0);
   gridLexicalModelLanguages.Enabled := e;
@@ -2436,7 +2411,6 @@ begin
 
   lm := SelectedLexicalModel;
   Assert(Assigned(lm));
-  lm.Name := editLexicalModelDescription.Text;
   Modified := True;
 end;
 
@@ -2448,7 +2422,6 @@ begin
     Exit;
   lm := SelectedLexicalModel;
   Assert(Assigned(lm));
-  lm.RTL := chkLexicalModelRTL.Checked;
   Modified := True;
 end;
 

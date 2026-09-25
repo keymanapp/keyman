@@ -3,6 +3,7 @@
 import logging
 import os
 import urllib.parse
+from keyman_config.keyman_locales import find_locales
 
 import gi
 
@@ -30,7 +31,7 @@ class DownloadKmpWindow(Gtk.Dialog):
         self.webview = WebKit2.WebView()
         self.webview.connect("decide-policy", self._keyman_policy)
         self.webview.connect("load-changed", self._update_back_button)
-        url = KeymanComUrl + "/go/linux/" + __releaseversion__ + "/download-keyboards"
+        url = KeymanComUrl + "/go/linux/" + __releaseversion__ + "/download-keyboards" + "?lang=" + self._get_current_locale()
         self.webview.load_uri(url)
         s.add(self.webview)
 
@@ -55,6 +56,12 @@ class DownloadKmpWindow(Gtk.Dialog):
 
         self.resize(800, 450)
         self.show_all()
+
+    def _get_current_locale(self):
+        loc = find_locales()[0]
+        if loc == "C": 
+            loc = "en"
+        return loc.replace('_','-')
 
     def _update_back_button(self, webview, load_event):
         self.back_button.set_sensitive(webview.can_go_back())
@@ -94,8 +101,7 @@ class DownloadKmpWindow(Gtk.Dialog):
                 qs = urllib.parse.parse_qs(parsed.query)
                 package_id = parsed.path.split('/')[-1]
                 downloadfile = os.path.join(get_download_folder(), package_id)
-                download_url = KeymanComUrl + '/go/package/download/' + package_id + \
-                    '?platform=linux&tier=' + __tier__
+                download_url = f'{KeymanComUrl}/go/package/download/{package_id}?platform=linux&tier={__tier__}'
                 if 'bcp47' in qs:
                     self.language = qs['bcp47'][0]
                     download_url += '&bcp47=' + qs['bcp47'][0]

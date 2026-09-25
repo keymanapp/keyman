@@ -25,13 +25,16 @@ export * as KvksFile from './types/kvks/kvks-file.js';
 
 export { TouchLayoutFileReader } from './types/keyman-touch-layout/keyman-touch-layout-file-reader.js';
 export { TouchLayoutFileWriter, TouchLayoutFileWriterOptions } from './types/keyman-touch-layout/keyman-touch-layout-file-writer.js';
+export { specialKeyCaps } from './types/keyman-touch-layout/special-key-caps.js';
 
 export { default as KMXBuilder } from './types/kmx/kmx-builder.js';
-export { default as KMXPlusBuilder}  from './types/kmx/kmx-plus-builder/kmx-plus-builder.js';
+export { default as KMXPlusBuilder, SectionBuilders } from './types/kmx/kmx-plus-builder/kmx-plus-builder.js';
 
 export * as LDMLKeyboard from './types/ldml-keyboard/ldml-keyboard-xml.js';
 export { LDMLKeyboardTestDataXMLSourceFile } from './types/ldml-keyboard/ldml-keyboard-testdata-xml.js';
 export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from './types/ldml-keyboard/ldml-keyboard-xml-reader.js';
+
+export * as Keylayout from './types/keylayout/keylayout-xml.js';
 
 export {
   CompilerAsyncCallbacks,
@@ -43,11 +46,15 @@ export {
   CompilerPathCallbacks,
   CompilerFileSystemCallbacksFolderEntry as FileSystemFolderEntry,
   DefaultCompilerFileSystemAsyncCallbacks,
+  EventResolver,
+  NullEventResolver,
+  DelegatingCompilerCallbacks,
+  ResolvingCompilerCallbacks,
 } from './compiler-callbacks.js';
 
 export { defaultCompilerOptions, CompilerBaseOptions, CompilerOptions, CompilerEvent, CompilerErrorNamespace,
   CompilerErrorSeverity,  CompilerCallbackOptions,
-  CompilerError, CompilerMessageSpec, CompilerMessageSpecWithException, compilerErrorSeverity, CompilerErrorMask, compilerErrorSeverityName,
+  CompilerError, CompilerMessageSpec, CompilerMessageObjectSpec, CompilerMessageSpecWithException, compilerErrorSeverity, CompilerErrorMask, compilerErrorSeverityName,
   compilerErrorFormatCode, CompilerMessageDef,
   compilerLogLevelToSeverity, CompilerLogLevel, compilerEventFormat, ALL_COMPILER_LOG_LEVELS,
   ALL_COMPILER_LOG_FORMATS, CompilerLogFormat,
@@ -66,8 +73,9 @@ export { UrlSubpathCompilerCallback } from './utils/UrlSubpathCompilerCallback.j
 
 export { DeveloperUtilsMessages } from './developer-utils-messages.js';
 export * as SourceFilenamePatterns from './source-filename-patterns.js';
-export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader } from './xml-utils.js';
-
+export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader, KeymanXMLMetadata, XML_FILENAME_SYMBOL, withOffset } from './xml-utils.js';
+export { SymbolUtils } from './symbol-utils.js';
+export * as LineUtils from './line-utils.js';
 export * as GitHubUrls from './github-urls.js';
 export * as CloudUrls from './cloud-urls.js';
 
@@ -76,3 +84,5 @@ export { getFontFamily, getFontFamilySync } from './font-family.js';
 export * as ValidIds from './valid-ids.js';
 
 export * as ProjectLoader from './project-loader.js';
+
+export { optionsManager, KeymanDeveloperOption, KeymanDeveloperOptions, KeymanDeveloperOptionsPath } from './keyman-developer-options.js';

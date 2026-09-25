@@ -73,7 +73,7 @@ export interface TSentinelRecord {
 
 
 export function ExpandSentinel(fk: KMX.KEYBOARD, pwsz: string, x: number): TSentinelRecord {
-  let result: TSentinelRecord = {
+  const result: TSentinelRecord = {
     IsSentinel: false
   };
   if(pwsz.charCodeAt(x) == KMX.KMXFile.UC_SENTINEL) {
@@ -84,14 +84,14 @@ export function ExpandSentinel(fk: KMX.KEYBOARD, pwsz: string, x: number): TSent
     switch(result.Code) {
     case KMX.KMXFile.CODE_ANY:
     case KMX.KMXFile.CODE_NOTANY:      // I3981
-      let anyIdx = pwsz.charCodeAt(x) - 1;
+      const anyIdx = pwsz.charCodeAt(x) - 1;
       result.Any = {
         StoreIndex: anyIdx,
         Store: fk.stores[anyIdx]
       }
       break;
     case KMX.KMXFile.CODE_INDEX:
-      let indexIdx = pwsz.charCodeAt(x) - 1;
+      const indexIdx = pwsz.charCodeAt(x) - 1;
       x++;
       result.Index = {
         StoreIndex: indexIdx,
@@ -103,14 +103,14 @@ export function ExpandSentinel(fk: KMX.KEYBOARD, pwsz: string, x: number): TSent
       result.DeadKey = { DeadKey: pwsz.charCodeAt(x) - 1 };
       break;
     case KMX.KMXFile.CODE_USE:
-      let useIdx =  pwsz.charCodeAt(x) - 1;
+      const useIdx =  pwsz.charCodeAt(x) - 1;
       result.Use = {
         GroupIndex: useIdx,
         Group: fk.groups[useIdx]
       };
       break;
     case KMX.KMXFile.CODE_CALL:
-      let callIdx = pwsz.charCodeAt(x) - 1;
+      const callIdx = pwsz.charCodeAt(x) - 1;
       result.Call = {
         StoreIndex: callIdx,
         Store: fk.stores[callIdx]
@@ -120,9 +120,9 @@ export function ExpandSentinel(fk: KMX.KEYBOARD, pwsz: string, x: number): TSent
       result.ContextEx = { Index: pwsz.charCodeAt(x) - 1 };
       break;
     case KMX.KMXFile.CODE_SETOPT:    // I3429
-      let setIdx1 = pwsz.charCodeAt(x) - 1;
+      const setIdx1 = pwsz.charCodeAt(x) - 1;
       x++;
-      let setIdx2 = pwsz.charCodeAt(x) - 1;
+      const setIdx2 = pwsz.charCodeAt(x) - 1;
       result.SetOpt = {
         StoreIndex1: setIdx1,
         Store1: fk.stores[setIdx1],
@@ -131,9 +131,9 @@ export function ExpandSentinel(fk: KMX.KEYBOARD, pwsz: string, x: number): TSent
       };
       break;
     case KMX.KMXFile.CODE_SETSYSTEMSTORE:  // I3437
-      let setsIdx1 = pwsz.charCodeAt(x) - 1;
+      const setsIdx1 = pwsz.charCodeAt(x) - 1;
       x++;
-      let setsIdx2 = pwsz.charCodeAt(x) - 1;
+      const setsIdx2 = pwsz.charCodeAt(x) - 1;
       result.SetSystemStore = {
         dwSystemID: setsIdx1,
         SystemStore: fk.stores.find(s => s.dwSystemID == setsIdx1) || null,
@@ -156,11 +156,11 @@ export function ExpandSentinel(fk: KMX.KEYBOARD, pwsz: string, x: number): TSent
       };
       break;
     case KMX.KMXFile.CODE_IFOPT:  // I3429
-      let ifIdx1 = pwsz.charCodeAt(x) - 1;
+      const ifIdx1 = pwsz.charCodeAt(x) - 1;
       x++;
-      let ifNot = pwsz.charCodeAt(x) - 1;
+      const ifNot = pwsz.charCodeAt(x) - 1;
       x++;
-      let ifIdx2 = pwsz.charCodeAt(x) - 1;
+      const ifIdx2 = pwsz.charCodeAt(x) - 1;
       result.IfOpt = {
         StoreIndex1: ifIdx1,
         Store1: fk.stores[ifIdx1],
@@ -170,11 +170,11 @@ export function ExpandSentinel(fk: KMX.KEYBOARD, pwsz: string, x: number): TSent
       };
       break;
     case KMX.KMXFile.CODE_IFSYSTEMSTORE:  // I3430
-      let ifsSystemID = pwsz.charCodeAt(x) - 1;
+      const ifsSystemID = pwsz.charCodeAt(x) - 1;
       x++;
-      let ifsNot = pwsz.charCodeAt(x) - 1;
+      const ifsNot = pwsz.charCodeAt(x) - 1;
       x++;
-      let ifsIdx2 = pwsz.charCodeAt(x) - 1;
+      const ifsIdx2 = pwsz.charCodeAt(x) - 1;
       result.IfSystemStore = {
         dwSystemID: ifsSystemID,
         SystemStore: fk.stores.find(s => s.dwSystemID == ifsSystemID) || null,

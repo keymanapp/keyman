@@ -1,4 +1,4 @@
-package com.example.darcy.keycode;
+package com.keyman.android.tests.keycode;
 
 import org.junit.Test;
 

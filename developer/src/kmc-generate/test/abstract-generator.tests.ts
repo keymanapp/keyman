@@ -3,26 +3,16 @@
  */
 
 import 'mocha';
-import * as path from 'path';
-import * as os from 'os';
-import * as fs from 'fs';
+import * as path from 'node:path';
+import * as os from 'node:os';
+import * as fs from 'node:fs';
 import { assert } from 'chai';
 import { AbstractGenerator, GeneratorArtifacts } from '../src/abstract-generator.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { options } from './shared-options.js';
 
 describe('AbstractGenerator', function () {
-  const callbacks = new TestCompilerCallbacks();
-
-  this.beforeEach(function() {
-    callbacks.clear();
-  });
-
-  this.afterEach(function() {
-    if(this.currentTest.isFailed()) {
-      callbacks.printMessages();
-    }
-  });
+  const callbacks = new TestCompilerCallbacks(this);
 
   it('should write out files successfully', async function() {
     const ag = new AbstractGenerator();
@@ -40,7 +30,7 @@ describe('AbstractGenerator', function () {
     };
     assert.isTrue(await ag.write(artifacts));
     assert.isTrue(fs.existsSync(filename));
-    const buf = fs.readFileSync(filename);
+    const buf = fs.readFileSync(filename) as Uint8Array;
     assert.deepEqual(buf, data);
 
     fs.unlinkSync(filename);

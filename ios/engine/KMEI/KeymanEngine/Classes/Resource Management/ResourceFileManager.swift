@@ -119,22 +119,28 @@ public class ResourceFileManager {
   internal func copyWithOverwrite(from source: URL, to destination: URL) throws {
     let fileManager = FileManager.default
 
-    // For now, we'll always allow overwriting.
-    if fileManager.fileExists(atPath: destination.path) {
-      try fileManager.removeItem(at: destination)
-    }
-
     // If we've been provided a security-scoped resource URL,
     // it needs special handling.  This function needs to accept
     // both scoped & non-scoped URLs.
-    if source.startAccessingSecurityScopedResource() { // only succeeds if scoped
-      // The Swift version of 'finally'.
-      defer { source.stopAccessingSecurityScopedResource() }
-      try fileManager.copyItem(at: source, to: destination)
-    } else {
-      // Not scoped?  No problem!
-      try fileManager.copyItem(at: source, to: destination)
+    let isSecurityScoped = source.startAccessingSecurityScopedResource()
+    defer {
+      if isSecurityScoped {
+        source.stopAccessingSecurityScopedResource()
+      }
     }
+
+    // Build a temporary copy of the file that will replace the destination file
+    // so that we can do the overwrite atomically, ensuring that we can't end
+    // in a state where the destination was erased but never got re-written due
+    // to a copy error.
+    let tempFile = fileManager.temporaryDirectory.appendingPathComponent("temp.file")
+    try? fileManager.removeItem(at: tempFile) // Just in case the replace failed previously.
+    try fileManager.copyItem(at: source, to: tempFile)
+
+    // The "replace" operation essentially transfers ownership of the temp file's
+    // contents to the destination filepath.  The temp-file reference to those
+    // contents is removed.
+    _ = try fileManager.replaceItemAt(destination, withItemAt: tempFile)
   }
 
   /**
@@ -193,7 +199,7 @@ public class ResourceFileManager {
 
     // first clear extraction folder to avoid creating duplicates
     try KeymanPackage.clearDirectory(destination: extractionFolder)
-    
+
     do {
       if let package = try KeymanPackage.extract(fileUrl: archiveUrl, destination: extractionFolder) {
         return package

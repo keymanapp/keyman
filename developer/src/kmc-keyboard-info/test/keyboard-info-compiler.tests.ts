@@ -10,12 +10,6 @@ import { KMX, KeymanFileTypes, KeymanTargets, KmpJsonFile } from '@keymanapp/com
 import { CompilerCallbacks } from '@keymanapp/developer-utils';
 import { KeyboardInfoFile, KeyboardInfoFileLanguage, KeyboardInfoFilePlatform } from './keyboard-info-file.js';
 
-const callbacks = new TestCompilerCallbacks();
-
-beforeEach(function() {
-  callbacks.clear();
-});
-
 const KHMER_ANGKOR_KPJ = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
 const KHMER_ANGKOR_JS  = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
 const KHMER_ANGKOR_KPS = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
@@ -81,6 +75,9 @@ const JAVA_DISPLAY_FONT_INFO = { family: "Java", source: [ JAVA_DISPLAY_FONT ] }
 const JAVA_OSK_FONT_INFO = { family: "Java Kbd", source: [ JAVA_OSK_FONT ] };
 
 describe('keyboard-info-compiler', function () {
+
+  const callbacks = new TestCompilerCallbacks(this);
+
   it('compile a .keyboard_info file correctly', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const buildKeyboardInfoFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.keyboard_info');
@@ -835,4 +832,66 @@ describe('keyboard-info-compiler', function () {
     const result = await compiler['fontSourceToKeyboardInfoFont'](KHMER_ANGKOR_KPS, kmpJsonData, fonts);
     assert.deepEqual(result, KHMER_ANGKOR_DISPLAY_FONT_INFO);
   });
+});
+
+describe('fillLanguageMetadata', function() {
+
+  const callbacks = new TestCompilerCallbacks(this);
+
+  const tests: { bcp47: string, lang: KeyboardInfoFileLanguage, commonScript: string }[] = [
+
+    // 'und' language subtag
+
+    {
+      bcp47: 'und',
+      lang: { languageName: 'Undetermined', regionName: undefined, scriptName: undefined, displayName: 'Undetermined' },
+      commonScript: 'Zyyy',
+    },
+    {
+      bcp47: 'und-Latn',
+      lang: { languageName: 'Undetermined', regionName: undefined, scriptName: 'Latin', displayName: 'Undetermined (Latin)' },
+      commonScript: 'Latn',
+    },
+    {
+      bcp47: 'und-MX',
+      lang: { languageName: 'Undetermined', regionName: 'Mexico', scriptName: undefined, displayName: 'Undetermined (Mexico)' },
+      commonScript: 'Zyyy',
+    },
+    {
+      bcp47: 'und-Khmr-MX',
+      lang: { languageName: 'Undetermined', regionName: 'Mexico', scriptName: 'Khmer', displayName: 'Undetermined (Khmer, Mexico)' },
+      commonScript: 'Khmr',
+    },
+
+    // Private use subtags
+
+    {
+      bcp47: 'qaa-Qabx-QQ',
+      lang: { languageName: 'qaa-Qabx-QQ', regionName: 'QQ', scriptName: 'Qabx', displayName: 'qaa-Qabx-QQ (Qabx, QQ)' },
+      commonScript: 'Qabx',
+    }
+  ];
+
+  for(const test of tests) {
+    it(`should handle ${test.bcp47} correctly`, async function() {
+      const compiler = new KeyboardInfoCompiler();
+      await compiler.init(callbacks, {sources: KHMER_ANGKOR_SOURCES});
+      const lang: KeyboardInfoFileLanguage = {};
+      const result = compiler.unitTestEndPoints.fillLanguageMetadata(
+        lang,
+        test.bcp47,
+        null, null
+      );
+      assert.isOk(result);
+      assert.equal(result.firstBcp47, test.bcp47);
+      assert.equal(result.commonScript, test.commonScript);
+
+      assert.equal(lang.languageName, test.lang.languageName);
+      assert.equal(lang.regionName, test.lang.regionName);
+      assert.equal(lang.scriptName, test.lang.scriptName);
+      assert.equal(lang.displayName, test.lang.displayName);
+
+      assert.isEmpty(callbacks.messages);
+    });
+  }
 });

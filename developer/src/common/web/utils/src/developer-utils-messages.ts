@@ -1,8 +1,9 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  */
-import { CompilerErrorNamespace, CompilerErrorSeverity,  CompilerMessageDef as def, CompilerMessageSpec as m } from './compiler-interfaces.js';
+import { CompilerErrorNamespace, CompilerErrorSeverity,  CompilerMessageDef as def, CompilerMessageSpec as m, CompilerMessageObjectSpec as mx } from './compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { ObjectWithCompileContext } from '@keymanapp/common-types';
 
 const DeveloperUtilsErrMask   = CompilerErrorNamespace.DeveloperUtils;
 // const SevInfo = CompilerErrorSeverity.Info   | DeveloperUtilsErrMask;
@@ -14,8 +15,10 @@ const SevError = CompilerErrorSeverity.Error | DeveloperUtilsErrMask;
 export class DeveloperUtilsMessages {
   // structured Ajv validation error
   static ERROR_SchemaValidationError = SevError | 0x0001;
-  static Error_SchemaValidationError = (o:{instancePath:string, keyword:string, message: string, params: string}) => m(this.ERROR_SchemaValidationError,
-    `Error validating LDML XML file: ${def(o.instancePath)}: ${def(o.keyword)}: ${def(o.message)} ${def(o.params)}`);
+  static Error_SchemaValidationError = (o:{instancePath:string, keyword:string, message: string, params: string}, compileContext?: ObjectWithCompileContext) => mx(
+    this.ERROR_SchemaValidationError, compileContext,
+    `Error validating LDML XML file: ${def(o.instancePath)}: ${def(o.keyword)}: ${def(o.message)} ${def(o.params)}`,
+  );
 
   static ERROR_ImportInvalidBase = SevError | 0x0002;
   static Error_ImportInvalidBase = (o: { base: string, path: string, subtag: string }) =>
@@ -65,15 +68,21 @@ export class DeveloperUtilsMessages {
     `Project file is not valid: ${def(o.message)}`,
   );
 
-  static ERROR_UnsupportedProjectVersion = SevError | 0x0013;
+  static ERROR_UnsupportedProjectVersion = SevError | 0x000B;
   static Error_UnsupportedProjectVersion = (o:{version:string}) => m(
     this.ERROR_UnsupportedProjectVersion,
     `Project version ${def(o.version)} is not supported by this version of Keyman Developer.`,
   );
 
-  static ERROR_ProjectFileCouldNotBeRead = SevError | 0x0014;
+  static ERROR_ProjectFileCouldNotBeRead = SevError | 0x000C;
   static Error_ProjectFileCouldNotBeRead = () => m(
     this.ERROR_ProjectFileCouldNotBeRead,
     `Project file could not be read`
+  );
+
+  static ERROR_NotAPackageFile = SevError | 0x000D;
+  static Error_NotAPackageFile = () => m(
+    this.ERROR_NotAPackageFile,
+    `Package source file is not a valid .kps file because it is missing the <Package> root element.`,
   );
 };

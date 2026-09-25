@@ -145,6 +145,7 @@
 		CE8B0BBD248734240045EB2E /* KeymanPackageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8B0BBC248734240045EB2E /* KeymanPackageTests.swift */; };
 		CE8B0BBF248764ED0045EB2E /* KMPResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8B0BBE248764ED0045EB2E /* KMPResource.swift */; };
 		CE8B5BB22491DA540075CCB0 /* 13.0 Cloud to Package Migration.bundle in Resources */ = {isa = PBXBuildFile; fileRef = CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */; };
+		CE8E6B1E2FEC17B100F5E731 /* WebViewSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8E6B1D2FEC17A900F5E731 /* WebViewSchemeHandler.swift */; };
 		CE8EDEB123F53D1A009E1FF6 /* FileManagementTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A079DD1223194B100581263 /* FileManagementTests.swift */; };
 		CE8EDEB323F53F96009E1FF6 /* VersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */; };
 		CE969BE8251AD8B500376D6A /* PackageWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE969BE7251AD8B500376D6A /* PackageWebViewController.swift */; };
@@ -459,6 +460,7 @@
 		CE8B0BBC248734240045EB2E /* KeymanPackageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanPackageTests.swift; sourceTree = "<group>"; };
 		CE8B0BBE248764ED0045EB2E /* KMPResource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPResource.swift; sourceTree = "<group>"; };
 		CE8B5BB12491DA530075CCB0 /* 13.0 Cloud to Package Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "13.0 Cloud to Package Migration.bundle"; sourceTree = "<group>"; };
+		CE8E6B1D2FEC17A900F5E731 /* WebViewSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewSchemeHandler.swift; sourceTree = "<group>"; };
 		CE8EDEB223F53F96009E1FF6 /* VersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionTests.swift; sourceTree = "<group>"; };
 		CE969BE7251AD8B500376D6A /* PackageWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageWebViewController.swift; sourceTree = "<group>"; };
 		CE96E42C24D1229A005B8E5A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
@@ -804,6 +806,7 @@
 				CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */,
 				C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */,
 				C0C16A881FA8146300F090BA /* KeymanWebViewController.swift */,
+				CE8E6B1D2FEC17A900F5E731 /* WebViewSchemeHandler.swift */,
 				C0A5FF361F6682EB00BE740C /* PopoverView.swift */,
 			);
 			path = Keyboard;
@@ -1363,7 +1366,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-tagged.sh\"\n";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/mac/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/mac/set-bundle-versions-tagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		CEC0C66F2410B005003E1BCD /* Run Script - upload dsyms to Sentry */ = {
@@ -1383,7 +1386,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n. \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\nif [ ${UPLOAD_SENTRY:-false} = true ]; then\n  # Calls resource script to perform the dSYM upload\n  phaseSentryDsymUpload \"keyman-ios\"\nfi\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n. \"$KEYMAN_ROOT/resources/build/mac/xcode-utils.inc.sh\"\n\nif [ ${UPLOAD_SENTRY:-false} = true ]; then\n  # Calls resource script to perform the dSYM upload\n  phaseSentryDsymUpload \"keyman-ios\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1522,6 +1525,7 @@
 				9A079DCA222E050E00581263 /* LexicalModelKeymanPackage.swift in Sources */,
 				9A60764422893A4E003BCFBA /* SettingsViewController.swift in Sources */,
 				C06085B41F9485E40057E5B9 /* UIButton+Helpers.swift in Sources */,
+				CE8E6B1E2FEC17B100F5E731 /* WebViewSchemeHandler.swift in Sources */,
 				C0959CD41F99C44E00B616BC /* Constants.swift in Sources */,
 				C0452BAD1F9F21270064431A /* Keyboard.swift in Sources */,
 				29B30C232B564F9900C342A4 /* KeymanEngineLogger.swift in Sources */,

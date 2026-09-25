@@ -203,6 +203,7 @@ type
     procedure WMNCHitTest(var Message: TWMNCHitTest); message WM_NCHITTEST;
 
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;   // I4225
+    procedure WMKeymanOskModifierEvent(var Message: TMessage); message WM_KEYMAN_OSK_MODIFIER_EVENT;
 
     procedure UpdatePanels;
     procedure SetActivePage(Page: TOSKActivePage);
@@ -996,6 +997,12 @@ procedure TfrmVisualKeyboard.WMExitSizeMove(var Message: TMessage);
 begin
   FNCButtonIsDown := False;
   inherited;
+end;
+
+procedure TfrmVisualKeyboard.WMKeymanOskModifierEvent(var Message: TMessage);
+begin
+  if Assigned(FOnScreenKeyboard) then
+    FOnScreenKeyboard.OskModifierEvent(Message.WParam, Message.LParam);
 end;
 
 procedure TfrmVisualKeyboard.AdjustToClosestMonitor(var x, y, cx, cy: Integer);

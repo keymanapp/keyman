@@ -2,7 +2,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "COM API library" \
@@ -44,7 +44,7 @@ function do_build() {
   mv -f "$WIN64_TARGET_PATH/kmcomapi.dll" "$WIN64_TARGET_PATH/kmcomapi.x64.dll"
 
   cp "$WIN32_TARGET" "$WINDOWS_PROGRAM_ENGINE"
-  cp "$WIN32_TARGET_PATH/kmcomapi.dbg" "$WINDOWS_DEBUGPATH_ENGINE/kmcomapi.dbg"
+  builder_if_release_build_level cp "$WIN32_TARGET_PATH/kmcomapi.dbg" "$WINDOWS_DEBUGPATH_ENGINE/kmcomapi.dbg"
   cp "$WIN64_TARGET_PATH/kmcomapi.x64.dll" "$WINDOWS_PROGRAM_ENGINE/kmcomapi.x64.dll"
 
   # x64 Delphi symbols not supported: cp "$WIN64_TARGET_PATH/kmcomapi.dbg" "$WINDOWS_PROGRAM_ENGINE/kmcomapi.x64.dbg"
@@ -76,5 +76,5 @@ builder_run_action build:project        do_build
 # builder_run_action test:project         do_test
 builder_run_action publish:project      do_publish
 builder_run_action install:project      do_install
-builder_run_action edit:project         start kmcompapi.dproj
+builder_run_action edit:project         start kmcomapi.dproj
 

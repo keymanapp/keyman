@@ -12,7 +12,8 @@ setup(
     scripts=['km-config', 'km-package-get',
              'km-package-install', 'km-kvk2ldml',
              'km-package-uninstall',
-             'km-package-list-installed'],
+             'km-package-list-installed',
+             'km-diag-report'],
 
     zip_safe=False,  # don't install a zip
 

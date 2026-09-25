@@ -11,6 +11,7 @@ uses
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
+  DUnitX.Loggers.TeamCity in '..\..\..\..\..\common\windows\delphi\general\DUnitX.Loggers.TeamCity.pas',
   Keyman.System.UILanguageManager in '..\..\..\global\delphi\general\Keyman.System.UILanguageManager.pas',
   Keyman.System.Test.UILanguageManagerTest in 'Keyman.System.Test.UILanguageManagerTest.pas';
 
@@ -55,6 +56,8 @@ begin
       System.Readln;
     end;
     {$ENDIF}
+
+    DUnitX.Loggers.TeamCity.ReportToTeamCity;
   except
     on E: Exception do
       System.Writeln(E.ClassName, ': ', E.Message);

@@ -17,10 +17,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 
+import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMKeyboardDownloaderActivity;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KeyboardPickerActivity;
@@ -45,7 +45,7 @@ import java.util.HashMap;
 /**
  * Displays an FV Keyboard enable and some lexical model switches.
  */
-public final class FVKeyboardSettingsActivity extends AppCompatActivity {
+public final class FVKeyboardSettingsActivity extends BaseActivity {
   private static Context context = null;
   private static Toolbar toolbar = null;
   private static TextView fvKeyboardTextView = null;
@@ -116,6 +116,7 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
     supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
     context = this;
     setContentView(R.layout.fv_keyboard_settings_list_layout);
+    setupEdgeToEdge(R.id.fvKeyboardSettingsConstraintLayout);
 
     if (getIntent() != null && getIntent().getExtras() != null) {
       intent = getIntent();

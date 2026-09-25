@@ -40,7 +40,7 @@ export class RotationProcessor {
   }
 
   resolve() {
-    var osk = this.keyman.osk;
+    const osk = this.keyman.osk;
 
     // `keyman: KeymanEngine` (modularized app/browser)
     this.keyman.touchLanguageMenu?.hide();
@@ -59,12 +59,12 @@ export class RotationProcessor {
       this.rotState = null;
     }
 
-    const target = this.keyman.contextManager.activeTarget;
-    if(target) {
+    const textStore = this.keyman.contextManager.activeTextStore;
+    if(textStore) {
       // This seems to help with scrolling accuracy in iOS Safari;
       // the scroll tends to consistently go too far without it.
       window.setTimeout(() => {
-        this.keyman.ensureElementVisibility(target.getElement());
+        this.keyman.ensureElementVisibility(textStore.getElement());
       }, 0);
     }
   }
@@ -81,8 +81,8 @@ export class RotationProcessor {
    */
   init() {
     // Note:  we use wrapper functions instead of `.bind(this)` in this method to facilitate stubbing for our rotation test page.
-    var os = this.keyman.config.hostDevice.OS;
-    var util = this.keyman.util;
+    const os = this.keyman.config.hostDevice.OS;
+    const util = this.keyman.util;
 
     if(os == 'ios') {
     /* iOS is rather inconsistent about these events, with changes to important window state information -
@@ -137,7 +137,7 @@ export class RotationProcessor {
   }
 
   iOSEventUpdate() {
-    var newState = new RotationState();
+    const newState = new RotationState();
 
     if(this.rotState.equals(newState)) {
       if(++this.idlePermutationCounter == RotationProcessor.IDLE_PERMUTATION_CAP) {

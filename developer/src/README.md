@@ -84,11 +84,15 @@ in Keyman for Windows.
 
 ## kmc
 
-node-based next generation compiler, hosts kmc, (and legacy kmlmc, kmlmp)
+node-based next generation compiler, hosts kmc
 
 ### kmc-analyze - Analysis tools
 
 File analysis tools for Keyman files.
+
+### kmc-convert - Keyboard conversion tools
+
+Tools for converting keyboard source files between various formats.
 
 ### kmc-copy - Project copying and renaming tools
 

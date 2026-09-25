@@ -1,7 +1,6 @@
 {
   "extends": "../../../tsconfig.dom.json",
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "../../../../build/tools/testing/test-utils/obj/",
     "rootDir": ".",
     "tsBuildInfoFile": "../../../../build/tools/testing/test-utils/obj/tsconfig.tsbuildinfo"

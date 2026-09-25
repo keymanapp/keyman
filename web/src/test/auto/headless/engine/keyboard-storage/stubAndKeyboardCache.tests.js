@@ -4,7 +4,7 @@ import fs from 'fs';
 
 import { KeyboardStub, StubAndKeyboardCache } from 'keyman/engine/keyboard-storage';
 
-import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { NodeKeyboardLoader } from 'keyman/test/resources';
 import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 
 import path from 'path';
@@ -165,7 +165,7 @@ describe('StubAndKeyboardCache', function () {
     cache.addStub(bad_stub);
 
     try {
-      cache.fetchKeyboardForStub(bad_stub);
+      cache.fetchKeyboard(bad_stub.KI);
       assert.fail();
     } catch(err) {
       assert.isTrue(err instanceof Error);

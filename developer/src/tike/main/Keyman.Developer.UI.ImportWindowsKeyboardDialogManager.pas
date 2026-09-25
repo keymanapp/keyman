@@ -70,6 +70,7 @@ begin
       iwk.Version := f.Version;
       iwk.BCP47Tags := f.BCP47Tags;
       iwk.Author := f.Author;
+      iwk.Description := f.Description;
       iwk.Targets := f.Targets;
 
       if not iwk.Execute then

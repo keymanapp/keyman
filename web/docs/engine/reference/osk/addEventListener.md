@@ -8,7 +8,7 @@ Adds an event listener for user-handling of On-Screen keyboard events.
 
 ## Syntax
 
-```c
+```js
 keyman.osk.addEventListener(eventName, func)
 ```
 

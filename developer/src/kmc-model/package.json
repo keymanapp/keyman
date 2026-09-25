@@ -37,12 +37,9 @@
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",
     "@keymanapp/models-templates": "*",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^20.4.1",
     "c8": "^7.12.0",
     "chalk": "^2.4.2",
-    "esbuild": "^0.25.0",
-    "mocha": "^10.0.0"
+    "esbuild": "^0.28.1"
   },
   "mocha": {
     "spec": "build/test/**/*.tests.js",
@@ -64,6 +61,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keymanapp/keyman.git"
+    "url": "git+https://github.com/keymanapp/keyman.git",
+    "directory": "developer/src/kmc-model"
   }
 }

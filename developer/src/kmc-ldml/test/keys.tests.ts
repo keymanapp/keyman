@@ -4,11 +4,12 @@ import { KeysCompiler } from '../src/compiler/keys.js';
 import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, Constants, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
-import { constants } from '@keymanapp/ldml-keyboard-constants';
+import { constants, KMXPlusVersion } from '@keymanapp/ldml-keyboard-constants';
 import { MetaCompiler } from '../src/compiler/meta.js';
 const keysDependencies = [ ...BASIC_DEPENDENCIES, MetaCompiler ];
 import Keys = KMXPlus.Keys;
 import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
+import { LDMLKeyboard, withOffset } from '@keymanapp/developer-utils';
 const K = Constants.USVirtualKeyCodes;
 
 describe('keys', function () {
@@ -48,7 +49,7 @@ describe('keys', function () {
 
         const [q] = keys.keys.filter(({ id }) => id.value === 'q');
         assert.ok(q);
-        assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
+        assert.isFalse(!!(q.flags & KMXPlus.KeysKeysFlags.gap));
         assert.equal(q.width, 32, 'q\'s width'); // ceil(3.14159 * 10.0)
         assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
         assert.equal(q.longPress.toString(), 'a-acute e-acute i-acute');
@@ -91,7 +92,7 @@ describe('keys', function () {
 
         const [q] = keys.keys.filter(({ id }) => id.value === 'q');
         assert.ok(q);
-        assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
+        assert.isFalse(!!(q.flags & KMXPlus.KeysKeysFlags.gap));
         assert.equal(q.width, 32, 'q\'s width'); // ceil(3.14159 * 10.0)
         assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
         assert.equal(q.longPress.toString(), 'a-acute e-acute i-acute');
@@ -133,7 +134,7 @@ describe('keys', function () {
 
         const [q] = keys.keys.filter(({ id }) => id.value === 'q');
         assert.ok(q);
-        assert.isFalse(!!(q.flags & constants.keys_key_flags_gap));
+        assert.isFalse(!!(q.flags & KMXPlus.KeysKeysFlags.gap));
         assert.equal(q.width, 32); // ceil(3.1 * 10)
         assert.equal(q.flicks, 'flick0'); // note this is a string, not a StrsItem
         assert.equal(q.longPress.toString(), 'a-acute e-acute i-acute');
@@ -162,11 +163,11 @@ describe('keys', function () {
 
         const [Qgap] = keys.keys.filter(({ id }) => id.value === 'Q');
         assert.ok(Qgap);
-        assert.isTrue(!!(Qgap.flags & constants.keys_key_flags_gap), 'Q’s gap=');
+        assert.isTrue(!!(Qgap.flags & KMXPlus.KeysKeysFlags.gap), 'Q’s gap=');
 
         const [Wshift] = keys.keys.filter(({ id }) => id.value === 'W');
         assert.isNotNull(Wshift);
-        assert.isFalse(!!(Wshift.flags & constants.keys_key_flags_gap));
+        assert.isFalse(!!(Wshift.flags & KMXPlus.KeysKeysFlags.gap));
         assert.equal(Wshift.switch.value, 'shift');
       },
     },
@@ -212,14 +213,14 @@ describe('keys', function () {
         assert.equal(interrobang.to.value, `‽`, `Interrobang's value`);
       },
     },
-  ], keysDependencies);
+  ], KMXPlusVersion.Version17, keysDependencies);
 });
 
 describe('keys.kmap', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   it('should compile minimal kmap data', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/minimal.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
     // skip reserved (gap) keys
@@ -311,7 +312,7 @@ describe('keys.kmap', function () {
     {
       subpath: 'sections/keys/invalid-bad-modifier.xml',
       errors: [
-        LdmlCompilerMessages.Error_InvalidModifier({layer:'base',modifiers:'altR-shift'}),
+        LdmlCompilerMessages.Error_InvalidModifier({ modifiers: 'altR-shift' }),
       ]
     },
     {
@@ -330,7 +331,11 @@ describe('keys.kmap', function () {
       // warning on custom form
       subpath: 'sections/layr/warn-custom-us-form.xml',
       warnings: [
-        LdmlCompilerMessages.Warn_CustomForm({id: "us"}),
+        // most tests will want to leave retainOffsetInMessages: false  to
+        // not require maintaining the offset here, which will break if
+        // the XML changes.
+        // However, it's worthwhile having at least one test that verifies in this way.
+        LdmlCompilerMessages.Warn_CustomForm({id: "us"}, withOffset(367)),
       ],
       callback: (sect, subpath, callbacks) => {
         const keys = sect as Keys;
@@ -355,6 +360,9 @@ describe('keys.kmap', function () {
           },
         ]);
       },
+      // Note: Most tests will NOT want to set this.
+      // We set this here to test the test mechanism.
+      retainOffsetInMessages: true,
     },
     {
       // warning on a custom unknown form - but no error!
@@ -392,7 +400,7 @@ describe('keys.kmap', function () {
         LdmlCompilerMessages.Warn_CustomForm({id: "us"}),
       ],
       errors: [
-        LdmlCompilerMessages.Error_InvalidScanCode({ form: "us", codes: ['ff'] }),
+        LdmlCompilerMessages.Error_InvalidScanCode({ codes: 'ff', id: 'us' }),
       ],
     },
     {
@@ -401,7 +409,7 @@ describe('keys.kmap', function () {
         LdmlCompilerMessages.Warn_CustomForm({id: "zzz"}),
       ],
       errors: [
-        LdmlCompilerMessages.Error_InvalidScanCode({ form: "zzz", codes: ['ff'] }),
+        LdmlCompilerMessages.Error_InvalidScanCode({ codes: 'ff', id: "zzz" }),
       ],
     },
     {
@@ -435,39 +443,42 @@ describe('keys.kmap', function () {
         ], 'modifiers for c');
       },
     },
-  ], keysDependencies);
+  ], KMXPlusVersion.Version17, keysDependencies);
 
   it('should reject layouts with too many hardware rows', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-rows.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-rows.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows());
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows(withOffset(276)));
   });
 
   it('should reject layouts with too many hardware keys', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-keys.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-hardware-too-many-keys.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: 1, hardware: 'us', modifiers: 'none'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({ row: 1, hardware: 'us', modifiers: 'none' }, withOffset(785) as LDMLKeyboard.LKRow));
   });
 
   it('should reject layouts with undefined keys', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-undefined-key.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-undefined-key.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}, withOffset(271) as LDMLKeyboard.LKRow));
   });
   it('should reject layouts with invalid keys', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch({keyId: 'Q'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch(
+      {keyId: 'Q'},
+      withOffset(188)
+    ));
   });
   it('should accept layouts with gap/switch keys', async function() {
-    let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks, keysDependencies) as Keys;
+    const keys = await loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks, KMXPlusVersion.Version17, keysDependencies) as Keys;
     assert.isNotNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 0);
     assert.equal(keys.keys.length, 4 + KeysCompiler.reserved_count);

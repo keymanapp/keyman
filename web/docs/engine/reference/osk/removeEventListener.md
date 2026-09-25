@@ -8,7 +8,7 @@ Removes a user-defined event handler.
 
 ## Syntax
 
-```c
+```js
 keyman.osk.removeEventListener(eventName, func);
 ```
 
@@ -29,5 +29,5 @@ keyman.osk.removeEventListener(eventName, func);
 ## Description
 
 To be implemented.
-    
+
 Will be the OSK's analogue of the to-be-implemented core function [`removeEventListener`](../core/removeEventListener).

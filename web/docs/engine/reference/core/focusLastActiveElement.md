@@ -8,7 +8,7 @@ Restore the focus to the element active before input was moved to KeymanWeb.
 
 ## Syntax
 
-```c
+```js
 keyman.focusLastActiveElement()
 ```
 
@@ -20,6 +20,7 @@ None.
 
 `undefined`
 
-## Description
+## See also
 
-...
+* [`keyman.interface.focusLastActiveTextStore()`](../interface/focusLastActiveTextStore)
+

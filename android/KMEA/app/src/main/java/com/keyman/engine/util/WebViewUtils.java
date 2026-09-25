@@ -32,8 +32,37 @@ public final class WebViewUtils {
     FULL;          // WebView installed and enabled
   }
 
+  // Min version of Chrome for Keyman for Android for EngineWebViewVersionStatus.DEGRADED
+  public static final String KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME = "37.0";
+
+  // Min version of Chrome for Keyman for Android (EngineWebViewVersionStatus.FULL)
+  // TODO: Keep this version in sync with resources/build/minimum-versions.inc.sh
+  public static final String KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME = "95.0";
+
   private static final String CHROME_INSTALL_PATTERN_FORMATSTR = "^.*Chrome/([\\d.]+).*$";
   private static final Pattern installPattern = Pattern.compile(CHROME_INSTALL_PATTERN_FORMATSTR);
+
+  /**
+   * Reserved magic domain for loading files from the local device. At runtime
+   * the WebViewAssetLoader will replace the protocol and domain with the
+   * internal storage path.
+   * See https://developer.android.com/reference/androidx/webkit/WebViewAssetLoader
+   */
+  private static final String MAGIC_DEFAULT_DOMAIN = "https://appassets.androidplatform.net";
+
+  /**
+   * Path under the asset domain where all assets live
+   */
+  public static final String ASSET_DATA_PATH = "/data/";
+
+  /**
+   * Build a full URL to the provided asset
+   */
+  public static String buildAssetUrl(String assetPath) {
+    String appendAsset = assetPath == null ? "" :
+      (assetPath.startsWith("/") ? assetPath.substring(1) : assetPath);
+    return WebViewUtils.MAGIC_DEFAULT_DOMAIN + WebViewUtils.ASSET_DATA_PATH + appendAsset;
+  }
 
   /**
    * Get the Keyman Engine mode based on the Chrome version.
@@ -52,9 +81,11 @@ public final class WebViewUtils {
       chromeVersion = getChromeVersion(context, webView);
     }
 
-    if (FileUtils.compareVersions("37.0", chromeVersion) == FileUtils.VERSION_GREATER) {
+    if (FileUtils.compareVersions(KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME, chromeVersion)
+        == FileUtils.VERSION_GREATER) {
       return EngineWebViewVersionStatus.DISABLED;
-    } else if (FileUtils.compareVersions("57.0", chromeVersion) == FileUtils.VERSION_GREATER) {
+    } else if (FileUtils.compareVersions(KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME, chromeVersion)
+        == FileUtils.VERSION_GREATER) {
       return EngineWebViewVersionStatus.DEGRADED;
     }
 

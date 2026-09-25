@@ -4,7 +4,7 @@ import { KmnCompilerResult } from "../compiler/compiler.js";
 
 export let FTabStop: string;
 export let nl: string;
-export let FCompilerWarningsAsErrors = false;
+export const FCompilerWarningsAsErrors = false;
 export let kmxResult: KmnCompilerResult;
 export let fk: KMX.KEYBOARD;
 export let FMnemonic: boolean;

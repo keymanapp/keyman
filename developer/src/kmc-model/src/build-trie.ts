@@ -26,10 +26,10 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
     throw new ModelCompilerError(ModelCompilerMessages.Error_SearchTermToKeyMustBeExplicitlySpecified());
   }
   // Make one big word list out of all of the filenames provided.
-  let wordlist: WordList = {};
+  const wordlist: WordList = {};
   filenames.forEach(filename => parseWordListFromFilename(wordlist, filename));
 
-  let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.SearchTermToKey);
+  const trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.SearchTermToKey);
   return JSON.stringify(trie);
 }
 
@@ -90,15 +90,15 @@ export function parseWordListFromContents(wordlist: WordList, contents: string):
 function _parseWordList(wordlist: WordList, source:  WordListSource): void {
   const TAB = "\t";
 
-  let wordsSeenInThisFile = new Set<string>();
+  const wordsSeenInThisFile = new Set<string>();
 
-  for (let [lineno, line] of source.lines()) {
+  for (const [lineno, srcLine] of source.lines()) {
     ModelCompilerMessageContext.line = lineno;
 
     // Remove the byte-order mark (BOM) from the beginning of the string.
     // Because `contents` can be the concatenation of several files, we have to remove
     // the BOM from every possible start of file -- i.e., beginning of every line.
-    line = line.replace(/^\uFEFF/, '').trim();
+    const line = srcLine.replace(/^\uFEFF/, '').trim();
 
     if (line.startsWith('#') || line === "") {
       continue; // skip comments and empty lines
@@ -108,7 +108,7 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
     let [wordform, countText] = line.split(TAB);
 
     // Clean the word form.
-    let original = wordform;
+    const original = wordform;
 
     wordform = wordform.normalize('NFC');
     if (original !== wordform) {
@@ -182,7 +182,7 @@ class WordListFromFilename {
  */
 function* enumerateLines(lines: string[]): Generator<LineNoAndText> {
     let i = 1;
-    for (let line of lines) {
+    for (const line of lines) {
       yield [i, line];
       i++;
     }
@@ -294,7 +294,7 @@ namespace Trie {
    * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
    */
   export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): object {
-    let root = new Trie(keyFunction).buildFromWordList(wordlist).root;
+    const root = new Trie(keyFunction).buildFromWordList(wordlist).root;
     return {
       totalWeight: sumWeights(root),
       root: root
@@ -316,8 +316,8 @@ namespace Trie {
      * @param words a list of word and count pairs.
      */
     buildFromWordList(words: WordList): Trie {
-      for (let [wordform, weight] of Object.entries(words)) {
-        let key = this.toKey(wordform);
+      for (const [wordform, weight] of Object.entries(words)) {
+        const key = this.toKey(wordform);
         addUnsorted(this.root, { key, weight, content: wordform }, 0);
       }
       sortTrie(this.root);
@@ -402,10 +402,10 @@ namespace Trie {
    * @param depth depth of the trie at this level.
    */
   function convertLeafToInternalNode(leaf: Leaf, depth: number): void {
-    let entries = leaf.entries;
+    const entries = leaf.entries;
 
     // Alias the current node, as the desired type.
-    let internal = (<unknown> leaf) as InternalNode;
+    const internal = (<unknown> leaf) as InternalNode;
     internal.type = 'internal';
 
     delete leaf.entries;
@@ -413,7 +413,7 @@ namespace Trie {
     internal.children = {};
 
     // Convert the old values array into the format for interior nodes.
-    for (let item of entries) {
+    for (const item of entries) {
       let char: string;
       if (depth < item.key.length) {
         char = item.key[depth];
@@ -444,7 +444,7 @@ namespace Trie {
       node.entries.sort(function (a, b) { return b.weight - a.weight; });
     } else {
       // We MUST recurse and sort children before returning.
-      for (let char of node.values) {
+      for (const char of node.values) {
         sortTrie(node.children[char]);
       }
 

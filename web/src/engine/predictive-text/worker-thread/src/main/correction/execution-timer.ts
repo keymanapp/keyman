@@ -1,4 +1,4 @@
-import { timedPromise } from "@keymanapp/web-utils";
+import { timedPromise } from "keyman/common/web-utils";
 
 const MIN_OUTLIER = 1; // 1ms.
 const MAX_CANDIDATES = 5;

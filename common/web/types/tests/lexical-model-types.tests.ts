@@ -7,7 +7,7 @@
 
 import { KMXPlus, LdmlKeyboardTypes, LexicalModelTypes } from "@keymanapp/common-types";
 
-export let u: LexicalModelTypes.USVString;
+export let u: string;
 export let l: LexicalModelTypes.Transform;
 export let s: LexicalModelTypes.Suggestion;
 export let st: LexicalModelTypes.SuggestionTag;

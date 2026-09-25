@@ -34,11 +34,8 @@
     "@keymanapp/developer-utils": "*"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^20.4.1",
     "c8": "^7.12.0",
     "chalk": "^2.4.2",
-    "mocha": "^8.4.0",
     "typescript": "^5.4.5"
   },
   "mocha": {
@@ -49,6 +46,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keymanapp/keyman.git"
+    "url": "git+https://github.com/keymanapp/keyman.git",
+    "directory": "developer/src/kmc-model-info"
   }
 }

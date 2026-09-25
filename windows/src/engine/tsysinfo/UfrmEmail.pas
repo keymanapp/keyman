@@ -7,12 +7,12 @@
 
   Modified Date:    8 Jun 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          13 May 2005 - mcdurdin - Integrated into kmshell from tsysinfo
                     16 Aug 2005 - mcdurdin - Add privacy statement
                     20 Jul 2008 - mcdurdin - I1554 - Don't require password for tsysinfo
@@ -136,6 +136,11 @@ begin
       Request.UrlPath := API_Path_SubmitDiag;
 
       Upload;
+      if Response.StatusCode = 413 then
+      begin
+        ShowMessage('The diagnostic report file was too large: '+IntToStr(Response.StatusCode)+ '. Contact us via the Keyman Community Forum for help.');
+        Exit;
+      end;
       if Response.StatusCode <> 200 then
       begin
         ShowMessage('The report was not successfully sent. An error was returned: '+IntToStr(Response.StatusCode));

@@ -146,6 +146,12 @@ div.kmw-key.kmw-key-default:not([id^='popup-'])
 | `kmw-alert-text`        | Message box alert text          |
 | `kmw-alert-close`       | Message box close icon          |
 
+### Class names applied to other elements
+
+|  Class name             | Element                         |
+| ----------------------- | ------------------------------- |
+| `kmw-page-trailer`      | Element appended to page on mobile devices to prevent keyboard overlap at the page's bottom |
+
 The default styles for _KeymanWeb_ can be found online at
 https://github.com/keymanapp/keyman/blob/master/web/src/resources/osk/kmwosk.css.
 

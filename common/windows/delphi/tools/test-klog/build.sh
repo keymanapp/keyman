@@ -2,23 +2,24 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Tool for validating klog is disabled for release builds" \
   clean configure build test prepublish edit
+
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
 source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 
+builder_describe_internal_dependency \
+  prepublish:project   build:project
+
 builder_describe_outputs \
   configure:project    /resources/build/win/delphi_environment_generated.inc.sh \
   build:project        /common/windows/delphi/tools/test-klog/$WIN32_TARGET_PATH/test_klog.exe
-
-builder_describe_internal_dependency \
-  prepublish:project   build:project
 
 #-------------------------------------------------------------------------------------------------------------------
 

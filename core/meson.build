@@ -6,7 +6,7 @@
 #
 
 project('keyman_core', 'cpp', 'c',
-        version: run_command(find_program('getversion.bat', 'getversion.sh'), check:true).stdout().strip(),
+        version: files('../VERSION.md'),
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++17',
@@ -43,7 +43,6 @@ if cpp_compiler.get_id() == 'emscripten'
   add_global_arguments('-pthread', language: [ 'cpp', 'c' ] )
 endif
 
-subdir('docs/internal')
 subdir('include')
 subdir('src')
 subdir('tests')

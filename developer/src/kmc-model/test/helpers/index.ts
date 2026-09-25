@@ -60,7 +60,7 @@ export function compileModelSourceCode(code: string) {
     };
   }
 
-  let fakeLMLayerWorker = {
+  const fakeLMLayerWorker = {
     loadModel(model: object) {
       exportedModel = model;
     }
@@ -76,7 +76,7 @@ export function compileModelSourceCode(code: string) {
   //
   // ...we can intercept the name "WhateverModel" and assign it to
   // `modelConstructorName`.
-  let modelsNamespace = new Proxy({}, {
+  const modelsNamespace = new Proxy({}, {
     get(_target, property)  {
       if (typeof property !== 'string')
         throw new Error(`Don't know how to handle non-string property: ${String(property)}`);
@@ -98,7 +98,7 @@ export function compileModelSourceCode(code: string) {
   //    wordBreaker["someWordBreaker"]
   //
   // ...we can intercept the name "someWordBreaker".
-  let wordBreakerNamespace = new Proxy({}, {
+  const wordBreakerNamespace = new Proxy({}, {
     get(_target, property)  {
       if (typeof property !== 'string')
         throw new Error(`Don't know how to handle non-string property: ${String(property)}`);

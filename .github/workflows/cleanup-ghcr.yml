@@ -1,0 +1,45 @@
+# This workflow removes all untagged Docker images from the
+# GitHub Container Registry.
+# It is triggered by a schedule event or a manual workflow dispatch event.
+
+name: "Docker images: Cleanup GitHub Container Registry"
+run-name: "Docker images: Cleanup GitHub Container Registry (branch ${{ github.ref_name }} on ${{ github.event_name }} by ${{ github.actor }})"
+defaults:
+  run:
+    shell: bash
+
+on:
+
+  schedule:
+    #run every Fri, 6 pm UTC
+    - cron: '0 18 * * 5' #
+
+  workflow_dispatch:
+
+
+jobs:
+  message:
+    name: Print message
+    runs-on: ubuntu-latest
+    if: ${{ github.event.act }}
+
+    steps:
+      - name: Print message
+        id: print-message
+        run: |
+          echo "Docker images: Cleanup GitHub Container Registry (branch ${{ github.ref_name }} on ${{ github.event_name }} by ${{ github.actor }})"
+
+  cleanup-images:
+    name: Cleanup GitHub Container Registry images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Removing all untagged images from GitHub Container Registry
+        id: cleanup-ghcr
+        uses: dataaxiom/ghcr-cleanup-action@cd0cdb900b5dbf3a6f2cc869f0dbb0b8211f50c4 # v1.0.16
+        with:
+          dry-run: false
+          expand-packages: true
+          packages: keyman-*-ci
+          delete-untagged: true
+          token: ${{ secrets.KEYMAN_SERVER_REPO_ACCESS_PAT }}

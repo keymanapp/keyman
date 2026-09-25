@@ -15,12 +15,14 @@ sudo apt-get upgrade
 sudo apt-get install keyman onboard-keyman
 ```
 
-An older version of Keyman for Linux packages is also available in any current Debian at:
+A possibly older version of Keyman for Linux packages is also available in
+any current Debian at:
 [https://packages.debian.org/keyman](https://packages.debian.org/keyman)
 
-**Note** in order to fully work you'll need a patched version of ibus
-which is available in the above launchpad repo. Patched versions of ibus
-will have the string `sil` in the package version number.
+**Note** Versions before Keyman 18 required a patched version of ibus in order
+to fully work. Patched versions of ibus were available in the above mentioned
+launchpad repository and had the string `sil` in the package version number.
+Keyman 18+ no longer requires a patched version of ibus.
 
 ## Q. How do I install a Keyman keyboard?
 

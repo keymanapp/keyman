@@ -5,12 +5,13 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/developer/src/packages.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/npm-packages.inc.sh"
 
 builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/common/include" \
@@ -20,6 +21,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/developer/src/common/web/utils" \
   "@/developer/src/kmc-analyze" \
   "@/developer/src/kmc-copy" \
+  "@/developer/src/kmc-convert" \
   "@/developer/src/kmc-generate" \
   "@/developer/src/kmc-keyboard-info" \
   "@/developer/src/kmc-kmn" \
@@ -34,10 +36,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "bundle                    creates a bundled version of kmc" \
   "api                       prepare compiler error documentation" \
   "test                      run automated tests for kmc" \
-  publish \
-  "--build-path=BUILD_PATH   build directory for bundle" \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  "--build-path=BUILD_PATH   build directory for bundle"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -55,8 +54,8 @@ function do_build() {
 #-------------------------------------------------------------------------------------------------------------------
 
 function do_test() {
-  builder_do_typescript_tests 50
-  ./test/command-line-tests.sh test
+  typescript_run_eslint_mocha_tests 45
+  builder_launch /developer/src/kmc/test/command-line-tests.sh test
 }
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -85,11 +84,14 @@ function do_bundle() {
   mkdir -p build/dist
   node build-bundler.js
 
-  sentry-cli sourcemaps inject \
-    --org keyman \
-    --project keyman-developer \
-    --release "$VERSION_GIT_TAG"  \
-    build/dist/ "${SOURCEMAP_PATHS[@]}"
+  if builder_is_ci_build && builder_is_ci_build_level_release; then
+    # Only inject sourcemaps for release builds
+    sentry-cli sourcemaps inject \
+      --org keyman \
+      --project keyman-developer \
+      --release "$KEYMAN_VERSION_GIT_TAG"  \
+      build/dist/ "${SOURCEMAP_PATHS[@]}"
+  fi
 
   # Manually copy over kmcmplib module
   cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
@@ -105,9 +107,8 @@ function do_bundle() {
 #-------------------------------------------------------------------------------------------------------------------
 
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action build      do_build
 builder_run_action test       do_test
 builder_run_action api        do_api
 builder_run_action bundle     do_bundle
-builder_run_action publish    builder_publish_npm

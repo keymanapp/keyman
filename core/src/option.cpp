@@ -14,17 +14,6 @@
 
 using namespace km::core;
 
-namespace
-{
-  constexpr char const * const scope_names_lut[] = {
-    u8"keyboard",
-    u8"environment"
-  };
-}
-
-// Forward declarations
-
-
 option::option(km_core_option_scope s, char16_t const *k, char16_t const *v)
 : option()
 {
@@ -51,34 +40,17 @@ option::release() {
   return opt;
 }
 
-// TODO: Relocate this and fix it
-json & km::core::operator << (json &j, abstract_processor const &)
-{
-  j << json::object;
-  // auto n = 0;
-  // for (auto scope: opts._scopes)
-  // {
-  //   j << scope_names_lut[n++] << json::object;
-  //   for (auto opt = scope; opt->key; ++opt)
-  //   {
-  //     j << opt->key << opt->value;
-  //   }
-  //   j << json::close;
-  // }
-
-  j << "saved" << json::object;
-  for (auto scope: {KM_CORE_OPT_KEYBOARD, KM_CORE_OPT_ENVIRONMENT})
-  {
-    j << scope_names_lut[scope-1] << json::object;
-    // for (auto & opt: opts._saved)
-    // {
-    //   if (opt.scope != scope) continue;
-    //   j << opt.key << opt.value;
-    // }
-    j << json::close;
+km_core_option_item *
+km::core::clone_options(km_core_option_item const *src) {
+  if (!src) {
+    return nullptr;
   }
-  j << json::close;
-  j << json::close;
-
-  return j;
+  size_t count = km_core_options_list_size(src);
+  km_core_option_item *result = new km_core_option_item[count + 1];
+  for (size_t i = 0; i < count; ++i) {
+    km::core::option opt(static_cast<km_core_option_scope>(src[i].scope), src[i].key, src[i].value);
+    result[i] = opt.release();
+  }
+  result[count] = KM_CORE_OPTIONS_END;
+  return result;
 }

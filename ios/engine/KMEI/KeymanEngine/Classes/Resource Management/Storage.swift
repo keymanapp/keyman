@@ -238,15 +238,15 @@ extension Storage {
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
-                     resourceName: "sentry.min.js",
-                     dstDir: baseDir,
-                     excludeFromBackup: true)
-    try Storage.copy(from: bundle,
                      resourceName: "keyman-sentry.js",
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
                      resourceName: "kmwosk.css",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
+    try Storage.copy(from: bundle,
+                     resourceName: "globe-hint.css",
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,

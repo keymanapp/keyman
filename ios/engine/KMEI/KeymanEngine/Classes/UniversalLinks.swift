@@ -25,11 +25,11 @@ public class UniversalLinks {
   public static var externalLinkLauncher: ((URL) -> Void)? = nil
 
   // e.g. https://keyman.com/keyboards/install/foo
-  private static let KEYBOARD_INSTALL_LINK_REGEX = try! NSRegularExpression(pattern: "^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.local)?/keyboards/install/([^?/]+)(?:\\?(.+))?$")
-  // e.g. http://keyman.com.local/keyboards/foo
-  private static let KEYBOARD_MATCH_ROOT_REGEX = try! NSRegularExpression(pattern: "^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.local)?/keyboards([/?].*)?$");
+  private static let KEYBOARD_INSTALL_LINK_REGEX = try! NSRegularExpression(pattern: "^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.localhost)?/keyboards/install/([^?/]+)(?:\\?(.+))?$")
+  // e.g. http://keyman.com.localhost/keyboards/foo
+  private static let KEYBOARD_MATCH_ROOT_REGEX = try! NSRegularExpression(pattern: "^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.localhost)?/keyboards([/?].*)?$");
   // e.g. https://keyman-staging.com/go/windows/14.0/download-keyboards?version=14.0.146.0
-  private static let KEYBOARD_MATCH_GO_REGEX = try! NSRegularExpression(pattern: "^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.local)?/go/windows/[^/]+/download-keyboards")
+  private static let KEYBOARD_MATCH_GO_REGEX = try! NSRegularExpression(pattern: "^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.localhost)?/go/windows/[^/]+/download-keyboards")
 
   public static func tryParseKeyboardInstallLink(_ link: URL) -> ParsedKeyboardInstallLink? {
     let linkString = link.absoluteString

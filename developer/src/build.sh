@@ -2,12 +2,10 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-. "$KEYMAN_ROOT/developer/src/packages.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
 
 builder_describe \
   "Keyman Developer" \
@@ -17,7 +15,7 @@ builder_describe \
   build \
   test \
   "api                          Analyze API and prepare API documentation" \
-  "publish                      Prepare files for distribution, publish symbols, publish or pack npm packages, and build installer" \
+  "publish                      Prepare files for distribution, publish symbols, and build installer" \
   "install                      Install built programs locally" \
   ":common                      Developer common files" \
   ":ext                         Third party components" \
@@ -25,6 +23,7 @@ builder_describe \
   ":kmcmplib                    Compiler - .kmn compiler" \
   ":kmc-analyze                 Compiler - Analysis Tools" \
   ":kmc-copy                    Compiler - Project Copying and Renaming Tools" \
+  ":kmc-convert                 Compiler - Keyboard Conversion Tools" \
   ":kmc-generate                Compiler - Generation Tools" \
   ":kmc-keyboard-info           Compiler - .keyboard_info Module" \
   ":kmc-kmn                     Compiler - .kmn to .kmx and .js Keyboard Module" \
@@ -43,9 +42,7 @@ builder_describe \
   ":setup                       Keyman Developer setup bootstrap" \
   ":test=test/auto              Various older tests (others in each module)" \
   ":tike                        Keyman Developer IDE" \
-  ":inst                        Bundled installers" \
-  "--npm-publish+               For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n+                Don't actually publish anything to external endpoints, just dry run"
+  ":inst                        Bundled installers"
 
 builder_describe_platform \
   :ext       win,delphi \
@@ -67,7 +64,7 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if [[ $BUILDER_OS == win ]]; then
+if builder_is_windows; then
   source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 fi
 
@@ -76,25 +73,6 @@ fi
 #
 function do_prepublish() {
   builder_heading "prepublish - verify environment before build"
-
-  #
-  # Make sure that package*.json have not been modified before
-  #
-
-  pushd "$KEYMAN_ROOT" >/dev/null
-  if git status --porcelain | grep -qP 'package(-lock)?\.json'; then
-    builder_echo "The following package.json files have been modified:"
-    git status --porcelain | grep -P 'package(-lock)?\.json'
-    builder_die "The publish action will not run until these files are checked in or reverted."
-  fi
-  popd
-
-  #
-  # To ensure that we cache the top-level package.json, we must call this before
-  # the global publish
-  #
-
-  builder_publish_cleanup
 
   #
   # Verify that the Delphi environment is correct for a release build
@@ -139,44 +117,7 @@ builder_run_action         api     api-documenter markdown -i ../build/api -o ..
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_publish() {
-  #--------------------------------------------------------
-  # TODO: Hard-coded calls to /common packages which need
-  # publishing; this should be able to be removed once we
-  # move the publish call to the top-level
-
-  local DRY_RUN= NPM_PUBLISH=
-
-  if builder_has_option --npm-publish; then
-    NPM_PUBLISH=--npm-publish
-  fi
-
-  if builder_has_option --dry-run; then
-    DRY_RUN=--dry-run
-  fi
-
-  ./common/web/utils/build.sh publish $DRY_RUN $NPM_PUBLISH
-  ../../common/web/keyman-version/build.sh publish $DRY_RUN $NPM_PUBLISH
-  ../../common/web/langtags/build.sh publish $DRY_RUN $NPM_PUBLISH
-  ../../common/web/types/build.sh publish $DRY_RUN $NPM_PUBLISH
-  ../../core/include/ldml/build.sh publish $DRY_RUN $NPM_PUBLISH
-  # end TODO
-  #--------------------------------------------------------
-
-  builder_echo info "Cleaning up package.json after 'npm version'"
-  # And then cleanup the mess
-  builder_publish_cleanup
-  # Restore all the package.json files and package-lock.json files that
-  # were clobbered by 'npm version'
-  pushd "$KEYMAN_ROOT" >/dev/null
-  git checkout package.json package-lock.json '**/package.json'
-  popd
-
-  # TODO: Copy ../build/docs {from api action} to help.keyman.com and open PR
-}
-
 builder_run_child_actions  publish
-builder_run_action         publish do_publish
 
 #-------------------------------------------------------------------------------------------------------------------
 

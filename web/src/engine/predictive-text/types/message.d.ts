@@ -24,7 +24,6 @@ import { LexicalModelTypes } from '@keymanapp/common-types';
 import Configuration = LexicalModelTypes.Configuration;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
-import USVString = LexicalModelTypes.USVString;
 
 /**
  * Tokens are signed 31-bit integers!
@@ -87,7 +86,7 @@ interface CurrentWordMessage {
    * Contains the 'current word' left of the caret given the Context
    * of its source message - the 'wordbreak' message with matching Token value.
    */
-  word: USVString;
+  word: string;
 }
 
 /**

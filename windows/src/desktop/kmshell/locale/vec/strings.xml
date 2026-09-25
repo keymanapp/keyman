@@ -161,7 +161,6 @@
   <string name="SKCouldNotPrintKeyboard" comment="/FormatString: ">No se pol stanpar ƚa tastièra. Prègo, salva inte na pàxena web e stanpa manualmente.</string>
   <string name="SKDamagedKeyboard" comment="/FormatString: ">&lt;Tastièra danexada&gt;</string>
   <string name="SKDebuggingWarning" comment="/FormatString: ">Ƚa informasion de debug Keyman ƚa vegnarà salvada inte un file de tèsto de nòme keymanlog\system.log so 'l to desktop. Te gà da nar fora da Keyman inanso de lèxar o scanseƚar sto file. ATENSION: sto file el pol deventar grando pasto in poco tenpo. Ativando el debugging se ralentarà el to sistèma e se gà da farlo nòma che se consejà da 'l supòrto de Tavultesoft. VERTIMENTO DE PRIVACY: tien conto che el logfile de debug el rejistra tute ƚe batùe de tastièra che te fà. Te gà da inpisar el log de debug nòma che durante na sesion de debugging o diagnòstega, e scanseƚar el file \keymanlog\system.log da 'l desktop pì presto che se pol.</string>
-  <string name="SKDefaultLanguageCode" comment="/FormatString: ">en</string>
   <string name="SKDialogSelectLanguage" comment="/FormatString: ">Desernisi lengua de ƚa interfacia utente</string>
   <string name="SKDownloadProgress_Title" comment="/FormatString: ">Descargo de 'l file</string>
   <string name="SKErrorActivatingBrowser" comment="/FormatString: ">No se pol ativar el navegador o el programa de email par sto URL.</string>

@@ -14,9 +14,9 @@ SIZE_THRESHOLD=1024
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder-basic.inc.sh"
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
-. "$KEYMAN_ROOT/resources/build/github.inc.sh"
+. "$KEYMAN_ROOT/resources/build/ci/github.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 display_usage() {
@@ -88,15 +88,15 @@ LOCAL_FILE=web/build/publish/release/keymanweb.js
 LOCAL_FILE_SIZE=`stat --printf="%s" $KEYMAN_ROOT/$LOCAL_FILE`
 
 #
-# Get the most recent build for $TIER from downloads.keyman.com
+# Get the most recent build for $KEYMAN_TIER from downloads.keyman.com
 #
 
 DOWNLOADS_VERSION_API=https://downloads.keyman.com/api/version/web
 REMOTE_KEYMANWEB_VERSIONS=`curl -s $DOWNLOADS_VERSION_API`
-REMOTE_VERSION=`echo $REMOTE_KEYMANWEB_VERSIONS | $JQ -r ".web.$TIER"`
+REMOTE_VERSION=`echo $REMOTE_KEYMANWEB_VERSIONS | $JQ -r ".web.$KEYMAN_TIER"`
 
-REMOTE_FILE_NEW=https://downloads.keyman.com/web/$TIER/$REMOTE_VERSION/static/build/app/browser/release/keymanweb.js
-REMOTE_FILE_OLD=https://downloads.keyman.com/web/$TIER/$REMOTE_VERSION/static/build/app/web/release/keymanweb.js
+REMOTE_FILE_NEW=https://downloads.keyman.com/web/$KEYMAN_TIER/$REMOTE_VERSION/static/build/app/browser/release/keymanweb.js
+REMOTE_FILE_OLD=https://downloads.keyman.com/web/$KEYMAN_TIER/$REMOTE_VERSION/static/build/app/web/release/keymanweb.js
 
 # If the remote file does not exist at the 'new' location, try the 'old' one instead.
 # Allows reorganization 'fallback' for the file-size check.

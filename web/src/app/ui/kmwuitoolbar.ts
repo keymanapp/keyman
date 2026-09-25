@@ -1,9 +1,8 @@
-/***
-   KeymanWeb 17.0
-   Copyright 2019-2023 SIL International
-***/
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 
-import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
+import type { KeymanEngine, KeyboardCookie, KeyboardDetails, UIModule } from 'keyman/app/browser';
 
 declare global {
   interface Window {
@@ -31,8 +30,6 @@ type ToolbarCookie = {
   maxrecent: number;
 } & Record<`recent${number}`, string>;
 
-type KeyboardDetail = ReturnType<KeymanEngine['_GetKeyboardDetail']>;
-
 type LanguageEntry = {
   /** Language id */
   id: string;
@@ -43,25 +40,25 @@ type LanguageEntry = {
   /**
    * A rich list of keyboard metadata for keyboards matching this language's language code (`id`).
    */
-  keyboards: KeyboardDetail[];
+  keyboards: KeyboardDetails[];
 }
 
 interface ListedKeyboard {
   priority: number;
   lang: LanguageEntry,
-  keyboard: KeyboardDetail;
+  keyboard: KeyboardDetails;
   buttonNode: HTMLDivElement;
   aNode: HTMLAnchorElement;
 }
 
-const keymanweb=window.keyman;
+const keyman=window.keyman;
 
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
-if(!keymanweb) {
+if(!keyman) {
   throw new Error("`keyman` global is missing; Keyman Engine for Web script has not been loaded");
-} else if(!keymanweb.ui?.name) {
+} else if(!keyman.ui?.name) {
   /********************************/
   /*                              */
   /* Toolbar User Interface       */
@@ -79,7 +76,7 @@ if(!keymanweb) {
 
   try {
     // Declare KeymanWeb, OnScreen keyboard and Util objects
-    const util=keymanweb.util;
+    const util=keyman.util;
 
     // Disable UI for touch devices
     if(util.isTouchDevice()) {
@@ -128,7 +125,7 @@ if(!keymanweb) {
        */
       maxListedKeyboards = 1;
       lastActiveControl: HTMLElement = null;
-      selectedKeyboard: KeyboardDetail = null;
+      selectedKeyboard: KeyboardDetails = null;
       selectedLanguage = '';
       helpOffsetX = 0;
       helpOffsetY = 0;
@@ -230,7 +227,7 @@ if(!keymanweb) {
        * Initialize toolbar UI
        */
       initialize() {
-        if(!keymanweb.initialized || this.init) {
+        if(!keyman.initialized || this.init) {
           return;
         }
 
@@ -300,7 +297,7 @@ if(!keymanweb) {
 
         const mapNode = this.createNode('map', 'kmw_worldgrey16');
         mapNode.name='kmw_worldgrey16';
-        for(let i in this.regions) {
+        for(const i in this.regions) {
           const areaNode = this.createNode('area');
           areaNode.shape = 'poly';
           areaNode.alt = '';
@@ -326,7 +323,7 @@ if(!keymanweb) {
         this.regionNodes = {};
 
         const listNode = this.createNode('ul');
-        for(let i in this.regions) {
+        for(const i in this.regions) {
           const itemNode = this.createNode('li');
           this.regionNodes[i] = this.createNode('a', null, null, this.regions[i].t);
           this.regionNodes[i].href='#';
@@ -369,7 +366,7 @@ if(!keymanweb) {
         aNode.href = '#';
         aNode.onclick = this.showOSK;
         aNode.onmousedown = function() {
-          keymanweb.activatingUI(true);
+          keyman.activatingUI(true);
         };
         aNode.title = this.ToolBar_Text.ShowOSK;
         aNode.appendChild(this.createNode('div', 'kmw_img_osk', 'kmw_img'));
@@ -405,7 +402,7 @@ if(!keymanweb) {
         this.registerEvents();
 
         // Restore focus
-        keymanweb.focusLastActiveElement();
+        keyman.focusLastActiveElement();
       }
 
       shutdown() {
@@ -435,7 +432,7 @@ if(!keymanweb) {
         this.regionLanguageListNodes = {};
 
         // Build list of keyboards by region and language
-        let Keyboards = keymanweb.getKeyboards();
+        const Keyboards = keyman.getKeyboards();
 
         // Sort the keyboards by region and language
         Keyboards.sort(this.sortKeyboards);
@@ -448,15 +445,15 @@ if(!keymanweb) {
           }
         }
 
-        for(let i in this.regions) {
+        for(const i in this.regions) {
           this.regionLanguageListNodes[i] = this.createNode('div', null, 'kmw_selector_region');
           let colNode = this.createNode('div', null, 'kmw_keyboard_col');
-          var max = 0, count = 0, languageCode = '';
+          let max = 0, count = 0, languageCode = '';
 
           // Get number of languages for the region
           for(let j=0; j<Keyboards.length; j++) {
             // REVERT:  ensures that keyboards without visible map region get displayed SOMEWHERE.
-            var kbdRegion = Keyboards[j].RegionCode;
+            const kbdRegion = Keyboards[j].RegionCode;
             if(!this.regions[kbdRegion]) {
               // For now, we'll display them within the 'middle-east' region.
               if(i != this.catchAllRegion) {
@@ -467,7 +464,7 @@ if(!keymanweb) {
             }
 
             // Get JUST the language code for this section.  BCP-47 codes can include more!
-            var bcpSubtags: string[] = keymanweb.util.getLanguageCodes(Keyboards[j].LanguageCode);
+            const bcpSubtags: string[] = keyman.util.getLanguageCodes(Keyboards[j].LanguageCode);
             if(bcpSubtags[0] == languageCode) {
               continue; // Same language as previous keyboard
             }
@@ -491,9 +488,9 @@ if(!keymanweb) {
               continue; // Not this region
             }
 
-            var bcpSubtags: string[] = keymanweb.util.getLanguageCodes(Keyboards[j].LanguageCode);
+            const bcpSubtags: string[] = keyman.util.getLanguageCodes(Keyboards[j].LanguageCode);
             if(bcpSubtags[0] == languageCode) {  // Same language as previous keyboard, so add it to that entry
-              var x = this.languages[languageCode].keyboards;
+              const x = this.languages[languageCode].keyboards;
 
               // While we could avoid duplicating keyboard entries that occur for multiple regions, we'll instead
               // allow them to display while distinguishing them more directly.  (That part is handled later.)
@@ -553,7 +550,7 @@ if(!keymanweb) {
         }
 
         // Restore focus
-        keymanweb.focusLastActiveElement();
+        keyman.focusLastActiveElement();
       }
 
       /**
@@ -563,7 +560,7 @@ if(!keymanweb) {
        * @param       {Object}  b
        * @return      {number}
        **/
-      readonly sortKeyboards = function(a: KeyboardDetail, b: KeyboardDetail) {
+      readonly sortKeyboards = function(a: KeyboardDetails, b: KeyboardDetails) {
         if(a.RegionCode < b.RegionCode) {
           return -2;
         }
@@ -611,8 +608,8 @@ if(!keymanweb) {
        * @param       {Object}  lang
        * @param       {Object}  kbd
        **/
-      addKeyboardToList(lang: LanguageEntry, kbd: KeyboardDetail) {
-        let found = this.findListedKeyboard(lang);
+      addKeyboardToList(lang: LanguageEntry, kbd: KeyboardDetails) {
+        const found = this.findListedKeyboard(lang);
         if(found == null) {
           // Add the button
           if(this.listedKeyboards.length >= this.maxListedKeyboards) {
@@ -627,7 +624,7 @@ if(!keymanweb) {
 
             // delete the oldest used control
             if(oldestFound != null) {
-              let rk = this.listedKeyboards[oldestFound];
+              const rk = this.listedKeyboards[oldestFound];
               this.langKeyboardListNodes[rk.lang.id] = null;
               this.langKeyboardNodes[rk.lang.id] = null;
               this.languageButtonsNode.removeChild(rk.buttonNode);
@@ -640,12 +637,12 @@ if(!keymanweb) {
               }
             }
           }
-          let buttonNode = this.createNode('div', null/*'kmw_button_keyboard_'+lang.id*/, 'kmw_button');
+          const buttonNode = this.createNode('div', null/*'kmw_button_keyboard_'+lang.id*/, 'kmw_button');
           let aNode = this.createNode('a', null, 'kmw_button_a'+(lang.keyboards.length>1 ? ' kmw_norightgap' : ''));
           aNode.href='#';
 
           let p1=this.ToolBar_Text['SelectKeyboardPre'] + kbd.Name;
-          let p2=this.ToolBar_Text['SelectKeyboardSuf'];
+          const p2=this.ToolBar_Text['SelectKeyboardSuf'];
           if(p1.toLowerCase().indexOf(p2.toLowerCase()) < 0) {
             p1=p1+' '+ p2;
           }
@@ -657,14 +654,14 @@ if(!keymanweb) {
           aNode.appendChild(this.createNode('div', null, 'kmw_a', this.lgText));
           buttonNode.appendChild(aNode);
 
-          let thisANode = aNode;
+          const thisANode = aNode;
 
           if(lang.keyboards.length > 1) {
             aNode = this.createNode('a', null, 'kmw_button_a kmw_noleftgap');
             aNode.href = '#';
             aNode.title = this.ToolBar_Text['AltKeyboardsPre']+lang.name + this.ToolBar_Text['AltKeyboardsSuf'];
             aNode.onclick = (event) => this.showKeyboardsForLanguage(event, lang);
-            let divNode = this.createNode('div', null, 'kmw_a');
+            const divNode = this.createNode('div', null, 'kmw_a');
             let kbdText = this.truncate(kbd.Name.replace(/\s?keyboard/i,''),40-this.lgText.length);
             divNode.appendChild(this.langKeyboardNodes[lang.id] = this.createNode('span', null, 'kmw_kbd', kbdText));
             aNode.appendChild(divNode);
@@ -674,8 +671,8 @@ if(!keymanweb) {
             this.langKeyboardListNodes[lang.id] = this.createNode('ul', null, 'kmw_selector_kbd');
             this.langKeyboardListNodes[lang.id].style.display='none';
 
-            for(let n in lang.keyboards) {
-              let itemNode = this.createNode('li');
+            for(const n in lang.keyboards) {
+              const itemNode = this.createNode('li');
               kbdText = lang.keyboards[n].Name.replace(/\s?keyboard/i,'');
               // We append the full BCP-47 code here for disambiguation when regional and/or script variants exist.
               kbdText = kbdText + " [" + lang.keyboards[n].LanguageCode + "]";
@@ -694,20 +691,20 @@ if(!keymanweb) {
 
           this.languageButtonsNode.appendChild(buttonNode);
 
-          let thisLang = lang, thisButtonNode = buttonNode;
+          const thisLang = lang, thisButtonNode = buttonNode;
           this.listedKeyboards.push({priority: this.keyboardListPriority++, lang:thisLang, keyboard:kbd, buttonNode:thisButtonNode, aNode:thisANode});
         } else {
           this.listedKeyboards[found].priority = this.keyboardListPriority++;
           this.listedKeyboards[found].keyboard = kbd;
-          let e = this.langKeyboardNodes[lang.id];
+          const e = this.langKeyboardNodes[lang.id];
           if(e) {
-            var kbdText=kbd.Name.replace(/\s?keyboard/i,'');
+            const kbdText=kbd.Name.replace(/\s?keyboard/i,'');
             e.innerHTML = this.truncate(kbdText,40-this.lgText.length);
           }
 
           if(this.listedKeyboards[found].aNode) {
             let p1 = this.ToolBar_Text['SelectKeyboardPre']+kbd.Name;
-            let p2 = this.ToolBar_Text['SelectKeyboardSuf'];
+            const p2 = this.ToolBar_Text['SelectKeyboardSuf'];
             if(p1.toLowerCase().indexOf(p2.toLowerCase()) < 0) {
               p1=p1+' '+ p2;
             }
@@ -754,7 +751,7 @@ if(!keymanweb) {
        * Description  Hide the list of keyboards for this language
        **/
       readonly hideKeyboardsForLanguage = (event: Event) => {
-        var e = this.keyboardsForLangPopup;
+        const e = this.keyboardsForLangPopup;
         if(e) {
           e.style.display='none';
         }
@@ -794,8 +791,8 @@ if(!keymanweb) {
        * @return      {boolean}
        **/
       selectLanguage(event: Event, lang: LanguageEntry) {
-        let found = this.findListedKeyboard(lang);
-        let kbd: KeyboardDetail = null;
+        const found = this.findListedKeyboard(lang);
+        let kbd: KeyboardDetails = null;
 
         if(found == null) {
           kbd = lang.keyboards[0];
@@ -820,11 +817,11 @@ if(!keymanweb) {
        * @param       {boolean} updateKeyman
        * @return      {boolean}
        **/
-      async selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetail, updateKeyman: boolean) {
-        keymanweb.activatingUI(true);
+      private async selectKeyboard(event: Event, lang: LanguageEntry, kbd: KeyboardDetails, updateKeyman: boolean): Promise<boolean> {
+        keyman.activatingUI(true);
 
         if(this.selectedLanguage) {
-          let found = this.findListedKeyboard(this.selectedLanguage);
+          const found = this.findListedKeyboard(this.selectedLanguage);
           if(found != null) {
             this.listedKeyboards[found].buttonNode.className = 'kmw_button';
           }
@@ -841,7 +838,7 @@ if(!keymanweb) {
         // Return focus to input area and activate the selected keyboard
         this.addKeyboardToList(lang, kbd);
         if(updateKeyman) {
-          await keymanweb.setActiveKeyboard(kbd.InternalName, kbd.LanguageCode).then(() => {
+          await keyman.setActiveKeyboard(kbd.InternalName, kbd.LanguageCode).then(() => {
             // Restore focus _after_ the keyboard finishes loading.
             this.setLastFocus();
           });
@@ -852,7 +849,7 @@ if(!keymanweb) {
         this.saveCookie();
         this.enableControls();
 
-        keymanweb.activatingUI(false);
+        keyman.activatingUI(false);
 
         return this.hideKeyboardsPopup(event) || this.hideKeyboardsForLanguage(event);
       }
@@ -863,7 +860,7 @@ if(!keymanweb) {
        * @return      {boolean}
        **/
       enableControls(): boolean {
-        let elems = [
+        const elems = [
           this.offButtonNode,
           this.offBarNode,
           this.oskButtonNode,
@@ -871,7 +868,7 @@ if(!keymanweb) {
         ];
         let hideOskButton=false;
 
-        if(keymanweb.isCJK(this.selectedKeyboard)) {
+        if(keyman.isCJK(this.selectedKeyboard)) {
           hideOskButton = true;
         } else if(this.selectedKeyboard == null) {
           hideOskButton = (elems[2].style.display == 'none');
@@ -905,7 +902,7 @@ if(!keymanweb) {
        * Restore the focus to the last focused element
        **/
       setLastFocus() {
-        keymanweb.focusLastActiveElement();
+        keyman.focusLastActiveElement();
       }
 
       /**
@@ -917,13 +914,13 @@ if(!keymanweb) {
        * @return      {boolean}
        **/
       readonly showOSK = (event: Event) => {
-        let osk = keymanweb.osk;
+        const osk = keyman.osk;
         if(!osk) {
           return false;
         }
-        keymanweb.activatingUI(true);
+        keyman.activatingUI(true);
         //Toggle OSK on or off
-        if(osk && keymanweb.getActiveKeyboard() != '') {
+        if(osk && keyman.getActiveKeyboard() != '') {
           if(osk.isEnabled()) {
             osk.hide();
            } else {
@@ -931,7 +928,7 @@ if(!keymanweb) {
            }
         }
         this.setLastFocus();
-        keymanweb.activatingUI(false);
+        keyman.activatingUI(false);
         return this.eventCapture(event);
       }
 
@@ -943,11 +940,11 @@ if(!keymanweb) {
        * @return      {boolean}
        * Description  Update the UI when all keyboards disabled by user
        **/
-      readonly offButtonClickEvent = async (event: Event) => {
+      private readonly offButtonClickEvent = async (event: Event): Promise<boolean> => {
         if(this.toolbarNode.className != 'kmw_controls_disabled') {
           this.hideKeyboardsForLanguage(null);
           if(this.selectedLanguage) {
-            var found = this.findListedKeyboard(this.selectedLanguage);
+            const found = this.findListedKeyboard(this.selectedLanguage);
             if(found != null) {
               this.listedKeyboards[found].buttonNode.className = 'kmw_button';
             }
@@ -959,7 +956,7 @@ if(!keymanweb) {
 
         // Return the focus to the input area and set the active keyboard to nothing
         this.setLastFocus();
-        await keymanweb.setActiveKeyboard('','');
+        await keyman.setActiveKeyboard('','');
 
         //Save current state when deselecting a keyboard (may not be needed)
         this.saveCookie();
@@ -997,7 +994,7 @@ if(!keymanweb) {
        * Description  Select the region for which to list languages
        **/
       readonly selectRegion = (event: Event, region: string) => {
-        let e = this.browseMapNode;
+        const e = this.browseMapNode;
 
         if(!e) {
           return this.eventCapture(event);
@@ -1073,7 +1070,7 @@ if(!keymanweb) {
           return true;
         }
 
-        let t=params.target;
+        const t=params.target;
         if(t.tagName.toLowerCase() == 'textarea' ||
           (t.tagName.toLowerCase() == 'input' && (t as HTMLInputElement).type.toLowerCase() == 'text')
         ) {
@@ -1084,10 +1081,10 @@ if(!keymanweb) {
             }
           } else {
             if(this.selectedKeyboard != null) {
-              if(keymanweb.isCJK()) {
+              if(keyman.isCJK()) {
                 this.oskButtonNode.style.display = this.oskBarNode.style.display = 'none';
               } else {
-                let osk = keymanweb.osk;
+                const osk = keyman.osk;
                 this.oskButtonNode.className = (osk && osk.isEnabled()) ? 'kmw_button_selected' : 'kmw_button';
               }
             }
@@ -1152,13 +1149,13 @@ if(!keymanweb) {
         internalName: string,
         languageCode: string
       }) => {  // Uses a different format than .getKeyboards(), b/c why not?
-        // https://help.keyman.com/developer/engine/web/16.0/reference/core/getKeyboards vs
-        // https://help.keyman.com/developer/engine/web/16.0/reference/events/kmw.keyboardchange
+        // https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboards vs
+        // https://help.keyman.com/developer/engine/web/current-version/reference/events/kmw.keyboardchange
         this.lastSelectedKeyboard = null;
-        let kbName=p.internalName,
-            lgName=keymanweb.util.getLanguageCodes(p.languageCode)[0];
+        const kbName=p.internalName,
+            lgName=keyman.util.getLanguageCodes(p.languageCode)[0];
         if(lgName != '' && kbName != '') {
-          let lg = this.languages[lgName];
+          const lg = this.languages[lgName];
           if(lg != null) {
             for(let j=0; j<lg.keyboards.length; j++) {
               if(lg.keyboards[j].InternalName == kbName) {
@@ -1202,7 +1199,7 @@ if(!keymanweb) {
       }
 
       registerEvents() {
-        let osk = keymanweb.osk;
+        const osk = keyman.osk;
         if(!osk) {
           return;
         }
@@ -1256,7 +1253,7 @@ if(!keymanweb) {
        * @return  {boolean}
       **/
       readonly hideAllPopups = (event: Event) => {
-        var e = this.keyboardsForLangPopup;
+        const e = this.keyboardsForLangPopup;
         if((!e || (e.style.display =='none')) && (this.selectorNode.className == '')) {
           return true;
         }
@@ -1284,7 +1281,7 @@ if(!keymanweb) {
        * for the popup, we stash the old event listener here and restore
        * it when we're done.
        */
-      lastDismissalCallback: (event: MouseEvent) => any = null;
+      lastDismissalCallback: (this: GlobalEventHandlers, ev: MouseEvent) => any = null;
 
       /**
        * Function     PopupDismissal
@@ -1367,15 +1364,15 @@ if(!keymanweb) {
           for(let i=0; i < c.maxrecent; i++) {
             // Is the entry actually defined?
             if(c[`recent${i}`] != undefined) {
-              var r=c[`recent${i}`].split(',');
+              const r=c[`recent${i}`].split(',');
               // Does its definition have the expected format?  That is: langID,keyboardID
               if(r.length == 2) {
-                var k = this.languages[r[0]];
+                const k = this.languages[r[0]];
                 // If the language has a defined entry in our list of loaded languages...
                 if(k != null) {
                   // Then, for our loaded keyboards for said loaded language...
                   // find the most recent match that is available in our current list.
-                  for(var j=0; j<k.keyboards.length; j++) {
+                  for(let j=0; j<k.keyboards.length; j++) {
                     if(k.keyboards[j].InternalName == r[1]) {
                       this.addKeyboardToList(k, k.keyboards[j]);
                       if(k.keyboards[j].InternalName == currentKeyboard) {
@@ -1394,12 +1391,12 @@ if(!keymanweb) {
         } else {
           // If language list and keyboard list have not yet been saved as a cookie,
           // initialize to the current (default) language and keyboard, if set by KMW
-          let kbName=keymanweb.getActiveKeyboard();
-          let lgName=keymanweb.getActiveLanguage();
+          const kbName=keyman.getActiveKeyboard();
+          const lgName=keyman.getActiveLanguage();
           if(lgName != '' && kbName != '') {
-            var lg = this.languages[lgName];
+            const lg = this.languages[lgName];
             if(lg != null) {
-              for(var j=0; j<lg.keyboards.length; j++) {
+              for(let j=0; j<lg.keyboards.length; j++) {
                 if(lg.keyboards[j].InternalName == kbName) {
                   this.selectKeyboard(null, lg, lg.keyboards[j], true);
                   window.focus();
@@ -1415,14 +1412,14 @@ if(!keymanweb) {
        * Save the current UI state in the KeymanWeb_Toolbar cookie
        **/
       saveCookie() {
-        let vs: ToolbarCookie ={
+        const vs: ToolbarCookie ={
           region: this.selectedRegion,
           maxrecent: this.listedKeyboards.length
         };
         vs.region = this.selectedRegion;
         vs.maxrecent = this.listedKeyboards.length;
 
-        for(var i=0; i<this.listedKeyboards.length; i++) {
+        for(let i=0; i<this.listedKeyboards.length; i++) {
           vs[`recent${i}`] = this.listedKeyboards[i].lang.id+","+this.listedKeyboards[i].keyboard.InternalName;
         }
 
@@ -1431,12 +1428,12 @@ if(!keymanweb) {
 
     }
 
-    const ui = keymanweb.ui = new ToolbarUI();
+    const ui = keyman.ui = new ToolbarUI();
 
-    keymanweb.addEventListener('keyboardregistered', ui.registerKeyboard);
-    keymanweb.addEventListener('controlfocused', ui.focusControlEvent);
-    keymanweb.addEventListener('controlblurred', ui.blurControlEvent);
-    keymanweb.addEventListener('keyboardchange', ui.changeKeyboardEvent);
+    keyman.addEventListener('keyboardregistered', ui.registerKeyboard);
+    keyman.addEventListener('controlfocused', ui.focusControlEvent);
+    keyman.addEventListener('controlblurred', ui.blurControlEvent);
+    keyman.addEventListener('keyboardchange', ui.changeKeyboardEvent);
 
     // Initialize when everything defined (replaces unreliable onload event handler)
     // In case the toolbar script loads a bit later than the main KMW script

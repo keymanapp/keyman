@@ -126,7 +126,7 @@ do_command() {
 # ----------------------------------------------------------------------------
 
 build_meson_cross_file_for_wasm() {
-  if [ $BUILDER_OS == win ]; then
+  if builder_is_windows; then
     local R=$(cygpath -w $(echo $EMSCRIPTEN_BASE) | sed 's_\\_\\\\_g')
   else
     local R=$(echo $EMSCRIPTEN_BASE | sed 's_/_\\/_g')

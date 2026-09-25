@@ -2,12 +2,15 @@
 #include "pch.h"
 #include "keyman-debug-etw.h"
 
-#ifdef _WIN64
-#define DEBUG_PLATFORM_STRING "x64"
-#define DEBUG_PLATFORM_STRINGW L"x64"
+#if defined(_M_ARM64)
+  #define DEBUG_PLATFORM_STRING "arm64"
+  #define DEBUG_PLATFORM_STRINGW L"arm64"
+#elif defined(_M_X64)
+  #define DEBUG_PLATFORM_STRING "x64"
+  #define DEBUG_PLATFORM_STRINGW L"x64"
 #else
-#define DEBUG_PLATFORM_STRING "x86"
-#define DEBUG_PLATFORM_STRINGW L"x86"
+  #define DEBUG_PLATFORM_STRING "x86"
+  #define DEBUG_PLATFORM_STRINGW L"x86"
 #endif
 
 #define TAB L"\t"
@@ -113,10 +116,12 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent2W(PWCHAR file
 #define MAX_DESCRIPTORS 12
     EVENT_DATA_DESCRIPTOR Descriptors[MAX_DESCRIPTORS];
 
-#ifdef _WIN64
-    DWORD platform = 2;
+#if defined(_M_ARM64)
+  DWORD platform = 3;
+#elif defined(_M_X64)
+  DWORD platform = 2;
 #else
-    DWORD platform = 1;
+  DWORD platform = 1;
 #endif
 
 
