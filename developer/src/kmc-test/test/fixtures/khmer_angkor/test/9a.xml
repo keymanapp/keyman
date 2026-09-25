@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE regressiontest SYSTEM "http://www.tavultesoft.com/keymandev/regtest.dtd">
+<regressiontest>
+  <info>
+    <version>6.0</version>
+    <systemkeyboard>00000409</systemkeyboard>
+    <keyboard>C:\keyman\keyboards\experimental-keyboards\khmer10\source\khmer_angkor.kmx</keyboard>
+    <beginmode>Unicode</beginmode>
+  </info>
+  <events>
+    <event>
+       <key><vkey>K_L</vkey></key>
+       <postcontext><text>ល</text></postcontext>
+    </event>
+    <event>
+       <key><vkey>K_O</vkey></key>
+       <postcontext><text>លោ</text></postcontext>
+    </event>
+    <event>
+       <key><vkey>K_K</vkey></key>
+       <postcontext><text>លោក</text></postcontext>
+    </event>
+  </events></regressiontest>

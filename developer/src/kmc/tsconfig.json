@@ -22,5 +22,6 @@
     { "path": "../kmc-model" },
     { "path": "../kmc-model-info" },
     { "path": "../kmc-package" },
+    { "path": "../kmc-test" },
   ]
 }
