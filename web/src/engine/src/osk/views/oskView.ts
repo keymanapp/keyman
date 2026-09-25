@@ -450,7 +450,7 @@ export abstract class OSKView
    * they rely on this function to manage presentation (showing / hiding) of the OSK.
    */
   private commonCheckAndDisplay() {
-    if(this.activationModel.activate && this.activeKeyboard) {
+    if(this.activationModel.canActivate && this.activeKeyboard) {
       this.present();
     } else {
       this.startHide(false);
