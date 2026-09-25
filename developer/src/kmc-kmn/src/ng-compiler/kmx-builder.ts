@@ -7,7 +7,7 @@
  */
 
 import { ASTNode } from './tree-construction.js';
-import { DwFileVersion, DwSystemID } from './kmx-enums.js';
+import { DwFileVersion, DwSystemID, DW_FILE_VERSION_MAP } from './kmx-constants.js';
 import { NodeType } from './node-type.js';
 
 /**
@@ -17,7 +17,7 @@ import { NodeType } from './node-type.js';
  */
 export class KmxBuilder {
   /** the KmxModel to be built */
-  private model = new KmxModel();
+  private readonly model = new KmxModel();
 
   /**
    * Construct a KmxBuilder
@@ -45,35 +45,15 @@ export class KmxBuilder {
     // dwFileVersion
     const versionNode = this.root.getDescendents(NodeType.VERSION)[0];
     // TODO-NG-COMPILER: error for invalid version
-    const versionText = versionNode.getText();
-    this.model.dwFileVersion = this.versionToDwFileVersion(versionText);
+    const versionText = versionNode?.getText() ?? '';
+    const valueText   = versionNode?.getTextOfType(NodeType.STRING) ?? '';
+    this.model.dwFileVersion = this.versionToDwFileVersion(valueText);
     this.model.compStore.push(new CompStore(DwSystemID.TSS_VERSION, versionText));
   }
 
   private versionToDwFileVersion(text: String): DwFileVersion {
-    const versionMap = new Map<Number, DwFileVersion>([
-      [3.0,  DwFileVersion.VERSION_30],
-      [3.1,  DwFileVersion.VERSION_31],
-      [3.2,  DwFileVersion.VERSION_32],
-      [4.0,  DwFileVersion.VERSION_40],
-      [5.0,  DwFileVersion.VERSION_50],
-      [5.1,  DwFileVersion.VERSION_501],
-      [6.0,  DwFileVersion.VERSION_60],
-      [7.0,  DwFileVersion.VERSION_70],
-      [8.0,  DwFileVersion.VERSION_80],
-      [9.0,  DwFileVersion.VERSION_90],
-      [10.0, DwFileVersion.VERSION_100],
-      [11.0, DwFileVersion.VERSION_100],
-      [12.0, DwFileVersion.VERSION_100],
-      [13.0, DwFileVersion.VERSION_100],
-      [14.0, DwFileVersion.VERSION_140],
-      [15.0, DwFileVersion.VERSION_150],
-      [16.0, DwFileVersion.VERSION_160],
-      [17.0, DwFileVersion.VERSION_170],
-      [18.0, DwFileVersion.VERSION_170],
-      [19.0, DwFileVersion.VERSION_190],
-    ]);
-    return versionMap.get(Number(text));
+    text = text.replace(/^['|"]|['"]$/gm, '');
+    return DW_FILE_VERSION_MAP.get(Number(text));
   }
 }
 
