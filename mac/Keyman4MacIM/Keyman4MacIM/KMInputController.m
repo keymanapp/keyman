@@ -148,14 +148,14 @@ KMInputMethodEventHandler* _eventHandler;
   NSInteger itag = mItem.tag;
   os_log_debug([KMLogs uiLog], "Keyman menu item selected - tag: %lu", itag);
   if (itag == OSK_MENUITEM_TAG) {
-    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"On-screen Keyboard"];
+    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"On-screen Keyboard menu selected"];
     [KMSettingsRepository.shared writeShowOskOnActivate:YES];
     os_log_debug([KMLogs oskLog], "menuAction OSK_MENUITEM_TAG, updating settings writeShowOsk to YES");
     [self.appDelegate showOSK];
   }
-  else if (itag == ABOUT_MENUITEM_TAG) {
-    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"About"];
-    [self.appDelegate showAboutWindow];
+  else if (itag == CONFIG_MENUITEM_TAG) {
+    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"Configuration menu selected"];
+    [self.appDelegate launchKeymanConfiguration];
   }
   else if (itag >= KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG) {
     [KMSentryHelper addUserBreadCrumb:@"menu" message:@"Selected Keyboard"];
