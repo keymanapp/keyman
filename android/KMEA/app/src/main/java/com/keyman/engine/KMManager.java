@@ -1568,7 +1568,7 @@ public final class KMManager {
       case InputType.TYPE_TEXT_VARIATION_LONG_MESSAGE:
       case InputType.TYPE_TEXT_VARIATION_EMAIL_SUBJECT:
       case InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT:
-        return SuggestionType.PREDICTIONS_WITH_AUTO_CORRECT;
+        return selectedType;
 
       // TODO:  return false for the following case once epic/user-dict lands!
       case InputType.TYPE_TEXT_VARIATION_PERSON_NAME:
@@ -1804,6 +1804,12 @@ public final class KMManager {
     KeyboardPickerActivity.deleteLexicalModel(context, position, silenceNotification);
   }
 
+  /**
+   * Used to reinforce suggestion-mode settings when a keyboard is reloaded, including
+   * when swapping back into the app after using the system keyboard mode in another app
+   * (or vice-versa).
+   * @param keyboard
+   */
   /* package-private */ static void refreshSuggestionType(KeyboardType keyboard) {
     SuggestionType lastSuggestionType;
     int lastInputType;
@@ -1822,6 +1828,12 @@ public final class KMManager {
     setSuggestionType(keyboard, lastSuggestionType);
   }
 
+  /**
+   * Directly sets the suggestion mode settings to utilize for predictive text, up to and
+   * including disabling it entirely.
+   * @param keyboard
+   * @param suggestionType
+   */
   public static void setSuggestionType(KeyboardType keyboard, SuggestionType suggestionType) {
     String url = KMString.format("setBannerOptions(%s)", suggestionType.toInt());
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
