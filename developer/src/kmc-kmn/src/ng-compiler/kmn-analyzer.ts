@@ -8,7 +8,7 @@
 
 import { TokenType } from "./token-type.js";
 import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule } from "./recursive-descent.js";
-import { SingleChildRuleWithASTRebuild, Rule, SequenceRule, SingleChildRule } from "./recursive-descent.js";
+import { SingleChildRuleWithASTRebuild, SequenceRule, SingleChildRule } from "./recursive-descent.js";
 import { TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyzer.js";
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyzer.js";
@@ -41,8 +41,8 @@ export class Parser {
    * @returns the abstract syntax tree (AST)
    */
   public parse(): ASTNode {
-    const kmnTreeRule: Rule = new KmnTreeRule();
-    const root: ASTNode = new ASTNode(NodeType.ROOT);
+    const kmnTreeRule = new KmnTreeRule();
+    const root        = new ASTNode(NodeType.ROOT);
     // TODO-NG-COMPILER: fatal error if parse returns false
     kmnTreeRule.parse(this.tokenBuffer, root);
     return root;
@@ -57,8 +57,8 @@ export class Parser {
 export class KmnTreeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new KmnTreeRebuild());
-    const line: Rule = new LineRule();
-    this.rule = new ManyRule(line);
+    const line = new LineRule();
+    this.rule  = new ManyRule(line);
   }
 }
 
@@ -75,15 +75,10 @@ export class KmnTreeRebuild extends ASTRebuild {
    * @returns the rebuilt tree, rooted at the first node found
    */
   public apply(node: ASTNode): ASTNode {
-    const children: ASTNode[] = [];
-    const sourceCodeNode: ASTNode = this.gatherSourceCode(node);
-    const groupNodes: ASTNode[]   = this.gatherGroups(node);
-    const storesNode: ASTNode     = this.gatherStores(node);
-    children.unshift(storesNode);
-    children.push(...node.removeChildren());
-    children.push(...groupNodes);
-    children.push(sourceCodeNode);
-    node.addChildren(children);
+    const sourceCodeNode = this.gatherSourceCode(node);
+    const groupNodes     = this.gatherGroups(node);
+    const storesNode     = this.gatherStores(node);
+    node.addChildren([storesNode, ...node.removeChildren(), ...groupNodes, sourceCodeNode]);
     return node;
   };
 
@@ -132,8 +127,8 @@ export class KmnTreeRebuild extends ASTRebuild {
    * @returns the stores nodes removed from the tree
    */
   private gatherStores(node: ASTNode): ASTNode {
-    const storeNodes: ASTNode[] = node.removeChildrenOfTypes(KmnTreeRebuild.STORES_NODETYPES);
-    const storesNode: ASTNode   = new ASTNode(NodeType.STORES);
+    const storeNodes = node.removeChildrenOfTypes(KmnTreeRebuild.STORES_NODETYPES);
+    const storesNode = new ASTNode(NodeType.STORES);
     storesNode.addChildren(storeNodes);
     return storesNode;
   }
@@ -157,8 +152,8 @@ export class KmnTreeRebuild extends ASTRebuild {
    * @returns the removed source code nodes as a SOURCE_CODE tree
    */
   private gatherSourceCode(node: ASTNode): ASTNode {
-    const lineNodes: ASTNode[]    = node.removeChildrenOfType(NodeType.LINE);
-    const sourceCodeNode: ASTNode = new ASTNode(NodeType.SOURCE_CODE);
+    const lineNodes      = node.removeChildrenOfType(NodeType.LINE);
+    const sourceCodeNode = new ASTNode(NodeType.SOURCE_CODE);
     sourceCodeNode.addChildren(lineNodes);
     return sourceCodeNode;
   }
@@ -170,11 +165,11 @@ export class KmnTreeRebuild extends ASTRebuild {
 export class LineRule extends SingleChildRule {
   public constructor() {
     super();
-    const compileTarget: Rule    = new CompileTargetRule();
-    const optCompileTarget: Rule = new OptionalRule(compileTarget);
-    const content: Rule          = new ContentRule();
-    const optContent: Rule       = new OptionalRule(content);
-    const newline: Rule          = new TokenRule(TokenType.NEWLINE, true);
+    const compileTarget    = new CompileTargetRule();
+    const optCompileTarget = new OptionalRule(compileTarget);
+    const content          = new ContentRule();
+    const optContent       = new OptionalRule(content);
+    const newline          = new TokenRule(TokenType.NEWLINE, true);
     this.rule = new SequenceRule([optCompileTarget, optContent, newline]);
   }
 }
@@ -204,13 +199,13 @@ export class CompileTargetRule extends AlternateTokenRule {
 export class ContentRule extends SingleChildRule {
   public constructor() {
     super();
-    const systemStoreAssign: Rule  = new SystemStoreAssignRule();
-    const capsAlwaysOff: Rule      = new CapsAlwaysOffRule();
-    const capsOnOnly: Rule         = new CapsOnOnlyRule();
-    const shiftFreesCaps: Rule     = new ShiftFreesCapsRule();
-    const headerAssign: Rule       = new HeaderAssignRule();
-    const normalStoreAssign: Rule  = new NormalStoreAssignRule();
-    const ruleBlock: Rule          = new RuleBlockRule();
+    const systemStoreAssign  = new SystemStoreAssignRule();
+    const capsAlwaysOff      = new CapsAlwaysOffRule();
+    const capsOnOnly         = new CapsOnOnlyRule();
+    const shiftFreesCaps     = new ShiftFreesCapsRule();
+    const headerAssign       = new HeaderAssignRule();
+    const normalStoreAssign  = new NormalStoreAssignRule();
+    const ruleBlock          = new RuleBlockRule();
     this.rule = new AlternateRule([
       systemStoreAssign,
       capsAlwaysOff,
@@ -229,8 +224,8 @@ export class ContentRule extends SingleChildRule {
 export class TextRule extends SingleChildRule {
   public constructor() {
     super();
-    const plainText: Rule     = new PlainTextRule();
-    const outsStatement: Rule = new OutsStatementRule();
+    const plainText     = new PlainTextRule();
+    const outsStatement = new OutsStatementRule();
     this.rule = new AlternateRule([plainText, outsStatement]);
   }
 }
@@ -241,8 +236,8 @@ export class TextRule extends SingleChildRule {
 export class PlainTextRule extends SingleChildRule {
   public constructor() {
     super();
-    const textRange: Rule  = new TextRangeRule();
-    const simpleText: Rule = new SimpleTextRule();
+    const textRange  = new TextRangeRule();
+    const simpleText = new SimpleTextRule();
     this.rule = new AlternateRule([textRange, simpleText]);
   }
 }
@@ -261,17 +256,17 @@ export class SimpleTextRule extends SingleChildRule {
   // TODO-NG-COMPILER: warning/error for DECIMAL, HEXADECIMAL and OCTAL
   public constructor() {
     super();
-    const stringRule: Rule       = new TokenRule(TokenType.STRING, true);
-    const virtualKey: Rule       = new VirtualKeyRule();
-    const uChar: Rule            = new TokenRule(TokenType.U_CHAR, true);
-    const namedConstant: Rule    = new TokenRule(TokenType.NAMED_CONSTANT, true);
-    const hangul: Rule           = new TokenRule(TokenType.HANGUL, true);
-    const decimal: Rule          = new TokenRule(TokenType.DECIMAL, true);
-    const hexadecimal: Rule      = new TokenRule(TokenType.HEXADECIMAL, true);
-    const octal: Rule            = new TokenRule(TokenType.OCTAL, true);
-    const nul: Rule              = new TokenRule(TokenType.NUL, true);
-    const deadkeyStatement: Rule = new DeadkeyStatementRule();
-    const beep: Rule             = new TokenRule(TokenType.BEEP, true);
+    const stringRule       = new TokenRule(TokenType.STRING, true);
+    const virtualKey       = new VirtualKeyRule();
+    const uChar            = new TokenRule(TokenType.U_CHAR, true);
+    const namedConstant    = new TokenRule(TokenType.NAMED_CONSTANT, true);
+    const hangul           = new TokenRule(TokenType.HANGUL, true);
+    const decimal          = new TokenRule(TokenType.DECIMAL, true);
+    const hexadecimal      = new TokenRule(TokenType.HEXADECIMAL, true);
+    const octal            = new TokenRule(TokenType.OCTAL, true);
+    const nul              = new TokenRule(TokenType.NUL, true);
+    const deadkeyStatement = new DeadkeyStatementRule();
+    const beep             = new TokenRule(TokenType.BEEP, true);
     this.rule = new AlternateRule([
       stringRule,
       virtualKey,
@@ -298,9 +293,9 @@ export class SimpleTextRule extends SingleChildRule {
 export class TextRangeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.RANGE));
-    const simpleText: Rule        = new SimpleTextRule();
-    const rangeEnd: Rule          = new RangeEndRule();
-    const oneOrManyRangeEnd: Rule = new OneOrManyRule(rangeEnd);
+    const simpleText        = new SimpleTextRule();
+    const rangeEnd          = new RangeEndRule();
+    const oneOrManyRangeEnd = new OneOrManyRule(rangeEnd);
     this.rule = new SequenceRule([simpleText, oneOrManyRangeEnd]);
   }
 }
@@ -313,9 +308,9 @@ export class TextRangeRule extends SingleChildRuleWithASTRebuild {
 export class RangeEndRule extends SingleChildRule {
   public constructor() {
     super();
-    const range: Rule         = new TokenRule(TokenType.RANGE);
-    const simpleText: Rule    = new SimpleTextRule();
-    this.rule = new SequenceRule([range, simpleText]);
+    const range      = new TokenRule(TokenType.RANGE);
+    const simpleText = new SimpleTextRule();
+    this.rule        = new SequenceRule([range, simpleText]);
   }
 }
 
@@ -329,11 +324,11 @@ export class RangeEndRule extends SingleChildRule {
 export class VirtualKeyRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.VIRTUAL_KEY));
-    const leftSquare: Rule   = new TokenRule(TokenType.LEFT_SQ);
-    const modifier: Rule     = new ModifierRule();
-    const manyModifier: Rule = new ManyRule(modifier);
-    const keyCode: Rule      = new KeyCodeRule();
-    const rightSquare: Rule  = new TokenRule(TokenType.RIGHT_SQ);
+    const leftSquare   = new TokenRule(TokenType.LEFT_SQ);
+    const modifier     = new ModifierRule();
+    const manyModifier = new ManyRule(modifier);
+    const keyCode      = new KeyCodeRule();
+    const rightSquare  = new TokenRule(TokenType.RIGHT_SQ);
     this.rule = new SequenceRule([
       leftSquare, manyModifier, keyCode, rightSquare
     ]);
@@ -356,10 +351,10 @@ export class VirtualKeyRule extends SingleChildRuleWithASTRebuild {
 export class ModifierRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new ChangeNode(NodeType.MODIFIER));
-    const shift: Rule    = new TokenRule(TokenType.SHIFT, true);
-    const caps: Rule     = new TokenRule(TokenType.CAPS, true);
-    const modifier: Rule = new TokenRule(TokenType.MODIFIER, true);
-    this.rule = new AlternateRule([shift, caps, modifier]);
+    const shift    = new TokenRule(TokenType.SHIFT, true);
+    const caps     = new TokenRule(TokenType.CAPS, true);
+    const modifier = new TokenRule(TokenType.MODIFIER, true);
+    this.rule      = new AlternateRule([shift, caps, modifier]);
   }
 }
 
@@ -374,10 +369,10 @@ export class ModifierRule extends SingleChildRuleWithASTRebuild {
 export class KeyCodeRule extends SingleChildRule {
   public constructor() {
     super();
-    const keyCode: Rule    = new TokenRule(TokenType.KEY_CODE, true);
-    const stringRule: Rule = new TokenRule(TokenType.STRING, true);
-    const decimal: Rule    = new TokenRule(TokenType.DECIMAL, true);
-    this.rule = new AlternateRule([keyCode, stringRule, decimal]);
+    const keyCode    = new TokenRule(TokenType.KEY_CODE, true);
+    const stringRule = new TokenRule(TokenType.STRING, true);
+    const decimal    = new TokenRule(TokenType.DECIMAL, true);
+    this.rule        = new AlternateRule([keyCode, stringRule, decimal]);
   }
 }
 
@@ -387,9 +382,9 @@ export class KeyCodeRule extends SingleChildRule {
 export class RuleBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const beginStatement: Rule  = new BeginStatementRule();
-    const groupStatement: Rule  = new GroupStatementRule();
-    const productionBlock: Rule = new ProductionBlockRule();
+    const beginStatement  = new BeginStatementRule();
+    const groupStatement  = new GroupStatementRule();
+    const productionBlock = new ProductionBlockRule();
     this.rule = new AlternateRule([beginStatement, groupStatement, productionBlock]);
   }
 }
@@ -404,11 +399,11 @@ export class RuleBlockRule extends SingleChildRule {
 export class BeginStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.BEGIN));
-    const begin: Rule          = new TokenRule(TokenType.BEGIN, true);
-    const entryPointRule: Rule = new EntryPointRule();
-    const optEntryPoint: Rule  = new OptionalRule(entryPointRule);
-    const chevron: Rule        = new TokenRule(TokenType.CHEVRON);
-    const useStatement: Rule   = new UseStatementRule();
+    const begin          = new TokenRule(TokenType.BEGIN, true);
+    const entryPointRule = new EntryPointRule();
+    const optEntryPoint  = new OptionalRule(entryPointRule);
+    const chevron        = new TokenRule(TokenType.CHEVRON);
+    const useStatement   = new UseStatementRule();
     this.rule = new SequenceRule([begin, optEntryPoint, chevron, useStatement]);
   }
 }
@@ -421,10 +416,10 @@ export class BeginStatementRule extends SingleChildRuleWithASTRebuild {
 export class EntryPointRule extends SingleChildRule {
   public constructor() {
     super();
-    const unicode: Rule       = new TokenRule(TokenType.UNICODE, true);
-    const newcontext: Rule    = new TokenRule(TokenType.NEWCONTEXT, true);
-    const postkeystroke: Rule = new TokenRule(TokenType.POSTKEYSTROKE, true);
-    const ansi: Rule          = new TokenRule(TokenType.ANSI, true);
+    const unicode       = new TokenRule(TokenType.UNICODE, true);
+    const newcontext    = new TokenRule(TokenType.NEWCONTEXT, true);
+    const postkeystroke = new TokenRule(TokenType.POSTKEYSTROKE, true);
+    const ansi          = new TokenRule(TokenType.ANSI, true);
     this.rule = new AlternateRule([unicode, newcontext, postkeystroke, ansi]);
   }
 }
@@ -439,10 +434,10 @@ export class EntryPointRule extends SingleChildRule {
 export class UseStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.USE));
-    const use: Rule          = new TokenRule(TokenType.USE, true);
-    const leftBracket: Rule  = new TokenRule(TokenType.LEFT_BR);
-    const groupName: Rule    = new GroupNameRule();
-    const rightBracket: Rule = new TokenRule(TokenType.RIGHT_BR);
+    const use          = new TokenRule(TokenType.USE, true);
+    const leftBracket  = new TokenRule(TokenType.LEFT_BR);
+    const groupName    = new GroupNameRule();
+    const rightBracket = new TokenRule(TokenType.RIGHT_BR);
     this.rule = new SequenceRule([use, leftBracket, groupName, rightBracket]);
   }
 }
@@ -457,12 +452,12 @@ export class UseStatementRule extends SingleChildRuleWithASTRebuild {
 export class GroupStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.GROUP));
-    const group: Rule              = new TokenRule(TokenType.GROUP, true);
-    const leftBracket: Rule        = new TokenRule(TokenType.LEFT_BR);
-    const groupName: Rule          = new GroupNameRule();
-    const rightBracket: Rule       = new TokenRule(TokenType.RIGHT_BR);
-    const groupQualifierRule: Rule = new GroupQualifierRule();
-    const optGroupQualifier: Rule  = new OptionalRule(groupQualifierRule);
+    const group              = new TokenRule(TokenType.GROUP, true);
+    const leftBracket        = new TokenRule(TokenType.LEFT_BR);
+    const groupName          = new GroupNameRule();
+    const rightBracket       = new TokenRule(TokenType.RIGHT_BR);
+    const groupQualifierRule = new GroupQualifierRule();
+    const optGroupQualifier  = new OptionalRule(groupQualifierRule);
     this.rule = new SequenceRule([
       group,
       leftBracket,
@@ -486,7 +481,7 @@ export class GroupNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if group name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.GROUPNAME));
-    const groupNameElement: Rule = new GroupNameElementRule();
+    const groupNameElement = new GroupNameElementRule();
     this.rule = new OneOrManyRule(groupNameElement);
   }
 }
@@ -502,10 +497,10 @@ export class GroupNameRule extends SingleChildRuleWithASTRebuild {
 export class GroupNameElementRule extends SingleChildRule {
   public constructor() {
     super();
-    const parameter: Rule        = new TokenRule(TokenType.PARAMETER, true);
-    const octal: Rule            = new TokenRule(TokenType.OCTAL, true);
-    const permittedKeyword: Rule = new PermittedKeywordRule();
-    this.rule = new AlternateRule([parameter, octal, permittedKeyword]);
+    const parameter        = new TokenRule(TokenType.PARAMETER, true);
+    const octal            = new TokenRule(TokenType.OCTAL, true);
+    const permittedKeyword = new PermittedKeywordRule();
+    this.rule              = new AlternateRule([parameter, octal, permittedKeyword]);
   }
 }
 
@@ -562,9 +557,9 @@ export class PermittedKeywordRule extends AlternateTokenRule {
 export class GroupQualifierRule extends SingleChildRule {
   public constructor() {
     super();
-    const usingKeys: Rule = new UsingKeysRule();
-    const readonly: Rule  = new TokenRule(TokenType.READONLY, true);
-    this.rule = new AlternateRule([usingKeys, readonly]);
+    const usingKeys = new UsingKeysRule();
+    const readonly  = new TokenRule(TokenType.READONLY, true);
+    this.rule       = new AlternateRule([usingKeys, readonly]);
   }
 }
 
@@ -576,9 +571,9 @@ export class GroupQualifierRule extends SingleChildRule {
 export class UsingKeysRule extends SingleChildRule {
   public constructor() {
     super();
-    const using: Rule = new TokenRule(TokenType.USING);
-    const keys: Rule  = new TokenRule(TokenType.KEYS);
-    this.rule = new SequenceRule([using, keys]);
+    const using = new TokenRule(TokenType.USING);
+    const keys  = new TokenRule(TokenType.KEYS);
+    this.rule   = new SequenceRule([using, keys]);
   }
 
   /**
@@ -608,7 +603,7 @@ export class ProductionBlockRule extends SingleChildRule {
     const lhsBlock = new LhsBlockRule();
     const chevron  = new TokenRule(TokenType.CHEVRON);
     const rhsBlock = new RhsBlockRule();
-    this.rule = new SequenceRule([lhsBlock, chevron, rhsBlock]);
+    this.rule      = new SequenceRule([lhsBlock, chevron, rhsBlock]);
   }
 
   /**
@@ -619,7 +614,7 @@ export class ProductionBlockRule extends SingleChildRule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode();
+    const tmp = new ASTNode();
     if (this.rule.parse(tokenBuffer, tmp)) {
       const productionNode = new ASTNode(NodeType.PRODUCTION);
       productionNode.addChild(tmp.getSoleChildOfType(NodeType.LHS));
@@ -642,10 +637,10 @@ export class ProductionBlockRule extends SingleChildRule {
 export class LhsBlockRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.LHS));
-    const match: Rule      = new TokenRule(TokenType.MATCH, true);
-    const nomatch: Rule    = new TokenRule(TokenType.NOMATCH, true);
-    const inputBlock: Rule = new InputBlockRule();
-    this.rule = new AlternateRule([match, nomatch,inputBlock]);
+    const match      = new TokenRule(TokenType.MATCH, true);
+    const nomatch    = new TokenRule(TokenType.NOMATCH, true);
+    const inputBlock = new InputBlockRule();
+    this.rule        = new AlternateRule([match, nomatch,inputBlock]);
   }
 }
 
@@ -657,14 +652,14 @@ export class LhsBlockRule extends SingleChildRuleWithASTRebuild {
 export class InputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const nulRule: Rule             = new TokenRule(TokenType.NUL, true);
-    const optNul: Rule              = new OptionalRule(nulRule);
-    const ifLikeStatement: Rule     = new IfLikeStatementRule();
-    const manyIfLikeStatement: Rule = new ManyRule(ifLikeStatement);
-    const inputContext: Rule        = new InputContextRule();
-    const optInputContext: Rule     = new OptionalRule(inputContext);
-    const keystoke: Rule            = new KeystrokeRule();
-    const optKeystroke: Rule        = new OptionalRule(keystoke);
+    const nulRule             = new TokenRule(TokenType.NUL, true);
+    const optNul              = new OptionalRule(nulRule);
+    const ifLikeStatement     = new IfLikeStatementRule();
+    const manyIfLikeStatement = new ManyRule(ifLikeStatement);
+    const inputContext        = new InputContextRule();
+    const optInputContext     = new OptionalRule(inputContext);
+    const keystoke            = new KeystrokeRule();
+    const optKeystroke        = new OptionalRule(keystoke);
     this.rule = new SequenceRule([
       optNul, manyIfLikeStatement, optInputContext, optKeystroke,
     ]);
@@ -680,7 +675,7 @@ export class InputContextRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.INPUT_CONTEXT));
     const inputElement = new InputElementRule();
-    this.rule = new OneOrManyRule(inputElement);
+    this.rule          = new OneOrManyRule(inputElement);
   }
 }
 
@@ -690,11 +685,11 @@ export class InputContextRule extends SingleChildRuleWithASTRebuild {
 export class InputElementRule extends SingleChildRule {
   public constructor() {
     super();
-    const anyStatement: Rule     = new AnyStatementRule();
-    const notanyStatement: Rule  = new NotanyStatementRule();
-    const contextStatement: Rule = new ContextStatementRule();
-    const indexStatement: Rule   = new IndexStatementRule();
-    const text: Rule             = new TextRule();
+    const anyStatement     = new AnyStatementRule();
+    const notanyStatement  = new NotanyStatementRule();
+    const contextStatement = new ContextStatementRule();
+    const indexStatement   = new IndexStatementRule();
+    const text             = new TextRule();
     this.rule = new AlternateRule([
       anyStatement,
       notanyStatement,
@@ -713,8 +708,8 @@ export class InputElementRule extends SingleChildRule {
 export class KeystrokeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.KEYSTROKE));
-    const plus: Rule            = new TokenRule(TokenType.PLUS);
-    const keystrokeElement      = new KeystrokeElementRule();
+    const plus                      = new TokenRule(TokenType.PLUS);
+    const keystrokeElement          = new KeystrokeElementRule();
     const oneOrManyKeystrokeElement = new OneOrManyRule(keystrokeElement);
     this.rule = new SequenceRule([plus, oneOrManyKeystrokeElement]);
   }
@@ -726,9 +721,9 @@ export class KeystrokeRule extends SingleChildRuleWithASTRebuild {
 export class KeystrokeElementRule extends SingleChildRule {
   public constructor() {
     super();
-    const anyStatement: Rule  = new AnyStatementRule();
-    const simpleText: Rule    = new SimpleTextRule();
-    const outsStatement: Rule = new OutsStatementRule()
+    const anyStatement  = new AnyStatementRule();
+    const simpleText    = new SimpleTextRule();
+    const outsStatement = new OutsStatementRule()
     this.rule = new AlternateRule([anyStatement, simpleText, outsStatement]);
   }
 }
@@ -741,8 +736,8 @@ export class KeystrokeElementRule extends SingleChildRule {
 export class RhsBlockRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.RHS));
-    const outputStatement: Rule = new OutputStatementRule();
-    this.rule = new OneOrManyRule(outputStatement);
+    const outputStatement = new OutputStatementRule();
+    this.rule             = new OneOrManyRule(outputStatement);
   }
 }
 
@@ -754,19 +749,19 @@ export class RhsBlockRule extends SingleChildRuleWithASTRebuild {
 export class OutputStatementRule extends SingleChildRule {
   public constructor() {
     super();
-    const useStatement: Rule     = new UseStatementRule();
-    const callStatement: Rule    = new CallStatementRule();
-    const setNormalStore: Rule   = new SetNormalStoreRule();
-    const saveStatement: Rule    = new SaveStatementRule();
-    const resetStore: Rule       = new ResetStoreRule();
-    const setSystemStore: Rule   = new SetSystemStoreRule();
-    const layerStatement: Rule   = new LayerStatementRule();
-    const indexStatement: Rule   = new IndexStatementRule();
-    const contextStatement: Rule = new ContextStatementRule();
-    const context: Rule          = new TokenRule(TokenType.CONTEXT, true);
-    const returnRule: Rule       = new TokenRule(TokenType.RETURN, true);
-    const text: Rule             = new TextRule();
-    const beep: Rule             = new TokenRule(TokenType.BEEP, true);
+    const useStatement     = new UseStatementRule();
+    const callStatement    = new CallStatementRule();
+    const setNormalStore   = new SetNormalStoreRule();
+    const saveStatement    = new SaveStatementRule();
+    const resetStore       = new ResetStoreRule();
+    const setSystemStore   = new SetSystemStoreRule();
+    const layerStatement   = new LayerStatementRule();
+    const indexStatement   = new IndexStatementRule();
+    const contextStatement = new ContextStatementRule();
+    const context          = new TokenRule(TokenType.CONTEXT, true);
+    const returnRule       = new TokenRule(TokenType.RETURN, true);
+    const text             = new TextRule();
+    const beep             = new TokenRule(TokenType.BEEP, true);
     this.rule = new AlternateRule([
       useStatement,
       callStatement,
