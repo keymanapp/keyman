@@ -1,7 +1,6 @@
 ---
-title: KMManager.getPredictionsSuspended()
+title: KMManager.getPredictionsSuspended() (Deprecated)
 ---
-
 ## Summary
 The **getPredictionsSuspended()** method returns a flag that determines whether predictions are temporarily disabled because the currently selected text field is a hidden password text field or a numeric text field.
 
@@ -24,6 +23,7 @@ Use this method to check if predictions are temporarily disabled because of the 
 
 ## History
 Added syntax in Keyman Engine for Android 18.0.
+Deprecated syntax in Keyman Engine for Android 19.0 in favor of [`defaultSuggestionModeForType`](defaultSuggestionModeForType).
 
 ## See also
 * [setPredictionsSuspended](setPredictionsSuspended)
