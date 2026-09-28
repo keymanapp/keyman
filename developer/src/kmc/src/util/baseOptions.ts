@@ -1,3 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Basic options for kmc - shared across commands
+ */
+import * as path from 'node:path';
 import { ALL_COMPILER_LOG_FORMATS, ALL_COMPILER_LOG_LEVELS, CompilerLogFormat, CompilerLogLevel } from "@keymanapp/developer-utils";
 import { Command, Option } from "commander";
 
@@ -45,7 +51,7 @@ export class BaseOptions {
 
 export class BuildBaseOptions extends BaseOptions {
   public static addOutFile(program: Command) {
-    return program.option('-o, --out-file <filename>', 'Override the default path and filename for the output file')
+    return program.option('-o, --out-file <filename>', 'Override default folder and/or filename for the output file; terminate with '+path.sep+' for folder')
   }
 
   public static addAll(program: Command) {

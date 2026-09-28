@@ -248,7 +248,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     const wasNull = !this.activeKeyboard;
 
     // If there was a previous activation attempt set and still active for the specified keyboard textStore,
-    // cancel it.  For exmaple, if the user selects a preloaded keyboard after having tried to select one
+    // cancel it.  For example, if the user selects a preloaded keyboard after having tried to select one
     // still async-loading, we should go with the later setting - the preloaded one.
     this.findAndPopActivation(this.currentKeyboardSrcTextStore());
 
@@ -314,31 +314,25 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     keyboardId: string,
     languageCode?: string
   ): {keyboard: Promise<Keyboard>, metadata: KeyboardStub} {
+    if (!keyboardId) {
+      return {
+        keyboard: Promise.resolve(null),
+        metadata: null
+      }
+    }
+
     // Set default language code
     languageCode ||= '';
 
     // Check that the saved keyboard is currently registered
-    let requestedStub: KeyboardStub = null;
-    if(keyboardId) {
-      requestedStub = this.keyboardCache.getStub(keyboardId, languageCode);
-    } else {
-      languageCode == '';
-    }
-
+    const requestedStub: KeyboardStub = this.keyboardCache.getStub(keyboardId, languageCode);
     if(!requestedStub) {
-      if(keyboardId) {
-        const availableStubList = this.keyboardCache.getStubList().map(stub => `${stub.KI}@${stub.KLC}`);
-        throw new Error(`No matching stub has been registered for keyboard ${keyboardId}.  Available stubs: ${JSON.stringify(availableStubList)}`);
-      } else {
-        return {
-          keyboard: Promise.resolve(null),
-          metadata: null
-        }
-      }
+      const availableStubList = this.keyboardCache.getStubList().map(stub => `${stub.KI}@${stub.KLC}`);
+      throw new Error(`No matching stub has been registered for keyboard ${keyboardId}.  Available stubs: ${JSON.stringify(availableStubList)}`);
     }
 
     // Check if current keyboard matches requested keyboard, but not (necessarily) stub
-    if (this.activeKeyboard?.metadata && keyboardId == this.activeKeyboard.metadata.id) {
+    if (keyboardId == this.activeKeyboard?.metadata?.id) {
       const {keyboard} = this.activeKeyboard;
       // In this case, the keyboard is loaded; just update the stub.
 
@@ -349,61 +343,61 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     }
 
     // Determine if the keyboard was previously loaded but is not active; use the cached, pre-loaded version if so.
-    let keyboard: Keyboard;
-    if(keyboard = this.keyboardCache.getKeyboardForStub(requestedStub)) {
+    const keyboard: Keyboard = this.keyboardCache.getKeyboardForStub(requestedStub);
+    if (keyboard) {
       return {
         keyboard: Promise.resolve(keyboard),
         metadata: requestedStub
       };
-    } else {
-      // It's async time - the keyboard is not preloaded within the cache.  Use the stub's data to load it.
+    }
 
-      // `beforeKeyboardChange` - first call
-      this.emit('beforekeyboardchange', requestedStub);
+    // It's async time - the keyboard is not preloaded within the cache.  Use the stub's data to load it.
 
-      const defermentPromise = this.engineConfig.deferForInitialization.then(() => {
-        // Provide a Promise for completion of the async load process.
-        const completionPromise = new ManagedPromise<Error>();
-        this.emit('keyboardasyncload', requestedStub, completionPromise.corePromise);
+    // `beforeKeyboardChange` - first call
+    this.emit('beforekeyboardchange', requestedStub);
 
-        const keyboardPromise = this.keyboardCache.fetchKeyboard(requestedStub.KI);
-        const timeoutPromise = new Promise<Keyboard>((resolve, reject) => {
-          const timeoutMsg = `Sorry, the ${requestedStub.name} keyboard for ${requestedStub.langName} is not currently available.`;
-          window.setTimeout(() => reject(new Error(timeoutMsg)), ContextManagerBase.TIMEOUT_THRESHOLD);
-        });
+    const defermentPromise = this.engineConfig.deferForInitialization.then(() => {
+      // Provide a Promise for completion of the async load process.
+      const completionPromise = new ManagedPromise<Error>();
+      this.emit('keyboardasyncload', requestedStub, completionPromise.corePromise);
 
-        const combinedPromise = Promise.race([keyboardPromise, timeoutPromise]);
-
-        // Ensure the async-load Promise completes properly.
-        combinedPromise.then(() => {
-          completionPromise.resolve(null);
-          // Prevent any 'unhandled Promise rejection' events that may otherwise occur from the timeout promise.
-          timeoutPromise.catch(() => {});
-        });
-        combinedPromise.catch((err) => {
-          completionPromise.resolve(err);
-          throw err;
-        });
-
-        return combinedPromise;
+      const keyboardPromise = this.keyboardCache.fetchKeyboard(requestedStub.KI);
+      const timeoutPromise = new Promise<Keyboard>((resolve, reject) => {
+        const timeoutMsg = `Download of ${requestedStub.KI} for language ${requestedStub.langId} timed out.`;
+        window.setTimeout(() => reject(new Error(timeoutMsg)), ContextManagerBase.TIMEOUT_THRESHOLD);
       });
 
-      // Now the fun part:  note the original call's parameters as a pending activation.
-      const promise = this.deferredKeyboardActivation(defermentPromise, requestedStub, this.currentKeyboardSrcTextStore());
-      return {
-        keyboard: promise.then(async (activation) => {
-          // Is the activation we requested still pending, or was it cancelled in favor of a
-          // different activation in some manner?
-          if(!activation) {
-            // If the user chose to load a different keyboard afterward that would affect the same
-            // textStore, the activation is no longer valid.
-            return Promise.resolve(null);
-          } else {
-            return defermentPromise;
-          }
-        }),
-        metadata: requestedStub
-      }
+      const combinedPromise = Promise.race([keyboardPromise, timeoutPromise]);
+
+      // Ensure the async-load Promise completes properly.
+      combinedPromise.then(() => {
+        completionPromise.resolve(null);
+        // Prevent any 'unhandled Promise rejection' events that may otherwise occur from the timeout promise.
+        timeoutPromise.catch(() => {});
+      });
+      combinedPromise.catch((err) => {
+        completionPromise.resolve(err);
+        throw err;
+      });
+
+      return combinedPromise;
+    });
+
+    // Now the fun part:  note the original call's parameters as a pending activation.
+    const promise = this.deferredKeyboardActivation(defermentPromise, requestedStub, this.currentKeyboardSrcTextStore());
+    return {
+      keyboard: promise.then(async (activation) => {
+        // Is the activation we requested still pending, or was it cancelled in favor of a
+        // different activation in some manner?
+        if(!activation) {
+          // If the user chose to load a different keyboard afterward that would affect the same
+          // textStore, the activation is no longer valid.
+          return Promise.resolve(null);
+        } else {
+          return defermentPromise;
+        }
+      }),
+      metadata: requestedStub
     }
   }
 }

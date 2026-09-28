@@ -7,6 +7,7 @@ import { KeymanSentry } from './KeymanSentry.js';
 export const enum SysExits {
   EX_USAGE = 64,
   EX_DATAERR = 65,
+  EX_SOFTWARE = 70,
 };
 
 export async function exitProcess(exitCode?: number): Promise<never> {

@@ -315,10 +315,6 @@
   <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">Selalu tunjukkan jendela papan tombol di layar ketika papan tombol Keyman dipilih</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">Ganti ke bantuan/papan tombol di layar yang sesuai ketika memilih sebuah papan tombol</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Debugging</string>
   <!-- Context: Configuration Dialog - Options tab -->

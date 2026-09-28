@@ -17,11 +17,9 @@ type
     koShowStartup,
     // Windows options
     koDebugging,
-    koSwitchLanguageForAllApplications, // I1089
     koDeadkeyConversion,   // I4552
     // On Screen Keyboard Options
     koAutoOpenOSK,          // I1288
-    koAutoSwitchOSKPages,  // I1375
     koUseTouchLayout,
     koBaseLayout,
     koAutomaticallyReportErrors,

@@ -283,7 +283,7 @@ describe('KMXPlusFileReader', function() {
       assert.equal(layr.forms[0].baseLayout.value, '');
       assert.equal(layr.forms[0].flags, 0);
       assert.equal(layr.forms[0].hardware.value, 'us');
-      assert.equal(layr.forms[0].minDeviceWidth, 123);
+      assert.equal(layr.forms[0].minDeviceWidth, 0);
 
       assert.lengthOf(layr.forms[0].layers, 1);
       assert.equal(layr.forms[0].layers[0].id.value, '');

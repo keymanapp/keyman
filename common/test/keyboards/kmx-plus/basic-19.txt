@@ -411,7 +411,7 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   index(strNull,strUs,2)            #   KMXPLUS_STR hardware = 'us'
   00 00 00 00                       #   KMX_DWORD layer;
   01 00 00 00                       #   KMX_DWORD count
-  7B 00 00 00                       #   KMX_DWORD minDeviceWidth; // 123
+  00 00 00 00                       #   KMX_DWORD minDeviceWidth; // 0
   00 00 00 00                       #   KMXPLUS_STR baseLayout v19
   00 00 00 00                       #   KMX_DWORD flags v19
 

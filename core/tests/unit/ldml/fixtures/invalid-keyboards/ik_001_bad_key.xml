@@ -14,7 +14,7 @@
   </keys>
 
   <layers formId="us">
-    <layer id="base">
+    <layer modifiers="none">
       <row keys="a" /> <!-- number row -->
     </layer>
   </layers>

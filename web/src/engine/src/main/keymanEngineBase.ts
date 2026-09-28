@@ -543,8 +543,8 @@ export class KeymanEngineBase<
   /**
    * Allow to change active keyboard by (internal) keyboard name
    *
-   * @param       {string}    PInternalName   Internal name
-   * @param       {string}    PLgCode         Language code
+   * @param       {string}    keyboardId    Keyboard name
+   * @param       {string}    languageCode  Language code
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/setActiveKeyboard
    */

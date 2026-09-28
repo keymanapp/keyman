@@ -1,5 +1,6 @@
 
 import { createRequire } from 'node:module';
+import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
@@ -8,7 +9,7 @@ import { configWorker, createMessageEventWithData, emptyContext, iGotDistractedB
 import { timedPromise } from 'keyman/common/web-utils';
 
 import { LMLayerWorker } from '@keymanapp/lm-worker/test-index';
-import { OutgoingMessage } from '@keymanapp/lm-message-types';
+import { OutgoingMessage, SuggestionMessage } from '@keymanapp/lm-message-types';
 
 import Suggestion = LexicalModelTypes.Suggestion;
 
@@ -73,11 +74,13 @@ describe('LMLayerWorker', function () {
       // Retrieve the internal 'dummy' suggestions for comparison.
       var hazel = iGotDistractedByHazel();
 
-      sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
-        message: 'suggestions',
-        token: token,
-        suggestions: hazel[0]
-      });
+      assert.isOk(fakePostMessage);
+
+      const lastCallParameters: SuggestionMessage = fakePostMessage.lastCall.args[0] as unknown as SuggestionMessage;
+
+      assert.equal(lastCallParameters.message, 'suggestions');
+      assert.equal(lastCallParameters.token, token);
+      assert.sameDeepMembers(lastCallParameters.suggestions, hazel[0]);
     });
 
     afterEach(function () {

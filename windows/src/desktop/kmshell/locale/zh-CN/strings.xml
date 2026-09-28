@@ -335,10 +335,6 @@
   <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">选择键盘时，总是在屏幕键盘窗口中显示</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">当选择键盘时，自动切换到屏幕键盘/帮助</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">调试中</string>
   <!-- Context: Configuration Dialog - Options tab -->

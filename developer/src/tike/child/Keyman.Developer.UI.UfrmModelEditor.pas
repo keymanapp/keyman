@@ -418,6 +418,7 @@ begin
 
   { Build tab }
   cmdOpenDebugHost.Enabled := lbDebugHosts.ItemIndex >= 0;
+  cmdCopyDebuggerLink.Enabled := lbDebugHosts.ItemIndex >= 0;
   cmdSendURLsToEmail.Enabled := lbDebugHosts.Items.Count > 0;   // I4506
 
   // We use FProjectFile because we don't want to accidentally create a standalone

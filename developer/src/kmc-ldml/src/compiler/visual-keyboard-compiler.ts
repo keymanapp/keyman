@@ -8,6 +8,7 @@
 import { KMXPlus, VisualKeyboard, translateLdmlModifiersToVisualKeyboardShift } from "@keymanapp/common-types";
 import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
+import { modifiersToString } from "../util/util.js";
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 
 // This is a partial polyfill for findLast, so not polluting Array.prototype
@@ -84,7 +85,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     layer: KMXPlus.LayrEntry,
     hardware: string,
   ) {
-    const layerId = layer.id.value;
+    const layerId = layer.id.value ?? modifiersToString(layer.mod); // used only for reference in error messages
 
     hardware = 'us'; // TODO-LDML: US Only. We need to clean this up for other hardware forms
 

@@ -122,11 +122,10 @@ type
   end;
 
 // The Default options here need to be consistent with the defaults set in TfrmRunDesktop.GetDefaultSettings
-const KeymanOptionInfo: array[0..16] of TKeymanOptionInfo = (  // I3331   // I3620   // I4552
+const KeymanOptionInfo: array[0..14] of TKeymanOptionInfo = (  // I3331   // I3620   // I4552
   // Global options
 
   (opt: koKeyboardHotkeysAreToggle;          RegistryName: SRegValue_KeyboardHotkeysAreToggle;         OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),
-  (opt: koSwitchLanguageForAllApplications;  RegistryName: SRegValue_SwitchLanguageForAllApplications; OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'), // I2277   // I4393
   (opt: koAltGrCtrlAlt;                      RegistryName: SRegValue_AltGrCtrlAlt;                     OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),
   (opt: koRightModifierHK;                   RegistryName: SRegValue_AllowRightModifierHotKey;           OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),
   (opt: koShowHints;                         RegistryName: SRegValue_EnableHints;                      OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),
@@ -140,7 +139,6 @@ const KeymanOptionInfo: array[0..16] of TKeymanOptionInfo = (  // I3331   // I36
 
   (opt: koReleaseShiftKeysAfterKeyPress;     RegistryName: SRegValue_ReleaseShiftKeysAfterKeyPress;    OptionType: kotBool; BoolValue: False; GroupName: 'kogOSK'),
   (opt: koAutoOpenOSK;                       RegistryName: SRegValue_AutoOpenOSK;                      OptionType: kotBool; BoolValue: True;  GroupName: 'kogOSK'),
-  (opt: koAutoSwitchOSKPages;                RegistryName: SRegValue_AutoSwitchOSKPages;               OptionType: kotBool; BoolValue: True;  GroupName: 'kogOSK'),
 
   // Startup options
 
@@ -191,14 +189,6 @@ begin
     o.FIntValue := KeymanOptionInfo[i].IntValue;
 
     o.FEnabled := True;
-
-    if (KeymanOptionInfo[i].opt = koSwitchLanguageForAllApplications) and
-      not (GetOs in [osVista, osWin7]) then
-    begin
-      o.FEnabled := False;   // I4271
-      o.FBoolValue := False;   // I4515
-      o.FDefaultBoolValue := False;   // I4515
-    end;
 
     o.FGroup := KeymanOptionInfo[i].GroupName;
 

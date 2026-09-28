@@ -136,7 +136,7 @@ export class ContextManager extends ContextManagerBase<WebviewConfiguration> {
     return this._activeKeyboard;
   }
 
-  activateKeyboardForTextStore(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, textStore: TextStore) {
+  protected activateKeyboardForTextStore(kbd: { keyboard: Keyboard, metadata: KeyboardStub }, textStore: TextStore) {
     // `textStore` is irrelevant for `app/webview`, as it'll only ever use 'global' keyboard settings.
 
     // Clone the object to prevent accidental by-reference changes.

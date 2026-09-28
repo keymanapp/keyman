@@ -32,6 +32,9 @@
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\keymansentry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\keymancontrol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="keymanx64.rc">

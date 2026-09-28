@@ -336,10 +336,6 @@
   <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">የኪይማን የፊደል ሰሌዳ ሲመረጥ ሁልጊዜ የስክሪን ላይ ኪቦርዱን መስኮት አሳይ</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">የፊደል ሰሌዳው በሚመረጥበት ጊዜ ወዲያውኑ ወደ ተገቢው የስክሪን ላይ ኪቦርድ እርዳታ ይቀይሩ</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">የኪማኑን ስህተቶች ፈልግ</string>
   <!-- Context: Configuration Dialog - Options tab -->

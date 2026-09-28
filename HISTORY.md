@@ -1,5 +1,76 @@
 # Keyman Version History
 
+## 19.0.285 alpha 2026-09-11
+
+* fix(web): handle 'unload' message while attempting model 'load' (#16548)
+* fix(android): load KMP files from app-external sources (#16392)
+
+## 19.0.284 alpha 2026-09-10
+
+* maint(developer): remove unused ajv dependency from kmc-convert (#16539)
+* fix(web): remove scroll-to-top on page load (#16531)
+
+## 19.0.283 alpha 2026-09-09
+
+* change(web): allow autocorrection on input of basic whitespaces (#16541)
+
+## 19.0.282 alpha 2026-09-08
+
+* refactor(web): clarify function scope and update some function comments (#16532)
+
+## 19.0.281 alpha 2026-09-07
+
+* chore(deps): bump fast-uri from 3.1.5 to 3.1.7 (#16511)
+* chore(deps): bump nanoid from 3.3.11 to 3.3.18 (#16512)
+* chore(deps): bump qs and express (#16513)
+* chore(web): adjust types in guide-examples tests (#16523)
+
+## 19.0.280 alpha 2026-09-05
+
+* fix(windows): open chm external links in user's browser (#16515)
+
+## 19.0.279 alpha 2026-09-03
+
+* chore(web): tweak error message (#16495)
+* change(web): stage construction of CorrectionPredictionTuple instances (#16429)
+* change(web): narrow the range of suggestions examined to determine autocompletion (#16436)
+* fix(web): remove deprecated `onunload` handler (#16504)
+* docs(developer): add comment to test fixtures to clarify expectations (#16505)
+* fix(developer): hide keyboard uninstall confirmation (#16506)
+* fix(developer): remember presentation and layer when switching platforms in touch layout editor (#16509)
+* fix(developer): ensure JSON regenerated after undo in touch layout editor (#16516)
+* fix(developer): improve validation of minDeviceWidth to match spec (#16501)
+* chore(developer): improve kmc-ldml test messages (#16502)
+* chore(web): add const for cookie name (#16519)
+* refactor(web): clarify scope of PageContextAttachment functions (#16521)
+
+## 19.0.278 alpha 2026-09-02
+
+* feat(developer): support output folder and `--continue-on-error` (#16453)
+* fix(developer): validate the number of hardware layers only in Layr compiler (#16455)
+* fix(developer): validate id and modifiers attributes in Layr compiler (#16456)
+* fix(developer): disable Copy Link in Model Editor if no link to copy (#16475)
+* fix(developer): open context help when F1 pressed in Project window (#16481)
+* chore(web): update file headers (#16497)
+
+## 19.0.277 alpha 2026-09-01
+
+* fix(developer): handle comment without trailing whitespace (#16479)
+* fix(developer): improve scroll wheel behavior in Character Map (#16474)
+* fix(developer): call 'Show Console' twice to make the console actually show on first use (#16483)
+* fix(developer): use path not dependent on pwd for starting Server (#16476)
+* chore(developer): remove duplicated versioning information from Server (#16478)
+* fix(developer): handle leading delimiters correctly in `u16tok()` (#16446)
+* chore(android): upload webview source map during android and ios build (#16449)
+* refactor(windows): rename `GetCapsAndNumlockState()` to `RefreshModifierState()` (#16444)
+* chore(developer): strip out defunct printing support (#16480)
+* fix(developer): make tool windows non-topmost when TIKE is deactivated (#16482)
+* fix(windows): simplify keyboard refresh and make it more on-demand (#16435)
+* refactor(windows): cleanup unused wm_keyman_control values (#16439)
+* maint(windows): remove `koSwitchLanguageForAllApplications`, `koAutoSwitchOSKPages`, osVista, osWin7, osWin8, cleanup (#16443)
+* change(developer): deprecate `fix`, `clearcontext`, bump max .kmx version to 19.0 (#16445)
+* fix(developer): add missing message parameters and cleanup kmc-kmn messages further (#16493)
+
 ## 19.0.276 alpha 2026-08-28
 
 * fix(windows): add manifest to insthelper and set trustinfo to asInvoker (#16430)

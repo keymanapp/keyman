@@ -8,7 +8,9 @@ function Link(elem)
       return pandoc.Link(elem.content, elem.target .. '.htm', elem.title, elem.attr)
     end
   end
-  return elem
+  -- target=_blank opens external links in browser
+  table.insert(elem.content, ' ↗️')
+  return pandoc.Link(elem.content, elem.target, 'This link opens in your web browser', { target = '_blank' })
 end
 
 function isLocalLink(elem)

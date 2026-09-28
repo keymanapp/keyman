@@ -71,7 +71,7 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
 
 - update basic.xml and basic.txt
     - Tweak `eveloper/src/kmc-ldml/test/fixtures/basic.xml` as needed
-    - You can use `developer/src/kmc-ldml/build.sh build-fixtures` which will generate these. The two .kmx files are supposed to match: if not, fix `basic.txt` or fix other bugs.
+    - You can use `developer/src/kmc-ldml/build.sh fixtures-build` which will generate these. The two .kmx files are supposed to match: if not, fix `basic.txt` or fix other bugs.
         - `developer/src/kmc-ldml/build/test/fixtures/basic-txt.kmx` - KMX generated from basic.txt.
         - `developer/src/kmc-ldml/build/test/fixtures/basic-xml.kmx` - KMX generated from basic.xml.
         - `developer/src/kmc-ldml/build/test/fixtures/basic-xml.kvk` - KVK generated from basic.xml.

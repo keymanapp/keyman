@@ -163,7 +163,7 @@ begin
     CODE_CONTEXTEX: Inc(Result, 2);
     CODE_NOTANY:   Inc(Result, 2);
 
-    CODE_CLEARCONTEXT: Inc(Result, 2);  // I3442
+    CODE_CLEARCONTEXT: Inc(Result, 2);  // I3442    // deprecated in 19.0
     CODE_IFOPT:    Inc(Result, 4);  // I3442
     CODE_IFSYSTEMSTORE: Inc(Result, 4);  // I3442
     CODE_SETOPT:   Inc(Result, 3);  // I3442

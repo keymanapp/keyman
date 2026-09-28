@@ -9,7 +9,7 @@
   </keys>
 
   <layers formId="holographic"> <!-- INVALID: 'holographic' is not a valid form. -->
-    <layer id="base">
+    <layer modifiers="none">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="grave one" />
     </layer>

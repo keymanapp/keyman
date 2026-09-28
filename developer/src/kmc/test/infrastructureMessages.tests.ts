@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import 'mocha';
 import * as fs from 'fs';
 import { assert } from 'chai';
@@ -66,7 +69,7 @@ describe('InfrastructureMessages', function () {
     const projectPath = makePathToFixture('kpj-2.0/khmer_angkor', 'khmer_angkor.kpj');
     const outFilePath = makePathToFixture('kpj-2.0/khmer_angkor', 'khmer_angkor.kmx');
     const options: CompilerOptions = {...defaultCompilerOptions};
-    await unitTestEndpoints.build(projectPath, outFilePath, ncb, options);
+    await unitTestEndpoints.build(projectPath, {path: outFilePath, isFolder: false}, ncb, options);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_OutFileNotValidForProjects),
       'ERROR_OutFileNotValidForProjects not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
   });

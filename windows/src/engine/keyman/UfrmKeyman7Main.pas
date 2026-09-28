@@ -153,8 +153,6 @@ uses
   Keyman.System.FrameworkInputPane,
 
   keymanapi_TLB,
-//TOUCH    UfrmTouchKeyboard,
-  GlobalKeyboardChangeManager,
   UfrmVisualKeyboard,
   IntegerList,
   KeymanTrayIcon,
@@ -221,10 +219,7 @@ type
     FLangSwitchRefreshWatcher: TThread;
     FLastFocus: THandle;
     FLastActive: THandle;
-    //FLastKeymanID: Integer;
-    FLastHKL: Integer;
     FLangSwitchManager: TLangSwitchManager;   // I3933
-    FGlobalKeyboardChangeManager: TGlobalKeyboardChangeManager;   // I4271
     FActiveHKL: Integer;
     FTrayIcon: TIcon;   // I4359
 
@@ -255,7 +250,6 @@ type
     procedure TrayIconMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure TrayIconDblClick(Sender: TObject);
-    //function CreateKeymanMenuItem(Owner: TPopupMenu; rp: TRunningProduct; cmi: IKeymanCustomisationMenuItem): TKeymanMenuItem;
     function AppMessage(var Message: TMessage): Boolean;
     procedure TestKeymanFunctioning(FunctionType: TTestKeymanFunctionType; RunOnSuccess, ResetCounter: Boolean);
     function ShouldTestKeymanFunctioning: Boolean;
@@ -264,13 +258,10 @@ type
 
     procedure UpdateOSKVisibility;
     function GetOption_AutoOpenOSK: Boolean;
-    function GetOption_AutoSwitchOSKPages: Boolean;
-    //procedure SnapToolHelp;
     procedure RecreateTaskbarIcons;
     function StartKeymanEngine: Boolean;
     procedure StartKeymanHostProcess(ProcessName: string);
     procedure OpenTextEditor;
-    //function GetCachedKeymanID(hkl: DWORD): DWORD;
     procedure ShowLanguageSwitchForm;
     procedure LanguageSwitchFormHidden(Sender: TObject);
     procedure RegisterControllerWindows;  // I3092
@@ -280,13 +271,7 @@ type
     function GetActiveKeymanID: Integer;   // I3949
     procedure RequestCurrentActiveKeyboard(Command: WORD);   // I3961
     function ProcessWMKeymanControl(Command, WParam: Word; LParam: DWord): LResult;   // I3961
-//TOUCH    procedure HideTouchKeyboard;
-//TOUCH    procedure ShowTouchKeyboard;
-//TOUCH    function UseTouchKeyboard: Boolean;
-//TOUCH    function TouchKeyboardVisible: Boolean;
-//TOUCH    procedure ProcessContextChange(Atom: DWORD);
 
-    procedure PostGlobalKeyboardChange(FActiveKeyboard: TLangSwitchKeyboard);   // I4271
     function IsControllerWindow(AHandle: THandle): Boolean;   // I4731
     procedure UpdateFocusInfo;   // I4731
     procedure UnregisterControllerWindows;   // I4731
@@ -341,16 +326,16 @@ type
     property LangSwitchManager: TLangSwitchManager read FLangSwitchManager;   // I3933
 
     property Option_AutoOpenOSK: Boolean read GetOption_AutoOpenOSK;
-    property Option_AutoSwitchOSKPages: Boolean read GetOption_AutoSwitchOSKPages;
   end;
 
 var
   frmKeyman7Main: TfrmKeyman7Main;
   hProgramMutex: THandle;
 
-  wm_keyman_globalswitch, wm_keyman_globalswitch_process, wm_keyman_control, wm_keyman_control_internal, wm_test_keyman_functioning: Cardinal;
+  wm_keyman_control, wm_keyman_control_internal, wm_test_keyman_functioning: Cardinal;
 
   FEnableCrashTest: Boolean = False;
+  wm_keyman_refresh: Cardinal;
 
 const
   KMC_StartProduct = 0;
@@ -406,7 +391,7 @@ uses
   klog,
   GetOsVersion,
   System.StrUtils,
-  System.Win.ComObj, {tlhelp32,}
+  System.Win.ComObj,
   VistaMessages,
   Vcl.AxCtrls,
   Vcl.Buttons,
@@ -470,8 +455,6 @@ begin
   rp.FTrayIcon.OnMouseUp := TrayIconMouseUp;
   rp.FTrayIcon.OnDblClick := TrayIconDblClick;
   rp.FTrayIcon.OnUnresponsive := TrayIconUnresponsive;
-  //rp.FTrayIcon.OnClick := TrayIconClick;
-//  rp.FTrayIcon.Icon.ReleaseHandle;
   rp.FTrayIcon.Icon.Assign(FTrayIcon);
   rp.FTrayIcon.Hint := MsgFromId(SKApplicationTitle);
   rp.FTrayIcon.Visible := True;
@@ -503,15 +486,9 @@ procedure TfrmKeyman7Main.FormCreate(Sender: TObject);
 begin
   TKeymanSentryClient.Breadcrumb('trace', 'TfrmKeyman7Main.FormCreate');
 
-  if GetOs in [osVista, osWin7] then   // I4576
-    FGlobalKeyboardChangeManager := TGlobalKeyboardChangeManager.Create;   // I4271
-
   frmKeymanMenu := TfrmKeymanMenu.Create(Self);
 
   FLangSwitchManager := TLangSwitchManager.Create;   // I3933
-
-  //FLastKeymanID := -1;
-  FLastHKL := GetKeyboardLayout(0);
 
   try
     GetDebugManager(Handle);
@@ -521,7 +498,6 @@ begin
   end;
 
   Application.HookMainWindow(AppMessage);
-//  FRunningProduct := TRunningProduct.Create;
 
   sMsg_TaskbarRestart := RegisterWindowMessage('TaskbarCreated');
   ChangeWindowMessageFilter(sMsg_TaskbarRestart, MSGFLT_ADD);
@@ -530,11 +506,6 @@ begin
 
   PostMessage(Handle, WM_USER_Start, 0, 0);
 end;
-
-{procedure TfrmKeyman7Main.AppDebug(var Msg: TMsg; var Handled: Boolean);
-begin
-  KL.Log('MESSAGE %8.8x %x [%x, %x]', [Msg.hwnd, Msg.message, Msg.wParam, Msg.lParam]);
-end;}
 
 procedure TfrmKeyman7Main.FormDestroy(Sender: TObject);
 begin
@@ -556,8 +527,6 @@ begin
   end;
   if Assigned(frmVisualKeyboard) then // I1096 - silent exception when Keyman closes
   begin
-    //frmVisualKeyboard.Hide;
-    //frmVisualKeyboard.Release;
     FreeAndNil(frmVisualKeyboard);  // I2692
   end;
 
@@ -575,20 +544,12 @@ begin
     kmint.KeymanEngineControl.ShutdownKeyman32Engine;
   FreeAndNil(FLangSwitchManager);   // I3933
 
-  //Windows.MessageBox(Handle, PChar(IntToStr(kmcom._AddRef)), 'RefCount+1', MB_OK);
   kmint.kmcom := nil;   // I5132
-
-  FreeAndNil(FGlobalKeyboardChangeManager);   // I4271
 end;
 
 function TfrmKeyman7Main.GetOption_AutoOpenOSK: Boolean;
 begin
   Result := kmcom.Options.Items['koAutoOpenOSK'].Value;
-end;
-
-function TfrmKeyman7Main.GetOption_AutoSwitchOSKPages: Boolean;
-begin
-  Result := kmcom.Options.Items['koAutoSwitchOSKPages'].Value;
 end;
 
 function TfrmKeyman7Main.IsControllerWindow(AHandle: THandle): Boolean;   // I4731
@@ -697,6 +658,10 @@ begin
 end;
 
 function TfrmKeyman7Main.AppMessage(var Message: TMessage): Boolean;
+var
+  hwndTextEditor: THandle;
+const
+  KR_PRE_REFRESH = 1;
 begin
   if Message.Msg = WM_ACTIVATEAPP then
   begin
@@ -717,16 +682,18 @@ begin
       frmVisualKeyboard.Dispatch(Message);
     Result := False;
   end
-  else if Message.Msg = wm_keyman_globalswitch then
+  else if Message.Msg = wm_keyman_refresh then
   begin
-    TDebugLogClient.Instance.WriteMessage('wm_keyman_globalswitch for Application Handle: %x %x', [Message.wParam, Message.lParam]);
-
-    case Message.wParam of
-      skHKL,      // A windows language has been selected so select the most appropriate Keyman keyboard
-      skSelectHKL: // Select the requested Windows language (and therefore the most appropriate Keyman keyboard)
-        FLastHKL := Message.lParam;
+    if Message.WParam = KR_PRE_REFRESH then
+    begin
+      // The text editor needs a special prod for keyboard changes
+      hwndTextEditor := FindWindow('TfrmTextEditor', nil);
+      if hwndTextEditor <> 0 then
+      begin
+        PostMessage(hwndTextEditor, wm_keyman_control, KMC_REFRESH, 0);
+      end;
     end;
-    Result := True;
+    Result := False;
   end
   else if Message.Msg = wm_keyman_control then
   begin
@@ -779,10 +746,6 @@ begin
   Result := 0;
 
   case Command of
-    KMC_GETLASTHKL:
-      begin
-        Result := FLastHKL;
-      end;
 
     KMC_SETFOCUSINFO:
       begin
@@ -799,10 +762,6 @@ begin
         if LParam <> 0
           then ShowVisualKeyboard
           else HideVisualKeyboard;
-      end;
-    KMC_GETLOADED:
-      begin
-        if IsProductLoaded then Result := 1 else Result := 0;
       end;
     KMC_REFRESH:
       begin
@@ -871,11 +830,6 @@ begin
         Sleep(5000);
         TDebugLogClient.Instance.WriteMessage('kmc_fakefreeze end', []);
       end;
-//TOUCH    KMC_CONTEXT:
-//TOUCH      begin
-//TOUCH        if LParam <> 0 then
-//TOUCH          ProcessContextChange(LParam);
-//TOUCH      end;
   end;
 end;
 
@@ -1126,16 +1080,6 @@ begin   // I3933
   frmKeymanMenu.PopupEx(mnu, pt.x, pt.y, systraylocation);   // I3990
 end;
 
-procedure TfrmKeyman7Main.PostGlobalKeyboardChange(FActiveKeyboard: TLangSwitchKeyboard);   // I4271
-begin
-  if Assigned(FActiveKeyboard) and
-      Assigned(kmcom) and
-      (GetOs in [osVista, osWin7]) and    // I4576   // I4576   // I4576
-      kmcom.Options.Items['koSwitchLanguageForAllApplications'].Value and
-      Assigned(FGlobalKeyboardChangeManager) then
-    FGlobalKeyboardChangeManager.PostChange(FActiveKeyboard);
-end;
-
 procedure TfrmKeyman7Main.TrayIconDblClick(Sender: TObject);
 begin
   SetLastFocus;
@@ -1323,8 +1267,6 @@ begin
     end;
   end;
 
-  //Windows.MessageBox(Handle, PChar(IntToStr(kmcom._AddRef)), 'RefCount+1', MB_OK);
-
   try
     kmcom.AutoApply := False;
     kmcom.Keyboards.Apply;
@@ -1429,8 +1371,6 @@ begin
   GlobalDeleteAtom(HiWord(CommandAndAtom));   // I3949
   buf := buftext;
 
-  //OutputDebugString(PChar('ProcessProfileChange("'+buf+'")'#13#10));
-
   {debug := } StrToken(buf, '|');   // I4285
 
   if not TryStrToInt(StrToken(buf, '|'), FLangID) then Exit;
@@ -1508,17 +1448,10 @@ begin
     UpdateOSKVisibility;
   end;
 
-  PostGlobalKeyboardChange(FActiveKeyboard);   // I4271
-
   if Assigned(frmVisualKeyboard) then   // I3949
   begin
     frmVisualKeyboard.RefreshSelectedKeyboard;  // I2398
   end;
-
-//TOUCH    if Assigned(frmTouchKeyboard) then
-//TOUCH    begin
-//TOUCH      frmTouchKeyboard.RefreshSelectedKeyboard;
-//TOUCH    end;
 
   if wCommand = PC_UPDATE_LANGUAGESWITCH then   // I4124
   begin                                                           // TODO fixup product id
@@ -1583,7 +1516,6 @@ begin
     Exit;
   end;
 
-  //Windows.SetForegroundWindow(FLastFocus); //FLastActive);
   if Winapi.Windows.SetFocus(FLastFocus) = 0 then
     TDebugLogClient.Instance.WriteLastError('SetLastFocus', 'SetFocus');
 
@@ -1701,19 +1633,9 @@ end;
 procedure TfrmKeyman7Main.MnuVisualKeyboard(Sender: TObject);
 begin
   SetLastFocus;     // I1289 - Focus not returned to active app when OSK opened
-
-//TOUCH    if UseTouchKeyboard then
-//TOUCH    begin
-//TOUCH      if TouchKeyboardVisible
-//TOUCH        then HideTouchKeyboard
-//TOUCH        else ShowTouchKeyboard;
-//TOUCH    end
-//TOUCH    else
-//TOUCH    begin
-    if VisualKeyboardVisible(apKeyboard)
-      then HideVisualKeyboard
-      else ShowVisualKeyboard(apKeyboard);
-//TOUCH    end;
+  if VisualKeyboardVisible(apKeyboard)
+    then HideVisualKeyboard
+    else ShowVisualKeyboard(apKeyboard);
 end;
 
 procedure TfrmKeyman7Main.MnuFontHelper(Sender: TObject);
@@ -1753,12 +1675,6 @@ procedure TfrmKeyman7Main.HideVisualKeyboard;
 begin
   if not Assigned(kmcom) and not StartKeymanEngine then Exit;
 
-//TOUCH    if UseTouchKeyboard then
-//TOUCH    begin
-//TOUCH      HideTouchKeyboard;
-//TOUCH      Exit;
-//TOUCH    end;
-
   if Assigned(frmVisualKeyboard) then // I1274 - Avoid crash when closing OSK when already closed!
     frmVisualKeyboard.Release;
 end;
@@ -1766,14 +1682,6 @@ end;
 procedure TfrmKeyman7Main.ShowVisualKeyboard(Page: TOSKActivePage);
 begin
   if not Assigned(kmcom) and not StartKeymanEngine then Exit;
-
-//TOUCH    if UseTouchKeyboard then
-//TOUCH    begin
-//TOUCH      ShowTouchKeyboard;
-//TOUCH      Exit;
-//TOUCH    end;
-
-//TOUCH    HideTouchKeyboard;
 
   if not Assigned(frmVisualKeyboard) then  // I1274 - Related, don't recreate OSK if already exists
   begin
@@ -1790,11 +1698,6 @@ function TfrmKeyman7Main.VisualKeyboardVisible(Page: TOSKActivePage): Boolean;
 begin
   Result := Assigned(frmVisualKeyboard) and ((Page = apUndefined) or (frmVisualKeyboard.ActivePage = Page));
 end;
-
-//TOUCH  function TfrmKeyman7Main.TouchKeyboardVisible: Boolean;
-//TOUCH  begin
-//TOUCH    Result := Assigned(frmTouchKeyboard);
-//TOUCH  end;
 
 procedure TfrmKeyman7Main.TestKeymanFunctioning(FunctionType: TTestKeymanFunctionType; RunOnSuccess, ResetCounter: Boolean);
 begin
@@ -1825,41 +1728,6 @@ begin
     end;
   end;
 end;
-
-//TOUCH  procedure TfrmKeyman7Main.ShowTouchKeyboard;
-//TOUCH  var
-//TOUCH    FProduct: IKeymanProduct;
-//TOUCH  begin
-//TOUCH    if not Assigned(kmcom) and not StartKeymanEngine then Exit;
-//TOUCH
-//TOUCH    if Assigned(frmVisualKeyboard) then // I1274 - Avoid crash when closing OSK when already closed!
-//TOUCH      frmVisualKeyboard.Release;
-//TOUCH
-//TOUCH    if not Assigned(frmTouchKeyboard) then
-//TOUCH    begin
-//TOUCH      FProduct := ProductFromMenuItem(nil);
-//TOUCH      if not Assigned(FProduct) then Exit;
-//TOUCH
-//TOUCH      frmTouchKeyboard := TfrmTouchKeyboard.Create(nil, FProduct);
-//TOUCH      frmTouchKeyboard.FreeNotification(Self);
-//TOUCH      frmTouchKeyboard.SetContext(FCurrentContext);
-//TOUCH      //frmTouchKeyboard.Show;
-//TOUCH    end;
-//TOUCH  end;
-
-//TOUCH  procedure TfrmKeyman7Main.HideTouchKeyboard;
-//TOUCH  begin
-//TOUCH    if not Assigned(kmcom) and not StartKeymanEngine then Exit;
-//TOUCH
-//TOUCH    FreeAndNil(frmTouchKeyboard);
-//TOUCH  end;
-
-//TOUCH  function TfrmKeyman7Main.UseTouchKeyboard: Boolean;
-//TOUCH  begin
-//TOUCH    if not Assigned(kmcom)
-//TOUCH      then Result := False
-//TOUCH      else Result := kmcom.Options['koUseTouchLayout'].Value;
-//TOUCH  end;
 
 procedure TfrmKeyman7Main.tmrCheckInputPaneTimer(Sender: TObject);
 var
@@ -2115,13 +1983,10 @@ end;
 
 initialization
   wm_test_keyman_functioning := RegisterWindowMessage('wm_test_keyman_functioning');
-  wm_keyman_globalswitch := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH');
-  wm_keyman_globalswitch_process := RegisterWindowMessage('WM_KEYMAN_GLOBALSWITCH_PROCESS');
   wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
   wm_keyman_control_internal := RegisterWindowMessage('WM_KEYMAN_CONTROL_INTERNAL');   // I3933
+  wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
 
   ChangeWindowMessageFilter(wm_keyman_control, MSGFLT_ADD);
-  ChangeWindowMessageFilter(wm_keyman_globalswitch, MSGFLT_ADD);
-  ChangeWindowMessageFilter(wm_keyman_globalswitch_process, MSGFLT_ADD);
   ChangeWindowMessageFilter(wm_keyman_control_internal, MSGFLT_ADD);   // I3933
 end.

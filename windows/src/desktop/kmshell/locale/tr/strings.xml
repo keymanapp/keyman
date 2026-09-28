@@ -10,7 +10,6 @@
   <string name="HintTitle_KH_EXITPRODUCT" comment="/HintTitle: ">Keyman'tan Çıkış?</string>
   <string name="koAltGrCtrlAlt" comment="/FormatString: ">AltGr'yi Ctrl+Alt ile simüle edin</string>
   <string name="koAutoOpenOSK" comment="/FormatString: ">Keyman klavye seçildiğinde daima Ekran Klavyesi Penceresini gösterin</string>
-  <string name="koAutoSwitchOSKPages" comment="/FormatString: ">Bir klavye seçildiğinde uygun Ekran Klavyesi/ Yardım'a otomatik olarak geçin</string>
   <string name="koDeadkeyConversion" comment="/FormatString: ">Harf imleme tuşlarına düz tuşlar gibi davran</string>
   <string name="koDebugging" comment="/FormatString: ">Hata Ayıklama</string>
   <string name="kogAdvanced" comment="/FormatString: ">Gelişmiş</string>

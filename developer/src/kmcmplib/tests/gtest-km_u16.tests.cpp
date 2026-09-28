@@ -32,6 +32,11 @@ TEST(km_u16_Test, u16tok_char_delim) {
 	KMX_WCHAR str[LINESIZE];
   KMX_WCHAR *ctx = nullptr;
 
+  // invalid parameters
+  EXPECT_EQ(nullptr, u16tok(str, ' ', nullptr));
+  EXPECT_EQ(nullptr, u16tok(str, (KMX_WCHAR)0, &ctx));
+  EXPECT_EQ(nullptr, u16tok(nullptr, ' ', nullptr));
+
   // sequence of tokens
   u16cpy(str, u"test a space  and two");
   ctx = nullptr;
@@ -55,6 +60,13 @@ TEST(km_u16_Test, u16tok_char_delim) {
   EXPECT_TRUE(!u16cmp(u"b", u16tok(nullptr, ' ', &ctx)));
   EXPECT_EQ(nullptr, u16tok(nullptr, ' ', &ctx));
 
+  // delimiters at start
+  u16cpy(str, u"  a b");
+  ctx = nullptr;
+  EXPECT_TRUE(!u16cmp(u"a", u16tok(str, ' ', &ctx)));
+  EXPECT_TRUE(!u16cmp(u"b", u16tok(nullptr, ' ', &ctx)));
+  EXPECT_EQ(nullptr, u16tok(nullptr, ' ', &ctx));
+
   // no string, no context
   ctx = nullptr;
   EXPECT_EQ(nullptr, u16tok(nullptr, ' ', &ctx));
@@ -72,6 +84,12 @@ TEST(km_u16_Test, u16tok_str_delim) {
 
 	KMX_WCHAR str[LINESIZE];
   KMX_WCHAR *ctx = nullptr;
+
+  // invalid parameters
+  EXPECT_EQ(nullptr, u16tok(str, u" ", nullptr));
+  EXPECT_EQ(nullptr, u16tok(str, nullptr, &ctx));
+  EXPECT_EQ(nullptr, u16tok(str, u"", &ctx));
+  EXPECT_EQ(nullptr, u16tok(nullptr, u" ", nullptr));
 
   // sequence of tokens
   u16cpy(str, u"test a space  and two");
@@ -95,6 +113,13 @@ TEST(km_u16_Test, u16tok_str_delim) {
   EXPECT_TRUE(!u16cmp(u"a", u16tok(str, u" ", &ctx)));
   EXPECT_TRUE(!u16cmp(u"b", u16tok(nullptr, u" ", &ctx)));
   EXPECT_EQ(nullptr, u16tok(nullptr, u" ", &ctx));
+
+  // delimiters at start
+  u16cpy(str, u"  a b");
+  ctx = nullptr;
+  EXPECT_TRUE(!u16cmp(u"a", u16tok(str, u" ", &ctx)));
+  EXPECT_TRUE(!u16cmp(u"b", u16tok(nullptr, u" ", &ctx)));
+  EXPECT_EQ(nullptr, u16tok(nullptr, ' ', &ctx));
 
   // no string, no context
   ctx = nullptr;
@@ -130,6 +155,9 @@ TEST(km_u16_Test, u16tok_str_compare_to_strtok) {
   // Compare behaviour of strtok:
 	char str[LINESIZE];
 
+  // Note: strtok behavior is undefined with invalid parameters so we don't do a reference test
+  // of invalid parameters
+
   // sequence of tokens
   strcpy(str, "test a space  and two");
   EXPECT_TRUE(!strcmp("test", strtok(str, " ")));
@@ -146,6 +174,12 @@ TEST(km_u16_Test, u16tok_str_compare_to_strtok) {
 
   // delimiters at end
   strcpy(str, "a b   ");
+  EXPECT_TRUE(!strcmp("a", strtok(str, " ")));
+  EXPECT_TRUE(!strcmp("b", strtok(nullptr, " ")));
+  EXPECT_EQ(nullptr, strtok(nullptr, " "));
+
+  // delimiters at start
+  strcpy(str, "   a b");
   EXPECT_TRUE(!strcmp("a", strtok(str, " ")));
   EXPECT_TRUE(!strcmp("b", strtok(nullptr, " ")));
   EXPECT_EQ(nullptr, strtok(nullptr, " "));

@@ -78,9 +78,6 @@ type
     actFileSaveAs: TFileSaveAs;
     actFileSaveCopyAs: TAction;
     actFileRevert: TAction;
-    actFilePageSetup: TFilePageSetup;
-    actFilePrint: TAction;
-    actFilePrintPreview: TAction;
     actFileExit: TFileExit;
     actEditCut: TKMDEditCut;
     actEditCopy: TKMDEditCopy;
@@ -144,15 +141,10 @@ type
     procedure actFileSaveExecute(Sender: TObject);
     procedure actFileSaveCopyAsExecute(Sender: TObject);
     procedure actFileRevertExecute(Sender: TObject);
-    procedure actFilePrintPreviewExecute(Sender: TObject);
-    procedure actFilePrintExecute(Sender: TObject);
-    procedure actFilePrintPreviewUpdate(Sender: TObject);
-    procedure actFilePrintUpdate(Sender: TObject);
     procedure actFileSaveAsAccept(Sender: TObject);
     procedure actFileSaveCopyAsUpdate(Sender: TObject);
     procedure actFileSaveAsUpdate(Sender: TObject);
     procedure actFileRevertUpdate(Sender: TObject);
-    procedure actFilePageSetupUpdate(Sender: TObject);
     procedure actFileSaveUpdate(Sender: TObject);
     procedure actFileSaveAsBeforeExecute(Sender: TObject);
     procedure actViewCharacterMapExecute(Sender: TObject);
@@ -256,7 +248,6 @@ uses
   Graphics,
   Messages,
   Keyman.Developer.UI.TikeOnlineUpdateCheck,
-  Printers,
   Vcl.Clipbrd,
   Keyman.System.KeyboardUtils,
   Keyman.Developer.System.Project.Project,
@@ -346,34 +337,6 @@ end;
 procedure TmodActionsMain.actFileOpenUpdate(Sender: TObject);
 begin
   actFileOpen.Enabled := IsGlobalProjectUIReady;
-end;
-
-procedure TmodActionsMain.actFilePageSetupUpdate(Sender: TObject);
-begin
-  with frmKeymanDeveloper do
-    actFilePageSetup.Enabled := IsGlobalProjectUIReady and Assigned(ActiveChild) and Supports(ActiveChild, IKMDPrintActions) and (Printer.Printers.Count > 0);
-end;
-
-procedure TmodActionsMain.actFilePrintExecute(Sender: TObject);
-begin
-  (frmKeymanDeveloper.ActiveChild as IKMDPrintActions).PrintFile;
-end;
-
-procedure TmodActionsMain.actFilePrintUpdate(Sender: TObject);
-begin
-  with frmKeymanDeveloper do
-    actFilePrint.Enabled := IsGlobalProjectUIReady and Assigned(ActiveChild) and Supports(ActiveChild, IKMDPrintActions) and (Printer.Printers.Count > 0);
-end;
-
-procedure TmodActionsMain.actFilePrintPreviewExecute(Sender: TObject);
-begin
-  (frmKeymanDeveloper.ActiveChild as IKMDPrintPreviewActions).PrintPreview;
-end;
-
-procedure TmodActionsMain.actFilePrintPreviewUpdate(Sender: TObject);
-begin
-  with frmKeymanDeveloper do
-    actFilePrintPreview.Enabled := IsGlobalProjectUIReady and Assigned(ActiveChild) and Supports(ActiveChild, IKMDPrintPreviewActions) and (Printer.Printers.Count > 0);
 end;
 
 procedure TmodActionsMain.actFileRevertExecute(Sender: TObject);

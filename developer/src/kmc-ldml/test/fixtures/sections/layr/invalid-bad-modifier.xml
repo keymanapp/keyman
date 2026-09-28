@@ -6,7 +6,7 @@
   <keys />
 
   <layers formId="us">
-    <layer id="base" modifiers="altR-shift"> <!-- invalid, should be "altR shift" -->
+    <layer modifiers="altR-shift"> <!-- invalid, should be "altR shift" -->
       <row keys="a b c" />
     </layer>
   </layers>

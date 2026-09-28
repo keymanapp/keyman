@@ -35,6 +35,8 @@
         id:'lo',name:'debugging',region:'Asia',
         font:{family:'LaoWeb',source:['../font/saysettha_web.ttf','../font/saysettha_web.woff','../font/saysettha_web.eot']}
         },
-      filename:'./timeout.js' // Intentional (simulated) error - the file never loads, simulating a server timeout.
+      filename: './timeout.js' // Intentional (simulated) error - the file never loads,
+      // simulating a server timeout. web/src/tools/testing/test-server/index.cjs#L12
+      // has special code when this file gets requested!
     });
   }

@@ -37,7 +37,6 @@ type
   TframeTextEditor = class(TTIKEForm, IKMDEditActions, IKMDSearchActions, IKMDTextEditorActions)
     lstImages: TMenuImgList;
     dlgFonts: TFontDialog;
-    dlgPrintSetup: TPrinterSetupDialog;
     lstImagesDisabled: TImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -161,9 +160,6 @@ type
     function OffsetToLine(Offset: Integer): Integer;   // I4083
 
     procedure SyntaxColourChange;
-
-    function PrintFile(Header: WideString = ''): Boolean;
-    function PrintPreview(Header: WideString = ''): Boolean;
 
     procedure LoadFromFile(AFileName: WideString); overload;   // I4034
     procedure LoadFromStream(AStream: TStream); overload;  // I2964
@@ -656,18 +652,6 @@ end;
 procedure TframeTextEditor.UpdateInsertState(const AMode: string);
 begin
   frmKeymanDeveloper.barStatus.Panels[1].Text := AMode;
-end;
-
-function TframeTextEditor.PrintFile(Header: WideString): Boolean;
-begin
-  ExecuteCommand('print');
-  Result := True;
-end;
-
-function TframeTextEditor.PrintPreview(Header: WideString): Boolean;
-begin
-  // TODO: print preview
-  Result := True;
 end;
 
 procedure TframeTextEditor.SetCharFont(const Value: TFont);

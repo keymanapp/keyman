@@ -326,10 +326,20 @@ int u16ncmp(const KMX_WCHAR* p, const KMX_WCHAR* q, size_t count) {
  * @return Pointer to the first token in p
  */
 KMX_WCHAR* u16tok(KMX_WCHAR* p, const KMX_WCHAR ch, KMX_WCHAR** ctx) {
+  if(ch == 0 || !ctx) {
+    return NULL;
+  }
+
   if (!p) {
     p = *ctx;
-    if (!p)
+    if (!p) {
       return NULL;
+    }
+  }
+
+  // skip initial delimiter
+  while (*p == ch) {
+    p++;
   }
 
   KMX_WCHAR* q = p;
@@ -356,10 +366,20 @@ KMX_WCHAR* u16tok(KMX_WCHAR* p, const KMX_WCHAR ch, KMX_WCHAR** ctx) {
  * @return Pointer to the first token in p
  */
 KMX_WCHAR* u16tok(KMX_WCHAR* p, const KMX_WCHAR* delimiters, KMX_WCHAR** ctx) {
+  if(!ctx || !delimiters || !(*delimiters)) {
+    return NULL;
+  }
+
   if (!p) {
     p = *ctx;
-    if (!p)
+    if (!p) {
       return NULL;
+    }
+  }
+
+  // skip initial delimiters
+  while (*p && u16chr(delimiters, *p)) {
+    p++;
   }
 
   KMX_WCHAR* q = p;

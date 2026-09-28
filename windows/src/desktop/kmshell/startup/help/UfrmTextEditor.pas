@@ -144,7 +144,7 @@ type
     procedure editorKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     cefFonts: TframeCEFHost;
-    wm_keyman_control, wm_keyman_refresh: UINT;
+    wm_keyman_control: UINT;
     FUpdating: Boolean;
     FCheckFontsThread: TCheckFontsThread;
     FCheckFontKeyboards: TCheckFontKeyboards;
@@ -154,8 +154,6 @@ type
     procedure WMUserFormShown(var Message: TMessage); message WM_USER_FormShown;
     procedure WMUserCheckFonts(var Message: TMessage); message WM_USER_CheckFonts;
     procedure PostKeymanControlMessage(msg, wParam: UINT; lParam: Cardinal);
-    {function SendKeymanControlMessage(msg, wParam: UINT;
-      lParam: Cardinal): Cardinal;}
     function CurrText: TTextAttributes;
     procedure GetFontNames;
     procedure SetEditRect;
@@ -248,7 +246,6 @@ procedure TfrmTextEditor.TntFormCreate(Sender: TObject);
 begin
   inherited;
   wm_keyman_control := RegisterWindowMessage('WM_KEYMAN_CONTROL');
-  wm_keyman_refresh := RegisterWindowMessage('WM_KEYMANREFRESH');
 
   HelpTopic := 'context/text-editor';
   Caption := MsgFromId(SKTextEditorCaption);
@@ -348,18 +345,6 @@ begin
   if hKeymanControl <> 0 then
     PostMessage(hKeymanControl, wm_keyman_control, MAKELONG(msg, wParam), lParam);
 end;
-
-{function TfrmTextEditor.SendKeymanControlMessage(msg: UINT; wParam: UINT; lParam: Cardinal): Cardinal;
-var
-  hKeymanControl: THandle;
-begin
-  hKeymanControl := FindWindow('TApplication', 'keyman');
-  if hKeymanControl <> 0 then
-    Result := SendMessage(hKeymanControl, wm_keyman_control, MAKELONG(msg, wParam), lParam)
-  else
-    Result := 0;
-end;}
-
 
 procedure TfrmTextEditor.LoadWebBox(web: TframeCEFHost; const AdditionalData: WideString = '');   // I4181
 var
@@ -724,7 +709,7 @@ end;
 procedure TfrmTextEditor.ApplicationEvents1Message(var Msg: tagMSG;
   var Handled: Boolean);
 begin
-  if (Msg.message = wm_keyman_refresh) and (Msg.wParam = KR_REFRESH) then
+  if (Msg.message = wm_keyman_control) and (Msg.wParam = KMC_REFRESH) then
   begin
     StartCheckFontsThread;
   end;

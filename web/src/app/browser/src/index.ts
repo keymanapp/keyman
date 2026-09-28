@@ -2,7 +2,7 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  */
 
-export { ContextManager, KeyboardCookie } from "./contextManager.js";
+export { ContextManager, KeyboardCookie, KeyboardCookieName } from "./contextManager.js";
 export { KeyboardDetails } from './keyboardDetails.js';
 export { KeymanEngine } from './keymanEngine.js';
 export { UIModule } from './uiModuleInterface.js';

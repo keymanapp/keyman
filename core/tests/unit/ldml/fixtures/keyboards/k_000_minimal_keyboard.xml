@@ -15,7 +15,7 @@ Keys that don't show up in a row don't generate an output
   </keys>
 
   <layers formId="us">
-    <layer id="base">
+    <layer modifiers="none">
       <row keys="1" />
       <row keys="q" />
     </layer>
