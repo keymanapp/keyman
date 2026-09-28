@@ -177,6 +177,7 @@ uses
   Hints,
   HotkeyUtils,
   initprog,
+  Keyman.Configuration.System.BaseKeyboard,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.UI.UfrmDiagnosticTests,
   KeymanOptionNames,
@@ -202,6 +203,7 @@ uses
   Keyman.Configuration.UI.UfrmStartInstall,
   RegistryKeys,
   SupportXMLRenderer,
+  UfrmBaseKeyboard,
   UfrmChangeHotkey,
   UfrmHTML,
   UfrmInstallKeyboardFromWeb,
@@ -679,8 +681,11 @@ end;
 
 procedure TfrmMain.Options_BaseKeyboard;   // I4169
 begin
-  WaitForElevatedConfiguration(Handle, '-basekeyboard');
-  // Refresh will be triggered by elevated process
+  if ConfigureAndSetBaseKeyboard(Handle) then
+  begin
+    DoRefresh;
+  end;
+
 end;
 
 procedure TfrmMain.Options_SettingsManager;

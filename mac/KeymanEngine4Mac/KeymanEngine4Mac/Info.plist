@@ -6,8 +6,6 @@
 	<string>en</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleGetInfoString</key>
-	<string>$(GET_INFO_STRING)</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -38,7 +36,7 @@
 		<string>x.y</string>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>$(COPYRIGHT_STRING_RIGHTS)</string>
+	<string>$(COPYRIGHT_STRING)</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
 </dict>

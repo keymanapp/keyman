@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { DeviceSpec, ManagedPromise, Version } from 'keyman/common/web-utils';
 import { getAbsoluteX, getAbsoluteY, landscapeView } from 'keyman/engine/dom-utils';
 import { EmitterListenerSpy } from 'keyman/engine/events';
@@ -11,11 +14,6 @@ import { getViewportScale } from '../screenUtils.js';
 import { ViewConfiguration } from '../config/viewConfiguration.js';
 import { TwoStateActivator } from './twoStateActivator.js';
 import { FloatingOSKCookie, FloatingOSKCookieSerializer } from './floatingOskCookie.js';
-
-/***
-   KeymanWeb 10.0
-   Copyright 2017 SIL International
-***/
 
 export interface FloatingOSKViewConfiguration extends ViewConfiguration {
   activator?: TwoStateActivator<HTMLElement>;

@@ -146,12 +146,8 @@ KMInputMethodEventHandler* _eventHandler;
 - (void)menuAction:(id)sender {
   NSMenuItem *mItem = [sender objectForKey:kIMKCommandMenuItemName];
   NSInteger itag = mItem.tag;
-  os_log_debug([KMLogs uiLog], "Keyman menu clicked - tag: %lu", itag);
-  if (itag == CONFIG_MENUITEM_TAG) {
-    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"Configuration..."];
-    [self showConfigurationWindow:sender];
-  }
-  else if (itag == OSK_MENUITEM_TAG) {
+  os_log_debug([KMLogs uiLog], "Keyman menu item selected - tag: %lu", itag);
+  if (itag == OSK_MENUITEM_TAG) {
     [KMSentryHelper addUserBreadCrumb:@"menu" message:@"On-screen Keyboard"];
     [KMSettingsRepository.shared writeShowOskOnActivate:YES];
     os_log_debug([KMLogs oskLog], "menuAction OSK_MENUITEM_TAG, updating settings writeShowOsk to YES");
@@ -164,23 +160,6 @@ KMInputMethodEventHandler* _eventHandler;
   else if (itag >= KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG) {
     [KMSentryHelper addUserBreadCrumb:@"menu" message:@"Selected Keyboard"];
     [self.appDelegate selectKeyboardFromMenu:itag];
-  }
-}
-
-- (void)showConfigurationWindow:(id)sender {
-  // Using `showConfigurationWindow` instead of `showPreferences:` because `showPreferences:` is missing in
-  // High Sierra (10.13.1 - 10.13.3). See: https://bugreport.apple.com/web/?problemID=35422518
-  // rrb: where Apple's API is broken (10.13.1-10.13.3) call our workaround, otherwise, call showPreferences
-  u_int16_t systemVersion = [KMOSVersion SystemVersion];
-  if ([KMOSVersion Version_10_13_1] <= systemVersion && systemVersion <= [KMOSVersion Version_10_13_3]) // between 10.13.1 and 10.13.3 inclusive
-  {
-    os_log_info([KMLogs uiLog], "Input Menu: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
-    [self.appDelegate showConfigurationWindow]; // call our workaround
-  }
-  else
-  {
-    os_log_info([KMLogs uiLog], "Input Menu: calling Apple's showPreferences (sys ver %x)", systemVersion);
-    [self showPreferences:sender]; // call Apple API
   }
 }
 
