@@ -1,18 +1,18 @@
 (*
   Name:             UImportOlderKeyboardUtils
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      28 Aug 2008
 
   Modified Date:    16 Jun 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          28 Aug 2008 - mcdurdin - I1616 - Upgrade keyboards from 6.x
                     01 Jun 2009 - mcdurdin - I2001 - use current user not local machine when testing root keyboard path
                     11 Jan 2011 - mcdurdin - I2642 - Installer uninstalls KM7 keyboards before upgrade can happen
@@ -54,7 +54,6 @@ uses
 class function TImportOlderKeyboardUtils.GetShortKeyboardName(const FileName: string): string;
 begin
   if (LowerCase(ExtractFileExt(FileName)) = '.kmx') or
-      (LowerCase(ExtractFileExt(FileName)) = '.kxx') or
       (LowerCase(ExtractFileExt(FileName)) = '.kmp')
     then Result := ChangeFileExt(ExtractFileName(FileName), '')
     else Result := FileName;

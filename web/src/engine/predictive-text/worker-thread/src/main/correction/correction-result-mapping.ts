@@ -27,10 +27,16 @@ export interface CorrectionResultMapping<ResultType> {
   readonly matchedResult: Readonly<ResultType>;
 
   /**
-   * Gets the "total cost" of the edge, which should be considered as the
+   * Gets the "correction cost" of the edge, which should be considered as the
    * negative log-likelihood of the input path taken to reach the node
    * multiplied by the 'probability' induced by needed Damerau-Levenshtein edits
    * to the resulting output.
    */
-  readonly totalCost: number;
+  readonly correctionCost: number;
+
+  /**
+   * The "total cost" of the edge - comprised of both the correction cost and the
+   * prediction cost based on the model's frequency data for the word.
+   */
+  readonly currentCost: number;
 }

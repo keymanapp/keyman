@@ -38,7 +38,11 @@ describe('correction-search: shouldStopSearchingEarly', () => {
   });
 
   it('stops checking corrections earlier when enough predictions have been found', () => {
-    const predictionProbs = [.010, .009, .008, .008, .0075, .0075, .007, .007, .006, .006, .005, .005];
+    // Thresholding is performed in log-space.
+    const baseCost = 1;
+    const expectedThreshold = CORRECTION_SEARCH_THRESHOLDS.REPLACEMENT_SEARCH_THRESHOLD;
+
+    const predictionProbs = [.010, .009, .008, .008, .0075, .007, .006, .005, .004, .003, .002, Math.exp(- baseCost - expectedThreshold)];
     assert.isAtLeast(predictionProbs.length, ModelCompositor.MAX_SUGGESTIONS, "test setup no longer valid");
 
     // The only part for each entry we actually care about here:  .totalProb.
@@ -49,12 +53,8 @@ describe('correction-search: shouldStopSearchingEarly', () => {
       } as CorrectionPredictionTupleCore
     });
 
-    const baseCost = 1;
-
-    // Thresholding is performed in log-space.
-    const expectedThreshold = CORRECTION_SEARCH_THRESHOLDS.REPLACEMENT_SEARCH_THRESHOLD;
-
+    // The actual assertions.
     assert.isFalse(shouldStopSearchingEarly(baseCost, baseCost + expectedThreshold - 0.01, predictions));
-    assert.isTrue(shouldStopSearchingEarly( baseCost, baseCost + expectedThreshold + 0.01, predictions));
+    assert.isTrue(shouldStopSearchingEarly(baseCost, baseCost + expectedThreshold + 0.01, predictions));
   });
 });

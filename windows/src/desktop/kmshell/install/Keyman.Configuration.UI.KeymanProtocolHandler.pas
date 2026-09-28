@@ -17,13 +17,13 @@ type
     FDownloadURL: string;
     frmDownloadProgress: TfrmDownloadProgress;
     function DoHandle(Owner: TComponent; const url: string; ASilent,
-      ANoWelcome: Boolean; const ALogFile: string): Boolean;
+      ANoWelcome: Boolean; const ALogFile: string; BaseKeyboardID: Integer): Boolean;
     procedure DoDownload(AOwner: TfrmDownloadProgress; var Result: Boolean);
     procedure HttpReceiveData(const Sender: TObject; AContentLength,
       AReadCount: Int64; var Abort: Boolean);
   public
     class function CanHandle(const url: string): Boolean; static;
-    class function Handle(Owner: TComponent; const url: string; ASilent, ANoWelcome: Boolean; const ALogFile: string): Boolean; static;
+    class function Handle(Owner: TComponent; const url: string; ASilent, ANoWelcome: Boolean; const ALogFile: string; BaseKeyboardID: Integer): Boolean; static;
   end;
 
 implementation
@@ -51,13 +51,13 @@ end;
 
 class function TKeymanProtocolHandler.Handle(Owner: TComponent;
   const url: string; ASilent, ANoWelcome: Boolean;
-  const ALogFile: string): Boolean;
+  const ALogFile: string; BaseKeyboardID: Integer): Boolean;
 var
   h: TKeymanProtocolHandler;
 begin
   h := TKeymanProtocolHandler.Create;
   try
-    Result := h.DoHandle(Owner, url, ASilent, ANoWelcome, ALogFile);
+    Result := h.DoHandle(Owner, url, ASilent, ANoWelcome, ALogFile, BaseKeyboardID);
   finally
     h.Free;
   end;
@@ -65,7 +65,7 @@ end;
 
 function TKeymanProtocolHandler.DoHandle(Owner: TComponent;
   const url: string; ASilent, ANoWelcome: Boolean;
-  const ALogFile: string): Boolean;
+  const ALogFile: string; BaseKeyboardID: Integer): Boolean;
 var
   FTempDir: string;
   PackageID, BCP47: string;
@@ -98,7 +98,7 @@ begin
     end;
 
     // TODO: this makes a circular dependency, refactor it out!
-    Result := TInstallFile.Execute(nil, FDownloadFilename, False, False, '', BCP47);
+    Result := TInstallFile.Execute(nil, FDownloadFilename, False, False, '', BCP47, BaseKeyboardID);
 
   finally
     if FileExists(FDownloadFilename) then
