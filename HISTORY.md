@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.294 alpha 2026-09-28
+
+* fix(mac): disable the help button entirely in the title bar of OSK (#16679)
+
 ## 19.0.293 alpha 2026-09-25
 
 * fix(mac): change .pkg name to lower case (#16659)
