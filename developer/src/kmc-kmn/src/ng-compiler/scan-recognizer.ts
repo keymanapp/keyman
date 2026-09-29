@@ -188,16 +188,6 @@ export const KMN_SCAN_RECOGNIZERS = [
   {tokenType: TokenType.USING,               regExp: /using(?![a-z0-9_\.-])/iy,                               emit: true},
   // https://help.keyman.com/developer/language/reference/group
   {tokenType: TokenType.KEYS,                regExp: /keys(?![a-z0-9_\.-])/iy,                                emit: true},
-  // https://help.keyman.com/developer/language/guide/compile-targets
-  {tokenType: TokenType.KEYMAN,              regExp: /\$keyman:/iy,                                           emit: true},
-  // https://help.keyman.com/developer/language/guide/compile-targets
-  {tokenType: TokenType.KEYMANONLY,          regExp: /\$keymanonly:/iy,                                       emit: true},
-  // https://help.keyman.com/developer/language/guide/compile-targets
-  {tokenType: TokenType.KEYMANWEB,           regExp: /\$keymanweb:/iy,                                        emit: true},
-  // https://help.keyman.com/developer/language/guide/compile-targets
-  {tokenType: TokenType.KMFL,                regExp: /\$kmfl:/iy,                                             emit: true},
-  // https://help.keyman.com/developer/language/guide/compile-targets
-  {tokenType: TokenType.WEAVER,              regExp: /\$weaver:/iy,                                           emit: true},
   {tokenType: TokenType.LEFT_BR,             regExp: /\(/y,                                                   emit: true},
   {tokenType: TokenType.RIGHT_BR,            regExp: /\)/y,                                                   emit: true},
   // https://help.keyman.com/developer/language/guide/virtual-keys

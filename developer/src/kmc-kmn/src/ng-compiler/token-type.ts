@@ -48,12 +48,8 @@ export enum TokenType {
   INCLUDECODES        = "INCLUDECODES",        // https://help.keyman.com/developer/language/reference/includecodes
   INDEX               = "INDEX",               // https://help.keyman.com/developer/language/reference/_index
   KEYBOARDVERSION     = "KEYBOARDVERSION",     // https://help.keyman.com/developer/language/reference/keyboardversion
-  KEYMAN              = "KEYMAN",              // https://help.keyman.com/developer/language/guide/compile-targets
-  KEYMANONLY          = "KEYMANONLY",          // https://help.keyman.com/developer/language/guide/compile-targets
-  KEYMANWEB           = "KEYMANWEB",           // https://help.keyman.com/developer/language/guide/compile-targets
   KEYS                = "KEYS",                // https://help.keyman.com/developer/language/reference/group
   KEY_CODE            = "KEY_CODE",            // https://help.keyman.com/developer/language/guide/virtual-keys
-  KMFL                = "KMFL",                // https://help.keyman.com/developer/language/guide/compile-targets
   KMW_EMBEDCSS        = "KMW_EMBEDCSS",        // https://help.keyman.com/developer/language/reference/kmw_embedcss
   KMW_EMBEDJS         = "KMW_EMBEDJS",         // https://help.keyman.com/developer/language/reference/kmw_embedjs
   KMW_HELPFILE        = "KMW_HELPFILE",        // https://help.keyman.com/developer/language/reference/kmw_helpfile
@@ -114,7 +110,6 @@ export enum TokenType {
   VERSION             = "VERSION",             // https://help.keyman.com/developer/language/reference/version
   VERSION_HEADER      = "VERSION_HEADER",      // https://help.keyman.com/developer/language/reference/_keywordsbytype
   VISUALKEYBOARD      = "VISUALKEYBOARD",      // https://help.keyman.com/developer/language/reference/visualkeyboard
-  WEAVER              = "WEAVER",              // https://help.keyman.com/developer/language/guide/compile-targets
   WHITESPACE          = "WHITESPACE",
   WINDOWSLANGUAGES    = "WINDOWSLANGUAGES",    // https://help.keyman.com/developer/language/reference/windowslanguages
 };
