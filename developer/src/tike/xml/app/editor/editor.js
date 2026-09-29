@@ -14,6 +14,40 @@ async function loadSettings() {
   return await $.getJSON('/app/settings/editor');
 }
 
+/**
+ * Replace all unpaired surrogates with U+FFFD, as they cannot be passed through
+ * `encodeURIComponent`. Unpaired surrogates should never appear in normal use;
+ * they are an indication of text corruption, so while this does reduce data,
+ * it's already corrupt data which we cannot handle anyway.
+ *
+ * @param {string} S
+ */
+function scrubUnpairedSurrogates(S) {
+  if(typeof S != 'string') {
+    return '';
+  }
+
+  // TODO: String.prototype.toWellFormed is available from Chrome 111 or later;
+  // we are on Chrome 89.0 (#16310)
+
+  // https://github.com/zloirock/core-js/blob/master/packages/core-js/modules/es.string.to-well-formed.js [MIT]
+  const REPLACEMENT_CHARACTER = '\uFFFD';
+  const length = S.length;
+  let result = Array(length);
+  for (let i = 0; i < length; i++) {
+    let charCode = S.charCodeAt(i);
+    // single UTF-16 code unit
+    if ((charCode & 0xF800) !== 0xD800) result[i] = S.charAt(i);
+    // unpaired surrogate
+    else if (charCode >= 0xDC00 || i + 1 >= length || (S.charCodeAt(i + 1) & 0xFC00) !== 0xDC00) result[i] = REPLACEMENT_CHARACTER;
+    // surrogate pair
+    else {
+      result[i] = S.charAt(i);
+      result[++i] = S.charAt(i);
+    }
+  } return result.join('');
+}
+
 (function(context) {
   var editor = null;
   var errorRange = null;
@@ -117,7 +151,7 @@ async function loadSettings() {
       // Even when loading, we post back the data to the backend so we have an original version
       $.post("/app/source/file", {
         Filename: filename,
-        Data: model.getValue()
+        Data: scrubUnpairedSurrogates(model.getValue())
         // delta.start, delta.end, delta.lines, delta.action
       });
       if (!context.loading) {
@@ -387,7 +421,7 @@ async function loadSettings() {
   context.print = function () {
     /****require("ace/config").loadModule("ace/ext/static_highlight", function (m) {
       var result = m.renderSync(
-        editor.getValue(), editor.session.getMode(), editor.renderer.theme
+        scrubUnpairedSurrogates(editor.getValue()), editor.session.getMode(), editor.renderer.theme
       );
       var iframe = document.createElement('iframe');
       iframe.onload = function () {
@@ -451,24 +485,13 @@ async function loadSettings() {
     command('location,' + (s.startLineNumber-1) + ',' + (s.startColumn-1) + ',' + (s.endLineNumber-1) + ',' + (s.endColumn-1) + ',' + n);
     var token = getTokenAtCursor();
     if (token) {
-      let text;
-      try {
-        text = encodeURIComponent(token.text);
-      } catch(e) {
-        if(e instanceof URIError) {
-          // if token.text contains an unpaired surrogate, encodeURIComponent
-          // fails with a URIError, in which case we will just avoid
-          // sending the token command.
-          return;
-        }
-        throw e;
-      }
+      const text = encodeURIComponent(token.text);
       command('token,' + token.column + ',' + text);
     }
   };
 
   var getTokenAtCursor = function () {
-    var txt = editor.getModel().getValueInRange(editor.getSelection());
+    let txt = scrubUnpairedSurrogates(editor.getModel().getValueInRange(editor.getSelection()));
     if (txt != '') {
       // We'll always return the first 100 characters of the selection and not
       // do any manipulation here.
