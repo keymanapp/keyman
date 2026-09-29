@@ -97,12 +97,12 @@ To open the Options tab of Keyman Configuration:
     If you untick this option, you can start Keyman yourself from the
     Start Menu.
 
-    Ensure the Windows Startup apps setting for Keyman is also enabled. Under
-    the startup apps settings it will actually be listed as Keyman
+    Ensure the Windows Startup apps setting for Keyman is also enabled. It will
+    actually be listed as Keyman
     Configuration. ![](../../desktop_images/windows-startup-apps.png)
 
-    A warning is displayed if the Start with Windows is selected but the Windows
-    Startup apps Setting is disabled for Keyman.
+    A warning is displayed if the Start when Windows starts is selected but the Windows
+    Startup apps setting is disabled for Keyman.
     ![](../../desktop_images/options-startup-warning.png)
 
 -   Show splash screen
