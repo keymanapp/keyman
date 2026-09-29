@@ -3,7 +3,7 @@
  *
  * Created by Ross Cruickshank on 2026-09-18
  *
- * This unit assists in determining whether Keyman is enabled to start 
+ * This unit assists in determining whether Keyman is enabled to start
  * with Windows in the Windows startup settings.
  *)
 unit Keyman.Configuration.System.StartupSettings;
@@ -24,6 +24,14 @@ uses
   SysUtils;
 
 const
+// This registry key is not documented by Microsoft, others have determined:
+// The value associated with it is 12 bytes in length the first being the
+// enabled/disabled state. The rest of the byte is the timestamp
+// of when it was disabled.
+// 03 - startup disabled, user with admin rights can enable
+// 02 - startup enabled, user with admin rights can disable
+// See issue #15785 for more details.
+
   StartupEnabled: Byte = $02;
   StartupDisabled: Byte = $03;
 
@@ -43,7 +51,7 @@ begin
         Exit;
       if reg.GetDataSize(SRegValue_WindowsRun_Keyman) <> SizeOf(data) then
         Exit;
-      if reg.ReadBinaryData(SRegValue_WindowsRun_Keyman, data, SizeOf(data)) <> sizeof(data) then 
+      if reg.ReadBinaryData(SRegValue_WindowsRun_Keyman, data, SizeOf(data)) <> sizeof(data) then
         Exit;
       Result := data[0] = StartUpDisabled;
     except
