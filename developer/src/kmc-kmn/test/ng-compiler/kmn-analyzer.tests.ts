@@ -11,7 +11,7 @@ import { assert } from 'chai';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
-import { BeginStatementRule, CompileTargetRule, ContentRule, EntryPointRule, GroupNameRule, KeystrokeElementRule, Parser } from '../../src/ng-compiler/kmn-analyzer.js';
+import { BeginStatementRule, ContentRule, EntryPointRule, GroupNameRule, KeystrokeElementRule, Parser } from '../../src/ng-compiler/kmn-analyzer.js';
 import { GroupQualifierRule, GroupStatementRule, InputBlockRule, InputContextRule, InputElementRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { KeystrokeRule, KmnTreeRule, LhsBlockRule, LineRule, ModifierRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { OutputStatementRule, PermittedKeywordRule, PlainTextRule, ProductionBlockRule, RhsBlockRule } from '../../src/ng-compiler/kmn-analyzer.js';
@@ -193,64 +193,6 @@ describe("KMN Analyser Tests", () => {
       assert.isTrue(line.parse(tokenBuffer, root));
       assert.equal(root.getSoleChild().nodeType, NodeType.LINE);
       assert.isFalse(root.getSoleChild().hasChildren());
-    });
-    it("can parse correctly (compile target)", () => {
-      tokenBuffer = stringToTokenBuffer('$keyman: store(&bitmap) "filename"\n');
-      const line: Rule = new LineRule();
-      assert.isTrue(line.parse(tokenBuffer, root));
-      const children = root.getChildren();
-      assert.equal(children.length, 3);
-      assert.equal(children[0].nodeType, NodeType.KEYMAN);
-      assert.equal(children[1].nodeType, NodeType.BITMAP);
-      assert.equal(children[1].getSoleChild().nodeType, NodeType.STRING);
-      assert.equal(children[2].nodeType, NodeType.LINE);
-    });
-    it("can parse correctly (compile target, plus, virtual key, u_char)", () => {
-      tokenBuffer = stringToTokenBuffer('$keymanonly: + [CTRL "."] > U+135E\n');
-      const line: Rule = new LineRule();
-      assert.isTrue(line.parse(tokenBuffer, root));
-      const children = root.getChildren();
-      assert.equal(children.length, 3);
-      assert.equal(children[0].nodeType, NodeType.KEYMANONLY);
-      assert.equal(children[1].nodeType, NodeType.PRODUCTION);
-      assert.equal(children[2].nodeType, NodeType.LINE);
-    });
-  });
-  describe("CompileTargetRule Tests", () => {
-    it("can construct a CompileTargetRule", () => {
-      tokenBuffer = stringToTokenBuffer('');
-      const compileTarget: Rule = new CompileTargetRule();
-      assert.isNotNull(compileTarget);
-    });
-    it("can parse correctly (KEYMAN)", () => {
-      tokenBuffer = stringToTokenBuffer('$keyman:');
-      const compileTarget: Rule = new CompileTargetRule();
-      assert.isTrue(compileTarget.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.KEYMAN));
-    });
-    it("can parse correctly (KEYMANONLY)", () => {
-      tokenBuffer = stringToTokenBuffer('$keymanonly:');
-      const compileTarget: Rule = new CompileTargetRule();
-      assert.isTrue(compileTarget.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.KEYMANONLY));
-    });
-    it("can parse correctly (KEYMANWEB)", () => {
-      tokenBuffer = stringToTokenBuffer('$keymanweb:');
-      const compileTarget: Rule = new CompileTargetRule();
-      assert.isTrue(compileTarget.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.KEYMANWEB));
-    });
-    it("can parse correctly (KMFL)", () => {
-      tokenBuffer = stringToTokenBuffer('$kmfl:');
-      const compileTarget: Rule = new CompileTargetRule();
-      assert.isTrue(compileTarget.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.KMFL));
-    });
-    it("can parse correctly (WEAVER)", () => {
-      tokenBuffer = stringToTokenBuffer('$weaver:');
-      const compileTarget: Rule = new CompileTargetRule();
-      assert.isTrue(compileTarget.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.WEAVER));
     });
   });
   describe("ContentRule Tests", () => {

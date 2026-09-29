@@ -76,18 +76,10 @@ export const TOKEN_TO_NODE = [
   {tokenType: TokenType.INDEX,               nodeType: NodeType.INDEX},
   // https://help.keyman.com/developer/language/reference/keyboardversion
   {tokenType: TokenType.KEYBOARDVERSION,     nodeType: NodeType.KEYBOARDVERSION},
-  // https://help.keyman.com/developer/language/guide/compile-targets
-  {tokenType: TokenType.KEYMAN,              nodeType: NodeType.KEYMAN},
-  // https://help.keyman.com/developer/language/guide/compile-targets
-  {tokenType: TokenType.KEYMANONLY,          nodeType: NodeType.KEYMANONLY},
-  // https://help.keyman.com/developer/language/guide/compile-targets
-  {tokenType: TokenType.KEYMANWEB,           nodeType: NodeType.KEYMANWEB},
   // https://help.keyman.com/developer/language/reference/group
   {tokenType: TokenType.KEYS,                nodeType: NodeType.KEYS},
   // https://help.keyman.com/developer/language/guide/virtual-keys
   {tokenType: TokenType.KEY_CODE,            nodeType: NodeType.KEY_CODE},
-  // https://help.keyman.com/developer/language/guide/compile-targets
-  {tokenType: TokenType.KMFL,                nodeType: NodeType.KMFL},
   // https://help.keyman.com/developer/language/reference/kmw_embedcss
   {tokenType: TokenType.KMW_EMBEDCSS,        nodeType: NodeType.KMW_EMBEDCSS},
   // https://help.keyman.com/developer/language/reference/kmw_embedjs
@@ -192,8 +184,6 @@ export const TOKEN_TO_NODE = [
   {tokenType: TokenType.VERSION_HEADER,      nodeType: NodeType.VERSION_HEADER},
   // https://help.keyman.com/developer/language/reference/visualkeyboard
   {tokenType: TokenType.VISUALKEYBOARD,      nodeType: NodeType.VISUALKEYBOARD},
-  // https://help.keyman.com/developer/language/guide/compile-targets
-  {tokenType: TokenType.WEAVER,              nodeType: NodeType.WEAVER},
   // https://help.keyman.com/developer/language/reference/windowslanguages
   {tokenType: TokenType.WINDOWSLANGUAGES,    nodeType: NodeType.WINDOWSLANGUAGES},
 ];
