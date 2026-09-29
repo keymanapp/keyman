@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.295 alpha 2026-09-29
+
+* fix(mac): open config app from input method (#16676)
+* maint(web): improve build perf and test params (#16582)
+* fix(developer): support Rich Edit in Charmap drag + drop (#16685)
+
 ## 19.0.294 alpha 2026-09-28
 
 * fix(mac): disable the help button entirely in the title bar of OSK (#16679)
