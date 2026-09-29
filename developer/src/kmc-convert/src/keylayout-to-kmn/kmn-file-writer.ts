@@ -247,7 +247,7 @@ export class KmnFileWriter {
    * @param  dataUkelele an object containing all data read from a .keylayout file
    * @return string -  all stores to be printed
    */
-  public writeKmnFileHeader(dataUkelele: ProcessedData | null): string {
+  private writeKmnFileHeader(dataUkelele: ProcessedData | null): string {
     if (!dataUkelele) {
       return "";
     }
@@ -277,7 +277,7 @@ export class KmnFileWriter {
    * @param  dataUkelele an object containing all data read from a .keylayout file
    * @return string -  all rules to be printed
    */
-  public writeDataRules(dataUkelele: ProcessedData | null): string {
+  private writeDataRules(dataUkelele: ProcessedData | null): string {
     if (!dataUkelele) {
       return "";
     }
@@ -325,7 +325,7 @@ export class KmnFileWriter {
         // lookup key nr of the key which is being processed
         let keyNr: number = 0;
         for (let j = 0; j <= KeylayoutToKmnConverter.MAX_KEY_IDENTIFIER; j++) {
-          if (keylayoutKmnConverter.mapUkeleleKeycodeToVK(j) === uniqueDataRules[k].key) {
+          if (keylayoutKmnConverter.unitTestEndpoints.mapUkeleleKeycodeToVK(j) === uniqueDataRules[k].key) {
             keyNr = j;
             break;
           }
@@ -588,7 +588,7 @@ export class KmnFileWriter {
    * https://docs.google.com/document/d/12J3NGO6RxIthCpZDTR8FYSRjiMgXJDLwPY2z9xqKzJ0/edit?tab=t.0#heading=h.16sx096j6jmy
    * @return outMsg the warning message array for all parts
    */
-  public createWarningText(inObj: RuleReview, posWarning: number = 2): string[] {
+  private createWarningText(inObj: RuleReview, posWarning: number = 2): string[] {
 
     const outMsg = [...inObj.warningMessages];
 
@@ -653,7 +653,7 @@ export class KmnFileWriter {
       // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
       if (inObj.Dk_modifier) {
 
-        const mod_OK = new KeylayoutToKmnConverter(this.callbacks, this.options).isAcceptableKeymanModifier(inObj.Dk_modifier);
+        const mod_OK = new KeylayoutToKmnConverter(this.callbacks, this.options).unitTestEndpoints.isAcceptableKeymanModifier(inObj.Dk_modifier);
 
         if ((outMsg[1].lastIndexOf('unavailable modifier') < 0))
           outMsg[1] += (!mod_OK) ? 'unavailable modifier ' : '';
@@ -768,7 +768,7 @@ export class KmnFileWriter {
    * @param  index the index of a rule in Rule[]
    * @return a string[] containing possible warnings for a rule
    */
-  public reviewRules(rule: Rule[], index: number): RuleReview {
+  private reviewRules(rule: Rule[], index: number): RuleReview {
 
     const unavailableModiWarnings = {
       type: 'UnavailableModifier',
@@ -803,7 +803,7 @@ export class KmnFileWriter {
     // ------------------------- check unavailable modifiers -------------------------
 
     if ((rule[index].ruleType === "C0") || (rule[index].ruleType === "C1")) {
-      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
+      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierKey)) {
         unavailableModiWarnings.compare_type = 'unav_C0_C1';
         unavailableModiWarnings.warningMessages = this.createWarningText(unavailableModiWarnings);
       }
@@ -811,7 +811,7 @@ export class KmnFileWriter {
 
 
     else if (rule[index].ruleType === "C2") {
-      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
+      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C2';
         unavailableSuperiWarnings.dk_prefix = ['C', 'A'];
         unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
@@ -820,7 +820,7 @@ export class KmnFileWriter {
         unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings);
       }
 
-      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
+      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierKey)) {
         unavailableModiWarnings.compare_type = 'unav_C2';
         unavailableModiWarnings.modifier = rule[index].modifierKey;
         unavailableModiWarnings.key = rule[index].key;
@@ -830,7 +830,7 @@ export class KmnFileWriter {
 
 
     else if (rule[index].ruleType === "C3") {
-      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierPrevDeadkey)) {
+      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierPrevDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C3';
         unavailableSuperiWarnings.dk_prefix = ['A', 'B'];
         unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
@@ -841,7 +841,7 @@ export class KmnFileWriter {
         unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings, 2);
       }
 
-      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
+      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C3';
         unavailableSuperiWarnings.prevDk_modifier = rule[index].modifierPrevDeadkey;
         unavailableSuperiWarnings.prevDk_key = rule[index].prevDeadkey;
@@ -852,7 +852,7 @@ export class KmnFileWriter {
         unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings, 2);
       }
 
-      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
+      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierKey)) {
         unavailableModiWarnings.compare_type = 'unav_C3';
         unavailableModiWarnings.modifier = rule[index].modifierKey;
         unavailableModiWarnings.key = rule[index].key;
@@ -1298,7 +1298,7 @@ export class KmnFileWriter {
     *         a non-control character will be written as itself ( 'A', '1', '፩', '😎')
     *         null in case of an empty string or null or undefined input
     */
-  public writeCharacterOrUnicode(ctr: string, msg: string = ""): MessageCharacter | null {
+  private writeCharacterOrUnicode(ctr: string, msg: string = ""): MessageCharacter | null {
 
     if ((ctr === null) || (ctr === undefined)) {
       return null;
@@ -1355,7 +1355,7 @@ export class KmnFileWriter {
         rest_string: ctr as string,
         carryOver: ''
       };
-      out.character = (UnicodeCharacterConversion.processXmlValue(xmlOutputData)).replaced_string ?? "";
+      out.character = UnicodeCharacterConversion.processXmlValue(xmlOutputData).replaced_string ?? "";
 
       // msg if a possibly invalid html will be written e.g. &commat; &gt &123 &abc &#x1234
       if ((out.character.indexOf('&') > -1) && (out.character.length > 1)) {
@@ -1378,10 +1378,13 @@ export class KmnFileWriter {
     return out;
   }
 
-
   /** @internal */
   public unitTestEndpoints = {
+    writeKmnFileHeader: this.writeKmnFileHeader.bind(this),
+    writeDataRules: this.writeDataRules.bind(this),
+    createWarningText: this.createWarningText.bind(this),
     reviewRules: this.reviewRules.bind(this),
+    writeCharacterOrUnicode: this.writeCharacterOrUnicode.bind(this),
   };
 }
 
