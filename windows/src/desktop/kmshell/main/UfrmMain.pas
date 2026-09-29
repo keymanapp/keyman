@@ -707,6 +707,9 @@ end;
 
 procedure TfrmMain.Options_StartupSettings;
 begin
+  // We'll refresh the page when we return to Keyman Configuration
+  // after the Startup Apps settings page is popped up in case the
+  // user has changed the setting
   FRefreshOnActivate := TUtilExecute.Shell(0, 'ms-settings:startupapps', '', '');
 end;
 

@@ -2,7 +2,9 @@
  * Keyman is copyright (C) SIL Global. MIT License.
  *
  * Created by Ross Cruickshank on 2026-09-18
- * This unit assists in determining whether Keyman is enabled to start with Windows in the Windows startup settings.
+ *
+ * This unit assists in determining whether Keyman is enabled to start 
+ * with Windows in the Windows startup settings.
  *)
 unit Keyman.Configuration.System.StartupSettings;
 
@@ -41,7 +43,8 @@ begin
         Exit;
       if reg.GetDataSize(SRegValue_WindowsRun_Keyman) <> SizeOf(data) then
         Exit;
-      reg.ReadBinaryData(SRegValue_WindowsRun_Keyman, data, SizeOf(data));
+      if reg.ReadBinaryData(SRegValue_WindowsRun_Keyman, data, SizeOf(data)) <> sizeof(data) then 
+        Exit;
       Result := data[0] = StartUpDisabled;
     except
       on E: ERegistryException do

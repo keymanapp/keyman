@@ -45,7 +45,6 @@ uses
   Keyman.Configuration.System.StartupSettings,
   kmint,
   MessageIdentifiers,
-  RegistryKeys,
   utilxml,
   Variants;
 
