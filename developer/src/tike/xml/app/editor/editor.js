@@ -491,7 +491,7 @@ function scrubUnpairedSurrogates(S) {
   };
 
   var getTokenAtCursor = function () {
-    let txt = scrubUnpairedSurrogates(editor.getModel().getValueInRange(editor.getSelection()));
+    const txt = scrubUnpairedSurrogates(editor.getModel().getValueInRange(editor.getSelection()));
     if (txt != '') {
       // We'll always return the first 100 characters of the selection and not
       // do any manipulation here.
