@@ -196,6 +196,7 @@ id _lastServerWithOSKShowing = nil;
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, hiding OSK");
     [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:@"hiding OSK on input method deactivation"];
     [self.oskWindow.window setIsVisible:NO];
+    [self updateOskMenuTextForClose];
   } else {
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, OSK already hidden");
   }
@@ -704,12 +705,44 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   NSMenuItem *osk = [self.menu itemWithTag:OSK_MENUITEM_TAG];
   if (osk) {
     [osk setAction:@selector(menuAction:)];
+    [self updateOskMenuText];
   }
   
   NSMenuItem *about = [self.menu itemWithTag:CONFIG_MENUITEM_TAG];
   if (about) {
     [about setAction:@selector(menuAction:)];
   }
+}
+
+/**
+ * Set the OSK menu item to Show or Hide depending on the current state
+ */
+- (void)updateOskMenuText {
+  BOOL oskOpen = [self.oskWindow.window isVisible];
+  
+  NSMenuItem *oskMenu = [self.menu itemWithTag:OSK_MENUITEM_TAG];
+  if (oskMenu) {
+    NSString* oskMenuText;
+    if (oskOpen) {
+      oskMenuText = NSLocalizedString(@"hide-osk-menu-text", nil);
+    } else {
+      oskMenuText = NSLocalizedString(@"show-osk-menu-text", nil);
+    }
+
+    os_log_debug([KMLogs oskLog], "updateOskMenuText, setting text to %{public}@", oskMenuText);
+
+    [oskMenu setTitle:oskMenuText];
+  }
+}
+
+/**
+ * Set the OSK menu item to Show
+ */
+- (void)updateOskMenuTextForClose {
+  NSMenuItem *oskMenu = [self.menu itemWithTag:OSK_MENUITEM_TAG];
+    NSString* oskMenuText = NSLocalizedString(@"show-osk-menu-text", nil);
+    os_log_debug([KMLogs oskLog], "updateOskMenuTextForClose, setting text to %{public}@", oskMenuText);
+    [oskMenu setTitle:oskMenuText];
 }
 
 - (void)updateKeyboardMenuItems {
@@ -922,11 +955,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)showOSK {
-  [self.oskWindow prepareToShowOsk];
   [[self.oskWindow window] makeKeyAndOrderFront:nil];
   [[self.oskWindow window] setLevel:NSStatusWindowLevel];
   [[self.oskWindow window] setTitle:self.oskWindowTitle];
   [KMSentryHelper addOskVisibleTag:[self.oskWindow.window isVisible]];
+  
+  [self updateOskMenuText];
 }
 
 /**
