@@ -15,7 +15,7 @@ KMX_BOOL ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
-int LineTokenType(PKMX_WCHAR *str);
+int LineTokenType(PFILE_KEYBOARD fk, PKMX_WCHAR *str, KMX_BOOL checkDeprecations);
 KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
   PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 );
@@ -587,95 +587,95 @@ TEST_F(CompilerTest, LineTokenType_test) {
     // T_BLANK, lptOther, empty string
     u16cpy(str, u"");
     p = str;
-    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+    EXPECT_EQ(T_BLANK, LineTokenType(&fileKeyboard, &p, FALSE));
 
     // T_BLANK, lptOther, one space
     u16cpy(str, u" ");
     p = str;
-    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+    EXPECT_EQ(T_BLANK, LineTokenType(&fileKeyboard, &p, FALSE));
 
     // T_BLANK, mismatched prefix, CKF_KEYMAN, lptKeymanWebOnly
     u16cpy(str, u"$keymanweb:");
     p = str;
     kmcmp::CompileTarget = CKF_KEYMAN;
-    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+    EXPECT_EQ(T_BLANK, LineTokenType(&fileKeyboard, &p, FALSE));
 
     // T_BLANK, mismatched prefix, CKF_KEYMANWEB, lptKeymanOnly
     u16cpy(str, u"$keymanonly:");
     p = str;
     kmcmp::CompileTarget = CKF_KEYMANWEB;
-    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+    EXPECT_EQ(T_BLANK, LineTokenType(&fileKeyboard, &p, FALSE));
 
     // T_BLANK, nothing after prefix
     u16cpy(str, u"$keyman:");
     p = str;
     kmcmp::CompileTarget = CKF_KEYMAN;
-    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+    EXPECT_EQ(T_BLANK, LineTokenType(&fileKeyboard, &p, FALSE));
 
     // T_STORE (=T_W_START)
     u16cpy(str, u"store(b)");
     p = str;
-    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(T_STORE, LineTokenType(&fileKeyboard, &p, FALSE));
     EXPECT_EQ(u16len(u"store"), p - str);
     EXPECT_TRUE(!u16cmp(p, u"(b)"));
 
     // T_BITMAPS (=T_W_END)
     u16cpy(str, u"bitmaps \"b\"");
     p = str;
-    EXPECT_EQ(T_BITMAPS, LineTokenType(&p));
+    EXPECT_EQ(T_BITMAPS, LineTokenType(&fileKeyboard, &p, FALSE));
     EXPECT_EQ(u16len(u"bitmaps "), p - str);
     EXPECT_TRUE(!u16cmp(p, u"\"b\""));
 
     // T_STORE, preceeded by one space
     u16cpy(str, u" store(b)");
     p = str;
-    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(T_STORE, LineTokenType(&fileKeyboard, &p, FALSE));
     EXPECT_EQ(u16len(u" store"), p - str);
     EXPECT_TRUE(!u16cmp(p, u"(b)"));
 
     // T_STORE, preceeded by two spaces
     u16cpy(str, u"  store(b)");
     p = str;
-    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(T_STORE, LineTokenType(&fileKeyboard, &p, FALSE));
     EXPECT_EQ(u16len(u"  store"), p - str);
     EXPECT_TRUE(!u16cmp(p, u"(b)"));
 
     // T_STORE, followed by one space
     u16cpy(str, u"store (b)");
     p = str;
-    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(T_STORE, LineTokenType(&fileKeyboard, &p, FALSE));
     EXPECT_EQ(u16len(u"store "), p - str);
     EXPECT_TRUE(!u16cmp(p, u"(b)"));
 
     // T_STORE, followed by two spaces
     u16cpy(str, u"store  (b)");
     p = str;
-    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(T_STORE, LineTokenType(&fileKeyboard, &p, FALSE));
     EXPECT_EQ(u16len(u"store  "), p - str);
     EXPECT_TRUE(!u16cmp(p, u"(b)"));
 
     // T_COMMENT
     u16cpy(str, u"c ");
     p = str;
-    EXPECT_EQ(T_COMMENT, LineTokenType(&p));
+    EXPECT_EQ(T_COMMENT, LineTokenType(&fileKeyboard, &p, FALSE));
     EXPECT_EQ(0, p - str);
 
     // comment without following space ... potential bug, but ReadLine() currently ensures following space
     u16cpy(str, u"c");
     p = str;
-    EXPECT_EQ(T_COMMENT, LineTokenType(&p));
+    EXPECT_EQ(T_COMMENT, LineTokenType(&fileKeyboard, &p, FALSE));
     EXPECT_EQ(0, p - str);
 
     // T_KEYTOKEY
     u16cpy(str, u"abc");
     p = str;
-    EXPECT_EQ(T_KEYTOKEY, LineTokenType(&p));
+    EXPECT_EQ(T_KEYTOKEY, LineTokenType(&fileKeyboard, &p, FALSE));
     EXPECT_EQ(0, p - str);
 
      // T_UNKNOWN
     u16cpy(str, u"z");
     p = str;
-    EXPECT_EQ(T_UNKNOWN, LineTokenType(&p));
+    EXPECT_EQ(T_UNKNOWN, LineTokenType(&fileKeyboard, &p, FALSE));
     EXPECT_EQ(0, p - str);
 }
 

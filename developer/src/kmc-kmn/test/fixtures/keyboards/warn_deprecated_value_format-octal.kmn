@@ -1,0 +1,9 @@
+store(&VERSION) '10.0'
+store(&NAME) 'warn_deprecated_value_format-octal'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+c ### deprecated in v19 compiler, so always warn regardless of target version
++ ' ' > 240

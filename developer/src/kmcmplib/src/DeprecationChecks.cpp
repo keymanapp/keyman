@@ -8,9 +8,35 @@
 
 void kmcmp::WarnDeprecatedHeader() {   // I4866
   if (AWarnDeprecatedCode_GLOBAL_LIB) {
+    // We warn on this for any keyboard version; keyboard authors should
+    // be moving to system stores
     ReportCompilerMessage(KmnCompilerMessages::WARN_HeaderStatementIsDeprecated);
   }
 }
+
+void kmcmp::WarnDeprecatedValueFormat() {
+  if (AWarnDeprecatedCode_GLOBAL_LIB) {
+    // We warn on this for any keyboard version; keyboard authors should
+    // be moving to U+xxxx format
+    ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedValueFormat);
+  }
+}
+
+void kmcmp::WarnDeprecatedCompileTarget(PFILE_KEYBOARD fk, const KMX_WCHAR *compileTarget) {
+  if (AWarnDeprecatedCode_GLOBAL_LIB && fk->version >= VERSION_190) {
+    // We will warn on this for any keyboard version >= 19
+    ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedCompileTarget, {
+      /* compileTarget */ string_from_u16string(compileTarget)
+    });
+  }
+}
+
+void kmcmp::WarnDeprecatedStatement(PFILE_KEYBOARD fk, std::string const &statement, KMX_DWORD version, std::string const &versionString) {
+  if(AWarnDeprecatedCode_GLOBAL_LIB && fk->version >= version) {
+    ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedStatement, {statement, versionString});  // I3438
+  }
+}
+
 
 /* Flag presence of deprecated features */
 void kmcmp::CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {

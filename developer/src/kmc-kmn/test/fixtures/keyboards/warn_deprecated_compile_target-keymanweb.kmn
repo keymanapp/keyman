@@ -1,0 +1,9 @@
+store(&VERSION) '19.0'
+store(&NAME) 'warn_deprecated_compile_target-keymanweb'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+c $keymanweb: deprecated in v19 compiler, will not work in v20+, so always warn
+$keymanweb: + ' ' > 'hello'
