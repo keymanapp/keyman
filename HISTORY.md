@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.296 alpha 2026-09-30
+
+* fix(developer): handle missing `&name` store in package compiler (#16697)
+* fix(developer): handle out-of-range return values from `GetExitCodeProcess` (#16702)
+* fix(developer): handle .gitignore in npm-based installations of kmc-generate (#16686)
+* fix(developer): transform unpaired surrogates in editor to U+FFFD (#16694)
+* chore(web): allow to open guide example from TC artifacts (#16689)
+
 ## 19.0.295 alpha 2026-09-29
 
 * fix(mac): open config app from input method (#16676)
