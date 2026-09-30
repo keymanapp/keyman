@@ -736,7 +736,9 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 /**
- * Set the OSK menu item to Show
+ * Set the OSK menu item directly to Show rather than evaluating the current state.
+ * This is necessary in some scenarios because the isVisible state of the OSK will
+ * not be updated for the close operation until later.
  */
 - (void)updateOskMenuTextForClose {
   NSMenuItem *oskMenu = [self.menu itemWithTag:OSK_MENUITEM_TAG];
