@@ -63,12 +63,12 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
         } else {
           summary.failed++;
           const message = test.error ? `message='${e(test.error.message)}'` : '';
-          const details = test.error ? `\ndetails='${e(test.error.stack)}\n`: '';
+          const details = test.error ? `details='${e(test.error.stack)}'`: '';
 
           if(test.error?.actual !== undefined && test.error?.expected !== undefined) {
-            logger.log(`##teamcity[testFailed type='comparisonFailure' name='${e(test.name)}' ${e(message)}] ${e(details)} expected='${e(test.error?.expected)}' actual='${e(test.error?.actual)}']`);
+            logger.log(`##teamcity[testFailed type='comparisonFailure' name='${e(test.name)}' ${message} ${details} expected='${e(test.error?.expected)}' actual='${e(test.error?.actual)}']`);
           }
-          logger.log(`##teamcity[testFailed name='${e(test.name)}' ${e(message)}] ${e(details)}']`);
+          logger.log(`##teamcity[testFailed name='${e(test.name)}' ${message} ${details}]`);
         }
 
         logger.log(`##teamcity[testFinished name='${e(test.name)}' duration='${e(test.duration ?? 0)}']`);

@@ -1,18 +1,18 @@
 (*
   Name:             CharMapDropTool_TntCustomEdit
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      23 Aug 2006
 
   Modified Date:    24 Jul 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          23 Aug 2006 - mcdurdin - Initial version
                     18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
                     24 Jul 2015 - mcdurdin - I4796 - Refresh Keyman Developer look and feel for release
@@ -22,13 +22,14 @@ unit CharMapDropTool_TntCustomEdit;  // I3306   // I4796
 interface
 
 uses
-  Windows,
+  Winapi.Windows,
   CharacterDragObject,
   CharMapDropTool,
   CharMapInsertMode,
-  Controls,
-  Messages,
-  StdCtrls;
+  Vcl.ComCtrls,
+  Vcl.Controls,
+  Vcl.StdCtrls,
+  Winapi.Messages;
 
 type
   TCharMapDropToolControl_TntCustomEdit = class(TCharMapDropToolControl)
@@ -45,11 +46,21 @@ type
 implementation
 
 procedure TCharMapDropToolControl_TntCustomEdit.Drag(AObject: TCharacterDragObject; X, Y: Integer; var Accept: Boolean);
+var
+  pt: TPOINTL;
 begin
-  Accept := (X > 0) and (Y > 0) and ((Control is TCustomEdit) or (Control is TCustomMemo));
+  // TCustomEdit is ancestor of TCustomMemo, TCustomRichEdit
+  Accept := (X > 0) and (Y > 0) and (Control is TCustomEdit);
   if Accept then
   begin
-    Edit.SelStart := SendMessage(Edit.Handle, EM_CHARFROMPOS, 0, MAKELONG(X, Y))
+    if  Control is TCustomRichEdit then
+    begin
+      pt.x := X;
+      pt.y := Y;
+      Edit.SelStart := SendMessage(Edit.Handle, EM_CHARFROMPOS, 0, LPARAM(@pt));
+    end
+    else
+      Edit.SelStart := LOWORD(SendMessage(Edit.Handle, EM_CHARFROMPOS, 0, MAKELONG(X, Y)));
   end;
 end;
 

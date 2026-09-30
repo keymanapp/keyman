@@ -39,9 +39,14 @@
   [self.window setMaxSize:NSMakeSize(size.width*1.6, size.height*1.6)];
   [self.window setMinSize:NSMakeSize(size.width*0.8, size.height*0.8)];
   [self.window setBackgroundColor:[NSColor colorWithSRGBRed:241.0/255.0 green:242.0/255.0 blue:242.0/255.0 alpha:1.0]];
-  
-  // # 1079: Versions of macOS prior to 10.10 do not support setting control size.
+
+  // #1079: Versions of macOS prior to 10.10 do not support setting control size.
   // Safest to just not add the help button at all on the OSK.
+
+  /* #16571 - disabling the help button in the title bar entirely for now as on Tahoe it
+              pushes the title over the window controls. The help is still accessible
+              through the menu. This is a stop-gap while we re-engineer this in a
+              future release.
   NSButton *helpBtn = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 17, 17)];
   if (helpBtn && [helpBtn respondsToSelector:@selector(setControlSize:)]) {
     _helpButton = helpBtn;
@@ -52,6 +57,7 @@
     [_helpButton setEnabled:[self hasHelpDocumentation]];
     [self.window addViewToTitleBar:_helpButton positionX:NSWidth(self.window.frame) - NSWidth(_helpButton.frame) -10];
   }
+  */
 }
 
 - (void)windowDidLoad {
@@ -74,7 +80,7 @@
 - (void)windowWillClose:(NSNotification *)notification {
   os_log_debug([KMLogs oskLog], "OSKWindowController windowWillClose");
   [KMSettingsRepository.shared writeShowOskOnActivate:NO];
-  
+
   // whenever the OSK is closing clear all of its modifier keys
   [self.oskView clearOskModifiers];
   [KMSentryHelper addOskVisibleTag:NO];
@@ -84,12 +90,12 @@
   NSString *kvkPath = [self AppDelegate].kvk.filePath;
   if (!kvkPath)
     return;
-  
+
   NSString *packagePath = [kvkPath stringByDeletingLastPathComponent];
   if (packagePath != nil) {
     if (self.AppDelegate.kbHelpWindow_.window != nil)
       [self.AppDelegate.kbHelpWindow_ close];
-    
+
     [self.AppDelegate.kbHelpWindow.window centerInParent];
     [self.AppDelegate.kbHelpWindow.window makeKeyAndOrderFront:nil];
     [self.AppDelegate.kbHelpWindow.window setLevel:NSFloatingWindowLevel];
@@ -142,7 +148,7 @@
  */
 - (void)timerAction:(NSTimer *)timer {
   UInt32 modifiers = GetCurrentKeyModifiers();
-  
+
   [self trackPhysicalShiftKeyState: modifiers];
   [self trackPhysicalOptionKeyState: modifiers];
   [self trackPhysicalControlKeyState: modifiers];
@@ -195,7 +201,7 @@
   if (!kvkPath) {
     return NO;
   }
-  
+
   NSString *packagePath = [kvkPath stringByDeletingLastPathComponent];
   if (packagePath != nil) {
     NSString *welcomeFile = [packagePath stringByAppendingPathComponent:@"welcome.htm"];
@@ -203,7 +209,7 @@
       return YES;
     }
   }
-  
+
   return NO;
 }
 
