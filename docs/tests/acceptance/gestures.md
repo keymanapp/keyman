@@ -1,7 +1,5 @@
 # Gestures Acceptance Tests
 
-Generated from the numbered HTML/JSON regression-test export.
-
 **TEST_288**
 
 Test case for 10_KEY_DIACRITICS,

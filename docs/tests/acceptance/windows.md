@@ -1,7 +1,5 @@
 # Windows Acceptance Tests
 
-Generated from the numbered HTML/JSON regression-test export.
-
 **TEST_61**
 
 feat(windows): add right modifier included in hotkey optional functionality #12259(TEST_LANGUAGE_HOTKEYS_LEFT_SIDE)

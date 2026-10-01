@@ -1,7 +1,5 @@
 # Linux Acceptance Tests
 
-Generated from the numbered HTML/JSON regression-test export.
-
 **TEST_91**
 
 KMX_PROCESSOR_COMPLIANT_TEST_CONTROL_1_GROUP_LINUX: gedit

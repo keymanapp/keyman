@@ -13,6 +13,8 @@ Each test has three main sections, with step-by-step instructions:
 `Cleanup` – restores the environment to its original state.
 
 ## History
-There was for a time period a test team operated external to Keyman development team they used a test suite program to manage and run these acceptance tests.
-The test team added to the tests as new features and bug corrections where made to help give good coverage of the products.
-These where extracted on the 12th May 2026. Then converted back into the markdown format that matches the Keyman "User Testing" syntax on Github. The have been placed in /docs/tests/acceptance in the keyman github repo.
+For a period of time, a test team operated separately to the Keyman development team. They used a test suite application to manage and run these acceptance tests.
+
+The test team added to the test suite as new features were introduced and bugs were fixed, helping to provide good coverage of the products.
+
+The tests were extracted on the 12th of May 2026 and converted back into Markdown format to match the Keyman User Testing syntax used on GitHub. They have been placed in /docs/tests/acceptance in the `keyman` GitHub repository.

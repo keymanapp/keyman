@@ -1,6 +1,4 @@
-# MAC Acceptance Tests
-
-Generated from the numbered HTML/JSON regression-test export.
+# macOS Acceptance Tests
 
 **TEST_233**
 

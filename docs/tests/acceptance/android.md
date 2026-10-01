@@ -1,7 +1,5 @@
 # Android Acceptance Tests
 
-Generated from the numbered HTML/JSON regression-test export.
-
 **TEST_347**
 
 Add back button to "Adjust Keyboard Height "menu

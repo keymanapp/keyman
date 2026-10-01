@@ -1,6 +1,4 @@
-# IOS Acceptance Tests
-
-Generated from the numbered HTML/JSON regression-test export.
+# iOS Acceptance Tests
 
 **TEST_356**
 

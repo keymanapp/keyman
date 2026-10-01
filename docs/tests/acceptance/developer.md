@@ -1,7 +1,5 @@
 # Developer Acceptance Tests
 
-Generated from the numbered HTML/JSON regression-test export.
-
 **TEST_339**
 
 Evaluate and apply npm audit fix (without forced changes)

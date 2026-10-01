@@ -1,7 +1,5 @@
 # Web Acceptance Tests
 
-Generated from the numbered HTML/JSON regression-test export.
-
 **TEST_334_334**
 
 Cancel flicks when both returning to and releasing at original tap location_TEST_FLICK_GENERAL_USE
