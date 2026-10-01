@@ -80,7 +80,7 @@ function do_carthage() {
 
   # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
   # which affects the sentry-cocoa dependency.
-  carthage build --use-xcframeworks --no-use-binaries --platform iOS || carthage_die "Carthage dependency loading failed"
+  XCODE_XCCONFIG_FILE="$KEYMAN_ROOT/ios/override.xcconfig" carthage build --use-xcframeworks --no-use-binaries --platform iOS || carthage_die "Carthage dependency loading failed"
 
   popd > /dev/null
 }
