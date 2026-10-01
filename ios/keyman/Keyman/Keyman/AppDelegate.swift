@@ -12,10 +12,8 @@ import WebKit
 import Sentry
 import os.log
 
-@UIApplicationMain
+@main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
-  private var _overlayWindow: UIWindow?
   private var _adhocDirectory: URL?
 
   var window: UIWindow?
@@ -60,43 +58,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-    SentryManager.start()
-    // Forces the logs to initialize, as their definitions result in lazy init.
-    // These references have been configured to also log app details.
-
-    // In iOS 15, navigation bars become transparent by default when the edge
-    // of the scrollable content aligns with the edge of the navigation bar.
-    // Force the appearance back to the pre-iOS 15 default behavior.
-    UINavigationBar.appearance().scrollEdgeAppearance = UINavigationBarAppearance()
     
-    UniversalLinks.externalLinkLauncher = { url in
-      UIApplication.shared.open(url)
-    }
-
-    Manager.applicationGroupIdentifier = "group.KM4I"
-
-    // TODO:  Assign a subclassed version of InputViewController that implements the image stuff.
-    Manager.shared.inputViewController = KeyboardViewController(forSystem: false)
-
-    window = UIWindow(frame: UIScreen.main.bounds)
-
-    // Initialize overlayWindow
-    _ = overlayWindow
-
-    // Override point for customization after application launch.
-    viewController = MainViewController()
-    let navigationController = UINavigationController(rootViewController: viewController)
-
-    // Navigation bar became translucent by default in iOS7 SDK, however we don't want it to be translucent.
-    navigationController.navigationBar.isTranslucent = false
-
-    window!.rootViewController = navigationController
-    window!.makeKeyAndVisible()
-
-    // TODO: look in documents directory for .zip / .kmp files
-    // TODO: OR browse documents Dir from new keyboard window
-    // self.installAdhocKeyboard(filePath: "")
-
+    SentryManager.start()
     return true
   }
 
@@ -149,41 +112,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     return false
-  }
-
-  func applicationDidEnterBackground(_ application: UIApplication) {
-    _overlayWindow = nil
-    FontManager.shared.unregisterCustomFonts()
-    
-    viewController?.saveTextSettings()
-  }
-
-  func applicationWillEnterForeground(_ application: UIApplication) {
-    perform(#selector(self.registerCustomFonts), with: nil, afterDelay: 1.0)
-  }
-
-  var overlayWindow: UIWindow {
-    if _overlayWindow == nil {
-      _overlayWindow = UIWindow(frame: UIScreen.main.bounds)
-      _overlayWindow!.rootViewController = UIViewController()
-      _overlayWindow!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      _overlayWindow!.autoresizesSubviews = true
-      _overlayWindow!.backgroundColor = UIColor(white: 0.0, alpha: 0.75)
-      _overlayWindow!.windowLevel = UIWindow.Level.statusBar + 1
-      _overlayWindow!.isUserInteractionEnabled = true
-      _overlayWindow!.isHidden = true
-    }
-
-    // Workaround to display overlay window above keyboard
-    let windows = UIApplication.shared.windows
-    if let lastWindow = windows.last {
-      _overlayWindow!.windowLevel = lastWindow.windowLevel + 1
-    }
-    return _overlayWindow!
-  }
-
-  @objc func registerCustomFonts() {
-    FontManager.shared.registerCustomFonts()
   }
 
   class func activeUserDefaults() -> UserDefaults {

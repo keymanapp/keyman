@@ -67,7 +67,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var keyboardPickerDismissedObserver: NotificationObserver?
   private var keyboardChangedObserver: NotificationObserver?
   private var keyboardRemovedObserver: NotificationObserver?
-  
+
   var shouldKeyboardBeVisible: Bool {
     return navigationController?.visibleViewController == self
   }
@@ -77,7 +77,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   var overlayWindow: UIWindow! {
-    return appDelegate?.overlayWindow
+    guard let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate else {
+      return nil
+    }
+
+    return sceneDelegate.overlayWindow
   }
 
   convenience init() {
@@ -116,7 +120,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       forName: Notifications.keyboardRemoved,
       observer: self,
       function: MainViewController.keyboardRemoved)
-    
+
     NotificationCenter.default.addObserver(
       forName: UIApplication.willEnterForegroundNotification,
       object: nil,
@@ -191,7 +195,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         // no textSize saved in UserDefaults, so use default size
         self.textSize = self.calculateDefaultTextSize()
       }
-    
+
       // default to system font so that we have a non-nil font that allows us to set size
       self.textView.font = UIFont.systemFont(ofSize: textSize)
 
@@ -212,7 +216,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       defaultIPhoneTextSize : defaultIPadTextSize
     return defaultSize
   }
-  
+
   private func constructAndAddInfoView() {
     // Setup Info View
     infoView = InfoViewController {

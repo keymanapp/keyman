@@ -71,7 +71,7 @@ class KeymanWebViewController: UIViewController {
   init(storage: Storage) {
     self.storage = storage
     self.schemeHandler = WebViewSchemeHandler(storage: storage)
-    
+
     super.init(nibName: nil, bundle: nil)
     _ = view
   }
@@ -120,14 +120,22 @@ class KeymanWebViewController: UIViewController {
   override func loadView() {
     let config = WKWebViewConfiguration()
     let prefs = WKPreferences()
-    prefs.javaScriptEnabled = true
+
+    let pagePrefs = WKWebpagePreferences()
+    pagePrefs.allowsContentJavaScript = true
+
+    // Explicitly grant universal context to custom scheme pipelines
     config.preferences = prefs
+    config.defaultWebpagePreferences = pagePrefs
+
     config.suppressesIncrementalRendering = false
     config.userContentController = self.userContentController
     config.setURLSchemeHandler(schemeHandler, forURLScheme: schemeHandler.scheme)
 
     webView = KeymanWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
-    webView!.isOpaque = false
+
+    // Keep this:  it's actually making a difference in background color visibility.
+    webView!.isOpaque = true
     webView!.translatesAutoresizingMaskIntoConstraints = false
     webView!.backgroundColor = UIColor.clear
     webView!.navigationDelegate = self
@@ -295,7 +303,7 @@ extension KeymanWebViewController {
     let loadingURL = schemeHandler.buildUrlForFile(
       fileURL: storage.keyboardURL(for: keyboard)
     )
-    
+
     var stub: [String: Any] = [
       "KI": "Keyboard_\(keyboard.id)",
       "KN": keyboard.name,
@@ -303,7 +311,7 @@ extension KeymanWebViewController {
       "KL": keyboard.languageName,
       "KF": loadingURL.absoluteString
     ]
-    
+
     if let packageID = keyboard.packageID {
       stub["KP"] = packageID
     }
@@ -597,6 +605,15 @@ extension KeymanWebViewController: WKNavigationDelegate {
     guard url.lastPathComponent == Resources.kmwFilename && (url.fragment?.isEmpty ?? true) else {
       return
     }
+
+    print("Is hidden: \(webView.isHidden)")
+    print("Alpha value: \(webView.alpha)")
+    print("View frame size: \(webView.frame.size)")
+    print("Window object exists: \(webView.window != nil)")
+
+    // Ensure it's explicitly pulled to the top of the stack
+    webView.superview?.bringSubviewToFront(webView)
+
     keyboardLoaded(self)
     delegate?.keyboardLoaded(self)
   }
