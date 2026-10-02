@@ -198,6 +198,9 @@ describe('KmnCompilerMessages', function () {
 
   it('should generate ERROR_VirtualKeyInContext if a virtual key is found in the context part of a rule', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_in_context.kmn'], KmnCompilerMessages.ERROR_VirtualKeyInContext);
+    await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_in_context-any.kmn'], KmnCompilerMessages.ERROR_VirtualKeyInContext);
+    await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_in_context-index.kmn'], KmnCompilerMessages.ERROR_VirtualKeyInContext);
+    await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_in_context-notany.kmn'], KmnCompilerMessages.ERROR_VirtualKeyInContext);
   });
 
   // WARN_TouchLayoutUnidentifiedKey
@@ -217,6 +220,7 @@ describe('KmnCompilerMessages', function () {
 
   it('should generate WARN_VirtualKeyInOutput if a virtual key is found in the output part of a rule', async function() {
     await testForMessage(this, ['invalid-keyboards', 'warn_virtual_key_in_output.kmn'], KmnCompilerMessages.WARN_VirtualKeyInOutput);
+    await testForMessage(this, ['invalid-keyboards', 'warn_virtual_key_in_output-index.kmn'], KmnCompilerMessages.WARN_VirtualKeyInOutput);
   });
 
   // ERROR_OutsTooLong
