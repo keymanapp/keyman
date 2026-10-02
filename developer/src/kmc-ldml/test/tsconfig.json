@@ -5,7 +5,6 @@
       "rootDir": ".",
       "rootDirs": ["./", "../src/"],
       "outDir": "../build/test",
-      "baseUrl": ".",
       "strictNullChecks": false, // TODO: get rid of this as some point
     },
   "include": [

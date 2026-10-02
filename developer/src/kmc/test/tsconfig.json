@@ -5,7 +5,6 @@
     "rootDir": ".",
     "rootDirs": ["./", "../src/"],
     "outDir": "../build/test",
-    "baseUrl": ".",
   },
   "include": [
     "**/*.tests.ts",

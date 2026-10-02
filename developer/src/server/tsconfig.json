@@ -6,7 +6,6 @@
     "sourceMap": true,
     "outDir": "build/src/",
     "rootDir": "src/",
-    "baseUrl": ".",
 
     "declaration": true,
     "alwaysStrict": true,

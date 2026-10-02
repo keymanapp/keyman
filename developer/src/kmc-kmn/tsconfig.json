@@ -4,7 +4,6 @@
   "compilerOptions": {
     "outDir": "build/src/",
     "rootDir": "src/",
-    "baseUrl": ".",
     "allowJs": true,
     "preserveConstEnums": true,
   },
