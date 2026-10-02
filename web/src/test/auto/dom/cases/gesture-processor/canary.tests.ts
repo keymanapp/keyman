@@ -22,7 +22,7 @@ describe("'Canary' checks", function() {
     let loc = document.location;
     // config.testFile generally starts with a '/', with the path resembling the actual full local
     // filesystem for the drive.
-    domain = `${loc.protocol}/${loc.host}`
+    domain = `${loc.protocol}//${loc.host}`;
 
     // Test-config setups will take care of the rest; the server-path will be rooted at the repo root.
     // With aliasing for resources/.

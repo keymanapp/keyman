@@ -13,7 +13,7 @@ export let DEVICE_DETECT_FAILURE = false;
 const loc = document.location;
 // config.testFile generally starts with a '/', with the path resembling the actual full local
 // filesystem for the drive.
-const domain = `${loc.protocol}/${loc.host}`
+const domain = `${loc.protocol}//${loc.host}`;
 
 // If we've set things up to support Device dection without loading KMW...
 try {

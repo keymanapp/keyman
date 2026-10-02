@@ -17,5 +17,9 @@ export function getKeymanRoot(): string {
 }
 
 export function getWebTestResourcesPath(): string {
-  return getKeymanRoot() + '/web/src/test/auto/resources';
+  return `${getKeymanRoot()}web/src/test/auto/resources`;
+}
+
+export function getPredictiveTextWorkerPath(): string {
+  return `${getKeymanRoot()}web/build/publish/debug/worker-thread.js`;
 }

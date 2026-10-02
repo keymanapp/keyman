@@ -1,3 +1,10 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * NodePredictiveTextWorker mirrors the necessary interfaces for
+ * WebPredictiveTextWorker in Node. It is used only for unit tests.
+ */
+
 // We use a subset of the Worker interface here; compiling directly against the true
 // WebWorker type definitions would require us to implement more methods than we do.
 /// <reference path="../worker-interface.d.ts" />
@@ -7,10 +14,13 @@ import * as worker from 'node:worker_threads';
 import { Buffer } from 'node:buffer';
 import { URL } from 'node:url';
 
+
 /**
  * Defines mappings from Node Worker signatures to WebWorker signatures
+ *
+ * TODO: move this to a separate module, no need for it to be embedded string
  */
-const nodeWorkerToWebWorkerMappingSource = `
+const nodeWorkerToWebWorkerMappingSource = (filename: string) => (`
 import { parentPort } from 'node:worker_threads';
 import fs from 'node:fs';
 import vm from 'node:vm';
@@ -42,37 +52,24 @@ function importScripts(...args) {
 const self = globalThis;
 self.postMessage = postMessage;
 self.importScripts = importScripts;
-`;
+self.self = self; // make it global!
+// Start off by importing the main worker itself
+importScripts(${JSON.stringify(filename)});
+`);
 
 /**
  * Uses the Node version of Workers to provide proper, authentic separate-thread
  * 'sandboxing'.  Also intercepts and interprets certain WebWorker method signatures
  * necessary to run the WebWorker-oriented worker code.
- *
- * Alternatively, only after writing this did I discover this package:
- * https://github.com/developit/web-worker.  They also ran one notable issue I did:
- * Node 18.x, at least, does not support use of Node Blobs for construction of a
- * Worker: https://github.com/developit/web-worker/pull/32... unlike Web Workers.
- *
- * So... Base64-encoded Data URLs it is.
- *
- * What we have here is perfectly fine for now, but if we need more complicated
- * cross-platform Worker support in the future, it may be wise to swap to use of
- * that package.
  */
-export class MappedWorker extends worker.Worker implements Worker {
-  constructor(scriptStr: string) {
-    const concatenatedScript = `
-    ${nodeWorkerToWebWorkerMappingSource}
-
-    ${scriptStr}
-    `;
-    const buffer = Buffer.from(concatenatedScript);
+export class NodePredictiveTextWorker extends worker.Worker implements Worker {
+  constructor(workerFilename: string) {
+    const buffer = Buffer.from(nodeWorkerToWebWorkerMappingSource(workerFilename));
     const dataSrc = "data:text/javascript;base64," + buffer.toString('base64');
     //@ts-ignore
     super(new URL(dataSrc));
 
-    // WebWorkers have a defined `onmessage` function, rather than this.on('message', ...)
+    // Workers have a defined `onmessage` function, rather than this.on('message', ...)
     this.on('message', (ev) => {
       if(this.onmessage) {
         this.onmessage({data: ev[0]});

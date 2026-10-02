@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 
-import { LMLayer, WebWorker }   from "@keymanapp/lexical-model-layer/web";
+import { LMLayer, WebPredictiveTextWorkerFactory } from "@keymanapp/lexical-model-layer/web";
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
-import { defaultCapabilities } from '../helpers.mjs';
+import { defaultCapabilities, predictiveTextWorkerFilename } from '../helpers.mjs';
 
 // Import assertions, even using 'with', aren't yet supported in Firefox's engine.
 // import hazelModel from '@keymanapp/common-test-resources/json/models/future_suggestions/i_got_distracted_by_hazel.json' with { type: 'json' };
@@ -17,7 +17,7 @@ describe('LMLayer using the trie model', function () {
 
   before(async () => {
     let loc = document.location;
-    domain = `${loc.protocol}/${loc.host}`;
+    domain = `${loc.protocol}//${loc.host}`;
 
     // Test-config setups will take care of the rest; the server-path will be rooted at the repo root.
     // With aliasing for resources/.
@@ -29,7 +29,7 @@ describe('LMLayer using the trie model', function () {
       // Parameter 3 = true:  enables 'test mode', disables correction-search timeout.
       // This helps prevent the correction-search timeout from flaking out periodically during unit tests in
       // CI, since remote servers / devices are involved.
-      var lmLayer = new LMLayer(defaultCapabilities, WebWorker.constructInstance(), true);
+      var lmLayer = new LMLayer(defaultCapabilities, (new WebPredictiveTextWorkerFactory(predictiveTextWorkerFilename)).constructInstance(), true);
 
       // We're testing many as asynchronous messages in a row.
       // this would be cleaner using async/await syntax, but
@@ -71,7 +71,7 @@ describe('LMLayer using the trie model', function () {
     //
     // https://community.software.sil.org/t/search-term-to-key-in-lexical-model-not-working-both-ways-by-default/3133
     it('should use the default searchTermToKey()', function () {
-      var lmLayer = new LMLayer(defaultCapabilities, WebWorker.constructInstance(), /* testMode */ true);
+      var lmLayer = new LMLayer(defaultCapabilities, (new WebPredictiveTextWorkerFactory(predictiveTextWorkerFilename)).constructInstance(), /* testMode */ true);
 
       let loc = document.location;
       return lmLayer.loadModel(
