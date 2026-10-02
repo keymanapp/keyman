@@ -845,7 +845,8 @@ var
 begin
   BUpdateSM := TUpdateStateMachine.Create(False);
   try
-    BUpdateSM.HandleCheck;
+    // User initiated manual check
+    BUpdateSM.HandleCheck(True);
   finally
     BUpdateSM.Free;
   end;
