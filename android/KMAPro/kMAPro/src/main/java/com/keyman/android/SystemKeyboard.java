@@ -172,24 +172,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     Context appContext = getApplicationContext();
     // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
     inputType = attribute.inputType;
-    KMManager.setPredictionsSuspended(inputType, KeyboardType.KEYBOARD_TYPE_SYSTEM);
-    if (KMManager.getPredictionsSuspended(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
-      KMManager.setBannerOptions(false);
-      // Set the system keyboard HTML banner
-      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM, isDarkMode());
-    } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
-      // Check if predictions needs to be re-enabled per Settings preference
-      Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
-      if (kbInfo != null) {
-        String langId = kbInfo.getLanguageID();
-        SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        int maySuggest = prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(langId), KMManager.KMDefault_Suggestion);
-        // Enable banner if maySuggest is not SuggestionType.SUGGESTIONS_DISABLED (0)
-        KMManager.setBannerOptions(maySuggest != SuggestionType.SUGGESTIONS_DISABLED.toInt());
-      } else {
-        KMManager.setBannerOptions(false);
-      }
-    }
+    KMManager.setSuggestionType(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.defaultSuggestionModeForInputType(inputType));
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM, isDarkMode());
 
     // Determine special handling for ENTER key
     KMManager.setEnterMode(attribute.imeOptions, inputType);
