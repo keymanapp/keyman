@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.253 stable 2026-10-02
+
+* fix(mac): disable the help button entirely in the title bar of OSK (#16680)
+
 ## 18.0.252 stable 2026-09-22
 
 * change(android): use webview asset loader (#16628)
