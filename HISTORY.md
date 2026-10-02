@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.297 alpha 2026-10-02
+
+* fix(windows): add warning when system startup disabled (#16603)
+* docs(windows): add startup app disabled warning help (#16695)
+
 ## 19.0.296 alpha 2026-09-30
 
 * fix(developer): handle missing `&name` store in package compiler (#16697)
