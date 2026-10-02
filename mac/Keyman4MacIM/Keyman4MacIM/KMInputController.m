@@ -148,10 +148,20 @@ KMInputMethodEventHandler* _eventHandler;
   NSInteger itag = mItem.tag;
   os_log_debug([KMLogs uiLog], "Keyman menu item selected - tag: %lu", itag);
   if (itag == OSK_MENUITEM_TAG) {
-    [KMSentryHelper addUserBreadCrumb:@"menu" message:@"On-screen Keyboard menu selected"];
-    [KMSettingsRepository.shared writeShowOskOnActivate:YES];
-    os_log_debug([KMLogs oskLog], "menuAction OSK_MENUITEM_TAG, updating settings writeShowOsk to YES");
-    [self.appDelegate showOSK];
+    // hide the OSK if it is currently visible; if not, show it
+    if ([self.appDelegate.oskWindow.window isVisible]) {
+      [KMSentryHelper addUserBreadCrumb:@"menu" message:@"OSK menu: Hiding On-screen Keyboard"];
+      os_log_debug([KMLogs oskLog], "menuAction OSK_MENUITEM_TAG, hiding OSK");
+      
+      [KMSettingsRepository.shared writeShowOskOnActivate:NO];
+      [self.appDelegate.oskWindow.window performClose:sender];
+    } else {
+      [KMSentryHelper addUserBreadCrumb:@"menu" message:@"OSK menu: Showing On-screen Keyboard"];
+      os_log_debug([KMLogs oskLog], "menuAction OSK_MENUITEM_TAG, showing OSK");
+      
+      [KMSettingsRepository.shared writeShowOskOnActivate:YES];
+      [self.appDelegate showOSK];
+    }
   }
   else if (itag == CONFIG_MENUITEM_TAG) {
     [KMSentryHelper addUserBreadCrumb:@"menu" message:@"Configuration menu selected"];
