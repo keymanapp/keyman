@@ -1,0 +1,9 @@
+store(&VERSION) '19.0'
+store(&NAME) 'warn_deprecated_compile_target-keymanonly'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+c $keymanonly: deprecated in v19 compiler, will not work in v20+, so always warn
+$keymanonly: + ' ' > 'hello'

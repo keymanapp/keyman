@@ -1,0 +1,9 @@
+store(&VERSION) '19.0'
+store(&NAME) 'warn_header_statement_is_deprecated-copyright'
+COPYRIGHT "SIL Global"
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ ' ' > 'hello'

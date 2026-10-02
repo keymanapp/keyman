@@ -1,0 +1,9 @@
+store(&VERSION) '10.0'
+store(&NAME) 'warn_deprecated_value_format-decimal'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+c d### deprecated in v19 compiler, so always warn regardless of target version
++ ' ' > d160

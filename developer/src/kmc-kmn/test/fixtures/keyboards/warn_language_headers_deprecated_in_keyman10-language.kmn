@@ -1,0 +1,9 @@
+store(&VERSION) "19.0"
+store(&NAME) 'warn_language_headers_deprecated_in_keyman10-language'
+store(&LANGUAGE) "x401"
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ ' ' > 'hello'
