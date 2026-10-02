@@ -52,7 +52,7 @@ export function determineModelWordbreaker(model: LexicalModel): (context: Contex
       // We're either relying on defaults or on the 14.0+ wordbreaker spec.
       let wordbreaker = model.wordbreaker || wordBreakers.default;
 
-      return models.wordbreak(wordbreaker, context);
+      return models.wordbreak(wordBreakers.sanitizeResults(wordbreaker), context);
       /* c8 ignore start */
     } else {
       // 1.  This model does not provide a model following the 14.0+ wordbreaking spec
@@ -69,7 +69,7 @@ export function determineModelWordbreaker(model: LexicalModel): (context: Contex
 export function determineModelTokenizer(model: LexicalModel) {
   return (context: Context) => {
     if(model.wordbreaker) {
-      return models.tokenize(model.wordbreaker, context);
+      return models.tokenize(wordBreakers.sanitizeResults(model.wordbreaker), context);
     } else {
       return null;
     }
