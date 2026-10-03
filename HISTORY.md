@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.298 alpha 2026-10-03
+
+* chore(linux): update Debian standards version (#16714)
+
 ## 19.0.297 alpha 2026-10-02
 
 * fix(windows): add warning when system startup disabled (#16603)
