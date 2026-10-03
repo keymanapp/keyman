@@ -412,8 +412,19 @@ describe('KmnCompilerMessages', function () {
   // WARN_LanguageHeadersDeprecatedInKeyman10
 
   ['ethnologuecode', 'language', 'windowslanguages'].forEach(storeName =>
-    it(`should generate WARN_LanguageHeadersDeprecatedInKeyman10 if the contains deprecated system store "&${storeName}`, async function() {
+    it(`should generate WARN_LanguageHeadersDeprecatedInKeyman10 if the file contains deprecated system store "&${storeName}"`, async function() {
       await testForMessage(this, ['keyboards', `warn_language_headers_deprecated_in_keyman10-${storeName}.kmn`], KmnCompilerMessages.WARN_LanguageHeadersDeprecatedInKeyman10);
+    })
+  );
+
+  // ERROR_StoreContainsUnsupportedStatement
+
+  ['any', 'index', 'clearcontext', 'fix', 'context', 'nul', 'use', 'return', 'beep', 'switch',
+   'call', 'contextex', 'notany', 'setopt',
+   'ifopt', 'baselayout', 'layer', 'platform',
+   'saveopt', 'resetopt', 'ifsystemstore', 'setsystemstore'].forEach(statement =>
+    it(`should generate ERROR_StoreContainsUnsupportedStatement if a store contains statement "${statement}"`, async function() {
+      await testForMessage(this, ['invalid-keyboards', `error_store_contains_unsupported_statement-${statement}.kmn`], KmnCompilerMessages.ERROR_StoreContainsUnsupportedStatement);
     })
   );
 });
