@@ -139,6 +139,7 @@ KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, i
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode);
 KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &targets);
+KMX_BOOL DoesStoreContainInvalidStatement(PKMX_WCHAR store);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -843,6 +844,11 @@ KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
     kmcmp::CodeConstants->reindex(); // has to be done after every character add due to possible use in another store.   // I4982
   }
 
+  if(DoesStoreContainInvalidStatement(sp->dpString)) {
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_StoreContainsUnsupportedStatement);
+    return FALSE;
+  }
+
   fk->cxStoreArray++;	// increment now, because GetXString refers to stores
 
   if (i > 0) {
@@ -1524,6 +1530,28 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
     }
   }
   return STATUS_Success;
+}
+
+/**
+ * Stores can contain only characters, deadkeys, and virtual keys (and `outs`).
+ * Note that `outs()` is expanded during read so there is no `CODE_OUTS`.
+ *
+ * @param store
+ * @return KMX_BOOL
+ */
+KMX_BOOL DoesStoreContainInvalidStatement(PKMX_WCHAR store) {
+  for (PKMX_WCHAR p = store; *p; p = incxstr(p)) {
+    if (*p == UC_SENTINEL) {
+      auto code = *(p + 1);
+      if(code == CODE_DEADKEY || code == CODE_EXTENDED) {
+        continue;
+      }
+
+      // No other codes are permitted; note, outs() does not have a code as it is expanded at compile time
+      return TRUE;
+    }
+  }
+  return FALSE;
 }
 
 /**
