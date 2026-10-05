@@ -8,6 +8,7 @@ import { LdmlCompilerMessages } from '@keymanapp/kmc-ldml';
 import { ModelCompilerMessages } from '@keymanapp/kmc-model';
 import { ModelInfoCompilerMessages } from '@keymanapp/kmc-model-info';
 import { PackageCompilerMessages } from '@keymanapp/kmc-package';
+import { TesterMessages } from '@keymanapp/kmc-test';
 import { InfrastructureMessages } from './infrastructureMessages.js';
 import { ConverterMessages } from '@keymanapp/kmc-convert';
 
@@ -26,6 +27,7 @@ const messageNamespaces: Record<CompilerErrorNamespace, any> = {
   [CompilerErrorNamespace.Copier]: CopierMessages,
   [CompilerErrorNamespace.Generator]: GeneratorMessages,
   [CompilerErrorNamespace.Converter]: ConverterMessages,
+  [CompilerErrorNamespace.Tester]: TesterMessages,
 };
 
 // This works around pain points in enumerating enum members in Typescript
@@ -52,4 +54,5 @@ export const messageSources: Record<CompilerErrorNamespace, CompilerMessageSourc
   [CompilerErrorNamespace.ModelInfoCompiler]:    { module: 'kmc-model-info',    class: ModelInfoCompilerMessages },
   [CompilerErrorNamespace.KeyboardInfoCompiler]: { module: 'kmc-keyboard-info', class: KeyboardInfoCompilerMessages },
   [CompilerErrorNamespace.Converter]:            { module: 'kmc-convert',       class: ConverterMessages },
+  [CompilerErrorNamespace.Tester]:               { module: 'kmc-tester',        class: TesterMessages },
 };
