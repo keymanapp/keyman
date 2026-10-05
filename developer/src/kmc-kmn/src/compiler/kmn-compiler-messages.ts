@@ -912,12 +912,6 @@ export class KmnCompilerMessages {
     square brackets, control characters, or Unicode non-characters.`
   );
 
-  static WARN_DeprecatedStatement                             = SevWarn | 0x0BB;
-  static Warn_DeprecatedStatement                             = (o: KmcmpLibMessageParameters) => mc(
-    this.WARN_DeprecatedStatement,
-    `The statement '${def(o.p?.[0])}' was deprecated in Keyman ${def(o.p?.[1])} and is scheduled to be removed in Keyman 20.`,
-  );
-
   static WARN_DeprecatedValueFormat                           = SevWarn | 0x0BC;
   static Warn_DeprecatedValueFormat                           = () => mc(
     this.WARN_DeprecatedValueFormat,

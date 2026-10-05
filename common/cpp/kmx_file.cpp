@@ -38,9 +38,9 @@ const int CODE__SIZE[] = {
     -1,  // unused                   0x09
     2,   // CODE_EXTENDED            0x0A
     -1,  // CODE_EXTENDEDEND         0x0B (unused)
-    1,   // CODE_SWITCH              0x0C (unused, marked as such in 19.0)
-    -1,  // CODE_KEY                 0x0D (unused, marked as such in 19.0)
-    0,   // CODE_CLEARCONTEXT        0x0E (deprecated in 19.0)
+    1,   // CODE_SWITCH              0x0C (unused, removed in 19.0)
+    -1,  // CODE_KEY                 0x0D (unused, removed in 19.0)
+    0,   // CODE_CLEARCONTEXT        0x0E (unused, removed in 19.0)
     1,   // CODE_CALL                0x0F
     -1,  // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
     1,   // CODE_CONTEXTEX           0x11

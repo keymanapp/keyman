@@ -1165,7 +1165,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     else if (u16ncmp(p, u"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
     else if (u16ncmp(p, u"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
     else if (u16ncmp(p, u"17.0", 4) == 0)  fk->version = VERSION_170; // Flicks and gestures
-    else if (u16ncmp(p, u"19.0", 4) == 0)  fk->version = VERSION_190; // Deprecations - fix, clearcontext
+    else if (u16ncmp(p, u"19.0", 4) == 0)  fk->version = VERSION_190; // Deprecations - compile targets $keymanonly, $keymanweb
 
     else {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidVersion);
@@ -1664,9 +1664,9 @@ const KMX_BOOL CODE__IS_TEXTUAL[] = {
   -1,     // unused                   0x09
   TRUE,   // CODE_EXTENDED            0x0A
   -1,     // CODE_EXTENDEDEND         0x0B (unused)
-  FALSE,  // CODE_SWITCH              0x0C
-  -1,     // CODE_KEY                 0x0D (never used)
-  FALSE,  // CODE_CLEARCONTEXT        0x0E (deprecated in 19.0)
+  FALSE,  // CODE_SWITCH              0x0C (unused, removed in 19.0)
+  -1,     // CODE_KEY                 0x0D (unused, removed in 19.0)
+  FALSE,  // CODE_CLEARCONTEXT        0x0E (unused, removed in 19.0)
   FALSE,  // CODE_CALL                0x0F // may trigger text effects but indirectly
   -1,     // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
   TRUE,   // CODE_CONTEXTEX           0x11
@@ -2236,13 +2236,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
     ErrChr = (int)(p - str) + offset + 1;
 
-    /*
-    char *tokenTypes[] = {
-      "clearcontext", "deadkey", "context", "return", "switch",
-      "index", "outs", "beep", "nul", "use", "any", "fix", "dk", "k_", "x", "d", "c",
-      "[", "]" };
-    */
-
     switch (towupper(*p))
     {
     case 'X':
@@ -2253,7 +2246,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 'B':  type = 4; break;		// beep, baselayout (synonym for if(&baselayout))  // I3430
     case 'I':  type = 5; break;		// index(s,n), if
     case 'O':  type = 6; break;		// outs(s)
-    case 'C':  type = 7; break;		// context, comments, clearcontext, call(s)
+    case 'C':  type = 7; break;		// context, comments, call(s)
     case 'N':  type = 8; break;		// nul, notany
     case 'U':  type = 9; break;		// use(g)
     case 'R':  type = 10; break;	// return, reset
@@ -2261,7 +2254,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     //case ']':  type = 12; break;	// end of vkey section
     //case 'K':  type = 13; break;	// virtual key name or "key"
     case 'S':  type = 14; break;	// switch, set, save
-    case 'F':  type = 15; break;	// fix (synonym for clearcontext)
+    // 15 was 'F', for undocumented, unused statement 'fix'
     case '$':  type = 16; break;	// named code constants
     case 'P':  type = 17; break;  // platform (synonym for if(&platform))  // I3430
     case 'L':  type = 18; break;  // layer (synonym for set(&layer))  // I3437
@@ -2469,14 +2462,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
           tstr[mx++] = CODE_CONTEXT;
           tstr[mx] = 0;
         }
-      }
-      else if (u16nicmp(p, u"clearcontext", 12) == 0)
-      {
-        kmcmp::WarnDeprecatedStatement(fk, "clearcontext", VERSION_190, "19.0");
-        p += 12;
-        tstr[mx++] = UC_SENTINEL;
-        tstr[mx++] = CODE_CLEARCONTEXT;
-        tstr[mx] = 0;
       }
       else if (u16nicmp(p, u"call", 4) == 0)
       {
@@ -2783,27 +2768,8 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else
       {
-        if (u16nicmp(p, u"switch", 6) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
-        p += 6;
-        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidSwitch;
-        tstr[mx++] = UC_SENTINEL;
-        tstr[mx++] = CODE_SWITCH;
-        tstr[mx++] = atoiW(q);
-        tstr[mx] = 0;
-      }
-      continue;
-    case 15:
-      if (u16nicmp(p, u"fix", 3) == 0)
-      {
-        kmcmp::WarnDeprecatedStatement(fk, "fix", VERSION_190, "19.0");
-        p += 3;
-        tstr[mx++] = UC_SENTINEL;
-        tstr[mx++] = CODE_CLEARCONTEXT;
-        tstr[mx] = 0;
-      }
-      else
         return KmnCompilerMessages::ERROR_InvalidToken;
+      }
       continue;
     case 16:
       if(!VerifyKeyboardVersion(fk, VERSION_60)) {

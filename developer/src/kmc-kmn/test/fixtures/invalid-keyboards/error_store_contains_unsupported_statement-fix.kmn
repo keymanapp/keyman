@@ -1,9 +1,0 @@
-store(&NAME) 'error_store_contains_unsupported_statement-fix'
-store(&VERSION) '9.0'
-
-begin Unicode > use(main)
-
-group(main) using keys
-
-c ERROR_StoreContainsUnsupportedStatement; note fix undocumented, deprecated in v19
-store(bad-fix) fix

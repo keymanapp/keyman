@@ -31,13 +31,6 @@ void kmcmp::WarnDeprecatedCompileTarget(PFILE_KEYBOARD fk, const KMX_WCHAR *comp
   }
 }
 
-void kmcmp::WarnDeprecatedStatement(PFILE_KEYBOARD fk, std::string const &statement, KMX_DWORD version, std::string const &versionString) {
-  if(AWarnDeprecatedCode_GLOBAL_LIB && fk->version >= version) {
-    ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedStatement, {statement, versionString});  // I3438
-  }
-}
-
-
 /* Flag presence of deprecated features */
 void kmcmp::CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
   /*
