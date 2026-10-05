@@ -118,6 +118,28 @@ id testClient = nil;
   XCTAssertTrue(replacementInfo.replacementLength == 2, @"replacementLength should be 2");
 }
 
+- (void)testEvaluateReplacement_lowStoreLocation_correctReplacementLocation {
+  NSString *context = @"testxa";
+  NSUInteger storeLocation = 10;
+  NSUInteger deletionLength = 1;
+  NSUInteger locationOfDeletion = 5;
+  
+  ReplacementInfo replacementInfo = [testEventHandler evaluateForReplaceability: context textStoreLocation:storeLocation deleteLength:deletionLength locationOfDeletionTarget:locationOfDeletion];
+  
+  XCTAssertTrue(replacementInfo.replacementLocation==8, @"replacementLocation should be 8");
+}
+
+- (void)testEvaluateReplacement_highStoreLocation_correctReplacementLocation {
+  NSString *context = @"testxa";
+  NSUInteger storeLocation = 1000;
+  NSUInteger deletionLength = 1;
+  NSUInteger locationOfDeletion = 5;
+  
+  ReplacementInfo replacementInfo = [testEventHandler evaluateForReplaceability: context textStoreLocation:storeLocation deleteLength:deletionLength locationOfDeletionTarget:locationOfDeletion];
+  
+  XCTAssertTrue(replacementInfo.replacementLocation==998, @"replacementLocation should be 998");
+}
+
 // Uses Malar Tirhuta script
 - (void)testEvaluateReplacement_latinCharacterPrecededBySurrogatePair_replacementLengthThree {
   NSString *context = @"test.𑒏a";    // 𑒏 : U+1148F : TIRHUTA LETTER

@@ -363,7 +363,6 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
   
   if (!self.apiCompliance.canReadText) {
     os_log_debug([KMLogs keyTraceLog], "InputMethodEventHandler readContext, unable to read context: non-compliant app");
-    *outSelection = selectionRange;
     return contextString;
   }
 
@@ -605,7 +604,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 
   // guard: must have sufficient context
   if ([context length] <= output.textToDelete.length) {
-    os_log_error([KMLogs keyTraceLog], "cannot replace text, insufficient context");
+    os_log_debug([KMLogs keyTraceLog], "cannot replace text, insufficient context");
     return NO; // return without deleting/replacing
   }
 
