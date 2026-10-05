@@ -329,21 +329,26 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
  */
 -(void)reportContext:(NSEvent *)event forClient:(id) client {
   NSString *contextString = nil;
-  NSRange currentSelection;
   
   // if we can read the text, then get the context and send it to Core
   // we do this whether the context has changed or not
   if (self.apiCompliance.canReadText) {
-    contextString = [self readContext:client at:&currentSelection];
+    contextString = [self readContext:client outSelection:NULL];
     [self.kme setCoreContextIfNeeded:contextString];
-  } else if (self.contextChanged) {
+
+    // the context is now current, reset the flag
+    self.contextChanged = NO;
+    return;
+  }
+  
+  if (self.contextChanged) {
     // we cannot read the text but know the context has changed, so we must clear it
     os_log_debug([KMLogs keyTraceLog], "reportContext, clearing context for non-compliant app");
     [self.kme clearCoreContext];
+    
+    // the context is now current, reset the flag
+    self.contextChanged = NO;
   }
-  
-  // the context is now current, reset the flag
-  self.contextChanged = NO;
 }
 
 /**
@@ -351,40 +356,47 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
  * Also returns the results of `[client selectedRange]` in the`selection` pointer
  */
 
--(NSString*)readContext:(id) client at:(NSRange *) selectionRange {
+-(NSString*)readContext:(id) client outSelection:(NSRangePointer) outSelection {
   NSString *contextString = @"";
   NSAttributedString *attributedString = nil;
+  NSRange selectionRange = {0};
   
+  if (!self.apiCompliance.canReadText) {
+    os_log_debug([KMLogs keyTraceLog], "InputMethodEventHandler readContext, unable to read context: non-compliant app");
+    *outSelection = selectionRange;
+    return contextString;
+  }
+
   // if we can read the text, then get the context for up to kMaxContext characters
-  if (self.apiCompliance.canReadText) {
-    if (selectionRange != NULL) {
-      *selectionRange = [client selectedRange];
-      os_log_debug([KMLogs keyTraceLog], "InputMethodEventHandler readContext, selectionRange %{public}@: ", NSStringFromRange(*selectionRange));
-    }
-        
-    NSUInteger contextLength = MIN(kMaxContext, selectionRange->location);
-    NSUInteger contextStart = selectionRange->location - contextLength;
-    
-    if (contextLength > 0) {
-      NSRange contextRange = NSMakeRange(contextStart, contextLength);
-      attributedString = [client attributedSubstringFromRange:contextRange];
+  selectionRange = [client selectedRange];
+  os_log_debug([KMLogs keyTraceLog], "InputMethodEventHandler readContext, selectionRange %{public}@: ", NSStringFromRange(selectionRange));
       
-      // adjust string in case that we receive half of a surrogate pair at context start
-      // the API appears to always return a full code point, but this could vary by app
-      if (attributedString.length > 0) {
-        if (CFStringIsSurrogateLowCharacter([attributedString.string characterAtIndex:0])) {
-          os_log_debug([KMLogs keyTraceLog], " first char is low surrogate, reducing context by one character");
-          contextString = [attributedString.string substringFromIndex:1];
-        } else {
-          contextString = attributedString.string;
-          
-          //only uncomment for testing as we do not want to write context in logs
-          //os_log_debug([KMLogs keyTraceLog], " length: %lu result: %{public}@", contextString.length, contextString);
-        }
+  NSUInteger contextLength = MIN(kMaxContext, selectionRange.location);
+  NSUInteger contextStart = selectionRange.location - contextLength;
+  
+  if (contextLength > 0) {
+    NSRange contextRange = NSMakeRange(contextStart, contextLength);
+    attributedString = [client attributedSubstringFromRange:contextRange];
+    
+    // adjust string in case that we receive half of a surrogate pair at context start
+    // the API appears to always return a full code point, but this could vary by app
+    if (attributedString.length > 0) {
+      if (CFStringIsSurrogateLowCharacter([attributedString.string characterAtIndex:0])) {
+        os_log_debug([KMLogs keyTraceLog], " first char is low surrogate, reducing context by one character");
+        contextString = [attributedString.string substringFromIndex:1];
+      } else {
+        contextString = attributedString.string;
+        
+        //only uncomment for testing as we do not want to write context in logs
+        //os_log_debug([KMLogs keyTraceLog], " length: %lu result: %{public}@", contextString.length, contextString);
       }
     }
   }
   
+  // return the range of the current selection
+  if (outSelection != NULL) {
+    *outSelection = selectionRange;
+  }
   return contextString;
 }
 
@@ -581,8 +593,8 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
     return NO; // return without deleting/replacing
   }
 
-  NSRange currentSelection;
-  NSString *context = [self readContext:client at:&currentSelection];
+  NSRange currentSelection = {0};
+  NSString *context = [self readContext:client outSelection:&currentSelection];
   os_log_debug([KMLogs keyTraceLog], "handleDeleteWithReplacement, currentSelection: %{public}@: ", NSStringFromRange(currentSelection));
 
   // guard: if text is currently selected, then accept default delete behavior of removing selected text
@@ -593,7 +605,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
 
   // guard: must have sufficient context
   if ([context length] <= output.textToDelete.length) {
-    os_log_debug([KMLogs keyTraceLog], "cannot replace text, insufficient context");
+    os_log_error([KMLogs keyTraceLog], "cannot replace text, insufficient context");
     return NO; // return without deleting/replacing
   }
 
@@ -697,8 +709,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
  * Determine the replacement info using the character preceding the string to be deleted.
  */
 -(ReplacementInfo) determineReplacementInfoWithPrecedingCharacter:(NSUInteger)precedingCharacterLocation textStoreLocation:(NSUInteger)textStoreLocation deleteLength:(NSUInteger)deleteLength context:(NSString*) context {
-  ReplacementInfo replacementInfo;
-  replacementInfo.canDeleteWithReplacement = NO;
+  ReplacementInfo replacementInfo = {NO, 0, 0, NULL};
 
   // get the preceding character from the context
   NSRange precedingCharacterRange = NSMakeRange(precedingCharacterLocation, 1);
@@ -732,8 +743,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
  *  Determine the replacement info using the surrogate pair preceding the string to be deleted.
  */
 -(ReplacementInfo) determineReplacementInfoWithPrecedingSurrogate:(NSUInteger)precedingCharacterLocation textStoreLocation:(NSUInteger)textStoreLocation deleteLength:(NSUInteger)deleteLength context:(NSString*) context {
-  ReplacementInfo replacementInfo;
-  replacementInfo.canDeleteWithReplacement = NO;
+  ReplacementInfo replacementInfo = {NO, 0, 0, NULL};
 
   // guard: return NO if there is no character before the precedingCharacterLocation
   if (precedingCharacterLocation <= 0) {
@@ -754,7 +764,7 @@ CGEventSourceRef _sourceForGeneratedEvent = nil;
     // found preceding surrogate as expected
   } else {
     NSString *message = [NSString stringWithFormat:@"Preceding characters of string do not comprise a surrogate pair: 0x%02x, 0x%02x", (unsigned int)highCharacter, (unsigned int)lowCharacter];
-    os_log_debug([KMLogs keyTraceLog], "%@", message);
+    os_log_error([KMLogs keyTraceLog], "%@", message);
     [KMSentryHelper addDebugBreadCrumb:@"event" message:message];
     return replacementInfo;
   }

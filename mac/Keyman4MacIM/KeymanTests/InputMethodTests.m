@@ -118,10 +118,9 @@ id testClient = nil;
   XCTAssertTrue(replacementInfo.replacementLength == 2, @"replacementLength should be 2");
 }
 
-//𑒏𑒹
-
+// Uses Malar Tirhuta script
 - (void)testEvaluateReplacement_latinCharacterPrecededBySurrogatePair_replacementLengthThree {
-  NSString *context = @"test.𑒏a";
+  NSString *context = @"test.𑒏a";    // 𑒏 : U+1148F : TIRHUTA LETTER
   NSString *stringToDelete = @"a";
   
   NSRange range = [context rangeOfString:stringToDelete];
@@ -137,7 +136,7 @@ id testClient = nil;
 }
 
 - (void)testEvaluateReplacement_surrogatePairPrecededByLatinCharacter_replacementLengthThree {
-  NSString *context = @"test.a𑒏";
+  NSString *context = @"test.a𑒏";    // 𑒏 : U+1148F : TIRHUTA LETTER
   NSString *stringToDelete = @"𑒏";
   
   NSRange range = [context rangeOfString:stringToDelete];
@@ -152,7 +151,7 @@ id testClient = nil;
   XCTAssertTrue(replacementInfo.replacementLength == 3, @"replacementLength should == 3");
 }
 
-- (void)testEvaluateReplacement_latinCharacterPrecededByCheckeredFlag_replacementLengthThree {
+- (void)testEvaluateReplacement_latinCharacterPrecededByEmoji_replacementLengthThree {
   NSString *context = @"test🏁a";
   NSString *stringToDelete = @"a";
   
@@ -168,7 +167,7 @@ id testClient = nil;
   XCTAssertTrue(replacementInfo.replacementLength == 3, @"replacementLength should == 3");
 }
 
-- (void)testEvaluateReplacement_checkeredFlagPrecededByLatinCharacter_replacementLengthThree {
+- (void)testEvaluateReplacement_emojiPrecededByLatinCharacter_replacementLengthThree {
   NSString *context = @"testa🏁";
   NSString *stringToDelete = @"🏁";
   
@@ -186,6 +185,7 @@ id testClient = nil;
 
 // Note: though this test checks the calculation, deleting the jolly roger emoji will currently not behave as expected.
 // Keyman core instructs only part of the emoji to be deleted. The same happens with emoji with skin tones.
+// See #4956 for context
 - (void)testEvaluateReplacement_jollyRogerPrecededByLatinCharacter_replacementLengthSix {
   NSString *context = @"testa🏴‍☠️";
   NSString *stringToDelete = @"🏴‍☠️";

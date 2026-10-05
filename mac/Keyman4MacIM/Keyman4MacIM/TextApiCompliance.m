@@ -380,9 +380,9 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
                             [clientAppId isEqual: @"com.Keyman.test.legacyInput"] ||
                             /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */
                             [clientAppId isEqual: @"com.tinyspeck.slackmacgap"] ||
-                            // 2026-09-24[sgs]: Slack does double backspace when inserting with replacement
+                            // #16731 2026-09-24[sgs]: Slack does double backspace when inserting with replacement
                             [clientAppId isEqual: @"com.microsoft.VSCode"]
-                            // 2026-09-24[sgs]: VSCode does double backspace when inserting with replacement
+                            // #16731 2026-09-24[sgs]: VSCode does double backspace when inserting with replacement
                             );
   
   os_log_debug([KMLogs complianceLog], "containedInHardCodedNoncompliantAppList: for app %{public}@: %{public}@", clientAppId, isAppNonCompliant?@"yes":@"no");
