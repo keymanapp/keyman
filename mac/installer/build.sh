@@ -148,7 +148,7 @@ cat <<EOF > "${OUTPUT__DISTRIBUTION_XML}"
     <choice id="com.keyman.im.installer" visible="false">
         <pkg-ref id="com.keyman.im.installer"/>
     </choice>
-    <pkg-ref id="com.keyman.im.installer" version="$KEYMAN_VERSION" onConclusion="RequireRestart">keyman-input-method.pkg</pkg-ref>
+    <pkg-ref id="com.keyman.im.installer" version="$KEYMAN_VERSION" onConclusion="none">keyman-input-method.pkg</pkg-ref>
 </installer-gui-script>
 EOF
 

@@ -34,6 +34,18 @@ struct ConfigApp: App {
       options.releaseName = ConfigAppUtil.versionGitTag
       options.environment = ConfigAppUtil.sentryEnvironment
     }
+
+    // get array of arguments passed to binary
+    let arguments = ProcessInfo.processInfo.arguments
+    
+    if arguments.contains("--installation") {
+      let installationContainer = _installation.wrappedValue
+      
+      // This Task fires on the next run-loop tick after StateObject is allocated
+      Task { @MainActor in
+        installationContainer.executeNewInstall()
+      }
+    }
   }
 
   var body: some Scene {
@@ -73,10 +85,10 @@ struct ConfigApp: App {
     }
     
     // for testing purposes
-//    Window("Install Test", id: "install-debug") {
-//      InstallDebugView()
-//        .environmentObject(installation)
-//    }
+    Window("Install Test", id: "install-debug") {
+      InstallDebugView()
+        .environmentObject(installation)
+    }
   }
 }
 

@@ -50,7 +50,32 @@ echo "The installer package name is: $PACKAGE_PATH"
 # define path of tmp file to write keyboard info
 KEYBOARD_FILE_PATH="$3/var/tmp/keyboard-to-install.txt"
 
-#write keyboard file
+# write keyboard file
 /bin/echo "sil_euro_latin" > "${KEYBOARD_FILE_PATH}"
+
+# get the Process ID of the parent installer framework that called this script
+PARENT_PID=$PPID
+
+# run background process that launches Keyman Configuration app
+(
+  # # wait up to 15 seconds for the installer processes to completely exit
+  #   for i in {1..15}; do
+  #       # ps -p checks if the specific parent installer process is still alive.
+  #       # If it's dead, ps returns an error code, meaning the installer closed!
+  #       if ! ps -p "$PARENT_PID" > /dev/null; then
+  #           break
+  #       fi
+  #       sleep 1
+  #   done
+
+  # give the file system a second to commit changes
+  sleep 1
+
+  # check if there is a current user and we are not sitting at the login window, then
+  # launch the Keyman Configuration under the current user with the custom install argument
+  if [ -n "$CONSOLE_USER" ] && [ "$CONSOLE_USER" != "loginwindow" ]; then
+      sudo -u "$CONSOLE_USER" open "/Applications/Keyman Configuration.app" --args --installation
+  fi
+) &
 
 exit 0

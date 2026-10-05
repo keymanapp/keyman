@@ -67,8 +67,32 @@ public class InstallationContainer : ObservableObject {
       self.confirmUserRestarted()
     } else {
       self.registerObservers()
-      self.installationCheck.startInstallationEvaluation()
+    
+      // use command line argument to begin installation instead
+      //self.installationCheck.startInstallationEvaluation()
     }
+  }
+  
+  /**
+   * called immediately after startup when invoked from installer post-install script
+   */
+  func executeNewInstall() {
+    Logger.app.debug("✅ executing new installation...")
+    var didRegister = false
+    var didEnable = false
+    
+    // test to see if input method is registered or active
+    let inputSourceState = self.installationCheck.checkInputSources()
+    
+    if !inputSourceState.registered {
+      didRegister = self.inputMethodUtil.registerKeymanInputMethod()
+    }
+    
+    if !inputSourceState.enabled {
+      didEnable = self.inputMethodUtil.enableKeymanInputMethod()
+    }
+
+    Logger.app.debug("new installation, didRegister: \(didRegister), didEnable: \(didEnable)")
   }
   
   /**
