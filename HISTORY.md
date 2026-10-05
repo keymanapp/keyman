@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 19.0.299 alpha 2026-10-05
+
+* chore(deps): bump ip-address from 10.5.0 to 10.7.2 in /developer/src/server/src/win32/trayicon/addon-src (#16698)
+* chore(deps): bump ip-address from 10.4.0 to 10.7.2 (#16696)
+* chore(deps-dev): bump brace-expansion from 2.0.2 to 2.1.7 in /resources/build/pr-build-status (#16721)
+* chore(deps): bump multer from 2.3.0 to 2.4.0 (#16692)
+* chore(deps): bump brace-expansion (#16728)
+* fix(mac): show or hide the OSK from the Keyman menu (#16708)
+* chore(deps-dev): bump brace-expansion from 2.1.1 to 2.1.7 in /core/tests/unit/wasm (#16730)
+
 ## 19.0.298 alpha 2026-10-03
 
 * chore(linux): update Debian standards version (#16714)
