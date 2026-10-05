@@ -46,6 +46,7 @@
 
 ## 19.0.291 alpha 2026-09-24
 
+* epic: mac-config (#15328)
 * chore(common): fix TC reporter reporting failures (#16643)
 * chore(android): remove unused map-polyfill.js and es6-shim.min.js polyfills (#16637)
 * fix(developer): address crashes in touch layout editor (#16572)
@@ -701,6 +702,7 @@
 
 ## 19.0.182 alpha 2025-12-22
 
+* epic: ARM support for Windows
 * maint(common): Fix crowdin sync version to v2.7.0 (#15373)
 * chore(linux): Update keyman-config.pot strings (#15366)
 * chore(windows): show architecture in support texteditor (#15378)
@@ -1814,7 +1816,7 @@
 ## 18.0.251 stable 2026-09-21
 
 * maint(android): update Android Target API to 36 (#16620)
-* 
+
 ## 18.0.250 stable 2026-09-21
 
 * fix(linux): fix memory problem (#15828)
