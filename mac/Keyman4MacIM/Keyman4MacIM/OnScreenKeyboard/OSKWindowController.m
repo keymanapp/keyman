@@ -73,10 +73,6 @@
   [self.oskView resizeOSKLayout];
 }
 
-- (void)prepareToShowOsk {
-  os_log_info([KMLogs oskLog], "OSKWindowController prepareToShowOsk");
-}
-
 - (void)windowWillClose:(NSNotification *)notification {
   os_log_debug([KMLogs oskLog], "OSKWindowController windowWillClose");
   [KMSettingsRepository.shared writeShowOskOnActivate:NO];
@@ -84,6 +80,7 @@
   // whenever the OSK is closing clear all of its modifier keys
   [self.oskView clearOskModifiers];
   [KMSentryHelper addOskVisibleTag:NO];
+  [self.AppDelegate updateOskMenuTextForClose];
 }
 
 - (void)helpAction:(id)sender {

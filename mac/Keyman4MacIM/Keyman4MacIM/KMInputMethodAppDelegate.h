@@ -82,6 +82,8 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 - (void)applyPersistedOptions;
 - (void)launchKeymanConfiguration;
 - (void)showOSK;
+- (void)updateOskMenuText;
+- (void)updateOskMenuTextForClose;
 - (void)selectKeyboardFromMenu:(NSInteger)tag;
 - (void)handleKeyEvent:(NSEvent *)event;
 - (void)loadKeyboardFromKmxFile:(KMXFile *)kmx;

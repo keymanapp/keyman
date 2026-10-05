@@ -15,3 +15,10 @@
 
 /* OK button label */
 "ok-button-label" = "OK";
+
+/* Show OSK menu text, displayed when OSK is not visible */
+"show-osk-menu-text" = "Show On-screen Keyboard";
+
+/* Hide OSK menu text, displayed when OSK is visible */
+"hide-osk-menu-text" = "Hide On-screen Keyboard";
+
