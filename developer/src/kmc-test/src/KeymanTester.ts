@@ -295,7 +295,7 @@ export class KeymanTester implements KeymanCompiler {
         console.error('vkey missing');
         return false; //TODO-KMC-TEST
       }
-      if(km_core.process_event(state, vkey, shift, 1, 0) != 0) {
+      if(km_core.process_event(state, vkey, shift, true, 0) != 0) {
         console.dir(regtest.events, {depth:10});
         console.error('process_event failed');
         return false; //TODO-KMC-TEST

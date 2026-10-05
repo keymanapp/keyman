@@ -5,11 +5,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder-full.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+. "$KEYMAN_ROOT/resources/build/node.inc.sh"
+. "$KEYMAN_ROOT/resources/build/typescript.inc.sh"
 
 builder_describe "Build Keyman kmc-test module" \
   "@/common/web/keyman-version" \
@@ -17,9 +18,7 @@ builder_describe "Build Keyman kmc-test module" \
   "@/developer/src/common/web/test-helpers" \
   "@/developer/src/common/web/utils" \
   "@/core:wasm" \
-  clean configure build api test publish \
-  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
-  "--dry-run,-n              don't actually publish, just dry run"
+  clean configure build api test
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -31,7 +30,7 @@ builder_parse "$@"
 #-------------------------------------------------------------------------------------------------------------------
 
 do_configure() {
-  verify_npm_setup
+  node_select_version_and_npm_ci
 
   mkdir -p "src/import/core/"
   # we don't need this file for release builds, but it's nice to have
@@ -61,5 +60,3 @@ builder_run_action api        api-extractor run --local --verbose
 # note: `export TEST_SAVE_FIXTURES=1` to get a copy of cloud-based fixtures saved to online/
 # TODO: -skip-full
 builder_run_action test       builder_do_typescript_tests 40
-
-builder_run_action publish    builder_publish_npm
