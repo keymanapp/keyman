@@ -273,7 +273,8 @@ public final class KMManager {
   private static int systemLastInputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL;
   private static SuggestionType inAppLastSuggestionType = SuggestionType.fromInt(KMDefault_Suggestion);
   private static SuggestionType systemLastSuggestionType = SuggestionType.fromInt(KMDefault_Suggestion);
-
+  private static String inAppLastSuggestionTypeLangCode = "";
+  private static String systemLastSuggestionTypeLangCode = "";
 
   // Determine how system keyboard handles ENTER key
   public static EnterModeType enterMode = EnterModeType.DEFAULT;
@@ -1813,16 +1814,34 @@ public final class KMManager {
   /* package-private */ static void refreshSuggestionType(KeyboardType keyboard) {
     SuggestionType lastSuggestionType;
     int lastInputType;
+    String lastLangCode;
+
+    String currentLangCode = "";
+    if(currentLexicalModel != null) {
+      currentLexicalModel.get(KMKey_LanguageID);
+    }
+
     if(keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
       lastSuggestionType = inAppLastSuggestionType;
       lastInputType = inAppLastInputType;
+      lastLangCode = inAppLastSuggestionTypeLangCode;
+
+      // Update the most recent lang code in case of future model swaps
+      inAppLastSuggestionTypeLangCode = currentLangCode;
     } else if(keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       lastSuggestionType = systemLastSuggestionType;
       lastInputType = systemLastInputType;
+      lastLangCode = systemLastSuggestionTypeLangCode;
+
+      // Update the most recent lang code in case of future model swaps
+      systemLastSuggestionTypeLangCode = currentLangCode;
     } else {
       return;
     }
-    if(lastSuggestionType == null) {
+
+    // In case of language-code swap or a previously-unset suggestion type,
+    // automatically enact default behavior.
+    if(lastSuggestionType == null || lastLangCode != currentLangCode) {
       lastSuggestionType = defaultSuggestionModeForInputType(lastInputType);
     }
     setSuggestionType(keyboard, lastSuggestionType);
@@ -1836,13 +1855,42 @@ public final class KMManager {
    */
   public static void setSuggestionType(KeyboardType keyboard, SuggestionType suggestionType) {
     String url = KMString.format("setBannerOptions(%s)", suggestionType.toInt());
+    String currentModelLangCode = "";
+    if(currentLexicalModel != null) {
+      currentModelLangCode = currentLexicalModel.get(KMKey_LanguageID);
+    }
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      inAppLastInputType = ((KMTextView) KMTextView.activeView).getInputType();
       inAppLastSuggestionType = suggestionType;
+      inAppLastSuggestionTypeLangCode = currentModelLangCode;
       InAppKeyboard.loadJavascript(url);
     }
 
     if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      // Stop-gap:  as we don't currently take an inputType for the system keyboard,
+      // use this to track if predictive-text could have been enabled (per user settings)
+      // but was instead disabled.
+      SuggestionType pureTextDefaultSuggestionType = defaultSuggestionModeForInputType(InputType.TYPE_CLASS_TEXT);
+      if(
+        // if there is a model
+        currentModelLangCode != ""
+        // if predictive text would normally be enabled
+        && pureTextDefaultSuggestionType != SuggestionType.SUGGESTIONS_DISABLED
+        // if the user's preference would normally be more permissive
+        && suggestionType.toInt() < pureTextDefaultSuggestionType.toInt()
+      ) {
+        if(suggestionType == SuggestionType.SUGGESTIONS_DISABLED) {
+          systemLastInputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+        } else if(suggestionType == SuggestionType.PREDICTIONS_WITH_CORRECTIONS) {
+          systemLastInputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+        } else {
+          systemLastInputType = InputType.TYPE_CLASS_TEXT;
+        }
+      } else {
+        systemLastInputType = InputType.TYPE_CLASS_TEXT;
+      }
       systemLastSuggestionType = suggestionType;
+      systemLastSuggestionTypeLangCode = currentModelLangCode;
       SystemKeyboard.loadJavascript(url);
     }
   }
