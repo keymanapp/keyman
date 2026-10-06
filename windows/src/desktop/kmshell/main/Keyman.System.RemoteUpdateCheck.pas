@@ -39,7 +39,7 @@ type
 
   TRemoteUpdateCheck = class
   private
-    FForce: Boolean;
+    FForce, FManualCheck: Boolean;
     FRemoteResult: TRemoteUpdateCheckResult;
     FErrorMessage: string;
     FShowErrors: Boolean;
@@ -57,7 +57,7 @@ type
     function DoRun: TRemoteUpdateCheckResult;
   public
 
-    constructor Create(AForce: Boolean);
+    constructor Create(AForce, AManualCheck: Boolean);
     destructor Destroy; override;
     function Run: TRemoteUpdateCheckResult;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
@@ -95,7 +95,7 @@ uses
 
 { TRemoteUpdateCheck }
 
-constructor TRemoteUpdateCheck.Create(AForce: Boolean);
+constructor TRemoteUpdateCheck.Create(AForce, AManualCheck: Boolean);
 begin
   inherited Create;
 
@@ -103,6 +103,7 @@ begin
   FRemoteResult := wucUnknown;
 
   FForce := AForce;
+  FManualCheck := AManualCheck;
 
   KL.Log('TRemoteUpdateCheck.Create');
 end;
@@ -159,7 +160,7 @@ begin
       http.Fields.Add('version', ansistring(CKeymanVersionInfo.Version));
       http.Fields.Add('tier', ansistring(CKeymanVersionInfo.Tier));
       http.Fields.Add('update', '1'); // This is checking for an update
-      if FForce then
+      if FManualCheck then
         http.Fields.Add('manual', '1')
       else
         http.Fields.Add('manual', '0');
