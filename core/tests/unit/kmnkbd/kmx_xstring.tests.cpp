@@ -235,7 +235,7 @@ void test_decxstr() {
      test_assert(q == (p - 4) );
 
      //runs OK with NEW version of decxstr (with CODE_SWITCH pointer moves 2 ( 3 altogether)
-     p_start = (PKMX_WCHAR)u"abc" C_CODE_SWITCH(u"\u0001") u"d";
+     p_start = (PKMX_WCHAR)u"abc" C_CODE_SWITCH(u"\u0001") u"d";    // unused, marked as such in 19.0
      p       = find_ptr_to_last_character(p_start);
      q       = decxstr(p, p_start);
      test_assert(q == (p - 3) );
@@ -625,7 +625,7 @@ void test_decxstr() {
   test_assert(q == p + 2 );
 
   // --- Test for FFFF + CODE_SWITCH -----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR) C_CODE_SWITCH(u"\u0001");
+  p = (PKMX_WCHAR) C_CODE_SWITCH(u"\u0001");    // unused, marked as such in 19.0
   q = incxstr(p);
   test_assert(q == p + 3 );
 
@@ -860,8 +860,8 @@ void test_decxstr() {
   q = incxstr(p);
   test_assert(q == p + 2 );
 
-  // --- Test for FFFF + CODE_SWITCH -----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR) C_CODE_SWITCH(u"\u0001") u"\u1234\u2468";
+  // --- Test for FFFF + CODE_SWITCH -----------------------------------  ------------------------------------------------------------------------
+  p = (PKMX_WCHAR) C_CODE_SWITCH(u"\u0001") u"\u1234\u2468";  // unused, marked as such in 19.0
   q = incxstr(p);
   test_assert(q == p + 3 );
 
@@ -1112,7 +1112,7 @@ void test_decxstr() {
   test_assert(q == p + 2 );
 
   // --- Test for FFFF + CODE_SWITCH -----------------------------------------------------------------------------------------------------------
-  p = (PKMX_WCHAR) C_CODE_SWITCH(u"\u0001") U_1F609_WINKING_FACE;
+  p = (PKMX_WCHAR) C_CODE_SWITCH(u"\u0001") U_1F609_WINKING_FACE;   // unused, marked as such in 19.0
   q = incxstr(p);
   test_assert(q == p + 3 );
 

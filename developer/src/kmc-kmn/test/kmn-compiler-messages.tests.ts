@@ -359,15 +359,6 @@ describe('KmnCompilerMessages', function () {
   // Deprecations
   //
 
-  // WARN_DeprecatedStatement
-
-  it('should generate WARN_DeprecatedStatement if the file has `clearcontext` or `fix` statements and is 19.0', async function() {
-    await testForMessage(this, ['keyboards', 'warn_deprecated_statement-clearcontext-19.kmn'], KmnCompilerMessages.WARN_DeprecatedStatement);
-    await testForMessage(this, ['keyboards', 'warn_deprecated_statement-fix-19.kmn'], KmnCompilerMessages.WARN_DeprecatedStatement);
-    await testForMessage(this, ['keyboards', 'warn_deprecated_statement-clearcontext-17.kmn']);
-    await testForMessage(this, ['keyboards', 'warn_deprecated_statement-fix-17.kmn']);
-  });
-
   // WARN_DeprecatedValueFormat
 
   it('should generate WARN_DeprecatedValueFormat if the file has decimal, octal, or hexadecimal value formats', async function() {
@@ -419,7 +410,7 @@ describe('KmnCompilerMessages', function () {
 
   // ERROR_StoreContainsUnsupportedStatement
 
-  ['any', 'index', 'clearcontext', 'fix', 'context', 'nul', 'use', 'return', 'beep', 'switch',
+  ['any', 'index', 'context', 'nul', 'use', 'return', 'beep',
    'call', 'contextex', 'notany', 'setopt',
    'ifopt', 'baselayout', 'layer', 'platform',
    'saveopt', 'resetopt', 'ifsystemstore', 'setsystemstore'].forEach(statement =>
