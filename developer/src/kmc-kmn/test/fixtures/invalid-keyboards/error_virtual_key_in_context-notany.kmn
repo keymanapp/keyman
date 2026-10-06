@@ -8,4 +8,4 @@ group(main) using keys
 store(keys) [NCAPS SHIFT K_S]
 
 c This should generate warning KM02074 ERROR_VirtualKeyInContext
-any(keys) + 'X' > 'x'
+notany(keys) + 'X' > 'x'
