@@ -361,12 +361,16 @@ KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
   p = str;
   pp = str;
 
-  switch (LineTokenType(&p))
+  switch (LineTokenType(fk, &p, TRUE))
   {
   case T_BLANK:
   case T_COMMENT:
     break;	// Ignore the line
+
   case T_VERSION:
+    kmcmp::WarnDeprecatedHeader();
+    break;  // The line has already been processed
+
   case T_STORE:
     break;	// The line has already been processed
 
@@ -523,7 +527,7 @@ KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
   {
     kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
-    ReportCompilerMessage(KmnCompilerMessages::WARN_BitmapNotUsed);
+    // ReportCompilerMessage(KmnCompilerMessages::WARN_BitmapNotUsed); : redundant, have WarnDeprecatedHeader
 
     if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidBitmapLine);  // I3481
@@ -2074,7 +2078,7 @@ LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
   return lptOther;
 }
 
-int LineTokenType(PKMX_WCHAR *str)
+int LineTokenType(PFILE_KEYBOARD fk, PKMX_WCHAR *str, KMX_BOOL checkDeprecations)
 {
   int i;
   size_t l;
@@ -2084,6 +2088,14 @@ int LineTokenType(PKMX_WCHAR *str)
   if (lpt == lptOther) return T_BLANK;
 
   /* Test KeymanWeb, Keyman and KeymanOnly prefixes */
+
+  if(checkDeprecations && lpt == lptKeymanWebOnly) {
+    kmcmp::WarnDeprecatedCompileTarget(fk, u"$keymanweb:");
+  }
+  if(checkDeprecations && lpt == lptKeymanOnly) {
+    kmcmp::WarnDeprecatedCompileTarget(fk, u"$keymanonly:");
+  }
+
   if (kmcmp::CompileTarget == CKF_KEYMAN && lpt == lptKeymanWebOnly) return T_BLANK;
   if (kmcmp::CompileTarget == CKF_KEYMANWEB && lpt == lptKeymanOnly) return T_BLANK;
 
@@ -2234,6 +2246,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         tstr[mx++] = n1;
         if (n2 >= 0) tstr[mx++] = n2;
         tstr[mx] = 0;
+        kmcmp::WarnDeprecatedValueFormat();
       }
       continue;
 
@@ -2400,10 +2413,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else if (u16nicmp(p, u"clearcontext", 12) == 0)
       {
-        // deprecated in 19.0
-        if(fk->version >= VERSION_190) {
-          ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedStatement, {"clearcontext", "19.0"});  // I3438
-        }
+        kmcmp::WarnDeprecatedStatement(fk, "clearcontext", VERSION_190, "19.0");
         p += 12;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_CLEARCONTEXT;
@@ -2727,10 +2737,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 15:
       if (u16nicmp(p, u"fix", 3) == 0)
       {
-        if(fk->version >= VERSION_190) {
-          // deprecated in 19.0
-          ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedStatement, {"fix", "19.0"});  // I3438
-        }
+        kmcmp::WarnDeprecatedStatement(fk, "fix", VERSION_190, "19.0");
         p += 3;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_CLEARCONTEXT;
