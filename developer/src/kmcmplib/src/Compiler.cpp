@@ -1587,7 +1587,7 @@ KMX_BOOL DoesStringContainVirtualKeys(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
         if(DoesStringContainVirtualKeys(fk, s->dpString)) {
           return TRUE;
         }
-      } else if(code == CODE_ANY) {
+      } else if(code == CODE_ANY || code == CODE_NOTANY) {
         PFILE_STORE s;
         s = &fk->dpStoreArray[*(p + 2) - 1];
         if(DoesStringContainVirtualKeys(fk, s->dpString)) {
