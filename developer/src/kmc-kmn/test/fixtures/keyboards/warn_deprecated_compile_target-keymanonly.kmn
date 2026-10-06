@@ -5,5 +5,5 @@ begin unicode > use(main)
 
 group(main) using keys
 
-c $keymanonly: deprecated in v19 compiler, will not work in v20+, so always warn
+c $keymanonly: deprecated in v19 compiler, will not work in v20+, so always warn regardless of target version
 $keymanonly: + ' ' > 'hello'
