@@ -53,7 +53,7 @@ KMXCodeNames: string[] = [
   '',
   'any', 'index', 'context', 'nul', 'use', 'return', 'beep', 'deadkey',
   '',
-  'extended', '', '', '', '', 'call',
+  'extended', '', ''/*switch*/, ''/*key*/, ''/*clearcontext*/, 'call',
   '', 'contextex', 'notany',
   'set', 'if', 'save', 'reset',  // I3429
   'if(&system)', 'set(&system)'];  // I3430    // I3437
