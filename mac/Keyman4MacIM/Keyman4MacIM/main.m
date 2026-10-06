@@ -71,8 +71,11 @@ int main(int argc, const char * argv[]) {
       NSString *commandString = [NSString stringWithUTF8String:installCommand];
       os_log_info([KMLogs startupLog], "main command: %{public}@", commandString);
 
-      if ([commandString isEqualToString:kMigrateCommand]) {
-        return doMigration();
+      if ([commandString isEqualToString:kMigrateAndCheckCommand]) {
+        doMigration();
+        return checkAccessibility();
+      } else if ([commandString isEqualToString:kMigrateCommand]) {
+        doMigration();
       } else if ([commandString isEqualToString:kAccessCommand]) {
         return requestAccessibility();
       } else if ([commandString isEqualToString:kCheckCommand]) {

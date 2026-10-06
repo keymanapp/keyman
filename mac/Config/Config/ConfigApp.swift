@@ -34,34 +34,27 @@ struct ConfigApp: App {
       options.releaseName = ConfigAppUtil.versionGitTag
       options.environment = ConfigAppUtil.sentryEnvironment
     }
-
-    // get array of arguments passed to binary
-    let arguments = ProcessInfo.processInfo.arguments
-    
-    if arguments.contains("--installation") {
-      let installationContainer = _installation.wrappedValue
-      
-      // This Task fires on the next run-loop tick after StateObject is allocated
-      Task { @MainActor in
-        installationContainer.executeNewInstall()
-      }
-    }
   }
 
   var body: some Scene {
     Window("Configuration", id: "main-config") {
       MainConfigView()
         .frame(
-            minWidth: 600, maxWidth: 1000,
-            minHeight: 400, maxHeight: .infinity
+          minWidth: 600, maxWidth: 1000,
+          minHeight: 400, maxHeight: .infinity
         )
         .environmentObject(settings)
-        .task {
-          if !installation.getHasDisplayedInstallationComplete() {
-            openWindow(id: "install")
-          }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in openWindow(id: "install")
+//        .task {
+//          Logger.app.log("running MainConfigView task")
+//          if installation.installInProgress {
+//            Logger.app.log("Installation in progress, opening Installation window")
+//            await Task.yield()
+//
+//            openWindow(id: "install")
+//          }
+//        }
+        .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in
+          openWindow(id: "install")
         }
     }
     // the size of the window when first opened
@@ -81,6 +74,18 @@ struct ConfigApp: App {
         } label: {
           Label("About Keyman Configuration", systemImage: "info.circle")
         }
+      }
+      // include an invisible command group to run when the app boots
+      CommandGroup(after: .appInfo) {
+        Color.clear
+          .frame(width: 0, height: 0)
+          .onAppear {
+            // this only evaluates to true if the app was launched from the installer post-install script
+            if installation.installInProgress {
+              Logger.app.log("installation in progress, opening Installation window")
+              openWindow(id: "install")
+            }
+          }
       }
     }
     

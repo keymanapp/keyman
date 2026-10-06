@@ -54,6 +54,7 @@ enum InstallationStateCondition: String {
 
 @MainActor
 public class InstallationCheck {
+  public let isLaunchedByInstaller: Bool      // the app was launched by the installer
   public var installationState: InstallationState?
   // with isEvaluatingNewInstallation==true, we are awaiting
   // message from input method to determine what tasks are needed
@@ -96,9 +97,10 @@ public class InstallationCheck {
     return .newInstallation
   }
   
-  public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil) {
+  public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil, launchedByInstaller: Bool) {
     self.defaultsRepository = defaultsRepo
     self.inputMethodUtil = inputMethodUtil
+    self.isLaunchedByInstaller = launchedByInstaller
     self.isEvaluatingNewInstallation = false
     self.configurationVersion = ConfigAppUtil.configAppVersion()
     
@@ -114,16 +116,14 @@ public class InstallationCheck {
     self.isInputMethodInstalled = keymanExists
     self.isInputMethodCurrent = keymanIsCurrent
     self.inputMethodVersion = keymanVersion
-
-    if self.isMigrationNeeded() {
-      _ = self.migrateData()
-    }
     
+    if launchedByInstaller {
+      clearInstallationState()
+    }
     let installState = InstallationCheck.readInstallationState(from: defaultsRepo)
 
     if (keymanExists && keymanIsCurrent) {
       // the input method is valid, examine the installation state recorded on disk
-      //
       let installationStateCondition = InstallationCheck.evaluateInstallationState(state: installState, for: keymanVersion);
       Logger.app.log("installationStateCondition: \(installationStateCondition.rawValue, privacy: .public)")
 
@@ -212,7 +212,11 @@ public class InstallationCheck {
     // call the input method to check whether Accessibility permission has been granted
     if (self.isInputMethodInstalled && self.isInputMethodCurrent) &&
         (self.isEvaluatingNewInstallation || self.isReadyForRepairCheckAtStartup()) {
-      self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
+      if (self.isLaunchedByInstaller) {
+        self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
+      } else {
+        self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
+      }
     }
   }
   
@@ -494,11 +498,9 @@ static func readInstallationState(from repo: DefaultsRepo) -> InstallationState?
     if !self.inputMethodUtil.isKeymanInputMethodEnabled() {
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .enableInputMethod))
       
-    // when repairing, prompt to restart to ensure that the input method has been loaded by the system
-      if (isRepair) {
-        newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
-        newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
-      }
+    // if enable is needed, prompt to restart to ensure that the input method has been loaded by the system
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
     }
     
     return newTasks

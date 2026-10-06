@@ -22,8 +22,12 @@ public extension Notification.Name {
   static let checkAccessibilityFailure = Notification.Name("accessibility.failure")
 }
 
+private let installationArgument = "--installation"
+
 @MainActor // run on the main actor since data is published directly to the UI
 public class InstallationContainer : ObservableObject {
+  @Published var installInProgress: Bool = false
+  
   public var installationPhase: InstallationPhase {
     return self.installationCheck.installationPhase
   }
@@ -37,6 +41,15 @@ public class InstallationContainer : ObservableObject {
   fileprivate let inputMethodUtil: InputMethodUtil
   
   public init() {
+    var isLaunchedByInstaller = false
+    
+    // Check to see if the app was launched directly from the installer's post-install script.
+    // If the installer launched the config app, then we must continue with the installation process.
+    if ProcessInfo.processInfo.arguments.contains(installationArgument) {
+      Logger.app.log("setting installInProgress to true")
+      isLaunchedByInstaller = true
+    }
+
     let defaultsRepo: DefaultsRepository
     // create the settings repository, gaining access to the app group UserDefaults
     do {
@@ -58,8 +71,9 @@ public class InstallationContainer : ObservableObject {
       fatalError("Unable to access group container path for InputMethodUtil: \(error.localizedDescription).")
     }
 
-    self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
-    
+    self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil, launchedByInstaller: isLaunchedByInstaller)
+    self.installInProgress = isLaunchedByInstaller || (self.installationCheck.installationPhase == .installationInProgress || self.installationCheck.installationPhase == .newInstallation)
+
     // If we can now confirm that the user restarted (the final task), then the installation
     // will be complete and there is no need to evaluate the state.
     // Otherwise, evaluate the installation to prepare for a new installation or check for repairs.
@@ -71,6 +85,10 @@ public class InstallationContainer : ObservableObject {
       // use command line argument to begin installation instead
       //self.installationCheck.startInstallationEvaluation()
     }
+    
+    if installInProgress {
+      self.executeNewInstall()
+    }
   }
   
   /**
@@ -78,21 +96,24 @@ public class InstallationContainer : ObservableObject {
    */
   func executeNewInstall() {
     Logger.app.debug("✅ executing new installation...")
-    var didRegister = false
-    var didEnable = false
+    self.installationCheck.startInstallationEvaluation()
     
-    // test to see if input method is registered or active
-    let inputSourceState = self.installationCheck.checkInputSources()
-    
-    if !inputSourceState.registered {
-      didRegister = self.inputMethodUtil.registerKeymanInputMethod()
-    }
-    
-    if !inputSourceState.enabled {
-      didEnable = self.inputMethodUtil.enableKeymanInputMethod()
-    }
-
-    Logger.app.debug("new installation, didRegister: \(didRegister), didEnable: \(didEnable)")
+//    self.installInProgress = true
+//    var didRegister = false
+//    var didEnable = false
+//    
+//    // test to see if input method is registered or active
+//    let inputSourceState = self.installationCheck.checkInputSources()
+//    
+//    if !inputSourceState.registered {
+//      didRegister = self.inputMethodUtil.registerKeymanInputMethod()
+//    }
+//    
+//    if !inputSourceState.enabled {
+//      didEnable = self.inputMethodUtil.enableKeymanInputMethod()
+//    }
+//
+//    Logger.app.debug("new installation, didRegister: \(didRegister), didEnable: \(didEnable)")
   }
   
   /**
@@ -295,6 +316,9 @@ public class InstallationContainer : ObservableObject {
       self.installationCheck.installationState = updatedState
       self.writeInstallationState()
     }
+    
+    // whenever a task is completed, update the installInProgress flag
+    self.installInProgress = self.installationCheck.installationPhase == .installationInProgress || self.installationCheck.installationPhase == .newInstallation
   }
 
   /**
