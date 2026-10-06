@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.300 beta 2026-10-06
+
+* chore: move to beta
+
 ## 19.0.299 alpha 2026-10-05
 
 * chore(deps): bump ip-address from 10.5.0 to 10.7.2 in /developer/src/server/src/win32/trayicon/addon-src (#16698)
