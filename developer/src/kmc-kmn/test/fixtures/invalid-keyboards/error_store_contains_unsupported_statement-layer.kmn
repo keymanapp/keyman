@@ -1,0 +1,12 @@
+store(&NAME) 'error_store_contains_unsupported_statement-layer'
+store(&VERSION) '9.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(opt) 'opt'
+
+c ERROR_StoreContainsUnsupportedStatement; note layer() compiles to CODE_IFSYSTEMSTORE
+store(bad-layer) layer('shift')
+

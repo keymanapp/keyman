@@ -930,6 +930,12 @@ export class KmnCompilerMessages {
     `Compile target '${def(o.p?.[0])}' was deprecated in Keyman 19 and will cause the line to always be ignored by kmc in Keyman 20.`,
   );
 
+  static ERROR_StoreContainsUnsupportedStatement                = SevError | 0x0BE;
+  static Error_StoreContainsUnsupportedStatement                = () => mc(
+    this.ERROR_StoreContainsUnsupportedStatement,
+    `A store can contain only characters, deadkeys, virtual keys, and 'outs()' statements.`,
+  );
+
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
   static Fatal_BufferOverflow                                 = () => mc(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
 

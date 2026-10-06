@@ -289,6 +289,8 @@ namespace KmnCompilerMessages {
     WARN_DeprecatedValueFormat =                        SevWarn | 0x0BC,
     WARN_DeprecatedCompileTarget =                      SevWarn | 0x0BD,
 
+    ERROR_StoreContainsUnsupportedStatement =           SevError | 0x0BE,
+
     FATAL_BufferOverflow =                              SevFatal | 0x0C0
 //    FATAL_Break =                                       SevFatal | 0x0C1,      unused
   };
