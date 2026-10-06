@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 20.0.1 alpha 2026-10-06
+
+* chore: add epics to HISTORY.md (#16729)
+* fix(android): refresh current keyboard when resuming main activity (#16645)
+* fix(mac): apply backspace to correct location (#16634)
+* docs: add acceptance tests from dokimion (#16693)
+* chore(developer): warn on v19 deprecated language features (#16710)
+* fix(developer): check `any()` and `index()` for invalid use of virtual keys (#16717)
+* fix(developer): emit compile error when unsupported statements encountered in stores (#16723)
+* chore(common): move CODE__SIZE declaration to common (#16724)
+* chore(common): remove `clearcontext`,`fix`,`switch`,`key` statements (#16726)
+* chore: move to 20.0-alpha (#16739)
+
 ## 19.0.299 alpha 2026-10-05
 
 * chore(deps): bump ip-address from 10.5.0 to 10.7.2 in /developer/src/server/src/win32/trayicon/addon-src (#16698)
