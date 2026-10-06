@@ -1531,7 +1531,6 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
  *   Rule structure: [context] ['+' key] '>' output
  *   Context structure: [nul] [if()|baselayout()|platform()]+ [char|any|context()|deadkey()|dk()|index()|notany()|outs()]
  * Test that nul is first, then if(), baselayout(), platform() statements are before any other content.
- * Also verifies that virtual keys are not found in the context.
  */
 void CheckContextStatementPositions(PKMX_WCHAR context) {
   KMX_BOOL hadContextChar = FALSE;
@@ -1548,9 +1547,6 @@ void CheckContextStatementPositions(PKMX_WCHAR context) {
         if (hadContextChar) {
           ReportCompilerMessage(KmnCompilerMessages::WARN_IfShouldBeAtStartOfContext);
         }
-        break;
-      case CODE_EXTENDED:
-        ReportCompilerMessage(KmnCompilerMessages::ERROR_VirtualKeyInContext);
         break;
       default:
         hadContextChar = TRUE;
@@ -1579,18 +1575,50 @@ KMX_DWORD CheckUseStatementsInOutput(PKMX_WCHAR output) {
   return STATUS_Success;
 }
 
+KMX_BOOL DoesStringContainVirtualKeys(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
+  for (; *p; p = incxstr(p)) {
+    if (*p == UC_SENTINEL) {
+      auto code = *(p+1);
+      if(code == CODE_EXTENDED) {
+        return TRUE;
+      } else if(code == CODE_INDEX) {
+        PFILE_STORE s;
+        s = &fk->dpStoreArray[*(p + 2) - 1];
+        if(DoesStringContainVirtualKeys(fk, s->dpString)) {
+          return TRUE;
+        }
+      } else if(code == CODE_ANY || code == CODE_NOTANY) {
+        PFILE_STORE s;
+        s = &fk->dpStoreArray[*(p + 2) - 1];
+        if(DoesStringContainVirtualKeys(fk, s->dpString)) {
+          return TRUE;
+        }
+      }
+    }
+  }
+  return FALSE;
+}
+
 /**
  * Warn if output has virtual keys in it, which is not supported by Core at all,
  * but was unofficially supported, but never worked properly, in Keyman for
  * Windows for many years
  */
-KMX_DWORD CheckVirtualKeysInOutput(PKMX_WCHAR output) {
-  PKMX_WCHAR p;
-  for (p = output; *p; p = incxstr(p)) {
-    if (*p == UC_SENTINEL && *(p + 1) == CODE_EXTENDED) {
-      ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualKeyInOutput);
-      break;
-    }
+KMX_DWORD CheckVirtualKeysInOutput(PFILE_KEYBOARD fk, PKMX_WCHAR output) {
+  if(DoesStringContainVirtualKeys(fk, output)) {
+    ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualKeyInOutput);
+    return STATUS_Success;
+  }
+  return STATUS_Success;
+}
+
+/**
+ * Error if context has virtual keys in it -- context can never contain keys,
+ * only characters and deadkeys.
+ */
+KMX_DWORD CheckVirtualKeysInContext(PFILE_KEYBOARD fk, PKMX_WCHAR context) {
+  if(DoesStringContainVirtualKeys(fk, context)) {
+    return KmnCompilerMessages::ERROR_VirtualKeyInContext;
   }
   return STATUS_Success;
 }
@@ -1785,6 +1813,9 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
 
   CheckContextStatementPositions(pklIn);
 
+  // Error if virtual keys are used in the context
+  if ((msg = CheckVirtualKeysInContext(fk, pklIn)) != STATUS_Success) return msg;
+
   // Test index and context offsets in context
   if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != STATUS_Success) return msg;
 
@@ -1794,7 +1825,7 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
   }
 
   // Warn if virtual keys are used in the output, as they are unsupported by Core
-  if ((msg = CheckVirtualKeysInOutput(pklOut)) != STATUS_Success) {
+  if ((msg = CheckVirtualKeysInOutput(fk, pklOut)) != STATUS_Success) {
     return msg;
   }
 
