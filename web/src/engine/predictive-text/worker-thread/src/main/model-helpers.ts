@@ -71,7 +71,8 @@ export function determineModelTokenizer(model: LexicalModel) {
     if(model.wordbreaker) {
       return models.tokenize(model.wordbreaker, context);
     } else {
-      return null;
+      // Not ideal for pre-14.0 models, but it'll do for now.
+      return models.tokenize(wordBreakers.default, context);
     }
   }
 }

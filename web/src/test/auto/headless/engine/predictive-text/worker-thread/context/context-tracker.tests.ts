@@ -76,10 +76,10 @@ describe('ContextTracker', function() {
       assert.equal(postContextMatch.final.appliedSuggestionId, baseSuggestion.id);
 
       // Penultimate token corresponds to whitespace, which does not have a 'raw' representation.
-      assert.equal(postContextMatch.final.tokenization.tokens[postContextMatch.final.tokenization.tokens.length - 2].exampleInput, ' ');
+      assert.equal(postContextMatch.final.displayTokenization.tokens[postContextMatch.final.displayTokenization.tokens.length - 2].exampleInput, ' ');
 
       // Final token is empty (follows a wordbreak)
-      assert.equal(postContextMatch.final.tokenization.tail.exampleInput, '');
+      assert.equal(postContextMatch.final.displayTokenization.tail.exampleInput, '');
     });
   });
 });

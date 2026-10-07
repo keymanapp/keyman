@@ -51,7 +51,7 @@ describe('Correction Searching', () => {
 
       assert.sameOrderedMembers(results.map((r) => r.matchString), expectedFirstTwenty);
       for(let i=0; i < expectedFirstTwenty.length - 1; i++) {
-        assert.isAtLeast(results[i+1].totalCost, results[i].totalCost);
+        assert.isAtLeast(results[i+1].currentCost, results[i].currentCost);
       }
 
       // The results will not be in the order as raw correction likelihood because some words
@@ -77,7 +77,7 @@ describe('Correction Searching', () => {
       assert.equal(result.correctionCost, 0);             // Gives a perfect match
       assert.equal(result.matchString, '');          // an empty match string.
       assert.isFalse(resultState.done);
-      assert.isAbove(result.totalCost, 0);
+      assert.isAbove(result.currentCost, 0);
     });
 
     // Hmm... how best to update this...
