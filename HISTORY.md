@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.303 beta 2026-10-07
+
+* fix(resources): export KEYMAN_TIER so we get beta tagging on release build (#16751)
+
 ## 19.0.302 beta 2026-10-07
 
 * fix(mac): lower case 'k' for .pkg.download_info (#16743)
