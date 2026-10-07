@@ -224,26 +224,33 @@ Keyman for Android can be built with the `android/build.sh` script.
 #### JAVA_HOME
 
 This environment variable tells Gradle what version of Java to use for building
-Keyman for Android. OpenJDK 11 is used for master.
+Keyman for Android. See [Minimum Versions](../minimum-versions.md) for
+the OpenJDK version used.
 
 It's recommended to set the environment variables to:
 
 ```bash
-export JAVA_HOME="[path to OpenJDK 11]"
+export JAVA_HOME="[path to OpenJDK]"
+```
+
+for example:
+
+```bash
+export JAVA_HOME="/usr/lib/jvm/java-21-openjdk-amd64"
 ```
 
 Also edit `/etc/profile.d/jvm.sh` as sudo:
 
 ```bash
-export JAVA_HOME="[path to OpenJDK 11]"
+export JAVA_HOME="[path to OpenJDK]"
 ```
 
 **Multiple versions of Java:** If you need to build Keyman for Android 16.0 or
-older versions, you can set `JAVA_HOME_11` to the OpenJDK 11 path and
+older versions, you can set `JAVA_HOME_21` to the OpenJDK 21 path and
 `JAVA_HOME` to the OpenJDK 8 path. This will build both versions correctly
 from command line. But note that you do need to update your `JAVA_HOME` env
 var to the associated version before opening Android Studio and loading any
-Android projects. `JAVA_HOME_11` is mostly used by CI.
+Android projects. `JAVA_HOME_21` is mostly used by CI.
 
 ## Docker Builder
 
