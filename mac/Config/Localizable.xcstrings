@@ -131,10 +131,13 @@
     "Resolve Issues" : {
 
     },
-    "Restart Computer" : {
+    "Restart Mac" : {
 
     },
-    "Restart your Mac to complete the installation. After restarting, open Keyman Configuration again if it doesn't launch automatically." : {
+    "Restart your Mac to complete the installation." : {
+
+    },
+    "Restart..." : {
 
     },
     "Run Keyman installer" : {

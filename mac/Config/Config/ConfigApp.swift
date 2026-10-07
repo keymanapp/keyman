@@ -44,15 +44,6 @@ struct ConfigApp: App {
           minHeight: 400, maxHeight: .infinity
         )
         .environmentObject(settings)
-//        .task {
-//          Logger.app.log("running MainConfigView task")
-//          if installation.installInProgress {
-//            Logger.app.log("Installation in progress, opening Installation window")
-//            await Task.yield()
-//
-//            openWindow(id: "install")
-//          }
-//        }
         .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in
           openWindow(id: "install")
         }
