@@ -27,7 +27,7 @@ import {
 
 import { TranscriptionCache } from "./transcriptionCache.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
-import { WorkerFactory } from "@keymanapp/lexical-model-layer";
+import { type WorkerFactory } from "@keymanapp/lexical-model-layer";
 
 // Only consider raw-insertion transforms.  Delete-left and delete-right disqualify an
 // incoming transform from reverting post-suggestion whitespace (or similar).

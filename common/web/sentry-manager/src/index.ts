@@ -18,6 +18,7 @@ export class KeymanSentryManager {
   static STANDARD_ALIASABLE_FILES = {
     'keymanweb.js':             'keymanweb.js',
     'keymanweb-webview.js':     'keymanweb-webview.js',
+    'worker-thread.js':         'worker-thread.js',
     'kmwuibutton.js':           'kmwuibutton.js',
     'kmwuifloat.js':            'kmwuifloat.js',
     'kmwuitoggle.js':           'kmwuitoggle.js',

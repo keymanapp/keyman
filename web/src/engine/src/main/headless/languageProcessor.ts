@@ -1,5 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
+import { LMLayer, type WorkerFactory } from "@keymanapp/lexical-model-layer/web";
 import { Transcription, TextStoreLanguageProcessorInterface, SyntheticTextStore, ProcessorAction } from 'keyman/engine/keyboard';
 import { type LanguageProcessorEventMap, type ModelSpec, StateChangeEnum, ReadySuggestions, type LanguageProcessorSpec } from 'keyman/engine/interfaces';
 import { ContextWindow } from "./contextWindow.js";

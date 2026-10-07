@@ -230,7 +230,7 @@ export class LMLayer {
 
   /**
    * Clears out any computational resources in use by the LMLayer, including shutting
-   * down any internal WebWorkers.
+   * down any internal PredictiveTextWorkers.
    */
   public shutdown() {
     this._worker.terminate();

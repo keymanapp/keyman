@@ -7,7 +7,7 @@ import * as sinon from 'sinon';
 
 import { LexicalModelTypes } from '@keymanapp/common-types';
 import { KeyboardTest, RecordedPhysicalKeystroke, RecordedSequenceTestSet } from '@keymanapp/recorder-core';
-import { NodeWorker } from '@keymanapp/lexical-model-layer/node';
+import { NodePredictiveTextWorkerFactory } from '@keymanapp/lexical-model-layer/node';
 import { DeviceSpec, KMWString } from 'keyman/common/web-utils';
 
 import { InputProcessor } from 'keyman/engine/main';
@@ -68,7 +68,7 @@ describe('InputProcessor', function() {
         // Can construct without the second parameter; if so, the final assertion - .mayPredict
         // will be invalidated.  (No worker, no ability to predict.)
         // @ts-ignore
-        core = new InputProcessor(device, NodeWorker, {
+        core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {
           baseLayout: 'us',
           keyboardInterface: new JSKeyboardInterface({}, null, new VariableStoreTestSerializer()),
           defaultOutputRules: new DefaultOutputRules()
@@ -103,7 +103,7 @@ describe('InputProcessor', function() {
     let testDistribution: KeyDistribution = [];
     let keyboardWithHarness: JSKeyboardInterface;
 
-    let mainWebScriptURL = require.resolve('@keymanapp/lm-worker/worker-main.wrapped.js');
+    let mainWebScriptURL = require.resolve('@keymanapp/lm-worker/worker-thread.js');
 
     // Easy peasy long context:  use the unminified main script for the predictive-text worker!
     let coreSourceCode = fs.readFileSync(mainWebScriptURL, 'utf-8');
@@ -309,7 +309,7 @@ describe('InputProcessor', function() {
     });
 
     it('replaces appended whitespace when a manually-applied suggestion is followed by a K_SPACE (dummy models)', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -366,7 +366,7 @@ describe('InputProcessor', function() {
     });
 
     it('replaces appended whitespace when a manually-applied suggestion is followed by a K_SPACE (trie models)', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -424,7 +424,7 @@ describe('InputProcessor', function() {
     });
 
     it('auto-applies a suggestion properly when available and triggered appropriately', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -476,7 +476,7 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after manually applying a suggestion and immediately backspacing', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -533,7 +533,7 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after returning to the whitespace after a manually-applied suggestion', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -594,7 +594,7 @@ describe('InputProcessor', function() {
     });
 
     it("displays a reversion after returning to the end of a manually-applied suggestion's body", async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -656,7 +656,7 @@ describe('InputProcessor', function() {
     });
 
     it("does not display a reversion after backspacing part of an applied suggestion", async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -720,7 +720,7 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after auto-applying a suggestion and immediately backspacing', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -775,7 +775,7 @@ describe('InputProcessor', function() {
     });
 
     it('displays a reversion after returning to the whitespace after a auto-applied suggestion', async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {
@@ -829,7 +829,7 @@ describe('InputProcessor', function() {
     });
 
     it("displays a reversion after returning to the end of an auto-applied suggestion's body", async () => {
-      const core = new InputProcessor(device, NodeWorker, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+      const core = new InputProcessor(device, new NodePredictiveTextWorkerFactory(), {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
       const langProcessor = core.languageProcessor;
 
       try {

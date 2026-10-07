@@ -67,7 +67,7 @@ run_tests() {
   # "TypeError [ERR_INVALID_URL_SCHEME]: The URL must be of scheme file"
   # when c8 tries to create a report from the raw coverage data. The reason
   # is a URL starting with `data:text/javascript` coming from
-  # `web/src/engine/predictive-text/worker-main/src/node/mappedWorker.ts`.
+  # `web/src/engine/predictive-text/worker-main/src/node/node-predictive-text-worker.ts`.
   #
   # So we first run all javascript tests except languageProcessor.tests.js
   # with coverage, and then in a second step run languageProcessor.tests.js

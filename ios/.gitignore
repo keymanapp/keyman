@@ -18,6 +18,8 @@ engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/kmwosk.css
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keyman.js.map
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanweb-webview.js
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keymanweb-webview.js.map
+engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/worker-thread.js
+engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/worker-thread.js.map
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/keyman-sentry.js
 engine/KMEI/KeymanEngine/resources/Keyman.bundle/Contents/Resources/sentry.min.js
 Keyman 2*
