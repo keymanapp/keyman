@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.302 beta 2026-10-07
+
+* fix(mac): lower case 'k' for .pkg.download_info (#16743)
+* docs: update v19 whats-new (#16748)
+
 ## 19.0.300 beta 2026-10-06
 
 * chore: move to beta
