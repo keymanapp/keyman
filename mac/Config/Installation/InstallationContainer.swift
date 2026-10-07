@@ -9,6 +9,7 @@
 import SwiftUI
 import Combine
 import KeymanSettings
+import Carbon
 import OSLog
 
 // in-app notifications sent
@@ -95,25 +96,8 @@ public class InstallationContainer : ObservableObject {
    * called immediately after startup when invoked from installer post-install script
    */
   func executeNewInstall() {
-    Logger.app.debug("✅ executing new installation...")
+    Logger.app.debug("executing new installation...")
     self.installationCheck.startInstallationEvaluation()
-    
-//    self.installInProgress = true
-//    var didRegister = false
-//    var didEnable = false
-//    
-//    // test to see if input method is registered or active
-//    let inputSourceState = self.installationCheck.checkInputSources()
-//    
-//    if !inputSourceState.registered {
-//      didRegister = self.inputMethodUtil.registerKeymanInputMethod()
-//    }
-//    
-//    if !inputSourceState.enabled {
-//      didEnable = self.inputMethodUtil.enableKeymanInputMethod()
-//    }
-//
-//    Logger.app.debug("new installation, didRegister: \(didRegister), didEnable: \(didEnable)")
   }
   
   /**
@@ -146,6 +130,13 @@ public class InstallationContainer : ObservableObject {
       name: NSNotification.Name.accessibilityNotGranted,
       object: nil // Observe notifications from any sender
     )
+    let notificationName = Notification.Name(kTISNotifyEnabledKeyboardInputSourcesChanged as String)
+    DistributedNotificationCenter.default().addObserver(
+      self,
+      selector: #selector(self.handleInputSourcesChanged(_:)),
+      name: notificationName,
+      object: nil // Observe notifications from any sender
+    )
   }
 
   /**
@@ -167,6 +158,74 @@ public class InstallationContainer : ObservableObject {
     // notify observers
     NotificationCenter.default.post(name: .installationRepairStarted, object: nil, userInfo: nil)
   }
+
+  /**
+   * called when `kTISNotifyEnabledKeyboardInputSourcesChanged` is received
+   */
+  @objc func handleInputSourcesChanged(_ notification: Notification) {
+    Logger.app.debug("handleInputSourcesChanged received message: \(notification, privacy: .public)")
+
+    guard self.installationState != nil else { return }
+
+    let inputSourceState = self.checkInputSources()
+    
+    if inputSourceState.registered && inputSourceState.enabled {
+      // the confirmEnabled task can now be marked as completed
+      if let task = self.currentTask() {
+        if task.taskType == .confirmEnabled {
+          self.updateTaskAsCompleted(taskType: .confirmEnabled)
+        }
+      }
+    }
+  }
+  
+  /**
+   * uses Carbon TextInputSource APIs to examine the input source list and verify
+   * whether the Keyman input method is registered and enabled
+   */
+  public func checkInputSources() -> (registered: Bool, enabled: Bool) {
+    var inputSourceState: (registered: Bool, enabled: Bool) = (false, false)
+    
+    let inputSourceId = InputMethodUtil.keymanBundleId
+    let properties = [
+        kTISPropertyInputSourceID: inputSourceId as CFString
+    ] as CFDictionary
+
+    Logger.app.debug("Checking updated input sources")
+
+    // use includesAllInstalled = true, so we get unregistered input methods
+    guard let listRef = TISCreateInputSourceList(properties, true) else {
+      Logger.app.error("Unable to fetch input source list.")
+      return inputSourceState
+    }
+    
+    let inputSourceList = listRef.takeRetainedValue() as! [TISInputSource]
+    
+    if (!inputSourceList.isEmpty) {
+      guard let source = inputSourceList.first else {
+        return inputSourceState
+      }
+
+      guard let idPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
+            let enabledPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceIsEnabled) else {
+        return inputSourceState
+      }
+      
+      inputSourceState.registered = true
+      
+      // Extract the string Identifier and boolean Enablement state
+      let sourceID = Unmanaged<CFString>.fromOpaque(idPtr).takeUnretainedValue() as String
+      let isEnabled = Unmanaged<CFBoolean>.fromOpaque(enabledPtr).takeUnretainedValue() as! Bool
+      
+      inputSourceState.enabled = isEnabled
+      Logger.app.debug("Source ID: \(sourceID, privacy: .public) | Is Enabled: \(isEnabled)")
+    } else {
+      Logger.app.debug("Keyman input source not registered in system.")
+    }
+    
+    return inputSourceState
+  }
+  
 
   /**
    * called when `NSNotification.Name.accessibilityGranted` is received
@@ -254,6 +313,8 @@ public class InstallationContainer : ObservableObject {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .enableInputMethod }) {
       return incompleteTask
+    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .confirmEnabled }) {
+      return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .requestAccess }) {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .confirmAccess }) {
@@ -287,6 +348,8 @@ public class InstallationContainer : ObservableObject {
       completedTask = true
     case .enableInputMethod:
       completedTask = self.enableKeymanInputMethod()
+    case .confirmEnabled:
+      completedTask = true
     case .requestAccess:
       completedTask = self.requestAccessibility()
     case .confirmAccess:

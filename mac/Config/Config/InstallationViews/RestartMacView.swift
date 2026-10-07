@@ -9,7 +9,7 @@
 import SwiftUI
 import OSLog
 
-struct RestartComputerView: View {
+struct RestartMacView: View {
   @EnvironmentObject var installation: InstallationContainer
   let namespace: Namespace.ID
   
@@ -35,7 +35,7 @@ struct RestartComputerView: View {
       GradientDivider(namespace: namespace)
         .padding(.bottom, 8)
       HStack {
-        Text("Finish installation")
+        Text("Complete installation")
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
         Button("Restart...", role: nil) { restartMac() }

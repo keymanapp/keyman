@@ -15,7 +15,6 @@
 import Foundation
 import KeymanSettings
 import OSLog
-import Carbon
 
 // The data model version number is updated by the input method.
 // We only read the value here, and if it is current, then there is no need
@@ -255,14 +254,6 @@ public class InstallationCheck {
       name: NSNotification.Name.accessibilityStateResponse,
       object: nil // Observe notifications from any sender
     )
-    
-    let notificationName = Notification.Name(kTISNotifyEnabledKeyboardInputSourcesChanged as String)
-    DistributedNotificationCenter.default().addObserver(
-      self,
-      selector: #selector(self.handleInputSourcesChanged(_:)),
-      name: notificationName,
-      object: nil // Observe notifications from any sender
-    )
 
     // TODO: add timeout in case response is not received
     // see issue #16579
@@ -304,61 +295,6 @@ public class InstallationCheck {
     }
   }
 
-  /**
-   * called when `kTISNotifyEnabledKeyboardInputSourcesChanged` is received
-   */
-  @objc func handleInputSourcesChanged(_ notification: Notification) {
-    Logger.app.debug("handleKeyboardEnabled received message: \(notification, privacy: .public)")
-    let inputSourceState = self.checkInputSources()
-  }
-  
-  public func checkInputSources() -> (registered: Bool, enabled: Bool) {
-    // Correct Carbon filtering keys
-//    let properties = [
-//      kTISPropertyInputSourceCategory: kTISCategoryKeyboardInputSource
-//    ] as CFDictionary
-    var inputSourceState: (registered: Bool, enabled: Bool) = (false, false)
-    
-    let inputSourceId = InputMethodUtil.keymanBundleId
-    let properties = [
-        kTISPropertyInputSourceID: inputSourceId as CFString
-    ] as CFDictionary
-
-    Logger.app.debug("🚦checking input sources")
-
-    // use includesAllInstalled = true, so we get unregistered input methods
-    guard let listRef = TISCreateInputSourceList(properties, true) else {
-      Logger.app.error("Unable to fetch input source list.")
-      return inputSourceState
-    }
-    
-    let inputSourceList = listRef.takeRetainedValue() as! [TISInputSource]
-    
-    if (!inputSourceList.isEmpty) {
-      guard let source = inputSourceList.first else {
-        return inputSourceState
-      }
-
-      guard let idPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
-            let enabledPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceIsEnabled) else {
-        return inputSourceState
-      }
-      
-      inputSourceState.registered = true
-      
-      // Extract the string Identifier and boolean Enablement state
-      let sourceID = Unmanaged<CFString>.fromOpaque(idPtr).takeUnretainedValue() as String
-      let isEnabled = Unmanaged<CFBoolean>.fromOpaque(enabledPtr).takeUnretainedValue() as! Bool
-      
-      inputSourceState.enabled = isEnabled
-      Logger.app.debug("Source ID: \(sourceID, privacy: .public) | Is Enabled: \(isEnabled)")
-    } else {
-      Logger.app.debug("Keyman input source not registered in system.")
-    }
-    
-    return inputSourceState
-  }
-  
   /**
    * Process the distributed notification message that we received from the Keyman input method.
    */
@@ -497,6 +433,7 @@ static func readInstallationState(from repo: DefaultsRepo) -> InstallationState?
     // add enable input method and restart mac tasks if needed
     if !self.inputMethodUtil.isKeymanInputMethodEnabled() {
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .enableInputMethod))
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmEnabled))
       
     // if enable is needed, prompt to restart to ensure that the input method has been loaded by the system
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
