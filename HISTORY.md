@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 20.0.2 alpha 2026-10-07
+
+* fix(mac): lower case 'k' for .pkg.download_info (#16744)
+
 ## 20.0.1 alpha 2026-10-06
 
 * chore: add epics to HISTORY.md (#16729)
