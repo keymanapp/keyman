@@ -161,7 +161,6 @@ public class InstallationCheck {
     let success = self.inputMethodUtil.invokeKeymanInputMethodMigration()
     Logger.app.debug("migrateData migration suceeded: \(success)")
 
-    // check whether
     if success {
       NotificationCenter.default.post(name: .dataMigrated, object: nil)
     }
@@ -210,10 +209,8 @@ public class InstallationCheck {
     guard self.isInputMethodInstalled else { return }
     guard self.isInputMethodCurrent else { return }
 
-    if (self.isLaunchedByInstaller) {
-      // call the input method to check whether Accessibility permission has been granted
-      self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
-    }
+    // call the input method to check whether Accessibility permission has been granted
+    self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
   }
 
   /**
@@ -282,7 +279,7 @@ public class InstallationCheck {
       let permissionGranted = self.processAccessibilityResponse(with: message)
       
       Logger.app.debug("handleAccessibilityResponse, message: \(message, privacy: .public)")
-
+      
       if let state = self.installationState {
         installCompleted = state.isComplete
       }
@@ -290,7 +287,12 @@ public class InstallationCheck {
       if self.isEvaluatingNewInstallation {
         // if evaluating the current state for a new installation,
         // complete the evaluation using the results of the permission check
-       self.completeNewInstallationEvaluation(accessibilityPermissionGranted: permissionGranted)
+        self.completeNewInstallationEvaluation(accessibilityPermissionGranted: permissionGranted)
+        
+        // for a new install, we triggered migration
+        if self.isLaunchedByInstaller {
+          NotificationCenter.default.post(name: .dataMigrated, object: nil)
+        }
       } else if installCompleted {
         // if this is a completed install, check whether repairs are needed
         self.checkForRepair(accessibilityPermissionGranted: permissionGranted)

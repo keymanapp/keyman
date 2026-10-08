@@ -48,7 +48,7 @@ public class InstallationContainer : ObservableObject {
     // Check to see if the app was launched directly from the installer's post-install script.
     // If the installer launched the config app, then we must continue with the installation process.
     if ProcessInfo.processInfo.arguments.contains(installationArgument) {
-      Logger.app.log("setting installInProgress to true")
+      Logger.app.log("setting isLaunchedByInstaller to true")
       isLaunchedByInstaller = true
     }
 
