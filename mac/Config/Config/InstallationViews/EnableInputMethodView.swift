@@ -91,7 +91,8 @@ struct EnableInputMethodView: View {
           .disabled(!enableButtonPressed)
       }
     }
-    // triggered when the system confirms that
+    // triggered when notified by the system that the input sources changed
+    // and we have confirmed that the Keyman input method is registered and enabled
     .onReceive( NotificationCenter.default.publisher(for: .inputMethodEnabled)) { notification in
       
       // bring the app to the front, just in case it is being blocked by the System Settings

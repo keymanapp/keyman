@@ -210,7 +210,9 @@ public class InstallationCheck {
     guard self.isInputMethodCurrent else { return }
 
     // call the input method to check whether Accessibility permission has been granted
-    self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
+    if (self.isLaunchedByInstaller) {
+      self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
+    }
   }
 
   /**
