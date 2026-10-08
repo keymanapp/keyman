@@ -41,7 +41,7 @@ Rosetta 2 installed.
 
 Many dependencies are only required for specific projects.
 
-* XCode (iOS, macOS) 26.2 or 26.3 (not higher at this time, see #16416) 
+* XCode (iOS, macOS) 26.2 or 26.3 (not higher at this time, see #16416)
   is needed only for Keyman for macOS and Keyman for iOS ().
 
   * Install from App Store
@@ -206,8 +206,10 @@ components such as emulator images and SDK updates.
 
 * node.js, emscripten
 
-```shell
-brew install node emscripten
+  ```shell
+  brew install node emscripten
+  ```
+
 * node.js 20.0, emscripten 3.1.64
 
 See section KeymanWeb Dependencies for installation
@@ -216,6 +218,6 @@ See section KeymanWeb Dependencies for installation
 
 * sentry-cli: Uploading symbols for Sentry-based error reporting
 
-  ```shell
-  brew install getsentry/tools/sentry-cli
-  ```
+  See <https://docs.sentry.io/cli/installation/> for the installation, and
+  check [minimum-versions.md](../minimum-versions.md) for the required version of
+  `sentry-cli`.
