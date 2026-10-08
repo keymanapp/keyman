@@ -99,23 +99,25 @@ Features
 
 ## Layout tab
 
+### Design view
+
+> Path: KMN → Layout tab → Design view (default) 
+
 <img src="../images/ui/frmKeymanWizard_Layout_Design.png" style="width:100%" alt="Keyboard Editor - Layout tab, Design view"/>
 
 The Layout tab gives you a simple interface to quickly create a keyboard
-using a visual representation of a desktop/laptop computer keyboard. You
+using a visual representation of a **desktop/laptop keyboard**. You
 can drag and drop characters from the character map to create keyboard
-layouts. You cannot access most of Keyman's more powerful features from
-the Layout Design view, but it will be useful to get you started on your
-design.
+layouts.
 
 Each key can have zero or more characters assigned to it. Each key can
 be assigned a different set of characters for each shift state. You can
-change the shift state by clicking on the Shift, Ctrl, and Alt keys.
+change the shift state by clicking on the <kbd>Shift</kbd>, <kbd>Ctrl</kbd>, and <kbd>Alt</kbd> keys.
 
 There are two ways to assign characters to the keys:
 
 -   Click on a key, and then type the character's code into the Unicode
-    Character Value(s) field, or the type/paste the character itself
+    Character Value(s) field, or type/paste the character itself
     into the Output character(s) field.
 -   Select the character from the Character Map and drag and drop it
     onto the appropriate key. This will set the key to output that
@@ -130,7 +132,7 @@ There are two ways to assign characters to the keys:
 Distinguish between left and right Ctrl/Alt
 :   A Keyman keyboard can treat left and right Ctrl and Alt identically,
     or it can distinguish between them. The Design view allows one or
-    the other mode (in Code view, you can use both interchangeably).
+    the other mode (in [Code view](#toc-code-view), you can use both interchangeably).
 
 Display 102nd Key (as on European keyboards)
 :   European keyboards have one extra key that is not on US keyboards.
@@ -143,8 +145,17 @@ Display 102nd Key (as on European keyboards)
     the backslash key will move down one row, but not otherwise change
     in behaviour.
 
-You can press and release <kbd>Ctrl</kbd> to select
+> [!TIP]
+> You can press and release <kbd>Ctrl</kbd> to select
 another key on the keyboard using your keyboard.
+
+You cannot access most of Keyman's more powerful features from
+the Layout Design view, but it will be useful to get you started on your
+design.
+
+### Code view
+
+> Path: KMN → Layout tab → Code view
 
 <img src="../images/ui/frmKeymanWizard_Layout_Code.png" style="width:100%" alt="Keyboard Editor - Layout tab, Code view"/>
 
@@ -155,6 +166,9 @@ the Code view.
 
 See the [Editor topic](editor) for more information on how to use the
 editor shown within this view.
+
+> [!NOTE]
+> Remember that any newly assigned keys from this view won't apply to the desktop/laptop keyboard unless using the 'Fill from layout' (See [On-screen](#toc-on-screen-tab) below).
 
 ## On-Screen tab
 
@@ -182,6 +196,9 @@ Fill from layout
     that matches the layout. This can be used to effectively
     pre-populate the On-Screen Keyboard and reduces the complexity of
     designing it from scratch.
+
+> [!CAUTION]
+> The changes from [Code view](#toc-code-view) will only apply to the desktop/laptop keyboard once you use the 'Fill from layout'.
 
 Import
 :   Imports an On-Screen Keyboard from an XML file.
