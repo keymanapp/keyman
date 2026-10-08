@@ -17,7 +17,7 @@ NSString * const kOskVisibleTagName = @"oskVisible";
 NSString * const kClientAppIdTagName = @"clientAppId";
 NSString * const kKeyboardTagName = @"keyboard";
 NSString * const kHasAccessibilityTagName = @"accessibilityEnabled";
-NSString * const kActiveKeyboardCountTagName = @"activeKeyboardCount";
+NSString * const kEnabledKeyboardCountTagName = @"enabledKeyboardCount";
 NSString * const kLifecycleStateTagName = @"lifecycleState";
 
 + (void)addLifecycleStateTag: (NSString *)value {
@@ -48,8 +48,8 @@ NSString * const kLifecycleStateTagName = @"lifecycleState";
   [self addCustomTag:kHasAccessibilityTagName withValue:value?@"true":@"false"];
 }
 
-+ (void)addActiveKeyboardCountTag:(NSUInteger)value {
-  [self addCustomTag:kActiveKeyboardCountTagName withValue:[[NSNumber numberWithUnsignedLong:value] stringValue]];
++ (void)addEnabledKeyboardCountTag:(NSUInteger)value {
+  [self addCustomTag:kEnabledKeyboardCountTagName withValue:[[NSNumber numberWithUnsignedLong:value] stringValue]];
 }
 
 /**

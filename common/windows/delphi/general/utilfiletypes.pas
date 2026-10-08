@@ -91,6 +91,27 @@ function IsProjectFile(const FileName: string): Boolean;
 function IsKeyboardFile(const FileName: string): Boolean;
 function RemoveFileExtension(Filename, Extension: string): string;
 
+(**
+  * Builds the compiled keyboard filename by inserting the base keyboard ID
+  * before the .kmx extension.
+  *
+  * @param  KeyboardFileName       Keyboard filename, in the form '[path\]keyboardid[.kmx]'
+  * @param  BaseKeyboardIDHex      Base keyboard KLID in eight digit hexadecimal form
+  * @return Compiled keyboard filename, in the form '[path\]keyboardid-<KLID>.kmx'
+  *)
+function BuildKeyboardFilenameWithBaseKeyboardID(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
+
+(**
+  * Builds the dead-key compiled keyboard filename by inserting the base
+  * keyboard ID and -d suffix before the .kmx extension.
+  *
+  * @param  KeyboardFileName       Keyboard filename, in the form '[path]\keyboardid[.kmx]'
+  * @param  BaseKeyboardIDHex      Base keyboard KLID in eight digit hexadecimal form
+  * @return Dead-key compiled keyboard filename, in the form '[path\]keyboardid-<KLID>-d.kmx'
+  *)
+function BuildKeyboardFilenameWithBaseKeyboardIDAndDeadkey(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
+
+
 type
   TKeymanFileTypeInfo = class
   public
@@ -206,6 +227,16 @@ begin
   Result := SameFileName(PackageFile_Welcome, FileName) or
     (StartsText(PackageFile_Welcome_Prefix, Filename) and
     SameText(ExtractFileExt(Filename), ExtractFileExt(PackageFile_Welcome)));
+end;
+
+function BuildKeyboardFilenameWithBaseKeyboardID(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
+begin
+    Result := ChangeFileExt(KeyboardFileName, '') + '-' + BaseKeyboardIDHex + '.kmx';
+end;
+
+function BuildKeyboardFilenameWithBaseKeyboardIDAndDeadkey(const KeyboardFileName: string; BaseKeyboardIDHex: string): string;
+begin
+  Result := ChangeFileExt(KeyboardFileName, '') + '-' + BaseKeyboardIDHex + '-d.kmx';
 end;
 
 end.

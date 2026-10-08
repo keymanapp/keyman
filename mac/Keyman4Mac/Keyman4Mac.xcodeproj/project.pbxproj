@@ -386,8 +386,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International. All rights reserved.";
-				COPYRIGHT_YEARS = "2017-2019";
+				COPYRIGHT_STRING = "Copyright © SIL Global. All rights reserved.";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Keyman4Mac/Frameworks",
@@ -412,8 +411,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				COPYRIGHT_STRING = "Copyright © $(COPYRIGHT_YEARS) SIL International. All rights reserved.";
-				COPYRIGHT_YEARS = "2017-2019";
+				COPYRIGHT_STRING = "Copyright © SIL Global. All rights reserved.";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Keyman4Mac/Frameworks",
