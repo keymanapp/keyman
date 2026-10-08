@@ -202,31 +202,43 @@ public class InstallationCheck {
   }
   
   /**
-   * Should be called immediately after init to evaluate what is needed for installation
-   * or, if the installation is complete, whether it needs repairs.
+   * For new installations, called from init to evaluate what is needed to complete install.
    * When the notification from the input method is received and the evaluation is done,
    * the installation can move out of the `evaluatingInstallation` phase
    */
-  public func startInstallationEvaluation() {
-    // call the input method to check whether Accessibility permission has been granted
-    if (self.isInputMethodInstalled && self.isInputMethodCurrent) &&
-        (self.isEvaluatingNewInstallation || self.isReadyForRepairCheckAtStartup()) {
-      if (self.isLaunchedByInstaller) {
-        self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
-      } else {
-        self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
-      }
+  public func startNewInstall() {
+    guard self.isInputMethodInstalled else { return }
+    guard self.isInputMethodCurrent else { return }
+
+    if (self.isLaunchedByInstaller) {
+      // call the input method to check whether Accessibility permission has been granted
+      self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
     }
   }
-  
+
+  /**
+   * For comopleted installations, called from init to evaluate whether repairs are needed.
+   * When the notification from the input method is received and the evaluation is done,
+   * the installation can move out of the `evaluatingInstallation` phase
+   */
+  public func startRepairCheck() {
+    guard self.isReadyForRepairCheckAtStartup() else { return }
+      
+    // call the input method to check whether Accessibility permission has been granted
+    self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
+  }
+
   /**
    * Returns true if we should check at app startup whether the installation needs repair.
    * Simply returns true if the installation is complete.
    */
   func isReadyForRepairCheckAtStartup() -> Bool {
+    guard self.isInputMethodInstalled else { return false }
+    guard self.isInputMethodCurrent else { return false }
+    
     let readyForRepairCheck = self.installationState?.isComplete == true
     
-    Logger.app.debug("isReadyForRepairCheckAtStartup: \(readyForRepairCheck, privacy: .public)")
+    Logger.app.debug("isReadyForRepairCheckAtStartup: \(readyForRepairCheck)")
 
     return readyForRepairCheck
   }

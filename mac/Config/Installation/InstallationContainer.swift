@@ -83,13 +83,12 @@ public class InstallationContainer : ObservableObject {
       self.confirmUserRestarted()
     } else {
       self.registerObservers()
-    
-      // use command line argument to begin installation instead
-      //self.installationCheck.startInstallationEvaluation()
-    }
-    
-    if installInProgress {
-      self.executeNewInstall()
+
+      if installInProgress {
+        self.executeNewInstall()
+      } else {
+        self.startRepairCheck()
+      }
     }
   }
   
@@ -98,9 +97,17 @@ public class InstallationContainer : ObservableObject {
    */
   func executeNewInstall() {
     Logger.app.debug("executing new installation...")
-    self.installationCheck.startInstallationEvaluation()
+    self.installationCheck.startNewInstall()
   }
-  
+
+  /**
+   * called immediately after startup when invoked from installer post-install script
+   */
+  func startRepairCheck() {
+    Logger.app.debug("executing repair check...")
+    self.installationCheck.startRepairCheck()
+  }
+
   /**
    * register observers to learn of results of InstallationState evaluation
    */
@@ -229,7 +236,6 @@ public class InstallationContainer : ObservableObject {
     
     return inputSourceState
   }
-  
 
   /**
    * called when `NSNotification.Name.accessibilityGranted` is received

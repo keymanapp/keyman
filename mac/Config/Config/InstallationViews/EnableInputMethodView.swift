@@ -8,12 +8,15 @@
 
 import SwiftUI
 
+/**
+ * Navigate directly to System Settings > Keyboard > Input Sources > Edit...
+ * From that location, the user would still need to click the '+' symbol, search for Keyman and click the Add button
+ */
 func openKeyboardSettingsInputSourcesPane() {
   if let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension?InputSources") {
     NSWorkspace.shared.open(url)
   }
 }
-//x-apple.systempreferences:com.apple.Keyboard
 
 struct EnableInputMethodView: View {
   @EnvironmentObject var installation: InstallationContainer
