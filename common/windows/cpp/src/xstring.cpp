@@ -48,7 +48,6 @@ PWSTR incxstr(PWSTR p)
 		case CODE_USE:			return p+1;
 		case CODE_DEADKEY:		return p+1;
 		case CODE_EXTENDED:		p += 2; while(*p && *p != UC_SENTINEL_EXTENDEDEND) p++; return p+1;
-		case CODE_CLEARCONTEXT: return p+1;
 		case CODE_CALL:			return p+1;
 		case CODE_CONTEXTEX:	return p+1;
     case CODE_IFOPT:    return p+3;
@@ -98,7 +97,6 @@ PWSTR decxstr(PWSTR p, PWSTR pStart)
 			case CODE_NOTANY:
 			case CODE_USE:
 			case CODE_DEADKEY:
-			case CODE_CLEARCONTEXT:
 			case CODE_CALL:
 			case CODE_CONTEXTEX:
       case CODE_RESETOPT:

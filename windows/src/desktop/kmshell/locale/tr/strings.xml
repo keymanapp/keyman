@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <resources>
   <string name="S_Toolbar_CloseOnScreenKeyboard" comment="/PlainText: ">Ekran Klavyesi Kapat</string>
   <string name="S_Menu_Exit" comment="/PlainText: ">&amp;Çıkış</string>
@@ -121,7 +121,7 @@
   <string name="S_Languages_Install" comment="/PlainText: ">Dil ekle</string>
   <string name="S_Languages_InstalledLanguage" comment="/PlainText: ">Yüklü Dil</string>
   <string name="S_Languages_KeymanKeyboard" comment="/PlainText: ">Keyman Klavye</string>
-  <string name="S_Languages_Uninstall" comment="/PlainText: ">x</string>
+  <string name="S_Languages_Uninstall" comment="/PlainText: ">✕</string>
   <string name="S_Languages_UseWindowsLayout" comment="/PlainText: ">(Windows düzeni kullan)</string>
   <string name="S_Languages_WindowsLayout" comment="/PlainText: ">Windows Düzeni</string>
   <string name="S_LayoutType_Mnemonic" comment="/PlainText: ">Windows düzenine (Anımsatıcı) eşleştirildi</string>

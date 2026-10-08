@@ -9,6 +9,7 @@ plugins {
 ext.rootPath = '../../'
 apply from: "$rootPath/version.gradle"
 String tier = System.getenv("KEYMAN_TIER");
+println "Using tier $tier"
 
 java {
     toolchain {
