@@ -16,7 +16,7 @@ import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyzer.tests.js';
 import { DeadkeyNameRule, HeaderAssignRule, HeaderNameRule, NormalStoreNameRule } from '../../src/ng-compiler/store-analyzer.js';
 import { NormalStoreAssignRule, NormalStoreRule, ResetStoreRule, SetNormalStoreRule, SetSystemStoreRule } from '../../src/ng-compiler/store-analyzer.js';
-import { ShiftFreesCapsRule, StoreNameRule, SystemStoreAssignRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyzer.js';
+import { StoreNameRule, SystemStoreAssignRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyzer.js';
 import { SystemStoreNameRule, SystemStoreRule } from '../../src/ng-compiler/store-analyzer.js';
 import { TokenBuffer } from './token-buffer.js';
 
@@ -471,19 +471,6 @@ describe("KMN Store Analyser Tests", () => {
       const resetNode = root.getSoleChildOfType(NodeType.RESET);
       assert.isNotNull(resetNode);
       assert.isNotNull(resetNode.getSoleChildOfType(NodeType.STORENAME));
-    });
-  });
-  describe("ShiftFreesCapsRule Tests", () => {
-    it("can construct a ShiftFreesCapsRule", () => {
-      tokenBuffer = stringToTokenBuffer('');
-      const shiftFreesCaps: Rule = new ShiftFreesCapsRule();
-      assert.isNotNull(shiftFreesCaps);
-    });
-    it("can parse correctly", () => {
-      tokenBuffer = stringToTokenBuffer('shift frees caps');
-      const shiftFreesCaps: Rule = new ShiftFreesCapsRule();
-      assert.isTrue(shiftFreesCaps.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.SHIFTFREESCAPS));
     });
   });
   describe("HeaderAssignRule Tests", () => {

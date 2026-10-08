@@ -13,7 +13,7 @@ import { TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyzer.js";
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyzer.js";
 import { HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyzer.js";
-import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStoreAssignRule } from "./store-analyzer.js";
+import { SetNormalStoreRule, SetSystemStoreRule, SystemStoreAssignRule } from "./store-analyzer.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
@@ -193,24 +193,24 @@ export class CompileTargetRule extends AlternateTokenRule {
 }
 
 /**
- * (BNF) content: systemStoreAssign|CAPSALWAYSOFF_HEADER|CAPSONONLY_HEADER|shiftFreesCaps|
- * headerAssign|normalStoreAssign|ruleBlock
+ * (BNF) content: systemStoreAssign|CAPSALWAYSOFF_HEADER|CAPSONONLY_HEADER|
+ * SHIFTFREESCAPS_HEADER|headerAssign|normalStoreAssign|ruleBlock
  */
 export class ContentRule extends SingleChildRule {
   public constructor() {
     super();
-    const systemStoreAssign    = new SystemStoreAssignRule();
-    const capsAlwaysOff_Header = new TokenRule(TokenType.CAPSALWAYSOFF_HEADER, true);
-    const capsOnOnly_Header    = new TokenRule(TokenType.CAPSONONLY_HEADER, true);
-    const shiftFreesCaps       = new ShiftFreesCapsRule();
-    const headerAssign         = new HeaderAssignRule();
-    const normalStoreAssign    = new NormalStoreAssignRule();
-    const ruleBlock            = new RuleBlockRule();
+    const systemStoreAssign     = new SystemStoreAssignRule();
+    const capsAlwaysOff_Header  = new TokenRule(TokenType.CAPSALWAYSOFF_HEADER, true);
+    const capsOnOnly_Header     = new TokenRule(TokenType.CAPSONONLY_HEADER, true);
+    const shiftFreesCaps_Header = new TokenRule(TokenType.SHIFTFREESCAPS_HEADER, true);
+    const headerAssign          = new HeaderAssignRule();
+    const normalStoreAssign     = new NormalStoreAssignRule();
+    const ruleBlock             = new RuleBlockRule();
     this.rule = new AlternateRule([
       systemStoreAssign,
       capsAlwaysOff_Header,
       capsOnOnly_Header,
-      shiftFreesCaps,
+      shiftFreesCaps_Header,
       headerAssign,
       normalStoreAssign,
       ruleBlock,
@@ -520,7 +520,6 @@ export class PermittedKeywordRule extends AlternateTokenRule {
       TokenType.CONTEXT,
       TokenType.COPYRIGHT_HEADER,
       TokenType.DECIMAL,
-      TokenType.FREES,
       TokenType.HEXADECIMAL,
       TokenType.HOTKEY_HEADER,
       TokenType.KEY_CODE,

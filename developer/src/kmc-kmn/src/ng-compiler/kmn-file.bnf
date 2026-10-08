@@ -1,8 +1,8 @@
 kmnTree: line*
 line: compileTarget? content? NEWLINE
 compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
-content: systemStoreAssign|CAPSALWAYSOFF_HEADER|CAPSONONLY_HEADER|shiftFreesCaps|
-  headerAssign|normalStoreAssign|ruleBlock
+content: systemStoreAssign|CAPSALWAYSOFF_HEADER|CAPSONONLY_HEADER|
+  SHIFTFREESCAPS_HEADER|headerAssign|normalStoreAssign|ruleBlock
 text: plainText|outsStatement
 plainText: textRange|simpleText
 simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|
@@ -20,7 +20,7 @@ groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
 groupName: groupNameElement+
 groupNameElement: PARAMETER|OCTAL|permittedKeyword
 permittedKeyword: ANSI|BEEP|BEGIN|BITMAP_HEADER|CAPS|CONTEXT|
-  COPYRIGHT_HEADER|DECIMAL|FREES|HEXADECIMAL|HOTKEY_HEADER|KEY_CODE|
+  COPYRIGHT_HEADER|DECIMAL|HEXADECIMAL|HOTKEY_HEADER|KEY_CODE|
   KEYS|LANGUAGE_HEADER|LAYOUT_HEADER|MATCH|MESSAGE_HEADER|NAME_HEADER|
   NEWCONTEXT|NOMATCH|NUL|OCTAL|POSTKEYSTROKE|READONLY|
   RETURN|SHIFT|UNICODE|USING|VERSION_HEADER
@@ -77,7 +77,6 @@ setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
 setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR
 systemStoreNameForSet: systemStoreName|LAYER
 resetStore: RESET LEFT_BR normalStoreName RIGHT_BR
-shiftFreesCaps: SHIFT FREES CAPS
 headerAssign: headerName headerValue
 headerValue: text+|PARAMETER?
 headerName: BITMAP_HEADER|COPYRIGHT_HEADER|HOTKEY_HEADER|LANGUAGE_HEADER|

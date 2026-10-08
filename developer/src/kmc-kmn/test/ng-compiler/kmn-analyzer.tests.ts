@@ -298,7 +298,7 @@ describe("KMN Analyser Tests", () => {
       tokenBuffer = stringToTokenBuffer('shift frees caps');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.SHIFTFREESCAPS));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.SHIFTFREESCAPS_HEADER));
     });
     it("can parse correctly (header assign)", () => {
       tokenBuffer = stringToTokenBuffer('hotkey [SHIFT K_H]');
@@ -849,7 +849,6 @@ describe("KMN Analyser Tests", () => {
         {input: 'context',       nodeType: NodeType.CONTEXT},
         {input: 'copyright ',    nodeType: NodeType.COPYRIGHT_HEADER},
         {input: 'd1 ',           nodeType: NodeType.DECIMAL},
-        {input: 'frees',         nodeType: NodeType.FREES},
         {input: 'xa1 ',          nodeType: NodeType.HEXADECIMAL},
         {input: 'hotkey ',       nodeType: NodeType.HOTKEY_HEADER},
         {input: 'keys',          nodeType: NodeType.KEYS},

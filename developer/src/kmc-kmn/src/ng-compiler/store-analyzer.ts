@@ -9,13 +9,10 @@
  */
 
 import { TokenType } from "./token-type.js";
-import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyzer.js";
 import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule } from "./recursive-descent.js";
 import { SingleChildRule, SingleChildRuleWithASTRebuild, SequenceRule, TokenRule } from "./recursive-descent.js";
 import { NodeType } from "./node-type.js";
-import { ASTNode } from "./tree-construction.js";
-import { TokenBuffer } from "./token-buffer.js";
 import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-rebuild.js";
 
 /**
@@ -296,58 +293,6 @@ export class ResetStoreRule extends SingleChildRuleWithASTRebuild {
     const normalStoreName = new NormalStoreNameRule();
     const rightBracket    = new TokenRule(TokenType.RIGHT_BR);
     this.rule = new SequenceRule([reset, leftBracket, normalStoreName, rightBracket]);
-  }
-}
-
-/**
- * An abstract base class for rules that match multiword caps lock
- * headers and map them to more modern caps lock system store commands.
- *
- * https://help.keyman.com/developer/language/reference/_keywordsbytype
- * https://help.keyman.com/developer/language/reference/caps
- */
-abstract class AbstractCapsLockStatementRule extends SingleChildRule {
-  public constructor(
-    /** type of token that will be created */
-    protected tokenType: TokenType,
-    /** type of node that will be added to the tree */
-    protected nodeType: NodeType,
-  ) {
-    super();
-  }
-
-  /**
-   * Parse a CapsLockStatementRule. A child class needs to identify
-   * the nodeType and tokenType that will be added to the AST if
-   * the parse is successful.
-   *
-   * @param tokenBuffer the TokenBuffer to parse
-   * @param node where to build the AST
-   * @returns true if this rule was successfully parsed
-   */
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    if (this.rule.parse(tokenBuffer, new ASTNode())) {
-      // TODO-NG-COMPILER: warning/error for caps lock statements
-      node.addNewChildWithToken(this.nodeType, new Token(this.tokenType, '1'));
-      return true;
-    }
-    return false;
-  }
-}
-
-/**
- * (BNF) shiftFreesCaps: SHIFT FREES CAPS
- *
- * https://help.keyman.com/developer/language/reference/_keywordsbytype
- * https://help.keyman.com/developer/language/reference/caps
- */
-export class ShiftFreesCapsRule extends AbstractCapsLockStatementRule {
-  public constructor() {
-    super(TokenType.SHIFTFREESCAPS, NodeType.SHIFTFREESCAPS);
-    const shift = new TokenRule(TokenType.SHIFT);
-    const frees = new TokenRule(TokenType.FREES);
-    const caps  = new TokenRule(TokenType.CAPS);
-    this.rule   = new SequenceRule([shift, frees, caps]);
   }
 }
 

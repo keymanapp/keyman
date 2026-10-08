@@ -179,7 +179,7 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'Caps Always Off');
       recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'caps  always  off');
     });
-    it("can recognise an CAPSONONLY token", () => {
+    it("can recognise an CAPSONONLY_HEADER token", () => {
       recogniseToken(TokenType.CAPSONONLY_HEADER, 'caps on only');
       recogniseToken(TokenType.CAPSONONLY_HEADER, 'CAPS ON ONLY');
       recogniseToken(TokenType.CAPSONONLY_HEADER, 'Caps On Only');
@@ -190,17 +190,18 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenType.SHIFT, 'SHIFT');
       recogniseToken(TokenType.SHIFT, 'Shift');
     });
-    it("can recognise a FREES token", () => {
-      recogniseToken(TokenType.FREES, 'frees');
-      recogniseToken(TokenType.FREES, 'FREES');
-      recogniseToken(TokenType.FREES, 'Frees');
+    it("can recognise a SHIFTFREESCAPS_HEADER token", () => {
+      recogniseToken(TokenType.SHIFTFREESCAPS_HEADER, 'shift frees caps');
+      recogniseToken(TokenType.SHIFTFREESCAPS_HEADER, 'SHIFT FREES CAPS');
+      recogniseToken(TokenType.SHIFTFREESCAPS_HEADER, 'Shift Frees Caps');
+      recogniseToken(TokenType.SHIFTFREESCAPS_HEADER, 'shift  frees  caps');
     });
     it("can recognise a BITMAP_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'bitmap');
       recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'BITMAP');
       recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'Bitmap');
     });
-    it("can recognise a COPYRIGHTP_HEADER token", () => {
+    it("can recognise a COPYRIGHT_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'copyright');
       recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'COPYRIGHT');
       recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'Copyright');
@@ -962,18 +963,6 @@ describe("Lexer Tests", () => {
     it("can recognise a shiftfreescaps store", () => {
       recogniseSystemStoreWithString(TokenType.SHIFTFREESCAPS, "1");
     });
-    it("can recognise a 'shift frees caps' statement", () => {
-      recogniseTokens(
-        'shift frees caps',
-        [
-          new Token(TokenType.SHIFT, 'shift'),
-          new Token(TokenType.WHITESPACE, ' ', 1, 6),
-          new Token(TokenType.FREES, 'frees', 1, 7),
-          new Token(TokenType.WHITESPACE, ' ', 1, 12),
-          new Token(TokenType.CAPS, 'caps', 1, 13),
-        ]
-      );
-    });
     it("can recognise a begin statement (unicode)", () => {
       recogniseTokens(
         'begin Unicode > use(main)',
@@ -1309,7 +1298,6 @@ describe("Lexer Tests", () => {
         '&shiftfreescaps',
         'caps',
         'shift',
-        'frees',
         'beep',
         'begin',
         'context',
