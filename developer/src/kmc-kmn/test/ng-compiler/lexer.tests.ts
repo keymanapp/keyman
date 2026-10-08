@@ -398,6 +398,31 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenType.KEYS, 'KEYS');
       recogniseToken(TokenType.KEYS, 'Keys');
     });
+    it("can recognise a KEYMAN token", () => {
+      recogniseToken(TokenType.KEYMAN, '$keyman:');
+      recogniseToken(TokenType.KEYMAN, '$KEYMAN:');
+      recogniseToken(TokenType.KEYMAN, '$Keyman:');
+    });
+    it("can recognise a KEYMANONLY token", () => {
+      recogniseToken(TokenType.KEYMANONLY, '$keymanonly:');
+      recogniseToken(TokenType.KEYMANONLY, '$KEYMANONLY:');
+      recogniseToken(TokenType.KEYMANONLY, '$KeymanOnly:');
+    });
+    it("can recognise a KEYMANWEB token", () => {
+      recogniseToken(TokenType.KEYMANWEB, '$keymanweb:');
+      recogniseToken(TokenType.KEYMANWEB, '$KEYMANWEB:');
+      recogniseToken(TokenType.KEYMANWEB, '$KeymanWeb:');
+    });
+    it("can recognise a KMFL token", () => {
+      recogniseToken(TokenType.KMFL, '$kmfl:');
+      recogniseToken(TokenType.KMFL, '$KMFL:');
+      recogniseToken(TokenType.KMFL, '$Kmfl:');
+    });
+    it("can recognise a WEAVER token", () => {
+      recogniseToken(TokenType.WEAVER, '$weaver:');
+      recogniseToken(TokenType.WEAVER, '$WEAVER:');
+      recogniseToken(TokenType.WEAVER, '$Weaver:');
+    });
     it("can recognise a LEFT_BR token", () => {
       recogniseToken(TokenType.LEFT_BR, '(');
     });
@@ -1191,6 +1216,9 @@ describe("Lexer Tests", () => {
           new Token(TokenType.U_CHAR, 'U+000A', 1, 37),
         ]
       );
+    });
+    it("can recognise compile targets (keyman, followed by space)", () => {
+      recogniseTokenFollowedBySpace(TokenType.KEYMAN, '$keyman:');
     });
     it("can handle no newline at end of file", () => {
       const lexer    = new Lexer('beep');

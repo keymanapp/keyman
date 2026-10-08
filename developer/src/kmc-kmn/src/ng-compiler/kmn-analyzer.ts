@@ -160,15 +160,35 @@ export class KmnTreeRebuild extends ASTRebuild {
 }
 
 /**
- * (BNF) line: content? NEWLINE
+ * (BNF) line: compileTarget? content? NEWLINE
  */
 export class LineRule extends SingleChildRule {
   public constructor() {
     super();
-    const content    = new ContentRule();
-    const optContent = new OptionalRule(content);
-    const newline    = new TokenRule(TokenType.NEWLINE, true);
-    this.rule = new SequenceRule([optContent, newline]);
+    const compileTarget    = new CompileTargetRule();
+    const optCompileTarget = new OptionalRule(compileTarget);
+    const content          = new ContentRule();
+    const optContent       = new OptionalRule(content);
+    const newline          = new TokenRule(TokenType.NEWLINE, true);
+    this.rule = new SequenceRule([optCompileTarget, optContent, newline]);
+  }
+}
+
+/**
+ * (BNF) compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
+ *
+ * https://help.keyman.com/developer/language/guide/compile-targets
+ */
+export class CompileTargetRule extends AlternateTokenRule {
+  // TODO-NG-COMPILER: warning/error for compile targets
+  public constructor() {
+    super([
+      TokenType.KEYMAN,
+      TokenType.KEYMANONLY,
+      TokenType.KEYMANWEB,
+      TokenType.KMFL,
+      TokenType.WEAVER,
+    ], true);
   }
 }
 
