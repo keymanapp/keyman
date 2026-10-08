@@ -146,8 +146,7 @@ Display 102nd Key (as on European keyboards)
     in behaviour.
 
 > [!TIP]
-> You can press and release <kbd>Ctrl</kbd> to select
-another key on the keyboard using your keyboard.
+> You can press and release <kbd>Ctrl</kbd> to select another key on the keyboard using your keyboard.
 
 You cannot access most of Keyman's more powerful features from
 the Layout Design view, but it will be useful to get you started on your
@@ -168,7 +167,7 @@ See the [Editor topic](editor) for more information on how to use the
 editor shown within this view.
 
 > [!NOTE]
-> Remember that any newly assigned keys from this view won't apply to the desktop/laptop keyboard unless using the 'Fill from layout' (See [On-screen](#toc-on-screen-tab) below).
+> Remember that any newly assigned keys from the layout tab won't be automatically added to the On-Screen keyboard except when you press the 'Fill from layout' button (See [On-screen](#toc-on-screen-tab) below).
 
 ## On-Screen tab
 
@@ -198,7 +197,7 @@ Fill from layout
     designing it from scratch.
 
 > [!CAUTION]
-> The changes from [Code view](#toc-code-view) will only apply to the desktop/laptop keyboard once you use the 'Fill from layout'.
+> The changes from the [Layout tab](#toc-layout-tab) will only apply to the On-Screen Keyboard once you use the 'Fill from layout'.
 
 Import
 :   Imports an On-Screen Keyboard from an XML file.
