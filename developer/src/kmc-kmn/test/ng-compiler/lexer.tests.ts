@@ -179,20 +179,11 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'Caps Always Off');
       recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'caps  always  off');
     });
-    it("can recognise an OFF token", () => {
-      recogniseToken(TokenType.OFF, 'off');
-      recogniseToken(TokenType.OFF, 'OFF');
-      recogniseToken(TokenType.OFF, 'Off');
-    });
-    it("can recognise an ON token", () => {
-      recogniseToken(TokenType.ON, 'on');
-      recogniseToken(TokenType.ON, 'ON');
-      recogniseToken(TokenType.ON, 'On');
-    });
-    it("can recognise an ONLY token", () => {
-      recogniseToken(TokenType.ONLY, 'only');
-      recogniseToken(TokenType.ONLY, 'ONLY');
-      recogniseToken(TokenType.ONLY, 'Only');
+    it("can recognise an CAPSONONLY token", () => {
+      recogniseToken(TokenType.CAPSONONLY_HEADER, 'caps on only');
+      recogniseToken(TokenType.CAPSONONLY_HEADER, 'CAPS ON ONLY');
+      recogniseToken(TokenType.CAPSONONLY_HEADER, 'Caps On Only');
+      recogniseToken(TokenType.CAPSONONLY_HEADER, 'caps  on  only');
     });
     it("can recognise a SHIFT token", () => {
       recogniseToken(TokenType.SHIFT, 'shift');
@@ -968,18 +959,6 @@ describe("Lexer Tests", () => {
     it("can recognise a capsononly store", () => {
       recogniseSystemStoreWithString(TokenType.CAPSONONLY, "1");
     });
-    it("can recognise a 'caps on only' statement", () => {
-      recogniseTokens(
-        'caps on only',
-        [
-          new Token(TokenType.CAPS, 'caps'),
-          new Token(TokenType.WHITESPACE, ' ', 1, 5),
-          new Token(TokenType.ON, 'on', 1, 6),
-          new Token(TokenType.WHITESPACE, ' ', 1, 8),
-          new Token(TokenType.ONLY, 'only', 1, 9),
-        ]
-      );
-    });
     it("can recognise a shiftfreescaps store", () => {
       recogniseSystemStoreWithString(TokenType.SHIFTFREESCAPS, "1");
     });
@@ -1329,9 +1308,6 @@ describe("Lexer Tests", () => {
         '&capsononly',
         '&shiftfreescaps',
         'caps',
-        'off',
-        'on',
-        'only',
         'shift',
         'frees',
         'beep',

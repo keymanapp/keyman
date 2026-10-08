@@ -12,7 +12,7 @@ import { SingleChildRuleWithASTRebuild, SequenceRule, SingleChildRule } from "./
 import { TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyzer.js";
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyzer.js";
-import { CapsOnOnlyRule, HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyzer.js";
+import { HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyzer.js";
 import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStoreAssignRule } from "./store-analyzer.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
@@ -193,7 +193,7 @@ export class CompileTargetRule extends AlternateTokenRule {
 }
 
 /**
- * (BNF) content: systemStoreAssign|CAPSALWAYSOFF_HEADER|capsOnOnly|shiftFreesCaps|
+ * (BNF) content: systemStoreAssign|CAPSALWAYSOFF_HEADER|CAPSONONLY_HEADER|shiftFreesCaps|
  * headerAssign|normalStoreAssign|ruleBlock
  */
 export class ContentRule extends SingleChildRule {
@@ -201,7 +201,7 @@ export class ContentRule extends SingleChildRule {
     super();
     const systemStoreAssign    = new SystemStoreAssignRule();
     const capsAlwaysOff_Header = new TokenRule(TokenType.CAPSALWAYSOFF_HEADER, true);
-    const capsOnOnly           = new CapsOnOnlyRule();
+    const capsOnOnly_Header    = new TokenRule(TokenType.CAPSONONLY_HEADER, true);
     const shiftFreesCaps       = new ShiftFreesCapsRule();
     const headerAssign         = new HeaderAssignRule();
     const normalStoreAssign    = new NormalStoreAssignRule();
@@ -209,7 +209,7 @@ export class ContentRule extends SingleChildRule {
     this.rule = new AlternateRule([
       systemStoreAssign,
       capsAlwaysOff_Header,
-      capsOnOnly,
+      capsOnOnly_Header,
       shiftFreesCaps,
       headerAssign,
       normalStoreAssign,
@@ -534,9 +534,6 @@ export class PermittedKeywordRule extends AlternateTokenRule {
       TokenType.NOMATCH,
       TokenType.NUL,
       TokenType.OCTAL,
-      TokenType.OFF,
-      TokenType.ON,
-      TokenType.ONLY,
       TokenType.POSTKEYSTROKE,
       TokenType.READONLY,
       TokenType.RETURN,

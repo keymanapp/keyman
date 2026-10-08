@@ -101,13 +101,9 @@ export const KMN_SCAN_RECOGNIZERS = [
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenType.CAPSALWAYSOFF_HEADER, regExp: /caps[^\S\r\n]+always[^\S\r\n]+off/iy,                  emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
+  {tokenType: TokenType.CAPSONONLY_HEADER,    regExp: /caps[^\S\r\n]+on[^\S\r\n]+only/iy,                     emit: true},
+  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenType.CAPS,                regExp: /caps(?![a-z0-9_\.-])/iy,                                emit: true},
-  // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  {tokenType: TokenType.OFF,                 regExp: /off(?![a-z0-9_\.-])/iy,                                 emit: true},
-  // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  {tokenType: TokenType.ON,                  regExp: /on(?![a-z0-9_\.-])/iy,                                  emit: true},
-  // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  {tokenType: TokenType.ONLY,                regExp: /only(?![a-z0-9_\.-])/iy,                                emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenType.SHIFT,               regExp: /shift(?![a-z0-9_\.-])/iy,                               emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype

@@ -38,6 +38,8 @@ export const TOKEN_TO_NODE = [
   {tokenType: TokenType.CAPSALWAYSOFF_HEADER, nodeType: NodeType.CAPSALWAYSOFF_HEADER},
   // https://help.keyman.com/developer/language/reference/caps
   {tokenType: TokenType.CAPSONONLY,          nodeType: NodeType.CAPSONONLY},
+  // https://help.keyman.com/developer/language/reference/caps
+  {tokenType: TokenType.CAPSONONLY_HEADER,   nodeType: NodeType.CAPSONONLY_HEADER},
   // https://help.keyman.com/developer/language/reference/casedkeys
   {tokenType: TokenType.CASEDKEYS,           nodeType: NodeType.CASEDKEYS},
   // https://help.keyman.com/developer/language/reference/context
@@ -141,14 +143,8 @@ export const TOKEN_TO_NODE = [
   {tokenType: TokenType.NUL,                 nodeType: NodeType.NUL},
   // https://help.keyman.com/developer/language/guide/strings
   {tokenType: TokenType.OCTAL,               nodeType: NodeType.OCTAL},
-  // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  {tokenType: TokenType.OFF,                 nodeType: NodeType.OFF},
   // https://help.keyman.com/developer/language/reference/oldlayer
   {tokenType: TokenType.OLDLAYER,            nodeType: NodeType.OLDLAYER},
-  // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  {tokenType: TokenType.ON,                  nodeType: NodeType.ON},
-  // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  {tokenType: TokenType.ONLY,                nodeType: NodeType.ONLY},
   // https://help.keyman.com/developer/language/reference/outs
   {tokenType: TokenType.OUTS,                nodeType: NodeType.OUTS},
   {tokenType: TokenType.PARAMETER,           nodeType: NodeType.PARAMETER},

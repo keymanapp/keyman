@@ -24,6 +24,7 @@ export enum NodeType {
   CAPSALWAYSOFF         = "CAPSALWAYSOFF",        // https://help.keyman.com/developer/language/reference/caps
   CAPSALWAYSOFF_HEADER  = "CAPSALWAYSOFF_HEADER", // https://help.keyman.com/developer/language/reference/caps
   CAPSONONLY            = "CAPSONONLY",           // https://help.keyman.com/developer/language/reference/caps
+  CAPSONONLY_HEADER     = "CAPSONONLY_HEADER",    // https://help.keyman.com/developer/language/reference/caps
   CASEDKEYS             = "CASEDKEYS",            // https://help.keyman.com/developer/language/reference/casedkeys
   CONTEXT               = "CONTEXT",              // https://help.keyman.com/developer/language/reference/context
   COPYRIGHT             = "COPYRIGHT",            // https://help.keyman.com/developer/language/reference/copyright

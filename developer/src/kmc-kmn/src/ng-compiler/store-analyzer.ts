@@ -335,23 +335,6 @@ abstract class AbstractCapsLockStatementRule extends SingleChildRule {
   }
 }
 
-
-/**
- * (BNF) capsOnOnly: CAPS ON ONLY
- *
- * https://help.keyman.com/developer/language/reference/_keywordsbytype
- * https://help.keyman.com/developer/language/reference/caps
- */
-export class CapsOnOnlyRule extends AbstractCapsLockStatementRule {
-  public constructor() {
-    super(TokenType.CAPSONONLY, NodeType.CAPSONONLY);
-    const caps = new TokenRule(TokenType.CAPS);
-    const on   = new TokenRule(TokenType.ON);
-    const only = new TokenRule(TokenType.ONLY);
-    this.rule  = new SequenceRule([caps, on, only]);
-  }
-}
-
 /**
  * (BNF) shiftFreesCaps: SHIFT FREES CAPS
  *

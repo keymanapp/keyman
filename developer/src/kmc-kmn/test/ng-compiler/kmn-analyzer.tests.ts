@@ -292,7 +292,7 @@ describe("KMN Analyser Tests", () => {
       tokenBuffer = stringToTokenBuffer('caps on only');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSONONLY));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSONONLY_HEADER));
     });
     it("can parse correctly (shift frees caps)", () => {
       tokenBuffer = stringToTokenBuffer('shift frees caps');
@@ -861,9 +861,6 @@ describe("KMN Analyser Tests", () => {
         {input: 'nomatch',       nodeType: NodeType.NOMATCH},
         {input: 'nul',           nodeType: NodeType.NUL},
         {input: '10 ',           nodeType: NodeType.OCTAL},
-        {input: 'off',           nodeType: NodeType.OFF},
-        {input: 'on',            nodeType: NodeType.ON},
-        {input: 'only',          nodeType: NodeType.ONLY},
         {input: 'postkeystroke', nodeType: NodeType.POSTKEYSTROKE},
         {input: 'readonly',      nodeType: NodeType.READONLY},
         {input: 'return',        nodeType: NodeType.RETURN},

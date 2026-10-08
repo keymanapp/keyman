@@ -24,6 +24,7 @@ export enum TokenType {
   CAPSALWAYSOFF        = "CAPSALWAYSOFF",        // https://help.keyman.com/developer/language/reference/caps
   CAPSALWAYSOFF_HEADER = "CAPSALWAYSOFF_HEADER", // https://help.keyman.com/developer/language/reference/_keywordsbytype
   CAPSONONLY           = "CAPSONONLY",           // https://help.keyman.com/developer/language/reference/caps
+  CAPSONONLY_HEADER    = "CAPSONONLY_HEADER",    // https://help.keyman.com/developer/language/reference/_keywordsbytype
   CASEDKEYS            = "CASEDKEYS",            // https://help.keyman.com/developer/language/reference/casedkeys
   CHEVRON              = "CHEVRON",              // https://help.keyman.com/developer/language/guide/virtual-keys
   COMMA                = "COMMA",
@@ -83,11 +84,8 @@ export enum TokenType {
   NOT_EQUAL            = "NOT_EQUAL",            // https://help.keyman.com/developer/language/reference/if
   NUL                  = "NUL",                  // https://help.keyman.com/developer/language/reference/_nul
   OCTAL                = "OCTAL",                // https://help.keyman.com/developer/language/guide/strings
-  OFF                  = "OFF",                  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   OLDCHARPOSMATCHING   = "OLDCHARPOSMATCHING",   // https://help.keyman.com/developer/language/reference/oldcharposmatching
   OLDLAYER             = "OLDLAYER",             // https://help.keyman.com/developer/language/reference/oldlayer
-  ON                   = "ON",                   // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  ONLY                 = "ONLY",                 // https://help.keyman.com/developer/language/reference/_keywordsbytype
   OUTS                 = "OUTS",                 // https://help.keyman.com/developer/language/reference/outs
   PARAMETER            = "PARAMETER",
   PLATFORM             = "PLATFORM",             // https://help.keyman.com/developer/language/reference/platform
