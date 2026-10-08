@@ -8,11 +8,12 @@
 
 import SwiftUI
 
-func openKeyboardSettings() {
-  if let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard") {
+func openKeyboardSettingsInputSourcesPane() {
+  if let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension?InputSources") {
     NSWorkspace.shared.open(url)
   }
 }
+//x-apple.systempreferences:com.apple.Keyboard
 
 struct EnableInputMethodView: View {
   @EnvironmentObject var installation: InstallationContainer
@@ -72,7 +73,7 @@ struct EnableInputMethodView: View {
             installation.executeCurrentInstallationTask()
             enableButtonPressed = true
           } else {
-            openKeyboardSettings()
+            openKeyboardSettingsInputSourcesPane()
           }
         } label: {
           Text("Enable")
