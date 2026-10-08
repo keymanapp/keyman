@@ -38,7 +38,7 @@ export class TranscriptionCache {
   public buildLog(): string {
     const entries = [...this.map.entries()];
     return entries
-      .map(([key, entry]) => `Context state ${key}'s keystroke:\n${entry.keystroke.inputBreadcrumb ?? ''}`)
+      .map(([key, entry]) => `Context state ${key}'s keystroke:\n${entry?.keystroke?.inputBreadcrumb ?? ''}`)
       .join('\n');
   }
 }
