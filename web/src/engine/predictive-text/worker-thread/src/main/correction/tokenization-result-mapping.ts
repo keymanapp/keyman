@@ -39,6 +39,10 @@ export class TokenizationResultMapping implements CorrectionResultMapping<Tokeni
     return this.matchedResult.totalEditCount;
   }
 
+  get correctionCost(): number {
+    return this.matchedResult.tokenCorrections.reduce((accum, curr) => accum + curr.correctionCost, 0);
+  }
+
   /**
    * Gets the "input sampling cost" of the edge, which should be considered as the
    * negative log-likelihood of the input path taken to reach the node.
@@ -53,7 +57,7 @@ export class TokenizationResultMapping implements CorrectionResultMapping<Tokeni
    * multiplied by the 'probability' induced by needed Damerau-Levenshtein edits
    * to the resulting output.
    */
-  get totalCost(): number {
-    return this.matchedResult.tokenCorrections.reduce((total, curr) => total + curr.totalCost, 0);
+  get currentCost(): number {
+    return this.matchedResult.tokenCorrections.reduce((total, curr) => total + curr.currentCost, 0);
   }
 }

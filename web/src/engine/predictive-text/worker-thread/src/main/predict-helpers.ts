@@ -79,7 +79,12 @@ export const CORRECTION_SEARCH_THRESHOLDS = {
    * in log-space, the search would stop at a total cost of 1 + this value if
    * a "full" set of suggestions had already been found.
    */
-  REPLACEMENT_SEARCH_THRESHOLD: 4 as const // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+
+  // Ensure at least one "edit distance cost unit" so that even heavily
+  // fat-fingered transpositions have a chance.  Note that the level is this
+  // applied, wordlist weightings have no effect and cannot prevent correction
+  // thresholding!
+  REPLACEMENT_SEARCH_THRESHOLD: EDIT_DISTANCE_COST_SCALE * 1.1
 }
 
 /**
@@ -318,7 +323,8 @@ export function determineTraversallessCorrectionSequences(
         inputCount: index == 0 ? Math.max(1, KMWString.length(token.exampleInput) + 1 - KMWString.length(correction.sample.insert)) : 1,
         inputSamplingCost: -Math.log(correction.p),
         knownCost: 0,
-        totalCost: -Math.log(correction.p)
+        correctionCost: -Math.log(correction.p),
+        currentCost: -Math.log(correction.p)
       };
 
       return match;
@@ -572,7 +578,7 @@ export function buildCorrectionSequence(
         insert: correction.matchString,  // insert correction string
         deleteLeft: 0,
       } as Transform,
-      p: Math.exp(-correction.totalCost * costFactor)
+      p: Math.exp(-correction.correctionCost * costFactor)
     };
 
     if(transitionEffects.transitionId !== undefined) {
@@ -807,7 +813,7 @@ export async function correctAndEnumerate(
 
   // Only run the correction search when corrections are enabled.
   let rawPredictions: TokenizedIntermediatePrediction[] = [];
-  let bestCorrectionCost: number;
+  let bestCurrentCost: number = Number.POSITIVE_INFINITY;
   for await(const match of getBestMatches<TokenizationResult, TokenizationResultMapping, TokenizationCorrector>(preppedTokenizationSearch, timer)) {
     const { totalEditCount, totalEditableCodepoints } = match.matchedResult;
     // If our 'match' fully replaces the tokens, reject it and try again.
@@ -839,13 +845,13 @@ export async function correctAndEnumerate(
     const predictions = predictFromCorrectionSequence(lexicalModel, predictionPrep);
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
-    if(predictions.length > 0 && (bestCorrectionCost === undefined || bestCorrectionCost > match.totalCost)) {
-      bestCorrectionCost = match.totalCost;
+    if(predictions.length > 0 && (bestCurrentCost === undefined || bestCurrentCost > match.currentCost)) {
+      bestCurrentCost = match.currentCost;
     }
 
     rawPredictions = rawPredictions.concat(predictions);
 
-    if(shouldStopSearchingEarly(bestCorrectionCost, match.totalCost, rawPredictions)) {
+    if(shouldStopSearchingEarly(bestCurrentCost, match.currentCost, rawPredictions)) {
       break;
     }
   }
@@ -869,20 +875,15 @@ export function shouldStopSearchingEarly(
     return true;
     // If enough have been found, we're safe to terminate earlier.
   } else if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
-    if(currentCorrectionCost >= bestCorrectionCost + CORRECTION_SEARCH_THRESHOLDS.REPLACEMENT_SEARCH_THRESHOLD) {
-      // Very useful for stopping 'sooner' when words reach a sufficient length.
-      return true;
-    } else {
-      // Sort the prediction list; we need them in descending probability order
-      // for the next check.
-      rawPredictions.sort((a, b) => b.probabilities.total - a.probabilities.total);
+    // Sort the prediction list; we need them in descending probability order
+    // for the next check.
+    rawPredictions.sort((a, b) => b.probabilities.total - a.probabilities.total);
 
-      // If the best result at the current state of the search fails to beat the worst
-      // pending suggestion from previous tiers, assume all further corrections will
-      // similarly fail to win; terminate the search-loop.
-      if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].probabilities.total > Math.exp(-currentCorrectionCost)) {
-        return true;
-      }
+    // If the best result at the current state of the search fails to beat the worst
+    // pending suggestion from previous tiers, assume all further corrections will
+    // similarly fail to win; terminate the search-loop.
+    if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].probabilities.total > Math.exp(-currentCorrectionCost)) {
+      return true;
     }
   }
 
@@ -1361,16 +1362,6 @@ export function predictionAutoSelect(suggestionDistribution: CompositedIntermedi
   if(baseCorrection.length == 0) {
     // If the correction is rooted on an empty root, there's no basis for
     // auto-correcting to this suggestion.
-    return;
-  }
-
-  // Find the highest probability for any correction that led to a valid prediction.
-  // No need to full-on re-sort everything, though.
-  const bestCorrectionP = suggestionDistribution.reduce((prev, current) => Math.max(prev, current.probabilities.correction), 0);
-  if(bestCorrectionP > bestSuggestion.probabilities.correction) {
-    // Here, the best suggestion didn't come from the best correction.
-    // Is it actually reasonable to auto-correct?  We're probably just very
-    // biased toward its frequency.  (Maybe a threshold should be considered?)
     return;
   }
 

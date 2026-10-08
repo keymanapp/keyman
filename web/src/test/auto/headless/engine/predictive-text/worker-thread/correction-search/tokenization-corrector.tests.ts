@@ -305,7 +305,7 @@ describe('TokenizationCorrector', () => {
         const mapping = searchResult.mapping;
         const tokenResults = mapping.matchedResult.tokenCorrections;
         assert.isNotNaN(searchResult.cost);
-        assert.equal(searchResult.cost, searchResult.mapping.totalCost);
+        assert.equal(searchResult.cost, searchResult.mapping.currentCost);
         assert.equal(tokenResults.length, 1);
         assert.sameOrderedMembers(tokenResults.map((r) => r.matchString), ['theref']);
 
@@ -398,7 +398,7 @@ describe('TokenizationCorrector', () => {
         const tokenResults = mapping.matchedResult.tokenCorrections;
         firstResults = tokenResults;
         assert.isNotNaN(searchResult.cost);
-        assert.equal(searchResult.cost, searchResult.mapping.totalCost);
+        assert.equal(searchResult.cost, searchResult.mapping.currentCost);
         assert.equal(tokenResults.length, 3);
         assert.sameOrderedMembers(tokenResults.map((r) => r.matchString), ['the', ' ', 'ef']);
       }

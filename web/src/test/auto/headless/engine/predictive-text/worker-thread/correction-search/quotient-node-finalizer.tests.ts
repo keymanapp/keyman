@@ -99,9 +99,9 @@ describe('QuotientNodeFinalizer', () => {
 
       assert.equal(searchResult.type, 'complete');
       if(searchResult.type == 'complete') {
-        assert.approximately(searchResult.mapping.totalCost, -Math.log(therefo.bestExample.p), Number.EPSILON * 1000);
+        assert.approximately(searchResult.mapping.correctionCost, -Math.log(therefo.bestExample.p), Number.EPSILON * 1000);
         assert.isNotNaN(searchResult.cost);
-        assert.equal(searchResult.cost, searchResult.mapping.totalCost);
+        assert.isAtLeast(searchResult.cost, searchResult.mapping.currentCost);
       } else {
         return;
       }
@@ -131,14 +131,14 @@ describe('QuotientNodeFinalizer', () => {
 
       assert.equal(searchResult.type, 'complete');
       if(searchResult.type == 'complete') {
-        assert.isAbove(searchResult.mapping.totalCost, -Math.log(therefo.bestExample.p));
+        assert.isAbove(searchResult.mapping.currentCost, -Math.log(therefo.bestExample.p));
 
         // There are two codepoints missing that are necessary to complete a
         // full word with the represented prefix.  Check that the penalty is set
         // appropriately, accounting for floating-point precision issues.
-        assert.isAtLeast(searchResult.mapping.totalCost, -Math.log(therefo.bestExample.p) + EDIT_DISTANCE_COST_SCALE * 1.99);
+        assert.isAtLeast(searchResult.mapping.currentCost, -Math.log(therefo.bestExample.p) + EDIT_DISTANCE_COST_SCALE * 1.99);
         assert.isNotNaN(searchResult.cost);
-        assert.equal(searchResult.cost, searchResult.mapping.totalCost);
+        assert.isAtLeast(searchResult.cost, searchResult.mapping.currentCost);
       } else {
         return;
       }

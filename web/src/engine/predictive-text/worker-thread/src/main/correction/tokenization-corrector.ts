@@ -36,7 +36,8 @@ export type TokenResult = {
   inputSamplingCost: number,
   inputCount: number,
   knownCost: number,
-  totalCost: number
+  correctionCost: number,
+  currentCost: number
 }
 
 /**
@@ -231,7 +232,8 @@ export class TokenizationCorrector implements CorrectionSearchable<TokenizationR
         inputSamplingCost: -Math.log(lockedResult.p),
         inputCount: uncorrectable.inputCount,
         knownCost: 0,
-        totalCost: -Math.log(lockedResult.p)
+        correctionCost: -Math.log(lockedResult.p),
+        currentCost: -Math.log(lockedResult.p)
       });
     });
 
@@ -342,7 +344,8 @@ export class TokenizationCorrector implements CorrectionSearchable<TokenizationR
           inputSamplingCost: -Math.log(lockedResult.p),
           inputCount: correctableToUpdate.inputCount,
           knownCost: MAX_EDIT_THRESHOLD_FACTOR, // we'll use the same threshold at which further search is terminated.
-          totalCost: -Math.log(lockedResult.p) + MAX_EDIT_THRESHOLD_FACTOR * EDIT_DISTANCE_COST_SCALE
+          correctionCost: -Math.log(lockedResult.p) + MAX_EDIT_THRESHOLD_FACTOR * EDIT_DISTANCE_COST_SCALE,
+          currentCost: -Math.log(lockedResult.p) + MAX_EDIT_THRESHOLD_FACTOR * EDIT_DISTANCE_COST_SCALE
         });
       }
 
@@ -373,7 +376,7 @@ export class TokenizationCorrector implements CorrectionSearchable<TokenizationR
       this._generatedTokenResults.set(correctableToUpdate.spaceId, tokenResult.mapping);
     }
 
-    const resultCost = tokenResult.type != 'none' ? tokenResult.cost : this._generatedTokenResults.get(correctableToUpdate.spaceId).totalCost;
+    const resultCost = tokenResult.type != 'none' ? tokenResult.cost : this._generatedTokenResults.get(correctableToUpdate.spaceId).currentCost;
 
     // Update the cost associated with the token.
     const tokenizationCost = this.lastTotalCost = this.getUpdatedTotalCost(correctableToUpdate, resultCost);

@@ -334,6 +334,9 @@ export class InputProcessor {
     }
 
     const keyEvent = processorAction.transcription.keystroke;
+    if(keyEvent.suppressAutocorrection) {
+      return null;
+    }
 
     // ...and is this immediately after a Suggestion with an appended Transform was applied?
     // (If not, don't consider reverting an appended transform.)

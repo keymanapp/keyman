@@ -64,9 +64,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       new TokenizationResultMapping([{
         matchString: 'fo',
         inputSamplingCost: -Math.log(trueInput.p),
+        correctionCost: -Math.log(trueInput.p),
         inputCount: 2,
         knownCost: 0,
-        totalCost: -Math.log(trueInput.p)
+        currentCost: -Math.log(trueInput.p)
       }], null)
     );
 
@@ -119,9 +120,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       new TokenizationResultMapping([{
         matchString: ' ',
         inputSamplingCost: -Math.log(trueInput.p),
+        correctionCost: -Math.log(trueInput.p),
         inputCount: 1,
         knownCost: 0,
-        totalCost: -Math.log(trueInput.p)
+        currentCost: -Math.log(trueInput.p)
       }], null)
     );
 
@@ -175,9 +177,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       new TokenizationResultMapping([{
         matchString: 'f',
         inputSamplingCost: -Math.log(trueInput.p),
+        correctionCost: -Math.log(trueInput.p),
         inputCount: 1,
         knownCost: 0,
-        totalCost: -Math.log(trueInput.p)
+        currentCost: -Math.log(trueInput.p)
       }], null)
     );
 
@@ -238,9 +241,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       new TokenizationResultMapping([{
         matchString: 'can\'t',
         inputSamplingCost: -Math.log(trueInput.p),
+        correctionCost: -Math.log(trueInput.p),
         inputCount: 5,
         knownCost: 0,
-        totalCost: -Math.log(trueInput.p)
+        currentCost: -Math.log(trueInput.p)
       }], null)
     );
 
@@ -292,9 +296,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       new TokenizationResultMapping([{
         matchString: ' ',
         inputSamplingCost: -Math.log(trueInput.p),
+        correctionCost: -Math.log(trueInput.p),
         inputCount: 1,
         knownCost: 0,
-        totalCost: -Math.log(trueInput.p)
+        currentCost: -Math.log(trueInput.p)
       }], null)
     );
 
@@ -348,9 +353,10 @@ describe('determineTokenizedCorrectionSequence', () => {
       new TokenizationResultMapping([{
         matchString: 'd',
         inputSamplingCost: -Math.log(trueInput.p),
+        correctionCost: -Math.log(trueInput.p),
         inputCount: 1,
         knownCost: 0,
-        totalCost: -Math.log(trueInput.p)
+        currentCost: -Math.log(trueInput.p)
       }], null)
     );
 

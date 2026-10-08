@@ -111,6 +111,11 @@ export class KeyEvent implements KeyEventSpec {
    */
   isSynthetic: boolean = true;
 
+  /**
+   * Set to `true` to prevent autocorrect from activating from this keystroke.
+   */
+  suppressAutocorrection: boolean = false;
+
   public constructor(keyEventSpec: KeyEventSpec) {
     for(const key in keyEventSpec) {
       // @ts-ignore
