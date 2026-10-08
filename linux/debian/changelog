@@ -1,8 +1,17 @@
-keyman (18.0.249-1) UNRELEASED; urgency=medium
+keyman (18.0.253-1) UNRELEASED; urgency=medium
 
-  * Add procps dependency (closes: 1136515)
+  * Add procps dependency (closes: #1136515)
 
- -- Eberhard Beilharz <eb1@sil.org>  Mon, 18 May 2026 18:06:49 +0200
+ -- Eberhard Beilharz <eb1@sil.org>  Tue, 06 Oct 2026 11:05:30 +0200
+
+keyman (18.0.248-2) unstable; urgency=medium
+
+  * Team upload.
+  * debian/patches/e77d2432ef91465e72460b32e5bc3e870b77fe9c.patch:
+    Backport upstream patch to fix FTBFS due to pkg_resources.
+    (Closes: #1149425)
+
+ -- Boyuan Yang <byang@debian.org>  Wed, 30 Sep 2026 10:39:04 -0400
 
 keyman (18.0.248-1) unstable; urgency=medium
 
