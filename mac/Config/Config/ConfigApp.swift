@@ -37,7 +37,7 @@ struct ConfigApp: App {
   }
 
   var body: some Scene {
-    Window("Configuration", id: "main-config") {
+    Window("Configuration", id: "config") {
       MainConfigView()
         .frame(
           minWidth: 600, maxWidth: 1000,
@@ -81,10 +81,10 @@ struct ConfigApp: App {
     }
     
     // for testing purposes
-    Window("Install Test", id: "install-debug") {
-      InstallDebugView()
-        .environmentObject(installation)
-    }
+//    Window("Install Test", id: "install-debug") {
+//      InstallDebugView()
+//        .environmentObject(installation)
+//    }
   }
 }
 

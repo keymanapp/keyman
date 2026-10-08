@@ -26,6 +26,9 @@
     "Close" : {
 
     },
+    "Complete installation" : {
+
+    },
     "Configuration" : {
 
     },
@@ -60,9 +63,6 @@
     "Ensure Keyman.app is set to provide it with necessary control in System Settings > Privacy & Security > Accessibility." : {
 
     },
-    "Finish installation" : {
-
-    },
     "Fonts:" : {
 
     },
@@ -75,10 +75,10 @@
     "Help not available." : {
 
     },
-    "Install" : {
+    "Input method has been enabled" : {
 
     },
-    "Install Test" : {
+    "Install" : {
 
     },
     "Installation" : {

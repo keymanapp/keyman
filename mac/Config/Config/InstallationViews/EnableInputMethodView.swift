@@ -10,10 +10,15 @@ import SwiftUI
 
 struct EnableInputMethodView: View {
   @EnvironmentObject var installation: InstallationContainer
+  @Environment(\.openWindow) private var openWindow
+  
   let namespace: Namespace.ID
   let onContinue: () -> Void
   @State var enableButtonPressed : Bool = false
-  
+
+  // tracks whether the user has enabled the input method in the System Settings
+  @State var inputMethodEnabled: Bool = false
+
   var body: some View {
     VStack {
       Text("Enable Keyman")
@@ -41,11 +46,21 @@ struct EnableInputMethodView: View {
       }
       .formStyle(.grouped)
       .padding(.top, 25)
-
+      
       HStack {
-        
+
         Spacer()
-        
+
+        if inputMethodEnabled {
+          Text("Input method has been enabled")
+            .font(.title2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .transition(
+              .scale(scale: 0.1, anchor: .center)
+              .combined(with: .opacity)
+            )
+       }
+
         Button {
           enableButtonPressed = true
           installation.executeCurrentInstallationTask()
@@ -60,6 +75,29 @@ struct EnableInputMethodView: View {
         .matchedGeometryEffect(id: "actionButton", in: namespace)
         NavigationButton(action: .advance, onContinue: onContinue)
           .disabled(!enableButtonPressed)
+      }
+    }
+    // triggered when the system confirms that
+    .onReceive( NotificationCenter.default.publisher(for: .inputMethodEnabled)) { notification in
+      
+      // bring the app to the front, just in case it is being blocked by the System Settings
+      NSApplication.shared.activate(ignoringOtherApps: true)
+      openWindow(id: "install")
+      
+      // wait 0.2 second for the window to switch before animating
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        withAnimation(.spring(response: 0.45, dampingFraction: 0.55)) {
+          inputMethodEnabled = true
+        }
+      }
+      
+      Task { @MainActor in
+        // wait 1.25 seconds (1,250,000,000 nanoseconds)
+        try? await Task.sleep(nanoseconds: 1_250_000_000)
+        
+        withAnimation(.smooth) {
+          onContinue() // moves the user to the next screen
+        }
       }
     }
   }

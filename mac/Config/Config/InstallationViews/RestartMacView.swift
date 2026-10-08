@@ -38,7 +38,17 @@ struct RestartMacView: View {
         Text("Complete installation")
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
-        Button("Restart...", role: nil) { restartMac() }
+        Button {
+          restartMac()
+        } label: {
+          Text("Restart...")
+            .padding(.horizontal, 16)
+            .padding(.vertical, 4)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(.blue)
+        .clipShape(Capsule())
+        .matchedGeometryEffect(id: "actionButton", in: namespace)
       }
     }
     .onAppear {

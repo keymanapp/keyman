@@ -21,6 +21,7 @@ public extension Notification.Name {
   static let accessibilityNotGranted = Notification.Name("installation.accessibility.not.granted")
   static let checkAccessibilitySuccess = Notification.Name("accessibility.success")
   static let checkAccessibilityFailure = Notification.Name("accessibility.failure")
+  static let inputMethodEnabled = Notification.Name("input.method.enabled")
 }
 
 private let installationArgument = "--installation"
@@ -176,6 +177,9 @@ public class InstallationContainer : ObservableObject {
           self.updateTaskAsCompleted(taskType: .confirmEnabled)
         }
       }
+      
+      // notify observers
+      NotificationCenter.default.post(name: .inputMethodEnabled, object: nil, userInfo: nil)
     }
   }
   
