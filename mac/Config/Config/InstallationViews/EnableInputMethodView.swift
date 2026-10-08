@@ -8,6 +8,12 @@
 
 import SwiftUI
 
+func openKeyboardSettings() {
+  if let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard") {
+    NSWorkspace.shared.open(url)
+  }
+}
+
 struct EnableInputMethodView: View {
   @EnvironmentObject var installation: InstallationContainer
   @Environment(\.openWindow) private var openWindow
@@ -48,9 +54,9 @@ struct EnableInputMethodView: View {
       .padding(.top, 25)
       
       HStack {
-
+        
         Spacer()
-
+        
         if inputMethodEnabled {
           Text("Input method has been enabled")
             .font(.title2)
@@ -59,11 +65,15 @@ struct EnableInputMethodView: View {
               .scale(scale: 0.1, anchor: .center)
               .combined(with: .opacity)
             )
-       }
-
+        }
+        
         Button {
-          enableButtonPressed = true
-          installation.executeCurrentInstallationTask()
+          if !enableButtonPressed {
+            installation.executeCurrentInstallationTask()
+            enableButtonPressed = true
+          } else {
+            openKeyboardSettings()
+          }
         } label: {
           Text("Enable")
             .padding(.horizontal, 16)
