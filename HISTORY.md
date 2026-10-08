@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.304 beta 2026-10-08
+
+* docs(common): add `sentry-cli` version and update documentation (#16752)
+* chore(linux): update changelog with Debian version (#16758)
+
 ## 19.0.303 beta 2026-10-07
 
 * fix(resources): export KEYMAN_TIER so we get beta tagging on release build (#16751)
