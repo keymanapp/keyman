@@ -36,7 +36,7 @@ Original TestLodge ID: TC162
 
 1. Open Firefox browser in Windows OS.
 2. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/433344:id/index.html' in the Search bar.
-3.Verify that the testing index page opens.
+3. Verify that the testing index page opens.
 4. Click 'View Keymanweb use samples' link button.
 5. Verify KeymanWeb Samples page opens.
 6. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -45,7 +45,7 @@ Original TestLodge ID: TC162
 9. Verify it produces ‘ŋ’
 10. Open Chrome browser in Windows OS.
 11. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/433344:id/index.html' in the Search bar.
-12.Verify that the testing index page opens.
+12. Verify that the testing index page opens.
 13. Click 'View Keymanweb use samples' link button.
 14. Verify KeymanWeb Samples page opens.
 15. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -54,7 +54,7 @@ Original TestLodge ID: TC162
 18. Verify it produces ‘ŋ’
 19. Open Safari browser in macOS.
 20.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/433344:id/index.html' in the Search bar.
-21.Verify that the testing index page opens.
+21. Verify that the testing index page opens.
 22. Click 'View Keymanweb use samples' link button.
 23. Verify KeymanWeb Samples page opens.
 24. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -63,7 +63,7 @@ Original TestLodge ID: TC162
 27. Verify it produces ‘ŋ’
 28. Open Chrome browser in macOS.
 29. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/433344:id/index.html' in the Search bar.
-30.Verify that the testing index page opens.
+30. Verify that the testing index page opens.
 31. Click 'View Keymanweb use samples' link button.
 32. Verify KeymanWeb Samples page opens.
 33. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -72,7 +72,7 @@ Original TestLodge ID: TC162
 36. Verify it produces ‘ŋ’
 37. Open Firefox in macOS.
 38. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/433344:id/index.html' in the Search bar.
-39.Verify that the testing index page opens.
+39. Verify that the testing index page opens.
 40. Click 'View Keymanweb use samples' link button.
 41. Verify KeymanWeb Samples page opens.
 42. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -81,7 +81,7 @@ Original TestLodge ID: TC162
 45. Verify it produces ‘ŋ’
 46. Open Firefox in Linux OS.
 47.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/433344:id/index.html' in the Search bar.
-48.Verify that the testing index page opens.
+48. Verify that the testing index page opens.
 49. Click 'View Keymanweb use samples' link button.
 50. Verify KeymanWeb Samples page opens.
 51. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -141,7 +141,7 @@ Original TestLodge ID: TC163
 
 1. Open Firefox browser in Windows OS.
 2. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/433344:id/index.html' in the Search bar.
-3.Verify that the testing index page opens.
+3. Verify that the testing index page opens.
 4. Click 'View Keymanweb use samples' link button.
 5. Verify KeymanWeb Samples page opens.
 6. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -151,7 +151,7 @@ Original TestLodge ID: TC163
 10. Verify that the Khmer Angkor keyboard is added and displayed on the Screen.
 11. Open Chrome browser in Windows OS.
 12.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-13.Verify that the testing index page opens.
+13. Verify that the testing index page opens.
 14. Click 'View Keymanweb use samples' link button.
 15. Verify KeymanWeb Samples page opens.
 16. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -161,7 +161,7 @@ Original TestLodge ID: TC163
 20. Verify that the Khmer Angkor keyboard is added and displayed on the Screen.
 21. Open Safari browser in macOS.
 22. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-23.Verify that the testing index page opens.
+23. Verify that the testing index page opens.
 24. Click 'View Keymanweb use samples' link button.
 25. Verify KeymanWeb Samples page opens.
 26. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -171,7 +171,7 @@ Original TestLodge ID: TC163
 30. Verify that the Khmer Angkor keyboard is added and displayed on the Screen.
 31. Open Chrome browser in macOS.
 32.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-33.Verify that the testing index page opens.
+33. Verify that the testing index page opens.
 34. Click 'View Keymanweb use samples' link button.
 35. Verify KeymanWeb Samples page opens.
 36. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -181,7 +181,7 @@ Original TestLodge ID: TC163
 40. Verify that the Khmer Angkor keyboard is added and displayed on the Screen.
 41. Open Firefox browser in macOS.
 42. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-43.Verify that the testing index page opens.
+43. Verify that the testing index page opens.
 44. Click 'View Keymanweb use samples' link button.
 45. Verify KeymanWeb Samples page opens.
 46. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -191,7 +191,7 @@ Original TestLodge ID: TC163
 50. Verify that the Khmer Angkor keyboard is added and displayed on the Screen.
 51. Open Firefox browser in Linux OS.
 52.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-53.Verify that the testing index page opens.
+53. Verify that the testing index page opens.
 54. Click 'View Keymanweb use samples' link button.
 55. Verify KeymanWeb Samples page opens.
 56. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -252,7 +252,7 @@ Original TestLodge ID: TC164
 
 1. Open Firefox browser in Windows OS.
 2.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-3.Verify that the testing index page opens.
+3. Verify that the testing index page opens.
 4. Click 'View Keymanweb use samples' link button.
 5. Verify KeymanWeb Samples page opens.
 6. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -276,7 +276,7 @@ Original TestLodge ID: TC164
 24. Verify it deletes the remaining letter on the screen.
 25. Open Chrome browser in Windows OS.
 22.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-23.Verify that the testing index page opens.
+23. Verify that the testing index page opens.
 24. Click 'View Keymanweb use samples' link button.
 25. Verify KeymanWeb Samples page opens.
 26. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -300,7 +300,7 @@ Original TestLodge ID: TC164
 40. Verify it deletes the remaining letter on the screen.
 41. Open Safari browser in macOS
 42. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-43.Verify that the testing index page opens.
+43. Verify that the testing index page opens.
 44. Click 'View Keymanweb use samples' link button.
 45. Verify KeymanWeb Samples page opens.
 46. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -324,7 +324,7 @@ Original TestLodge ID: TC164
 64. Verify it deletes the remaining letter on the screen.
 61. Open Chrome browser in macOS.
 62.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-63.Verify that the testing index page opens.
+63. Verify that the testing index page opens.
 64. Click 'View Keymanweb use samples' link button.
 65. Verify KeymanWeb Samples page opens.
 66. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -348,7 +348,7 @@ Original TestLodge ID: TC164
 84. Verify it deletes the remaining letter on the screen.
 85. Open Firefox browser in macOS.
 86.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-87.Verify that the testing index page opens.
+87. Verify that the testing index page opens.
 88. Click 'View Keymanweb use samples' link button.
 89. Verify KeymanWeb Samples page opens.
 90. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -372,7 +372,7 @@ Original TestLodge ID: TC164
 108. Verify it deletes the remaining letter on the screen.
 101. Open Firefox browser in Linux OS.
 102. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-103.Verify that the testing index page opens.
+103. Verify that the testing index page opens.
 104. Click 'View Keymanweb use samples' link button.
 105. Verify KeymanWeb Samples page opens.
 106. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -447,7 +447,7 @@ Original TestLodge ID: TC165
 
 1. Open Firefox browser in Windows OS.
 2. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-3.Verify that the testing index page opens.
+3. Verify that the testing index page opens.
 4. Click 'View Keymanweb use samples' link button.
 5. Verify KeymanWeb Samples page opens.
 6. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -458,7 +458,7 @@ Original TestLodge ID: TC165
 11. Verify that a Spanish keyboard is added to the list.
 12. Open Chrome browser in Windows OS.
 13.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-14.Verify that the testing index page opens.
+14. Verify that the testing index page opens.
 15. Click 'View Keymanweb use samples' link button.
 16. Verify KeymanWeb Samples page opens.
 17. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -469,7 +469,7 @@ Original TestLodge ID: TC165
 22. Verify that a Spanish keyboard is added to the list.
 23. Open Safari browser in macOS.
 24.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-25.Verify that the testing index page opens.
+25. Verify that the testing index page opens.
 26. Click 'View Keymanweb use samples' link button.
 27. Verify KeymanWeb Samples page opens.
 28. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -480,7 +480,7 @@ Original TestLodge ID: TC165
 33. Verify that a Spanish keyboard is added to the list.
 34. Open Chrome browser in macOS.
 35.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-36.Verify that the testing index page opens.
+36. Verify that the testing index page opens.
 37. Click 'View Keymanweb use samples' link button.
 38. Verify KeymanWeb Samples page opens.
 39. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -491,7 +491,7 @@ Original TestLodge ID: TC165
 44. Verify that a Spanish keyboard is added to the list.
 45. Open Firefox browser in macOS.
 46. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-47.Verify that the testing index page opens.
+47. Verify that the testing index page opens.
 48. Click 'View Keymanweb use samples' link button.
 49. Verify KeymanWeb Samples page opens.
 50. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -502,7 +502,7 @@ Original TestLodge ID: TC165
 55. Verify that a Spanish keyboard is added to the list.
 56. Open Firefox browser in Linux OS.
 57.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-58.Verify that the testing index page opens.
+58. Verify that the testing index page opens.
 59. Click 'View Keymanweb use samples' link button.
 60. Verify KeymanWeb Samples page opens.
 61. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -564,7 +564,7 @@ Original TestLodge ID: TC166
 
 1. Open Firefox browser in Windows OS.
 2.  Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-3.Verify that the testing index page opens.
+3. Verify that the testing index page opens.
 4. Click 'View Keymanweb use samples' link button.
 5. Verify KeymanWeb Samples page opens.
 6. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -677,7 +677,7 @@ Original TestLodge ID: TC167
 45. Type d.
 46. Verify that the final letter should be xdx.
 47. Open Chrome browser in Windows OS.
-48.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+48. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 49. Verify that the testing index page opens.
 50. Click 'View Keymaweb website-oriented manual test pages' link button.
 51. Verify KeymanWeb Samples page opens.
@@ -951,7 +951,7 @@ Original TestLodge ID: TC169
 <summary>Action</summary>
 
 1. Open Firefox browser in Linux OS.
-2.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+2. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 3. Verify that the testing index page opens.
 4. Click 'View Keymaweb website-oriented manual test pages' link button.
 5. Verify KeymanWeb Samples page opens.
@@ -1176,7 +1176,7 @@ Original TestLodge ID: TC171
 11. Click / touch a blank area of the page.
 12. Verify that the OSK should automatically hide.
 13.  Open Chrome in windows OS.
-14.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+14. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 15. Verify that the testing index page opens.
 16. Click 'Tests the new Attachment/Enablement API functionality' link button.
 17. Verify KeymanWeb Samples - Attachment API Testing page opens.
@@ -1293,8 +1293,8 @@ Original TestLodge ID: TC172
 
 1. Open Firefox browser in Windows OS.
 2. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-3.Verify that the testing index page opens.
-4.Click 'Tests the new Attachment/Enablement API functionality' link button.
+3. Verify that the testing index page opens.
+4. Click 'Tests the new Attachment/Enablement API functionality' link button.
 5. Verify KeymanWeb Samples - Attachment API Testing page opens.
 6. Click the ‘Create Inputs’ button one time.
 7. Click the ‘Create Textarea’ button one time.
@@ -1451,7 +1451,7 @@ Verify KeymanWeb Samples - Attachment API Testing page opens.
 15. Click Dynamic area #2.
 16. Verify that the Lao keyboard should be displayed.
 17. Open Chrome browser in Windows OS.
-18.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+18. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 19. Verify that the testing index page opens.
 20. Click 'Tests the new Attachment/Enablement API functionality' link button.
 21. Verify KeymanWeb Samples - Attachment API Testing page opens.
@@ -1523,7 +1523,7 @@ Verify KeymanWeb Samples - Attachment API Testing page opens.
 87. Click Dynamic area #2.
 88. Verify that the Lao keyboard should be displayed.
 89. Open Firefox browser in macOS.
-90.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+90. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 91. Verify that the testing index page opens.
 92. Click 'Tests the new Attachment/Enablement API functionality' link button.
 93. Verify KeymanWeb Samples - Attachment API Testing page opens.
@@ -1628,7 +1628,7 @@ Original TestLodge ID: TC174
 15. Type 2.
 16. Verify the second option should replace the context.
 17. Open Chrome browser in Windows OS.
-18.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+18. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 19. Verify that the testing index page opens.
 20. Click 'View Keymaweb website-oriented manual test pages' link button.
 21. Verify KeymanWeb Samples page opens.
@@ -1644,7 +1644,7 @@ Original TestLodge ID: TC174
 31. Type 2.
 32. Verify the second option should replace the context.
 33. Open Safari browser in macOS.
-34.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+34. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 35. Verify that the testing index page opens.
 36. Click 'View Keymaweb website-oriented manual test pages' link button.
 37. Verify KeymanWeb Samples page opens.
@@ -1692,7 +1692,7 @@ Original TestLodge ID: TC174
 80. Type 2.
 81. Verify the second option should replace the context.
 82. Open Firefox in Linux OS.
-83.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+83. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 84. Verify that the testing index page opens.
 85. Click 'View Keymaweb website-oriented manual test pages' link button.
 86. Verify KeymanWeb Samples page opens.
@@ -1760,10 +1760,10 @@ Original TestLodge ID: TC175
 
 1. Open Firefox browser in Windows OS.
 2. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-3.Verify that the testing index page opens.
+3. Verify that the testing index page opens.
 4. Click 'View Keymaweb website-oriented manual test pages' link button.
 5. Verify KeymanWeb Samples page opens.
-6.Click 'Test unminified Keymanweb' link button.
+6. Click 'Test unminified Keymanweb' link button.
 7. Verify the corresponding KeymaWeb Sample page opens.
 8. Type 'japanese' under "Add a keyboard by keyboard name" text box.
 9. Click Add button.
@@ -1843,7 +1843,7 @@ Original TestLodge ID: TC175
 83. Verify that the OSK should remain visible.
 84. Verify the caret should move from the input control to the textarea control.
 85. Open Chrome browser in macOS.
-86.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+86. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 87. Verify that the testing index page opens.
 88. Click 'View Keymaweb website-oriented manual test pages' link button.
 89. Verify KeymanWeb Samples page opens.
@@ -2028,7 +2028,7 @@ Original TestLodge ID: TC176
 49.  Verify that the letter ‘ŋ’ appears on the text input screen.
 50. Click the Safari browser in iPad Tablet.
 51. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
-52.Verify that the testing index page opens.
+52. Verify that the testing index page opens.
 53. Click 'View Keymanweb use samples' link button.
 54. Verify KeymanWeb Samples page opens.
 55. Click 'Example1 - Toggle UI, all resources in same folder as page' link button.
@@ -2039,7 +2039,7 @@ Original TestLodge ID: TC176
 60. Long-press ‘n’ key, while keeping the finger down, move on the long-press options ‘ŋ‘ so it's highlighted, and release.
 61.  Verify that the letter ‘ŋ’ appears on the text input screen.
 62. Click the Safari browser in the iPad Tablet with a physical keyboard.
-63.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+63. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 64. Verify that the testing index page opens.
 65. Click 'View Keymanweb use samples' link button.
 66. Verify KeymanWeb Samples page opens.
@@ -2262,7 +2262,7 @@ Original TestLodge ID: TC178
 48. Hit Backspace key.
 49. Verify that it shows an empty text area.
 50. Click the Safari browser in an iPhone Mobile.
-51.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+51. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 52. Verify that the testing index page opens.
 53. Click 'View Keymanweb use samples' link button.
 54. Verify KeymanWeb Samples page opens.
@@ -2432,7 +2432,7 @@ Original TestLodge ID: TC179
 20. Click the Add button.
 21. Verify that the Spanish keyboard is added to the list.
 22. Click Safari browser in an iPhone Mobile.
-23.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+23. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 24. Verify that the testing index page opens.
 25. Click 'View Keymanweb use samples' link button.
 26. Verify KeymanWeb Samples page opens.
@@ -2807,7 +2807,7 @@ Original TestLodge ID: TC182
 8. Verify that manual attachment mode results in a page with no KMW-activated controls.
 9. Verify that the KeymanWeb is properly attached to and detaches from each relevant type of control with the page’s API-interface controls.
 10. Click the Chrome browser icon in an Android Mobile device attached with a physical keyboard.
-11.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+11. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 12. Verify that the testing index page opens.
 13. Click 'View Keymanweb website-oriented manual test pages' link button.
 14. Verify KeymanWeb 17 Testing page opens.
@@ -3081,7 +3081,7 @@ Original TestLodge ID: TC184
 16. Click / touch a blank area of the page.
 17. Verify that the OSK should automatically hide.
 18. Click the Chrome browser in Android mobile attached with physical keyboard
-19.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+19. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 20. Verify that the testing index page opens.
 21. Click 'View Keymanweb website-oriented manual test pages' link button.
 22. Verify KeymanWeb 17 Testing page opens.
@@ -3132,7 +3132,7 @@ Original TestLodge ID: TC184
 73. Click / touch a blank area of the page.
 74. Verify that the OSK should automatically hide.
 75. Click the Safari browser icon on the iPad device.
-76.Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
+76. Enter ‘https://build.palaso.org/repository/download/Keymanweb_TestPullRequests/391530:id/index.html' in the Search bar.
 77. Verify that the testing index page opens.
 78. Click 'View Keymanweb website-oriented manual test pages' link button.
 79. Verify KeymanWeb 17 Testing page opens.
