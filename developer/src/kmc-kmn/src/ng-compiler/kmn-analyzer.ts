@@ -12,7 +12,7 @@ import { SingleChildRuleWithASTRebuild, SequenceRule, SingleChildRule } from "./
 import { TokenRule } from "./recursive-descent.js";
 import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyStatementRule, IfLikeStatementRule } from "./statement-analyzer.js";
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyzer.js";
-import { CapsAlwaysOffRule, CapsOnOnlyRule, HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyzer.js";
+import { CapsOnOnlyRule, HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyzer.js";
 import { SetNormalStoreRule, SetSystemStoreRule, ShiftFreesCapsRule, SystemStoreAssignRule } from "./store-analyzer.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
@@ -193,22 +193,22 @@ export class CompileTargetRule extends AlternateTokenRule {
 }
 
 /**
- * (BNF) content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
+ * (BNF) content: systemStoreAssign|CAPSALWAYSOFF_HEADER|capsOnOnly|shiftFreesCaps|
  * headerAssign|normalStoreAssign|ruleBlock
  */
 export class ContentRule extends SingleChildRule {
   public constructor() {
     super();
-    const systemStoreAssign  = new SystemStoreAssignRule();
-    const capsAlwaysOff      = new CapsAlwaysOffRule();
-    const capsOnOnly         = new CapsOnOnlyRule();
-    const shiftFreesCaps     = new ShiftFreesCapsRule();
-    const headerAssign       = new HeaderAssignRule();
-    const normalStoreAssign  = new NormalStoreAssignRule();
-    const ruleBlock          = new RuleBlockRule();
+    const systemStoreAssign    = new SystemStoreAssignRule();
+    const capsAlwaysOff_Header = new TokenRule(TokenType.CAPSALWAYSOFF_HEADER, true);
+    const capsOnOnly           = new CapsOnOnlyRule();
+    const shiftFreesCaps       = new ShiftFreesCapsRule();
+    const headerAssign         = new HeaderAssignRule();
+    const normalStoreAssign    = new NormalStoreAssignRule();
+    const ruleBlock            = new RuleBlockRule();
     this.rule = new AlternateRule([
       systemStoreAssign,
-      capsAlwaysOff,
+      capsAlwaysOff_Header,
       capsOnOnly,
       shiftFreesCaps,
       headerAssign,
@@ -512,7 +512,6 @@ export class GroupNameElementRule extends SingleChildRule {
 export class PermittedKeywordRule extends AlternateTokenRule {
   public constructor() {
     super([
-      TokenType.ALWAYS,
       TokenType.ANSI,
       TokenType.BEEP,
       TokenType.BEGIN,

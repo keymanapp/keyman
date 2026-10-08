@@ -14,7 +14,7 @@ import { NodeType } from "../../src/ng-compiler/node-type.js";
 import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { Rule } from '../../src/ng-compiler/recursive-descent.js';
 import { stringToTokenBuffer } from './kmn-analyzer.tests.js';
-import { CapsAlwaysOffRule, CapsOnOnlyRule, DeadkeyNameRule, HeaderAssignRule, HeaderNameRule, NormalStoreNameRule } from '../../src/ng-compiler/store-analyzer.js';
+import { CapsOnOnlyRule, DeadkeyNameRule, HeaderAssignRule, HeaderNameRule, NormalStoreNameRule } from '../../src/ng-compiler/store-analyzer.js';
 import { NormalStoreAssignRule, NormalStoreRule, ResetStoreRule, SetNormalStoreRule, SetSystemStoreRule } from '../../src/ng-compiler/store-analyzer.js';
 import { ShiftFreesCapsRule, StoreNameRule, SystemStoreAssignRule, SystemStoreNameForSetRule } from '../../src/ng-compiler/store-analyzer.js';
 import { SystemStoreNameRule, SystemStoreRule } from '../../src/ng-compiler/store-analyzer.js';
@@ -471,19 +471,6 @@ describe("KMN Store Analyser Tests", () => {
       const resetNode = root.getSoleChildOfType(NodeType.RESET);
       assert.isNotNull(resetNode);
       assert.isNotNull(resetNode.getSoleChildOfType(NodeType.STORENAME));
-    });
-  });
-  describe("CapsAlwaysOffRule Tests", () => {
-    it("can construct a CapsAlwaysOffRule", () => {
-      tokenBuffer = stringToTokenBuffer('');
-      const capsAlwaysOff: Rule = new CapsAlwaysOffRule();
-      assert.isNotNull(capsAlwaysOff);
-    });
-    it("can parse correctly", () => {
-      tokenBuffer = stringToTokenBuffer('caps always off');
-      const capsAlwaysOff: Rule = new CapsAlwaysOffRule();
-      assert.isTrue(capsAlwaysOff.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSALWAYSOFF));
     });
   });
   describe("CapsOnOnlyRule Tests", () => {

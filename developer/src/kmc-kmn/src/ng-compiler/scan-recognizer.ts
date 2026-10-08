@@ -99,9 +99,9 @@ export const KMN_SCAN_RECOGNIZERS = [
   // https://help.keyman.com/developer/language/reference/caps
   {tokenType: TokenType.SHIFTFREESCAPS,      regExp: /&shiftfreescaps(?![a-z0-9_\.-])/iy,                     emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  {tokenType: TokenType.CAPS,                regExp: /caps(?![a-z0-9_\.-])/iy,                                emit: true},
+  {tokenType: TokenType.CAPSALWAYSOFF_HEADER, regExp: /caps[^\S\r\n]+always[^\S\r\n]+off/iy,                  emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  {tokenType: TokenType.ALWAYS,              regExp: /always(?![a-z0-9_\.-])/iy,                              emit: true},
+  {tokenType: TokenType.CAPS,                regExp: /caps(?![a-z0-9_\.-])/iy,                                emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenType.OFF,                 regExp: /off(?![a-z0-9_\.-])/iy,                                 emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype

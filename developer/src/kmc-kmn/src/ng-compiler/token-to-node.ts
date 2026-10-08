@@ -12,8 +12,6 @@ import { NodeType } from "./node-type.js";
 import { TokenType } from "./token-type.js";
 
 export const TOKEN_TO_NODE = [
-  // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  {tokenType: TokenType.ALWAYS,              nodeType: NodeType.ALWAYS},
   // https://help.keyman.com/developer/language/reference/begin
   {tokenType: TokenType.ANSI,                nodeType: NodeType.ANSI},
   // https://help.keyman.com/developer/language/reference/any
@@ -36,6 +34,8 @@ export const TOKEN_TO_NODE = [
   {tokenType: TokenType.CAPS,                nodeType: NodeType.CAPS},
   // https://help.keyman.com/developer/language/reference/caps
   {tokenType: TokenType.CAPSALWAYSOFF,       nodeType: NodeType.CAPSALWAYSOFF},
+  // https://help.keyman.com/developer/language/reference/caps
+  {tokenType: TokenType.CAPSALWAYSOFF_HEADER, nodeType: NodeType.CAPSALWAYSOFF_HEADER},
   // https://help.keyman.com/developer/language/reference/caps
   {tokenType: TokenType.CAPSONONLY,          nodeType: NodeType.CAPSONONLY},
   // https://help.keyman.com/developer/language/reference/casedkeys

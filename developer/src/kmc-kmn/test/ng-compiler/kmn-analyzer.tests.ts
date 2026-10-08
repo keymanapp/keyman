@@ -286,7 +286,7 @@ describe("KMN Analyser Tests", () => {
       tokenBuffer = stringToTokenBuffer('caps always off');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSALWAYSOFF));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSALWAYSOFF_HEADER));
     });
     it("can parse correctly (caps on only)", () => {
       tokenBuffer = stringToTokenBuffer('caps on only');
@@ -841,7 +841,6 @@ describe("KMN Analyser Tests", () => {
     it("can parse correctly", () => {
       // *_HEADER tokens must be followed by a space
       [
-        {input: 'always',        nodeType: NodeType.ALWAYS},
         {input: 'ansi',          nodeType: NodeType.ANSI},
         {input: 'beep',          nodeType: NodeType.BEEP},
         {input: 'begin',         nodeType: NodeType.BEGIN},

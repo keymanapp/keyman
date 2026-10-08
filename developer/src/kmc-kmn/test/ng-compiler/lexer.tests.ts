@@ -173,10 +173,11 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenType.CAPS, 'CAPS');
       recogniseToken(TokenType.CAPS, 'Caps');
     });
-    it("can recognise an ALWAYS token", () => {
-      recogniseToken(TokenType.ALWAYS, 'always');
-      recogniseToken(TokenType.ALWAYS, 'ALWAYS');
-      recogniseToken(TokenType.ALWAYS, 'Always');
+    it("can recognise a CAPSALWAYSOFF_HEADER token", () => {
+      recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'caps always off');
+      recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'CAPS ALWAYS OFF');
+      recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'Caps Always Off');
+      recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'caps  always  off');
     });
     it("can recognise an OFF token", () => {
       recogniseToken(TokenType.OFF, 'off');
@@ -662,7 +663,7 @@ describe("Lexer Tests", () => {
         ]
       );
     });
-    it("recognise a continuation followed by whitespace and a diallowed token as a PARAMETER", () => {
+    it("recognise a continuation followed by whitespace and a disallowed token as a PARAMETER", () => {
       recogniseTokens(
         '\\ beep\n',
         [
@@ -963,18 +964,6 @@ describe("Lexer Tests", () => {
     });
     it("can recognise a capsalwaysoff store", () => {
       recogniseSystemStoreWithString(TokenType.CAPSALWAYSOFF, "1");
-    });
-    it("can recognise a 'caps always off' statement", () => {
-      recogniseTokens(
-        'caps always off',
-        [
-          new Token(TokenType.CAPS, 'caps'),
-          new Token(TokenType.WHITESPACE, ' ', 1, 5),
-          new Token(TokenType.ALWAYS, 'always', 1, 6),
-          new Token(TokenType.WHITESPACE, ' ', 1, 12),
-          new Token(TokenType.OFF, 'off', 1, 13),
-        ]
-      );
     });
     it("can recognise a capsononly store", () => {
       recogniseSystemStoreWithString(TokenType.CAPSONONLY, "1");
@@ -1340,7 +1329,6 @@ describe("Lexer Tests", () => {
         '&capsononly',
         '&shiftfreescaps',
         'caps',
-        'always',
         'off',
         'on',
         'only',
