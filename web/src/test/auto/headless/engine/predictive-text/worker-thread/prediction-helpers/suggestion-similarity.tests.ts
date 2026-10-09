@@ -6,7 +6,7 @@ import { deepCopy } from 'keyman/common/web-utils';
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 import {
-  CorrectionPredictionTuple,
+  CompositedIntermediatePrediction,
   models,
   PredictionMetadata,
   processSimilarity,
@@ -84,7 +84,7 @@ const testModelWithoutCasing = new DummyModel({
       .replace(/[“”]/g, '"')
       // ** Difference from model-defaults here **
       // And finally, erase single-quotation marks.
-      .replace(/'/, '');
+      .replace(/'/g, '');
   }
   // No suggestions needed here, so we don't define any.
 });
@@ -110,93 +110,93 @@ const testModelWithCasing = new DummyModel({
   // No suggestions needed here, so we don't define any.
 });
 
+const commonMetadata: PredictionMetadata = {
+  autoSelectable: true,
+  matchLevel: SuggestionSimilarity.none,
+  rawEditCount: 0, // does not matter for these tests
+  predictionLength: 0 // does not matter for these tests
+};
+
 /**
  * Builds a fresh copy of test values useful for suggestion-similarity
  * testing.
  * @returns
  */
 const build_its_is_set = () => {
-  const metadata: PredictionMetadata = {
-    matchLevel: SuggestionSimilarity.none,
-    preservationTransform: undefined,
-    rawEditCount: 0, // does not matter for these tests
-    predictionLength: 0 // does not matter for these tests
-  };
-
-  const its: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'its',
-      p: 0.8
-    },
-    prediction: {
-      sample: {
+  const its: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 's',
           deleteLeft: 0
         },
         displayAs: 'its'
       },
-      p: 0.2
+      correction: 'its'
     },
-    totalProb: 0.16,
-    metadata: {...metadata}
+    probabilities: {
+      prediction: .2,
+      correction: .8,
+      total: .2 * .8
+    },
+    metadata: {...commonMetadata}
   };
 
-  const it_is: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'its',
-      p: 0.8
-    },
-    prediction: {
-      sample: {
+  const it_is: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: '\'s',
           deleteLeft: 0
         },
         displayAs: 'it\'s'
       },
-      p: 0.8
+      correction: 'its'
     },
-    totalProb: 0.64,
-    metadata: {...metadata}
+    probabilities: {
+      prediction: .8,
+      correction: .8,
+      total: .8 * .8
+    },
+    metadata: {...commonMetadata}
   };
 
-  const is: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'is',
-      p: 0.2
-    },
-    prediction: {
-      sample: {
+  const is: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 's',
           deleteLeft: 1
         },
         displayAs: 'is'
       },
-      p: 0.5
+      correction: 'is'
     },
-    totalProb: 0.1,
-    metadata: {...metadata}
+    probabilities: {
+      prediction: .5,
+      correction: .2,
+      total: .5 * .2
+    },
+    metadata: {...commonMetadata}
   };
 
-  const is_not: CorrectionPredictionTuple = {
-    correction: {
-      sample: 'is',
-      p: 0.2
-    },
-    prediction: {
-      sample: {
+  const is_not: CompositedIntermediatePrediction = {
+    components: {
+      prediction: {
         transform: {
           insert: 'sn\'t',
           deleteLeft: 1
         },
         displayAs: 'isn\'t'
       },
-      p: 0.5
+      correction: 'is'
     },
-    totalProb: 0.1,
-    metadata: {...metadata}
+    probabilities: {
+      prediction: .5,
+      correction: .2,
+      total: .5 * .2
+    },
+    metadata: {...commonMetadata}
   };
 
   return {
@@ -227,7 +227,7 @@ describe('processSimilarity', () => {
     const testSet = build_its_is_set();
     const distribution = [...Object.values(testSet)];
 
-    const expectation: CorrectionPredictionTuple[] = [
+    const expectation: CompositedIntermediatePrediction[] = [
       {
         ...testSet.its,
         metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.exact }
@@ -245,14 +245,14 @@ describe('processSimilarity', () => {
 
     const its = testSet.its;
     const original_its = deepCopy(its);
-    const keep_its = toAnnotatedSuggestion(testModelWithCasing, original_its.prediction.sample, 'keep', QuoteBehavior.noQuotes);
+    const keep_its = toAnnotatedSuggestion(testModelWithCasing, original_its.components.prediction, 'keep', QuoteBehavior.noQuotes);
     keep_its.matchesModel = true;
 
-    processSimilarity(testModelWithCasing, distribution, context, trueInput);
+    processSimilarity(testModelWithCasing, distribution, context, models.applyTransform(trueInput.sample, context));
 
     assert.sameDeepMembers(distribution, expectation);
-    assert.equal(its.prediction.sample.tag, 'keep');
-    assert.deepEqual(its.prediction.sample, keep_its);
+    assert.equal(its.components.prediction.tag, 'keep');
+    assert.deepEqual(its.components.prediction, keep_its);
   });
 
   it(`selects contraction as 'more similar' than same-keyed non-contraction when context is contraction`, () => {
@@ -274,7 +274,7 @@ describe('processSimilarity', () => {
     const testSet = build_its_is_set();
     const distribution = [...Object.values(testSet)];
 
-    const expectation: CorrectionPredictionTuple[] = [
+    const expectation: CompositedIntermediatePrediction[] = [
       {
         ...testSet.its,
         metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameKey }
@@ -292,14 +292,51 @@ describe('processSimilarity', () => {
 
     const it_is = testSet.it_is;
     const original_it_is = deepCopy(it_is);
-    const keep_it_is = toAnnotatedSuggestion(testModelWithCasing, original_it_is.prediction.sample, 'keep', QuoteBehavior.noQuotes);
+    const keep_it_is = toAnnotatedSuggestion(testModelWithCasing, original_it_is.components.prediction, 'keep', QuoteBehavior.noQuotes);
     keep_it_is.matchesModel = true;
 
-    processSimilarity(testModelWithCasing, distribution, context, trueInput);
+    processSimilarity(testModelWithCasing, distribution, context, models.applyTransform(trueInput.sample, context));
 
     assert.sameDeepMembers(distribution, expectation);
-    assert.equal(it_is.prediction.sample.tag, 'keep');
-    assert.deepEqual(it_is.prediction.sample, keep_it_is);
+    assert.equal(it_is.components.prediction.tag, 'keep');
+    assert.deepEqual(it_is.components.prediction, keep_it_is);
+  });
+
+  it('operates properly when no transition in context occurs', () => {
+    const transformId = 314159;
+
+    const context: Context = {
+      left: 'appl',
+      right: '',
+      startOfBuffer: true,
+      endOfBuffer: true
+    };
+
+    const distribution: CompositedIntermediatePrediction[] = [
+      {
+        components: {
+          prediction: {
+            transform: {
+              insert: 'apple',
+              deleteLeft: 4,
+              id: transformId
+            },
+            displayAs: 'apple'
+          },
+          correction: 'appl'
+        },
+        probabilities: {
+          prediction: 1,
+          correction: 1,
+          total: 1
+        },
+        metadata: commonMetadata
+      }
+    ];
+
+    const result = processSimilarity(testModelWithCasing, distribution, context, context);
+    assert.isFalse(result);
+    assert.equal(distribution[0].metadata.matchLevel, SuggestionSimilarity.none);
   });
 
   describe('with casing', () => {
@@ -331,14 +368,14 @@ describe('processSimilarity', () => {
 
       // Have the predictions replace existing context parts with the lowercased equivalents.
       Object.values(testSet).forEach((entry) => {
-        const transform = entry.prediction.sample.transform;
+        const transform = entry.components.prediction.transform;
         transform.insert = transform.deleteLeft == 0 ? `it${transform.insert}` : `i${transform.insert}`;
         transform.deleteLeft = 2;
       });
 
       const distribution = [...Object.values(testSet)];
 
-      const expectation: CorrectionPredictionTuple[] = [
+      const expectation: CompositedIntermediatePrediction[] = [
         {
           ...testSet.its,
           metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.sameKey }
@@ -355,10 +392,10 @@ describe('processSimilarity', () => {
         }
       ];
 
-      processSimilarity(testModelWithCasing, distribution, context, trueInput);
+      processSimilarity(testModelWithCasing, distribution, context, models.applyTransform(trueInput.sample, context));
 
       // Because we mucked with the casing here, there is no perfect 'keep' match.
-      const keep = distribution.find((entry) => entry.prediction.sample.tag == 'keep');
+      const keep = distribution.find((entry) => entry.components.prediction.tag == 'keep');
       assert.isNotOk(keep);
       assert.sameDeepMembers(distribution, expectation);
     });
@@ -385,14 +422,14 @@ describe('processSimilarity', () => {
 
       // Have the predictions replace existing context parts with the lowercased equivalents.
       Object.values(testSet).forEach((entry) => {
-        const transform = entry.prediction.sample.transform;
+        const transform = entry.components.prediction.transform;
         transform.insert = transform.deleteLeft == 0 ? `it${transform.insert}` : `i${transform.insert}`;
         transform.deleteLeft = 2;
       });
 
       const distribution = [...Object.values(testSet)];
 
-      const expectation: CorrectionPredictionTuple[] = [
+      const expectation: CompositedIntermediatePrediction[] = [
         {
           ...testSet.its,
           metadata: { ...testSet.its.metadata, matchLevel: SuggestionSimilarity.none }
@@ -409,10 +446,11 @@ describe('processSimilarity', () => {
         }
       ];
 
-      processSimilarity(testModelWithoutCasing, distribution, context, trueInput);
+      expectation.forEach((entry) => entry.metadata.matchLevel = SuggestionSimilarity.none);
+      processSimilarity(testModelWithoutCasing, distribution, context, models.applyTransform(trueInput.sample, context));
 
       // Because we mucked with the casing here, there is no perfect 'keep' match.
-      const keep = distribution.find((entry) => entry.prediction.sample.tag == 'keep');
+      const keep = distribution.find((entry) => entry.components.prediction.tag == 'keep');
       assert.isNotOk(keep);
       assert.sameDeepMembers(distribution, expectation);
     });

@@ -26,10 +26,10 @@ import {
   ExtendedEditOperation,
   generateSubsetId,
   models,
-  TransitionEdge,
   SearchQuotientSpur,
   traceInsertEdits,
-  determineTaillessTrueKeystroke
+  LegacyQuotientSpur,
+  TransitionEdge
 } from '@keymanapp/lm-worker/test-index';
 
 import Transform = LexicalModelTypes.Transform;
@@ -51,13 +51,15 @@ function toTransitionToken(text: string, transitionId?: number) {
   let isWhitespace = text == ' ';
   let token = ContextToken.fromRawText(plainModel, '');
   const textAsTransform = { insert: text, deleteLeft: 0, id: idSeed };
-  token.addInput({
+  token = new ContextToken(new LegacyQuotientSpur(
+    token.searchModule,
+    [ { sample: textAsTransform, p: 1 } ], {
     segment: {
       transitionId: textAsTransform.id,
       start: 0
     }, bestProbFromSet: 1,
     subsetId: generateSubsetId()
-  }, [ { sample: textAsTransform, p: 1 } ]);
+  }));
   token.isWhitespace = isWhitespace;
   return token;
 }
@@ -98,7 +100,6 @@ describe('ContextTokenization', function() {
       let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
-      assert.isNotOk(tokenization.transitionEdits);
       assert.equal(tokenization.tail.exampleInput, 'day');
       assert.isFalse(tokenization.tail.isWhitespace);
     });
@@ -106,36 +107,11 @@ describe('ContextTokenization', function() {
     it("constructs from a token array + alignment data", () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
       const tokens = rawTextTokens.map((text => toTransitionToken(text)));
-      const emptyTransform = { insert: '', deleteLeft: 0, deleteRight: 0 };
 
-      // We _could_ flesh this out a bit more... but it's not really needed for this test.
-      const edgeWindow = buildEdgeWindow(tokens, emptyTransform, false, testEdgeWindowSpec);
-      let transitionEdits: TransitionEdge = {
-        alignment: {
-          merges: [],
-          splits: [],
-          unmappedEdits: [],
-          edgeWindow: {...edgeWindow, retokenization: rawTextTokens.slice(edgeWindow.sliceIndex)},
-          removedTokenCount: 0
-        },
-        inputs: [{sample: (() => {
-          const map = new Map<number, Transform>();
-          map.set(0, emptyTransform);
-          return map;
-        })(), p: 1}],
-        inputSubsetId: generateSubsetId()
-      };
-
-      let tokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
+      let tokenization = new ContextTokenization(tokens);
 
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
-      assert.isOk(tokenization.transitionEdits);
-      assert.deepEqual(tokenization.transitionEdits, {
-        addedNewTokens: false,
-        removedOldTokens: false,
-        editedTokenCount: 1
-      });
       assert.equal(tokenization.tail.exampleInput, 'day');
       assert.isFalse(tokenization.tail.isWhitespace);
     });
@@ -163,7 +139,7 @@ describe('ContextTokenization', function() {
         inputSubsetId: generateSubsetId()
       };
 
-      let baseTokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
+      let baseTokenization = new ContextTokenization(tokens, transitionEdits);
       let cloned = new ContextTokenization(baseTokenization);
 
       assert.sameOrderedMembers(
@@ -2537,113 +2513,6 @@ describe('ContextTokenization', function() {
       expectedMap.set(-1, { insert: '', deleteLeft: 2 });
       expectedMap.set( 0, { insert: '', deleteLeft: 0 });
       assert.deepEqual(results, expectedMap);
-    });
-  });
-
-  describe('determineTaillessTrueKeystroke', () => {
-    it('handles simple tail-token extensions correctly', () => {
-      const tokenizedInput: Map<number, Transform> = new Map();
-      tokenizedInput.set(0, { insert: '', deleteLeft: 0 });
-
-      const preservedTransform = determineTaillessTrueKeystroke(tokenizedInput);
-      assert.isNotOk(preservedTransform);
-    });
-
-    it('handles simple tail-terminating whitespace inputs correctly', () => {
-      const tokenizedInput: Map<number, Transform> = new Map();
-      tokenizedInput.set(1, { insert: ' ', deleteLeft: 0 });
-      tokenizedInput.set(2, { insert: '', deleteLeft: 0 });
-
-      const preservedTransform = determineTaillessTrueKeystroke(tokenizedInput);
-      assert.deepEqual(preservedTransform, {
-        insert: ' ',
-        deleteLeft: 0
-      });
-    });
-
-    it('handles simple tail-token char deletions correctly', () => {
-      const tokenizedInput: Map<number, Transform> = new Map();
-      tokenizedInput.set(0, { insert: '', deleteLeft: 1 });
-
-      const preservedTransform = determineTaillessTrueKeystroke(tokenizedInput);
-      assert.isNotOk(preservedTransform);
-    });
-
-    it('handles tail whitespace-token deletions correctly', () => {
-      const tokenizedInput: Map<number, Transform> = new Map();
-      tokenizedInput.set(-1, { insert: '', deleteLeft: 1 });
-      tokenizedInput.set(0, { insert: '', deleteLeft: 0 });
-
-      const preservedTransform = determineTaillessTrueKeystroke(tokenizedInput);
-      assert.isNotOk(preservedTransform);
-    });
-
-    it('handles multi-token insert with small delete correctly', () => {
-      const tokenizedInput: Map<number, Transform> = new Map();
-      tokenizedInput.set(0, { insert: 'a', deleteLeft: 1 });
-      tokenizedInput.set(1, { insert: ' ', deleteLeft: 0 });
-      tokenizedInput.set(2, { insert: 'bc', deleteLeft: 0 });
-
-      const preservedTransform = determineTaillessTrueKeystroke(tokenizedInput);
-      assert.deepEqual(preservedTransform, {
-        insert: 'a ',
-        deleteLeft: 1
-      });
-    });
-
-    it('handles multi-token delete with small insert correctly', () => {
-      const tokenizedInput: Map<number, Transform> = new Map();
-      tokenizedInput.set(-2, { insert: 'a', deleteLeft: 1 });
-      tokenizedInput.set(-1, { insert: '', deleteLeft: 1 });
-      tokenizedInput.set(0, { insert: '', deleteLeft: 1 });
-
-      const preservedTransform = determineTaillessTrueKeystroke(tokenizedInput);
-      assert.isNotOk(preservedTransform);
-    });
-
-    it('handles multi-token insertion/deletion input correctly (1)', () => {
-      const tokenizedInput: Map<number, Transform> = new Map();
-      tokenizedInput.set(-2, { insert: 'a', deleteLeft: 1 });
-      tokenizedInput.set(-1, { insert: ' ', deleteLeft: 1 });
-      tokenizedInput.set(0, { insert: 'b', deleteLeft: 1 });
-      tokenizedInput.set(1, { insert: ' ', deleteLeft: 0 });
-      tokenizedInput.set(2, { insert: 'c', deleteLeft: 0 });
-
-      const preservedTransform = determineTaillessTrueKeystroke(tokenizedInput);
-      assert.deepEqual(preservedTransform, {
-        insert: 'a b ',
-        deleteLeft: 3
-      });
-    });
-
-    it('handles multi-token insertion/deletion input correctly (2)', () => {
-      const tokenizedInput: Map<number, Transform> = new Map();
-      tokenizedInput.set(-4, { insert: 'a', deleteLeft: 1 });
-      tokenizedInput.set(-3, { insert: ' ', deleteLeft: 1 });
-      tokenizedInput.set(-2, { insert: 'b', deleteLeft: 1 });
-      tokenizedInput.set(-1, { insert: ' ', deleteLeft: 1 });
-      tokenizedInput.set(0, { insert: '', deleteLeft: 0 });
-
-      const preservedTransform = determineTaillessTrueKeystroke(tokenizedInput);
-      assert.deepEqual(preservedTransform, {
-        insert: 'a b ',
-        deleteLeft: 4
-      });
-    });
-
-    it('handles multi-token insertion/deletion input correctly (3)', () => {
-      const tokenizedInput: Map<number, Transform> = new Map();
-      tokenizedInput.set(-4, { insert: 'a', deleteLeft: 1 });
-      tokenizedInput.set(-3, { insert: ' ', deleteLeft: 1 });
-      tokenizedInput.set(-2, { insert: 'b', deleteLeft: 1 });
-      tokenizedInput.set(-1, { insert: '', deleteLeft: 1 });
-      tokenizedInput.set(0, { insert: '', deleteLeft: 0 });
-
-      const preservedTransform = determineTaillessTrueKeystroke(tokenizedInput);
-      assert.deepEqual(preservedTransform, {
-        insert: 'a ',
-        deleteLeft: 2
-      });
     });
   });
 });

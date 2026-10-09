@@ -21,32 +21,32 @@ LMLayerWorker.loadModel(new models.DummyModel({
 const appleDummySuggestionSets: Suggestion[][] = [[
   // Set 1:
   {
-    transform: { insert: 'e', deleteLeft: 0},
+    transform: { insert: 'apple', deleteLeft: 0},
     displayAs: 'apple',
   }, {
-    transform: { insert: 'y', deleteLeft: 0},
+    transform: { insert: 'apply', deleteLeft: 0},
     displayAs: 'apply'
   }, {
-    transform: { insert: 'es', deleteLeft: 0},
+    transform: { insert: 'apples', deleteLeft: 0},
     displayAs: 'apples'
   }
 ], [
   // Set 2:
   {
-    transform: { insert: 'e', deleteLeft: 0},
+    transform: { insert: 'apple', deleteLeft: 0},
     displayAs: 'apple',
     tag: 'keep'
   }, {
-    transform: { insert: 'y', deleteLeft: 0},
+    transform: { insert: 'apply', deleteLeft: 0},
     displayAs: 'apply'
   }, {
-    transform: { insert: 's', deleteLeft: 1},
+    transform: { insert: 'apps', deleteLeft: 1},
     displayAs: 'apps'
   }
 ], [
   // Set 3:
   {
-    transform: { insert: 'ied', deleteLeft: 2},
+    transform: { insert: 'applied', deleteLeft: 2},
     displayAs: 'applied'
   }
 ], [
@@ -101,7 +101,7 @@ describe("PredictionContext", () => {
     suggestions = updateFake.secondCall.args[0];
     assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['apple', 'apply', 'apples']);
     assert.isNotOk(suggestions.find((obj) => obj.tag == 'keep'));
-    assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 0));
+    assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 4));
 
     textStore.insertTextBeforeCaret('e'); // appl| + e = apple
     let transcription = textStore.buildTranscriptionFrom(initialTextStore, null, true);
@@ -113,7 +113,7 @@ describe("PredictionContext", () => {
     suggestions = updateFake.thirdCall.args[0];
     assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['apple', 'apply', 'apps']);
     assert.equal(suggestions.find((obj) => obj.tag == 'keep').displayAs, 'apple');
-    assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'apps');
+    assert.isOk(suggestions.find((obj) => obj.displayAs == 'apps'));
   });
 
   it('ignores outdated predictions', async function () {
@@ -140,14 +140,17 @@ describe("PredictionContext", () => {
     suggestions = updateFake.secondCall.args[0];
     assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['apple', 'apply', 'apples']);
     assert.isNotOk(suggestions.find((obj) => obj.tag == 'keep'));
-    assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 0));
+    assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 4));
 
+    textStore = SyntheticTextStore.from(initialTextStore);
+    textStore.insertTextBeforeCaret('e');
     const baseTranscription = textStore.buildTranscriptionFrom(initialTextStore, null, true);
 
     // Mocking:  corresponds to the second set of mocked predictions - round 2 of
     // 'apple', 'apply', 'apples'.
     const skippedPromise = langProcessor.predict(baseTranscription, dummiedGetLayer());
 
+    textStore = SyntheticTextStore.from(initialTextStore);
     textStore.insertTextBeforeCaret('e'); // appl| + e = apple
     const finalTranscription = textStore.buildTranscriptionFrom(initialTextStore, null, true);
 
@@ -219,7 +222,7 @@ describe("PredictionContext", () => {
     suggestions = updateFake.firstCall.args[0];
     assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['apple', 'apply', 'apps']);
     assert.equal(suggestions.find((obj) => obj.tag == 'keep').displayAs, 'apple');
-    assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'apps');
+    assert.isOk(suggestions.find((obj) => obj.displayAs == 'apps'));
 
     // Now for the real test.
     previousTextState = SyntheticTextStore.from(textState); // snapshot it!

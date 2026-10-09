@@ -118,16 +118,6 @@ const determineTargetSplitSequences = (constituentPaths: SearchQuotientSpur[][],
 
 describe('SearchQuotientCluster', () => {
   describe('constructor()', () => {
-    it('initializes from LegacySearchRoot', () => {
-      const path = new LegacyQuotientRoot(testModel);
-      const cluster = new SearchQuotientCluster([path]);
-      assert.equal(cluster.inputCount, 0);
-      assert.equal(cluster.codepointLength, 0);
-      assert.isNumber(cluster.spaceId);
-      assert.deepEqual(cluster.bestExample, {text: '', p: 1});
-      assert.deepEqual(cluster.parents, [path]);
-    });
-
     it('initializes from arbitrary SearchQuotientSpur', () => {
       const rootPath = new LegacyQuotientRoot(testModel);
 
