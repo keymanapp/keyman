@@ -150,7 +150,6 @@ begin
 		CODE_USE:			     Result := 1;
 		CODE_DEADKEY:		   Result := 1;
 		CODE_EXTENDED:		 Result := 3;
-		CODE_CLEARCONTEXT: Result := 1; // deprecated in 19.0
 		CODE_CALL:			   Result := 1;
 		CODE_CONTEXTEX:	   Result := 1;
     CODE_NOTANY:       Result := 1;
@@ -196,9 +195,6 @@ begin
       CODE_BEEP:          Result := 'beep';
       CODE_DEADKEY:       Result := Format('dk(%s)', [FKbd.Deadkeys[Ord(FString[Index+2])-1].Name]);
       CODE_EXTENDED:      Result := FormatVirtualKey(Ord(FString[Index+2]), Ord(FString[Index+3]));
-      CODE_SWITCH:        Result := '??switch';
-      CODE_KEY:           Result := '??key';
-      CODE_CLEARCONTEXT:  Result := 'clearcontext'; // deprecated in 19.0
       CODE_CALL:          Result := 'call(func)';
       CODE_CONTEXTEX:     Result := Format('context(%d)', [Ord(FString[Index+2])]);
       CODE_NOTANY:        begin storeindex := Ord(FString[Index+2])-1; Result := Format('notany(%s)', [Fkbd.Stores[storeindex].Name]); end;

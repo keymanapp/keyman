@@ -494,10 +494,6 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
         if(m_state.StopOutput) return psrPostMessages;
         FoundUse = TRUE;
         break;
-      case CODE_CLEARCONTEXT:
-        // statement deprecated in 19.0
-        // no longer supported, no-op
-        break;
       case CODE_INDEX:
         p++;
         s = &m_keyboard.Keyboard->dpStoreArray[*p - 1];

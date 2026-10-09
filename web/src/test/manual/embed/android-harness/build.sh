@@ -20,21 +20,9 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-### CLEAN ACTIONS
+### ACTIONS
 
-if builder_start_action clean; then
-  rm -rf build/
-  builder_finish_action success clean
-fi
-
-### CONFIGURE ACTIONS
-
-if builder_start_action configure; then
-  node_select_version_and_npm_ci
-  builder_finish_action success configure
-fi
-
-if builder_start_action build; then
+function do_build() {
   mkdir -p "host/osk"
   cp -R "$KEYMAN_ROOT/android/KMEA/app/src/main/assets/"* "host/"
   cp "$KEYMAN_ROOT/web/build/app/webview/debug/keymanweb-webview.js" "host/keymanweb-webview.js"
@@ -51,5 +39,9 @@ if builder_start_action build; then
 
   cp "$KEYMAN_ROOT/web/src/test/manual/web/web_context_tests.js" "host/"
   # android\KMEA\app\src\main\assets\keyboard.html
-  builder_finish_action success build
-fi
+}
+
+builder_run_action clean       rm -rf build/
+builder_run_action configure   node_select_version_and_npm_ci
+builder_run_action build       do_build
+

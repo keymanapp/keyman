@@ -736,6 +736,32 @@ table tr
 {
   display: none;
 }
+.options_startup_warning
+{
+  background: #FFFFFF;
+  border: 2px solid #CC3846;
+  color: #000000;
+  display: flex;
+  align-items: flex-start;
+  margin: 4px 8px 8px 32px;
+  padding: 8px;
+}
+.options_startup_warning_icon
+{
+  flex: 0 0 auto;
+  height: 32px;
+  margin: 8px 8px 0 0;
+  width: 32px;
+}
+.options_startup_warning_content
+{
+  flex: 1 1 auto;
+}
+#options .options_startup_warning input,
+#options .options_startup_warning button
+{
+  margin: 6px 0 0;
+}
 #options_control
 {
   left: 0;
