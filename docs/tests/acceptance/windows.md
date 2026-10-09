@@ -1,5 +1,20 @@
 # Windows Acceptance Tests
 
+### Clean up instructions for manual tests
+For all these acceptance steps to perform a `cleanup` Uninstall Keyman and any third-party applications installed as part for the `Setup` steps.
+
+If an installation becomes corrupted and it is not possible to uninstall `Keyman for Windows` through `Add or remove programs`, clean up the files in the following folders if they exist.
+
+- %ProgramFiles(x86)%\Keyman or %ProgramFiles%\Keyman
+- %CommonProgramFiles(x86)%\Keyman or %CommonProgramFiles%\Keyman
+- %ProgramData%\Keyman
+- %AppData%\Keyman
+- %LocalAppData%\Keyman
+
+If still having trouble remove the registry values at
+- HKCU\Software\Keyman
+- HKLM\Software\Wow6432Node\Keyman
+
 **TEST_1**
 
 Test case for INSTALL Keyman
@@ -53,21 +68,6 @@ Original TestLodge ID: TC01
 22. Verify that the Open Configuration blue link button appears on the dialog.
 23. Click the ‘Start Keyman’ button.
 24. Verify that the Keyman is started and visible in the Notification area (in the task bar).
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version  from the list.
-8. Click the Uninstall option.
-9. Verify that the Keyman Uninstallation completed successfully.
 
 </details>
 
@@ -134,21 +134,6 @@ Original TestLodge ID: TC02
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_3**
@@ -203,21 +188,6 @@ Original TestLodge ID: TC03
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_4**
@@ -269,21 +239,6 @@ Original TestLodge ID: TC04
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_5**
@@ -328,21 +283,6 @@ Original TestLodge ID: TC05
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.yman 16.0’  from the list.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_6**
@@ -367,9 +307,9 @@ Original TestLodge ID: TC06
 <details>
 <summary>Setup</summary>
 
-1.Install Keyman latest  Stable build from Keyman.com site.
-2.Install CapsLock Keyboard.
-3.CapsLock is currently on
+1. Install Keyman latest  Stable build from Keyman.com site.
+2. Install CapsLock Keyboard.
+3. CapsLock is currently on
 4. Currently active keyboard is the CapsLock Keyboard.
 
 </details>
@@ -381,21 +321,6 @@ Original TestLodge ID: TC06
 2. Verify that the Notepad app opens
 3. Type ‘a’
 4.  Verify that the word ‘pass’ appears on the Notepad.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -423,10 +348,10 @@ Original TestLodge ID: TC07
 <details>
 <summary>Setup</summary>
 
-1.Install Keyman latest  Stable build from Keyman.com Site.
-2.Install CapsLock Keyboard.
+1. Install Keyman latest  Stable build from Keyman.com Site.
+2. Install CapsLock Keyboard.
 3. CapsLock is currently on
-4.Currently active keyboard is the CapsLock Keyboard.
+4. Currently active keyboard is the CapsLock Keyboard.
 
 </details>
 
@@ -437,21 +362,6 @@ Original TestLodge ID: TC07
 2. Verify that the Notepad app opens
 3. Press Shift + b keys.
 4. Verify that the word ‘pass’ should appear on the Notepad.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -496,21 +406,6 @@ Original TestLodge ID: TC08
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_9**
@@ -549,21 +444,6 @@ Original TestLodge ID: TC09
 2. Verify that the Notepad app opens
 3. Type ‘c’
 4. Verify that the text ‘pass’ should appear on the Notepad.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -608,21 +488,6 @@ Original TestLodge ID: TC10
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_11**
@@ -664,21 +529,6 @@ Original TestLodge ID: TC11
 6. Verify that the CapsalwaysOff icon appears in the taskbar.
 7. Type ‘a’ in the Notepad.
 8. Verify that the result should show ‘ncaps_little_a’ in the Notepad app.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -728,21 +578,6 @@ Original TestLodge ID: TC12
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_13**
@@ -789,21 +624,6 @@ Original TestLodge ID: TC13
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_14**
@@ -845,21 +665,6 @@ Original TestLodge ID: TC14
 6. Verify that the Capsalwaysoff keyboard icon appears in the taskbar.
 7. Press ’ CapsLock Key + Shift Key + a ‘  keys.
 8. Verify that output should show ‘ncaps_shift_A’ in the Notepad app.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -908,21 +713,6 @@ Original TestLodge ID: TC15
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_16**
@@ -961,21 +751,6 @@ Original TestLodge ID: TC16
 2. Verify that the Notepad app opens
 3. Type 1
 4. Verify the output results should show ‘pass.’ in the Notepad app.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -1019,21 +794,6 @@ Original TestLodge ID: TC17
 4. Type 2
 5. Verify that the caps lock indicator turned on
 6. Verify that the output should show  ‘pass.’ in the Notepad app.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -1081,21 +841,6 @@ Original TestLodge ID: TC18
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_19**
@@ -1136,21 +881,6 @@ Original TestLodge ID: TC19
 4. Press Shift + 3 Key.
 5. Verify that the Caps lock indicator turned OFF
 6. Verify that the output results show  ‘pass.’ in the Notepad app.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -1195,21 +925,6 @@ Original TestLodge ID: TC20
 4. Press and release the Shift key.
 5. Verify that the caps lock indicator turned OFF
 6. Verify there was no output should appear in the Notepad app.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -1273,21 +988,6 @@ Original TestLodge ID: TC21
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version  from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_22**
@@ -1331,21 +1031,6 @@ Original TestLodge ID: TC22
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_23**
@@ -1386,21 +1071,6 @@ Original TestLodge ID: TC23
 5. Select the EuroLatin Keyboard
 6. Type a b c d in the Notepad.
 7. Verify the output should show  ‘abcd’ in the Notepad app.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -1462,21 +1132,6 @@ Original TestLodge ID: TC24
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_25**
@@ -1535,21 +1190,6 @@ Original TestLodge ID: TC25
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_26**
@@ -1582,7 +1222,7 @@ Original TestLodge ID: TC26
 6. Create New>DWORD(32-bit) key.
 7. Rename ‘ShowIMWindowAlways’ to the new DWORD key.
 8. Set the Key value to1
-9.This keyboard uses the letters aeom to allow IMX input. This time a IM window should display.
+9. This keyboard uses the letters aeom to allow IMX input. This time a IM window should display.
 
 </details>
 
@@ -1604,21 +1244,6 @@ Original TestLodge ID: TC26
 13. Verify that the option menu appears on the screen.
 14. Select the 3rd ### option.
 15. Verify that the output results should show ‘ try æ### ‘
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -1667,21 +1292,6 @@ Original TestLodge ID: TC27
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_28**
@@ -1724,21 +1334,6 @@ Original TestLodge ID: TC28
 8. Verify that the IMX window will appear and in the top left the letters hanzi should be present
 9. Click the 5th option
 10. Verify the output results 汉字变换 should appear in the Notepad app.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -1789,21 +1384,6 @@ Original TestLodge ID: TC29
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_30**
@@ -1851,21 +1431,6 @@ Original TestLodge ID: TC30
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_31**
@@ -1910,21 +1475,6 @@ Original TestLodge ID: TC31
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_32**
@@ -1966,21 +1516,6 @@ Original TestLodge ID: TC32
 6. Verify that the 043 - output and keystroke Keyboard icon appears in the task bar.
 7. Type 123
 8. Verify the output results  "abd3" should appear in the Notepad app.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
 
 </details>
 
@@ -2032,21 +1567,6 @@ Original TestLodge ID: TC33
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_34**
@@ -2091,21 +1611,6 @@ Original TestLodge ID: TC34
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_35**
@@ -2141,19 +1646,7 @@ Original TestLodge ID: TC186
 2. Change the directory path to where we downloaded the Keyman Alpha Build.
 3. Type the command : keyman latest version number.exe -o (say “17.0.210.exe -o”).
 4. Verify that the self extract process happened without any errors.
-5.) Verify the build was installed successfully without showing any error messages.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Click the Control Panel option.
-3. Click the ‘Uninstall a Program’ option.
-4. Select the installed Keyman version from the list.
-5. Click the Uninstall option.
-6. Verify that the keyman uninstallation was completed successfully.
+5. ) Verify the build was installed successfully without showing any error messages.
 
 </details>
 
@@ -2213,21 +1706,6 @@ Original TestLodge ID: TC187
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Task bar)
-2. Verify that the ‘Control panel’ appears in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the the Keyman Uninstallation completed successfully
-
-</details>
-
 ---
 
 **TEST_38**
@@ -2270,21 +1748,6 @@ Original TestLodge ID: TC205
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the Search bar (in Taskbar)
-2. Verify that the ‘Control panel’ appeared in the menu list.
-3. Click the Control panel option.
-4. Verify that the Control Panel dialog appeared.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the Keyman Uninstallation was completed successfully
-
-</details>
-
 ---
 
 **TEST_41**
@@ -2323,14 +1786,6 @@ Original TestLodge ID: TC218
 4. Verify it produces `.
 5. Type e
 6. Verify it produces è
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the Windows
-2. Uninstall the TextEdit app.
 
 </details>
 
@@ -2376,14 +1831,6 @@ Original TestLodge ID: TC220
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the Windows
-2. Uninstall the TextEdit app.
-
-</details>
-
 ---
 
 **TEST_46**
@@ -2425,13 +1872,6 @@ Original TestLodge ID: TC232
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the Windows
-
-</details>
-
 ---
 
 **TEST_48**
@@ -2470,13 +1910,6 @@ Original TestLodge ID: TC234
 5. Press the "scroll lock"
 6. Type e
 7. Verify it produces è
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the Windows
 
 </details>
 
@@ -2522,14 +1955,6 @@ Original TestLodge ID: TC246
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the Windows
-2. Uninstall the TextEdit app.
-
-</details>
-
 ---
 
 **TEST_53**
@@ -2569,14 +1994,6 @@ Original TestLodge ID: TC248
 5. Press and Release CTRL key.
 6. Type e
 7. Verify it produces ê
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the Windows
-2. Uninstall the TextEdit app.
 
 </details>
 
@@ -2622,14 +2039,6 @@ Original TestLodge ID: TC261
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the Windows
-2. Uninstall the WordPad app.
-
-</details>
-
 ---
 
 **TEST_58**
@@ -2669,14 +2078,6 @@ Original TestLodge ID: TC263
 5. Press and Release CTRL key.
 6. Type e
 7. Verify it produces ê
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the Windows
-2. Uninstall the WordPad app.
 
 </details>
 
@@ -2730,21 +2131,6 @@ Original TestLodge ID: TC295
 16. Verify the keyboard switch from Tamil to IPA SIL keyboard.
 17. Enter some IPA letters using the IPA SIL keyboard.
 18. Verify the IPA text appears in the Notepad app.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Type ‘Control panel’ in the search bar (in the taskbar)
-2. Verify that the ‘Control Panel’ appears in the menu list.
-3. Click the Control Panel option.
-4. Verify that the Control Panel dialog appears.
-5. Click the ‘Uninstall a Program’ option.
-6. Verify that the Programs and Features dialog box opens.
-7. Select the installed Keyman version from the list.
-8. Click the Uninstall option.
-9. Verify that the Keyman Uninstallation was completed successfully.
 
 </details>
 
@@ -2806,21 +2192,6 @@ TC - feat(windows): kmshell switch handling for the installing state_TEST_INSTAL
 24.    Open the configuration window.
 25.    On the Keyboard Layouts: Verified that the gff_amharic keyboard is updated.
 26.    On the Update Tab: Verified there are no updates available.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1.    Type ‘Control panel’ in the search bar (in the task bar)
-2.    Verify that the ‘Control Panel’ appears in the menu list.
-3.    Click the Control Panel option.
-4.    Verify that the Control Panel dialog appears.
-5.    Click the ‘Uninstall a Program’ option.
-6.    Verify that the Programs and Features dialog box opens.
-7.    Select the installed Keyman version from the list.
-8.    Click the Uninstall option.
-9.    Verify that the Keyman Uninstallation was completed successfully.
 
 </details>
 
@@ -2887,21 +2258,6 @@ TC - fix(windows): handle keyboard package not downloaded #12948
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1.    Type ‘Control panel’ in the search bar (in the task bar)
-2.    Verify that the ‘Control Panel’ appears in the menu list.
-3.    Click the Control Panel option.
-4.    Verify that the Control Panel dialog appears.
-5.    Click the ‘Uninstall a Program’ option.
-6.    Verify that the Programs and Features dialog box opens.
-7.    Select the installed Keyman version from the list.
-8.    Click the Uninstall option.
-9.    Verify that the Keyman Uninstallation was completed successfully.
-
-</details>
-
 ---
 
 **TEST_324**
@@ -2950,17 +2306,3 @@ TC - feat(windows): UI layout for update tab_TEST_UI_UPDATES_KBD #12840
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1.    Type ‘Control panel’ in the search bar (in the task bar)
-2.    Verify that the ‘Control Panel’ appears in the menu list.
-3.    Click the Control Panel option.
-4.    Verify that the Control Panel dialog appears.
-5.    Click the ‘Uninstall a Program’ option.
-6.    Verify that the Programs and Features dialog box opens.
-7.    Select the installed Keyman version from the list.
-8.    Click the Uninstall option.
-9.    Verify that the Keyman Uninstallation was completed successfully.
-
-</details>
