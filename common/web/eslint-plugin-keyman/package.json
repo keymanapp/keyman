@@ -1,0 +1,15 @@
+{
+  "name": "@keymanapp/eslint-plugin-keyman",
+  "private": "true",
+  "description": "Lint tests for keymanapp/keyman",
+  "author": "Marc Durdin",
+  "main": "./lib/index.js",
+  "exports": "./lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "dependencies": {
+    "requireindex": "^1.2.0"
+  },
+  "license": "MIT"
+}
