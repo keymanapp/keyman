@@ -1,4 +1,18 @@
 module.exports = {
   ignorePatterns: ["**/build/**/*", "**/coverage/**/*"],
-  rules: {},
+  plugins: [
+    '@keymanapp/eslint-plugin-keyman',
+  ],
+  rules: {
+    "@keymanapp/keyman/prohibit-unitTestEndpoints": "error",
+  },
+  overrides: [
+    {
+      files: ["**/*.tests.ts"],
+      rules: {
+        "@keymanapp/keyman/prohibit-unitTestEndpoints": "off",
+      },
+    }
+  ]
+  // rules: {},
 };
