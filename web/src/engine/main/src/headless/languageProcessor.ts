@@ -440,7 +440,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   }
 
   public get wordbreaksAfterSuggestions() {
-    return this.configuration.wordbreaksAfterSuggestions;
+    return this.configuration?.wordbreaksAfterSuggestions;
   }
 
   public tryAcceptSuggestion(source: string): boolean {
