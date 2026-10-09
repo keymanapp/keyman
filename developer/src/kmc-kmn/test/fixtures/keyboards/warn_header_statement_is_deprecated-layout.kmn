@@ -1,0 +1,9 @@
+store(&VERSION) '19.0'
+store(&NAME) 'warn_header_statement_is_deprecated-layout'
+LAYOUT x11
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ ' ' > 'hello'

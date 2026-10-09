@@ -437,17 +437,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   protected void onResume() {
     super.onResume();
 
-    if (navigationView != null) {
-      updateCurrentKeyboardDrawerItemTitle(navigationView);
-      updateInstalledLanguagesDrawerTitle(navigationView);
-      initializeDrawerItemSubtitles(navigationView);
-    }
-
-    if (textView != null) {
-      // Reset inAppPredictionsSuspendedForSensitiveInput flag
-      KMManager.setPredictionsSuspended(textView.getInputType(), KeyboardType.KEYBOARD_TYPE_INAPP);
-    }
-
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
 
@@ -465,12 +454,35 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
     resizeTextView(textView.isKeyboardVisible());
 
+    // The keyboard may have been changed while we were paused, for example if
+    // the keyboard picker activity is started.
+    com.keyman.engine.data.Keyboard currentKeyboard = KMManager.getCurrentKeyboardInfo(context);
+    if(currentKeyboard != null) {
+      // TODO(v20): eliminate `lastKnownKeyboardId` and always use `currentKeyboard.getKeyboardID()`
+      // TODO(v20): this lines up with onKeyboardChanged(), refactor accordingly
+      lastKnownKeyboardId = currentKeyboard.getKeyboardID();
+    }
+
+    if (navigationView != null) {
+      // TODO(v20): these three calls are repeated in various places and should be cleaned up
+      updateCurrentKeyboardDrawerItemTitle(navigationView);
+      updateInstalledLanguagesDrawerTitle(navigationView);
+      initializeDrawerItemSubtitles(navigationView);
+    }
+
+    if (textView != null) {
+      // Reset inAppPredictionsSuspendedForSensitiveInput flag
+      KMManager.setPredictionsSuspended(textView.getInputType(), KeyboardType.KEYBOARD_TYPE_INAPP);
+      textView.setTypeface(KMManager.getKeyboardTextFontTypeface(this));
+    }
+
     KMManager.addKeyboardEventListener(this);
     KMKeyboardDownloaderActivity.addKeyboardDownloadEventListener(this);
     PackageActivity.addKeyboardDownloadEventListener(this);
 
     CheckInstallReferrer.checkGooglePlayInstallReferrer(this, context);
 
+    // TODO(v20): move loadingIntentUri logic into a separate function
     Intent intent = getIntent();
     Uri loadingIntentUri = intent.getData();
 
@@ -663,6 +675,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
         drawerLayout.closeDrawer(GravityCompat.END);
       } else {
+        updateCurrentKeyboardDrawerItemTitle(navigationView);
+        updateInstalledLanguagesDrawerTitle(navigationView);
+        initializeDrawerItemSubtitles(navigationView);
         drawerLayout.openDrawer(GravityCompat.END);
       }
       return true;
@@ -866,8 +881,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
    * If URL is valid, download the kmp.
    * @param packageUri URI to download the package.
    * @param installMode KMP installation mode (silent, welcome only, or full)
-   * TODO: only ever pass packageId and bcp47 from callers, as KMPLink should be responsible for
+   * TODO(v20): only ever pass packageId and bcp47 from callers, as KMPLink should be responsible for
    *       URL parsing, not this function.
+   * TODO(v20): move this into a separate module
    */
   public void downloadKMP(Uri packageUri, KmpInstallMode installMode) {
     if (packageUri == null) {
@@ -983,6 +999,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     overridePendingTransition(android.R.anim.fade_in, com.keyman.engine.R.anim.hold);
   }
 
+  // TODO(v20): remove remaining tendrils
   private void showWebBrowser() {
     // Telemetry for in-app browser usage.
     // Logging here because WebBrowserActivity is launched in a separate process.
@@ -1267,7 +1284,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
   }
 
-  // TODO: Move this to KMEA during Keyman 13.0 refactoring
+  // TODO(v20): Move this to KMEA during Keyman 13.0 refactoring
   public static void useLocalKMP(Context context, Uri data) {
     if (data != null) {
       useLocalKMP(context, data, false);
@@ -1410,6 +1427,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         });
   }
 
+  // TODO(v20): cleanup setting draw item [sub]titles; lots of repetition and unnecessary conditions
   private void initializeDrawerItemSubtitles(NavigationView navigationView) {
     setDrawerItemSubtitle(navigationView, R.id.nav_spacebar_caption,
         getString(R.string.drawer_subtitle_spacebar_caption));
@@ -1417,8 +1435,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         getString(R.string.drawer_subtitle_show_osk));
     setDrawerItemSubtitle(navigationView, R.id.nav_toggle_send_crash_report,
         getString(R.string.drawer_subtitle_send_crash_report));
-    setDrawerItemSubtitle(navigationView, R.id.nav_about_current_keyboard,
-      getString(R.string.drawer_subtitle_about_current_keyboard));
     updateThemeDrawerSubtitle(navigationView);
     updateCurrentKeyboardDrawerSubtitle(navigationView);
   }
@@ -1632,6 +1648,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     }
   }
 
+  // TODO(v20): remove
   private void bindDrawerCheckboxAction(NavigationView navigationView, int menuItemId,
       final Runnable onActivate) {
     MenuItem menuItem = navigationView.getMenu().findItem(menuItemId);
@@ -1671,6 +1688,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     });
   }
 
+  // TODO(v20): remove
   private void setDrawerCheckboxState(NavigationView navigationView, int menuItemId, boolean isChecked) {
     MenuItem menuItem = navigationView.getMenu().findItem(menuItemId);
     if (menuItem == null) {

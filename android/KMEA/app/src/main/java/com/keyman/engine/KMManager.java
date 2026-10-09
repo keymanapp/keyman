@@ -2885,6 +2885,9 @@ public final class KMManager {
 
   public static int getCurrentKeyboardIndex(Context context) {
     String key = KMKeyboard.currentKeyboard();
+    if(key == null) {
+      return KeyboardController.INDEX_NOT_FOUND;
+    }
     return KeyboardController.getInstance().getKeyboardIndex(key);
   }
 
@@ -2893,11 +2896,6 @@ public final class KMManager {
     if(index < 0) {
       // index can be undefined if user installs Keyman (without launching it)
       // and then enables Keyaman as a system keyboard from the Android settings menus.
-      // We'll only log if key isn't for fallback keyboard
-      String key = KMKeyboard.currentKeyboard();
-      if (!isDefaultKey(key)) {
-        KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
-      }
       return null;
     }
     return KeyboardController.getInstance().getKeyboardInfo(index);

@@ -200,9 +200,9 @@ namespace kmx {
 //  0x09 = bkspace.-- we don't need to keep this separate though with UC_SENTINEL
 #define CODE_EXTENDED   0x0A
 //#define CODE_EXTENDEDEND  0x0B  deprecated
-#define CODE_SWITCH     0x0C
-#define CODE_KEY      0x0D
-#define CODE_CLEARCONTEXT 0x0E    // deprecated in 19.0
+//#define CODE_SWITCH   0x0C        // unused, removed in 19.0
+//#define CODE_KEY      0x0D        // unused, removed in 19.0
+//#define CODE_CLEARCONTEXT 0x0E    // unused, removed in 19.0
 #define CODE_CALL     0x0F
 // UC_SENTINEL_EXTENDEDEND  0x10
 #define CODE_CONTEXTEX    0x11
@@ -234,8 +234,8 @@ namespace kmx {
 #define U_CODE_BEEP u"\u0007"
 #define U_CODE_DEADKEY u"\u0008"
 #define U_CODE_EXTENDED u"\u000A"
-#define U_CODE_SWITCH u"\u000C"
-#define U_CODE_CLEARCONTEXT u"\u000E"   // deprecated in 19.0
+#define U_CODE_SWITCH u"\u000C"         // unused, removed in 19.0; this macro kept for security tests
+#define U_CODE_CLEARCONTEXT u"\u000E"   // unused, removed in 19.0; this macro kept for security tests
 #define U_CODE_CALL u"\u000F"
 #define U_CODE_EXTENDEDEND u"\u0010"
 #define U_CODE_CONTEXTEX u"\u0011"
@@ -256,8 +256,8 @@ namespace kmx {
 #define C_CODE_BEEP() U_UC_SENTINEL U_CODE_BEEP
 #define C_CODE_DEADKEY(deadkey) U_UC_SENTINEL U_CODE_DEADKEY deadkey
 #define C_CODE_EXTENDED(varargs) U_UC_SENTINEL U_CODE_EXTENDED varargs
-#define C_CODE_SWITCH(val) U_UC_SENTINEL U_CODE_SWITCH val
-#define C_CODE_CLEARCONTEXT() U_UC_SENTINEL U_CODE_CLEARCONTEXT   // deprecated in 19.0
+#define C_CODE_SWITCH(val) U_UC_SENTINEL U_CODE_SWITCH val        // unused, removed in 19.0; this macro kept for security tests
+#define C_CODE_CLEARCONTEXT() U_UC_SENTINEL U_CODE_CLEARCONTEXT   // unused, removed in 19.0; this macro kept for security tests
 #define C_CODE_CALL(val) U_UC_SENTINEL U_CODE_CALL val
 #define C_CODE_CONTEXTEX(val) U_UC_SENTINEL U_CODE_CONTEXTEX val
 #define C_CODE_NOTANY(val) U_UC_SENTINEL U_CODE_NOTANY val
