@@ -969,7 +969,7 @@ describe('app/browser:  ContextManager', function () {
 
         // Actual test:  transitioning focus from an independent-mode target
         // to a global-mode target.
-        contextManager.setKeyboardForTextStore(textStore, '', '');
+        contextManager.setKeyboardForTextStore(textStore, null, null);
 
         const beforekeyboardchange = sinon.fake();
         const keyboardchange = sinon.fake();
@@ -1017,7 +1017,7 @@ describe('app/browser:  ContextManager', function () {
 
         // Actual test:  transitioning focus from an independent-mode target
         // to a global-mode target.
-        contextManager.setKeyboardForTextStore(textStore, '', '');
+        contextManager.setKeyboardForTextStore(textStore, null, null);
 
         // Allow the indirect keyboard-change operation to resolve.
         await timedPromise(10);
@@ -1249,6 +1249,32 @@ describe('app/browser:  ContextManager', function () {
         assert.isTrue(keyboardchange.calledOnce);          // There should be no attempt to swap to the lao kbd.
         assert.isTrue(keyboardasyncload.calledTwice);
         assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.test_chirality.metadata);
+      });
+
+      it('cancels pending activation when leaving independent mode', async () => {
+        const FETCH_DELAY = 50;
+
+        keyboardCache.addKeyboard(KEYBOARDS.khmer_angkor.keyboard);
+
+        await contextManager.activateKeyboard('khmer_angkor', 'km');
+
+        const textarea = document.getElementById('textarea');
+        const textStore = textStoreForElement(textarea);
+
+        withDelayedFetching(keyboardLoader, FETCH_DELAY, () => {
+          contextManager.setKeyboardForTextStore(textStore, 'lao_2008_basic', 'lo');
+        });
+
+        await Promise.resolve();
+
+        contextManager.setKeyboardForTextStore(textStore, null, null);
+
+        await timedPromise(FETCH_DELAY + 10);
+
+        const attachment = textStore.getElement()._kmwAttachment;
+        assert.isNull(attachment.keyboard);
+        assert.equal((contextManager as any).currentKeyboardSrcTextStore(), null);
+        assert.strictEqual(contextManager.activeKeyboard.metadata, KEYBOARDS.khmer_angkor.metadata);
       });
     });
   });

@@ -50,6 +50,7 @@
     "developer/src/kmc-package",
     "developer/src/kmc",
     "developer/src/server",
+    "developer/src/tike/xml/layoutbuilder",
     "common/test/resources",
     "common/web/keyman-version",
     "common/web/langtags",

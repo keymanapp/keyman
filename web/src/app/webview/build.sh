@@ -87,8 +87,6 @@ compile_and_copy() {
       "$script" "$sourcemap" --clean
   done
 
-  node map-polyfill-bundler.js
-
   # For dependent test pages.
   builder_launch /web/src/test/manual/embed/android-harness/build.sh configure,build
 }

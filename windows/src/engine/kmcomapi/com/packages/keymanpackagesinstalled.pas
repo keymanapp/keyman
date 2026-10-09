@@ -38,7 +38,8 @@ type
     property Items[Index: Integer]: IIntKeymanPackageInstalled read GetItem write SetItem; default;
   end;
 
-  TKeymanPackagesInstalled = class(TKeymanAutoCollectionObject, IKeymanPackagesInstalled, IKeymanPackagesInstalled2)
+  TKeymanPackagesInstalled = class(TKeymanAutoCollectionObject,
+    IKeymanPackagesInstalled, IKeymanPackagesInstalled2, IKeymanPackagesInstalled3)
   private
     FPackages: TPackageList;
   protected
@@ -51,6 +52,7 @@ type
     function IndexOf(const ID: WideString): Integer; safecall;
     procedure Install(const Filename: WideString; Force: WordBool); safecall;
     function Install2(const Filename: WideString; Force: WordBool): IKeymanPackageInstalled; safecall;
+    function Install3(const Filename: WideString; Force: WordBool; BaseKeyboardID: Integer): IKeymanPackageInstalled; safecall;
   public
     constructor Create(AContext: TKeymanContext);
     destructor Destroy; override;
@@ -118,7 +120,7 @@ begin
     o := [ipLegacyRegisterAndInstallProfiles];
     if Force then
       Include(o, ipForce);
-    Execute(Filename, o);
+    Execute(Filename, o, 0);
   finally
     Free;
   end;
@@ -136,7 +138,29 @@ begin
     o := [];
     if Force then
       Include(o, ipForce);
-    Execute(Filename, o);
+    Execute(Filename, o, 0);
+  finally
+    Free;
+  end;
+
+  DoRefresh;
+  Result := Get_Items(Filename);
+
+  KL.MethodExit(Self, 'Install2');
+end;
+
+function TKeymanPackagesInstalled.Install3(const Filename: WideString;
+  Force: WordBool; BaseKeyboardID: Integer): IKeymanPackageInstalled;
+var
+  o: TKPInstallPackageOptions;
+begin
+  KL.MethodEnter(Self, 'Install2', [Filename, Force]);
+  with TKPInstallPackage.Create(Context) do
+  try
+    o := [];
+    if Force then
+      Include(o, ipForce);
+    Execute(Filename, o, BaseKeyboardID);
   finally
     Free;
   end;

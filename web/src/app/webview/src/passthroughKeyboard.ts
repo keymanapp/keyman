@@ -39,6 +39,8 @@ export class PassthroughKeyboard extends HardKeyboardBase {
       isSynthetic: false       // is not an OSK keystroke.
     });
 
+    Lkc.suppressAutocorrection = true;
+
     // 'us' is our default base layout; our distributed engine doesn't support
     // changing the assumed base keyboard for mnemonics.
     Lkc = processForMnemonicsAndLegacy(Lkc, this.activeKeyboard, 'us');
