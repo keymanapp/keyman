@@ -437,6 +437,10 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   protected void onResume() {
     super.onResume();
 
+    if (textView != null) {
+      KMManager.setSuggestionType(KeyboardType.KEYBOARD_TYPE_INAPP, KMManager.defaultSuggestionModeForInputType(textView.getInputType()));
+    }
+
     KMManager.onResume();
     KMManager.hideSystemKeyboard();
 

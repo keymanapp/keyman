@@ -1,5 +1,5 @@
 ---
-title: KMManager.setPredictionsSuspended()
+title: KMManager.setPredictionsSuspended() (Deprecated)
 ---
 
 ## Summary
@@ -9,7 +9,6 @@ The **setPredictionsSuspended()** method sets a flag to temporarily disable pred
 ```java
 KMManager.setPredictionsSuspended(int inputType, KeyboardType keyboardType)
 ```
-
 ### Parameters
 
 [`inputType`](https://developer.android.com/reference/android/text/InputType)
@@ -31,6 +30,7 @@ Use this method to temporarily disable predictions because of the currently sele
 
 ## History
 Added syntax in Keyman Engine for Android 18.0.
+Deprecated syntax in Keyman Engine for Android 19.0 in favor of [`setSuggestionType`](setSuggestionType).
 
 ## See also
 * [getPredictionsSuspended](getPredictionsSuspended)
