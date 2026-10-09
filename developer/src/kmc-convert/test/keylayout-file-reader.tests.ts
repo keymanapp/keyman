@@ -25,7 +25,7 @@ describe('KeylayoutFileReader', function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test.keylayout');
       const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      const validated = sutR.unitTestEndpoints.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
       assert.isTrue(validated);
     });
 
@@ -33,7 +33,7 @@ describe('KeylayoutFileReader', function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_unknownTags.keylayout');
       const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      const validated = sutR.unitTestEndpoints.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
       assert.isFalse(validated);
     });
 
@@ -41,33 +41,33 @@ describe('KeylayoutFileReader', function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_additionalTags.keylayout');
       const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      const validated = sutR.unitTestEndpoints.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
       assert.isFalse(validated);
     });
     it('validate() should return false on inputfile with missing tags', async function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_missingTags.keylayout');
       const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      const validated = sutR.unitTestEndpoints.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
       assert.isFalse(validated);
     });
     it('validate() should return false on no entries in action-when', async function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_noActionWhen.keylayout');
       const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-      const validated = sutR.unitTestEndpoints.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+      const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
       assert.isFalse(validated);
     });
     it('validate() should return false on null as input', async function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_noActionWhen.keylayout');
-      const validated = sutR.unitTestEndpoints.validate(null, inputFilename);
+      const validated = sutR.validate(null, inputFilename);
       assert.isFalse(validated);
     });
     it('validate() should return false on undefined as input', async function () {
       const sutR = new KeylayoutFileReader(compilerTestCallbacks);
       const inputFilename = makePathToFixture('../data/Test_noActionWhen.keylayout');
-      const validated = sutR.unitTestEndpoints.validate(undefined, inputFilename);
+      const validated = sutR.validate(undefined, inputFilename);
       assert.isFalse(validated);
     });
   });
@@ -76,7 +76,7 @@ describe('KeylayoutFileReader', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const inputFilename = makePathToFixture('../data/Test_unknownTags.keylayout');
     const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const validated = sutR.unitTestEndpoints.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+    const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
     assert.isFalse(validated);
   });
 
@@ -84,7 +84,7 @@ describe('KeylayoutFileReader', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const inputFilename = makePathToFixture('../data/Test_additionalTags.keylayout');
     const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const validated = sutR.unitTestEndpoints.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+    const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
     assert.isFalse(validated);
   });
 
@@ -92,7 +92,7 @@ describe('KeylayoutFileReader', function () {
     const sutR = new KeylayoutFileReader(compilerTestCallbacks);
     const inputFilename = makePathToFixture('../data/Test_missingTags.keylayout');
     const result: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(inputFilename));
-    const validated = sutR.unitTestEndpoints.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
+    const validated = sutR.validate(result as Keylayout.KeylayoutXMLSourceFile, inputFilename);
     assert.isFalse(validated);
   });
 });

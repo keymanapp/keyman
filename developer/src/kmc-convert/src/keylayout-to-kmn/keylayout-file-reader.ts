@@ -83,7 +83,7 @@ export class KeylayoutFileReader {
   /**
    * @returns true if valid, false if invalid
    */
-  private validate(source: Keylayout.KeylayoutXMLSourceFile, inputFilename: string): boolean {
+  public validate(source: Keylayout.KeylayoutXMLSourceFile, inputFilename: string): boolean {
     if (!source) {
       this.callbacks.reportMessage(ConverterMessages.Error_UnableToReadFile({ inputFilename: inputFilename }));
       return false;
@@ -178,7 +178,6 @@ export class KeylayoutFileReader {
     findMapIndexinKeymap: this.findMapIndexinKeymap.bind(this),
     findIndexinKeymapSelect: this.findIndexinKeymapSelect.bind(this),
     checkForCorrespondingElements: this.checkForCorrespondingElements.bind(this),
-    validate: this.validate.bind(this),
     boxArray: this.boxArray.bind(this),
   };
 };
