@@ -20,7 +20,6 @@ export enum TokenType {
   BITMAP                = "BITMAP",                // https://help.keyman.com/developer/language/reference/bitmap
   BITMAP_HEADER         = "BITMAP_HEADER",         // https://help.keyman.com/developer/language/reference/_keywordsbytype
   CALL                  = "CALL",                  // https://help.keyman.com/developer/language/reference/call
-  CAPS                  = "CAPS",                  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   CAPSALWAYSOFF         = "CAPSALWAYSOFF",         // https://help.keyman.com/developer/language/reference/caps
   CAPSALWAYSOFF_HEADER  = "CAPSALWAYSOFF_HEADER",  // https://help.keyman.com/developer/language/reference/_keywordsbytype
   CAPSONONLY            = "CAPSONONLY",            // https://help.keyman.com/developer/language/reference/caps
@@ -99,7 +98,6 @@ export enum TokenType {
   RIGHT_SQ              = "RIGHT_SQ",              // https://help.keyman.com/developer/language/guide/virtual-keys
   SAVE                  = "SAVE",                  // https://help.keyman.com/developer/language/reference/save
   SET                   = "SET",                   // https://help.keyman.com/developer/language/reference/set
-  SHIFT                 = "SHIFT",                 // https://help.keyman.com/developer/language/reference/_keywordsbytype
   SHIFTFREESCAPS        = "SHIFTFREESCAPS",        // https://help.keyman.com/developer/language/reference/caps
   SHIFTFREESCAPS_HEADER = "SHIFTFREESCAPS_HEADER", // https://help.keyman.com/developer/language/reference/_keywordsbytype
   STORE                 = "STORE",                 // https://help.keyman.com/developer/language/reference/store

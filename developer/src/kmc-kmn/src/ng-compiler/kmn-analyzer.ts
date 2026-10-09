@@ -17,7 +17,7 @@ import { SetNormalStoreRule, SetSystemStoreRule, SystemStoreAssignRule } from ".
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { ASTRebuild, ChangeNode, GivenNode, NewNode, NewNodeOrTree } from "./ast-rebuild.js";
+import { ASTRebuild, GivenNode, NewNode, NewNodeOrTree } from "./ast-rebuild.js";
 
 /**
  * The Next Generation Parser for the Keyman Keyboard Language.
@@ -315,7 +315,7 @@ export class RangeEndRule extends SingleChildRule {
 }
 
 /**
- * (BNF) virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
+ * (BNF) virtualKey: LEFT_SQ MODIFIER* keyCode RIGHT_SQ
  *
  * https://help.keyman.com/developer/language/guide/virtual-keys
  *
@@ -325,36 +325,13 @@ export class VirtualKeyRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.VIRTUAL_KEY));
     const leftSquare   = new TokenRule(TokenType.LEFT_SQ);
-    const modifier     = new ModifierRule();
+    const modifier     = new TokenRule(TokenType.MODIFIER, true);
     const manyModifier = new ManyRule(modifier);
     const keyCode      = new KeyCodeRule();
     const rightSquare  = new TokenRule(TokenType.RIGHT_SQ);
     this.rule = new SequenceRule([
       leftSquare, manyModifier, keyCode, rightSquare
     ]);
-  }
-}
-
-/**
- * (BNF) modifier: SHIFT|CAPS|MODIFIER
- *
- * https://help.keyman.com/developer/language/guide/virtual-keys
- *
- * SHIFT and CAPS are distinct from other modifiers because
- * they are also used in 'CAPS ALWAYS OFF', 'CAPS ON ONLY' and
- * 'SHIFT FREES CAPS'. As SHIFT and CAPS are separately identified,
- * a MODIFIER node must be created for them if needed.
- *
- * Uses a ChangeNode to replace the sole child node with a MODIFIER
- * node but retaining the same Token
- */
-export class ModifierRule extends SingleChildRuleWithASTRebuild {
-  public constructor() {
-    super(new ChangeNode(NodeType.MODIFIER));
-    const shift    = new TokenRule(TokenType.SHIFT, true);
-    const caps     = new TokenRule(TokenType.CAPS, true);
-    const modifier = new TokenRule(TokenType.MODIFIER, true);
-    this.rule      = new AlternateRule([shift, caps, modifier]);
   }
 }
 
@@ -516,7 +493,6 @@ export class PermittedKeywordRule extends AlternateTokenRule {
       TokenType.BEEP,
       TokenType.BEGIN,
       TokenType.BITMAP_HEADER,
-      TokenType.CAPS,
       TokenType.CONTEXT,
       TokenType.COPYRIGHT_HEADER,
       TokenType.DECIMAL,
@@ -536,7 +512,6 @@ export class PermittedKeywordRule extends AlternateTokenRule {
       TokenType.POSTKEYSTROKE,
       TokenType.READONLY,
       TokenType.RETURN,
-      TokenType.SHIFT,
       TokenType.UNICODE,
       TokenType.USING,
       TokenType.VERSION_HEADER,

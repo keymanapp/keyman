@@ -168,11 +168,6 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenType.SHIFTFREESCAPS, '&SHIFTFREESCAPS');
       recogniseToken(TokenType.SHIFTFREESCAPS, '&ShiftFreesCaps');
     });
-    it("can recognise a CAPS token", () => {
-      recogniseToken(TokenType.CAPS, 'caps');
-      recogniseToken(TokenType.CAPS, 'CAPS');
-      recogniseToken(TokenType.CAPS, 'Caps');
-    });
     it("can recognise a CAPSALWAYSOFF_HEADER token", () => {
       recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'caps always off');
       recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'CAPS ALWAYS OFF');
@@ -184,11 +179,6 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenType.CAPSONONLY_HEADER, 'CAPS ON ONLY');
       recogniseToken(TokenType.CAPSONONLY_HEADER, 'Caps On Only');
       recogniseToken(TokenType.CAPSONONLY_HEADER, 'caps  on  only');
-    });
-    it("can recognise a SHIFT token", () => {
-      recogniseToken(TokenType.SHIFT, 'shift');
-      recogniseToken(TokenType.SHIFT, 'SHIFT');
-      recogniseToken(TokenType.SHIFT, 'Shift');
     });
     it("can recognise a SHIFTFREESCAPS_HEADER token", () => {
       recogniseToken(TokenType.SHIFTFREESCAPS_HEADER, 'shift frees caps');
@@ -500,26 +490,32 @@ describe("Lexer Tests", () => {
       recogniseTokenFollowedByRightSquare(TokenType.OCTAL, '777');
     });
     it("can recognise a MODIFIER token", () => {
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'shift');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'lctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'rctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'alt');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'lalt');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ralt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'caps');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ncaps');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'SHIFT');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'CTRL');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'LCTRL');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'RCTRL');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ALT');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'LALT');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'RALT');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'CAPS');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'NCAPS');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Shift');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Lctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Rctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Alt');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Lalt');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ralt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Caps');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ncaps');
     });
     it("can recognise a KEY_CODE token", () => {
@@ -1320,12 +1316,14 @@ describe("Lexer Tests", () => {
         'message',
         'name',
         'version',
+        'shift',
         'ctrl',
         'lctrl',
         'rctrl',
         'alt',
         'lalt',
         'ralt',
+        'caps',
         'ncaps',
       ].forEach((text) => { handleInvalidKeyword(text); });
     });

@@ -30,8 +30,6 @@ export const TOKEN_TO_NODE = [
   {tokenType: TokenType.BITMAP_HEADER,         nodeType: NodeType.BITMAP_HEADER},
   // https://help.keyman.com/developer/language/reference/call
   {tokenType: TokenType.CALL,                  nodeType: NodeType.CALL},
-  // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  {tokenType: TokenType.CAPS,                  nodeType: NodeType.CAPS},
   // https://help.keyman.com/developer/language/reference/caps
   {tokenType: TokenType.CAPSALWAYSOFF,         nodeType: NodeType.CAPSALWAYSOFF},
   // https://help.keyman.com/developer/language/reference/caps
@@ -162,8 +160,6 @@ export const TOKEN_TO_NODE = [
   {tokenType: TokenType.SAVE,                  nodeType: NodeType.SAVE},
   // https://help.keyman.com/developer/language/reference/set
   {tokenType: TokenType.SET,                   nodeType: NodeType.SET},
-  // https://help.keyman.com/developer/language/reference/_keywordsbytype
-  {tokenType: TokenType.SHIFT,                 nodeType: NodeType.SHIFT},
   // https://help.keyman.com/developer/language/reference/caps
   {tokenType: TokenType.SHIFTFREESCAPS,        nodeType: NodeType.SHIFTFREESCAPS},
     // https://help.keyman.com/developer/language/reference/_keywordsbytype
