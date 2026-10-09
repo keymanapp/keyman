@@ -42,6 +42,7 @@ implementation
 
 uses
   custinterfaces,
+  Keyman.Configuration.System.StartupSettings,
   kmint,
   MessageIdentifiers,
   utilxml,
@@ -70,6 +71,10 @@ var
 begin
   References := Null;  // I2678
   Result := kmcom.Options.SerializeXML(0, '', References);
+  if TWindowsStartupSettings.IsWindowsStartupDisabled then
+    Result := Result + '<StartupDisabled>True</StartupDisabled>'
+  else
+    Result := Result + '<StartupDisabled>False</StartupDisabled>';
   FGroups := TStringList.Create;
   try
     Result := Result + '<OptionGroups>';

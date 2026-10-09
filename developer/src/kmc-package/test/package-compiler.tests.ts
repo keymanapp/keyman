@@ -274,6 +274,12 @@ describe('KmpCompiler', function () {
     assert.equal(kmpJson.keyboards[0].name, 'version 4'); // picks up example.kmx's name
   });
 
+  it(`should load a package with a .kmx file without a &name store`, function () {
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'kmx_no_name.kps'));
+    assert.isNotNull(kmpJson);
+    assert.equal(kmpJson.keyboards[0].name, 'kmx_no_name'); // picks up kmx_no_name's id
+  });
+
   it(`should load a package with missing keyboard version metadata`, function () {
     const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_version.kps'));
     assert.equal(kmpJson.keyboards[0].version, '4.0');  // picks up example.kmx's version

@@ -12,6 +12,14 @@
 #import <Foundation/Foundation.h>
 #import "KMInputMethodAppDelegate.h"
 
+// used to perform delete by inserting with replacement
+typedef struct {
+  BOOL canDeleteWithReplacement;
+  NSUInteger replacementLocation;
+  NSUInteger replacementLength;
+  NSString *replacementString;
+} ReplacementInfo;
+
 @interface KMInputMethodEventHandler : NSObject
 
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id)sender;
