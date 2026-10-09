@@ -140,6 +140,7 @@ KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, i
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode);
 KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &targets);
+KMX_BOOL DoesStoreContainInvalidStatement(PKMX_WCHAR store);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -362,12 +363,16 @@ KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
   p = str;
   pp = str;
 
-  switch (LineTokenType(&p))
+  switch (LineTokenType(fk, &p, TRUE))
   {
   case T_BLANK:
   case T_COMMENT:
     break;	// Ignore the line
+
   case T_VERSION:
+    kmcmp::WarnDeprecatedHeader();
+    break;  // The line has already been processed
+
   case T_STORE:
     break;	// The line has already been processed
 
@@ -524,7 +529,7 @@ KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
   {
     kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
-    ReportCompilerMessage(KmnCompilerMessages::WARN_BitmapNotUsed);
+    // ReportCompilerMessage(KmnCompilerMessages::WARN_BitmapNotUsed); : redundant, have WarnDeprecatedHeader
 
     if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidBitmapLine);  // I3481
@@ -838,6 +843,11 @@ KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
       kmcmp::CodeConstants->AddCode(sp->dpString[0], sp->szName, fk->cxStoreArray);
     }
     kmcmp::CodeConstants->reindex(); // has to be done after every character add due to possible use in another store.   // I4982
+  }
+
+  if(DoesStoreContainInvalidStatement(sp->dpString)) {
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_StoreContainsUnsupportedStatement);
+    return FALSE;
   }
 
   fk->cxStoreArray++;	// increment now, because GetXString refers to stores
@@ -1162,7 +1172,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     else if (u16ncmp(p, u"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
     else if (u16ncmp(p, u"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
     else if (u16ncmp(p, u"17.0", 4) == 0)  fk->version = VERSION_170; // Flicks and gestures
-    else if (u16ncmp(p, u"19.0", 4) == 0)  fk->version = VERSION_190; // Deprecations - fix, clearcontext
+    else if (u16ncmp(p, u"19.0", 4) == 0)  fk->version = VERSION_190; // Deprecations - compile targets $keymanonly, $keymanweb
     // TODO-WEB-CORE: Embedded OSK should now be 20.0
 
     else {
@@ -1533,11 +1543,32 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
 }
 
 /**
+ * Stores can contain only characters, deadkeys, and virtual keys (and `outs`).
+ * Note that `outs()` is expanded during read so there is no `CODE_OUTS`.
+ *
+ * @param store
+ * @return KMX_BOOL
+ */
+KMX_BOOL DoesStoreContainInvalidStatement(PKMX_WCHAR store) {
+  for (PKMX_WCHAR p = store; *p; p = incxstr(p)) {
+    if (*p == UC_SENTINEL) {
+      auto code = *(p + 1);
+      if(code == CODE_DEADKEY || code == CODE_EXTENDED) {
+        continue;
+      }
+
+      // No other codes are permitted; note, outs() does not have a code as it is expanded at compile time
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
  * Checks that the order of statements in the context matches the specification.
  *   Rule structure: [context] ['+' key] '>' output
  *   Context structure: [nul] [if()|baselayout()|platform()]+ [char|any|context()|deadkey()|dk()|index()|notany()|outs()]
  * Test that nul is first, then if(), baselayout(), platform() statements are before any other content.
- * Also verifies that virtual keys are not found in the context.
  */
 void CheckContextStatementPositions(PKMX_WCHAR context) {
   KMX_BOOL hadContextChar = FALSE;
@@ -1554,9 +1585,6 @@ void CheckContextStatementPositions(PKMX_WCHAR context) {
         if (hadContextChar) {
           ReportCompilerMessage(KmnCompilerMessages::WARN_IfShouldBeAtStartOfContext);
         }
-        break;
-      case CODE_EXTENDED:
-        ReportCompilerMessage(KmnCompilerMessages::ERROR_VirtualKeyInContext);
         break;
       default:
         hadContextChar = TRUE;
@@ -1585,18 +1613,50 @@ KMX_DWORD CheckUseStatementsInOutput(PKMX_WCHAR output) {
   return STATUS_Success;
 }
 
+KMX_BOOL DoesStringContainVirtualKeys(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
+  for (; *p; p = incxstr(p)) {
+    if (*p == UC_SENTINEL) {
+      auto code = *(p+1);
+      if(code == CODE_EXTENDED) {
+        return TRUE;
+      } else if(code == CODE_INDEX) {
+        PFILE_STORE s;
+        s = &fk->dpStoreArray[*(p + 2) - 1];
+        if(DoesStringContainVirtualKeys(fk, s->dpString)) {
+          return TRUE;
+        }
+      } else if(code == CODE_ANY || code == CODE_NOTANY) {
+        PFILE_STORE s;
+        s = &fk->dpStoreArray[*(p + 2) - 1];
+        if(DoesStringContainVirtualKeys(fk, s->dpString)) {
+          return TRUE;
+        }
+      }
+    }
+  }
+  return FALSE;
+}
+
 /**
  * Warn if output has virtual keys in it, which is not supported by Core at all,
  * but was unofficially supported, but never worked properly, in Keyman for
  * Windows for many years
  */
-KMX_DWORD CheckVirtualKeysInOutput(PKMX_WCHAR output) {
-  PKMX_WCHAR p;
-  for (p = output; *p; p = incxstr(p)) {
-    if (*p == UC_SENTINEL && *(p + 1) == CODE_EXTENDED) {
-      ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualKeyInOutput);
-      break;
-    }
+KMX_DWORD CheckVirtualKeysInOutput(PFILE_KEYBOARD fk, PKMX_WCHAR output) {
+  if(DoesStringContainVirtualKeys(fk, output)) {
+    ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualKeyInOutput);
+    return STATUS_Success;
+  }
+  return STATUS_Success;
+}
+
+/**
+ * Error if context has virtual keys in it -- context can never contain keys,
+ * only characters and deadkeys.
+ */
+KMX_DWORD CheckVirtualKeysInContext(PFILE_KEYBOARD fk, PKMX_WCHAR context) {
+  if(DoesStringContainVirtualKeys(fk, context)) {
+    return KmnCompilerMessages::ERROR_VirtualKeyInContext;
   }
   return STATUS_Success;
 }
@@ -1614,9 +1674,9 @@ const KMX_BOOL CODE__IS_TEXTUAL[] = {
   -1,     // unused                   0x09
   TRUE,   // CODE_EXTENDED            0x0A
   -1,     // CODE_EXTENDEDEND         0x0B (unused)
-  FALSE,  // CODE_SWITCH              0x0C
-  -1,     // CODE_KEY                 0x0D (never used)
-  FALSE,  // CODE_CLEARCONTEXT        0x0E (deprecated in 19.0)
+  FALSE,  // CODE_SWITCH              0x0C (unused, removed in 19.0)
+  -1,     // CODE_KEY                 0x0D (unused, removed in 19.0)
+  FALSE,  // CODE_CLEARCONTEXT        0x0E (unused, removed in 19.0)
   FALSE,  // CODE_CALL                0x0F // may trigger text effects but indirectly
   -1,     // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
   TRUE,   // CODE_CONTEXTEX           0x11
@@ -1791,6 +1851,9 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
 
   CheckContextStatementPositions(pklIn);
 
+  // Error if virtual keys are used in the context
+  if ((msg = CheckVirtualKeysInContext(fk, pklIn)) != STATUS_Success) return msg;
+
   // Test index and context offsets in context
   if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != STATUS_Success) return msg;
 
@@ -1800,7 +1863,7 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
   }
 
   // Warn if virtual keys are used in the output, as they are unsupported by Core
-  if ((msg = CheckVirtualKeysInOutput(pklOut)) != STATUS_Success) {
+  if ((msg = CheckVirtualKeysInOutput(fk, pklOut)) != STATUS_Success) {
     return msg;
   }
 
@@ -2084,7 +2147,7 @@ LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
   return lptOther;
 }
 
-int LineTokenType(PKMX_WCHAR *str)
+int LineTokenType(PFILE_KEYBOARD fk, PKMX_WCHAR *str, KMX_BOOL checkDeprecations)
 {
   int i;
   size_t l;
@@ -2094,6 +2157,14 @@ int LineTokenType(PKMX_WCHAR *str)
   if (lpt == lptOther) return T_BLANK;
 
   /* Test KeymanWeb, Keyman and KeymanOnly prefixes */
+
+  if(checkDeprecations && lpt == lptKeymanWebOnly) {
+    kmcmp::WarnDeprecatedCompileTarget(fk, u"$keymanweb:");
+  }
+  if(checkDeprecations && lpt == lptKeymanOnly) {
+    kmcmp::WarnDeprecatedCompileTarget(fk, u"$keymanonly:");
+  }
+
   if (kmcmp::CompileTarget == CKF_KEYMAN && lpt == lptKeymanWebOnly) return T_BLANK;
   if (kmcmp::CompileTarget == CKF_KEYMANWEB && lpt == lptKeymanOnly) return T_BLANK;
 
@@ -2175,13 +2246,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
     ErrChr = (int)(p - str) + offset + 1;
 
-    /*
-    char *tokenTypes[] = {
-      "clearcontext", "deadkey", "context", "return", "switch",
-      "index", "outs", "beep", "nul", "use", "any", "fix", "dk", "k_", "x", "d", "c",
-      "[", "]" };
-    */
-
     switch (towupper(*p))
     {
     case 'X':
@@ -2192,7 +2256,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 'B':  type = 4; break;		// beep, baselayout (synonym for if(&baselayout))  // I3430
     case 'I':  type = 5; break;		// index(s,n), if
     case 'O':  type = 6; break;		// outs(s)
-    case 'C':  type = 7; break;		// context, comments, clearcontext, call(s)
+    case 'C':  type = 7; break;		// context, comments, call(s)
     case 'N':  type = 8; break;		// nul, notany
     case 'U':  type = 9; break;		// use(g)
     case 'R':  type = 10; break;	// return, reset
@@ -2200,7 +2264,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     //case ']':  type = 12; break;	// end of vkey section
     //case 'K':  type = 13; break;	// virtual key name or "key"
     case 'S':  type = 14; break;	// switch, set, save
-    case 'F':  type = 15; break;	// fix (synonym for clearcontext)
+    // 15 was 'F', for undocumented, unused statement 'fix'
     case '$':  type = 16; break;	// named code constants
     case 'P':  type = 17; break;  // platform (synonym for if(&platform))  // I3430
     case 'L':  type = 18; break;  // layer (synonym for set(&layer))  // I3437
@@ -2244,6 +2308,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         tstr[mx++] = n1;
         if (n2 >= 0) tstr[mx++] = n2;
         tstr[mx] = 0;
+        kmcmp::WarnDeprecatedValueFormat();
       }
       continue;
 
@@ -2407,17 +2472,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
           tstr[mx++] = CODE_CONTEXT;
           tstr[mx] = 0;
         }
-      }
-      else if (u16nicmp(p, u"clearcontext", 12) == 0)
-      {
-        // deprecated in 19.0
-        if(fk->version >= VERSION_190) {
-          ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedStatement, {"clearcontext", "19.0"});  // I3438
-        }
-        p += 12;
-        tstr[mx++] = UC_SENTINEL;
-        tstr[mx++] = CODE_CLEARCONTEXT;
-        tstr[mx] = 0;
       }
       else if (u16nicmp(p, u"call", 4) == 0)
       {
@@ -2724,30 +2778,8 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else
       {
-        if (u16nicmp(p, u"switch", 6) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
-        p += 6;
-        q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidSwitch;
-        tstr[mx++] = UC_SENTINEL;
-        tstr[mx++] = CODE_SWITCH;
-        tstr[mx++] = atoiW(q);
-        tstr[mx] = 0;
-      }
-      continue;
-    case 15:
-      if (u16nicmp(p, u"fix", 3) == 0)
-      {
-        if(fk->version >= VERSION_190) {
-          // deprecated in 19.0
-          ReportCompilerMessage(KmnCompilerMessages::WARN_DeprecatedStatement, {"fix", "19.0"});  // I3438
-        }
-        p += 3;
-        tstr[mx++] = UC_SENTINEL;
-        tstr[mx++] = CODE_CLEARCONTEXT;
-        tstr[mx] = 0;
-      }
-      else
         return KmnCompilerMessages::ERROR_InvalidToken;
+      }
       continue;
     case 16:
       if(!VerifyKeyboardVersion(fk, VERSION_60)) {

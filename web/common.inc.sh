@@ -115,10 +115,10 @@ function test-headless() {
 
   if [[ -e .c8rc.json && -z "${SKIP_C8:-}" ]]; then
     builder_echo '> ' c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
-    c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
+    c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}" "${builder_extra_params[@]}"
   else
     builder_echo '> ' mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
-    mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}"
+    mocha --recursive "${TEST_BASE}${TEST_FOLDER}" "${TEST_OPTS[@]}" "${builder_extra_params[@]}"
   fi
 
   if builder_is_running_on_teamcity; then

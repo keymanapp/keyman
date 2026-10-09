@@ -1,0 +1,8 @@
+store(&VERSION) '19.0'
+NAME "warn_header_statement_is_deprecated-name"
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ ' ' > 'hello'

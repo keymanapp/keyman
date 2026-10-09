@@ -1,0 +1,11 @@
+store(&NAME) 'ERROR_VirtualKeyInContext-any'
+store(&VERSION) '9.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(keys) [NCAPS SHIFT K_S]
+
+c This should generate warning KM02074 ERROR_VirtualKeyInContext
+notany(keys) + 'X' > 'x'

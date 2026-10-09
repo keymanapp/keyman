@@ -37,5 +37,5 @@ KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str);
 KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_BOOL ProcessGroupFinish(PFILE_KEYBOARD fk);
 KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
-int LineTokenType(PKMX_WCHAR *str);
+int LineTokenType(PFILE_KEYBOARD fk, PKMX_WCHAR *str, KMX_BOOL checkDeprecations);
 KMX_BOOL BuildVKDictionary(PFILE_KEYBOARD fk); // I3438
