@@ -13,7 +13,7 @@ import Sentry
 import os.log
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UISceneDelegate {
 
   private var _overlayWindow: UIWindow?
   private var _adhocDirectory: URL?
@@ -58,28 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return true
   }
 
-  func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-    SentryManager.start()
-    // Forces the logs to initialize, as their definitions result in lazy init.
-    // These references have been configured to also log app details.
-
-    // In iOS 15, navigation bars become transparent by default when the edge
-    // of the scrollable content aligns with the edge of the navigation bar.
-    // Force the appearance back to the pre-iOS 15 default behavior.
-    UINavigationBar.appearance().scrollEdgeAppearance = UINavigationBarAppearance()
-    
-    UniversalLinks.externalLinkLauncher = { url in
-      UIApplication.shared.open(url)
-    }
-
-    Manager.applicationGroupIdentifier = "group.KM4I"
-
-    // TODO:  Assign a subclassed version of InputViewController that implements the image stuff.
-    Manager.shared.inputViewController = KeyboardViewController(forSystem: false)
-
-    window = UIWindow(frame: UIScreen.main.bounds)
-
+  func commonStart(withRootWindow: UIWindow?) {
     // Initialize overlayWindow
     _ = overlayWindow
 
@@ -96,7 +75,39 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // TODO: look in documents directory for .zip / .kmp files
     // TODO: OR browse documents Dir from new keyboard window
     // self.installAdhocKeyboard(filePath: "")
+  }
 
+  func scene(
+    _ scene: UIScene,
+    willConnectTo session: UISceneSession,
+    options connectionOptions: UIScene.ConnectionOptions
+  ) {
+    guard let windowScene = scene as? UIWindowScene else {
+      return
+    }
+
+    // In iOS 15, navigation bars become transparent by default when the edge
+    // of the scrollable content aligns with the edge of the navigation bar.
+    // Force the appearance back to the pre-iOS 15 default behavior.
+    UINavigationBar.appearance().scrollEdgeAppearance = UINavigationBarAppearance()
+
+    UniversalLinks.externalLinkLauncher = { url in
+      UIApplication.shared.open(url)
+    }
+
+    Manager.applicationGroupIdentifier = "group.KM4I"
+
+    // TODO:  Assign a subclassed version of InputViewController that implements the image stuff.
+    Manager.shared.inputViewController = KeyboardViewController(forSystem: false)
+
+    window = UIWindow(windowScene: windowScene)
+    commonStart(withRootWindow: window)
+  }
+
+  func application(_ application: UIApplication,
+                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+    
+    SentryManager.start()
     return true
   }
 
@@ -151,14 +162,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return false
   }
 
-  func applicationDidEnterBackground(_ application: UIApplication) {
+  func sceneDidEnterBackground(_ scene: UIScene) {
     _overlayWindow = nil
     FontManager.shared.unregisterCustomFonts()
     
     viewController?.saveTextSettings()
   }
 
-  func applicationWillEnterForeground(_ application: UIApplication) {
+  func sceneWillEnterForeground(_ scene: UIScene) {
     perform(#selector(self.registerCustomFonts), with: nil, afterDelay: 1.0)
   }
 
