@@ -57,8 +57,7 @@ export class Parser {
 export class KmnTreeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new KmnTreeRebuild());
-    const line = new LineRule();
-    this.rule  = new ManyRule(line);
+    this.rule = new ManyRule(new LineRule());
   }
 }
 
@@ -165,10 +164,8 @@ export class KmnTreeRebuild extends ASTRebuild {
 export class LineRule extends SingleChildRule {
   public constructor() {
     super();
-    const compileTarget    = new CompileTargetRule();
-    const optCompileTarget = new OptionalRule(compileTarget);
-    const content          = new ContentRule();
-    const optContent       = new OptionalRule(content);
+    const optCompileTarget = new OptionalRule(new CompileTargetRule());
+    const optContent       = new OptionalRule(new ContentRule());
     const newline          = new TokenRule(TokenType.NEWLINE, true);
     this.rule = new SequenceRule([optCompileTarget, optContent, newline]);
   }
@@ -289,8 +286,7 @@ export class TextRangeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.RANGE));
     const simpleText        = new SimpleTextRule();
-    const rangeEnd          = new RangeEndRule();
-    const oneOrManyRangeEnd = new OneOrManyRule(rangeEnd);
+    const oneOrManyRangeEnd = new OneOrManyRule(new RangeEndRule());
     this.rule = new SequenceRule([simpleText, oneOrManyRangeEnd]);
   }
 }
@@ -320,8 +316,7 @@ export class VirtualKeyRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.VIRTUAL_KEY));
     const leftSquare   = new TokenRule(TokenType.LEFT_SQ);
-    const modifier     = new TokenRule(TokenType.MODIFIER, true);
-    const manyModifier = new ManyRule(modifier);
+    const manyModifier = new ManyRule(new TokenRule(TokenType.MODIFIER, true));
     const keyCode      = new KeyCodeRule();
     const rightSquare  = new TokenRule(TokenType.RIGHT_SQ);
     this.rule = new SequenceRule([
@@ -371,11 +366,10 @@ export class RuleBlockRule extends SingleChildRule {
 export class BeginStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.BEGIN));
-    const begin          = new TokenRule(TokenType.BEGIN, true);
-    const entryPointRule = new EntryPointRule();
-    const optEntryPoint  = new OptionalRule(entryPointRule);
-    const chevron        = new TokenRule(TokenType.CHEVRON);
-    const useStatement   = new UseStatementRule();
+    const begin         = new TokenRule(TokenType.BEGIN, true);
+    const optEntryPoint = new OptionalRule(new EntryPointRule());
+    const chevron       = new TokenRule(TokenType.CHEVRON);
+    const useStatement  = new UseStatementRule();
     this.rule = new SequenceRule([begin, optEntryPoint, chevron, useStatement]);
   }
 }
@@ -424,12 +418,11 @@ export class UseStatementRule extends SingleChildRuleWithASTRebuild {
 export class GroupStatementRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.GROUP));
-    const group              = new TokenRule(TokenType.GROUP, true);
-    const leftBracket        = new TokenRule(TokenType.LEFT_BR);
-    const groupName          = new GroupNameRule();
-    const rightBracket       = new TokenRule(TokenType.RIGHT_BR);
-    const groupQualifierRule = new GroupQualifierRule();
-    const optGroupQualifier  = new OptionalRule(groupQualifierRule);
+    const group             = new TokenRule(TokenType.GROUP, true);
+    const leftBracket       = new TokenRule(TokenType.LEFT_BR);
+    const groupName         = new GroupNameRule();
+    const rightBracket      = new TokenRule(TokenType.RIGHT_BR);
+    const optGroupQualifier = new OptionalRule(new GroupQualifierRule());
     this.rule = new SequenceRule([
       group,
       leftBracket,
@@ -453,8 +446,7 @@ export class GroupNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if group name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.GROUPNAME));
-    const groupNameElement = new GroupNameElementRule();
-    this.rule = new OneOrManyRule(groupNameElement);
+    this.rule = new OneOrManyRule(new GroupNameElementRule());
   }
 }
 
@@ -617,14 +609,10 @@ export class LhsBlockRule extends SingleChildRuleWithASTRebuild {
 export class InputBlockRule extends SingleChildRule {
   public constructor() {
     super();
-    const nulRule             = new TokenRule(TokenType.NUL, true);
-    const optNul              = new OptionalRule(nulRule);
-    const ifLikeStatement     = new IfLikeStatementRule();
-    const manyIfLikeStatement = new ManyRule(ifLikeStatement);
-    const inputContext        = new InputContextRule();
-    const optInputContext     = new OptionalRule(inputContext);
-    const keystoke            = new KeystrokeRule();
-    const optKeystroke        = new OptionalRule(keystoke);
+    const optNul              = new OptionalRule(new TokenRule(TokenType.NUL, true));
+    const manyIfLikeStatement = new ManyRule(new IfLikeStatementRule());
+    const optInputContext     = new OptionalRule(new InputContextRule());
+    const optKeystroke        = new OptionalRule(new KeystrokeRule());
     this.rule = new SequenceRule([
       optNul, manyIfLikeStatement, optInputContext, optKeystroke,
     ]);
@@ -639,8 +627,7 @@ export class InputBlockRule extends SingleChildRule {
 export class InputContextRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.INPUT_CONTEXT));
-    const inputElement = new InputElementRule();
-    this.rule          = new OneOrManyRule(inputElement);
+    this.rule = new OneOrManyRule(new InputElementRule());
   }
 }
 
@@ -674,8 +661,7 @@ export class KeystrokeRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.KEYSTROKE));
     const plus                      = new TokenRule(TokenType.PLUS);
-    const keystrokeElement          = new KeystrokeElementRule();
-    const oneOrManyKeystrokeElement = new OneOrManyRule(keystrokeElement);
+    const oneOrManyKeystrokeElement = new OneOrManyRule(new KeystrokeElementRule());
     this.rule = new SequenceRule([plus, oneOrManyKeystrokeElement]);
   }
 }
@@ -701,8 +687,7 @@ export class KeystrokeElementRule extends SingleChildRule {
 export class RhsBlockRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.RHS));
-    const outputStatement = new OutputStatementRule();
-    this.rule             = new OneOrManyRule(outputStatement);
+    this.rule = new OneOrManyRule(new OutputStatementRule());
   }
 }
 

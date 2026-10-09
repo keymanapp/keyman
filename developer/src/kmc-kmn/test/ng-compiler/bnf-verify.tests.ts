@@ -165,6 +165,7 @@ function replaceOneOrManyRule(str: string): string {
   if (str != null && str.includes('OneOrManyRule')) {
     str = str.replace(/^OneOrManyRule\(/, '');
     str = str.replace(/\)$/, '');
+    str = replaceSubRule(str);
     str = str + '+';
   }
   return str;
@@ -174,6 +175,7 @@ function replaceManyRule(str: string): string {
   if (str != null && str.includes('ManyRule')) {
     str = str.replace(/ManyRule\(/, '');
     str = str.replace(/\)$/, '');
+    str = replaceSubRule(str);
     str = str + '*';
   }
   return str;
@@ -218,6 +220,15 @@ function replaceTokenElements(str: string): string {
     str = str.replaceAll(/(?:TokenType\.)([^|\s]*)/g,
       (match, p1, offset, string, groups) =>
         { return p1.toLowerCase(); });
+  }
+  return str;
+}
+
+function replaceSubRule(str: string): string {
+  if (str != null && str.includes('new')) {
+    str = str.replaceAll(/(?:new)(\S+)Rule\(\)/g,
+      (match, p1, offset, string, groups) =>
+        { return lowerCaseFirstLetter(p1); });
   }
   return str;
 }

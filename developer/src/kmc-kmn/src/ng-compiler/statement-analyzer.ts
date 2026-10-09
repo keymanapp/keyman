@@ -123,15 +123,13 @@ export class SaveStatementRule extends AbstractBracketedStoreNameStatementRule {
  */
 abstract class AbstractShortcutRule extends SingleChildRuleWithASTRebuild {
   protected leftBracket: Rule;
-  protected plainText: Rule;
   protected oneOrManyPlainText: Rule;
   protected rightBracket: Rule;
 
   public constructor(nodeType: NodeType) {
     super(new GivenNode(nodeType));
     this.leftBracket        = new TokenRule(TokenType.LEFT_BR);
-    this.plainText          = new PlainTextRule();
-    this.oneOrManyPlainText = new OneOrManyRule(this.plainText);
+    this.oneOrManyPlainText = new OneOrManyRule(new PlainTextRule());
     this.rightBracket       = new TokenRule(TokenType.RIGHT_BR);
   }
 }
@@ -224,7 +222,6 @@ abstract class AbstractIfStoreStatementRule extends SingleChildRuleWithASTRebuil
   protected leftBracket: Rule;
   protected comparison: Rule;
   protected rightBracket: Rule;
-  protected plainText: Rule;
   protected oneOrManyPlainText: Rule;
 
   public constructor() {
@@ -233,8 +230,7 @@ abstract class AbstractIfStoreStatementRule extends SingleChildRuleWithASTRebuil
     this.leftBracket        = new TokenRule(TokenType.LEFT_BR);
     this.comparison         = new ComparisonRule();
     this.rightBracket       = new TokenRule(TokenType.RIGHT_BR);
-    this.plainText          = new PlainTextRule();
-    this.oneOrManyPlainText = new OneOrManyRule(this.plainText);
+    this.oneOrManyPlainText = new OneOrManyRule(new PlainTextRule());
   }
 }
 

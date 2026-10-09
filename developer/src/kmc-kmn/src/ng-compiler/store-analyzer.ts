@@ -26,8 +26,7 @@ export class SystemStoreAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new FirstNode());
     const systemStore = new SystemStoreRule();
-    const text        = new TextRule();
-    const manyText    = new ManyRule(text);
+    const manyText    = new ManyRule(new TextRule());
     this.rule         = new SequenceRule([systemStore, manyText]);
   }
 }
@@ -101,8 +100,7 @@ export class NormalStoreAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.STORE));
     const normalStore = new NormalStoreRule();
-    const text        = new TextRule();
-    const manyText    = new ManyRule(text);
+    const manyText    = new ManyRule(new TextRule());
     this.rule         = new SequenceRule([normalStore, manyText]);
   }
 }
@@ -136,8 +134,7 @@ export class NormalStoreNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if normal store name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.STORENAME));
-    const normalStoreNameElement = new NormalStoreNameElementRule();
-    this.rule = new OneOrManyRule(normalStoreNameElement);
+    this.rule = new OneOrManyRule(new NormalStoreNameElementRule());
   }
 }
 
@@ -170,8 +167,7 @@ export class DeadkeyNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if deadkey name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.DEADKEYNAME));
-    const deadkeyNameElement = new DeadkeyNameElementRule();
-    this.rule = new OneOrManyRule(deadkeyNameElement);
+    this.rule = new OneOrManyRule(new DeadkeyNameElementRule());
   }
 }
 
@@ -219,8 +215,7 @@ export class SetNormalStoreRule extends SingleChildRuleWithASTRebuild {
     const leftBracket     = new TokenRule(TokenType.LEFT_BR);
     const normalStoreName = new NormalStoreNameRule();
     const equal           = new TokenRule(TokenType.EQUAL);
-    const text            = new TextRule();
-    const oneOrManyText   = new OneOrManyRule(text);
+    const oneOrManyText   = new OneOrManyRule(new TextRule());
     const rightBracket    = new TokenRule(TokenType.RIGHT_BR);
 
     this.rule = new SequenceRule([
@@ -248,8 +243,7 @@ export class SetSystemStoreRule extends SingleChildRuleWithASTRebuild {
     const leftBracket           = new TokenRule(TokenType.LEFT_BR);
     const systemStoreNameForSet = new SystemStoreNameForSetRule();
     const equal                 = new TokenRule(TokenType.EQUAL);
-    const text                  = new TextRule();
-    const oneOrManyText         = new OneOrManyRule(text);
+    const oneOrManyText         = new OneOrManyRule(new TextRule());
     const rightBracket          = new TokenRule(TokenType.RIGHT_BR);
 
     this.rule = new SequenceRule([
@@ -332,10 +326,8 @@ export class HeaderAssignRule extends SingleChildRuleWithASTRebuild {
 export class HeaderValueRule extends SingleChildRule {
   public constructor() {
     super();
-    const text          = new TextRule();
-    const oneOrManyText = new OneOrManyRule(text);
-    const parameter     = new TokenRule(TokenType.PARAMETER, true);
-    const optParameter  = new OptionalRule(parameter);
+    const oneOrManyText = new OneOrManyRule(new TextRule());
+    const optParameter  = new OptionalRule(new TokenRule(TokenType.PARAMETER, true));
     this.rule           = new AlternateRule([oneOrManyText, optParameter]);
   }
 }
