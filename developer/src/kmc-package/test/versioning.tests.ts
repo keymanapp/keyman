@@ -1,7 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { KmpJsonFile } from '@keymanapp/common-types';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { unitTestEndpoints } from '../src/compiler/package-version-validator.js';
 import { makePathToFixture } from './helpers/index.js';
@@ -38,8 +37,8 @@ describe('package versioning', function () {
       assert.isTrue(await kmpCompiler.init(callbacks, null));
 
       const kpsPath = makePathToFixture('versioning', filename);
-      const kmpJson: KmpJsonFile.KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
-      assert.isTrue(kmpJson !== null);
+      const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(kpsPath) ?? {};
+      assert.isTrue(kmpJsonData !== null);
     });
   }
 
