@@ -1,8 +1,7 @@
 kmnTree: line*
 line: compileTarget? content? NEWLINE
 compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
-content: systemStoreAssign|CAPSALWAYSOFF_HEADER|CAPSONONLY_HEADER|
-  SHIFTFREESCAPS_HEADER|headerAssign|normalStoreAssign|ruleBlock
+content: systemStoreAssign|capsLockHeader|headerAssign|normalStoreAssign|ruleBlock
 text: plainText|outsStatement
 plainText: textRange|simpleText
 simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|
@@ -75,6 +74,7 @@ setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
 setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR
 systemStoreNameForSet: systemStoreName|LAYER
 resetStore: RESET LEFT_BR normalStoreName RIGHT_BR
+capsLockHeader: CAPSALWAYSOFF_HEADER|CAPSONONLY_HEADER|SHIFTFREESCAPS_HEADER
 headerAssign: headerName headerValue
 headerValue: text+|PARAMETER?
 headerName: BITMAP_HEADER|COPYRIGHT_HEADER|HOTKEY_HEADER|LANGUAGE_HEADER|

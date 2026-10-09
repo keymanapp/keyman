@@ -297,6 +297,22 @@ export class ResetStoreRule extends SingleChildRuleWithASTRebuild {
 }
 
 /**
+ * (BNF) see the BNF file (kmn-file.bnf)
+ *
+ * https://help.keyman.com/developer/language/reference/_keywordsbytype
+ */
+export class CapsLockHeaderRule extends AlternateTokenRule {
+  // TODO-NG-COMPILER: warning/error for caps lock header statements
+  public constructor() {
+    super([
+      TokenType.CAPSALWAYSOFF_HEADER,
+      TokenType.CAPSONONLY_HEADER,
+      TokenType.SHIFTFREESCAPS_HEADER,
+    ], true);
+  }
+};
+
+/**
  * (BNF) headerAssign: headerName headerValue
  *
  * Uses a FirstNode to rebuild the tree to be rooted at the first node found
