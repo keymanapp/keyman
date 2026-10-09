@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.305 beta 2026-10-09
+
+* docs: remove repeated clean up instructions (#16745)
+* fix(web): prevent crash adding log entry for keystroke with `inputBreadCrumb` (#16762)
+* maint(ios): new iOS certificate (beta-19.0) (#16772)
+* docs(developer): fix typo in whatsnew (#16774)
+* fix(web): fix crash applying suggestions (#16786)
+
 ## 19.0.304 beta 2026-10-08
 
 * docs(common): add `sentry-cli` version and update documentation (#16752)
