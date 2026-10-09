@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 20.0.3 alpha 2026-10-09
+
+* maint(ios): new iOS certificate (alpha-20.0) (#16771)
+
 ## 20.0.2 alpha 2026-10-07
 
 * fix(mac): lower case 'k' for .pkg.download_info (#16744)
