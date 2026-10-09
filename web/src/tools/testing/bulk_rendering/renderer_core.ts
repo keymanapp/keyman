@@ -186,7 +186,7 @@ export class BatchRenderer {
       layers = layers || Object.keys(keyman.osk.vkbd?.layerGroup.layers);
 
       const renderLayer = function(i: number) {
-        return new Promise(function(resolve) {
+        return new Promise(async function(resolve) {
           // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
           if(keyman.osk.vkbd) {
             keyman.core.keyboardProcessor.layerId = layers[i];
@@ -197,7 +197,7 @@ export class BatchRenderer {
             return;
           }
           // Make sure the active element's still set!
-          renderer.setActiveDummy();
+          await renderer.setActiveDummy();
           keyman.osk.show(true);
 
           (document as any).fonts.ready.then(function() {
@@ -262,8 +262,8 @@ export class BatchRenderer {
     document.getElementById('deviceNotes').appendChild(description);
   }
 
-  setActiveDummy() {
-    keyman.setActiveElement(BatchRenderer.dummy, true);
+  async setActiveDummy() {
+    await keyman.setActiveElement(BatchRenderer.dummy, true);
   }
 
   async run(allLayers: boolean, filter: string) {
@@ -278,7 +278,7 @@ export class BatchRenderer {
       // Establish a 'dummy' element to bypass the 'nothing's active' check KMW usually uses.
       BatchRenderer.dummy = document.createElement('input');
       keyman.attachToControl(BatchRenderer.dummy);
-      this.setActiveDummy();
+      await this.setActiveDummy();
 
       BatchRenderer.divMaster = <HTMLDivElement> document.getElementById('renderList');
       if(BatchRenderer.divMaster.childElementCount > 0) {

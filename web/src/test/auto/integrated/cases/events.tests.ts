@@ -66,7 +66,7 @@ describe('Event Management', function() {
       ele.onchange = null;
     }
 
-    keyman.setActiveElement(ele);
+    await keyman.setActiveElement(ele);
 
     let eventDriver = new KMWRecorder.BrowserDriver(ele);
     await eventDriver.simulateEvent(event);
@@ -90,7 +90,7 @@ describe('Event Management', function() {
       ele.onchange = null;
     }
 
-    keyman.setActiveElement(ele);
+    await keyman.setActiveElement(ele);
 
     // Browsers will only start loading OSK resources (the CSS) once both a keyboard and target
     // are set... and that's an async operation.
@@ -114,7 +114,7 @@ describe('Event Management', function() {
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
     var ele = document.getElementById('input');
-    keyman.setActiveElement(ele);
+    await keyman.setActiveElement(ele);
 
     var counterObj = {i:0};
     var fin = 3;
@@ -137,7 +137,7 @@ describe('Event Management', function() {
     var event = new KMWRecorder.OSKInputEventSpec(simple_A as OSKInputEventSpec);
 
     var ele = document.getElementById('input');
-    keyman.setActiveElement(ele);
+    await keyman.setActiveElement(ele);
 
     var counterObj = {i:0};
     var fin = 3;
