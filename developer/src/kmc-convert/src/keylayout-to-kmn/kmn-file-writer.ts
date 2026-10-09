@@ -325,7 +325,7 @@ export class KmnFileWriter {
         // lookup key nr of the key which is being processed
         let keyNr: number = 0;
         for (let j = 0; j <= KeylayoutToKmnConverter.MAX_KEY_IDENTIFIER; j++) {
-          if (keylayoutKmnConverter.unitTestEndpoints.mapUkeleleKeycodeToVK(j) === uniqueDataRules[k].key) {
+          if (keylayoutKmnConverter.mapUkeleleKeycodeToVK(j) === uniqueDataRules[k].key) {
             keyNr = j;
             break;
           }
@@ -653,7 +653,7 @@ export class KmnFileWriter {
       // if the dk is unavailable, the modifiers of the dependant C0 rule will get a warning 'unavailable superior rule '
       if (inObj.Dk_modifier) {
 
-        const mod_OK = new KeylayoutToKmnConverter(this.callbacks, this.options).unitTestEndpoints.isAcceptableKeymanModifier(inObj.Dk_modifier);
+        const mod_OK = new KeylayoutToKmnConverter(this.callbacks, this.options).isAcceptableKeymanModifier(inObj.Dk_modifier);
 
         if ((outMsg[1].lastIndexOf('unavailable modifier') < 0))
           outMsg[1] += (!mod_OK) ? 'unavailable modifier ' : '';
@@ -803,7 +803,7 @@ export class KmnFileWriter {
     // ------------------------- check unavailable modifiers -------------------------
 
     if ((rule[index].ruleType === "C0") || (rule[index].ruleType === "C1")) {
-      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierKey)) {
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
         unavailableModiWarnings.compare_type = 'unav_C0_C1';
         unavailableModiWarnings.warningMessages = this.createWarningText(unavailableModiWarnings);
       }
@@ -811,7 +811,7 @@ export class KmnFileWriter {
 
 
     else if (rule[index].ruleType === "C2") {
-      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C2';
         unavailableSuperiWarnings.dk_prefix = ['C', 'A'];
         unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
@@ -820,7 +820,7 @@ export class KmnFileWriter {
         unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings);
       }
 
-      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierKey)) {
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
         unavailableModiWarnings.compare_type = 'unav_C2';
         unavailableModiWarnings.modifier = rule[index].modifierKey;
         unavailableModiWarnings.key = rule[index].key;
@@ -830,7 +830,7 @@ export class KmnFileWriter {
 
 
     else if (rule[index].ruleType === "C3") {
-      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierPrevDeadkey)) {
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierPrevDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C3';
         unavailableSuperiWarnings.dk_prefix = ['A', 'B'];
         unavailableSuperiWarnings.dk_id = [rule[index].idPrevDeadkey, rule[index].idDeadkey];
@@ -841,7 +841,7 @@ export class KmnFileWriter {
         unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings, 2);
       }
 
-      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierDeadkey)) {
         unavailableSuperiWarnings.compare_type = 'unav_C3';
         unavailableSuperiWarnings.prevDk_modifier = rule[index].modifierPrevDeadkey;
         unavailableSuperiWarnings.prevDk_key = rule[index].prevDeadkey;
@@ -852,7 +852,7 @@ export class KmnFileWriter {
         unavailableSuperiWarnings.warningMessages = this.createWarningText(unavailableSuperiWarnings, 2);
       }
 
-      if (!keylayoutKmnConverter.unitTestEndpoints.isAcceptableKeymanModifier(rule[index].modifierKey)) {
+      if (!keylayoutKmnConverter.isAcceptableKeymanModifier(rule[index].modifierKey)) {
         unavailableModiWarnings.compare_type = 'unav_C3';
         unavailableModiWarnings.modifier = rule[index].modifierKey;
         unavailableModiWarnings.key = rule[index].key;

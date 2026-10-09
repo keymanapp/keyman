@@ -281,7 +281,7 @@ describe('KeylayoutToKmnConverter', function () {
       [null, false],
     ].forEach(function (values) {
       it(("isAcceptableKeymanModifier(" + values[0] + ")").padEnd(38, " ") + ' should return ' + values[1], async function () {
-        const result = sut.unitTestEndpoints.isAcceptableKeymanModifier(values[0] as string);
+        const result = sut.isAcceptableKeymanModifier(values[0] as string);
         assert.equal(result, values[1]);
       });
     });
@@ -303,7 +303,7 @@ describe('KeylayoutToKmnConverter', function () {
       [, ''],
     ].forEach(function (values) {
       it(("mapUkeleleKeycodeToVK(" + values[0] + ")").padEnd(26, " ") + "should return " + "'" + values[1] + "'", async function () {
-        const result = sut.unitTestEndpoints.mapUkeleleKeycodeToVK(values[0] as number);
+        const result = sut.mapUkeleleKeycodeToVK(values[0] as number);
         assert.equal(result, values[1]);
       });
     });

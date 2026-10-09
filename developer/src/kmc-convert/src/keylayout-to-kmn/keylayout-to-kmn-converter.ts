@@ -108,7 +108,7 @@ export class KeylayoutToKmnConverter {
       return null;
     }
     try {
-      if (!KeylayoutReader.unitTestEndpoints.validate(jsonO, inputFilename)) {
+      if (!KeylayoutReader.validate(jsonO, inputFilename)) {
         return null;
       }
     } catch (e: any) {
@@ -720,7 +720,7 @@ export class KeylayoutToKmnConverter {
    * @param  keylayoutModifier the modifier string used in the .keylayout-file
    * @return true if the modifier can be used in keyman; false if not
    */
-  private isAcceptableKeymanModifier(keylayoutModifier: string): boolean {
+  public isAcceptableKeymanModifier(keylayoutModifier: string): boolean {
     if (keylayoutModifier === null)
       return false;
     const modifierSingle = keylayoutModifier.toUpperCase().split(" ");
@@ -737,7 +737,7 @@ export class KeylayoutToKmnConverter {
    * @param  pos Ukelele (=mac) keycodes
    * @return VK
    */
-  private mapUkeleleKeycodeToVK(pos: number): string {
+  public mapUkeleleKeycodeToVK(pos: number): string {
     const vk = [
       "K_A"          /* A */,
       "K_S"          /* S */,
@@ -1056,13 +1056,9 @@ export class KeylayoutToKmnConverter {
   /** @internal */
   public unitTestEndpoints = {
     convert: this.convert.bind(this),
-
     reviewRuleInputData: this.reviewRuleInputData.bind(this),
     createKmnModifier: this.createKmnModifier.bind(this),
     checkIfCapsIsUsed: this.checkIfCapsIsUsed.bind(this),
-    isAcceptableKeymanModifier: this.isAcceptableKeymanModifier.bind(this),
-    mapUkeleleKeycodeToVK: this.mapUkeleleKeycodeToVK.bind(this),
-
     getActionIndexFromActionId: this.getActionIndexFromActionId.bind(this),
     getActionIdFromActionNext: this.getActionIdFromActionNext.bind(this),
     getModifierArrayFromKeyModifierArray: this.getModifierArrayFromKeyModifierArray.bind(this),
