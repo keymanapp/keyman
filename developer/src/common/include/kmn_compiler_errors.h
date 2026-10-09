@@ -205,7 +205,7 @@ namespace KmnCompilerMessages {
 
     WARN_TooManyWarnings =                              SevWarn | 0x080,
     WARN_OldVersion =                                   SevWarn | 0x081,
-    WARN_BitmapNotUsed =                                SevWarn | 0x082,
+    // WARN_BitmapNotUsed =                                SevWarn | 0x082,   removed in 19.0.295-alpha
     WARN_CustomLanguagesNotSupported =                  SevWarn | 0x083,
     WARN_KeyBadLength =                                 SevWarn | 0x084,
     WARN_IndexStoreShort =                              SevWarn | 0x085,
@@ -285,7 +285,11 @@ namespace KmnCompilerMessages {
     ERROR_NameMustNotContainParentheses =               SevError | 0x0B9,
     ERROR_NameMustNotContainSquareBrackets =            SevError | 0x0BA,
 
-    WARN_DeprecatedStatement =                          SevWarn | 0x0BB,
+    // 0x0BB unused
+    WARN_DeprecatedValueFormat =                        SevWarn | 0x0BC,
+    WARN_DeprecatedCompileTarget =                      SevWarn | 0x0BD,
+
+    ERROR_StoreContainsUnsupportedStatement =           SevError | 0x0BE,
 
     FATAL_BufferOverflow =                              SevFatal | 0x0C0
 //    FATAL_Break =                                       SevFatal | 0x0C1,      unused
