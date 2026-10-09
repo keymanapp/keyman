@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>19.0.0.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <FollowKeyboardVersion/>
+  </Options>
+  <Info>
+    <Version/>
+    <Name>test_v19_kmxplus</Name>
+    <Description>test_v19_kmxplus</Description>
+  </Info>
+  <Files>
+    <File>
+      <Name>..\build\test_v19_kmxplus.kmx</Name>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>test_v19_kmxplus</Name>
+      <ID>test_v19_kmxplus</ID>
+      <Version>1.0</Version>
+      <Languages>
+        <Language ID="en">English</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>

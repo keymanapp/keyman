@@ -4,7 +4,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { DeviceSpec, KMWString } from 'keyman/common/web-utils';
-import { Codes, DefaultOutputRules, KeyEvent, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
+import { Codes, DefaultOutputRules, JSKeyboard, KeyEvent, MinimalKeymanGlobal, SyntheticTextStore } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface, JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/test/resources';
 import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
@@ -98,7 +98,7 @@ describe('Engine - specialized backspace handling', function() {
     // -- START: Standard keyboard unit test loading boilerplate --
     let harness = new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer());
     let keyboardLoader = new NodeKeyboardLoader(harness);
-    let keyboard = await keyboardLoader.loadKeyboardFromPath(ipaPath);
+    let keyboard = await keyboardLoader.loadKeyboardFromPath(ipaPath) as JSKeyboard;
     // --  END:  Standard keyboard unit test loading boilerplate --
 
     // This part provides extra assurance that the keyboard properly loaded.
@@ -112,7 +112,7 @@ describe('Engine - specialized backspace handling', function() {
     // -- START: Standard keyboard unit test loading boilerplate --
     harness = new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer());
     keyboardLoader = new NodeKeyboardLoader(harness);
-    keyboard = await keyboardLoader.loadKeyboardFromPath(angkorPath);
+    keyboard = await keyboardLoader.loadKeyboardFromPath(angkorPath) as JSKeyboard;
     // --  END:  Standard keyboard unit test loading boilerplate --
 
     // This part provides extra assurance that the keyboard properly loaded.
@@ -127,7 +127,7 @@ describe('Engine - specialized backspace handling', function() {
     harness.install();
     // Sets the keyboard as the harness's "loaded" keyboard, but not "active".
     harness.KR(new (DUMMIED_KEYS_KEYBOARD_SCRIPT as any)());
-    harness.activeKeyboard = harness.loadedKeyboard;
+    harness.activeKeyboard = harness.loadedKeyboard as JSKeyboard;
     assert.isOk(harness.activeKeyboard);
     dummiedWithHarness = harness;
 
@@ -137,7 +137,7 @@ describe('Engine - specialized backspace handling', function() {
     harness.install();
     // Sets the keyboard as the harness's "loaded" keyboard, but not "active".
     harness.KR(new (DOUBLED_BKSP_KEYBOARD_SCRIPT as any)());
-    harness.activeKeyboard = harness.loadedKeyboard;
+    harness.activeKeyboard = harness.loadedKeyboard as JSKeyboard;
     assert.isOk(harness.activeKeyboard);
     bksp2xWithHarness = harness;
   });

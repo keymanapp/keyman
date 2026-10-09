@@ -54,7 +54,7 @@ public:
 private:
   bool _caps_lock_on = false;
 
-  std::u16string parse_source_string(std::string const &s);
+  bool parse_source_string(std::string const &s, std::u16string& result);
   bool parse_option_string(std::string line, kmx_options &options, kmx_option_type type);
   bool is_token(const std::string token, std::string &line);
   key_event char_to_event(char ch);

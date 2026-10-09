@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+
 export * as KMX from './kmx/kmx.js';
 export { KmxFileReader, KmxFileReaderError } from './kmx/kmx-file-reader.js';
 export * as KeymanTargets from './kmx/keyman-targets.js';
@@ -7,10 +11,21 @@ export { default as KvkFileReader } from './kvk/kvk-file-reader.js';
 export { default as KvkFileWriter } from './kvk/kvk-file-writer.js';
 export * as KvkFile from './kvk/kvk-file.js';
 
+export { KMXPlusFileReader } from './kmx/kmx-plus/kmx-plus-file-reader.js';
+export * as KMXPlusFileFormat from './kmx/kmx-plus/kmx-plus-file.js';
 
-export { USVirtualKeyCodes } from './consts/virtual-key-constants.js';
+export { USVirtualKeyCodes, usVirtualKeyName } from './consts/virtual-key-constants.js';
 export * as Constants from './consts/virtual-key-constants.js';
-export { ModifierKeyConstants } from './consts/modifier-key-constants.js';
+export {
+  ModifierKeyConstant, ModifierKeyConstants, LDML_MODIFIER_TO_KVK_MODIFIER, KVK_MODIFIER_TO_LDML_MODIFIER,
+  translateLdmlModifiersToVisualKeyboardShift, translateVisualKeyboardShiftToLdmlModifiers,
+  visualKeyboardShiftToLayerName,
+  modifierStringToState,
+} from './consts/modifier-key-constants.js';
+export {
+  CharacterConstant,
+  CharacterConstantString,
+} from './consts/character-constants.js';
 
 export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';
 

@@ -120,8 +120,10 @@ struct COMP_STORE {
 #define TSS_NEWLAYER                    42
 #define TSS_OLDLAYER                    43
 #define TSS__KEYMAN_150_MAX             43
+/* Keyman 17.0 system stores */
+#define TSS_DISPLAYMAP                  44
 
-#define TSS__MAX                        43
+#define TSS__MAX                        44
 
 /* KVK file format definitions */
 

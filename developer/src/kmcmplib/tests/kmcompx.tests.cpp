@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
   options.warnDeprecatedCode = true;
   options.shouldAddCompilerVersion = false;
   options.target = CKF_KEYMAN;
+  options.targetVersion = 0;
 
   if(kmcmp_CompileKeyboard(kmn_file, options, msgproc, loadfileProc, nullptr, result)) {
     char* testname = strrchr( (char*) kmn_file, '/') + 1;

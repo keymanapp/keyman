@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { checkMessages, compileKeyboard, compilerTestOptions, makePathToFixture } from './helpers/index.js';
+import { checkMessages, compileKeyboard, compilerTestOptions, makePathToCommonFixture } from './helpers/index.js';
 import { KMX } from '@keymanapp/common-types';
 import KEYMAN_VERSION from '@keymanapp/keyman-version';
 
@@ -10,7 +10,7 @@ describe('kmx metadata compiler', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
   it('should compile metadata with debug and compiler version', async function() {
-    const inputFilename = makePathToFixture('basic.xml');
+    const inputFilename = makePathToCommonFixture('keyboards', 'kmx-plus', 'basic.xml');
 
     // Compile the keyboard
     const kmx = await compileKeyboard(inputFilename, {...compilerTestOptions, saveDebug:true, shouldAddCompilerVersion:true});
@@ -45,7 +45,7 @@ describe('kmx metadata compiler', function () {
   });
 
   it('should compile metadata with no compiler version', async function() {
-    const inputFilename = makePathToFixture('basic.xml');
+    const inputFilename = makePathToCommonFixture('keyboards', 'kmx-plus', 'basic.xml');
 
     // Compile the keyboard
     const kmx = await compileKeyboard(inputFilename, {...compilerTestOptions, saveDebug:true, shouldAddCompilerVersion:false});

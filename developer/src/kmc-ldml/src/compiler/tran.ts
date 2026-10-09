@@ -1,4 +1,4 @@
-import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
+import { constants, KMXPlusVersion, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LdmlKeyboardTypes, util } from '@keymanapp/common-types';
 import { CompilerCallbacks, LDMLKeyboard } from "@keymanapp/developer-utils";
 import { ObjectWithCompileContext } from "@keymanapp/common-types";
@@ -53,8 +53,8 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
   protected type: T;
 
-  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
-    super(source, callbacks);
+  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks, targetVersion: KMXPlusVersion) {
+    super(source, callbacks, targetVersion);
   }
 
   public validate(): boolean {
@@ -466,8 +466,8 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 }
 
 export class TranCompiler extends TransformCompiler<'simple', Tran /*, TranItem*/> {
-  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
-    super(source, callbacks);
+  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks, targetVersion: KMXPlusVersion) {
+    super(source, callbacks, targetVersion);
     this.type = 'simple';
   }
   protected newTran(): Tran {
@@ -479,8 +479,8 @@ export class TranCompiler extends TransformCompiler<'simple', Tran /*, TranItem*
 };
 
 export class BkspCompiler extends TransformCompiler<'backspace', Bksp /*, BkspItem*/> {
-  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
-    super(source, callbacks);
+  constructor(source: LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks, targetVersion: KMXPlusVersion) {
+    super(source, callbacks, targetVersion);
     this.type = 'backspace';
   }
   protected newTran(): Bksp {

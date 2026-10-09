@@ -1,4 +1,4 @@
-import { KMX, KvkFile, VisualKeyboard } from "@keymanapp/common-types";
+import { KvkFile, VisualKeyboard, visualKeyboardShiftToLayerName } from "@keymanapp/common-types";
 import { FTabStop, nl } from "./compiler-globals.js";
 import { CKeymanWebKeyCodes } from "./keymanweb-key-codes.js";
 import { RequotedString } from "./kmw-compiler.js";
@@ -21,60 +21,6 @@ function WideQuote(s: string): string {
   }
   return result;
 }
-
-function VkShiftStateToKmxShiftState(ShiftState: number): number {
-
-  interface TVKToKMX {
-    VK: number; KMX: number;
-  }
-
-  const Map: TVKToKMX[] = [
-    {VK: KvkFile.BUILDER_KVK_SHIFT_STATE.KVKS_SHIFT, KMX: KMX.KMXFile.K_SHIFTFLAG},
-    {VK: KvkFile.BUILDER_KVK_SHIFT_STATE.KVKS_CTRL,  KMX: KMX.KMXFile.K_CTRLFLAG},
-    {VK: KvkFile.BUILDER_KVK_SHIFT_STATE.KVKS_ALT,   KMX: KMX.KMXFile.K_ALTFLAG},
-    {VK: KvkFile.BUILDER_KVK_SHIFT_STATE.KVKS_LCTRL, KMX: KMX.KMXFile.LCTRLFLAG},
-    {VK: KvkFile.BUILDER_KVK_SHIFT_STATE.KVKS_RCTRL, KMX: KMX.KMXFile.RCTRLFLAG},
-    {VK: KvkFile.BUILDER_KVK_SHIFT_STATE.KVKS_LALT,  KMX: KMX.KMXFile.LALTFLAG},
-    {VK: KvkFile.BUILDER_KVK_SHIFT_STATE.KVKS_RALT,  KMX: KMX.KMXFile.RALTFLAG}
-  ];
-
-  let result = 0;
-  for(let i = 0; i < Map.length; i++) {
-    if (ShiftState & Map[i].VK) {
-      result |= Map[i].KMX;
-    }
-  }
-
-  return result;
-}
-
-
-function VKShiftToLayerName(shift: number): string {
-
-  const masks: string[] = [
-      'leftctrl',
-      'rightctrl',
-      'leftalt',
-      'rightalt',
-      'shift',
-      'ctrl',
-      'alt'
-    ];
-
-  shift = VkShiftStateToKmxShiftState(shift);
-  if(shift == 0) {
-    return 'default';
-  }
-
-  let result = '';
-  for(let i = 0; i < masks.length; i++) {
-    if(shift & (1 << i)) {
-      result += masks[i] + '-';
-    }
-  }
-  return result.substring(0, result.length - 1);
-}
-
 
 function VisualKeyboardToKLS(FVK: VisualKeyboard.VisualKeyboard): string {
 
@@ -111,7 +57,7 @@ function VisualKeyboardToKLS(FVK: VisualKeyboard.VisualKeyboard): string {
 
   for(let i = 0; i < layers.length; i++) {
     const layer = layers[i];
-    result += `${FTabStop}${FTabStop}"${VKShiftToLayerName(layer.shift)}": [`;
+    result += `${FTabStop}${FTabStop}"${visualKeyboardShiftToLayerName(layer.shift)}": [`;
     for(let j = 0; j < layer.keys.length - 1; j++) {
       result += '"'+WideQuote(layer.keys[j] ?? '')+'",';
     }

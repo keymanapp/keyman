@@ -57,10 +57,12 @@ export function build_uset(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS ) : BUI
   });
 
   const uset: BUILDER_USET = {
-    ident: constants.hex_section_id(constants.section.uset),
-    size: constants.length_uset +
-      (constants.length_uset_uset * usets.length) +
-      (constants.length_uset_range * ranges.length),
+    header: {
+      ident: constants.hex_section_id(constants.section.uset),
+      size: constants.length_uset +
+        (constants.length_uset_uset * usets.length) +
+        (constants.length_uset_range * ranges.length),
+    },
     usetCount: usets.length,
     rangeCount: ranges.length,
     usets,

@@ -42,7 +42,7 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
   }
 
   /** bottleneck for reading keyboard XML files */
-  readFile(path: string): Uint8Array {
+  public readFile(path: string): Uint8Array {
     const data = this.callbacks.loadFile(path);
     if (data) {
       this.eventResolver.addFile(path, new TextDecoder().decode(data));
@@ -51,12 +51,12 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
   }
 
   /** @returns [data, filename] */
-  readImportFile(version: string, subpath: string): [Uint8Array, string] {
+  private readImportFile(version: string, subpath: string): [Uint8Array, string] {
     const importPath = this.callbacks.resolveFilename(this.options.cldrImportsPath, `${version}/${subpath}`);
     return [this.readFile(importPath), importPath];
   }
 
-  readLocalImportFile(path: string): [Uint8Array, string] {
+  private readLocalImportFile(path: string): [Uint8Array, string] {
     // try each of the local imports paths
     for (const localPath of this.options.localImportsPaths) {
       const importPath = this.callbacks.path.join(localPath, path);
@@ -323,7 +323,7 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
     return true;
   }
 
-  loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
+  private loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
     const data = new TextDecoder().decode(file);
     const source = new KeymanXMLReader('keyboard3')
       .parse(data) as LDMLKeyboardXMLSourceFile;
@@ -355,9 +355,15 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
     return null;
   }
 
-  loadTestDataUnboxed(file: Uint8Array): any {
-    const source = new KeymanXMLReader('keyboardTest3')
-      .parse(new TextDecoder().decode(file)) as any;
+  private loadTestDataUnboxed(file: Uint8Array): any {
+    let source: any;
+    try {
+      source = new KeymanXMLReader('keyboardTest3')
+        .parse(new TextDecoder().decode(file)) as any;
+    } catch(e) {
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({e}));
+      return null;
+    }
     return source;
   }
 
@@ -367,7 +373,7 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
    * @param subtag subtag to filter on
    * @returns
    */
-  findSubtagArray(source: NameAndProps[], subtag: string): NameAndProps[]  {
+  private findSubtagArray(source: NameAndProps[], subtag: string): NameAndProps[]  {
     return source?.filter(o => o['#name'] === subtag);
   }
 
@@ -377,7 +383,7 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
    * @param subtag
    * @returns
    */
-  findSubtag(source: NameAndProps[], subtag: string): NameAndProps | null {
+  private findSubtag(source: NameAndProps[], subtag: string): NameAndProps | null {
     const r = this.findSubtagArray(source, subtag);
     if (!r || r.length === 0) {
       return null;
@@ -405,7 +411,7 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
    * @param subtag name to extract
    * @param mapper custom mapper function
    */
-  stuffBoxes(obj: any, source: NameAndProps[], subtag: string, asArray?: boolean, mapper?: (v: NameAndProps, r: LDMLKeyboardXMLSourceFileReader) => any) {
+  private stuffBoxes(obj: any, source: NameAndProps[], subtag: string, asArray?: boolean, mapper?: (v: NameAndProps, r: LDMLKeyboardXMLSourceFileReader) => any) {
     if (!mapper) {
       mapper = LDMLKeyboardXMLSourceFileReader.defaultMapper;
     }
@@ -417,7 +423,7 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
     }
   }
 
-  boxTestDataArrays(raw: any) : LDMLKeyboardTestDataXMLSourceFile | null {
+  private boxTestDataArrays(raw: any) : LDMLKeyboardTestDataXMLSourceFile | null {
     if (!raw) return null;
     const a : LDMLKeyboardTestDataXMLSourceFile = {
       keyboardTest3: {

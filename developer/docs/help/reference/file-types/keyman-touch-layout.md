@@ -97,7 +97,7 @@ Character Keys"). Typically, you would use only the "common" virtual key
 
 - `U_####[_####]` is used as a shortcut for a key that will output those
   Unicode values, if no rule matches it. This is similar to the overloaded
-  behaviour for `K_` ids. Thus `####` must be valid Unicode characters. 
+  behaviour for `K_` ids. Thus `####` must be valid Unicode characters.
   The square bracket characters `[` and `]` indicate an optional portion of the sequence
   and are not to be included in the shortcut. E.g.
   `U_0259` would generate a schwa if no rule matches. It is still valid to
@@ -192,9 +192,10 @@ A number of special text labels are recognized as identifying special purpose
 keys, such as Shift, Backspace, Enter, etc., for which icons are more
 appropriately used than a text label. A special font including these icons is
 included with Keyman and automatically embedded and used in any web page using
-Keyman. The list of icons in the font will probably be extended in future, but
-for now the following special labels are recognized:
+Keyman. The list of icons in the font may be extended in future.
+The special labels are listed below:
 
+<!-- start:special_key_caps -->
 <table class="display">
   <thead>
     <tr>
@@ -293,8 +294,9 @@ for now the following special labels are recognized:
     </tr>
     <tr>
       <td markdown="1">`*ZWNJ*`</td>
-      <td class="special-osk">&#xE075; (iOS) or &#xE076; (Android)</td>
-      <td>Zero Width Non Joiner (shape determined by current platform)</td>
+      <td class="special-osk">&#xE075;</td>
+      <td>Zero Width Non Joiner (shape determined by current platform,
+          will be <span class="special-osk">&#xE076;</span> on Android)</td>
     </tr>
     <tr>
       <td markdown="1">`*ZWNJiOS*`</td>
@@ -524,6 +526,7 @@ with legacy desktop layouts, and not recommended for general use:
     </tr>
   </tbody>
 </table>
+<!-- end:special_key_caps -->
 
 ### Key type
 

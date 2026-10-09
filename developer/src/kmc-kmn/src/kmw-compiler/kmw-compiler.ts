@@ -172,7 +172,7 @@ export function WriteCompiledKeyboard(
       return null;
     } else if(!result.result) {
       sLayoutFile = '';
-      callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFile({filename:sLayoutFilename}));
+      callbacks.reportMessage(KmwCompilerMessages.Error_InvalidTouchLayoutFile({filename:sLayoutFilename, message: 'see previous messages'}));
       return null;
     } else {
       sLayoutFile = result.output;

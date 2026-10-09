@@ -8,7 +8,7 @@ test_files = [
   '../src/KeymanSystemServiceClient.cpp',
 ]
 
-common_test_files = [ meson.global_source_root() / '../../common/include/test_color.cpp' ]
+common_test_files = []
 
 keymancore_tests_lib = c_compiler.find_library(
   'keymancore-tests', # meson will prefix 'lib'
