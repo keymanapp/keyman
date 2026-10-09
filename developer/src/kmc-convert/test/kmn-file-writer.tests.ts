@@ -31,7 +31,7 @@ describe('KmnFileWriter', function () {
     const converted = sut.unitTestEndpoints.convert(read as Keylayout.KeylayoutXMLSourceFile, inputFilename.replace(/\.keylayout$/, '.kmn'));
 
     it('writeDataRules() should return true (no error) if written', async function () {
-      const result = sutW.writeDataRules(converted);
+      const result = sutW.unitTestEndpoints.writeDataRules(converted);
       assert.isTrue(result.length > 0);
     });
 
@@ -63,7 +63,7 @@ describe('KmnFileWriter', function () {
       + "\n";
 
     it(('writeKmnFileHeader should return store text with filename ').padEnd(62, " ") + 'on correct input', async function () {
-      const writtenCorrectName = sutW.writeKmnFileHeader(converted);
+      const writtenCorrectName = sutW.unitTestEndpoints.writeKmnFileHeader(converted);
       assert.equal(writtenCorrectName, (outExpectedFirst + (converted?.keylayoutFilename ?? "") + outExpectedLast));
     });
   });
@@ -403,7 +403,7 @@ describe('KmnFileWriter', function () {
           modifiers: [[]],
           rules: values[0] as Rule[]
         };
-        const result1 = sutW.writeDataRules(data);
+        const result1 = sutW.unitTestEndpoints.writeDataRules(data);
         assert.isTrue(result1 === values[1][0]);
       });
     });
@@ -427,7 +427,7 @@ describe('KmnFileWriter', function () {
       ['', '', 'Msg empty output or unsupported numerical html entity '],
     ].forEach(function (values) {
       it(('should convert "' + values[0] + '"').padEnd(25, " ") + 'to "' + values[1] + '"', async function () {
-        const result = sutW.writeCharacterOrUnicode(values[0] as string, "Msg ");
+        const result = sutW.unitTestEndpoints.writeCharacterOrUnicode(values[0] as string, "Msg ");
         assert.isNotNull(result);
         assert.equal(result?.character, values[1]);
         assert.equal(result?.message, values[2]);

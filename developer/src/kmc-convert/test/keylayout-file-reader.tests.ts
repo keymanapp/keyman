@@ -153,7 +153,7 @@ describe('findMapIndexinKeymap ', function () {
   ].forEach(function (values) {
     it(("findMapIndexinKeymap(keyMapSelect.mapIndex = '" + values[0] + "')").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
       keyMapSelect.mapIndex = values[0] as string;
-      const result = sutR.findMapIndexinKeymap(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMapSelect);
+      const result = sutR.unitTestEndpoints.findMapIndexinKeymap(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMapSelect);
       assert.isTrue(result === values[1]);
     });
   });
@@ -183,7 +183,7 @@ describe('findIndexinKeymapSelect ', function () {
   ].forEach(function (values) {
     it(("findIndexinKeymapSelect(keyMap.index = '" + values[0] + "')").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
       keyMap.index = values[0] as string;
-      const result = sutR.findIndexinKeymapSelect(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMap);
+      const result = sutR.unitTestEndpoints.findIndexinKeymapSelect(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMap);
       assert.isTrue(result === values[1]);
     });
   });
@@ -200,7 +200,7 @@ describe('checkForCorrespondingElements ', function () {
   ].forEach(function (values) {
     it(("checkForCorrespondingElements in " + values[0]).padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
       const jsonO: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(makePathToFixture(values[0] as string)));
-      const result = sutR.checkForCorrespondingElements(jsonO as Keylayout.KeylayoutXMLSourceFile);
+      const result = sutR.unitTestEndpoints.checkForCorrespondingElements(jsonO as Keylayout.KeylayoutXMLSourceFile);
       assert.isTrue(result === values[1]);
     });
   });
