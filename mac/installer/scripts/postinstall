@@ -50,7 +50,29 @@ echo "The installer package name is: $PACKAGE_PATH"
 # define path of tmp file to write keyboard info
 KEYBOARD_FILE_PATH="$3/var/tmp/keyboard-to-install.txt"
 
-#write keyboard file
+# write keyboard file
 /bin/echo "sil_euro_latin" > "${KEYBOARD_FILE_PATH}"
+
+# run background process that launches Keyman Configuration app
+
+# first kill any old Keyman Configuration processes that are running
+# they would not receive the command line argument when we passed one
+echo "sending kill command"
+pkill -u "$CONSOLE_USER" -if "Keyman Configuration"
+
+# give the file system a second to commit changes
+sleep 1
+
+# check if there is a current user and we are not sitting at the login window, then
+# launch the Keyman Configuration under the current user with the custom install argument
+
+if [ -n "$CONSOLE_USER" ] && [ "$CONSOLE_USER" != "loginwindow" ]; then
+  echo "⚙️ starting Keyman Configuration"
+  USER_ID=$(id -u "$CONSOLE_USER")
+
+  # use launchctl to safely inject the app into their active GUI session
+  # use -a to pass the --args safely
+  launchctl asuser "$USER_ID" open -n -a "/Applications/Keyman Configuration.app" --args --installation &
+fi
 
 exit 0

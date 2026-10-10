@@ -37,19 +37,15 @@ struct ConfigApp: App {
   }
 
   var body: some Scene {
-    Window("Configuration", id: "main-config") {
+    Window("Configuration", id: "config") {
       MainConfigView()
         .frame(
-            minWidth: 600, maxWidth: 1000,
-            minHeight: 400, maxHeight: .infinity
+          minWidth: 600, maxWidth: 1000,
+          minHeight: 400, maxHeight: .infinity
         )
         .environmentObject(settings)
-        .task {
-          if !installation.getHasDisplayedInstallationComplete() {
-            openWindow(id: "install")
-          }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in openWindow(id: "install")
+        .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in
+          openWindow(id: "install")
         }
     }
     // the size of the window when first opened
@@ -69,6 +65,18 @@ struct ConfigApp: App {
         } label: {
           Label("About Keyman Configuration", systemImage: "info.circle")
         }
+      }
+      // include an invisible command group to run when the app boots
+      CommandGroup(after: .appInfo) {
+        Color.clear
+          .frame(width: 0, height: 0)
+          .onAppear {
+            // this only evaluates to true if the app was launched from the installer post-install script
+            if installation.installInProgress {
+              Logger.app.log("installation in progress, opening Installation window")
+              openWindow(id: "install")
+            }
+          }
       }
     }
     

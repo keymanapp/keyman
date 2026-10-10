@@ -42,7 +42,8 @@ public class InputMethodUtil {
   let kMigrateCommand = "migrate"
   let kAccessCommand = "access"
   let kCheckCommand = "check"
-  
+  let kMigrateAndCheckCommand = "migrateandcheck"
+
   public init() throws {
     try self.pathUtil = KeymanPaths()
   }
@@ -249,7 +250,30 @@ public class InputMethodUtil {
       try self.launchKeymanInputMethodAsSeparateProcess(argument: kCheckCommand)
     }
   }
-  
+
+  /**
+   * Send a distributed notification to the input method to do two things:
+   * 1. migrate data if necessary
+   * 2. check the state of Accessibility permission
+   * If Keyman is running then kill it and invoke as separate process.
+   * However, Keyman should never be running because we only migrate data
+   * when Keyman Config is invoked from the installer.
+   */
+  func invokeKeymanInputMethodCheckAccessWithMigration() throws {
+    Logger.setup.info("invokeKeymanInputMethodCheckAccessWithMigration()")
+    LogUtil.infoBreadcrumb("invokeKeymanInputMethodCheckAccessWithMigration()", category: .setup)
+    
+    if self.isKeymanInputMethodRunning() {
+      // kill Keyman so that it refreshes its accessibility state
+      _ = self.killKeymanInputMethod()
+      Logger.setup.debug("invokeKeymanInputMethodCheckAccessWithMigration(), killed Keyman")
+    }
+    
+    // Keyman is not running, launch to check accessibility and migrate data with specific command line argument
+    Logger.setup.debug("invokeKeymanInputMethodCheckAccessWithMigration(), calling launchKeymanInputMethodAsSeparateProcess()")
+    try self.launchKeymanInputMethodAsSeparateProcess(argument: kMigrateAndCheckCommand)
+  }
+
   /**
    * Send a distributed notification to check the state of Accessibility permission.
    */
@@ -347,6 +371,28 @@ public class InputMethodUtil {
     Logger.setup.log("doAsyncAccessibilityCheck, listening across process boundaries, time: \(Date().formatted(timeStyle))")
   }
   
+  /**
+   * Only including for a new installation invoked from the installer.
+   * Calls Keyman input method to check whether it has accessibility permission granted
+   * while also instructing the input method to migrate data.
+   * Receives response as distributed notification named `accessibilityStateResponse`
+   */
+  public func doAsyncAccessibilityCheckWithMigration() {
+    do {
+      try self.invokeKeymanInputMethodCheckAccessWithMigration()
+    } catch {
+      Logger.setup.error("invoking Keyman failed: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("invoking Keyman failed: \(error as NSError)", category: .setup)
+    }
+    
+    let timeStyle = Date.FormatStyle()
+      .hour(.twoDigits(amPM: Date.FormatStyle.Symbol.Hour.AMPMStyle.abbreviated))
+      .minute(.twoDigits)
+      .second(.twoDigits)
+      .secondFraction(.fractional(3))
+    Logger.setup.log("doAsyncAccessibilityCheckWithMigration, listening across process boundaries, time: \(Date().formatted(timeStyle))")
+  }
+
   /**
    * Kill the application with the specified bundle Id
    * This is only permitted when running outside sandbox

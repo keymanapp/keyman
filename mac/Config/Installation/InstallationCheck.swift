@@ -53,6 +53,7 @@ enum InstallationStateCondition: String {
 
 @MainActor
 public class InstallationCheck {
+  public let isLaunchedByInstaller: Bool      // the app was launched by the installer
   public var installationState: InstallationState?
   // with isEvaluatingNewInstallation==true, we are awaiting
   // message from input method to determine what tasks are needed
@@ -95,9 +96,10 @@ public class InstallationCheck {
     return .newInstallation
   }
   
-  public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil) {
+  public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil, launchedByInstaller: Bool) {
     self.defaultsRepository = defaultsRepo
     self.inputMethodUtil = inputMethodUtil
+    self.isLaunchedByInstaller = launchedByInstaller
     self.isEvaluatingNewInstallation = false
     self.configurationVersion = ConfigAppUtil.configAppVersion()
     
@@ -113,16 +115,14 @@ public class InstallationCheck {
     self.isInputMethodInstalled = keymanExists
     self.isInputMethodCurrent = keymanIsCurrent
     self.inputMethodVersion = keymanVersion
-
-    if self.isMigrationNeeded() {
-      _ = self.migrateData()
-    }
     
+    if launchedByInstaller {
+      clearInstallationState()
+    }
     let installState = InstallationCheck.readInstallationState(from: defaultsRepo)
 
     if (keymanExists && keymanIsCurrent) {
       // the input method is valid, examine the installation state recorded on disk
-      //
       let installationStateCondition = InstallationCheck.evaluateInstallationState(state: installState, for: keymanVersion);
       Logger.app.log("installationStateCondition: \(installationStateCondition.rawValue, privacy: .public)")
 
@@ -161,7 +161,6 @@ public class InstallationCheck {
     let success = self.inputMethodUtil.invokeKeymanInputMethodMigration()
     Logger.app.debug("migrateData migration suceeded: \(success)")
 
-    // check whether
     if success {
       NotificationCenter.default.post(name: .dataMigrated, object: nil)
     }
@@ -202,27 +201,43 @@ public class InstallationCheck {
   }
   
   /**
-   * Should be called immediately after init to evaluate what is needed for installation
-   * or, if the installation is complete, whether it needs repairs.
+   * For new installations, called from init to evaluate what is needed to complete install.
    * When the notification from the input method is received and the evaluation is done,
    * the installation can move out of the `evaluatingInstallation` phase
    */
-  public func startInstallationEvaluation() {
+  public func startNewInstall() {
+    guard self.isInputMethodInstalled else { return }
+    guard self.isInputMethodCurrent else { return }
+
     // call the input method to check whether Accessibility permission has been granted
-    if (self.isInputMethodInstalled && self.isInputMethodCurrent) &&
-        (self.isEvaluatingNewInstallation || self.isReadyForRepairCheckAtStartup()) {
-      self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
+    if (self.isLaunchedByInstaller) {
+      self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
     }
   }
-  
+
+  /**
+   * For comopleted installations, called from init to evaluate whether repairs are needed.
+   * When the notification from the input method is received and the evaluation is done,
+   * the installation can move out of the `evaluatingInstallation` phase
+   */
+  public func startRepairCheck() {
+    guard self.isReadyForRepairCheckAtStartup() else { return }
+      
+    // call the input method to check whether Accessibility permission has been granted
+    self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
+  }
+
   /**
    * Returns true if we should check at app startup whether the installation needs repair.
    * Simply returns true if the installation is complete.
    */
   func isReadyForRepairCheckAtStartup() -> Bool {
+    guard self.isInputMethodInstalled else { return false }
+    guard self.isInputMethodCurrent else { return false }
+    
     let readyForRepairCheck = self.installationState?.isComplete == true
     
-    Logger.app.debug("isReadyForRepairCheckAtStartup: \(readyForRepairCheck, privacy: .public)")
+    Logger.app.debug("isReadyForRepairCheckAtStartup: \(readyForRepairCheck)")
 
     return readyForRepairCheck
   }
@@ -250,6 +265,7 @@ public class InstallationCheck {
       name: NSNotification.Name.accessibilityStateResponse,
       object: nil // Observe notifications from any sender
     )
+
     // TODO: add timeout in case response is not received
     // see issue #16579
   }
@@ -265,7 +281,7 @@ public class InstallationCheck {
       let permissionGranted = self.processAccessibilityResponse(with: message)
       
       Logger.app.debug("handleAccessibilityResponse, message: \(message, privacy: .public)")
-
+      
       if let state = self.installationState {
         installCompleted = state.isComplete
       }
@@ -273,7 +289,12 @@ public class InstallationCheck {
       if self.isEvaluatingNewInstallation {
         // if evaluating the current state for a new installation,
         // complete the evaluation using the results of the permission check
-       self.completeNewInstallationEvaluation(accessibilityPermissionGranted: permissionGranted)
+        self.completeNewInstallationEvaluation(accessibilityPermissionGranted: permissionGranted)
+        
+        // for a new install, we triggered migration
+        if self.isLaunchedByInstaller {
+          NotificationCenter.default.post(name: .dataMigrated, object: nil)
+        }
       } else if installCompleted {
         // if this is a completed install, check whether repairs are needed
         self.checkForRepair(accessibilityPermissionGranted: permissionGranted)
@@ -289,7 +310,7 @@ public class InstallationCheck {
       Logger.app.debug("handleAccessibilityResponse, received but did not include message")
     }
   }
-  
+
   /**
    * Process the distributed notification message that we received from the Keyman input method.
    */
@@ -428,12 +449,11 @@ static func readInstallationState(from repo: DefaultsRepo) -> InstallationState?
     // add enable input method and restart mac tasks if needed
     if !self.inputMethodUtil.isKeymanInputMethodEnabled() {
       newTasks.insert(InstallationTask.createNewInstallationTask(type: .enableInputMethod))
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmEnabled))
       
-    // when repairing, prompt to restart to ensure that the input method has been loaded by the system
-      if (isRepair) {
-        newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
-        newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
-      }
+    // if enable is needed, prompt to restart to ensure that the input method has been loaded by the system
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .requestRestart))
+      newTasks.insert(InstallationTask.createNewInstallationTask(type: .confirmRestart))
     }
     
     return newTasks
