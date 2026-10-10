@@ -29,18 +29,22 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
-    "@keymanapp/developer-utils": "*",
     "@keymanapp/common-types": "*",
+    "@keymanapp/developer-utils": "*",
     "@keymanapp/keyman-version": "*"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@keymanapp/developer-test-helpers": "*",
     "@keymanapp/resources-gosh": "*",
     "@types/node": "^20.4.1",
     "@types/semver": "^7.3.12",
     "c8": "^7.12.0",
     "chalk": "^2.4.2",
-    "typescript": "^5.4.5"
+    "eslint": "^10.12.0",
+    "jiti": "^2.7.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^8.71.1"
   },
   "mocha": {
     "spec": "build/test/**/*.tests.js",
