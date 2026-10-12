@@ -27,17 +27,17 @@ export interface CommandLineBuildBaseOptions extends CommandLineBaseOptions {
  */
 export class BaseOptions {
   public static addLogLevel(program: Command) {
-    return program.addOption(new Option('-l, --log-level <logLevel>', 'Log level').choices(ALL_COMPILER_LOG_LEVELS).default('info'));
+    return program.addOption(new Option('-l, --log-level <logLevel>', 'log level').choices(ALL_COMPILER_LOG_LEVELS).default('info'));
   }
 
   public static addLogFormat(program: Command) {
-    return program.addOption(new Option('--log-format <logFormat>', 'Log format').choices(ALL_COMPILER_LOG_FORMATS).default('formatted'));
+    return program.addOption(new Option('--log-format <logFormat>', 'log format').choices(ALL_COMPILER_LOG_FORMATS).default('formatted'));
   }
 
   public static addColor(program: Command) {
     return program
-      .option('--color', 'Force colorization for log messages')
-      .option('--no-color', 'No colorization for log messages; if both omitted, detects from console');
+      .option('--color', 'force colorization for log messages')
+      .option('--no-color', 'no colorization for log messages; if both omitted, detects from console');
   }
 
   public static addAll(program: Command) {
@@ -51,7 +51,7 @@ export class BaseOptions {
 
 export class BuildBaseOptions extends BaseOptions {
   public static addOutFile(program: Command) {
-    return program.option('-o, --out-file <filename>', 'Override default folder and/or filename for the output file; terminate with '+path.sep+' for folder')
+    return program.option('-o, --out-file <filename>', 'override default folder and/or filename for the output file; terminate with '+path.sep+' for folder')
   }
 
   public static addAll(program: Command) {

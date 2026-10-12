@@ -20,6 +20,8 @@ interface AnalysisActivityOptions extends CompilerBaseOptions {
 
 export function declareAnalyze(program: Command) {
   const command = program.command('analyze');
+  command.description('run analysis and statistical tasks on Keyman keyboards');
+
   declareOskCharUse(command);
   declareOskRewrite(command);
 }
@@ -28,12 +30,12 @@ function declareOskCharUse(command: Command) {
   const subCommand = command.command('osk-char-use [infile...]');
   BaseOptions.addAll(subCommand);
   subCommand
-    .description('Analyze On Screen Keyboards for character usage')
-    .option('-b, --base', 'First PUA codepoint to use, in hexadecimal (default F100)', 'F100')
-    .option('--include-counts', 'Include number of times each character is referenced', false)
-    .option('--strip-dotted-circle', 'Strip U+25CC (dotted circle base) from results', false)
-    .option('-i, --input-mapping-file <filename>', 'Merge result file with existing mapping file')
-    .addOption(new Option('-m, --mapping-file <filename>', 'Result file to write to (.json, .md, or .txt)').makeOptionMandatory())
+    .description('analyze On Screen Keyboards (OSKs) for character usage')
+    .option('-b, --base', 'first PUA codepoint to use, in hexadecimal (default F100)', 'F100')
+    .option('--include-counts', 'include number of times each character is referenced', false)
+    .option('--strip-dotted-circle', 'strip U+25CC (dotted circle base) from results', false)
+    .option('-i, --input-mapping-file <filename>', 'merge result file with existing mapping file')
+    .addOption(new Option('-m, --mapping-file <filename>', 'result file to write to (.json, .md, or .txt)').makeOptionMandatory())
     .action(async (filenames: string[], _options: any, commander: any): Promise<never|void> => {
       const options = commander.optsWithGlobals();
       if(!filenames.length) {
@@ -53,7 +55,7 @@ function declareOskCharUse(command: Command) {
 function declareOskRewrite(command: Command) {
   const subCommand = command.command('osk-rewrite-from-char-use [infile...]');
   subCommand
-    .description('Rewrite On Screen Keyboard files from source mapping; given file.ext, output is written to file-pua.ext')
+    .description('rewrite On Screen Keyboard (OSK) files from source mapping; given file.ext, output is written to file-pua.ext')
     .addOption(new Option('-m, --mapping-file <filename>', 'JSON mapping file to read from').makeOptionMandatory())
     .action(async (filenames: string[], options: any) => {
       if(!filenames.length) {
