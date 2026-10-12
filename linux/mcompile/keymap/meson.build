@@ -21,6 +21,7 @@ cpp_files = files(
   'mc_import_rules.cpp',
   '../../../common/cpp/km_u16.cpp',
   '../../../common/cpp/utfcodec.cpp',
+  '../../../common/cpp/kmx_file.cpp',
 )
 
 comon_include_dir = [

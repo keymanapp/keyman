@@ -88,7 +88,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   while ((msg = ReadLine(infile, sz, offset, str, TRUE)) == STATUS_Success)
   {
     p = str;
-    switch (LineTokenType(&p))
+    switch (LineTokenType(fk, &p, FALSE))
     {
       case T_VERSION:
         *(p + 4) = 0;

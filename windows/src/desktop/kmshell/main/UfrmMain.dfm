@@ -16,6 +16,7 @@ inherited frmMain: TfrmMain
   PixelsPerInch = 96
   TextHeight = 13
   object AppEvents: TApplicationEvents
+    OnActivate = AppEventsActivate
     OnMessage = AppEventsMessage
     Left = 416
     Top = 256

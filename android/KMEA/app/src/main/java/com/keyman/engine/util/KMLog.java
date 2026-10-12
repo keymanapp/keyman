@@ -21,6 +21,7 @@ import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
+// TODO(v20): make KMLog more resilient to re-entrancy by preventing nested calls with a sentinel flag
 public final class KMLog {
   private static final String TAG = "KMLog";
 
