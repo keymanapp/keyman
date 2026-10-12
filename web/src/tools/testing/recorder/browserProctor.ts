@@ -54,7 +54,7 @@ export class BrowserProctor extends Proctor {
   // Performs browser-specific global test prep.
   async beforeAll() {
     const ele = this.target;
-    keyman.setActiveElement(ele, true);
+    await keyman.setActiveElement(ele, true);
 
     // If the CSS isn't fully loaded, the element positions will not match their expected
     // locations in the keyboard layout and OSK keys won't be triggered properly by the

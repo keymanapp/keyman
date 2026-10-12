@@ -166,9 +166,9 @@ describe('Engine - Browser Interactions', function() {
       return loadKeyboardFromJSON("resources/json/keyboards/lao_2008_basic.json", baseTimeout);
     });
 
-    beforeEach(function() {
+    beforeEach(async function() {
       const keyman: KeymanEngine = window[keyman_window];
-      keyman.setActiveElement(inputElem);
+      await keyman.setActiveElement(inputElem);
       inputElem.value = "";
     });
 

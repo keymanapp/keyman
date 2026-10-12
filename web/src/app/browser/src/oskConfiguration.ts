@@ -20,10 +20,10 @@ export function setupOskListeners(engine: KeymanEngine, osk: OSKView, contextMan
     }
   });
 
-  osk.on('hiderequested', (key) => { // K_ROPT
+  osk.on('hiderequested', async (key) => { // K_ROPT
     if(osk) {
       osk.startHide(true);
-      contextManager.forgetActiveTextStore();
+      await contextManager.forgetActiveTextStore();
     }
   });
 

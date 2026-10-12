@@ -75,6 +75,11 @@ function dispatchFocus(eventName: string, elem: HTMLElement) {
   elem.dispatchEvent(event);
 }
 
+async function dispatchFocusAndWait(elem: HTMLElement) {
+  dispatchFocus('focus', elem);
+  await timedPromise(0);
+}
+
 // The replaced methods sometimes fail in unit-testing setups, possibly due to the very short time intervals involved.
 // The replacements suffice to trigger the same effects.
 function upgradeFocus(elem: HTMLElement) {
@@ -239,12 +244,12 @@ describe('app/browser:  ContextManager', function () {
       assert.isNotOk(contextManager.activeTextStore);
     });
 
-    it('change: null -> input', () => {
+    it('change: null -> input', async () => {
       const textstorechange = sinon.fake();
       contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
-      dispatchFocus('focus', input);
+      await dispatchFocusAndWait(input);
 
       assert.equal(contextManager.activeTextStore?.getElement(), input, ".activeTextStore not updated when element gained focus");
 
@@ -254,12 +259,12 @@ describe('app/browser:  ContextManager', function () {
       assert.equal(textStore.getElement(), input, '.activeTextStore does not match the newly-focused element');
     });
 
-    it('change: null -> textarea', () => {
+    it('change: null -> textarea', async () => {
       const textstorechange = sinon.fake();
       contextManager.on('textstorechange', textstorechange);
 
       const textarea = document.getElementById('textarea');
-      dispatchFocus('focus', textarea);
+      await dispatchFocusAndWait(textarea);
 
       assert.equal(contextManager.activeTextStore?.getElement(), textarea, ".activeTextStore not updated when element gained focus");
 
@@ -269,7 +274,7 @@ describe('app/browser:  ContextManager', function () {
       assert.equal(textStore.getElement(), textarea, '.activeTextStore does not match the newly-focused element');
     });
 
-    it('change: null -> designIframe', () => {
+    it('change: null -> designIframe', async () => {
       const textstorechange = sinon.fake();
       contextManager.on('textstorechange', textstorechange);
 
@@ -283,7 +288,7 @@ describe('app/browser:  ContextManager', function () {
       //
       // Possible future improvement:  TextStore.focusElement (property)?
       // Though that may be affected by the Chrome vs Firefox bit noted above.
-      dispatchFocus('focus', iframe.contentDocument.body);
+      await dispatchFocusAndWait(iframe.contentDocument.body);
 
       assert.equal(contextManager.activeTextStore?.getElement(), iframe, ".activeTextStore not updated when element gained focus");
 
@@ -293,12 +298,12 @@ describe('app/browser:  ContextManager', function () {
       assert.equal(textStore.getElement(), iframe, '.activeTextStore does not match the newly-focused element');
     });
 
-    it('change: null -> contentEditable', () => {
+    it('change: null -> contentEditable', async () => {
       const textstorechange = sinon.fake();
       contextManager.on('textstorechange', textstorechange);
 
       const editable = document.getElementById('editable');
-      dispatchFocus('focus', editable);
+      await dispatchFocusAndWait(editable);
 
       assert.equal(contextManager.activeTextStore?.getElement(), editable, ".activeTextStore not updated when element gained focus");
 
@@ -308,13 +313,13 @@ describe('app/browser:  ContextManager', function () {
       assert.equal(textStore.getElement(), editable, '.activeTextStore does not match the newly-focused element');
     });
 
-    it('change: input -> null', () => {
+    it('change: input -> null', async () => {
       // Setup:  from prior test
       const textstorechange = sinon.fake();
       contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
-      dispatchFocus('focus', input);
+      await dispatchFocusAndWait(input);
       assert.equal(contextManager.activeTextStore?.getElement(), input);
 
       // actual test
@@ -350,20 +355,20 @@ describe('app/browser:  ContextManager', function () {
       assert.equal(textStore, null, 'textstorechange event did not indicate clearing of .activeTextStore');
     });
 
-    it('change: input -> textarea', () => {
+    it('change: input -> textarea', async () => {
       // Setup:  from prior test
       const textstorechange = sinon.fake();
       contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
-      dispatchFocus('focus', input);
+      await dispatchFocusAndWait(input);
 
       dispatchFocus('blur', input);
       assert.equal(contextManager.activeTextStore?.getElement(), null);
 
       // And now the new stuff.
       const textarea = document.getElementById('textarea');
-      dispatchFocus('focus', textarea);
+      await dispatchFocusAndWait(textarea);
 
       assert.equal(contextManager.activeTextStore?.getElement(), textarea, ".activeTextStore not updated when element gained focus");
 
@@ -373,12 +378,12 @@ describe('app/browser:  ContextManager', function () {
       assert.equal(textStore.getElement(), textarea, '.activeTextStore does not match the newly-focused element');
     });
 
-    it('restoration: input (no flags set)', () => {
+    it('restoration: input (no flags set)', async () => {
       const textstorechange = sinon.fake();
       contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
-      dispatchFocus('focus', input);
+      await dispatchFocusAndWait(input);
       assert.isTrue(textstorechange.calledOnce);
       dispatchFocus('blur', input);
       assert.isTrue(textstorechange.calledTwice);
@@ -391,17 +396,17 @@ describe('app/browser:  ContextManager', function () {
       assert.equal(contextManager.activeTextStore?.getElement(), input);
     });
 
-    it('forget: input', () => {
+    it('forget: input', async () => {
       const textstorechange = sinon.fake();
       contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
-      dispatchFocus('focus', input);
+      await dispatchFocusAndWait(input);
       assert.isTrue(textstorechange.calledOnce);
 
       contextManager.focusAssistant.maintainingFocus = true;
       contextManager.focusAssistant.restoringFocus = true;
-      contextManager.forgetActiveTextStore();
+      await contextManager.forgetActiveTextStore();
       // The 'forget' operation is **aggressive**.  Perma-forget.
       assert.isNotOk(contextManager.lastActiveTextStore);
 
@@ -423,12 +428,12 @@ describe('app/browser:  ContextManager', function () {
       assert.equal(contextManager.activeTextStore?.getElement(), null);
     });
 
-    it('restoration: input (`maintaining`)', () => {
+    it('restoration: input (`maintaining`)', async () => {
       const textstorechange = sinon.fake();
       contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
-      dispatchFocus('focus', input);
+      await dispatchFocusAndWait(input);
       assert.isTrue(textstorechange.calledOnce);
 
       contextManager.focusAssistant.maintainingFocus = true;
@@ -448,12 +453,12 @@ describe('app/browser:  ContextManager', function () {
       assert.isTrue(textstorechange.calledOnce, 'textstorechange called during restoration of maintained state');
     });
 
-    it('loss: input (on clear of `maintaining`)', () => {
+    it('loss: input (on clear of `maintaining`)', async () => {
       const textstorechange = sinon.fake();
       contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
-      dispatchFocus('focus', input);
+      await dispatchFocusAndWait(input);
       assert.isTrue(textstorechange.calledOnce);
 
       contextManager.focusAssistant.maintainingFocus = true;
@@ -469,12 +474,12 @@ describe('app/browser:  ContextManager', function () {
       assert.equal(contextManager.activeTextStore?.getElement(), null);
     });
 
-    it('restoration: input (`restoring`)', () => {
+    it('restoration: input (`restoring`)', async () => {
       const textstorechange = sinon.fake();
       contextManager.on('textstorechange', textstorechange);
 
       const input = document.getElementById('input');
-      dispatchFocus('focus', input); // 1
+      await dispatchFocusAndWait(input); // 1
       assert.isTrue(textstorechange.calledOnce);
 
       contextManager.focusAssistant.maintainingFocus = true;

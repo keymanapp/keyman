@@ -66,8 +66,8 @@ test.describe('Auto-control example from the guide', function () {
     await page.getByTestId('textarea').click();
 
     // Verify OSK is shown
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
     await expect(page.locator('#keymanweb_title_bar')).toContainText('Lao (Phonetic)');
   });
 });
@@ -86,8 +86,8 @@ test.describe('Control-by-control example from the guide', function () {
     await page.getByPlaceholder('id = address').click();
 
     // Verify OSK is not shown
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeFalsy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).toBeFalsy();
     await expect(page.getByRole('img', { name: 'Use Web Keyboard' })).not.toBeVisible();
     await expect(page.getByRole('img', { name: 'Show On Screen Keyboard' })).not.toBeVisible();
   });
@@ -99,8 +99,8 @@ test.describe('Control-by-control example from the guide', function () {
 
     // Verify the control is in system-keyboard mode: the OSK stays hidden,
     // while the toggle UI remains available for switching keyboards.
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeFalsy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeFalsy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).toBeFalsy();
     await expect(page.getByRole('img', { name: 'Use Web Keyboard' })).toBeVisible();
     await expect(page.getByRole('img', { name: 'Show On Screen Keyboard' }).isHidden()).toBeTruthy();
 
@@ -113,14 +113,59 @@ test.describe('Control-by-control example from the guide', function () {
     await page.getByPlaceholder('id = text').click();
 
     // Verify OSK is shown
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
     await expect(page.getByRole('img', { name: 'Use Web Keyboard' })).toBeVisible();
     await expect(page.getByRole('img', { name: 'Show On Screen Keyboard' })).toBeVisible();
 
     // Verify Lao (Phonetic) keyboard is active
     await expect(page.locator('#keymanweb_title_bar')).toContainText('Lao (Phonetic)');
     // Verify "Lao - Lao (Phonetic)" is selected (bold) in the menu
+    await expect(await getSelectedKeyboardMenuText(page)).toBe('Lao - Lao (Phonetic)');
+  });
+
+  test('switching between fields always shows OSK where appropriate (#16522)', async ({ page }: { page: Page }) => {
+    const verifyOskNotShowing = async () => {
+      await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeFalsy();
+      await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).toBeFalsy();
+      await expect(page.getByRole('img', { name: 'Use Web Keyboard' })).toBeVisible();
+      await expect(page.getByRole('img', { name: 'Show On Screen Keyboard' }).isHidden()).toBeTruthy();
+    };
+
+    const verifyLaoOskShowing = async () => {
+      await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+      await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
+      await expect(page.getByRole('img', { name: 'Use Web Keyboard' })).toBeVisible();
+      await expect(page.getByRole('img', { name: 'Show On Screen Keyboard' })).toBeVisible();
+      await expect(page.locator('#keymanweb_title_bar')).toContainText('Lao (Phonetic)');
+      await expect(await getSelectedKeyboardMenuText(page)).toBe('Lao - Lao (Phonetic)');
+    };
+
+    // Setup
+    await beforeEach(page);
+
+    // Click the subject field - verify OSK is not shown since system-keyboard selected
+    await page.getByPlaceholder('id = subject').click();
+    await verifyOskNotShowing();
+
+    // Click the message body field (which is in KeymanWeb mode) - verify OSK shows
+    await page.getByPlaceholder('id = text').click();
+    await verifyLaoOskShowing();
+
+    // Click the subject field again - OSK should hide again
+    await page.getByPlaceholder('id = subject').click();
+    await verifyOskNotShowing();
+
+    // Execute
+    // Click the message body field again - OSK should show again
+    await page.getByPlaceholder('id = text').click();
+
+    // Verify (#16522)
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
+    await expect(page.getByRole('img', { name: 'Use Web Keyboard' })).toBeVisible();
+    await expect(page.getByRole('img', { name: 'Show On Screen Keyboard' })).toBeVisible();
+    await expect(page.locator('#keymanweb_title_bar')).toContainText('Lao (Phonetic)');
     await expect(await getSelectedKeyboardMenuText(page)).toBe('Lao - Lao (Phonetic)');
   });
 });
@@ -139,8 +184,8 @@ test.describe('Full manual control example from the guide', function () {
 
     // Verify 'English' selected (which has the value '') and no OSK showing
     await expect(page.getByLabel('Keyboard')).toHaveValue('');
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).not.toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).not.toBeTruthy();
   });
 
   test('Selecting English keyboard shows no OSK', async ({ page } : { page: Page }) => {
@@ -169,8 +214,8 @@ test.describe('Full manual control example from the guide', function () {
     await keyboardchangePromise;
 
     // Verify no OSK showing
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).not.toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).not.toBeTruthy();
   });
 
   test('Selecting Devanagari keyboard shows Devanagari OSK', async ({ page } : { page: Page }) => {
@@ -187,8 +232,8 @@ test.describe('Full manual control example from the guide', function () {
     await keyboardchangePromise;
 
     // Verify Devanagari OSK showing
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
     await expect(page.locator('#keymanweb_title_bar')).toContainText('Devanagari (INSCRIPT)');
   });
 
@@ -206,8 +251,8 @@ test.describe('Full manual control example from the guide', function () {
     await keyboardchangePromise;
 
     // Verify Hebrew OSK showing
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
     await expect(page.locator('#keymanweb_title_bar')).toContainText('Hebrew');
   });
 });
@@ -226,8 +271,8 @@ test.describe('Manual control example from the guide', function () {
     await page.getByTestId('multilingual').click();
 
     // Verify no OSK showing
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).not.toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).not.toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).not.toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).not.toBeTruthy();
   });
 
   test('Shows Lao OSK after clicking button', async ({ page } : { page: Page }) => {
@@ -237,8 +282,8 @@ test.describe('Manual control example from the guide', function () {
     await page.getByTestId('multilingual').click();
 
     // Verify Lao OSK showing
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
     await expect(page.locator('#keymanweb_title_bar')).toContainText('Lao');
   });
 
@@ -251,8 +296,8 @@ test.describe('Manual control example from the guide', function () {
 
     // Verify Lao OSK showing
     await page.getByTestId('multilingual').click();
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).toBeTruthy();
     await expect(page.locator('#keymanweb_title_bar')).toContainText('Lao');
 
     // Click button again to hide OSK
@@ -260,8 +305,8 @@ test.describe('Manual control example from the guide', function () {
 
     // Verify Lao OSK not showing
     await page.getByTestId('multilingual').click();
-    await expect(await page.evaluate(() => keyman.osk.isEnabled())).not.toBeTruthy();
-    await expect(await page.evaluate(() => keyman.osk.isVisible())).not.toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isEnabled())).not.toBeTruthy();
+    await expect.poll(() => page.evaluate(() => keyman.osk.isVisible())).not.toBeTruthy();
 
   });
 });

@@ -8,7 +8,7 @@ import {
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 import { DeviceSpec } from 'keyman/common/web-utils';
-import { JSKeyboard, Keyboard } from "keyman/engine/keyboard";
+import { JSKeyboard, Keyboard, TextStore } from "keyman/engine/keyboard";
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import * as views from './viewsAnchorpoint.js';
@@ -41,6 +41,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
   private _ui: UIModule;
   hotkeyManager: HotkeyManager = new HotkeyManager();
   private readonly beepHandler: BeepHandler;
+  private globalOskEnabled: boolean = true;
 
 
   // Properties sometimes set up by a hosting page
@@ -75,15 +76,32 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.core.keyboardProcessor, this.contextManager);
 
-    // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
-    this.contextManager.on('textstorechange', (textStore) => {
-      const e = (textStore as AbstractElementTextStore<any>)?.getElement();
-      if(this.osk) {
-        (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
+    // Scrolls the document-body to ensure that a focused element remains visible after the OSK
+    // appears. Also save and restore osk state if element is in independent mode.
+    this.contextManager.on('textstorechange', async (textStore: TextStore) => {
+      const elem = (textStore as AbstractElementTextStore<any>)?.getElement();
+      if (this.osk) {
+        const activator = this.osk.activationModel as TwoStateActivator<HTMLElement>;
+        const previousElem = activator.activationTrigger;
+        if (previousElem && this.contextManager.isElementInIndependentMode(previousElem)) {
+          previousElem._kmwAttachment.oskEnabled = activator.enabled;
+        } else {
+          this.globalOskEnabled = activator.enabled;
+        }
+        if (elem) {
+          if (this.contextManager.isElementInIndependentMode(elem)) {
+            if (elem._kmwAttachment.oskEnabled !== undefined) {
+              activator.enabled = elem._kmwAttachment.oskEnabled;
+            }
+          } else {
+            activator.enabled = this.globalOskEnabled;
+          }
+        }
+        activator.activationTrigger = elem;
       }
 
       if(this.config.hostDevice.touchable && textStore) {
-        this.ensureElementVisibility(e);
+        this.ensureElementVisibility(elem);
       }
     });
   }
@@ -571,7 +589,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
    *  @param  {Object|string} e         element id or element
    *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123)
    **/
-  setActiveElement(e: string|HTMLElement, setFocus?: boolean): void {
+  public async setActiveElement(e: string|HTMLElement, setFocus?: boolean): Promise<void> {
     if(typeof e == 'string') {
       const id = e;
       e = document.getElementById(e);
@@ -585,7 +603,7 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
     if(!textStore) {
       throw new Error(`KMW is not attached to the specified element (id: ${e.id}).`);
     }
-    this.contextManager.setActiveTextStore(textStore, setFocus);
+    await this.contextManager.setActiveTextStore(textStore, setFocus);
   }
 
   /**
