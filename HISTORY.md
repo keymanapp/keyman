@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 20.0.3 alpha 2026-10-09
+
+* maint(ios): new iOS certificate (alpha-20.0) (#16771)
+
+## 20.0.2 alpha 2026-10-07
+
+* fix(mac): lower case 'k' for .pkg.download_info (#16744)
+
+## 20.0.1 alpha 2026-10-06
+
+* chore: add epics to HISTORY.md (#16729)
+* fix(android): refresh current keyboard when resuming main activity (#16645)
+* fix(mac): apply backspace to correct location (#16634)
+* docs: add acceptance tests from dokimion (#16693)
+* chore(developer): warn on v19 deprecated language features (#16710)
+* fix(developer): check `any()` and `index()` for invalid use of virtual keys (#16717)
+* fix(developer): emit compile error when unsupported statements encountered in stores (#16723)
+* chore(common): move CODE__SIZE declaration to common (#16724)
+* chore(common): remove `clearcontext`,`fix`,`switch`,`key` statements (#16726)
+* chore: move to 20.0-alpha (#16739)
+
 ## 19.0.305 beta 2026-10-09
 
 * docs: remove repeated clean up instructions (#16745)
