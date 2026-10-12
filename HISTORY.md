@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.306 beta 2026-10-12
+
+* fix(web): don't crash on gestures when banner disabled (#16788)
+* maint(common): add lint for unitTestEndpoints usage (#16769)
+
 ## 19.0.305 beta 2026-10-09
 
 * docs: remove repeated clean up instructions (#16745)
