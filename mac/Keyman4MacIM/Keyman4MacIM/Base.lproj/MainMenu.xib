@@ -23,7 +23,7 @@
                 <menuItem title="On-Screen Keyboard" tag="-2" id="s96-JI-YDh">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
-                <menuItem title="About..." tag="-1" id="kb2-ww-RS3" userLabel="About">
+                <menuItem title="Configuration..." tag="-1" id="P1b-lE-yFw" userLabel="Configuration">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
             </items>

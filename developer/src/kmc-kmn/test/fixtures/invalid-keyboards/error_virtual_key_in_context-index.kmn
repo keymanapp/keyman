@@ -1,0 +1,12 @@
+store(&NAME) 'ERROR_VirtualKeyInContext-index'
+store(&VERSION) '9.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(keys) [NCAPS SHIFT K_S]
+store(letter) 'F'
+
+c This should generate warning KM02074 ERROR_VirtualKeyInContext
+any(letter) index(keys, 1) + 'X' > 'x'

@@ -1,5 +1,5 @@
 ---
-title: What's new in Keyman Developer 19.0
+title: What's new in Keyman Developer 20.0
 ---
 
-Keyman Developer 19 has the following significant changes:
+Keyman Developer 20 has the following significant changes:
