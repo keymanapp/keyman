@@ -650,8 +650,6 @@ export class KmnCompilerMessages {
   static WARN_OldVersion                                      = SevWarn | 0x081;
   static Warn_OldVersion                                      = () => mc(this.WARN_OldVersion, `The keyboard file is an old version`);
 
-  static WARN_BitmapNotUsed                                   = SevWarn | 0x082;
-  static Warn_BitmapNotUsed                                   = () => mc(this.WARN_BitmapNotUsed, `The 'bitmaps' statement is obsolete and only the first bitmap referred to will be used, you should use 'bitmap'.`);
 
   static WARN_CustomLanguagesNotSupported                     = SevWarn | 0x083;
   static Warn_CustomLanguagesNotSupported                     = () => mc(this.WARN_CustomLanguagesNotSupported, `Languages over 0x1FF, 0x1F are not supported correctly by Windows. You should use no LANGUAGE line instead.`);
@@ -756,7 +754,7 @@ export class KmnCompilerMessages {
   static Warn_PlatformNotInTargets                            = () => mc(this.WARN_PlatformNotInTargets, `The specified platform is not a target platform`);
 
   static WARN_HeaderStatementIsDeprecated                     = SevWarn | 0x09D;
-  static Warn_HeaderStatementIsDeprecated                     = () => mc(this.WARN_HeaderStatementIsDeprecated, `Header statements are deprecated; use instead the equivalent system store`);
+  static Warn_HeaderStatementIsDeprecated                     = () => mc(this.WARN_HeaderStatementIsDeprecated, `Header statements are deprecated; use instead the equivalent system store. Header statements are scheduled to be removed in Keyman 20.`);
 
   static WARN_UseNotLastStatementInRule                       = SevWarn | 0x09E;
   static Warn_UseNotLastStatementInRule                       = () => mc(this.WARN_UseNotLastStatementInRule, `A rule with use() statements in the output should not have other content following the use() statements`);
@@ -784,7 +782,7 @@ export class KmnCompilerMessages {
   static Warn_MixingLeftAndRightModifiers                     = () => mc(this.WARN_MixingLeftAndRightModifiers, `Left and right modifiers should not both be used in the same rule`);
 
   static WARN_LanguageHeadersDeprecatedInKeyman10             = SevWarn | 0x0A5;
-  static Warn_LanguageHeadersDeprecatedInKeyman10             = () => mc(this.WARN_LanguageHeadersDeprecatedInKeyman10, `This language header has been deprecated in Keyman 10. Instead, add language metadata in the package file`);
+  static Warn_LanguageHeadersDeprecatedInKeyman10             = () => mc(this.WARN_LanguageHeadersDeprecatedInKeyman10, `This language header was deprecated in Keyman 10. Instead, add language metadata in the package file. This header is scheduled to be removed in Keyman 20.`);
 
   static HINT_NonUnicodeFile                                  = SevHint | 0x0A6;
   static Hint_NonUnicodeFile                                  = () => mc(this.HINT_NonUnicodeFile, `Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8`);
@@ -914,10 +912,22 @@ export class KmnCompilerMessages {
     square brackets, control characters, or Unicode non-characters.`
   );
 
-  static WARN_DeprecatedStatement                             = SevWarn | 0x0BB;
-  static Warn_DeprecatedStatement                             = (o: KmcmpLibMessageParameters) => mc(
-    this.WARN_DeprecatedStatement,
-    `The statement '${def(o.p?.[0])}' has been deprecated in Keyman ${def(o.p?.[1])}`,
+  static WARN_DeprecatedValueFormat                           = SevWarn | 0x0BC;
+  static Warn_DeprecatedValueFormat                           = () => mc(
+    this.WARN_DeprecatedValueFormat,
+    `The decimal (d###), octal (###), and hexadecimal (x###) value formats were deprecated in Keyman 19 and are scheduled to be removed in Keyman 20.`,
+  );
+
+  static WARN_DeprecatedCompileTarget                           = SevWarn | 0x0BD;
+  static Warn_DeprecatedCompileTarget                           = (o: KmcmpLibMessageParameters) => mc(
+    this.WARN_DeprecatedCompileTarget,
+    `Compile target '${def(o.p?.[0])}' was deprecated in Keyman 19 and will cause the line to always be ignored by kmc in Keyman 20.`,
+  );
+
+  static ERROR_StoreContainsUnsupportedStatement                = SevError | 0x0BE;
+  static Error_StoreContainsUnsupportedStatement                = () => mc(
+    this.ERROR_StoreContainsUnsupportedStatement,
+    `A store can contain only characters, deadkeys, virtual keys, and 'outs()' statements.`,
   );
 
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;

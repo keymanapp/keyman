@@ -7,7 +7,6 @@ import 'mocha';
 import { unitTestEndpoints } from '../src/util/extendedCompilerOptions.js';
 import { InfrastructureMessages } from '../src/messages/infrastructureMessages.js';
 import { CompilerError, CompilerMessageOverride, CompilerErrorSeverity } from '@keymanapp/developer-utils';
-import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 
 interface MessageTest {input: string, result: CompilerMessageOverride};
 interface InvalidMessageTest {input: string, code: number};
@@ -25,7 +24,6 @@ describe('commandOptionsMessageToCompilerOptionsMessage', function () {
 
     // Test hint and warn messages
     {input: 'KM05009:E', result: {code: InfrastructureMessages.HINT_FilenameHasDifferingCase, level: CompilerErrorSeverity.Error } },
-    {input: 'KM02082:E', result: {code: KmnCompilerMessages.WARN_BitmapNotUsed, level: CompilerErrorSeverity.Error } },
 
     // Test different allowable patterns
     {input: '5002', result: {code: InfrastructureMessages.INFO_BuildingFile, level: 'disable' } },

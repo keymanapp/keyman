@@ -358,6 +358,7 @@
             <Form>frmStartInstall</Form>
         </DCCReference>
         <DCCReference Include="util\Keyman.Configuration.Util.NetworkConnection.pas"/>
+        <DCCReference Include="util\Keyman.Configuration.System.StartupSettings.pas"/>
         <DCCReference Include="main\Keyman.Configuration.System.BaseKeyboard.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">

@@ -256,9 +256,9 @@
 //	0x09 = bkspace.-- we don't need to keep this separate though with UC_SENTINEL
 #define CODE_EXTENDED		0x0A
 //#define CODE_EXTENDEDEND	0x0B  deprecated
-#define CODE_SWITCH			0x0C
-#define CODE_KEY			0x0D
-#define	CODE_CLEARCONTEXT	0x0E		// deprecated in 19.0
+//#define CODE_SWITCH			0x0C    // unused, removed in 19.0
+//#define CODE_KEY			0x0D			// unused, removed in 19.0
+//#define	CODE_CLEARCONTEXT	0x0E	// unused, removed in 19.0
 #define CODE_CALL			0x0F
 // UC_SENTINEL_EXTENDEDEND  0x10
 #define CODE_CONTEXTEX		0x11

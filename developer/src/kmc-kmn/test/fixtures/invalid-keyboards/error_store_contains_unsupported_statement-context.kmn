@@ -1,0 +1,9 @@
+store(&NAME) 'error_store_contains_unsupported_statement-context'
+store(&VERSION) '9.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c ERROR_StoreContainsUnsupportedStatement
+store(bad-context) context
