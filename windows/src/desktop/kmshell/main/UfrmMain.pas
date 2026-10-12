@@ -99,10 +99,12 @@ type
     procedure TntFormClose(Sender: TObject; var Action: TCloseAction);
     procedure TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure AppEventsMessage(var Msg: tagMSG; var Handled: Boolean);
+    procedure AppEventsActivate(Sender: TObject);
 
   private
     FPageTag: Integer;
     FClosing: Boolean;
+    FRefreshOnActivate: Boolean;
     wm_keyman_refresh: Cardinal;
     LastRefreshToken: System.IntPtr;
 
@@ -133,6 +135,7 @@ type
     procedure Options_ResetHints;
     procedure Options_BaseKeyboard;   // I4169
     procedure Options_SettingsManager;
+    procedure Options_StartupSettings;
 
     procedure Hotkey_Set(params: TStringList);
     procedure Hotkey_Clear(params: TStringList);
@@ -174,6 +177,7 @@ uses
   Hints,
   HotkeyUtils,
   initprog,
+  Keyman.Configuration.System.BaseKeyboard,
   Keyman.Configuration.System.TIPMaintenance,
   Keyman.Configuration.UI.UfrmDiagnosticTests,
   KeymanOptionNames,
@@ -193,11 +197,13 @@ uses
   Keyman.Configuration.Util.NetworkConnection,
   Keyman.Configuration.System.UmodWebHttpServer,
   Keyman.Configuration.System.HttpServer.App.ConfigMain,
+  Keyman.Configuration.System.StartupSettings,
   Keyman.Configuration.UI.InstallFile,
   Keyman.Configuration.UI.UfrmSettingsManager,
   Keyman.Configuration.UI.UfrmStartInstall,
   RegistryKeys,
   SupportXMLRenderer,
+  UfrmBaseKeyboard,
   UfrmChangeHotkey,
   UfrmHTML,
   UfrmInstallKeyboardFromWeb,
@@ -262,6 +268,15 @@ begin
   if FPageTag > 0 then
     modWebHttpServer.SharedData.Remove(FPageTag);
   inherited;
+end;
+
+procedure TfrmMain.AppEventsActivate(Sender: TObject);
+begin
+ if FRefreshOnActivate then
+ begin
+   FRefreshOnActivate := False;
+   DoRefresh;
+ end;
 end;
 
 {-------------------------------------------------------------------------------
@@ -343,6 +358,7 @@ begin
   else if command = 'options_resethints' then Options_ResetHints
   else if command = 'options_basekeyboard' then Options_BaseKeyboard   // I4169
   else if command = 'options_settingsmanager' then Options_SettingsManager
+  else if command = 'options_startupsettings' then Options_StartupSettings
 
   else if command = 'language_underlyingkeyboard' then Options_BaseKeyboard
 
@@ -665,8 +681,11 @@ end;
 
 procedure TfrmMain.Options_BaseKeyboard;   // I4169
 begin
-  WaitForElevatedConfiguration(Handle, '-basekeyboard');
-  // Refresh will be triggered by elevated process
+  if ConfigureAndSetBaseKeyboard(Handle) then
+  begin
+    DoRefresh;
+  end;
+
 end;
 
 procedure TfrmMain.Options_SettingsManager;
@@ -686,17 +705,22 @@ begin
   end;
 end;
 
+procedure TfrmMain.Options_StartupSettings;
+begin
+  // We'll refresh the page when we return to Keyman Configuration
+  // after the Startup Apps settings page is popped up in case the
+  // user has changed the setting
+  FRefreshOnActivate := TUtilExecute.Shell(0, 'ms-settings:startupapps', '', '');
+end;
+
 procedure TfrmMain.Options_ClickCheck(params: TStringList);
 var
   option: IKeymanOption;
+  startupDisabled: Boolean;
 begin
   if GetOptionFromParams(params, option) and option.Enabled then
   begin
     option.Value := not option.Value;
-
-    if (option.ID = 'koDebugging') and option.Value then
-      ShowMessage(MsgFromId(SKDebuggingWarning));
-
     kmcom.Errors.Clear;
     DoApply;
     if kmcom.Errors.Count > 0 then
@@ -706,7 +730,19 @@ begin
       // be invalid
       ShowMessage(kmcom.Errors[0].Description);
       DoRefresh;
-    end;
+    end
+    else
+    begin
+      if (option.ID = 'koDebugging') and option.Value then
+        ShowMessage(MsgFromId(SKDebuggingWarning));
+      startupDisabled := (option.ID = 'koStartWithWindows') and option.Value and TWindowsStartupSettings.IsWindowsStartupDisabled;
+      DoRefresh;
+      if startupDisabled then
+        if MessageDlg(MsgFromId(S_StartupDisabledWarningOpenSettings),
+          mtWarning, [mbYes, mbNo], 0) = mrYes then
+          Options_StartupSettings;
+    end
+
   end
   else
     ShowMessage(params.Text);

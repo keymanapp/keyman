@@ -7,12 +7,12 @@
 
   Modified Date:    31 Dec 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          13 May 2005 - mcdurdin - Integrated into kmshell from tsysinfo
                     09 Jun 2005 - mcdurdin - Use MSXML_TLB not MSXML2_TLB
                     20 Jul 2008 - mcdurdin - I1523 - Report additional items in tsysinfo
@@ -143,7 +143,7 @@ procedure AddRegistry(node: IXMLDOMNode; key: HKEY; path: string);
       Inc(buf);
     end;
   end;
-  
+
 var
   i: Integer;
   str: TStringList;
@@ -415,7 +415,7 @@ begin
       IsDir := (f.Attr and faDirectory) = faDirectory;
 
       if IsDir and ((f.Name = '.') or (f.Name = '..')) then Continue;
-      
+
       if IsDir
         then subnode := xmlAddChild(node, 'Directory')
         else subnode := xmlAddChild(node, 'File');
@@ -427,9 +427,9 @@ begin
       begin
         xmlSetAttribute(subnode, 'Size', IntToStr(f.Size));
         ext := ExtractFileExt(f.Name);
-        if SameText(ext, '.kmx') or SameText(ext, '.kxx') then
+        if SameText(ext, '.kmx') then
           AddFileKMXInfo(subnode, s+f.Name)
-        else if SameText(ext, '.dll') or SameText(ext, '.exe') or SameText(ext, '.kma') then
+        else if SameText(ext, '.dll') or SameText(ext, '.exe') then
           AddFilePEInfo(subnode, s+f.Name)
         else if SameText(ext, '.ttf') or SameText(ext, '.otf') then
           AddFileTTFInfo(subnode, s+f.Name);

@@ -1,7 +1,7 @@
 import { EventEmitter } from "eventemitter3";
 import { LMLayer, WorkerFactory } from "@keymanapp/lexical-model-layer/web";
 import { Transcription, TextStoreLanguageProcessorInterface, SyntheticTextStore, ProcessorAction } from 'keyman/engine/keyboard';
-import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
+import { type LanguageProcessorEventMap, type ModelSpec, StateChangeEnum, ReadySuggestions, type LanguageProcessorSpec } from 'keyman/engine/interfaces';
 import { ContextWindow } from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
 import { LexicalModelTypes } from '@keymanapp/common-types';
@@ -11,7 +11,7 @@ import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 
 /* Is more like the model configuration engine */
-export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
+export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> implements LanguageProcessorSpec {
   private lmEngine: LMLayer;
   private currentModel?: ModelSpec;
   private configuration?: Configuration;

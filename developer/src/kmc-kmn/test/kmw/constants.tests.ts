@@ -26,7 +26,7 @@ import {assert} from 'chai';
 
 import { specialCharacters as keymanWebSpecialCharacters } from "./_imported_web_osk_specialCharacters.js";
 import { CSpecialText17, CSpecialText14, CSpecialText10, CSpecialText17ZWNJ } from "../../src/kmw-compiler/constants.js";
-import { builder } from "./_imported_layoutbuilder_constants.js";
+import { builderConstants } from "./_imported_layoutbuilder_constants.js";
 import { constants as coreLdmlConstants } from "@keymanapp/ldml-keyboard-constants";
 import { specialKeyCaps } from "@keymanapp/developer-utils";
 
@@ -38,7 +38,7 @@ describe('Key cap special text values from KeymanWeb', function() {
     //   developer/src/tike/xml/layoutbuilder/constants.js
     //   developer/src/common/web/utils/src/types/keyman-touch-layout/special-key-caps.ts
     //   web/src/engine/src/osk/specialCharacters.ts
-    assert.deepEqual(builder.specialCharacters, keymanWebSpecialCharacters);
+    assert.deepEqual(builderConstants.specialCharacters, keymanWebSpecialCharacters);
     assert.deepEqual(specialKeyCaps, keymanWebSpecialCharacters);
   });
 

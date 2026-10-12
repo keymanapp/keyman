@@ -130,6 +130,7 @@ core_files = files(
   'keyboard.cpp',
   'state.cpp',
   '../../common/cpp/utfcodec.cpp',
+  '../../common/cpp/kmx_file.cpp',
 )
 
 mock_files = files(

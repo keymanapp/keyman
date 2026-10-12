@@ -27,4 +27,4 @@ For more information on using Keyman Configuration, see:
 -   [Keyman Configuration - Options Tab](options)
 -   [Keyman Configuration - Hotkeys Tab](hotkeys)
 -   [Keyman Configuration - Support Tab](support)
--   [Keyman Configuration - Keep in Touch Tab](keep-in-touch)
+-   [Keyman Configuration - Update Tab](update)

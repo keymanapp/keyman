@@ -19,12 +19,12 @@ inherited frameWordlistEditor: TframeWordlistEditor
     TabOrder = 0
     TabPosition = tpBottom
     OnChanging = pagesChanging
-    ExplicitWidth = 635
+ExplicitWidth = 635
     ExplicitHeight = 299
     object pageDesign: TTabSheet
       Caption = 'Design'
       ImageIndex = -1
-      ExplicitLeft = 0
+ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 627
       ExplicitHeight = 273
@@ -42,8 +42,9 @@ inherited frameWordlistEditor: TframeWordlistEditor
         TabOrder = 0
         OnClick = gridWordlistClick
         OnDrawCell = gridWordlistDrawCell
+        OnSelectCell = gridWordlistSelectCell
         OnSetEditText = gridWordlistSetEditText
-        ExplicitWidth = 627
+ExplicitWidth = 627
         ExplicitHeight = 232
       end
       object panGridControls: TPanel
@@ -53,7 +54,7 @@ inherited frameWordlistEditor: TframeWordlistEditor
         Height = 41
         Align = alBottom
         TabOrder = 1
-        ExplicitTop = 232
+ExplicitTop = 232
         ExplicitWidth = 627
         object cmdDeleteRow: TButton
           Left = 0
@@ -78,7 +79,7 @@ inherited frameWordlistEditor: TframeWordlistEditor
     object pageCode: TTabSheet
       Caption = 'Code'
       ImageIndex = -1
-      ExplicitLeft = 0
+ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0
