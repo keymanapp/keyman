@@ -5,7 +5,6 @@
       "rootDir": ".",
       "rootDirs": ["./", "../src/"],
       "outDir": "../build/test",
-      "baseUrl": ".",
       "strictNullChecks": true,
       "paths": {
         // "@keymanapp/keyman-version": ["../../../common/web/keyman-version/keyman-version.mts"],
