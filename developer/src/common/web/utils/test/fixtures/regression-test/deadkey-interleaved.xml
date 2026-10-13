@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE regressiontest SYSTEM "http://www.tavultesoft.com/keymandev/regtest.dtd">
+<regressiontest>
+  <info>
+    <version>6.0</version>
+    <systemkeyboard>00000409</systemkeyboard>
+    <keyboard>C:\keyman\keyboards\keyboards\release\k\krung\build\krung.kmx</keyboard>
+    <beginmode>Unicode</beginmode>
+  </info>
+  <events>
+    <event>
+       <key><shiftstate></shiftstate><vkey>K_Q</vkey></key>
+       <postcontext><text>ប៉ាគ់</text><deadkey>middle_q</deadkey><text>foo</text></postcontext>
+    </event>
+  </events></regressiontest>

@@ -317,6 +317,10 @@ export enum CompilerErrorNamespace {
    * kmc-convert 0xC000…0xCFFF
    */
   Converter = 0xC000,
+  /**
+   * kmc-test 0xD000…0xDFFF
+   */
+  Tester = 0xD000,
 };
 
 type CompilerErrorSeverityOverride = CompilerErrorSeverity | 'disable';

@@ -21,6 +21,7 @@ export type KeymanXMLType =
   | 'kps'                 // <Package>
   | 'kvks'                // <visualkeyboard>
   | 'kpj'                 // <KeymanDeveloperProject>
+  | 'regressiontest'      // <regressiontest>
   ;
 
 /** Bag of options, maximally one for each KeymanXMLType */
@@ -93,6 +94,28 @@ const PARSER_OPTIONS: KeymanXMLParserOptionsBag = {
       }
     },
     trimValues: false, // preserve spaces
+  },
+  'regressiontest': {
+    ignorePiTags: true,
+    textNodeName: '_',
+    htmlEntities: true,
+    ignoreAttributes: false, // We'd like attributes, please
+    attributeNamePrefix: '$', // causes remapping into $: { … } objects
+    numberParseOptions: {
+      skipLike: /(?:)/, // parse numbers as strings
+      hex: null,
+      leadingZeros: null,
+      eNotation: null,
+    },
+    preserveOrder: true,     // Gives us a 'special' format
+    trimValues: false, // preserve spaces, but:
+    tagValueProcessor: (tagName: string, tagValue: string, jPath: JPathOrMatcher, hasAttributes: boolean, isLeafNode: boolean) : string | undefined => {
+      if (!isLeafNode) {
+        return tagValue?.trim(); // trimmed value
+      } else {
+        return null;  // no change to leaf nodes
+      }
+    },
   },
 };
 
