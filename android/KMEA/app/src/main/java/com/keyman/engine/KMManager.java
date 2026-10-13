@@ -271,10 +271,6 @@ public final class KMManager {
   // API added Keyman 18.0, updated in 19.0
   private static int inAppLastInputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL;
   private static int systemLastInputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL;
-  private static SuggestionType inAppLastSuggestionType = SuggestionType.fromInt(KMDefault_Suggestion);
-  private static SuggestionType systemLastSuggestionType = SuggestionType.fromInt(KMDefault_Suggestion);
-  private static String inAppLastSuggestionTypeLangCode = "";
-  private static String systemLastSuggestionTypeLangCode = "";
 
   // Determine how system keyboard handles ENTER key
   public static EnterModeType enterMode = EnterModeType.DEFAULT;
@@ -1524,63 +1520,6 @@ public final class KMManager {
   }
 
   /**
-   * Determines the most-featured suggestion mode supported by KeymanEngine for
-   * the specified `InputType` and active lexical model.  This will auto-disable
-   * predictive-text for password fields and selectively disable autocorrect for
-   * fields where it would likely mangle the user's intent (like an email or URL
-   * field).
-   * @param inputType
-   * @return
-   */
-  public static SuggestionType defaultSuggestionModeForInputType(int inputType) {
-    if(KMManager.currentLexicalModel == null || (inputType & InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS) != 0) {
-      return SuggestionType.SUGGESTIONS_DISABLED;
-    }
-
-    int inputClass = inputType & InputType.TYPE_MASK_CLASS;
-    int inputVariation = inputType & InputType.TYPE_MASK_VARIATION;
-
-    // Do not make suggestions for numeric, date-times, or phone numbers.
-    // (They're the only other types, currently.)
-    if(inputClass != InputType.TYPE_CLASS_TEXT) {
-      return SuggestionType.SUGGESTIONS_DISABLED;
-    }
-
-    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-
-    SuggestionType selectedType = SuggestionType.fromInt(
-      prefs.getInt(
-        KMManager.getLanguageAutoCorrectionPreferenceKey(
-          KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)
-        ),
-        KMManager.KMDefault_Suggestion
-      )
-    );
-
-    switch(inputVariation) {
-      case InputType.TYPE_TEXT_VARIATION_PASSWORD:
-      case InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD:
-        return SuggestionType.SUGGESTIONS_DISABLED;
-      case InputType.TYPE_TEXT_VARIATION_FILTER:
-      case InputType.TYPE_TEXT_VARIATION_NORMAL:
-      case InputType.TYPE_TEXT_VARIATION_SHORT_MESSAGE:
-      case InputType.TYPE_TEXT_VARIATION_LONG_MESSAGE:
-      case InputType.TYPE_TEXT_VARIATION_EMAIL_SUBJECT:
-      case InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT:
-        return selectedType;
-
-      // TODO:  return false for the following case once epic/user-dict lands!
-      case InputType.TYPE_TEXT_VARIATION_PERSON_NAME:
-      default:
-        if(selectedType == SuggestionType.PREDICTIONS_WITH_AUTO_CORRECT) {
-          return SuggestionType.PREDICTIONS_WITH_CORRECTIONS;
-        } else {
-          return selectedType;
-        }
-    }
-  }
-
-  /**
    * Sets PredictionsSuspended true if the given InputType field for the keyboard is a hidden password text field
    * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
    * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
@@ -1598,8 +1537,7 @@ public final class KMManager {
       systemLastInputType = inputType;
     }
 
-    SuggestionType mode = defaultSuggestionModeForInputType(inputType);
-    setSuggestionType(keyboard, mode);
+    refreshSuggestionType(keyboard);
   }
 
   /**
@@ -1611,15 +1549,19 @@ public final class KMManager {
    */
   @Deprecated public static boolean getPredictionsSuspended(KeyboardType keyboard) {
     int lastInputType;
+    String languageID = "";
+
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
       lastInputType = inAppLastInputType;
+      languageID = InAppKeyboard.getLanguageID();
     } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       lastInputType = systemLastInputType;
+      languageID = SystemKeyboard.getLanguageID();
     } else {
       return true;
     }
 
-    return defaultSuggestionModeForInputType(lastInputType) == SuggestionType.SUGGESTIONS_DISABLED;
+    return suggestionModeForInputType(lastInputType, languageID) == SuggestionType.SUGGESTIONS_DISABLED;
   }
 
   /**
@@ -1732,13 +1674,15 @@ public final class KMManager {
     File modelFile = new File(getLexicalModelsDir(), modelFilename);
     String url = getLexicalModelsUrl() + modelFilename;
 
-    // Disable sugestions if lexical-model file doesn't exist
+    currentLexicalModel = lexicalModelInfo;
+
+    // Disable suggestions if lexical-model file doesn't exist
     if (!modelFile.exists()) {
       modelFileExists = false;
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange()) {
-        setSuggestionType(KeyboardType.KEYBOARD_TYPE_INAPP, SuggestionType.SUGGESTIONS_DISABLED);
+        refreshSuggestionType(KeyboardType.KEYBOARD_TYPE_INAPP);
       } else if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange()) {
-        setSuggestionType(KeyboardType.KEYBOARD_TYPE_SYSTEM, SuggestionType.SUGGESTIONS_DISABLED);
+        refreshSuggestionType(KeyboardType.KEYBOARD_TYPE_SYSTEM);
       }
       KMLog.LogError(TAG, modelFile.getAbsolutePath() + " does not exist");
     }
@@ -1761,17 +1705,14 @@ public final class KMManager {
     model = model.replaceAll("\'", "\\\\'"); // Double-escaped-backslash b/c regex.
     model = model.replaceAll("\"", "'");
 
-    currentLexicalModel = lexicalModelInfo;
     // *** refactor to use common settings-detection with the setBannerOptions route. ***
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      inAppLastSuggestionType = null;
-      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, defaultSuggestionModeForInputType(inAppLastInputType).toInt()));
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, suggestionModeForInputType(inAppLastInputType, languageID).toInt()));
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      systemLastSuggestionType = null;
-      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, defaultSuggestionModeForInputType(systemLastInputType).toInt()));
+      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %d)", model, suggestionModeForInputType(systemLastInputType, languageID).toInt()));
     }
     return true;
   }
@@ -1810,9 +1751,7 @@ public final class KMManager {
    * @param keyboard
    */
   /* package-private */ static void refreshSuggestionType(KeyboardType keyboard) {
-    SuggestionType lastSuggestionType;
     int lastInputType;
-    String lastLangCode;
 
     String currentLangCode = "";
     if(currentLexicalModel != null) {
@@ -1820,76 +1759,81 @@ public final class KMManager {
     }
 
     if(keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      lastSuggestionType = inAppLastSuggestionType;
       lastInputType = inAppLastInputType;
-      lastLangCode = inAppLastSuggestionTypeLangCode;
-
-      // Update the most recent lang code in case of future model swaps
-      inAppLastSuggestionTypeLangCode = currentLangCode;
     } else if(keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      lastSuggestionType = systemLastSuggestionType;
       lastInputType = systemLastInputType;
-      lastLangCode = systemLastSuggestionTypeLangCode;
-
-      // Update the most recent lang code in case of future model swaps
-      systemLastSuggestionTypeLangCode = currentLangCode;
     } else {
       return;
     }
 
     // In case of language-code swap or a previously-unset suggestion type,
     // automatically enact default behavior.
-    if(lastSuggestionType == null || lastLangCode != currentLangCode) {
-      lastSuggestionType = defaultSuggestionModeForInputType(lastInputType);
-    }
-    setSuggestionType(keyboard, lastSuggestionType);
-  }
+    SuggestionType suggestionType = suggestionModeForInputType(lastInputType, currentLangCode);
 
-  /**
-   * Directly sets the suggestion mode settings to utilize for predictive text, up to and
-   * including disabling it entirely.
-   * @param keyboard
-   * @param suggestionType
-   */
-  public static void setSuggestionType(KeyboardType keyboard, SuggestionType suggestionType) {
     String url = KMString.format("setBannerOptions(%s)", suggestionType.toInt());
-    String currentModelLangCode = "";
-    if(currentLexicalModel != null) {
-      currentModelLangCode = currentLexicalModel.get(KMKey_LanguageID);
-    }
     if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
-      inAppLastInputType = ((KMTextView) KMTextView.activeView).getInputType();
-      inAppLastSuggestionType = suggestionType;
-      inAppLastSuggestionTypeLangCode = currentModelLangCode;
       InAppKeyboard.loadJavascript(url);
     }
 
     if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
-      // Stop-gap:  as we don't currently take an inputType for the system keyboard,
-      // use this to track if predictive-text could have been enabled (per user settings)
-      // but was instead disabled.
-      SuggestionType pureTextDefaultSuggestionType = defaultSuggestionModeForInputType(InputType.TYPE_CLASS_TEXT);
-      if(
-        // if there is a model
-        currentModelLangCode != ""
-        // if predictive text would normally be enabled
-        && pureTextDefaultSuggestionType != SuggestionType.SUGGESTIONS_DISABLED
-        // if the user's preference would normally be more permissive
-        && suggestionType.toInt() < pureTextDefaultSuggestionType.toInt()
-      ) {
-        if(suggestionType == SuggestionType.SUGGESTIONS_DISABLED) {
-          systemLastInputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
-        } else if(suggestionType == SuggestionType.PREDICTIONS_WITH_CORRECTIONS) {
-          systemLastInputType = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
-        } else {
-          systemLastInputType = InputType.TYPE_CLASS_TEXT;
-        }
-      } else {
-        systemLastInputType = InputType.TYPE_CLASS_TEXT;
-      }
-      systemLastSuggestionType = suggestionType;
-      systemLastSuggestionTypeLangCode = currentModelLangCode;
       SystemKeyboard.loadJavascript(url);
+    }
+  }
+
+  /**
+   * Determines the most-featured suggestion mode supported by KeymanEngine for
+   * the specified `InputType` and active lexical model.  This will auto-disable
+   * predictive-text for password fields and selectively disable autocorrect for
+   * fields where it would likely mangle the user's intent (like an email or URL
+   * field).
+   * @param inputType
+   * @return
+   */
+  private static SuggestionType suggestionModeForInputType(int inputType, String langCode) {
+    if(KMManager.currentLexicalModel == null || (inputType & InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS) != 0) {
+      return SuggestionType.SUGGESTIONS_DISABLED;
+    }
+
+    int inputClass = inputType & InputType.TYPE_MASK_CLASS;
+    int inputVariation = inputType & InputType.TYPE_MASK_VARIATION;
+
+    // Do not make suggestions for numeric, date-times, or phone numbers.
+    // (They're the only other types, currently.)
+    if(inputClass != InputType.TYPE_CLASS_TEXT) {
+      return SuggestionType.SUGGESTIONS_DISABLED;
+    }
+
+    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+
+    SuggestionType selectedType = SuggestionType.fromInt(
+      prefs.getInt(
+        KMManager.getLanguageAutoCorrectionPreferenceKey(
+          KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)
+        ),
+        KMManager.KMDefault_Suggestion
+      )
+    );
+
+    switch(inputVariation) {
+      case InputType.TYPE_TEXT_VARIATION_PASSWORD:
+      case InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD:
+        return SuggestionType.SUGGESTIONS_DISABLED;
+      case InputType.TYPE_TEXT_VARIATION_FILTER:
+      case InputType.TYPE_TEXT_VARIATION_NORMAL:
+      case InputType.TYPE_TEXT_VARIATION_SHORT_MESSAGE:
+      case InputType.TYPE_TEXT_VARIATION_LONG_MESSAGE:
+      case InputType.TYPE_TEXT_VARIATION_EMAIL_SUBJECT:
+      case InputType.TYPE_TEXT_VARIATION_WEB_EDIT_TEXT:
+        return selectedType;
+
+      // TODO:  return false for the following case once epic/user-dict lands!
+      case InputType.TYPE_TEXT_VARIATION_PERSON_NAME:
+      default:
+        if(selectedType == SuggestionType.PREDICTIONS_WITH_AUTO_CORRECT) {
+          return SuggestionType.PREDICTIONS_WITH_CORRECTIONS;
+        } else {
+          return selectedType;
+        }
     }
   }
 
@@ -1925,11 +1869,20 @@ public final class KMManager {
       return false;
     }
 
-    SuggestionType predictConfig = mayPredict
-      ? defaultSuggestionModeForInputType(lastInputType)
-      : SuggestionType.SUGGESTIONS_DISABLED;
-    setSuggestionType(keyboard, predictConfig);
+    int inputType = mayPredict ? lastInputType : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+    setInputType(keyboard, inputType);
     return true;
+  }
+
+  public static void setInputType(KeyboardType keyboard, int inputType) {
+    if(keyboard == KeyboardType.KEYBOARD_TYPE_INAPP) {
+      inAppLastInputType = inputType;
+    } else if(keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+      systemLastInputType = inputType;
+    } else {
+      return;
+    }
+    refreshSuggestionType(keyboard);
   }
 
   /**

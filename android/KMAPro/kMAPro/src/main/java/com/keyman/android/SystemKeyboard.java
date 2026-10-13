@@ -172,7 +172,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     Context appContext = getApplicationContext();
     // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
     inputType = attribute.inputType;
-    KMManager.setSuggestionType(KeyboardType.KEYBOARD_TYPE_SYSTEM, KMManager.defaultSuggestionModeForInputType(inputType));
+    KMManager.setInputType(KeyboardType.KEYBOARD_TYPE_SYSTEM, inputType);
     BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM, isDarkMode());
 
     // Determine special handling for ENTER key
