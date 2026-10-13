@@ -254,6 +254,9 @@ The KMManager is the core class which provides most of the methods and constants
 [`setHTMLBanner()`](setHTMLBanner)
 : sets the contents of an HTML banner for Keyman Engine to display when suggestions aren't available
 
+[`setInputType()`](setInputType)
+: informs the engine about what type of input text is expected, allowing it to configure predictive-text accordingly
+
 [`setKeyboard()`](setKeyboard)
 : sets the keyboard to be used
 
