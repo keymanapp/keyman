@@ -17,6 +17,13 @@ private let keyboardChangeHelpText = NSLocalizedString("keyboard-help-change", b
 private let subKeyColor = Colors.popupKey
 private let subKeyColorHighlighted = Colors.popupKeyHighlighted
 
+enum SuggestionType: Int {
+  case disabled = 0
+  case onlyPredictions = 1
+  case predictAndCorrect = 2
+  case autocorrect = 3
+}
+
 // We subclass for one critical reason - by default, WebViews may become first responder...
 // a detail that is really, REALLY bad for a WebView in a keyboard.
 //
@@ -67,6 +74,9 @@ class KeymanWebViewController: UIViewController {
 
   private var currentText: String = ""
   private var currentCursorRange: NSRange? = nil
+  
+  private var languageCode: String = ""
+  private var _suggestionType: SuggestionType = .disabled
 
   init(storage: Storage) {
     self.storage = storage
@@ -78,6 +88,20 @@ class KeymanWebViewController: UIViewController {
 
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  var suggestionType: SuggestionType {
+    get {
+      return self._suggestionType
+    }
+    
+    set(value) {
+      self._suggestionType = value
+      
+      if activeModel {
+        self.setSuggestionMode(languageID: languageCode)
+      }
+    }
   }
 
   @objc func fixLayout() {
@@ -304,6 +328,8 @@ extension KeymanWebViewController {
       "KF": loadingURL.absoluteString
     ]
     
+    self.languageCode = keyboard.languageID
+    
     if let packageID = keyboard.packageID {
       stub["KP"] = packageID
     }
@@ -427,21 +453,30 @@ extension KeymanWebViewController {
 
     if lexicalModel.languageID == Manager.shared.currentKeyboardID?.languageID {
       // We're registering a lexical model for the now-current keyboard.
-      // Enact any appropriate language-modeling settings!
+      // Check its settings and adjust the pred-text engine accordingly.
+      setSuggestionMode(languageID: lexicalModel.languageID)
+    } // else - We're registering a model in the background - don't change settings.
+    
+    webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)
+  }
+  
+  private func setSuggestionMode(languageID: String) {
+    // Enact any appropriate language-modeling settings!
+    let userDefaults = Storage.active.userDefaults
+    
+    self.activeModel = userDefaults.predictSettingForLanguage(languageID: languageID)
+    let suggestionType = self.suggestionType
 
-      let userDefaults = Storage.active.userDefaults
+    let predict = (suggestionType.rawValue > SuggestionType.disabled.rawValue)
+      ? userDefaults.predictSettingForLanguage(languageID: languageID) : false
+    let correct = (suggestionType.rawValue > SuggestionType.onlyPredictions.rawValue)
+      ? userDefaults.correctSettingForLanguage(languageID: languageID) : false
+    let autocorrect = (suggestionType.rawValue > SuggestionType.predictAndCorrect.rawValue)
+      ? userDefaults.autocorrectSettingForLanguage(languageID: languageID) : false
 
-      let predict = userDefaults.predictSettingForLanguage(languageID: lexicalModel.languageID)
-      let correct = userDefaults.correctSettingForLanguage(languageID: lexicalModel.languageID)
-      let autocorrect = userDefaults.autocorrectSettingForLanguage(languageID: lexicalModel.languageID)
-
-      // Pass these off to KMW!
-      // We do these first so that they're automatically set for the to-be-registered model in advance.
-      webView!.evaluateJavaScript("enableSuggestions(\(stubString), \(predict), \(correct), \(autocorrect))")
-      self.activeModel = predict
-    } else {  // We're registering a model in the background - don't change settings.
-      webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)
-    }
+    // Pass these off to KMW!
+    // We do these first so that they're automatically set for the to-be-registered model in advance.
+    webView!.evaluateJavaScript("setSuggestionMode(\(predict), \(correct), \(autocorrect))")
   }
 
   func setBannerImage(to path: String) {
