@@ -418,4 +418,20 @@ describe('KmnCompilerMessages', function () {
       await testForMessage(this, ['invalid-keyboards', `error_store_contains_unsupported_statement-${statement}.kmn`], KmnCompilerMessages.ERROR_StoreContainsUnsupportedStatement);
     })
   );
+
+  // WARN_CallUsedOnUnsupportedPlatform
+
+  ['macosx', 'linux', 'desktop', 'any'].forEach(platform =>
+    it(`should generate WARN_CallUsedOnUnsupportedPlatform if the file contains call() for an unsupported platform '${platform}'`, async function() {
+      await testForMessage(this, ['keyboards', `warn_call_used_on_unsupported_platform-${platform}.kmn`], KmnCompilerMessages.WARN_CallUsedOnUnsupportedPlatform);
+    })
+  );
+
+  ['windows','web','androidphone','mobile','tablet'].forEach(platform =>
+    it(`should not generate WARN_CallUsedOnUnsupportedPlatform if the file contains call() for supported platform '${platform}'`, async function() {
+      await testForMessage(this, ['keyboards', `warn_call_used_on_unsupported_platform-${platform}.kmn`]);
+    })
+  );
+
+
 });
