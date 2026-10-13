@@ -225,6 +225,7 @@ class Storage {
 // MARK: - Copying
 extension Storage {
   func copyKMWFiles(from bundle: Bundle) throws {
+    // TODO: these should be in a constant array, not enumerated individually here (see also Android)
     try Storage.copy(from: bundle,
                      resourceName: Resources.kmwFilename,
                      dstDir: baseDir,
@@ -235,6 +236,18 @@ extension Storage {
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
                      resourceName: "keymanweb-webview.js",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
+    try Storage.copy(from: bundle,
+                     resourceName: "keymanweb-webview.js.map",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
+    try Storage.copy(from: bundle,
+                     resourceName: "worker-thread.js",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
+    try Storage.copy(from: bundle,
+                     resourceName: "worker-thread.js.map",
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,

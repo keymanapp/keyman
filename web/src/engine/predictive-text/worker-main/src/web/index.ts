@@ -1,7 +1,7 @@
-export { LMLayer } from '../lmlayer.js';
-export { WebWorker } from './web-worker.js';
-export { SourcemappedWorker } from './sourcemappedWorker.js';
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 
-export interface WorkerFactory {
-  constructInstance(): Worker
-}
+export { LMLayer } from '../lmlayer.js';
+export { type WorkerFactory } from '../worker-factory.js';
+export { WebPredictiveTextWorkerFactory } from './web-predictive-text-worker-factory.js';
