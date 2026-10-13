@@ -12,7 +12,7 @@ describe("Activators", () => {
 
       assert.isTrue(activator.enabled);
       assert.isTrue(activator.conditionsMet);
-      assert.isTrue(activator.activate);
+      assert.isTrue(activator.canActivate);
     });
 
     it("set to 'off'", () => {
@@ -21,19 +21,19 @@ describe("Activators", () => {
 
       assert.isFalse(activator.enabled);
       assert.isTrue(activator.conditionsMet);
-      assert.isFalse(activator.activate);
+      assert.isFalse(activator.canActivate);
     });
 
     it('activate and enabled act as aliases', () => {
       const activator = new SimpleActivator();
 
       assert.isTrue(activator.enabled);
-      assert.isTrue(activator.activate);
+      assert.isTrue(activator.canActivate);
 
       activator.enabled = false;
-      assert.isFalse(activator.activate);
+      assert.isFalse(activator.canActivate);
 
-      activator.activate = true;
+      activator.canActivate = true;
       assert.isTrue(activator.enabled);
     });
 
@@ -86,7 +86,7 @@ describe("Activators", () => {
 
       assert.isTrue(activator.enabled);
       assert.isFalse(activator.conditionsMet);
-      assert.isFalse(activator.activate);
+      assert.isFalse(activator.canActivate);
       assert.isNotOk(activator.activationTrigger);
     });
 
@@ -101,7 +101,7 @@ describe("Activators", () => {
 
       assert.isTrue(activator.enabled);
       assert.isTrue(activator.conditionsMet);
-      assert.isTrue(activator.activate);
+      assert.isTrue(activator.canActivate);
       assert.isOk(activator.activationTrigger);
 
       assert.isTrue(activateStub.called);

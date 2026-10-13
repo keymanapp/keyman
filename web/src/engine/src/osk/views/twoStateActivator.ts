@@ -11,13 +11,13 @@ export class TwoStateActivator<Type> extends Activator<TriggerEventMap<Type>> {
   private _enabled: boolean = true;
   private actValue: Type = null;
 
-  get activate(): boolean {
+  get canActivate(): boolean {
     return this._enabled && !!this.actValue;
   }
 
   private checkState(oldValue: boolean) {
-    if(this.activate != oldValue) {
-      this.emit('activate', this.activate);
+    if(this.canActivate != oldValue) {
+      this.emit('activate', this.canActivate);
     }
   }
 
@@ -26,7 +26,7 @@ export class TwoStateActivator<Type> extends Activator<TriggerEventMap<Type>> {
   }
 
   set enabled(flag: boolean) {
-    const oldState = this.activate;
+    const oldState = this.canActivate;
     this._enabled = flag; // may change this.value!
 
     this.checkState(oldState);
@@ -37,7 +37,7 @@ export class TwoStateActivator<Type> extends Activator<TriggerEventMap<Type>> {
   }
 
   set activationTrigger(value: Type) {
-    const oldState = this.activate;
+    const oldState = this.canActivate;
     const oldValue = this.actValue;
     this.actValue = value; // may change this.value!
 
