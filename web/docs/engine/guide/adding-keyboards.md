@@ -40,6 +40,7 @@ await keyman.addKeyboards('@he')
 The `@` prefix indicates the use of the BCP 47 language code, which in this case corresponds with
 Hebrew.
 
+<!-- #16018
 To add all keyboards for a language at once, `$` can be appended to the language
 name or language code:
 
@@ -48,6 +49,7 @@ await keyman.addKeyboards('@fr$');
 // or
 await keyman.addKeyboardsForLanguage('French$');
 ```
+-->
 
 ## Directly linking a local copy
 

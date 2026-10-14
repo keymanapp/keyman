@@ -54,8 +54,10 @@ The string format is one of the following:
 The keyboard catalogue is online at
 [https://keyman.com/developer/keymanweb/keyboards](https://keyman.com/developer/keymanweb/keyboards).
 
+<!-- #16018
 If the BCP47 language code is suffixed with `$` (e.g. `@fr$`) and no specific keyboard is
 requested, all keyboards for that language code will be loaded.
+-->
 
 ### Using an `object`
 
