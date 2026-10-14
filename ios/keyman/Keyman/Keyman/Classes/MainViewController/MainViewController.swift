@@ -770,8 +770,13 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                style: .default, handler: nil)
     alert.addAction(clear)
     alert.addAction(cancel)
-    alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[6]
-    present(alert, animated: true, completion: nil)
+    
+    if UIDevice.current.userInterfaceIdiom == .phone {
+      present(alert, animated: false, completion: nil)
+    } else {
+      alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[6]
+      present(alert, animated: true, completion: nil)
+    }
   }
 
   func showActivityIndicator() {
