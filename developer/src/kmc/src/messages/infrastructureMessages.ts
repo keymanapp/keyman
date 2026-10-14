@@ -6,7 +6,7 @@ import { CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerM
 const Namespace = CompilerErrorNamespace.Infrastructure;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
 const SevHint = CompilerErrorSeverity.Hint | Namespace;
-// const SevWarn = CompilerErrorSeverity.Warn | Namespace;
+const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
@@ -43,9 +43,11 @@ export class InfrastructureMessages {
 
   // 0x0008: ERROR_InvalidProjectFile moved to DeveloperUtilsMessages
 
-  static HINT_FilenameHasDifferingCase = SevHint | 0x0009;
-  static Hint_FilenameHasDifferingCase = (o:{reference:string, filename:string}) => m(this.HINT_FilenameHasDifferingCase,
-    `File on disk '${def(o.filename)}' does not match case of '${def(o.reference)}' in source file; this is an error on platforms with case-sensitive filesystems.`);
+  static WARN_FilenameHasDifferingCase = SevWarn | 0x0009;
+  static Warn_FilenameHasDifferingCase = (o:{reference:string, filename:string}) => m(
+    this.WARN_FilenameHasDifferingCase,
+    `File on disk '${def(o.filename)}' does not match case of '${def(o.reference)}' in source file; this is an error on platforms with case-sensitive filesystems.`,
+  );
 
   static ERROR_UnknownFileFormat = SevError | 0x000A;
   static Error_UnknownFileFormat = (o:{format:string}) => m(this.ERROR_UnknownFileFormat,
