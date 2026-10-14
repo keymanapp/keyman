@@ -1,4 +1,6 @@
 store(&NAME) 'warn_call_used_on_unsupported_platform-macosx'
+
+c warning SHOULD be generated for macosx
 store(&TARGETS) 'macosx'
 store(&VERSION) '10.0'
 

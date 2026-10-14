@@ -1,4 +1,7 @@
 store(&NAME) 'warn_call_used_on_unsupported_platform-tablet'
+
+
+c warning should NOT be generated for tablet
 store(&TARGETS) 'tablet'
 store(&VERSION) '10.0'
 

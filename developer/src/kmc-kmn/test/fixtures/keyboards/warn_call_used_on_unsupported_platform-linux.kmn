@@ -1,4 +1,6 @@
 store(&NAME) 'warn_call_used_on_unsupported_platform-linux'
+
+c warning SHOULD be generated for linux
 store(&TARGETS) 'linux'
 store(&VERSION) '10.0'
 

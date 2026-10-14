@@ -1,4 +1,6 @@
 store(&NAME) 'warn_call_used_on_unsupported_platform-any'
+
+c warning SHOULD be generated for any (due to inclusion of macosx, linus)
 store(&TARGETS) 'any'
 store(&VERSION) '10.0'
 

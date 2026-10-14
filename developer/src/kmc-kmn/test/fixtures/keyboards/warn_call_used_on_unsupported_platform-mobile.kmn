@@ -1,4 +1,6 @@
 store(&NAME) 'warn_call_used_on_unsupported_platform-mobile'
+
+c warning should NOT be generated for mobile
 store(&TARGETS) 'mobile'
 store(&VERSION) '10.0'
 
