@@ -316,56 +316,72 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                         highlightedImage: UIImage(named: "IconMoreSelected")!,
                                         imageScale: imageScaleF,
                                         action: #selector(self.showDropDownMenu),
-                                        orientation: orientation)
+                                        orientation: orientation,
+                                        forDropdown: false
+    )
     moreButton.title = NSLocalizedString("menu-more", comment: "")
 
     let infoButton = createNavBarButton(with: UIImage(named: "IconInfo")!,
                                         highlightedImage: UIImage(named: "IconInfoSelected")!,
                                         imageScale: imageScaleF,
                                         action: #selector(self.infoButtonClick),
-                                        orientation: orientation)
+                                        orientation: orientation,
+                                        forDropdown: UIDevice.current.userInterfaceIdiom == .phone
+    )
     infoButton.title = NSLocalizedString("menu-help", comment: "")
 
     let getStartedButton = createNavBarButton(with: UIImage(named: "IconNotepad")!,
                                               highlightedImage: UIImage(named: "IconNotepadSelected")!,
                                               imageScale: imageScaleF,
                                               action: #selector(self.showGetStartedView),
-                                              orientation: orientation)
+                                              orientation: orientation,
+                                              forDropdown: UIDevice.current.userInterfaceIdiom == .phone
+    )
     getStartedButton.title = NSLocalizedString("menu-get-started", comment: "")
 
     let trashButton = createNavBarButton(with: UIImage(named: "IconTrash")!,
                                          highlightedImage: UIImage(named: "IconTrashSelected")!,
                                          imageScale: imageScaleF,
                                          action: #selector(self.trashButtonClick),
-                                         orientation: orientation)
+                                         orientation: orientation,
+                                         forDropdown: UIDevice.current.userInterfaceIdiom == .phone
+    )
     trashButton.title = NSLocalizedString("menu-clear-text", comment: "")
 
     let textSizeButton = createNavBarButton(with: UIImage(named: "IconTextSize")!,
                                             highlightedImage: UIImage(named: "IconTextSizeSelected")!,
                                             imageScale: imageScaleF,
                                             action: #selector(self.textSizeButtonClick),
-                                            orientation: orientation)
+                                            orientation: orientation,
+                                            forDropdown: UIDevice.current.userInterfaceIdiom == .phone
+    )
     textSizeButton.title = NSLocalizedString("menu-text-size", comment: "")
 
     let browserButton = createNavBarButton(with: UIImage(named: "IconBrowser")!,
                                            highlightedImage: UIImage(named: "IconBrowserSelected")!,
                                            imageScale: 1.0,
                                            action: #selector(self.showKMWebBrowserView),
-                                           orientation: orientation)
+                                           orientation: orientation,
+                                           forDropdown: false
+    )
     browserButton.title = NSLocalizedString("menu-show-browser", comment: "")
 
     let actionButton = createNavBarButton(with: UIImage(named: "IconShare")!,
                                           highlightedImage: UIImage(named: "IconShareSelected")!,
                                           imageScale: imageScaleF,
                                           action: #selector(self.actionButtonClick),
-                                          orientation: orientation)
+                                          orientation: orientation,
+                                          forDropdown: false
+    )
     actionButton.title = NSLocalizedString("menu-share", comment: "")
 
     let settingsButton = createNavBarButton(with: UIImage(named: "IconMore")!,
                                             highlightedImage: UIImage(named: "IconMoreSelected")!,
                                             imageScale: imageScaleF,
                                             action: #selector(self.settingsButtonClick),
-                                            orientation: orientation)
+                                            orientation: orientation,
+                                            forDropdown: UIDevice.current.userInterfaceIdiom == .phone
+    )
     settingsButton.title = NSLocalizedString("menu-settings", comment: "")
 
     dropdownItems = [textSizeButton, trashButton, infoButton, getStartedButton, settingsButton]
@@ -385,27 +401,54 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                   highlightedImage imageHighlighted: UIImage,
                                   imageScale scaleF: CGFloat,
                                   action selector: Selector,
-                                  orientation: UIInterfaceOrientation) -> UIBarButtonItem {
-    let size = CGSize(width: image.size.width * scaleF, height: image.size.height * scaleF)
+                                  orientation: UIInterfaceOrientation,
+                                  forDropdown: Bool
+  ) -> UIBarButtonItem {
+    if forDropdown {
+      let size = CGSize(width: image.size.width * scaleF, height: image.size.height * scaleF)
 
-    let vAdjPort: CGFloat = UIScreen.main.scale == 2.0 ? -3.6 : -2.6
-    let vAdjLscpe: CGFloat = -1.6
+      let vAdjPort: CGFloat = UIScreen.main.scale == 2.0 ? -3.6 : -2.6
+      let vAdjLscpe: CGFloat = -1.6
 
-    let vAdj = orientation.isPortrait ? vAdjPort : vAdjLscpe
-    let navBarHeight = self.navBarHeight()
-    let y = (navBarHeight - size.height) / 2.0 + vAdj
+      let vAdj = orientation.isPortrait ? vAdjPort : vAdjLscpe
+      let navBarHeight = self.navBarHeight()
+      let y = (navBarHeight - size.height) / 2.0 + vAdj
 
-    let customButton = UIButton(type: .custom)
-    customButton.setImage(image, for: .normal)
-    customButton.setImage(imageHighlighted, for: .highlighted)
-    customButton.frame = CGRect(x: 0.0, y: y, width: size.width, height: size.height)
-    customButton.addTarget(self, action: selector, for: .touchUpInside)
+      let customButton = UIButton(type: .custom)
+      customButton.setImage(image, for: .normal)
+      customButton.setImage(imageHighlighted, for: .highlighted)
+      customButton.frame = CGRect(x: 0.0, y: y, width: size.width, height: size.height)
+      customButton.addTarget(self, action: selector, for: .touchUpInside)
 
-    let containerView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: size.width, height: navBarHeight))
-    containerView.backgroundColor = UIColor.clear
-    containerView.addSubview(customButton)
+      let containerView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: size.width, height: navBarHeight))
+      containerView.backgroundColor = UIColor.clear
+      containerView.addSubview(customButton)
 
-    return UIBarButtonItem(customView: containerView)
+      customButton.setImage(imageHighlighted, for: .highlighted)
+      customButton.frame = CGRect(x: 0.0, y: y, width: size.width, height: size.height)
+      customButton.addTarget(self, action: selector, for: .touchUpInside)
+
+      return UIBarButtonItem(customView: containerView)
+    } else {
+      var config = UIButton.Configuration.plain()
+      config.image = image
+
+      let customButton = UIButton(configuration: config, primaryAction: UIAction { sender in
+        self.perform(selector, with: sender)
+      })
+
+      customButton.configurationUpdateHandler = { button in
+        button.configuration?.image = (button.state == .highlighted) ? imageHighlighted : image
+      }
+
+      let barButtonItem = UIBarButtonItem(customView: customButton)
+
+//      // Could hide the Liquid Glass button styling with this.
+//      if #available(iOS 26.0, *) {
+//        barButtonItem.hidesSharedBackground = true
+//      }
+      return barButtonItem
+    }
   }
 
   override func viewDidAppear(_ animated: Bool) {
@@ -984,7 +1027,16 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
 
     popover?.dismiss(animated: false)
     _ = dismissDropDownMenu()
+
     overlayWindow.isHidden = false
+    var color: UIColor
+    if traitCollection.userInterfaceStyle == .dark {
+      color = UIColor(white: 0.1, alpha: 0.75)
+    } else {
+      color = UIColor(white: 0.0, alpha: 0.75)
+    }
+    overlayWindow.backgroundColor = color
+
     getStartedVC = GetStartedViewController()
     getStartedVC.mainViewController = self
     let containerView: UIView! = getStartedVC.view
@@ -996,7 +1048,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     Manager.shared.hideKeyboard()
 
     containerView.frame = containerView.frame.insetBy(dx: 15, dy: 140)
-    containerView.backgroundColor = UIColor.white
+    containerView.backgroundColor = UIColor.systemBackground
     containerView.layer.cornerRadius = 6.0
     containerView.center = overlayWindow.center
     containerView.tag = getStartedViewTag
