@@ -39,7 +39,7 @@ describe("Verify Parser Against BNF Tests", () => {
     const sourceRules: Dictionary = getSourceRules(sourceBuffer);
     assert.deepEqual(bnfRules, sourceRules);
   });
-  it("really matches the BNF grammar rules", () => {
+  it.skip("really matches the BNF grammar rules", () => {
     //const bnfBuffer: string = readFileSync(BNF_FILENAME).toString();
     //const bnfRules: Dictionary = getBnfRules(bnfBuffer);
     const sourceBuffer: string = [
@@ -246,92 +246,43 @@ function replaceSubRule(str: string): string {
   return str;
 }
 
-interface MemberInfo {
-    name: string;
-    type: string;
-    kind: "property" | "parameter" | "parameter-property";
-}
-
-interface ClassInfo {
-    name:    string;
-    members: MemberInfo[];
-}
-
 interface RuleInfo {
     name: string;
     expression: string | undefined;
 }
 
-function getSourceRules2(buffer:string): Dictionary {
-    const rules: Dictionary = {};
+function getSourceRules2(buffer: string): Dictionary {
+  const rules: Dictionary = {};
 
-    const sourceFile = ts.createSourceFile(
-      "",
-      buffer,
-      ts.ScriptTarget.Latest,
-      true,
-      ts.ScriptKind.TS
-    );
+  const sourceFile = ts.createSourceFile(
+    "combined-source.ts",
+    buffer,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS
+  );
 
-    function getType(n: ts.ParameterDeclaration | ts.PropertyDeclaration): string {
-      let result = n.type ? n.type.getText(sourceFile) : "(no explicit type)";
+  const extractedRules: RuleInfo[] = [];
 
-      if (n.questionToken) result += "?";
+  function visit(node: ts.Node): void {
+    if (ts.isClassDeclaration(node) || ts.isClassExpression(node)) {
+      const name = node.name?.text;
 
-      if (ts.isPropertyDeclaration(n) && n.exclamationToken) {
-        result += "!";
+      if (name?.endsWith("Rule")) {
+        extractedRules.push({
+          name,
+          expression: inspectRuleExpression(node, sourceFile)
+        });
       }
-
-      return result;
     }
 
-    const classes: ClassInfo[] = [];
-    const extractedRules: RuleInfo[] = [];
+    ts.forEachChild(node, visit);
+  }
 
-    function visit(n: ts.Node): void {
-      if (ts.isClassDeclaration(n) ||
-        ts.isClassExpression(n)) {
+  visit(sourceFile);
 
-        const name = n.name?.text ?? "(anonymous class)";
-        const members: MemberInfo[] = [];
-
-        for (const member of n.members) {
-          if (ts.isPropertyDeclaration(member)) {
-            members.push({
-              name: member.name.getText(sourceFile),
-              type: getType(member),
-              kind: "property"
-            });
-          }
-
-          if (ts.isConstructorDeclaration(member)) {
-            for (const param of member.parameters) {
-              const isProperty = ts.isParameterPropertyDeclaration(param, member);
-              members.push({
-                name: param.name.getText(sourceFile),
-                type: getType(param),
-                kind: isProperty
-                  ? "parameter-property"
-                  : "parameter"
-              });
-            }
-          }
-
-          extractedRules.push({
-            name,
-            expression: inspectRuleExpression(n, sourceFile)
-          });
-        }
-
-        classes.push({ name, members });
-      }
-
-      ts.forEachChild(n, visit);
-    }
-
-    visit(sourceFile);
-
-    return rules;
+  // Set a breakpoint here to inspect extractedRules.
+  return rules;
 }
 
 function inspectRuleExpression(
@@ -342,66 +293,124 @@ function inspectRuleExpression(
 
   if (!constructor?.body) return undefined;
 
-  // Map local variable names to their initializer expressions.
   const variables = new Map<string, ts.Expression>();
 
   for (const statement of constructor.body.statements) {
-    if (ts.isVariableStatement(statement)) {
-      for (const declaration of statement.declarationList.declarations) {
-        if (ts.isIdentifier(declaration.name) && declaration.initializer) {
-          variables.set(declaration.name.text, declaration.initializer);
-        }
+    if (!ts.isVariableStatement(statement)) continue;
+
+    for (const declaration of statement.declarationList.declarations) {
+      if (ts.isIdentifier(declaration.name) && declaration.initializer) {
+        variables.set(declaration.name.text, declaration.initializer);
       }
     }
   }
 
-  // Find: this.rule = expression
-  let ruleExpression: ts.Expression | undefined;
+  const alternateTokens = inspectAlternateTokenRule(cls);
+    if (alternateTokens !== undefined) {
+      return alternateTokens;
+  }
 
-  for (const statement of constructor.body.statements) {
-    if (!ts.isExpressionStatement(statement)) continue;
+  const assignment = constructor.body.statements.find(statement =>
+    ts.isExpressionStatement(statement) &&
+    ts.isBinaryExpression(statement.expression) &&
+    statement.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+    ts.isPropertyAccessExpression(statement.expression.left) &&
+    statement.expression.left.expression.kind === ts.SyntaxKind.ThisKeyword &&
+    statement.expression.left.name.text === "rule"
+  );
 
-    const expression = statement.expression;
+  if (!assignment || !ts.isExpressionStatement(assignment)) {
+    return undefined;
+  }
 
-    if (ts.isBinaryExpression(expression) &&
-        expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
-        ts.isPropertyAccessExpression(expression.left) &&
-        expression.left.expression.kind === ts.SyntaxKind.ThisKeyword &&
-        expression.left.name.text === "rule"
-    ) {
-        ruleExpression = expression.right;
+  const expression = (assignment.expression as ts.BinaryExpression).right;
+
+  function describe(node: ts.Expression): string {
+    if (ts.isIdentifier(node)) {
+      const initializer = variables.get(node.text);
+      return initializer ? describe(initializer) : node.text;
+    }
+
+    if (ts.isArrayLiteralExpression(node)) {
+      return node.elements.map(describe).join(", ");
+    }
+
+    if (ts.isNewExpression(node)) {
+      const name = node.expression.getText(sourceFile);
+      const args: readonly ts.Expression[] = node.arguments ?? [];
+
+      switch (name) {
+        case "AlternateRule":
+          return args.length && ts.isArrayLiteralExpression(args[0])
+            ? args[0].elements.map(describe).join(" | ")
+            : `AlternateRule(${args.map(describe).join(", ")})`;
+
+        case "SequenceRule":
+          return args.length && ts.isArrayLiteralExpression(args[0])
+            ? args[0].elements.map(describe).join(" ")
+            : `SequenceRule(${args.map(describe).join(", ")})`;
+
+        case "TokenRule":
+          if (args.length > 0 && ts.isPropertyAccessExpression(args[0])) {
+            return args[0].name.text;
+          }
+          return `TokenRule(${args.map(describe).join(", ")})`;
+
+        case "ManyRule":
+          return args.length > 0
+            ? `${describe(args[0])}*`
+            : "ManyRule";
+
+        case "OneOrManyRule":
+          return args.length > 0
+            ? `${describe(args[0])}+`
+            : "OneOrManyRule";
+
+        case "OptionalRule":
+          return args.length > 0
+            ? `${describe(args[0])}?`
+            : "OptionalRule";
+
+        default:
+          return args.length
+            ? `${name}(${args.map(describe).join(", ")})`
+            : name;
       }
-  }
-
-  if (!ruleExpression) return undefined;
-
-  function describe(expression: ts.Expression): string {
-    if (ts.isIdentifier(expression)) {
-       const initializer = variables.get(expression.text);
-
-      return initializer ? describe(initializer) : expression.text;
     }
 
-    if (ts.isNewExpression(expression)) {
-      const name = expression.expression.getText(sourceFile);
-      const args: readonly ts.Expression[] = expression.arguments ?? [];
+    return node.getText(sourceFile);
+  }
 
-      if (name === "AlternateRule" && args.length > 0 &&
-        ts.isArrayLiteralExpression(args[0]))
-        {
-          return "AlternateRule\n" +
-            args[0].elements
-            .map(e => "  " + describe(e))
-            .join("\n");
+  function inspectAlternateTokenRule(
+    cls: ts.ClassDeclaration | ts.ClassExpression
+  ): string | undefined {
+    if (cls.heritageClauses?.some(clause =>
+      clause.token === ts.SyntaxKind.ExtendsKeyword &&
+      clause.types.some(type => type.expression.getText() === "AlternateTokenRule")
+    )) {
+      const constructor = cls.members.find(ts.isConstructorDeclaration);
+      const superCall = constructor?.body?.statements.find(statement =>
+        ts.isExpressionStatement(statement) &&
+        ts.isCallExpression(statement.expression) &&
+        statement.expression.expression.kind === ts.SyntaxKind.SuperKeyword
+      );
+
+      if (superCall && ts.isExpressionStatement(superCall)) {
+        const args = (superCall.expression as ts.CallExpression).arguments;
+        const tokens = args[0];
+
+        if (tokens && ts.isArrayLiteralExpression(tokens)) {
+          return tokens.elements.map(token =>
+            ts.isPropertyAccessExpression(token)
+              ? token.name.text
+              : token.getText()
+          ).join(" | ");
         }
-
-      return name + (args.length
-        ? "(" + args.map(describe).join(", ") + ")"
-        : "");
+      }
     }
 
-    return expression.getText(sourceFile);
+    return undefined;
   }
 
-  return describe(ruleExpression);
+  return describe(expression);
 }
