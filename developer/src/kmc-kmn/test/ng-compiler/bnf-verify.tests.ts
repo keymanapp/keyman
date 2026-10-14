@@ -17,6 +17,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
+import ts from "typescript";
 import { readFileSync } from 'node:fs';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 
@@ -37,6 +38,18 @@ describe("Verify Parser Against BNF Tests", () => {
     ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
     const sourceRules: Dictionary = getSourceRules(sourceBuffer);
     assert.deepEqual(bnfRules, sourceRules);
+  });
+  it("really matches the BNF grammar rules", () => {
+    //const bnfBuffer: string = readFileSync(BNF_FILENAME).toString();
+    //const bnfRules: Dictionary = getBnfRules(bnfBuffer);
+    const sourceBuffer: string = [
+      '../../src/kmc-kmn/src/ng-compiler/kmn-analyzer.ts',
+      '../../src/kmc-kmn/src/ng-compiler/statement-analyzer.ts',
+      '../../src/kmc-kmn/src/ng-compiler/store-analyzer.ts',
+    ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
+    const sourceRules: Dictionary = getSourceRules2(sourceBuffer);
+    //assert.deepEqual(bnfRules, sourceRules);
+    assert.deepEqual(null, sourceRules);
   });
 });
 describe("Verify BNF Against Lexer Tests", () => {
@@ -231,4 +244,164 @@ function replaceSubRule(str: string): string {
         { return lowerCaseFirstLetter(p1); });
   }
   return str;
+}
+
+interface MemberInfo {
+    name: string;
+    type: string;
+    kind: "property" | "parameter" | "parameter-property";
+}
+
+interface ClassInfo {
+    name:    string;
+    members: MemberInfo[];
+}
+
+interface RuleInfo {
+    name: string;
+    expression: string | undefined;
+}
+
+function getSourceRules2(buffer:string): Dictionary {
+    const rules: Dictionary = {};
+
+    const sourceFile = ts.createSourceFile(
+      "",
+      buffer,
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.TS
+    );
+
+    function getType(n: ts.ParameterDeclaration | ts.PropertyDeclaration): string {
+      let result = n.type ? n.type.getText(sourceFile) : "(no explicit type)";
+
+      if (n.questionToken) result += "?";
+
+      if (ts.isPropertyDeclaration(n) && n.exclamationToken) {
+        result += "!";
+      }
+
+      return result;
+    }
+
+    const classes: ClassInfo[] = [];
+    const extractedRules: RuleInfo[] = [];
+
+    function visit(n: ts.Node): void {
+      if (ts.isClassDeclaration(n) ||
+        ts.isClassExpression(n)) {
+
+        const name = n.name?.text ?? "(anonymous class)";
+        const members: MemberInfo[] = [];
+
+        for (const member of n.members) {
+          if (ts.isPropertyDeclaration(member)) {
+            members.push({
+              name: member.name.getText(sourceFile),
+              type: getType(member),
+              kind: "property"
+            });
+          }
+
+          if (ts.isConstructorDeclaration(member)) {
+            for (const param of member.parameters) {
+              const isProperty = ts.isParameterPropertyDeclaration(param, member);
+              members.push({
+                name: param.name.getText(sourceFile),
+                type: getType(param),
+                kind: isProperty
+                  ? "parameter-property"
+                  : "parameter"
+              });
+            }
+          }
+
+          extractedRules.push({
+            name,
+            expression: inspectRuleExpression(n, sourceFile)
+          });
+        }
+
+        classes.push({ name, members });
+      }
+
+      ts.forEachChild(n, visit);
+    }
+
+    visit(sourceFile);
+
+    return rules;
+}
+
+function inspectRuleExpression(
+  cls: ts.ClassDeclaration | ts.ClassExpression,
+  sourceFile: ts.SourceFile
+): string | undefined {
+  const constructor = cls.members.find(ts.isConstructorDeclaration);
+
+  if (!constructor?.body) return undefined;
+
+  // Map local variable names to their initializer expressions.
+  const variables = new Map<string, ts.Expression>();
+
+  for (const statement of constructor.body.statements) {
+    if (ts.isVariableStatement(statement)) {
+      for (const declaration of statement.declarationList.declarations) {
+        if (ts.isIdentifier(declaration.name) && declaration.initializer) {
+          variables.set(declaration.name.text, declaration.initializer);
+        }
+      }
+    }
+  }
+
+  // Find: this.rule = expression
+  let ruleExpression: ts.Expression | undefined;
+
+  for (const statement of constructor.body.statements) {
+    if (!ts.isExpressionStatement(statement)) continue;
+
+    const expression = statement.expression;
+
+    if (ts.isBinaryExpression(expression) &&
+        expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+        ts.isPropertyAccessExpression(expression.left) &&
+        expression.left.expression.kind === ts.SyntaxKind.ThisKeyword &&
+        expression.left.name.text === "rule"
+    ) {
+        ruleExpression = expression.right;
+      }
+  }
+
+  if (!ruleExpression) return undefined;
+
+  function describe(expression: ts.Expression): string {
+    if (ts.isIdentifier(expression)) {
+       const initializer = variables.get(expression.text);
+
+      return initializer ? describe(initializer) : expression.text;
+    }
+
+    if (ts.isNewExpression(expression)) {
+      const name = expression.expression.getText(sourceFile);
+      const args: readonly ts.Expression[] = expression.arguments ?? [];
+
+      if (name === "AlternateRule" && args.length > 0 &&
+        ts.isArrayLiteralExpression(args[0]))
+        {
+          return "AlternateRule\n" +
+            args[0].elements
+            .map(e => "  " + describe(e))
+            .join("\n");
+        }
+
+      return name + (args.length
+        ? "(" + args.map(describe).join(", ") + ")"
+        : "");
+    }
+
+    return expression.getText(sourceFile);
+  }
+
+  return describe(ruleExpression);
 }
