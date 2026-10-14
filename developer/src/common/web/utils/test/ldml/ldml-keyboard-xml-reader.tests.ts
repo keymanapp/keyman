@@ -178,6 +178,14 @@ describe('ldml keyboard xml reader tests', function () {
       ],
     },
     {
+      subpath: 'invalid-import-local-bad-xml.xml',
+      loadfail: true,
+      messages: [
+        DeveloperUtilsMessages.ERROR_InvalidXml,
+        DeveloperUtilsMessages.ERROR_SchemaValidationError,
+      ],
+    },
+    {
       subpath: 'invalid-import-path.xml',
       loadfail: true,
       errors: [
