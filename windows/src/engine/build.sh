@@ -15,7 +15,7 @@ builder_describe \
   "publish                 Prepare files for distribution, publish symbols, and build installer module" \
   "install                 Install built programs locally" \
   \
-  ":insthelper             Installation helper module" \
+  ":inst-cpp               Installation helper module based on cpp" \
   ":keyman                 Main host process (32 bit)" \
   ":keyman32               Keystroke processing engine (all archs)" \
   ":keymanmc               Message library" \
