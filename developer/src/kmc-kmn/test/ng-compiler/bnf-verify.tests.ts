@@ -86,26 +86,26 @@ function getSourceRules(buffer: string): Dictionary {
     ts.ScriptKind.TS
   );
 
-  function visit(node: ts.Node): void {
-    if (ts.isClassDeclaration(node) || ts.isClassExpression(node)) {
-      const className = node.name?.text;
-
-      if (className?.endsWith("Rule")) {
-        const name = lowerFirst(className.replace(/Rule$/, ""));
-        const expression = inspectRuleExpression(node, sourceFile);
-
-        if (expression !== undefined) {
-          rules[name] = expression;
-        }
-      }
-    }
-
-    ts.forEachChild(node, visit);
-  }
-
-  visit(sourceFile);
+  visit(sourceFile, sourceFile, rules);
 
   return rules;
+}
+
+function visit(node: ts.Node, sourceFile: ts.SourceFile, rules: Dictionary): void {
+  if (ts.isClassDeclaration(node) || ts.isClassExpression(node)) {
+    const className = node.name?.text;
+
+    if (className?.endsWith("Rule")) {
+      const name       = lowerFirst(className.replace(/Rule$/, ""));
+      const expression = inspectRuleExpression(node, sourceFile);
+
+      if (expression !== undefined) {
+        rules[name] = expression;
+      }
+    }
+  }
+
+  ts.forEachChild(node, child => visit(child, sourceFile, rules));
 }
 
 function inspectRuleExpression(
