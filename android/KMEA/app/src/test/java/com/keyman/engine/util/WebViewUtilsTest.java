@@ -16,18 +16,11 @@ import com.keyman.engine.util.WebViewUtils;
 
 @RunWith(RobolectricTestRunner.class)
 public class WebViewUtilsTest {
-  private Context context = null;
-
-  @Before
-  public void getContext() {
-    context = ApplicationProvider.getApplicationContext();
-  }
-
   @Test
   public void test_ChromeEmpty_EngineWebViewVersionStatusDisabled() {
     String chromeVersion = "";
     Assert.assertEquals(WebViewUtils.EngineWebViewVersionStatus.DISABLED,
-      WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion));
+      WebViewUtils.getEngineWebViewVersionStatus(chromeVersion));
   }
 
   @Test
@@ -35,14 +28,14 @@ public class WebViewUtilsTest {
     double chromeVersionFloat = Float.parseFloat(WebViewUtils.KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME) - 1.0;
     String chromeVersion = String.valueOf(chromeVersionFloat);
     Assert.assertEquals(WebViewUtils.EngineWebViewVersionStatus.DISABLED,
-      WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion));
+      WebViewUtils.getEngineWebViewVersionStatus(chromeVersion));
   }
 
   @Test
   public void test_Chrome37_EngineWebViewVersionStatusDegraded() {
     String chromeVersion = WebViewUtils.KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME;
     Assert.assertEquals(WebViewUtils.EngineWebViewVersionStatus.DEGRADED,
-      WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion));
+      WebViewUtils.getEngineWebViewVersionStatus(chromeVersion));
   }
 
   @Test
@@ -50,14 +43,14 @@ public class WebViewUtilsTest {
     double chromeVersionFloat = Float.parseFloat(WebViewUtils.KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME) - 1.0;
     String chromeVersion = String.valueOf(chromeVersionFloat);
     Assert.assertEquals(WebViewUtils.EngineWebViewVersionStatus.DEGRADED,
-      WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion));
+      WebViewUtils.getEngineWebViewVersionStatus(chromeVersion));
   }
 
   @Test
   public void test_Chrome95_EngineWebViewVersionStatusFull() {
     String chromeVersion = WebViewUtils.KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME;
     Assert.assertEquals(WebViewUtils.EngineWebViewVersionStatus.FULL,
-      WebViewUtils.getEngineWebViewVersionStatus(context, null, chromeVersion));
+      WebViewUtils.getEngineWebViewVersionStatus(chromeVersion));
   }
 
   @Test
