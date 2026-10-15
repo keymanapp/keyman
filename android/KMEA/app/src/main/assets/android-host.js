@@ -15,11 +15,6 @@ var fragmentToggle = 0;
 var deferredBannerCall;
 var longpressDelay = null;
 
-var sentryManager = new KeymanSentryManager({
-  hostPlatform: "android"
-});
-sentryManager.init();
-
 window.addEventListener('load', init, false);
 
 function init() {
