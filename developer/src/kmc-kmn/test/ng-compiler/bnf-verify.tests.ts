@@ -79,7 +79,7 @@ function getSourceRules(buffer: string): Dictionary {
   const rules: Dictionary = {};
 
   const sourceFile = ts.createSourceFile(
-    "combined-source.ts",
+    "",
     buffer,
     ts.ScriptTarget.Latest,
     true,
@@ -91,17 +91,19 @@ function getSourceRules(buffer: string): Dictionary {
   return rules;
 }
 
-function visitRules(node: ts.Node, sourceFile: ts.SourceFile, rules: Dictionary): void {
-  if (ts.isClassDeclaration(node) || ts.isClassExpression(node)) {
-    const className = node.name?.text;
+function visitRules(
+  node: ts.Node,
+  sourceFile: ts.SourceFile,
+  rules: Dictionary
+): void {
+  if ((ts.isClassDeclaration(node) || ts.isClassExpression(node)) &&
+    node.name?.text.endsWith("Rule")
+  ) {
+    const name       = lowerFirst(node.name.text.replace(/Rule$/, ""));
+    const expression = inspectRuleExpression(node, sourceFile);
 
-    if (className?.endsWith("Rule")) {
-      const name       = lowerFirst(className.replace(/Rule$/, ""));
-      const expression = inspectRuleExpression(node, sourceFile);
-
-      if (expression !== undefined) {
-        rules[name] = expression;
-      }
+    if (expression !== undefined) {
+      rules[name] = expression;
     }
   }
 
@@ -139,10 +141,10 @@ function inspectRuleExpression(
         const assignment = getThisPropertyAssignment(statement);
 
         if (assignment) {
-          properties.set(
-            (assignment.left as ts.PropertyAccessExpression).name.text,
-            assignment.right
-          );
+          const propertyName = (assignment.left as ts.PropertyAccessExpression).name.text;
+          if (!properties.has(propertyName)) {
+            properties.set(propertyName, assignment.right);
+          }
         }
       }
     }
@@ -165,7 +167,7 @@ function inspectRuleExpression(
   const assignment = constructor.body.statements
     .map(getThisPropertyAssignment)
     .find(assignment =>
-      assignment &&
+      assignment?.left &&
       ts.isPropertyAccessExpression(assignment.left) &&
       assignment.left.name.text === "rule"
     );
@@ -269,16 +271,12 @@ function describeExpression(
     switch (name) {
       case "AlternateRule":
         return args.length && ts.isArrayLiteralExpression(args[0])
-          ? args[0].elements
-              .map(element => describeExpression(element, variables, properties, sourceFile))
-              .join("|")
+          ? describeArray(args[0].elements, variables, properties, sourceFile, "|")
           : `AlternateRule(${describeArgs().join(", ")})`;
 
       case "SequenceRule":
         return args.length && ts.isArrayLiteralExpression(args[0])
-          ? args[0].elements
-              .map(element => describeExpression(element, variables, properties, sourceFile))
-              .join(" ")
+          ? describeArray(args[0].elements, variables, properties, sourceFile, " ")
           : `SequenceRule(${describeArgs().join(", ")})`;
 
       case "TokenRule":
@@ -312,6 +310,20 @@ function describeExpression(
   return node.getText(sourceFile);
 }
 
+function describeArray(
+  elements: ts.NodeArray<ts.Expression>,
+  variables: Map<string, ts.Expression>,
+  properties: Map<string, ts.Expression>,
+  sourceFile: ts.SourceFile,
+  separator: string
+): string {
+  return elements
+    .map(element =>
+      describeExpression(element, variables, properties, sourceFile)
+    )
+    .join(separator);
+}
+
 function lowerFirst(text: string): string {
   return text.charAt(0).toLowerCase() + text.slice(1);
 }
@@ -322,18 +334,15 @@ function findClassDeclaration(
 ): ts.ClassDeclaration | undefined {
   let result: ts.ClassDeclaration | undefined;
 
-  function visit(node: ts.Node): void {
-    if (
-      ts.isClassDeclaration(node) &&
-      node.name?.text === name
-    ) {
+  function visitNode(node: ts.Node): void {
+    if (ts.isClassDeclaration(node) && node.name?.text === name) {
       result = node;
       return;
     }
-
-    ts.forEachChild(node, visit);
+    ts.forEachChild(node, visitNode);
   }
 
-  visit(sourceFile);
+  visitNode(sourceFile);
+
   return result;
 }
