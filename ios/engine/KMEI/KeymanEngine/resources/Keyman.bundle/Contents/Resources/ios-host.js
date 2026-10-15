@@ -26,12 +26,6 @@ var oskWidth = 0;
 var bannerHeight = 0;
 var bannerImgPath = '';
 
-var sentryManager = new KeymanSentryManager({
-    hostPlatform: "ios"
-});
-
-sentryManager.init();
-
 window.addEventListener('load', init, false);
 
 function init() {
