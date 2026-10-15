@@ -357,22 +357,14 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     // We should NOT call .resetContext() here for this reason.
   }
   
+  /**
+    Determines the correct predictive-text settings for the active context, regardless of
+    active language and model.
+   */
   func determineSuggestionType() -> SuggestionType {
-    let inputTextType = textDocumentProxy.textContentType
     let inputKeyboardType = textDocumentProxy.keyboardType
     
-//    // Often `nil` for system-keyboard mode, but it's always worth a look.
-//    if inputTextType != nil {
-//      switch inputTextType {
-//        case .password
-//          return .disabled
-//      case .
-//        default:
-//          return .autocorrect
-//      }
-//    }
-    
-    if inputKeyboardType == nil {
+    if inputKeyboardType == nil || (textDocumentProxy.isSecureTextEntry ?? false) {
       return .disabled
     } else {
       switch inputKeyboardType {
@@ -381,6 +373,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
         case .emailAddress, .namePhonePad, .URL, .webSearch:
           return .predictAndCorrect
         default:
+          let autocorrectionType = textDocumentProxy.autocorrectionType
+          if autocorrectionType == .no {
+            return .predictAndCorrect
+          }
           return .autocorrect
       }
     }

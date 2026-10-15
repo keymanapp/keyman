@@ -17,6 +17,14 @@ private let keyboardChangeHelpText = NSLocalizedString("keyboard-help-change", b
 private let subKeyColor = Colors.popupKey
 private let subKeyColorHighlighted = Colors.popupKeyHighlighted
 
+/**
+  Denotes the highest-level predictive-text settings that are appropriate to enable
+  for the current context.  The language-specific setting will be replaced with this
+  setting if the former exceeds the current context's limits.
+
+  For example, when entering text into an explicitly numeric field, autocorrect should
+  not be enabled.
+ */
 enum SuggestionType: Int {
   case disabled = 0
   case onlyPredictions = 1
@@ -74,14 +82,21 @@ class KeymanWebViewController: UIViewController {
 
   private var currentText: String = ""
   private var currentCursorRange: NSRange? = nil
-  
-  private var languageCode: String = ""
+
+  /**
+    Tracks the language code of the active keyboard and model.
+
+    This is used when refreshing predictive-text settings as the user changes the
+    active responder, as different responders may request different limits to
+    predictive-text features.
+   */
+  private var languageID: String = ""
   private var _suggestionType: SuggestionType = .disabled
 
   init(storage: Storage) {
     self.storage = storage
     self.schemeHandler = WebViewSchemeHandler(storage: storage)
-    
+
     super.init(nibName: nil, bundle: nil)
     _ = view
   }
@@ -89,17 +104,17 @@ class KeymanWebViewController: UIViewController {
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-  
+
   var suggestionType: SuggestionType {
     get {
       return self._suggestionType
     }
-    
+
     set(value) {
       self._suggestionType = value
-      
+
       if activeModel {
-        self.setSuggestionMode(languageID: languageCode)
+        self.setSuggestionMode(languageID: languageID)
       }
     }
   }
@@ -319,7 +334,7 @@ extension KeymanWebViewController {
     let loadingURL = schemeHandler.buildUrlForFile(
       fileURL: storage.keyboardURL(for: keyboard)
     )
-    
+
     var stub: [String: Any] = [
       "KI": "Keyboard_\(keyboard.id)",
       "KN": keyboard.name,
@@ -327,9 +342,9 @@ extension KeymanWebViewController {
       "KL": keyboard.languageName,
       "KF": loadingURL.absoluteString
     ]
-    
-    self.languageCode = keyboard.languageID
-    
+
+    self.languageID = keyboard.languageID
+
     if let packageID = keyboard.packageID {
       stub["KP"] = packageID
     }
@@ -456,14 +471,17 @@ extension KeymanWebViewController {
       // Check its settings and adjust the pred-text engine accordingly.
       setSuggestionMode(languageID: lexicalModel.languageID)
     } // else - We're registering a model in the background - don't change settings.
-    
+
     webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)
   }
-  
+
+  /**
+    Determines the correct predictive-text settings for the currently-loaded model and active context.
+   */
   private func setSuggestionMode(languageID: String) {
     // Enact any appropriate language-modeling settings!
     let userDefaults = Storage.active.userDefaults
-    
+
     self.activeModel = userDefaults.predictSettingForLanguage(languageID: languageID)
     let suggestionType = self.suggestionType
 
@@ -476,7 +494,9 @@ extension KeymanWebViewController {
 
     // Pass these off to KMW!
     // We do these first so that they're automatically set for the to-be-registered model in advance.
-    webView!.evaluateJavaScript("setSuggestionMode(\(predict), \(correct), \(autocorrect))")
+    if !isLoading {
+      webView!.evaluateJavaScript("setSuggestionMode(\(predict), \(correct), \(autocorrect))")
+    }
   }
 
   func setBannerImage(to path: String) {
