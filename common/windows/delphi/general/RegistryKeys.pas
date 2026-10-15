@@ -283,6 +283,8 @@ const
 
   SRegValue_WindowsRun_Keyman          = 'Keyman';
 
+  SRegKey_StartupApproved_Run = 'Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run';  // CU
+
   SRegValue_LanguageCheckDisabledItems = 'language check disabled items'; // CU
 
 {-------------------------------------------------------------------------------

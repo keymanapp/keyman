@@ -1,0 +1,6 @@
+c no &name store for testing #16681
+store(&keyboardversion) '1.0'
+
+begin unicode > use(main)
+
+group(main) using keys

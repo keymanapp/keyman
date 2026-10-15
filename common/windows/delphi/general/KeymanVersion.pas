@@ -37,6 +37,7 @@ const
   ENVIRONMENT_STABLE = 'stable';
 
 const
+  SKeymanVersion200 = '20.0';
   SKeymanVersion190 = '19.0';
   SKeymanVersion180 = '18.0';
   SKeymanVersion170 = '17.0';

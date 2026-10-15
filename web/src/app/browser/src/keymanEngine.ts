@@ -590,13 +590,12 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
   /**
    * Move focus to user-specified element
-   *
-   *  @param  {string|Object}   e   element or element id
-   *
+   * @deprecated
+   * @param  {string|Object}   e   element or element id
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/moveToElement
    **/
   public moveToElement(e: string|HTMLElement): void {
-    if(typeof(e) == "string") { // Can't instanceof string, and String is a different type.
+    if(typeof(e) == "string") {
       e=document.getElementById(e);
     }
 

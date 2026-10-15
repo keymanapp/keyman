@@ -275,7 +275,9 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 -(void)setContextIfNeeded:(NSString*)context {
   unichar const * unicharContext = [self.coreHelper createUnicharStringFromNSString:context];
   km_core_status result = km_core_state_context_set_if_needed(self.coreState, unicharContext);
-  os_log_debug([KMELogs coreLog], "setContextIfNeeded, context=%{public}@, km_core_state_context_set_if_needed result=%d", context, result);
+  
+  // only uncomment for debugging to avoid logging context
+  //os_log_debug([KMELogs coreLog], "setContextIfNeeded, context=%{public}@, km_core_state_context_set_if_needed result=%d", context, result);
 }
 
 -(NSString*)contextDebug {

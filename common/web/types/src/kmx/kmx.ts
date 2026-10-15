@@ -308,9 +308,9 @@ export class KMXFile {
   //  0x09 = bkspace.-- we don't need to keep this separate though with UC_SENTINEL
   public static readonly CODE_EXTENDED =     0x0A;
   //public static readonly CODE_EXTENDEDEND =  0x0B;  deprecated
-  public static readonly CODE_SWITCH =       0x0C;
-  public static readonly CODE_KEY =          0x0D;
-  public static readonly CODE_CLEARCONTEXT = 0x0E;    // deprecated in 19.0
+  //public static readonly CODE_SWITCH =       0x0C;  // unused, removed in 19.0
+  //public static readonly CODE_KEY =          0x0D;  // unused, removed in 19.0
+  //public static readonly CODE_CLEARCONTEXT = 0x0E;  // unused, removed in 19.0
   public static readonly CODE_CALL =         0x0F;
   // UC_SENTINEL_EXTENDEDEND  0x10
   public static readonly CODE_CONTEXTEX =    0x11;

@@ -132,6 +132,7 @@ core_files = files(
   'state.cpp',
   'jsonpp.cpp',
   '../../common/cpp/utfcodec.cpp',
+  '../../common/cpp/kmx_file.cpp',
 )
 
 mock_files = files(

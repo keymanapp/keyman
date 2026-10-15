@@ -10,7 +10,6 @@
 #import "KMInputMethodLifecycle.h"
 #import "KMSettingsRepository.h"
 #import "KMDataRepository.h"
-#import "ZipArchive.h"
 #import "KMPackageReader.h"
 #import "KMPackageInfo.h"
 #import "PrivacyConsent.h"
@@ -30,6 +29,10 @@ NSString *processorType = @"Unknown";
 NSString *const kKeyboardsChanged = @"com.keyman.keyboards.changed";
 NSString *const kAccessibilityCheckedRequest = @"com.keyman.accessibility.check.request";
 NSString *const kAccessibilityRequest = @"com.keyman.accessibility.request";
+
+// information for launching Keyman Configuration app
+NSString *const kConfigBundleId = @"com.keyman.config";
+NSString *const kDefaultConfigPath = @"/Applications/Keyman Configuration.app";
 
 @implementation NSString (VersionNumbers)
 /**
@@ -193,6 +196,7 @@ id _lastServerWithOSKShowing = nil;
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, hiding OSK");
     [KMSentryHelper addInfoBreadCrumb:@"lifecycle" message:@"hiding OSK on input method deactivation"];
     [self.oskWindow.window setIsVisible:NO];
+    [self updateOskMenuTextForClose];
   } else {
     os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, OSK already hidden");
   }
@@ -330,7 +334,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
     // Too many of these to be useful for most debugging sessions, but we'll keep this around to be
     // un-commented when needed.
-    os_log_debug([KMLogs keyTraceLog], "System Event: %{public}@", sysEvent);
+//    os_log_debug([KMLogs keyTraceLog], "System Event: %{public}@", sysEvent);
     
     switch (type) {
       case kCGEventFlagsChanged:
@@ -701,12 +705,46 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   NSMenuItem *osk = [self.menu itemWithTag:OSK_MENUITEM_TAG];
   if (osk) {
     [osk setAction:@selector(menuAction:)];
+    [self updateOskMenuText];
   }
   
-  NSMenuItem *about = [self.menu itemWithTag:ABOUT_MENUITEM_TAG];
+  NSMenuItem *about = [self.menu itemWithTag:CONFIG_MENUITEM_TAG];
   if (about) {
     [about setAction:@selector(menuAction:)];
   }
+}
+
+/**
+ * Set the OSK menu item to Show or Hide depending on the current state
+ */
+- (void)updateOskMenuText {
+  BOOL oskOpen = [self.oskWindow.window isVisible];
+  
+  NSMenuItem *oskMenu = [self.menu itemWithTag:OSK_MENUITEM_TAG];
+  if (oskMenu) {
+    NSString* oskMenuText;
+    if (oskOpen) {
+      oskMenuText = NSLocalizedString(@"hide-osk-menu-text", nil);
+    } else {
+      oskMenuText = NSLocalizedString(@"show-osk-menu-text", nil);
+    }
+
+    os_log_debug([KMLogs oskLog], "updateOskMenuText, setting text to %{public}@", oskMenuText);
+
+    [oskMenu setTitle:oskMenuText];
+  }
+}
+
+/**
+ * Set the OSK menu item directly to Show rather than evaluating the current state.
+ * This is necessary in some scenarios because the isVisible state of the OSK will
+ * not be updated for the close operation until later.
+ */
+- (void)updateOskMenuTextForClose {
+  NSMenuItem *oskMenu = [self.menu itemWithTag:OSK_MENUITEM_TAG];
+    NSString* oskMenuText = NSLocalizedString(@"show-osk-menu-text", nil);
+    os_log_debug([KMLogs oskLog], "updateOskMenuTextForClose, setting text to %{public}@", oskMenuText);
+    [oskMenu setTitle:oskMenuText];
 }
 
 - (void)updateKeyboardMenuItems {
@@ -919,17 +957,64 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)showOSK {
-  [self.oskWindow prepareToShowOsk];
   [[self.oskWindow window] makeKeyAndOrderFront:nil];
   [[self.oskWindow window] setLevel:NSStatusWindowLevel];
   [[self.oskWindow window] setTitle:self.oskWindowTitle];
   [KMSentryHelper addOskVisibleTag:[self.oskWindow.window isVisible]];
+  
+  [self updateOskMenuText];
 }
 
-- (void)showAboutWindow {
-  [self.aboutWindow.window centerInParent];
-  [self.aboutWindow.window makeKeyAndOrderFront:nil];
-  [self.aboutWindow.window setLevel:NSFloatingWindowLevel];
+/**
+ * Launch the Keyman Configuration app.
+ * First try the Applications folder, and if it isn't there, use the bundleID to open it wherever it is.
+ */
+- (void)launchKeymanConfiguration {
+  NSWorkspace *workspace = [NSWorkspace sharedWorkspace];
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  
+  // first try to find the app in the Applications directory
+  NSURL *appURL = [NSURL fileURLWithPath:kDefaultConfigPath];
+  
+  if ([fileManager fileExistsAtPath:kDefaultConfigPath]) {
+    [workspace openURL:appURL options:NSWorkspaceLaunchDefault configuration:@{} error:nil];
+    return;
+  }
+  
+  // if app was not located in the Applications directory, search by bundleID
+  NSURL *fallbackURL = [workspace URLForApplicationWithBundleIdentifier:kConfigBundleId];
+  if (fallbackURL) {
+    [workspace openURL:fallbackURL options:NSWorkspaceLaunchDefault configuration:@{} error:nil];
+  } else {
+    [self showConfigAppNotFoundAlert];
+  }
+}
+
+/**
+ * Display alert in the case that the config app could not be found
+ */
+- (void)showConfigAppNotFoundAlert {
+  // ensure that UI updates are executed on the main thread
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSAlert *alert = [[NSAlert alloc] init];
+    NSString *alertTitle = NSLocalizedString(@"alert-title-config-app-not-found", nil);
+    NSString *alertText = NSLocalizedString(@"alert-text-config-app-not-found", nil);
+    NSString *submitText = NSLocalizedString(@"ok-button-label", nil);
+
+    // configure the alert text
+    [alert setMessageText:alertTitle];
+    [alert setInformativeText:alertText];
+    [alert addButtonWithTitle:submitText];
+
+    [alert setAlertStyle:NSAlertStyleCritical];
+    
+    NSWindow *alertWindow = [alert window];
+    [alertWindow setLevel:NSFloatingWindowLevel];
+    [alertWindow orderFrontRegardless];
+    [alertWindow center];
+
+    [alert runModal];
+  });
 }
 
 /*
@@ -939,18 +1024,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  */
 
 // TODO: rewrite confusing pattern, multiple methods differing only by underscore
-- (NSWindowController *)aboutWindow_ {
-  return _aboutWindow;
-}
-
-- (NSWindowController *)aboutWindow {
-  if (_aboutWindow.window == nil) {
-    _aboutWindow = [[KMAboutWindowController alloc] initWithWindowNibName:@"KMAboutWindowController"];
-    [self observeCloseFor:_aboutWindow.window];
-  }
-  
-  return _aboutWindow;
-}
 
 - (NSWindowController *)kbHelpWindow_ {
   return _kbHelpWindow;

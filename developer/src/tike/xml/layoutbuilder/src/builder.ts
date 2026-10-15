@@ -3,7 +3,7 @@
 
 import { builderConstants } from "./constants.js";
 
-// temporary interface to streamline transform to Typescript
+// TODO: temporary interface to streamline transform to Typescript
 interface Builder {
   [key: string]: any;
 };

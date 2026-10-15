@@ -105,7 +105,7 @@ The KeymanWeb core module is exposed to the developer as `window.keyman`.
 : Test if a given keyboard or keyboard stub (or the current keyboard) is for Chinese, Japanese, or Korean.
 
 
-[`moveToElement` Function](moveToElement)
+[`moveToElement` Function](moveToElement) (deprecated)
 : Move input focus to user specified element.
 
 
