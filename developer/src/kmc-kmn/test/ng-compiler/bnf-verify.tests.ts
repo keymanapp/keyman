@@ -39,17 +39,16 @@ describe("Verify Parser Against BNF Tests", () => {
     const sourceRules: Dictionary = getSourceRules(sourceBuffer);
     assert.deepEqual(bnfRules, sourceRules);
   });
-  it.skip("really matches the BNF grammar rules", () => {
-    //const bnfBuffer: string = readFileSync(BNF_FILENAME).toString();
-    //const bnfRules: Dictionary = getBnfRules(bnfBuffer);
+  it("really matches the BNF grammar rules", () => {
+    const bnfBuffer: string = readFileSync(BNF_FILENAME).toString();
+    const bnfRules: Dictionary = getBnfRules2(bnfBuffer);
     const sourceBuffer: string = [
       '../../src/kmc-kmn/src/ng-compiler/kmn-analyzer.ts',
       '../../src/kmc-kmn/src/ng-compiler/statement-analyzer.ts',
       '../../src/kmc-kmn/src/ng-compiler/store-analyzer.ts',
     ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
     const sourceRules: Dictionary = getSourceRules2(sourceBuffer);
-    //assert.deepEqual(bnfRules, sourceRules);
-    assert.deepEqual(null, sourceRules);
+    assert.deepEqual(bnfRules, sourceRules);
   });
 });
 describe("Verify BNF Against Lexer Tests", () => {
@@ -74,6 +73,20 @@ function getBnfRules(buffer:string): Dictionary {
     const match = line.match(/(.*)\s*:\s*(.*)/)
     if (match) {
       rules[match[1]] = replaceElementNames(match[2]);
+    }
+  });
+  return rules;
+}
+
+function getBnfRules2(buffer:string): Dictionary {
+  const rules: Dictionary = {};
+  buffer = removeComments(buffer);
+  buffer = wrapLines(buffer);
+  const lines: string[] = buffer.split(/\r\n|\n|\r/g);
+  lines.forEach((line) => {
+    const match = line.match(/(.*)\s*:\s*(.*)/)
+    if (match) {
+      rules[match[1]] = match[2];
     }
   });
   return rules;
@@ -246,11 +259,6 @@ function replaceSubRule(str: string): string {
   return str;
 }
 
-interface RuleInfo {
-    name: string;
-    expression: string | undefined;
-}
-
 function getSourceRules2(buffer: string): Dictionary {
   const rules: Dictionary = {};
 
@@ -262,17 +270,17 @@ function getSourceRules2(buffer: string): Dictionary {
     ts.ScriptKind.TS
   );
 
-  const extractedRules: RuleInfo[] = [];
-
   function visit(node: ts.Node): void {
     if (ts.isClassDeclaration(node) || ts.isClassExpression(node)) {
-      const name = node.name?.text;
+      const className = node.name?.text;
 
-      if (name?.endsWith("Rule")) {
-        extractedRules.push({
-          name,
-          expression: inspectRuleExpression(node, sourceFile)
-        });
+      if (className?.endsWith("Rule")) {
+        const name = lowerFirst(className.replace(/Rule$/, ""));
+        const expression = inspectRuleExpression(node, sourceFile);
+
+        if (expression !== undefined) {
+          rules[name] = expression;
+        }
       }
     }
 
@@ -281,7 +289,7 @@ function getSourceRules2(buffer: string): Dictionary {
 
   visit(sourceFile);
 
-  // Set a breakpoint here to inspect extractedRules.
+  // Set a breakpoint here to inspect rules.
   return rules;
 }
 
@@ -293,7 +301,8 @@ function inspectRuleExpression(
 
   if (!constructor?.body) return undefined;
 
-  const variables = new Map<string, ts.Expression>();
+  const variables  = new Map<string, ts.Expression>();
+  const properties = new Map<string, ts.Expression>();
 
   for (const statement of constructor.body.statements) {
     if (!ts.isVariableStatement(statement)) continue;
@@ -303,6 +312,37 @@ function inspectRuleExpression(
         variables.set(declaration.name.text, declaration.initializer);
       }
     }
+  }
+
+  let currentClass: ts.ClassDeclaration | ts.ClassExpression | undefined = cls;
+
+  while (currentClass) {
+    const constructor = currentClass.members.find(ts.isConstructorDeclaration);
+
+    if (constructor?.body) {
+      for (const statement of constructor.body.statements) {
+        if (
+          ts.isExpressionStatement(statement) &&
+          ts.isBinaryExpression(statement.expression) &&
+          statement.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+          ts.isPropertyAccessExpression(statement.expression.left) &&
+          statement.expression.left.expression.kind === ts.SyntaxKind.ThisKeyword
+        ) {
+          properties.set(
+            statement.expression.left.name.text,
+            statement.expression.right
+          );
+        }
+      }
+    }
+
+    const parentName = currentClass.heritageClauses
+      ?.find(clause => clause.token === ts.SyntaxKind.ExtendsKeyword)
+      ?.types[0]?.expression.getText(sourceFile);
+
+    currentClass = parentName
+      ? findClassDeclaration(parentName, sourceFile)
+      : undefined;
   }
 
   const alternateTokens = inspectAlternateTokenRule(cls);
@@ -326,9 +366,17 @@ function inspectRuleExpression(
   const expression = (assignment.expression as ts.BinaryExpression).right;
 
   function describe(node: ts.Expression): string {
+    if (
+      ts.isPropertyAccessExpression(node) &&
+      node.expression.kind === ts.SyntaxKind.ThisKeyword
+    ) {
+      const initializer = properties.get(node.name.text);
+      return initializer ? describe(initializer) : node.name.text;
+    }
+
     if (ts.isIdentifier(node)) {
       const initializer = variables.get(node.text);
-      return initializer ? describe(initializer) : node.text;
+      return initializer ? describe(initializer) : lowerFirst(node.text.replace(/Rule$/, ""));
     }
 
     if (ts.isArrayLiteralExpression(node)) {
@@ -342,7 +390,7 @@ function inspectRuleExpression(
       switch (name) {
         case "AlternateRule":
           return args.length && ts.isArrayLiteralExpression(args[0])
-            ? args[0].elements.map(describe).join(" | ")
+            ? args[0].elements.map(describe).join("|")
             : `AlternateRule(${args.map(describe).join(", ")})`;
 
         case "SequenceRule":
@@ -373,8 +421,8 @@ function inspectRuleExpression(
 
         default:
           return args.length
-            ? `${name}(${args.map(describe).join(", ")})`
-            : name;
+            ? `${lowerFirst(name.replace(/Rule$/, ""))}(${args.map(describe).join(", ")})`
+            : lowerFirst(name.replace(/Rule$/, ""));
       }
     }
 
@@ -404,7 +452,7 @@ function inspectRuleExpression(
             ts.isPropertyAccessExpression(token)
               ? token.name.text
               : token.getText()
-          ).join(" | ");
+          ).join("|");
         }
       }
     }
@@ -413,4 +461,30 @@ function inspectRuleExpression(
   }
 
   return describe(expression);
+}
+
+function lowerFirst(text: string): string {
+  return text.charAt(0).toLowerCase() + text.slice(1);
+}
+
+function findClassDeclaration(
+  name: string,
+  sourceFile: ts.SourceFile
+): ts.ClassDeclaration | undefined {
+  let result: ts.ClassDeclaration | undefined;
+
+  function visit(node: ts.Node): void {
+    if (
+      ts.isClassDeclaration(node) &&
+      node.name?.text === name
+    ) {
+      result = node;
+      return;
+    }
+
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return result;
 }
