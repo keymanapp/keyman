@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 20.0.4 alpha 2026-10-14
+
+* refactor(web): clarify scope of `doShow`/`doHide` (#16589)
+* refactor(web): update function comments and cleanup (#16591)
+
 ## 20.0.3 alpha 2026-10-09
 
 * maint(ios): new iOS certificate (alpha-20.0) (#16771)
