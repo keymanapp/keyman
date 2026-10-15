@@ -25,7 +25,7 @@ struct ConfigApp: App {
   @Environment(\.openWindow) private var openWindow
   
   init() {
-    Logger.app.log("Starting Keyman Configuration, version: \(ConfigAppUtil.versionWithTag), versionWithTag: \(ConfigAppUtil.versionWithTag)")
+    Logger.app.log("Starting Keyman Configuration, version: \(ConfigAppUtil.versionWithTag, privacy: .private), versionWithTag: \(ConfigAppUtil.versionWithTag, privacy: .private)")
     let sentryDsnUrl = "https://960f8b8e574c46e3be385d60ce8e1fea@o1005580.ingest.sentry.io/5983522"
 
     // Initialize Sentry only once here
@@ -75,6 +75,7 @@ struct ConfigApp: App {
             if installation.installInProgress {
               Logger.app.log("installation in progress, opening Installation window")
               openWindow(id: "install")
+              NSApp.activate(ignoringOtherApps: true)
             }
           }
       }

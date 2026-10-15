@@ -96,10 +96,10 @@ public class InstallationCheck {
     return .newInstallation
   }
   
-  public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil, launchedByInstaller: Bool) {
+  public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil, isLaunchedByInstaller: Bool) {
     self.defaultsRepository = defaultsRepo
     self.inputMethodUtil = inputMethodUtil
-    self.isLaunchedByInstaller = launchedByInstaller
+    self.isLaunchedByInstaller = isLaunchedByInstaller
     self.isEvaluatingNewInstallation = false
     self.configurationVersion = ConfigAppUtil.configAppVersion()
     
@@ -116,7 +116,7 @@ public class InstallationCheck {
     self.isInputMethodCurrent = keymanIsCurrent
     self.inputMethodVersion = keymanVersion
     
-    if launchedByInstaller {
+    if isLaunchedByInstaller {
       clearInstallationState()
     }
     let installState = InstallationCheck.readInstallationState(from: defaultsRepo)
@@ -206,8 +206,16 @@ public class InstallationCheck {
    * the installation can move out of the `evaluatingInstallation` phase
    */
   public func startNewInstall() {
-    guard self.isInputMethodInstalled else { return }
-    guard self.isInputMethodCurrent else { return }
+    Logger.app.debug("starting new installation...")
+    
+    guard self.isInputMethodInstalled else {
+      Logger.app.debug("startNewInstall invoked when input method is not installed")
+      return
+    }
+    guard self.isInputMethodCurrent else {
+      Logger.app.debug("startNewInstall invoked when input method is not current")
+      return
+    }
 
     // call the input method to check whether Accessibility permission has been granted
     if (self.isLaunchedByInstaller) {
@@ -221,7 +229,10 @@ public class InstallationCheck {
    * the installation can move out of the `evaluatingInstallation` phase
    */
   public func startRepairCheck() {
-    guard self.isReadyForRepairCheckAtStartup() else { return }
+    guard self.isReadyForRepairCheckAtStartup() else {
+      Logger.app.debug("startRepairCheck invoked when not ready for repair")
+      return
+    }
       
     // call the input method to check whether Accessibility permission has been granted
     self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
@@ -232,8 +243,14 @@ public class InstallationCheck {
    * Simply returns true if the installation is complete.
    */
   func isReadyForRepairCheckAtStartup() -> Bool {
-    guard self.isInputMethodInstalled else { return false }
-    guard self.isInputMethodCurrent else { return false }
+    guard self.isInputMethodInstalled else {
+      Logger.app.debug("isReadyForRepairCheckAtStartup false, input method not installed")
+      return false
+    }
+    guard self.isInputMethodCurrent else {
+      Logger.app.debug("isReadyForRepairCheckAtStartup false, input method is not current")
+      return false
+    }
     
     let readyForRepairCheck = self.installationState?.isComplete == true
     
@@ -345,29 +362,6 @@ public class InstallationCheck {
   }
 
   /**
-   * Load the installation state and the tasks required to complete the installation of Keyman.
-   * This is accomplished by one of the following:
-   * 1. reading the saved installation which is either
-   *  completed or
-   *  in progress
-   * 2. creating a new installation
-   * 
-   */
-  public func loadState() -> InstallationState? {
-    var installationState: InstallationState? = nil
-    
-    guard self.isInputMethodInstalled && self.isInputMethodCurrent else {
-      return nil
-    }
-    
-    if let savedInstallationState = readInstallationState() {
-      installationState = savedInstallationState
-    }
-    
-    return installationState
-  }
-
-  /**
    * Clear the installation state from the UserDefaults
    */
   func clearInstallationState() {
@@ -427,6 +421,7 @@ func readInstallationState() -> InstallationState? {
  */
 static func readInstallationState(from repo: DefaultsRepo) -> InstallationState? {
   guard let installationMap = repo.readInstallationState() else {
+    Logger.app.debug("readInstallationState returns nil: no installation state exists")
     return nil
   }
   

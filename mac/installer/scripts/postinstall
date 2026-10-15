@@ -11,11 +11,11 @@ echo "Keyman for Mac: postinstall script"
 
 # Get the actual user currently logged into the console
 # This works even if the installer is run with sudo or as root
-CONSOLE_USER=$(stat -f "%Su" /dev/console)
-echo "console user is: $CONSOLE_USER"
+USER_NAME=$(stat -f "%Su" /dev/console)
+echo "user name is: $USER_NAME"
 
-# Get the home directory of the console user
-USER_HOME=$(eval echo "~$CONSOLE_USER")
+# Get the home directory of the user
+USER_HOME=$(eval echo "~$USER_NAME")
 echo "user home directory is: $USER_HOME"
 
 # Define the source file path within the package payload
@@ -33,7 +33,7 @@ echo "destination directory is: $DEST_DIR"
 if [ ! -d "$DEST_DIR" ]; then
     mkdir -p "$DEST_DIR"
     # Set the user as owner of the Input Methods directory
-    chown "$CONSOLE_USER":staff "$DEST_DIR"
+    chown "$USER_NAME":staff "$DEST_DIR"
 fi
 
 # Copy the input method to the destination directory
@@ -42,37 +42,49 @@ fi
 cp -R "$SOURCE_FILE" "$DEST_DIR/"
 
 # Set the user as owner
-chown -R "$CONSOLE_USER":staff "$DEST_DIR/Keyman.app"
+chown -R "$USER_NAME":staff "$DEST_DIR/Keyman.app"
 
-# TODO: add code here to extract keyboard name from package path
-echo "The installer package name is: $PACKAGE_PATH"
+# TODO: see issue #5318
+# the following few lines must be updated to extract the package name from the path
+# and write it to a file for retrieval by the config app so it can download the package
 
-# define path of tmp file to write keyboard info
-KEYBOARD_FILE_PATH="$3/var/tmp/keyboard-to-install.txt"
+# for #5318, add code here to extract package name from package path
+#echo "The installer package name is: $PACKAGE_PATH"
 
-# write keyboard file
-/bin/echo "sil_euro_latin" > "${KEYBOARD_FILE_PATH}"
+# for #5318, define path of tmp file to write keyboard info
+#KEYBOARD_FILE_PATH="$3/var/tmp/keyboard-to-install.txt"
+
+# for #5318, write keyboard file containing package name
+#/bin/echo "sil_euro_latin" > "${KEYBOARD_FILE_PATH}"
 
 # run background process that launches Keyman Configuration app
 
 # first kill any old Keyman Configuration processes that are running
 # they would not receive the command line argument when we passed one
 echo "sending kill command"
-pkill -u "$CONSOLE_USER" -if "Keyman Configuration"
+pkill -u "$USER_NAME" -if "Keyman Configuration"
 
-# give the file system a second to commit changes
-sleep 1
+# also kill Keyman because Keyman Configuration will invoke it during install
+pkill -u "$USER_NAME" -if "Keyman"
+
+# give the file system a couple seconds to commit changes
+sleep 2
 
 # check if there is a current user and we are not sitting at the login window, then
 # launch the Keyman Configuration under the current user with the custom install argument
 
-if [ -n "$CONSOLE_USER" ] && [ "$CONSOLE_USER" != "loginwindow" ]; then
+if [ -n "$USER_NAME" ] && [ "$USER_NAME" != "loginwindow" ]; then
   echo "⚙️ starting Keyman Configuration"
-  USER_ID=$(id -u "$CONSOLE_USER")
 
-  # use launchctl to safely inject the app into their active GUI session
-  # use -a to pass the --args safely
-  launchctl asuser "$USER_ID" open -n -a "/Applications/Keyman Configuration.app" --args --installation &
+  # get the numerical User ID of the active logged-in GUI user
+  USER_ID=$(stat -f "%u" /dev/console)
+  echo "USER_ID is: $USER_ID"
+
+  APP_BINARY="/Applications/Keyman Configuration.app/Contents/MacOS/Keyman Configuration"
+
+# Launch the binary directly inside the user's system session context.
+# The trailing '&' runs it in the background.
+  launchctl asuser "$USER_ID" sudo -i -u "$USER_NAME" "$APP_BINARY" installation &
 fi
 
 exit 0

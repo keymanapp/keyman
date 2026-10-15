@@ -24,7 +24,7 @@ public extension Notification.Name {
   static let inputMethodEnabled = Notification.Name("input.method.enabled")
 }
 
-private let installationArgument = "--installation"
+private let installationArgument = "installation"
 
 @MainActor // run on the main actor since data is published directly to the UI
 public class InstallationContainer : ObservableObject {
@@ -50,6 +50,8 @@ public class InstallationContainer : ObservableObject {
     if ProcessInfo.processInfo.arguments.contains(installationArgument) {
       Logger.app.log("setting isLaunchedByInstaller to true")
       isLaunchedByInstaller = true
+    } else {
+      Logger.app.debug("installation command line argument not specified")
     }
 
     let defaultsRepo: DefaultsRepository
@@ -73,7 +75,7 @@ public class InstallationContainer : ObservableObject {
       fatalError("Unable to access group container path for InputMethodUtil: \(error.localizedDescription).")
     }
 
-    self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil, launchedByInstaller: isLaunchedByInstaller)
+    self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil, isLaunchedByInstaller: isLaunchedByInstaller)
     self.installInProgress = isLaunchedByInstaller || (self.installationCheck.installationPhase == .installationInProgress || self.installationCheck.installationPhase == .newInstallation)
 
     // If we can now confirm that the user restarted (the final task), then the installation
@@ -101,10 +103,10 @@ public class InstallationContainer : ObservableObject {
   }
 
   /**
-   * called immediately after startup when invoked from installer post-install script
+   * called immediately after startup when installation was completed prior to launch
    */
   func startRepairCheck() {
-    Logger.app.debug("executing repair check...")
+    Logger.app.debug("starting repair check...")
     self.installationCheck.startRepairCheck()
   }
 

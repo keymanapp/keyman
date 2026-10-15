@@ -64,14 +64,14 @@ struct RestartMacView: View {
     
     guard let appleScript = NSAppleScript(source: scriptSource) else {
       Logger.app.error("failed to initialize AppleScript source")
-        return
+      return
     }
     
     var errorInfo: NSDictionary?
     appleScript.executeAndReturnError(&errorInfo)
     
     if let error = errorInfo {
-        Logger.app.error("AppleScript execution error: \(error)")
+      Logger.app.error("AppleScript execution error: \(error)")
     }
   }
 }
