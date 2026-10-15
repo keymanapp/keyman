@@ -93,7 +93,7 @@ class SceneDelegate: UIResponder, UISceneDelegate {
       _overlayWindow!.rootViewController = UIViewController()
       _overlayWindow!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
       _overlayWindow!.autoresizesSubviews = true
-      _overlayWindow!.backgroundColor = UIColor(white: 0.0, alpha: 0.75)
+      _overlayWindow!.backgroundColor = UIColor(white: 0, alpha: 0.75)
       _overlayWindow!.windowLevel = UIWindow.Level.statusBar + 1
       _overlayWindow!.isUserInteractionEnabled = true
       _overlayWindow!.isHidden = true
