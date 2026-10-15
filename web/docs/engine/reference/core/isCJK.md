@@ -8,7 +8,7 @@ Test if a given keyboard or keyboard stub (or the current keyboard) is for Chine
 
 ## Syntax
 
-```c
+```js
 keyman.isCJK(keyboard);
 ```
 

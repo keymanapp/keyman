@@ -183,7 +183,7 @@ export function kmxToXml(kmx: KMXPlus.KMXPlusFile): string {
     return {
       layers: layr.lists.map(({ hardware, minDeviceWidth, layers }) => ({
         ...stringToAttr('formId', hardware),
-        ...numberToAttr('minDeviceWidth', minDeviceWidth),
+        ...numberToAttr('minDeviceWidth', minDeviceWidth === 0 ? undefined : minDeviceWidth),
         layer: layers.map(({ id, mod, rows }) => ({
           ...stringToAttr('id', id),
           ...asAttr('modifiers', modToString(mod)),

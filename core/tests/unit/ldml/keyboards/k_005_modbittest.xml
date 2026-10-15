@@ -12,7 +12,7 @@
   <keys/> <!-- implied only -->
 
   <layers formId="us">
-    <layer id="base" modifiers="none">
+    <layer modifiers="none">
       <row keys="a" /> <!-- K_BKQUOTE -->
     </layer>
     <layer modifiers="shift">

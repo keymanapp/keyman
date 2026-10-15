@@ -71,7 +71,7 @@ After this, you can access the website at the following ports:
 | status.keyman.com* | http://localhost:8060 | http://status-backend.keyman.com.localhost | status-keyman-website  |
 |                    | http://localhost:8061 | http://status.keyman.com.localhost         | status-keyman-public   |
 
-\* Note that status.keyman.com runs in two containers in development to allow for live reload and separation of logs for backend and frontend. 
+\* Note that status.keyman.com runs in two containers in development to allow for live reload and separation of logs for backend and frontend.
 In production, only port 8060 is used.
 
 #### Remove the Docker container and image
@@ -94,6 +94,55 @@ docker logs -f {Docker Container Name}
 ```
 
 Refer to **Port lookup table** above for Docker container names
+
+---------
+
+## How to run composer updates
+
+The Docker containers are setup with multi-stage images, so you will need to
+target the composer-builder stage if you want to execute composer commands such
+as `composer update` or `composer audit`. The following scripts show how to do
+this; here the same id is used for the image tag and the container name for simplicity:
+
+On macOS, Linux:
+
+```bash
+COMPOSER_ID=composer-temp
+# setup
+docker build -f Dockerfile --target composer-builder --tag $COMPOSER_ID .
+docker run -v "$(pwd):/var/www/html/" --name $COMPOSER_ID --user root --rm -d $COMPOSER_ID
+# run commands with `docker exec`, e.g.:
+#  docker exec $COMPOSER_ID    composer audit
+#  docker exec $COMPOSER_ID    composer update
+#  docker exec $COMPOSER_ID    composer update --lock
+# copy modified files to mounted volume:
+docker exec $COMPOSER_ID    cp composer.lock /var/www/html/
+docker exec $COMPOSER_ID    cp composer.json /var/www/html/
+# cleanup
+docker stop $COMPOSER_ID
+docker rmi $COMPOSER_ID
+```
+
+On git bash for Windows, paths must start with `//`, e.g. `//$(pwd)`, `//var/www/html/`:
+
+```bash
+COMPOSER_ID=composer-temp
+# setup
+docker build -f Dockerfile --target composer-builder --tag $COMPOSER_ID .
+docker run -v "//$(pwd):/var/www/html/" --name $COMPOSER_ID --user root --rm -d $COMPOSER_ID
+# run commands with `docker exec`, e.g.:
+#  docker exec $COMPOSER_ID    composer audit
+#  docker exec $COMPOSER_ID    composer update
+#  docker exec $COMPOSER_ID    composer update --lock
+# copy modified files to mounted volume:
+docker exec $COMPOSER_ID    cp composer.lock //var/www/html/
+docker exec $COMPOSER_ID    cp composer.json //var/www/html/
+# cleanup
+docker stop $COMPOSER_ID
+docker rmi $COMPOSER_ID
+```
+
+
 
 ---------
 

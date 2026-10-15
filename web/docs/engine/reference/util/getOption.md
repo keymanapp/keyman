@@ -8,7 +8,7 @@ Get a KeymanWeb, On-Screen Keyboard or User Interface option value.
 
 ## Syntax
 
-```c
+```js
 keyman.util.getOption(optionName, dflt);
 ```
 

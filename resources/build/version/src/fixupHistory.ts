@@ -7,13 +7,9 @@ type GitHub = ReturnType<typeof getOctokit>;
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { gt } from 'semver';
-import { reportHistory } from './reportHistory.js';
+import { reportHistory, PRInformation } from './reportHistory.js';
 import { spawnChild } from './util/spawnAwait.js';
 
-interface PRInformation {
-  title: string;
-  number: number;
-}
 
 // ------------------------------------------------------------------------------------
 // splitPullsIntoHistory

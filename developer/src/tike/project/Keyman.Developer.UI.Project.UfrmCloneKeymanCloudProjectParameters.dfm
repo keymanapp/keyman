@@ -8,6 +8,14 @@ inherited frmCloneKeymanCloudProjectParameters: TfrmCloneKeymanCloudProjectParam
   ExplicitHeight = 545
   PixelsPerInch = 96
   TextHeight = 13
+  object lblMessage: TLabel
+    Left = 8
+    Top = 478
+    Width = 314
+    Height = 13
+    Caption = 'The keyboard %0:s has no source available. It cannot be cloned.'
+    FocusControl = editPath
+  end
   object cmdOK: TButton
     Left = 680
     Top = 473

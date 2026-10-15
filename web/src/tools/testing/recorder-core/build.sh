@@ -18,7 +18,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
-  "@/common/web/keyman-version" \
+  "@/common/web/keyman-version   build" \
   configure \
   clean \
   build

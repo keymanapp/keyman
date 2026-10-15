@@ -1,5 +1,6 @@
 [host_machine]
 system = 'windows'
+subsystem = 'windows'
 cpu_family = 'aarch64'
 cpu = 'arm64'
 endian = 'little'

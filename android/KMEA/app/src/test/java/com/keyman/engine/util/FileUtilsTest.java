@@ -23,7 +23,7 @@ public class FileUtilsTest {
     List<ShadowLog.LogItem> logs = ShadowLog.getLogs();
 
     // The logs contain type 4, but we only care about type 6 for connection messages
-    Assert.assertEquals(2, logs.size());
+    Assert.assertEquals("Size did not match 2: " + logs.toString(), 2, logs.size());
 
     Assert.assertEquals("Connection", logs.get(0).tag);
     Assert.assertEquals("Initialization failed:\njava.net.MalformedURLException: no protocol: invalidURL", logs.get(0).msg);

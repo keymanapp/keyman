@@ -8,7 +8,7 @@ Attach user-defined event handler for any DOM event for an element.
 
 ## Syntax
 
-```c
+```js
 keyman.util.attachDOMEvent(Pelem, eventName, handler, useCapture);
 ```
 

@@ -154,7 +154,7 @@ begin
         end;
       until b = 0;
 
-      ExitCode := ec;   // I3631
+      ExitCode := Integer(ec);   // I3631
 
       Result := True;
     finally

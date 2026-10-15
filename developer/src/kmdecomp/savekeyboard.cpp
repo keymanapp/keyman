@@ -30,10 +30,10 @@
 
 #define _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 #include <codecvt>
-
 #include "../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "../../../common/windows/cpp/include/legacy_kmx_memory.h"
 #include "../../../common/include/vkeys.h"
+#include "../../../common/include/km_vkey.h"
 
 #define SSN__PREFIX		L"&"
 
@@ -265,15 +265,6 @@ PWCHAR ExtString(PWCHAR str)
         }
 				str+=2; // skip UC_SENTINEL_EXTENDEDEND
 				p = wcschr(p, 0);
-				break;
-			case CODE_SWITCH:
-				p = wcscat2(q, BUFSIZE, L"switch<deprecated> ");
-				break;
-			case CODE_KEY:
-				p = wcscat2(q, BUFSIZE, L"key<deprecated> ");
-				break;
-			case CODE_CLEARCONTEXT:
-				p = wcscat2(q, BUFSIZE, L"clearcontext ");
 				break;
 			case CODE_CALL:
 				str++;

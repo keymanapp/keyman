@@ -8,6 +8,7 @@
 import { ModifierKeyConstants, KMXPlus, VisualKeyboard } from "@keymanapp/common-types";
 import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
+import { modifiersToString } from "../util/util.js";
 
 // This is a partial polyfill for findLast, so not polluting Array.prototype
 // https://medium.com/@stheodorejohn/findlast-method-polyfill-in-javascript-bridging-browser-gaps-c3baf6aabae1
@@ -93,7 +94,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     layer: KMXPlus.LayrEntry,
     hardware: string,
   ) {
-    const layerId = layer.id.value;
+    const layerId = layer.id.value ?? modifiersToString(layer.mod); // used only for reference in error messages
 
     hardware = 'us'; // TODO-LDML: US Only. We need to clean this up for other hardware forms
 

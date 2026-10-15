@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <resources>
   <string name="S_Toolbar_CloseOnScreenKeyboard" comment="/PlainText: ">Ekran Klavyesi Kapat</string>
   <string name="S_Menu_Exit" comment="/PlainText: ">&amp;Çıkış</string>
@@ -10,7 +10,6 @@
   <string name="HintTitle_KH_EXITPRODUCT" comment="/HintTitle: ">Keyman'tan Çıkış?</string>
   <string name="koAltGrCtrlAlt" comment="/FormatString: ">AltGr'yi Ctrl+Alt ile simüle edin</string>
   <string name="koAutoOpenOSK" comment="/FormatString: ">Keyman klavye seçildiğinde daima Ekran Klavyesi Penceresini gösterin</string>
-  <string name="koAutoSwitchOSKPages" comment="/FormatString: ">Bir klavye seçildiğinde uygun Ekran Klavyesi/ Yardım'a otomatik olarak geçin</string>
   <string name="koDeadkeyConversion" comment="/FormatString: ">Harf imleme tuşlarına düz tuşlar gibi davran</string>
   <string name="koDebugging" comment="/FormatString: ">Hata Ayıklama</string>
   <string name="kogAdvanced" comment="/FormatString: ">Gelişmiş</string>
@@ -122,7 +121,7 @@
   <string name="S_Languages_Install" comment="/PlainText: ">Dil ekle</string>
   <string name="S_Languages_InstalledLanguage" comment="/PlainText: ">Yüklü Dil</string>
   <string name="S_Languages_KeymanKeyboard" comment="/PlainText: ">Keyman Klavye</string>
-  <string name="S_Languages_Uninstall" comment="/PlainText: ">x</string>
+  <string name="S_Languages_Uninstall" comment="/PlainText: ">✕</string>
   <string name="S_Languages_UseWindowsLayout" comment="/PlainText: ">(Windows düzeni kullan)</string>
   <string name="S_Languages_WindowsLayout" comment="/PlainText: ">Windows Düzeni</string>
   <string name="S_LayoutType_Mnemonic" comment="/PlainText: ">Windows düzenine (Anımsatıcı) eşleştirildi</string>

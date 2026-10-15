@@ -8,7 +8,7 @@ Change the currently active keyboard.
 
 ## Syntax
 
-```c
+```js
 keyman.setActiveKeyboard(keyboardName, languageCode);
 ```
 

@@ -1,6 +1,5 @@
-import { OSKView } from "keyman/engine/osk";
-import { DeviceSpec } from "keyman/engine/keyboard";
-import { type EmbeddedGestureConfig } from "keyman/engine/osk";
+import { OSKView, type EmbeddedGestureConfig } from "keyman/engine/osk";
+import { DeviceSpec } from 'keyman/common/web-utils';
 
 import { GlobeHint } from './osk/globeHint.js';
 import { type KeymanEngine }  from "./keymanEngine.js";

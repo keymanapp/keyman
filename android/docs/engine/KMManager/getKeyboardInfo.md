@@ -31,35 +31,6 @@ Use this method to get details of the keyboard at given position in
 keyboards list. Details include keyboard ID, language ID, keyboard name,
 language name and fonts.
 
-  
-
-------------------------------------------------------------------------
-
-## Syntax (Deprecated)
-
-``` javascript
-KMManager.getKeyboardInfo(Context context, int index)
-```
-
-### Parameters
-
-`context`
-:   The context.
-
-`index`
-:   0-based position of the keyboard in keyboards list.
-
-### Returns
-
-(Deprecated) Returns an information dictionary of the specified keyboard
-with keys and values defined as `HashMap<String key, String value>`.
-
-## Description
-
-Use this method to get details of the keyboard at given position in
-keyboards list. Details include keyboard ID, language ID, keyboard name,
-language name and fonts.
-
 ## Examples
 
 ### Example: Using `getKeyboardInfo()`

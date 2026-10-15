@@ -76,36 +76,6 @@ object modActionsMain: TmodActionsMain
       OnExecute = actFileRevertExecute
       OnUpdate = actFileRevertUpdate
     end
-    object actFilePageSetup: TFilePageSetup
-      Category = 'File'
-      Caption = 'Page Set&up...'
-      Dialog.MinMarginLeft = 0
-      Dialog.MinMarginTop = 0
-      Dialog.MinMarginRight = 0
-      Dialog.MinMarginBottom = 0
-      Dialog.MarginLeft = 2500
-      Dialog.MarginTop = 2500
-      Dialog.MarginRight = 2500
-      Dialog.MarginBottom = 2500
-      Dialog.PageWidth = 21000
-      Dialog.PageHeight = 29700
-      OnUpdate = actFilePageSetupUpdate
-    end
-    object actFilePrint: TAction
-      Category = 'File'
-      Caption = '&Print...'
-      ImageIndex = 20
-      ShortCut = 16464
-      OnExecute = actFilePrintExecute
-      OnUpdate = actFilePrintUpdate
-    end
-    object actFilePrintPreview: TAction
-      Category = 'File'
-      Caption = 'Print Pre&view'
-      ImageIndex = 19
-      OnExecute = actFilePrintPreviewExecute
-      OnUpdate = actFilePrintPreviewUpdate
-    end
     object actFileExit: TFileExit
       Category = 'File'
       Caption = 'E&xit'

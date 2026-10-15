@@ -80,8 +80,6 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      Filleverantörsbibliotek behövs för att visa hjälpfilen: %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Kritiskt tangentbordsfel med %1$s:%2$s för %3$s språk. Laddar standardtangentbordet.</string>
-    <!-- Context: Fatal keyboard error.  -->
-    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Fel i tangentbordet %1$s:%2$s för %3$s språk.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Söker efter tillhörande ordbok att ladda ner</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>

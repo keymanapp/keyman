@@ -8,7 +8,7 @@ Obtain the keyboard set for a specific control, if it exists.
 
 ## Syntax
 
-```c
+```js
 keyman.getKeyboardForControl(Pelem);
 ```
 

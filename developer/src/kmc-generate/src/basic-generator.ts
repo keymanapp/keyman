@@ -106,6 +106,13 @@ export class BasicGenerator extends AbstractGenerator {
 
   private transform(sourceFile: string, destFile: string, artifacts: GeneratorArtifacts) {
     destFile = this.callbacks.path.join(this.options.outPath, this.options.id, destFile == '' ? sourceFile : destFile);
+
+    if(sourceFile == AbstractGenerator.SFile_GitIgnore) {
+      // #16683: npm does not package .gitignore, so we renamed it in our
+      // template distribution. The source file will have the name 'gitignore',
+      // but the output file will be '.gitignore'
+      sourceFile = AbstractGenerator.SFile_GitIgnore_NoDot;
+    }
     sourceFile = this.callbacks.path.join(this.templateBasePath, this.templatePath, sourceFile);
 
     const sourceData = this.callbacks.loadFile(sourceFile);

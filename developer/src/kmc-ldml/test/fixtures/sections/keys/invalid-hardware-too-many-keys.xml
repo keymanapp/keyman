@@ -22,7 +22,7 @@
   </keys>
 
   <layers formId="us">
-    <layer id="base">
+    <layer modifiers="none">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="grave one two three four five six seven eight nine ten eleven minus equal" />
     </layer>

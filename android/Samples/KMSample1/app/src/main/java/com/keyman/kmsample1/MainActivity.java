@@ -64,6 +64,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       KMManager.KMDefault_KeyboardFont,  // Font for KMSample1 text field
       KMManager.KMDefault_KeyboardFont); // Font for OSK
     KMManager.addKeyboard(this, kbInfo);
+    KMManager.setDefaultKeyboard(kbInfo); // Workaround for #16215
 
     // Add a dictionary
     HashMap<String, String>lexicalModelInfo = new HashMap<String, String>();
@@ -132,7 +133,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
   	KMManager.onConfigurationChanged(newConfig);
-	
+
 	  resizeTextView(textView.isKeyboardVisible());
 	  lastOrientation = newConfig.orientation;
   }

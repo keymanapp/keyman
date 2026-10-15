@@ -79,6 +79,7 @@ the `KMX_Version` enum:
 | `0x00000F00` | `VERSION_150` | Keyman 15.0                                                      |
 | `0x00001000` | `VERSION_160` | Keyman 16.0                                                      |
 | `0x00001100` | `VERSION_170` | Keyman 17.0                                                      |
+| `0x00001300` | `VERSION_190` | Keyman 19.0                                                      |
 
 ### `StartGroup`
 

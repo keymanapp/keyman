@@ -306,11 +306,12 @@ export class UtilApiEndpoint {
   }
 
   /**
-   * Function     toNzString
+   * Function     toNzString (deprecated)
    * Scope        Public
    * @param       {*}           item         variable to test
    * @param       {?*=}         dflt         default value
    * @return      {*}
+   * @deprecated
    * Description  Test if a variable is null, false, empty string, or undefined, and return as string
    */
   public nzString(item: any, dflt: string): string {
@@ -339,11 +340,12 @@ export class UtilApiEndpoint {
   }
 
   /**
-   * Function     toNumber
+   * Function     toNumber (deprecated)
    * Scope        Public
    * @param       {string}      s            numeric string
    * @param       {number}      dflt         default value
    * @return      {number}
+   * @deprecated
    * Description  Return string converted to integer or default value
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/util/toNumber
@@ -354,11 +356,12 @@ export class UtilApiEndpoint {
   }
 
   /**
-   * Function     toFloat
+   * Function     toFloat (deprecated)
    * Scope        Public
    * @param       {string}      s            numeric string
    * @param       {number}      dflt         default value
    * @return      {number}
+   * @deprecated
    * Description  Return string converted to real value or default value
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/util/toFloat
@@ -369,7 +372,7 @@ export class UtilApiEndpoint {
   }
 
   /**
-   * Function     rgba
+   * Function     rgba (deprecated)
    * Scope        Public
    * @param       {Object}      s           element style object
    * @param       {number}      r           red value, 0-255
@@ -377,6 +380,7 @@ export class UtilApiEndpoint {
    * @param       {number}      b           blue value, 0-255
    * @param       {number}      a           opacity value, 0-1.0
    * @return      {string}                  background colour style string
+   * @deprecated
    * Description  Browser-independent alpha-channel management
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/util/rgba

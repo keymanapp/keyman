@@ -306,14 +306,12 @@ var
   JSON: string;
   ss: TStringStream;
   sl: TStringList;
-const
-  CTouchLayoutBasicFile = 'template-basic'+Ext_KeymanTouchLayout;
 begin
   Assert(HasTouchLayout);
 
   sl := TStringList.Create; // We use a stringlist because may have a BOM
   try
-    sl.LoadFromFile(GetLayoutBuilderPath + CTouchLayoutBasicFile, TEncoding.UTF8);
+    sl.LoadFromFile(GetLayoutBuilderTemplatePath + CTouchLayout_BasicTemplate, TEncoding.UTF8);
     JSON := sl.Text;
   finally
     sl.Free;

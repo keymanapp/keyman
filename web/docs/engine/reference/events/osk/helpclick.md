@@ -1,14 +1,14 @@
 ---
 title: osk.helpclick Event
 ---
-  
+
 ## Summary
 
 Called upon user request for the UI to present a help page.
 
 ## Syntax
 
-```
+```js
 keyman.osk.addEventListener('helpclick', function() {
   ...
 });

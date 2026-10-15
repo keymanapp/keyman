@@ -13,7 +13,7 @@ public class BannerController {
   public static final String KM_BANNER_DIR = "banner";
   public static final String KM_BANNER_THEME_KEYMAN = "banner.html";
 
-  public static void setHTMLBanner(Context context, KMManager.KeyboardType keyboardType) {
+  public static void setHTMLBanner(Context context, KMManager.KeyboardType keyboardType, boolean isDarkMode) {
     if (keyboardType == KMManager.KeyboardType.KEYBOARD_TYPE_UNDEFINED) {
       return;
     }
@@ -22,6 +22,9 @@ public class BannerController {
 
     // Always use Keyman banner theme
     String contents = FileUtils.readContents(context, KM_BANNER_THEME_KEYMAN);
+    if (isDarkMode) {
+      contents = contents.replace("class=\"keyman-banner\"", "class=\"keyman-banner dark\"");
+    }
     KMManager.setHTMLBanner(keyboardType, contents);
     KMManager.setBanner(keyboardType, KMManager.BannerType.HTML);
     KMManager.showBanner(true);

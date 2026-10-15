@@ -8,13 +8,13 @@ title: contextMatch (KCM) (Deprecated)
 
 ## Syntax
 
-```keyman
+```js
 keyman.interface.contextMatch(n, Pelem, val, ln);
 ```
 
 or
 
-```keyman
+```js
 KeymanWeb.KCM(n, Pelem, val, ln); // Shorthand
 ```
 
@@ -51,7 +51,7 @@ This is a core element of keyboard input management within KeymanWeb in versions
 
 a keyboard would check that the initial context (`"a"`) matches by using
 
-```keyman
+```js
 keyman.interface.contextMatch(1, Pelem, "a", 1)
 ```
 

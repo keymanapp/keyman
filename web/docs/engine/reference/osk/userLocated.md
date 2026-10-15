@@ -8,7 +8,7 @@ Determine whether or not the OSK has been moved from its default position by the
 
 ## Syntax
 
-```c
+```js
 keyman.osk.userLocated();
 ```
 

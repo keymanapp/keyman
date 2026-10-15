@@ -8,7 +8,7 @@ Save document variables as a cookie.
 
 ## Syntax
 
-```c
+```js
 keyman.util.saveCookie(cn, cv);
 ```
 
@@ -26,6 +26,7 @@ keyman.util.saveCookie(cn, cv);
 
 `undefined`
 
-## Description
+## See also
 
-...
+* [`keyman.util.loadCookie()`](loadCookie)
+

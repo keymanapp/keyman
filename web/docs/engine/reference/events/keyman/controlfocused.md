@@ -8,7 +8,7 @@ Called when an input element receives focus.
 
 ## Syntax
 
-```
+```js
 keyman.addEventListener('controlfocused', function(eventProperties) {
   ...
 });

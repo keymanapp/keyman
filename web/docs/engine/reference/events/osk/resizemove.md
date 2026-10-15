@@ -1,14 +1,14 @@
 ---
 title: osk.resizemove Event
 ---
-  
+
 ## Summary
 
 Called when OSK resized or moved on desktop.
 
 ## Syntax
 
-```
+```js
 keyman.osk.addEventListener('resizemove', function() {
   ...
 });

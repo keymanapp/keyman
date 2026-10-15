@@ -20,8 +20,8 @@
     <key id="hmaqtugha" output="\u{CFFFD}" longPressKeyIds="a e" />
   </keys>
 
-  <layers formId="us" minDeviceWidth="123">
-    <layer id="zz">
+  <layers formId="us">
+    <layer modifiers="none">
       <row keys="hmaqtugha" />
     </layer>
   </layers>

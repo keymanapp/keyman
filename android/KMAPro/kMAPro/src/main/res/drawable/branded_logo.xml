@@ -3,7 +3,7 @@
     android:opacity="opaque">
 
     <!-- background color -->
-    <item android:drawable="@android:color/white" />
+    <item android:drawable="@color/branded_logo_bg" />
 
     <!-- product logos -->
     <item

@@ -83,7 +83,7 @@ public final class SelectPackageActivity extends BaseActivity {
       HashMap<String, String> hashMap = new HashMap<>();
       hashMap.put(titleKey, keyboardName);
       hashMap.put(subtitleKey, pkgID);
-      String icon = String.valueOf(R.drawable.ic_action_forward);
+      String icon = String.valueOf(R.drawable.ic_action_forward_mode);
       hashMap.put(iconKey, icon);
       list.add(hashMap);
     }

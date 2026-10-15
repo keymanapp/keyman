@@ -9,7 +9,7 @@ left-control vs right-control.
 
 ## Syntax
 
-```c
+```js
 keyman.isChiral(keyboard);
 ```
 

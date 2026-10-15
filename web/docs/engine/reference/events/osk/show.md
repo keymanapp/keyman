@@ -1,14 +1,14 @@
 ---
 title: osk.show Event
 ---
-  
+
 ## Summary
 
 Called when the OSK is displayed.
 
 ## Syntax
 
-```
+```js
 keyman.osk.addEventListener('show', function(obj) {
   ...
 });
@@ -45,6 +45,7 @@ Available display state information:
     not. Your event handler should return `true` aside from exceptional
     circumstances.
 
-## Description
+## See also
 
-...
+* [`hide` event](hide)
+

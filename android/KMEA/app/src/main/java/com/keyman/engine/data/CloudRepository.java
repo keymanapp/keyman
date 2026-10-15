@@ -21,6 +21,7 @@ import com.keyman.engine.cloud.CloudDownloadMgr;
 import com.keyman.engine.packages.JSONUtils;
 import com.keyman.engine.util.BCP47;
 import com.keyman.engine.util.DownloadFileUtils;
+import com.keyman.engine.util.FileUtils;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.util.VersionUtils;
 
@@ -45,7 +46,7 @@ public class CloudRepository {
   public static final String API_STAGING_HOST = "api.keyman.com"; // #7227 disabling: "api.keyman-staging.com";
 
   public static final String API_MODEL_LANGUAGE_FORMATSTR = "https://%s/model?q=bcp47:%s";
-  public static final String API_PACKAGE_VERSION_FORMATSTR = "https://%s/package-version?platform=android%s%s";
+  public static final String API_PACKAGE_VERSION_FORMATSTR = "https://%s/package-version?platform=android&keyman-version=%s%s%s";
 
   private Dataset memCachedDataset;
   private Calendar lastLoad; // To be used for Dataset caching.
@@ -153,8 +154,10 @@ public class CloudRepository {
   /**
    * Search the available lexical models list and see there's an associated model for a
    * given language ID. Available models are from the cloud catalog and locally installed models.
-   * @param context Context
-   * @param languageID String of the language ID to search
+   * If more than one model are installed for a given language, the first one found will be
+   * returned.
+   * @param context     Context
+   * @param languageID  String of the language ID to search
    * @return LexicalModel of an associated lexical model. Null if no match found
    */
   public LexicalModel getAssociatedLexicalModel(@NonNull Context context, String languageID) {
@@ -205,7 +208,7 @@ public class CloudRepository {
       }
     }
 
-    String queryURL = String.format(API_PACKAGE_VERSION_FORMATSTR, getHost(), keyboardQuery, lexicalModelQuery);
+    String queryURL = String.format(API_PACKAGE_VERSION_FORMATSTR, getHost(), KMManager.getVersion(), keyboardQuery, lexicalModelQuery);
     return new CloudApiTypes.CloudApiParam(
       CloudApiTypes.ApiTarget.PackageVersion, queryURL).setType(CloudApiTypes.JSONType.Object);
   }
@@ -253,6 +256,49 @@ public class CloudRepository {
     downloadMetaDataFromServer(context,updateHandler,onSuccess,onFailure);
   }
 
+  /**
+   * Merges the new lexical models into the existing dataset models. If
+   * a model already exists, it compares the versions and uses the newer one.
+   * Otherwise the model gets added to the dataset. Models that exist
+   * in the dataset but not in the new models list are preserved.
+   * @param datasetModels  Collection of lexical models in the dataset
+   * @param newModels      List of new lexical models to merge
+   */
+  private void mergeLexicalModels(Dataset.LexicalModels datasetModels, List<LexicalModel> newModels) {
+    if (newModels == null) {
+      return;
+    }
+
+    List<LexicalModel> existingModels = new ArrayList<>(datasetModels.asList());
+    List<LexicalModel> mergedModels = new ArrayList<>();
+
+    // Process all incoming models
+    for (LexicalModel newModel : newModels) {
+      LexicalModel existingMatch = null;
+      for (int i = 0; i < existingModels.size(); i++) {
+        if (newModel.equals(existingModels.get(i))) {
+          existingMatch = existingModels.remove(i);
+          break;
+        }
+      }
+
+      if (existingMatch != null) {
+        if (FileUtils.compareVersions(existingMatch.getVersion(), newModel.getVersion()) != FileUtils.VERSION_LOWER) {
+          mergedModels.add(existingMatch);
+        } else {
+          mergedModels.add(newModel);
+        }
+      } else {
+        mergedModels.add(newModel);
+      }
+    }
+
+    // Add remaining existing models that weren't matched
+    mergedModels.addAll(existingModels);
+
+    datasetModels.clear();
+    datasetModels.addAll(mergedModels);
+  }
 
   /**
    * precache dataset and notify callbacks if no update from cloud api services is necessary.
@@ -286,11 +332,13 @@ public class CloudRepository {
       languageCodes.add(installedSet.getItem(i).code);
     }
 
+    // add all models that are installed locally
+    memCachedDataset.lexicalModels.addAll(installedSet.lexicalModels.asList());
+
     // Get kmp.json info from installed (adhoc and cloud) models.
     // Consolidate kmp.json info from packages/
     JSONObject kmpLanguagesArray = wrapKmpKeyboardJSON(JSONUtils.getLanguages());
     JSONArray kmpLexicalModelsArray = JSONUtils.getLexicalModels();
-    final boolean fromKMP = true;
 
     try {
       if (kmpLanguagesArray.getJSONObject(KMKeyboardDownloaderActivity.KMKey_Languages).
@@ -298,7 +346,10 @@ public class CloudRepository {
         memCachedDataset.keyboards.addAll(CloudDataJsonUtil.processKeyboardJSON(kmpLanguagesArray, true));
       }
       if (kmpLexicalModelsArray.length() > 0) {
-        memCachedDataset.lexicalModels.addAll(CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray, fromKMP));
+        // Add all models that exist locally, whether or not they are installed.
+        // This set of models doesn't have the download url set, so instead of
+        // replacing the models in `memCacheDataSet.lexicalModels` we merge them.
+        mergeLexicalModels(memCachedDataset.lexicalModels, CloudDataJsonUtil.processLexicalModelJSON(kmpLexicalModelsArray, true));
       }
     } catch (Exception e) {
       KMLog.LogException(TAG, "preCacheDataSet error ", e);

@@ -8,7 +8,7 @@ Get the (internal) keyboard name and language code of the most recently active k
 
 ## Syntax
 
-```c
+```js
 keyman.getSavedKeyboard();
 ```
 

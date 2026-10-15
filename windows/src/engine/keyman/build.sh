@@ -9,7 +9,9 @@ builder_describe "Keyman main host process (32-bit)" \
   @/common/include \
   @/common/windows/delphi \
   @/windows/src/global/delphi \
-  clean configure build test publish install debug-manifest edit
+  clean configure build test publish install edit \
+  "debug-manifest     Build a uiAccess=false manifest.res for debugging and build within Delphi IDE" \
+  "--debug-manifest   For 'build' action, use a uiAccess=false manifest.res"
 
 builder_parse "$@"
 
@@ -32,7 +34,12 @@ function do_clean() {
 function do_build() {
   create-windows-output-folders
   build_version.res
-  build_manifest.res
+  if builder_has_option --debug-manifest; then
+    builder_echo warning "Using a non-elevated uiAccess=false debug manifest"
+    do_build_debug_manifest
+  else
+    build_manifest.res
+  fi
   run_in_vs_env rc keymanmenuitem.rc
   run_in_vs_env rc icons.rc
   run_in_vs_env rc osktoolbar.rc

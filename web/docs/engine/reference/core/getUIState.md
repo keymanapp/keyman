@@ -8,7 +8,7 @@ Get the KeymanWeb user interface activation state.
 
 ## Syntax
 
-```c
+```js
 keyman.getUIState()
 ```
 

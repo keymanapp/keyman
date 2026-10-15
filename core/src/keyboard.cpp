@@ -26,7 +26,6 @@ keyboard_attributes::keyboard_attributes(std::u16string const & kbid,
     options_store const &opts)
 : _keyboard_id(kbid),
   _version_string(version),
-  _folder_path(""),
   _default_opts(opts)
 {
   // Ensure that the default_options array will be properly terminated.
@@ -38,7 +37,6 @@ keyboard_attributes::keyboard_attributes(std::u16string const & kbid,
 keyboard_attributes::keyboard_attributes(keyboard_attributes &&rhs)
 : _keyboard_id(std::move(rhs._keyboard_id)),
   _version_string(std::move(rhs._version_string)),
-  _folder_path(""),
   _default_opts(std::move(rhs._default_opts))
 {
     rhs.id = rhs.version_string = nullptr;

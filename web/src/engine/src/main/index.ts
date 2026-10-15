@@ -1,0 +1,11 @@
+export { EngineConfiguration, InitOptionDefaults, InitOptionSpec } from './engineConfiguration.js';
+export { ContextManagerBase, ContextManagerConfiguration, type KeyboardInfoPair } from './contextManagerBase.js';
+export { HardKeyboardBase, processForMnemonicsAndLegacy } from './hardKeyboardBase.js';
+export { KeyboardInterfaceBase } from './keyboardInterfaceBase.js';
+export { KeymanEngineBase } from './keymanEngineBase.js';
+export { LegacyAPIEvents } from './legacyAPIEvents.js';
+export { VariableStoreCookieSerializer } from './variableStoreCookieSerializer.js';
+export { LanguageProcessor } from './headless/languageProcessor.js';
+export { TranscriptionCache } from './headless/transcriptionCache.js';
+export { InputProcessor } from './headless/inputProcessor.js';
+export { DeviceDetector } from './headless/deviceDetector.js';

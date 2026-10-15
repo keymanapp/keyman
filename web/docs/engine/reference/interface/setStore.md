@@ -8,13 +8,13 @@ title: setStore (KSETS)
 
 ## Syntax
 
-```c
+```js
 keyman.interface.setStore(systemId, strValue, Pelem);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KSETS(systemId, strValue, Pelem); // Shorthand
 ```
 

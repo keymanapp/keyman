@@ -20,6 +20,7 @@ builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
   "test+" \
   ":dom                  Runs DOM-oriented unit tests (reduced footprint, nothing browser-specific)" \
   ":integrated           Runs KMW's integration test suite" \
+  ":e2e                  Runs KMW's end-to-end test suite" \
   "--inspect             Runs browser-based unit tests in an inspectable mode"
 
 builder_parse "$@"
@@ -30,6 +31,7 @@ builder_parse "$@"
 WTR_CONFIG=
 if builder_is_ci_build; then
   WTR_CONFIG=.CI
+  export KEYMAN_IS_CI_BUILD=1
 fi
 
 # Prepare the flags for the karma command.
@@ -40,6 +42,10 @@ fi
 
 # End common configs.
 
-builder_run_action test:dom web-test-runner --config "src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
+cd "${KEYMAN_ROOT}"
 
-builder_run_action test:integrated web-test-runner --config "src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
+builder_run_action test:dom         web-test-runner --config "web/src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
+
+builder_run_action test:integrated  web-test-runner --config "web/src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_INSPECT}
+
+builder_run_action test:e2e         npx playwright test --config "web/src/test/auto/e2e/playwright.config.ts"

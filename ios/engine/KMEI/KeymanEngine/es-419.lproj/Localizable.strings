@@ -173,7 +173,7 @@
 "menu-picker-title" = "Teclados";
 
 /* Primary text for the Settings menu option to report keyboard crashes */
-"menu-settings-error-report" = "Permitir reporte de errores";
+"menu-settings-error-report" = "Permitir el envío de informes de errores";
 
 /* Secondary text for the Settings menu option to report keyboard crashes */
 "menu-settings-error-report-description" = "Puede requerir \"acceso completo\"";

@@ -8,7 +8,7 @@ Get the absolute position of an element.
 
 ## Syntax
 
-```c
+```js
 keyman.util.getAbsolute(Pelem);
 ```
 
@@ -25,6 +25,6 @@ keyman.util.getAbsolute(Pelem);
 
 ## Description
 
-See also: 
+See also:
 - [`keyman.util.getAbsoluteX()`](getAbsoluteX)
 - [`keyman.util.getAbsoluteY()`](getAbsoluteY)

@@ -7,6 +7,7 @@
 #include <vector>
 #include <codecvt>
 #include <locale>
+#include "../../../common/include/km_vkey.h"
 
 BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard);
 
@@ -542,43 +543,6 @@ DWORD NextUTF32(PWCHAR pc) {
   }
   return *pc;
 }
-/*
-void PrintRule(LPKEYBOARD kbd, LPKEY kp) {
-  LPSTORE sp;
-  std::vector<DWORD> context, output;
-
-  // Always take first char in each referenced store
-  for (PWCHAR pc = kp->dpContext; pc && *pc; pc = incxstr(pc)) {
-    if (*pc == UC_SENTINEL) {
-      switch (*(pc + 1)) {
-      case CODE_ANY:
-        sp = &kbd->dpStoreArray[*(pc + 2) - 1];
-        context.push_back(NextUTF32(sp->dpString));
-        break;
-      case CODE_NOTANY:
-        assert(FALSE); //TODO
-      case CODE_INDEX:
-        assert(FALSE); //TODO
-      case CODE_DEADKEY:
-
-        case CODE_EXTENDED:		p += 2; while (*p != UC_SENTINEL_EXTENDEDEND) p++; return p + 1;
-        case CODE_CLEARCONTEXT: return p + 1;
-        case CODE_CALL:			return p + 1;
-        case CODE_CONTEXTEX:	return p + 1;
-        case CODE_IFOPT:    return p + 3;
-        case CODE_IFSYSTEMSTORE: return p + 3;
-        case CODE_SETOPT:   return p + 2;
-        case CODE_SETSYSTEMSTORE: return p + 2;
-        case CODE_RESETOPT: return p + 1;
-        case CODE_SAVEOPT:  return p + 1;
-      }
-    }
-    else {
-      // Character (either 1 or 2 word)
-    }
-  }
-}
-*/
 
 int groupindex(LPKEYBOARD kbd, LPGROUP gp) {
   return gp - kbd->dpGroupArray;
@@ -599,21 +563,6 @@ void PrintTree(LPKEYBOARD kbd, GROUPTREE *t, int depth) {
     PrintTree(kbd, t->refs[i].target, (depth + 1));
   }
 }
-
-
-// MapVirtualKeys is copied from syskbd.cpp (keyman32)
-#define VK_COLON	0xBA
-#define VK_EQUAL	0xBB
-#define VK_COMMA	0xBC
-#define VK_HYPHEN	0xBD
-#define VK_PERIOD	0xBE
-#define	VK_SLASH	0xBF
-#define VK_ACCENT	0xC0
-#define VK_LBRKT	0xDB
-#define VK_BKSLASH	0xDC
-#define VK_RBRKT	0xDD
-#define VK_QUOTE	0xDE
-#define VK_xDF		0xDF
 
 WCHAR MapVirtualKeys(WORD keyCode, UINT shiftFlags)
 {

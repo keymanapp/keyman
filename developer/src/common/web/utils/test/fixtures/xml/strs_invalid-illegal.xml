@@ -21,7 +21,7 @@
     <key id="that" output="&#xFFFF;" /> <!-- illegal NCR (single char)-->
   </keys>
 
-  <layers formId="us" minDeviceWidth="123">
+  <layers formId="touch" minDeviceWidth="123">
     <layer id="&#xFFFE;">
       <row keys="hmaqtugha that" />
     </layer>

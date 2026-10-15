@@ -54,9 +54,9 @@ const
 //	= $09 = bkspace.-- we don't need to keep this separate though with UC_SENTINEL
   CODE_EXTENDED		= $0A;
 //#define CODE_EXTENDEDEND	= $0B  deprecated
-  CODE_SWITCH			= $0C;
-  CODE_KEY			= $0D;
-  CODE_CLEARCONTEXT	= $0E;
+//CODE_SWITCH			= $0C;      // unused, removed in 19.0
+//CODE_KEY			  = $0D;      // unused, removed in 19.0
+//CODE_CLEARCONTEXT	= $0E;    // unused, removed in 19.0
   CODE_CALL		 =	$0F;
 // UC_SENTINEL_EXTENDEDEND  0x10
   CODE_CONTEXTEX = $11;
@@ -75,15 +75,6 @@ const
   CODE_LASTCODE = $18;
 
 const
-  KMXCodeNames: array[CODE_FIRSTCODE..CODE_LASTCODE] of string = (
-    'any', 'index', 'context', 'nul', 'use', 'return', 'beep', 'deadkey',
-    '',
-    'extended', '', 'switch', 'key', 'clearcontext', 'call',
-    '', 'contextex', 'notany',
-    'set', 'if', 'save', 'reset',  // I3429
-    'if(&system)', 'set(&system)');  // I3430    // I3437
-
-const
   VERSION_30 = $00000300;
   VERSION_31 = $00000301;
   VERSION_32 = $00000302;
@@ -99,9 +90,10 @@ const
   VERSION_150 = $00000F00;
   VERSION_160 = $00001000;
   VERSION_170 = $00001100;
+  VERSION_190 = $00001300;
 
   VERSION_MIN	= VERSION_50;
-  VERSION_MAX	= VERSION_170;
+  VERSION_MAX	= VERSION_190;
 
   VERSION_MASK_MINOR = $00FF;
   VERSION_MASK_MAJOR = $FF00;

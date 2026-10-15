@@ -4,7 +4,7 @@ import { ExpandSentinel, incxstr, xstrlen } from "./util.js";
 import { options, nl, FTabStop, setupGlobals, callbacks, FFix183_LadderLength, FCallFunctions, fk, minimumKeymanVersionToString, isKeyboardVersion10OrLater, isKeyboardVersion17OrLater } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
 import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
-import { ValidateLayoutFile } from "./validate-layout-file.js";
+import { CompileLayoutFile } from "./compile-layout-file.js";
 import { VisualKeyboardFromFile } from "./visual-keyboard-compiler.js";
 import { KmnCompilerResult, STORETYPE_DEBUG, STORETYPE_OPTION, STORETYPE_RESERVED } from "../compiler/compiler.js";
 
@@ -166,7 +166,7 @@ export function WriteCompiledKeyboard(
   if (sLayoutFilename != '') {  // I3483
     sLayoutFilename = callbacks.resolveFilename(kmnfile, sLayoutFilename);
 
-    const result = ValidateLayoutFile(keyboard, options.saveDebug, sLayoutFilename, sVKDictionary, kmxResult.displayMap);
+    const result = CompileLayoutFile(keyboard, options.saveDebug, sLayoutFilename, sVKDictionary, kmxResult.displayMap);
     if(!result) {
       sLayoutFile = '';
       return null;

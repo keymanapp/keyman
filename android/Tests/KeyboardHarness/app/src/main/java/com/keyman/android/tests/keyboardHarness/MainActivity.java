@@ -58,6 +58,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       KMManager.KMDefault_KeyboardFont,
       KMManager.KMDefault_KeyboardFont);
     KMManager.addKeyboard(this, chiralityKBInfo);
+    Keyboard.setDefaultKeyboard(chiralityKBInfo);
 
     // Longpress test keyboard
     Keyboard longpressKBbInfo = new Keyboard(

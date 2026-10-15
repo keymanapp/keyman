@@ -127,6 +127,10 @@ export const USVirtualKeyCodes = {
   'k_?C1':193,
   K_oDF:0xDF,
   K_ODF:0xDF,
+
+  // Key codes > 50000 are special virtual key codes that are only used
+  // in touch layouts and should probably not be used elsewhere.
+  // See https://github.com/keymanapp/keyman/pull/15343#discussion_r2674949933
   K_LOPT:50001,
   K_ROPT:50002,
   K_NUMERALS:50003,

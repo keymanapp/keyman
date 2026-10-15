@@ -7,7 +7,7 @@
 
   <!-- this is here because this test is used by test-compiler-e2e -->
   <layers formId="us">
-    <layer id="base">
+    <layer modifiers="none">
       <row keys="a b c" />
     </layer>
   </layers>

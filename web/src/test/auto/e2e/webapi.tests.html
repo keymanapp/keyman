@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+  <title>KeymanWeb API Tests</title>
+
+  <!-- Insert uncompiled KeymanWeb source scripts -->
+  <script src="../../../../build/publish/debug/keymanweb.js"></script>
+  <script src="../../../../build/publish/debug/kmwuitoggle.js"></script>
+
+  <!-- Initialization: set paths to keyboards, resources and fonts as required -->
+  <script>
+    keyman.init({
+      root: './src',
+      ui: 'toggle',
+      resources: '../../../src/resources'
+    }).then(async function () {
+      await keyman.addKeyboards([
+        {
+          id: 'european2',
+          name: 'English (EuroLatin2)',
+          languages: {
+            id: 'en',
+            name: 'English'
+          },
+          filename: '../../../../build/docs/engine/guide/examples/js/european2.js'
+        },
+        {
+          id: 'laokeys',
+          name: 'Lao (Phonetic)',
+          languages: {
+            id: 'lo',
+            name: 'Lao'
+          },
+          filename: '../../../../build/docs/engine/guide/examples/js/laokeys.js'
+        },
+        {
+          id: 'hebrew',
+          name: 'Hebrew',
+          languages: {
+            id: 'he',
+            name: 'Hebrew'
+          },
+          filename: '../../../../build/docs/engine/guide/examples/js/hebrew.js'
+        },
+        {
+          id: 'devanagari_inscript',
+          name: 'Devanagari Inscript',
+          languages: {
+            id: 'hi',
+            name: 'Hindi'
+          },
+          filename: '../../../../build/docs/engine/guide/examples/js/devanagari_inscript.js'
+        },
+        {
+          id: 'korean_korda',
+          name: 'Korean Korda',
+          languages: {
+            id: 'ko',
+            name: 'Korean'
+          },
+          filename: '../../../../build/docs/engine/guide/examples/js/korean_korda.js'
+        },
+      ]);
+
+      // Set independent mode for input3 and input4
+      keyman.setKeyboardForControl(document.getElementById('input3'), 'Keyboard_hebrew', 'he');
+      keyman.setKeyboardForControl(document.getElementById('input4'), 'Keyboard_devanagari_inscript', 'hi');
+
+      // Set global active keyboard
+      keyman.setActiveKeyboard('Keyboard_laokeys', 'lo');
+    });
+  </script>
+</head>
+
+<body>
+  <h2>KeymanWeb API Tests</h2>
+
+  <div>
+    <h3>Input fields in global mode</h3>
+    <p><label for='input1'>Input 1 (default: Lao (Phonetic)):</label> <input type='text' id='input1' aria-label='input1'/> &mdash; <label for='input2'>Input 2 (default: Lao (Phonetic)):</label> <input type='text' id='input2' aria-label='input2'/></p>
+  </div>
+  <div>
+    <h3>Input fields in independent mode</h3>
+    <p><label for='input3'>Input 3 (default: Hebrew):</label> <input type='text' id='input3' aria-label='input3'/> &mdash; <label for='input4'>Input 4 (default: Devanagari):</label> <input type='text' id='input4' aria-label='input4'/></p>
+  </div>
+</body>
+
+</html>

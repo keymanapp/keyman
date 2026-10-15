@@ -1,20 +1,17 @@
 {
   "extends": "../../../tsconfig.dom.json",
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "../../../../build/tools/testing/recorder/obj/",
     "rootDir": ".",
-    "tsBuildInfoFile": "../../../../build/tools/testing/recorder/obj/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "../../../../build/tools/testing/recorder/obj/tsconfig.tsbuildinfo",
   },
 
   "include": [ "*.ts" ],
 
   "references": [
-    { "path": "../../../../../common/web/keyman-version" },
-    { "path": "../../../engine/common/web-utils" },
-    { "path": "../../../engine/predictive-text/types" },
+    { "path": "../../../common/web-utils" },
     { "path": "../../../app/browser" },
     { "path": "../recorder-core" },
-    { "path": "../../../engine/keyboard" },
+    { "path": "../../../engine" },
   ]
 }

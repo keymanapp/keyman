@@ -145,6 +145,7 @@ export class AbstractGenerator {
   protected static readonly SFile_LicenseMD = 'LICENSE.md';
   protected static readonly SFile_ReadmeMD = 'README.md';
   protected static readonly SFile_GitIgnore = '.gitignore';
+  protected static readonly SFile_GitIgnore_NoDot = 'gitignore'; // #16683
 
   protected get callbacks(): CompilerCallbacks { return this._callbacks; }
   private _callbacks: CompilerCallbacks;

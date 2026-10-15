@@ -98,7 +98,7 @@ function upload_with_retry() {
   return 1
 }
 
-distributions="${DIST:-jammy noble questing resolute}"
+distributions="${DIST:-jammy noble resolute stonking}"
 packageversion="${PACKAGEVERSION:-1~sil1}"
 retries="${RETRIES:-5}"
 

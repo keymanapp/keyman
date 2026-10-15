@@ -8,7 +8,7 @@ Detach KeymanWeb from HTML element (or IFrame).
 
 ## Syntax
 
-```c
+```js
 keyman.detachFromControl(Pelem);
 ```
 

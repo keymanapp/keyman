@@ -81,6 +81,10 @@ export interface CopierResult extends KeymanCompilerResult {
   artifacts: CopierArtifacts;
 };
 
+/**
+ * @public
+ * Copy a project and rename internal references
+ */
 export class KeymanProjectCopier implements KeymanCompiler {
   options: CopierOptions;
   callbacks: CompilerCallbacks;
@@ -111,8 +115,8 @@ export class KeymanProjectCopier implements KeymanCompiler {
    * artifacts on success. The files are passed in by name, and the compiler
    * will use callbacks as passed to the {@link KeymanProjectCopier.init}
    * function to read any input files by disk.
-   * @param   source  Source file or folder to copy. Can be a local file or folder, https://github.com/.../repo[/path], or cloud:id
-   * @returns         Binary artifacts on success, null on failure.
+   * @param   source - Source file or folder to copy. Can be a local file or folder, https://github.com/.../repo[/path], or cloud:id
+   * @returns          Binary artifacts on success, null on failure.
    */
   public async run(source: string): Promise<CopierResult> {
 
@@ -174,7 +178,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
   /**
    * Resolve the source project file to either a local filesystem file,
    * or a reference on GitHub
-   * @param source
+   * @param source - URI to a project file
    * @returns  path to .kpj (either local or remote)
    */
   private async getSourceProject(source: string): Promise<string | GitHubRef> {
@@ -196,7 +200,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
   /**
    * Resolve source path to the contained project file; the project
    * file must have the same basename as the folder in this case
-   * @param source
+   * @param source - local file path to a .kpj project file
    * @returns
    */
   private getLocalFolderProject(source: string): string {
@@ -212,7 +216,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
   /**
    * Resolve source path to the input .kpj filename, folder name
    * is not relevant when .kpj filename is passed in
-   * @param source
+   * @param source - local file path to a .kpj project file
    * @returns
    */
   private getLocalFileProject(source: string): string {
@@ -224,7 +228,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
    *   `[https://]github.com/owner/repo/branch/path/to/kpj`
    * The path must be fully qualified, referencing the .kpj file; it
    * cannot just be the folder where the .kpj is found
-   * @param source
+   * @param source - URL to a .kpj project file on GitHub
    * @returns a promise: GitHub reference to the source for the keyboard, or null on failure
    */
   private async getGitHubSourceProject(source: string): Promise<GitHubRef> {
@@ -273,7 +277,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
    * The `keyboard_id` parameter should be a valid id (a-z0-9_), as found at
    * https://keyman.com/keyboards; alternatively if it is a model_id, it should
    * have the format author.bcp47.uniq
-   * @param source
+   * @param source - a reference to a keyboard or model project on Keyman Cloud
    * @returns a promise: GitHub reference to the source for the keyboard, or null on failure
    */
   private async getCloudSourceProject(source: string): Promise<GitHubRef> {
@@ -613,8 +617,8 @@ export class KeymanProjectCopier implements KeymanCompiler {
   /**
    * renames matching filename to the output filename pattern, and prepends the
    * outputPath
-   * @param filename
-   * @param outputPath
+   * @param filename - input filename to rename
+   * @param outputPath - target filename path
    * @returns
    */
   private generateNewFilename(filename: string, outputPath: string): string {

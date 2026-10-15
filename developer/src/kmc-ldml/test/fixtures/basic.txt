@@ -12,7 +12,7 @@
 #
 #    cd developer/src/kmc
 #    ./build.sh configure build # if needed
-#    ./build.sh build-fixtures
+#    ./build.sh fixtures-build
 #
 #  This will compile both the .xml and the .txt to build/test/fixtures and also emit the
 #  checksum for basic-xml.kmx so you can patch that into this file.
@@ -408,7 +408,7 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   index(strNull,strUs,2)            #   KMXPLUS_STR hardware = 'us'
   00 00 00 00                       #   KMX_DWORD layer;
   01 00 00 00 # count
-  7B 00 00 00                       #   KMX_DWORD minDeviceWidth; // 123
+  00 00 00 00                       #   KMX_DWORD minDeviceWidth; // 0
   # layers 0
   00 00 00 00                       #   KMXPLUS_STR id;
   00 00 00 00                       #   KMX_DWORD mod

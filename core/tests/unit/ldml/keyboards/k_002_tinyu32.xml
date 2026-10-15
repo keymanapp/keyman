@@ -16,7 +16,7 @@
   </keys>
 
   <layers formId="us">
-    <layer id="base">
+    <layer modifiers="none">
       <row keys="hmaqtugha that screamcat" /> <!-- number row -->
     </layer>
   </layers>

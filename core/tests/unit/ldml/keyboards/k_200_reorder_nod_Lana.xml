@@ -21,7 +21,7 @@
   </keys>
 
   <layers formId="us">
-    <layer modifiers="none" id="base">
+    <layer modifiers="none">
       <row keys="roast" />
       <row keys="gap wa gap gap t2 gap gap gap o gap" />
       <row keys="gap sakot gap gap gap gap gap kha gap" />

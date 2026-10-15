@@ -1,5 +1,5 @@
 ---
-title: Using the Banner on the Keyboard - Keyman for iPhone and iPad Help
+title: Predictive-Text Settings and the Banner - Keyman for iPhone and iPad Help
 ---
 
 ## About the Keyboard Banner
@@ -9,6 +9,18 @@ Keyman keyboards now always display a banner above the keyboard for one of the f
 * Display suggestions (See "Using the Suggestion Banner" below)
 * Display a Keyman-themed banner so popups and gestures for the top row of keys are visible
 * Reserved for future functionality
+
+## Adjusting Text Suggestion Settings
+
+The banner mode can be controlled by going to Keyman Settings --> (select an installed language)
+
+At the bottom of the language settings menu are three controls for the banner:
+
+![](../ios_images/prediction-options.png)
+
+* Offer word completions (Suggestion banner displays predictions; shows a flat image-banner if disabled)
+* Offer corrections (Suggestion banner displays predictions and corrections)
+* Apply corrections automatically (Tapping the space bar may automatically apply the best suggestion)
 
 ## Using the Suggestion Banner
 

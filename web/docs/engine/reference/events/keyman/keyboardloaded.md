@@ -8,7 +8,7 @@ Called when keyboard code loaded.
 
 ## Syntax
 
-```
+```js
 keyman.addEventListener('keyboardloaded', function(keyboardProperties) {
   ...
 });

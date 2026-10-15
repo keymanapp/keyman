@@ -1589,7 +1589,6 @@ procedure TfrmVisualKeyboard.UpdateActivePage;
 begin
   if ActivePage in [apUndefined, apKeyboard] then  // I2287
   begin
-    {$MESSAGE HINT 'eliminate Option_AutoSwitchOSKPages'}
     LoadKeyboard;
     if (frmKeyman7Main.ActiveKeymanID = KEYMANID_NONKEYMAN) or FOnScreenKeyboard.HasVisualKeyboard(frmKeyman7Main.ActiveKeymanID) then   // I3949
       ActivePage := apKeyboard

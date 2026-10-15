@@ -280,6 +280,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="keymanhp.h" />
+    <ClInclude Include="..\..\..\include\keymancontrol.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

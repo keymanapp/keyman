@@ -18,6 +18,16 @@ import { LdmlKeyboardCompiler } from '../src/main.js';
 describe('visual-keyboard-compiler', function() {
   this.slow(500); // 0.5 sec -- json schema validation takes a while
 
+  this.beforeEach(function() {
+    compilerTestCallbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest.isFailed()) {
+      compilerTestCallbacks.printMessages();
+    }
+  });
+
   it('should build fixtures', async function() {
     // Let's build basic.xml
 

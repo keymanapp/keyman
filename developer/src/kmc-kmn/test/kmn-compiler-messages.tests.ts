@@ -3,14 +3,76 @@ import { assert } from 'chai';
 import { CompilerErrorMask, CompilerErrorNamespace } from '@keymanapp/developer-utils';
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { KmnCompiler } from '../src/main.js';
-import { KmnCompilerMessageRanges, KmnCompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
+import { KmcKmnCompilerEvent, KmnCompilerMessageRanges, KmnCompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
 import { makePathToFixture } from './helpers/index.js';
+
+
+// Source - https://stackoverflow.com/a/9924463
+// Posted by Jack Allan, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-09-01, License - CC BY-SA 3.0
+function getParamNames(func: any) {
+  const STRIP_COMMENTS = /(\/\/.*$)|(\/\*[\s\S]*?\*\/)|(\s*=[^,\)]*(('(?:\\'|[^'\r\n])*')|("(?:\\"|[^"\r\n])*"))|(\s*=[^,\)]*))/mg;
+  const ARGUMENT_NAMES = /([^\s,]+)/g;
+  const fnStr = func.toString().replace(STRIP_COMMENTS, '');
+  let result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES);
+  if(result === null)
+     result = [];
+  return result;
+}
+
 
 describe('KmnCompilerMessages', function () {
   const callbacks = new TestCompilerCallbacks(this);
 
   it('should have a valid KmnCompilerMessages object', function() {
     return verifyCompilerMessagesObject(KmnCompilerMessages, CompilerErrorNamespace.KmnCompiler);
+  });
+
+  it('should have correct parameter types and numeric ranges for kmcmplib vs kmw vs kmc-kmn messages', function() {
+    // See comment in kmn-compiler-messages.ts for logic.
+    // This function follows the same pattern as `verifyCompilerMessagesObject` but with specific tests for
+    // this more constrained object
+    const toTitleCase = (s: string) => s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+    const keys = Object.keys(KmnCompilerMessages);
+    const m = KmnCompilerMessages as Record<string,any>;
+
+    for(const key of keys) {
+      if(typeof m[key] == 'number') {
+        const o = /^(DEBUG|VERBOSE|INFO|HINT|WARN|ERROR|FATAL)_([A-Za-z0-9_]+)$/.exec(key);
+        const f = toTitleCase(o[1]) + '_' + o[2];
+        // note: validation done in verifyCompilerMessagesObject, don't repeat it here
+
+        const v: KmcKmnCompilerEvent = m[f]('','','','','','','','','','','','' /* ignore arguments*/);
+
+        const code = m[key] & CompilerErrorMask.BaseError;
+        const hex = code.toString(16).padStart(3, '0');
+
+        if(code >= KmnCompilerMessageRanges.RANGE_CompilerMessage_Min &&code <= KmnCompilerMessageRanges.RANGE_CompilerMessage_Max) {
+          // kmc-kmn messages, should not be using mw() function or mc() function
+          //
+          assert.equal(v.kmcKmnSource, 'kmc-kmn', `expected ${v.kmcKmnSource} to equal 'kmc-kmn' for ${hex}, '${key}'.`);
+        } else if(code >= KmnCompilerMessageRanges.RANGE_KMN_COMPILER_MIN && code <= KmnCompilerMessageRanges.RANGE_KMN_COMPILER_MAX) {
+          // kmcmplib or kmw compiler messages, should not be using m() function or mx() function
+          assert.oneOf(v.kmcKmnSource, ['kmcmplib', 'kmw-compiler'], `expected ${v.kmcKmnSource} to equal 'kmcmplib' or 'kmw-compiler for ${hex}, '${key}'.`);
+          if(v.kmcKmnSource == 'kmcmplib') {
+            // The only allowed param is an object o with property p. We
+            // cannot test parameter shape directly, so we will compare
+            // outputs of calling if o.p is set, which should not match what
+            // we get when o.p is not set.
+            const params = getParamNames(m[f]);
+            if(params.length) {
+              const v2: KmcKmnCompilerEvent = m[f]({p:['1','2','3','4','5','6','7','8','9']});
+              assert.notEqual(v.message, v2.message, `Message '${key}' (${hex}) must use \`(o: KmcmpLibMessageParameters)\` pattern or have no parameters`);
+            }
+          }
+        } else if(code >= KmnCompilerMessageRanges.RANGE_LEXICAL_MODEL_MIN && code <= KmnCompilerMessageRanges.RANGE_LEXICAL_MODEL_MAX) {
+          assert.fail(`Message identifier ${hex} for '${key}' is reserved and should not be used (LEXICAL_MODEL range)`);
+        } else {
+          assert.fail(`Message identifier ${hex} for '${key}' is out of range`);
+        }
+      }
+    }
+
   });
 
   it('should have a 1:1 correspondence with kmn_compiler_errors.h', function() {
@@ -95,7 +157,11 @@ describe('KmnCompilerMessages', function () {
     await compiler.run(kmnPath, null);
 
     if(Array.isArray(messageId)) {
-      assert.sameMembers(messageId, callbacks.messages.map(m=>m.code));
+      assert.sameMembers(
+        callbacks.messages.map(m=>m.code),
+        messageId,
+        `messages did not match, received ${JSON.stringify(callbacks.messages,null,2)}, expected: ${JSON.stringify(messageId)}`
+      );
     } else if(messageId) {
       assert.isTrue(callbacks.hasMessage(messageId), `messageId ${messageId.toString(16)} not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
       assert.lengthOf(callbacks.messages, 1, `messages should have 1 entry, instead has: `+JSON.stringify(callbacks.messages,null,2));
@@ -132,6 +198,9 @@ describe('KmnCompilerMessages', function () {
 
   it('should generate ERROR_VirtualKeyInContext if a virtual key is found in the context part of a rule', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_in_context.kmn'], KmnCompilerMessages.ERROR_VirtualKeyInContext);
+    await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_in_context-any.kmn'], KmnCompilerMessages.ERROR_VirtualKeyInContext);
+    await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_in_context-index.kmn'], KmnCompilerMessages.ERROR_VirtualKeyInContext);
+    await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_in_context-notany.kmn'], KmnCompilerMessages.ERROR_VirtualKeyInContext);
   });
 
   // WARN_TouchLayoutUnidentifiedKey
@@ -151,6 +220,7 @@ describe('KmnCompilerMessages', function () {
 
   it('should generate WARN_VirtualKeyInOutput if a virtual key is found in the output part of a rule', async function() {
     await testForMessage(this, ['invalid-keyboards', 'warn_virtual_key_in_output.kmn'], KmnCompilerMessages.WARN_VirtualKeyInOutput);
+    await testForMessage(this, ['invalid-keyboards', 'warn_virtual_key_in_output-index.kmn'], KmnCompilerMessages.WARN_VirtualKeyInOutput);
   });
 
   // ERROR_OutsTooLong
@@ -285,4 +355,67 @@ describe('KmnCompilerMessages', function () {
     await testForMessage(this, ['invalid-keyboards', 'error_name_must_not_contain_square_brackets-deadkey.kmn'], [KmnCompilerMessages.ERROR_NameMustNotContainSquareBrackets, KmnCompilerMessages.ERROR_InvalidDeadkey]);
   });
 
+  //
+  // Deprecations
+  //
+
+  // WARN_DeprecatedValueFormat
+
+  it('should generate WARN_DeprecatedValueFormat if the file has decimal, octal, or hexadecimal value formats', async function() {
+    await testForMessage(this, ['keyboards', 'warn_deprecated_value_format-decimal.kmn'], KmnCompilerMessages.WARN_DeprecatedValueFormat);
+    await testForMessage(this, ['keyboards', 'warn_deprecated_value_format-octal.kmn'], KmnCompilerMessages.WARN_DeprecatedValueFormat);
+    await testForMessage(this, ['keyboards', 'warn_deprecated_value_format-hexadecimal.kmn'], KmnCompilerMessages.WARN_DeprecatedValueFormat);
+  });
+
+  // WARN_DeprecatedCompileTarget
+
+  it('should generate WARN_DeprecatedCompileTarget if the file contains a deprecated compile target', async function() {
+    await testForMessage(this, ['keyboards', 'warn_deprecated_compile_target-keymanonly.kmn'], KmnCompilerMessages.WARN_DeprecatedCompileTarget);
+    await testForMessage(this, ['keyboards', 'warn_deprecated_compile_target-keymanweb.kmn'], KmnCompilerMessages.WARN_DeprecatedCompileTarget);
+  });
+
+  // WARN_HeaderStatementIsDeprecated
+
+  ['bitmap', 'bitmaps', 'caps-always-off', 'caps-on-only', 'copyright', 'hotkey', 'message', 'name', 'shift-frees-caps', 'version'].forEach(statement =>
+    it(`should generate WARN_HeaderStatementIsDeprecated if the file contains deprecated header statement "${statement.replaceAll('-',' ').toUpperCase()}"`, async function() {
+      await testForMessage(this, ['keyboards',  `warn_header_statement_is_deprecated-${statement}.kmn`], KmnCompilerMessages.WARN_HeaderStatementIsDeprecated);
+    })
+  );
+
+  ['language', 'languagename'].forEach(statement =>
+    // Two messages generated for these legacy header statements
+    it(`should generate WARN_HeaderStatementIsDeprecated and WARN_LanguageHeadersDeprecatedInKeyman10 if the file contains deprecated header statement "${statement.replaceAll('-',' ').toUpperCase()}"`, async function() {
+      await testForMessage(this, ['keyboards',  `warn_header_statement_is_deprecated-${statement}.kmn`], [
+        KmnCompilerMessages.WARN_HeaderStatementIsDeprecated, KmnCompilerMessages.WARN_LanguageHeadersDeprecatedInKeyman10
+      ]);
+    })
+  );
+
+  ['layout'].forEach(statement =>
+    // LAYOUT statement requires LANGUAGE as well, so we'll get two messages here
+    it(`should generate WARN_HeaderStatementIsDeprecated and ERROR_LayoutButNoLanguage if the file contains deprecated header statement "${statement.replaceAll('-',' ').toUpperCase()}"`, async function() {
+      await testForMessage(this, ['keyboards',  `warn_header_statement_is_deprecated-${statement}.kmn`], [
+        KmnCompilerMessages.WARN_HeaderStatementIsDeprecated, KmnCompilerMessages.ERROR_LayoutButNoLanguage
+      ]);
+    })
+  );
+
+  // WARN_LanguageHeadersDeprecatedInKeyman10
+
+  ['ethnologuecode', 'language', 'windowslanguages'].forEach(storeName =>
+    it(`should generate WARN_LanguageHeadersDeprecatedInKeyman10 if the file contains deprecated system store "&${storeName}"`, async function() {
+      await testForMessage(this, ['keyboards', `warn_language_headers_deprecated_in_keyman10-${storeName}.kmn`], KmnCompilerMessages.WARN_LanguageHeadersDeprecatedInKeyman10);
+    })
+  );
+
+  // ERROR_StoreContainsUnsupportedStatement
+
+  ['any', 'index', 'context', 'nul', 'use', 'return', 'beep',
+   'call', 'contextex', 'notany', 'setopt',
+   'ifopt', 'baselayout', 'layer', 'platform',
+   'saveopt', 'resetopt', 'ifsystemstore', 'setsystemstore'].forEach(statement =>
+    it(`should generate ERROR_StoreContainsUnsupportedStatement if a store contains statement "${statement}"`, async function() {
+      await testForMessage(this, ['invalid-keyboards', `error_store_contains_unsupported_statement-${statement}.kmn`], KmnCompilerMessages.ERROR_StoreContainsUnsupportedStatement);
+    })
+  );
 });

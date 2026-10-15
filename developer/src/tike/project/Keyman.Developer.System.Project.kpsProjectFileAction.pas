@@ -29,6 +29,8 @@ begin
   w := TKmcWrapper.Create;
   try
     Result := w.Compile(Self, FileName, TargetFilename, False);
+    if not OwnerProject.Options.SkipMetadataFiles then
+      Result := Result and w.CompileForPublishing(Self, OwnerProject.FileName, False);
     // TODO(lowpri): FDebug flag
   finally
     w.Free;

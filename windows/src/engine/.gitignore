@@ -3,6 +3,9 @@ keyman32/keyman-debug-etw.h
 keyman32/keyman-debug-etw.rc
 keyman32/keyman-debug-etw.res
 keyman32/keyman-debug-etwTEMP.BIN
+keymanhp/versionarm64.res
+keymanhp/versionx64.res
+kmcomapi/kbd_noicon.res
 mcompile/Debug
 
 # Visual Studio packages for test

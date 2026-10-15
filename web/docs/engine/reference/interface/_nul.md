@@ -8,13 +8,13 @@ title: nul (KN)
 
 ## Syntax
 
-```c
+```js
 keyman.interface.nul(n, Pelem);
 ```
 
 or
 
-```c
+```js
 KeymanWeb.KN(n, Pelem); // Shorthand
 ```
 

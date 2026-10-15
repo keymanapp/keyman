@@ -84,8 +84,6 @@
     <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">      Библиотека файлового провайдера необходима для просмотра файла справки: %1$s</string>
     <!-- Context: Fatal keyboard error. Will load default keyboard -->
     <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">      Неустранимая ошибка клавиатуры %1$s:%2$s для %3$s языка. Загрузка по умолчанию клавиатуры.</string>
-    <!-- Context: Fatal keyboard error.  -->
-    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Ошибка в клавиатуре %1$s:%2$s для языка %3$s.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Проверка соответствующего словаря для загрузки</string>
     <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>

@@ -9,7 +9,7 @@ import {
 import * as KMWRecorder from '#recorder';
 import OSKInputEventSpec = KMWRecorder.OSKInputEventSpec;
 
-import { timedPromise } from '@keymanapp/web-utils';
+import { timedPromise } from 'keyman/common/web-utils';
 import { type KeymanEngine } from 'keyman/app/browser';
 
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';

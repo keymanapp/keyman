@@ -72,12 +72,12 @@ await keyman.addKeyboards({
 Custom fonts may also be utilized via the `languages.font` property. For example:
 
 ```typescript
-languages:{
-  id:'lo',
-  name:'Lao',
-  font:{
-    family:'LaoWeb',
-    source:['../font/saysettha_web.ttf','../font/saysettha_web.woff']
+languages: {
+  id: 'lo',
+  name: 'Lao',
+  font: {
+    family: 'LaoWeb',
+    source: ['../font/saysettha_web.ttf','../font/saysettha_web.woff']
   }
 }
 ```

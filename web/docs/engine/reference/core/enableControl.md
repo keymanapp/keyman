@@ -8,7 +8,7 @@ Enables KeymanWeb input handling for the specified control.
 
 ## Syntax
 
-```c
+```js
 keyman.enableControl(Pelem)
 ```
 
@@ -40,6 +40,6 @@ If `'kmw-disabled'` is removed from the control via other means, `enableControl(
 
 If called on an element in an unattached state, the `'kmw-disabled'` tag will be removed from the element.
 
-## See also 
+## See also
 - [`keyman.attachToControl()`](attachToControl)
 - [`keyman.disableControl()`](disableControl)

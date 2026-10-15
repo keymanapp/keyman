@@ -108,7 +108,6 @@
 
 #define KR_REQUEST_REFRESH  0
 #define KR_PRE_REFRESH      1
-#define KR_REFRESH          2
 #define KR_SETTINGS_CHANGED 3   // Broadcast when Keyman Configuration settings change
 
 /* WM_KEY* message analysis */

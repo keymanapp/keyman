@@ -1,30 +1,28 @@
 import {
-  DOMKeyboardLoader
-} from 'keyman/engine/keyboard/dom-keyboard-loader';
-
-import {
+  DOMKeyboardLoader,
+  JSKeyboard,
   Keyboard,
   KeyboardProperties,
   MinimalKeymanGlobal
 } from 'keyman/engine/keyboard';
 
-import { KeyboardInterface } from 'keyman/engine/js-processor';
-import { KeyboardStub } from 'keyman/engine/keyboard-storage';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
+import { KeyboardInfoPair } from 'keyman/engine/main';
+import { VariableStoreTestSerializer } from 'keyman/test/headless-resources';
 
-const loader = new DOMKeyboardLoader(new KeyboardInterface(window, MinimalKeymanGlobal));
+const loader = new DOMKeyboardLoader(new JSKeyboardInterface(window, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
 
 export function loadKeyboardFromPath(path: string) {
   return loader.loadKeyboardFromPath(path);
 }
 
+export type KeyboardMap = {
+  [key: string]: KeyboardInfoPair & { keyboard: Keyboard }
+};
+
 export function loadKeyboardsFromStubs(apiStubs: any, baseDir: string) {
   baseDir = baseDir || './';
-  const keyboards: {
-    [key: string]: {
-      keyboard: Keyboard,
-      metadata: KeyboardStub
-    }
-  } = {};
+  const keyboards: KeyboardMap = {};
   let priorPromise: Promise<void | Keyboard> = Promise.resolve();
   for(const stub of apiStubs) {
     // We are keeping this strictly sequential because we don't have sandboxed
@@ -37,7 +35,12 @@ export function loadKeyboardsFromStubs(apiStubs: any, baseDir: string) {
       const overwriteLoader = (id: number, path: string) => {
         const loader = loadKeyboardFromPath(path);
         return loader.then(kbd => {
-          keyboards[stub.id].keyboard = kbd;
+          if (kbd instanceof JSKeyboard) {
+            keyboards[stub.id].keyboard = kbd;
+          } else {
+            // TODO-web-core: implement for KMX keyboards if needed
+            keyboards[stub.id].keyboard = null;
+          }
         });
       }
       keyboards[stub.id] = {

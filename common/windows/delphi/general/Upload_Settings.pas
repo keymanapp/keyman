@@ -86,6 +86,8 @@ function API_UserAgent: string; // = 'Keyman for Windows/<ver>...'
 function API_UserAgent_Developer: string; // = 'Keyman Developer/<ver>...'
 function API_UserAgent_Diagnostics: string;
 
+function API_Path_Keyboard(const id: string): string;
+
 function KeymanCom_Protocol_Server: string; // = 'https://keyman.com';
 
 function MakeAPIURL(path: string): string;
@@ -120,6 +122,8 @@ const
   // servers have resource constraints but should be okay for limited use.
   S_KeymanCom_Staging = 'https://keyman.com';  // #7227 disabling: 'https://keyman-staging.com';
   S_APIServer_Staging = 'api.keyman.com';  // #7227 disabling: 'api.keyman-staging.com';
+
+  S_API_Path_Keyboard = '/keyboard/%0:s';
 
 const
   URLPath_PackageDownload_Format = '/go/package/download/%0:s?platform=windows&tier=%1:s&bcp47=%2:s&update=%3:d';
@@ -185,6 +189,11 @@ end;
 function URL_KmcMessage(const id: string): string;
 begin
    Result := Format(URL_KeymanDeveloper_HelpKmcMessage_Format, [id.ToLower]);
+end;
+
+function API_Path_Keyboard(const id: string): string;
+begin
+  Result := Format(S_API_Path_Keyboard, [id]);
 end;
 
 end.

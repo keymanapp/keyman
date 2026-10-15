@@ -315,10 +315,6 @@
   <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">Zawsze pokazuj okno klawiatury ekranowej, gdy wybrana jest klawiatura Keyman</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 7.0.244.0 -->
-  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">Automatycznie przełącz na odpowiednią klawiaturę ekranową/stronę pomocy po wybraniu klawiatury</string>
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">Debugowanie</string>
   <!-- Context: Configuration Dialog - Options tab -->

@@ -33,7 +33,7 @@ builder_parse "$@"
 builder_run_action clean      rm -rf ./build/
 builder_run_action configure  node_select_version_and_npm_ci
 builder_run_action build      tsc --build
-builder_run_action api        api-extractor run --local --verbose
+builder_run_action api        typescript_run_api_extractor developer/src/kmc-copy main.d.ts
 
 # note: `export TEST_SAVE_ARTIFACTS=1` to save a copy of artifacts to temp path
 # note: `export TEST_SAVE_FIXTURES=1` to get a copy of cloud-based fixtures saved to online/

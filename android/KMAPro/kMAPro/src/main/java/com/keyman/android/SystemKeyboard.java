@@ -7,7 +7,7 @@ package com.keyman.android;
 import com.keyman.engine.util.DownloadFileUtils;
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.DefaultLanguageResource;
-import com.tavultesoft.kmapro.KeymanSettingsActivity;
+import com.tavultesoft.kmapro.KeymanSettingsKeys;
 import com.tavultesoft.kmapro.PreferencesManager;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
@@ -76,13 +76,13 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.setInputMethodService(this); // for HW interface
 
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
+    KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsKeys.SPACEBAR_TEXT, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
     // Set the system keyboard HTML banner
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM, isDarkMode());
 
-    boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
+    boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsKeys.HAPTIC_FEEDBACK, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
 
     // Checking for updates should never be allowed to crash the keyboard.
@@ -176,7 +176,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (KMManager.getPredictionsSuspended(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
       KMManager.setBannerOptions(false);
       // Set the system keyboard HTML banner
-      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM, isDarkMode());
     } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
       // Check if predictions needs to be re-enabled per Settings preference
       Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
@@ -282,7 +282,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onKeyboardChanged(String newKeyboard) {
     // Refresh banner theme
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM, isDarkMode());
     KMManager.showSystemKeyboard();
     sendCurrentFontName();
   }
@@ -290,7 +290,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onKeyboardShown() {
     // Refresh banner theme
-    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM, isDarkMode());
   }
 
   @Override
@@ -309,7 +309,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
 
     Context context = getApplicationContext();
     SharedPreferences prefs = context.getSharedPreferences(PreferencesManager.kma_prefs_name, Context.MODE_PRIVATE);
-    boolean showOSK = prefs.getBoolean(KeymanSettingsActivity.oskWithPhysicalKeyboardKey, false);
+    boolean showOSK = prefs.getBoolean(KeymanSettingsKeys.OSK_WITH_PHYSICAL_KEYBOARD, false);
     return showOSK;
   }
 
@@ -348,5 +348,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public boolean onKeyLongPress(int keyCode, KeyEvent event) {
     return interpreter.onKeyLongPress(keyCode, event);
+  }
+  private boolean isDarkMode() {
+    return (getResources().getConfiguration().uiMode &
+      Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
   }
 }

@@ -1,5 +1,436 @@
 # Keyman Version History
 
+## 19.0.306 beta 2026-10-12
+
+* fix(web): don't crash on gestures when banner disabled (#16788)
+* maint(common): add lint for unitTestEndpoints usage (#16769)
+
+## 19.0.305 beta 2026-10-09
+
+* docs: remove repeated clean up instructions (#16745)
+* fix(web): prevent crash adding log entry for keystroke with `inputBreadCrumb` (#16762)
+* maint(ios): new iOS certificate (beta-19.0) (#16772)
+* docs(developer): fix typo in whatsnew (#16774)
+* fix(web): fix crash applying suggestions (#16786)
+
+## 19.0.304 beta 2026-10-08
+
+* docs(common): add `sentry-cli` version and update documentation (#16752)
+* chore(linux): update changelog with Debian version (#16758)
+
+## 19.0.303 beta 2026-10-07
+
+* fix(resources): export KEYMAN_TIER so we get beta tagging on release build (#16751)
+
+## 19.0.302 beta 2026-10-07
+
+* fix(mac): lower case 'k' for .pkg.download_info (#16743)
+* docs: update v19 whats-new (#16748)
+
+## 19.0.300 beta 2026-10-06
+
+* chore: move to beta
+
+## 19.0.299 alpha 2026-10-05
+
+* chore(deps): bump ip-address from 10.5.0 to 10.7.2 in /developer/src/server/src/win32/trayicon/addon-src (#16698)
+* chore(deps): bump ip-address from 10.4.0 to 10.7.2 (#16696)
+* chore(deps-dev): bump brace-expansion from 2.0.2 to 2.1.7 in /resources/build/pr-build-status (#16721)
+* chore(deps): bump multer from 2.3.0 to 2.4.0 (#16692)
+* chore(deps): bump brace-expansion (#16728)
+* fix(mac): show or hide the OSK from the Keyman menu (#16708)
+* chore(deps-dev): bump brace-expansion from 2.1.1 to 2.1.7 in /core/tests/unit/wasm (#16730)
+
+## 19.0.298 alpha 2026-10-03
+
+* chore(linux): update Debian standards version (#16714)
+
+## 19.0.297 alpha 2026-10-02
+
+* fix(windows): add warning when system startup disabled (#16603)
+* docs(windows): add startup app disabled warning help (#16695)
+
+## 19.0.296 alpha 2026-09-30
+
+* fix(developer): handle missing `&name` store in package compiler (#16697)
+* fix(developer): handle out-of-range return values from `GetExitCodeProcess` (#16702)
+* fix(developer): handle .gitignore in npm-based installations of kmc-generate (#16686)
+* fix(developer): transform unpaired surrogates in editor to U+FFFD (#16694)
+* chore(web): allow to open guide example from TC artifacts (#16689)
+
+## 19.0.295 alpha 2026-09-29
+
+* fix(mac): open config app from input method (#16676)
+* maint(web): improve build perf and test params (#16582)
+* fix(developer): support Rich Edit in Charmap drag + drop (#16685)
+
+## 19.0.294 alpha 2026-09-28
+
+* fix(mac): disable the help button entirely in the title bar of OSK (#16679)
+
+## 19.0.293 alpha 2026-09-25
+
+* fix(mac): change .pkg name to lower case (#16659)
+* chore(deps-dev): bump grunt from 1.4.1 to 1.5.3 in /developer/src/tike/xml/layoutbuilder/src/ext/jquery-ui (#16648)
+* chore(deps): bump multer from 2.2.0 to 2.3.0 (#16543)
+* chore(web): clarify `LanguageProcessorSpec` usage (#16662)
+* docs(web): deprecate `keyman.moveToElement(elem)` API (#16661)
+* chore(developer): cleanup tike build.sh for touch-layout-editor (#16665)
+* change(mac): remove unused minizip code (#16639)
+
+## 19.0.292 alpha 2026-09-24
+
+* chore(windows): use ✕ U+2715 consistently in localizations (#16566)
+* docs(windows): replace 'keep in touch' tab with 'update' tab to help … (#16544)
+* chore(web): improve reporting on dictionary load errors (#16647)
+* maint(mac): use build/upload as upload path for downloads.keyman.com (#16654)
+
+## 19.0.291 alpha 2026-09-24
+
+* epic: mac-config (#15328)
+* chore(common): fix TC reporter reporting failures (#16643)
+* chore(android): remove unused map-polyfill.js and es6-shim.min.js polyfills (#16637)
+* fix(developer): address crashes in touch layout editor (#16572)
+* feat(mac): remove obsolete configuration UI (#16570)
+* change(developer): reorganize touch layout editor files (#16517)
+* change(developer): move touch layout editor to typescript (#16520)
+
+## 19.0.290 alpha 2026-09-23
+
+* fix(windows): set basekeyboard as current user not the admin user on an elevated process (#16162)
+* fix(windows): add non-admin user install with different base keyboard (#16528)
+
+## 19.0.289 alpha 2026-09-21
+
+* fix(android): suppress autocorrection of hardware keystroke input (#16606)
+* change(web): add lexical weighting to prediction search (#16600)
+
+## 19.0.288 alpha 2026-09-18
+
+* change(web): remove TokenizationCorrector class only used in epic/boundary-correction (#16581)
+
+## 19.0.287 alpha 2026-09-17
+
+* fix(web): support autocorrection of transposed text (#16450)
+* fix(web): allow to set default keyboard to 'off' (#16524)
+
+## 19.0.286 alpha 2026-09-16
+
+* fix(developer): trim new words entered into the wordlist editor (#16538)
+* chore(windows): remove references to unused extensions .kma and .kxx (#16569)
+* refactor(web): add header to osk views files (#16568)
+
+## 19.0.285 alpha 2026-09-11
+
+* fix(web): handle 'unload' message while attempting model 'load' (#16548)
+* fix(android): load KMP files from app-external sources (#16392)
+
+## 19.0.284 alpha 2026-09-10
+
+* maint(developer): remove unused ajv dependency from kmc-convert (#16539)
+* fix(web): remove scroll-to-top on page load (#16531)
+
+## 19.0.283 alpha 2026-09-09
+
+* change(web): allow autocorrection on input of basic whitespaces (#16541)
+
+## 19.0.282 alpha 2026-09-08
+
+* refactor(web): clarify function scope and update some function comments (#16532)
+
+## 19.0.281 alpha 2026-09-07
+
+* chore(deps): bump fast-uri from 3.1.5 to 3.1.7 (#16511)
+* chore(deps): bump nanoid from 3.3.11 to 3.3.18 (#16512)
+* chore(deps): bump qs and express (#16513)
+* chore(web): adjust types in guide-examples tests (#16523)
+
+## 19.0.280 alpha 2026-09-05
+
+* fix(windows): open chm external links in user's browser (#16515)
+
+## 19.0.279 alpha 2026-09-03
+
+* chore(web): tweak error message (#16495)
+* change(web): stage construction of CorrectionPredictionTuple instances (#16429)
+* change(web): narrow the range of suggestions examined to determine autocompletion (#16436)
+* fix(web): remove deprecated `onunload` handler (#16504)
+* docs(developer): add comment to test fixtures to clarify expectations (#16505)
+* fix(developer): hide keyboard uninstall confirmation (#16506)
+* fix(developer): remember presentation and layer when switching platforms in touch layout editor (#16509)
+* fix(developer): ensure JSON regenerated after undo in touch layout editor (#16516)
+* fix(developer): improve validation of minDeviceWidth to match spec (#16501)
+* chore(developer): improve kmc-ldml test messages (#16502)
+* chore(web): add const for cookie name (#16519)
+* refactor(web): clarify scope of PageContextAttachment functions (#16521)
+
+## 19.0.278 alpha 2026-09-02
+
+* feat(developer): support output folder and `--continue-on-error` (#16453)
+* fix(developer): validate the number of hardware layers only in Layr compiler (#16455)
+* fix(developer): validate id and modifiers attributes in Layr compiler (#16456)
+* fix(developer): disable Copy Link in Model Editor if no link to copy (#16475)
+* fix(developer): open context help when F1 pressed in Project window (#16481)
+* chore(web): update file headers (#16497)
+
+## 19.0.277 alpha 2026-09-01
+
+* fix(developer): handle comment without trailing whitespace (#16479)
+* fix(developer): improve scroll wheel behavior in Character Map (#16474)
+* fix(developer): call 'Show Console' twice to make the console actually show on first use (#16483)
+* fix(developer): use path not dependent on pwd for starting Server (#16476)
+* chore(developer): remove duplicated versioning information from Server (#16478)
+* fix(developer): handle leading delimiters correctly in `u16tok()` (#16446)
+* chore(android): upload webview source map during android and ios build (#16449)
+* refactor(windows): rename `GetCapsAndNumlockState()` to `RefreshModifierState()` (#16444)
+* chore(developer): strip out defunct printing support (#16480)
+* fix(developer): make tool windows non-topmost when TIKE is deactivated (#16482)
+* fix(windows): simplify keyboard refresh and make it more on-demand (#16435)
+* refactor(windows): cleanup unused wm_keyman_control values (#16439)
+* maint(windows): remove `koSwitchLanguageForAllApplications`, `koAutoSwitchOSKPages`, osVista, osWin7, osWin8, cleanup (#16443)
+* change(developer): deprecate `fix`, `clearcontext`, bump max .kmx version to 19.0 (#16445)
+* fix(developer): add missing message parameters and cleanup kmc-kmn messages further (#16493)
+
+## 19.0.276 alpha 2026-08-28
+
+* fix(windows): add manifest to insthelper and set trustinfo to asInvoker (#16430)
+* fix(windows): resync caps lock state when Keyman keyboard is activated (#16423)
+
+## 19.0.275 alpha 2026-08-27
+
+* docs(mac): refresh build/setup docs and remove APPSTORECONNECT_PROVIDER (#16432)
+* chore(mac): update setup document (#16415)
+* change(web): enhance missing-stubs error (#16437)
+
+## 19.0.274 alpha 2026-08-24
+
+* maint(windows): move to vs2026 arm runner for GHA (#16418)
+* chore(web): skip guide-examples.tests.ts until race is fixed (#16427)
+
+## 19.0.273 alpha 2026-08-22
+
+* feat(linux): use display language for keyboard search (#16393)
+
+## 19.0.272 alpha 2026-08-21
+
+* chore(mac): put coreutils on path on mac and improve docs (#16409)
+* docs(mac): add XCode version requirement (#16408)
+* fix(developer): clean kmc-convert build.sh with new publish patterns (#16412)
+* feat(developer): kmc convert follow-up tasks (#16420)
+* docs(android): document autocorrect toggle within Android help (#16405)
+* docs(ios): document autocorrect toggle within iOS help (#16406)
+
+## 19.0.271 alpha 2026-08-20
+
+* feat(ios): pass current display language to keyboard download (#16401)
+* epic: kmc-convert (#12191)
+* chore(deps): bump multer from 2.1.1 to 2.2.0 (#16109)
+* fix(developer): tighten touch layout file structural validity checks (#16347)
+* chore(deps): bump ws from 8.20.1 to 8.21.0 (#16104)
+* chore(deps): bump ip-address from 10.2.0 to 10.4.0 (#16301)
+* chore(deps): bump ip-address from 10.2.0 to 10.5.0 in /developer/src/server/src/win32/trayicon/addon-src (#16302)
+* chore(deps): bump fast-uri from 3.1.2 to 3.1.5 (#16309)
+* chore: refresh package-lock.json after dependabot merges (#16410)
+
+## 19.0.270 alpha 2026-08-19
+
+* fix(windows): support .png format icon in tray icon (#16362)
+* fix(windows): handle font and package .zip format errors during package installation (#16363)
+* chore(deps-dev): bump form-data from 4.0.4 to 4.0.6 (#16103)
+* chore(deps-dev): bump js-yaml from 4.1.1 to 4.3.0 in /resources/build/pr-build-status (#16240)
+* epic: autocorrect (#12893)
+* change(android): enable autocorrect by default (#16403)
+
+## 19.0.269 alpha 2026-08-18
+
+* chore(deps): bump body-parser from 1.20.5 to 1.20.6 (#16275)
+* maint(android): update FV Android Target API to 36 (#16355)
+* fix(web): cancel gestures on relayouts and context resets (#16384)
+
+## 19.0.268 alpha 2026-08-17
+
+* feat(windows): pass UI language to keyboard download page (#16364)
+* fix(developer): mark touch layout file as modified after applying template (#16370)
+* chore(resources): update langtags to 2026-06-09, iso639-3 to current, language-subtag-registry to 2026-08-08, cleanup and add download scripts (#16371)
+* chore(common): disable strictNullChecks for TypeScript for now (#16387)
+
+## 19.0.267 alpha 2026-08-14
+
+* chore(common): add missing history (#16369)
+* chore(windows): remove junk files from kmshell (#16365)
+* fix(windows): release shift key on OSK when user releases physical right shift (#16361)
+* fix(web): adjust sourcemap linking pattern used for error reporting within mobile apps (#16368)
+* chore(android,ios): Update Crowdin strings for Spanish - Latin America (#16358)
+
+## 19.0.266 alpha 2026-08-13
+
+* chore(deps-dev): bump esbuild from 0.25.0 to 0.28.1 (#16095)
+* feat(web): add `keyman.versionInfo` API (#16351)
+* fix(web): cleanup `loaduserinterface` and `unloaduserinterface` events (#16353)
+* docs(web): deprecate unused and obsolete API endpoints and docs cleanup (#16354)
+* chore(common): cleanup and merge Preprocessor constants (#14360)
+
+## 19.0.265 alpha 2026-08-12
+
+* fix(core): make coherence check a debug assert (#16343)
+* feat(windows): honour Windows "metered connection" flag for downloading updates (#16099)
+
+## 19.0.264 alpha 2026-08-11
+
+* docs(android): update keyboardharness readme (#16220)
+* feat(android): design improvement for settings, add dark mode and tool menu (#15827)
+
+## 19.0.263 alpha 2026-08-10
+
+* chore(deps): bump tar from 7.5.11 to 7.5.22 in /developer/src/server/src/win32/trayicon/addon-src (#16282)
+* chore(deps): bump brace-expansion from 5.0.6 to 5.0.9 in /developer/src/server/src/win32/trayicon/addon-src (#16295)
+* refactor(web): improve naming of `_SetTargetDir` function (#16311)
+* docs(web): add language identifier to the code blocks of event docs (#16333)
+
+## 19.0.262 alpha 2026-08-04
+
+* chore(web): fire `keyboardloaded` event only once per keyboard (#16297)
+
+## 19.0.261 alpha 2026-07-30
+
+* fix(core): clone state actions deep copy (#15961)
+* maint(android): update Android Target API to 36 (#16280)
+* refactor(web): adjust function visibility and variable names (#16286)
+
+## 19.0.260 alpha 2026-07-27
+
+* fix(web): ignore exception trying to access cookie (#16283)
+* chore(web): update help links to use latest version (#16285)
+
+## 19.0.259 alpha 2026-07-20
+
+* docs(web): fix typos following #16170 (#16225)
+
+## 19.0.258 alpha 2026-07-15
+
+* chore(android): remove doc for non-existing deprecated functions (#16244)
+
+## 19.0.257 alpha 2026-07-14
+
+* chore(linux): remove questing, add stonking (#16236)
+* chore(android): cleanup Android build scripts and artifact filenames (#16234)
+* chore(web): declare scope for stubAndKeyboardCache members (#16221)
+* fix(android): improve clarity of keyboard script error popup (#16228)
+* chore(android): log legacy cloud keyboards (#16237)
+* chore(android): cleanup font variable names, remove obsolete code (#16211)
+
+## 19.0.256 alpha 2026-07-13
+
+* fix(android): add permissions for Sentry and set default keyboard (#16216)
+* maint(resources): add extra debug reporting for builder (#16230)
+
+## 19.0.255 alpha 2026-07-11
+
+* maint(android): use KEYMAN_TIER instead of TIER.md (#16219)
+* feat(ios): add keyman-version to package-version check (#16138)
+* docs(web): cleanup of index pages and page titles (#16171)
+* feat(android): add keyman-version to package-version check (#16139)
+
+## 19.0.254 alpha 2026-07-10
+
+* fix(android): handle blank keyboard tap properly (#16217)
+* fix(web): define IME interfaces in `KeyboardInterfaceBase` (#16170)
+
+## 19.0.253 alpha 2026-07-09
+
+* fix(web): resync model in `set osk()` (as used by Server) (#16127)
+* chore(developer): consolidate api-extractor usage in Developer (#16135)
+
+## 19.0.252 alpha 2026-07-08
+
+* chore(linux): reorder buttons on kmp install window (#16210)
+* refactor(web): rename `keymanweb` to `keyman` in UI modules (#16174)
+* chore: remove deprecated "X-UA-Compatible" and "apple-mobile-web-app-capable" metas (#16176)
+* fix(android): refactor `KMLog` - simplification and added resilience (#16152)
+* fix(android): differentiate between fontPath and fontUrl in Keyman Engine for Android (#16188)
+* fix(web): fixes cookie unit-tests and path for OSK resources during testing (#16209)
+
+## 19.0.251 alpha 2026-07-02
+
+* fix(android): skip test on Windows that triggers androidx WebKit bug (#16184)
+
+## 19.0.250 alpha 2026-07-01
+
+* fix(android): use `WebViewAssetLoader` for loading assets on Android (address regression in 19.0.242) (#16146)
+* fix(ios): bundle in KMW's globe-hint.css (#16142)
+* fix(ios): load host page, keyboards through a consistent WKURLSchemeHandler (#16136)
+
+## 19.0.249 alpha 2026-06-30
+
+* fix(windows): add update property to remote check (#16126)
+* chore(android): allow to build FV app in docker container (#16163)
+* fix(developer): warn only on race when destroying TAppSourceHttpResponder (#16140)
+* fix(developer): map shift key nextlayer property when importing OSK (#16110)
+
+## 19.0.248 alpha 2026-06-29
+
+* chore: add missing line to history (#16154)
+* maint(resources): DRY out `PRInformation` interface (#16158)
+* fix(developer): prevent clone of legacy keyboards with no source (#16111)
+* fix(developer): consolidate user options in TypeScript code (#16134)
+* fix(developer): fixup references to layer after deleting in Touch Layout Editor (#16129)
+* fix(web): revert regression in setting `activeKeyboard` in `set osk` (#16156)
+* test(web): add e2e tests for examples from guide (#16108)
+* maint(linux): show output of API check also in log file (#16153)
+
+## 19.0.247 alpha 2026-06-16
+
+* chore: update multi-labeler to 5.0.0 (#16100)
+
+## 19.0.246 alpha 2026-06-15
+
+* feat(developer): run project validation from IDE (#16076)
+* fix(core): use meson subsystem and needs_exe_wrapper for cross builds on Windows (#16088)
+* docs(windows): add context documentation for additional Advanced options (#16089)
+
+## 19.0.245 alpha 2026-06-10
+
+* chore(web): hide KMX keyboard test page (#16083)
+* docs(web): remove unnecessary mentioning of Keyman 17 from docs (#16085)
+* chore(web): remove outdated `*_load.js` files (#16086)
+* fix(web): fix `KeyboardStub.validateForCustomKeyboard` (#16067)
+
+## 19.0.244 alpha 2026-06-09
+
+* refactor(web): extract function, rename variables (#16063)
+* refactor(web): reformatting of files (#16066)
+* chore(web): improve the KeymanWeb integration documentation (#16064)
+* chore(web): more improvements to documentation (#16070)
+
+## 19.0.243 alpha 2026-06-08
+
+* fix(developer): reduce km_core_keyboard_attrs size to 12 (#16075)
+* chore(deps): bump minimatch in /core/tests/unit/wasm (#16045)
+* chore(deps): bump glob from 10.4.5 to 10.5.0 in /core/tests/unit/wasm (#16046)
+* chore(deps-dev): bump js-yaml from 4.1.0 to 4.2.0 in /core/tests/unit/wasm (#16047)
+* chore(deps-dev): bump picomatch from 2.3.1 to 2.3.2 in /core/tests/unit/wasm (#16048)
+* chore(deps): bump qs and express (#16009)
+
+## 19.0.242 alpha 2026-06-03
+
+* fix(web): fix displaying of keyboard menu (#16061)
+
+## 19.0.241 alpha 2026-06-02
+
+* chore: web-core preflight (#16015)
+* chore(web): web-core preflight - strip core references (#16040)
+* docs: add note on how to use composer on dockerized websites (#16029)
+* fix(web): fix race displaying active keyboard in menu (#16042)
+
+## 19.0.240 alpha 2026-05-28
+
+* chore(web): add filename to link text of manual web tests (#16019)
+* docs(web): reformat and small fixes (#16021)
+
+## 19.0.239 alpha 2026-05-27
+
+* chore(web): remove obsolete file (#16013)
+
 ## 19.0.238 alpha 2026-05-26
 
 * maint(linux): Don't block merge if source verification check fails (#16010)
@@ -312,6 +743,7 @@
 
 ## 19.0.182 alpha 2025-12-22
 
+* epic: ARM support for Windows
 * maint(common): Fix crowdin sync version to v2.7.0 (#15373)
 * chore(linux): Update keyman-config.pot strings (#15366)
 * chore(windows): show architecture in support texteditor (#15378)
@@ -1412,6 +1844,31 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.253 stable 2026-10-02
+
+* fix(mac): disable the help button entirely in the title bar of OSK (#16680)
+
+## 18.0.252 stable 2026-09-22
+
+* change(android): use webview asset loader (#16628)
+* chore: revert "fix(web): retry importScripts NetworkErrors in attempt to mitigate errors loading models" (#16630)
+
+## 18.0.251 stable 2026-09-21
+
+* maint(android): update Android Target API to 36 (#16620)
+
+## 18.0.250 stable 2026-09-21
+
+* fix(linux): fix memory problem (#15828)
+* chore: update fast-xml-parser to 5.8.0 (#15953)
+* fix(linux): add dependency on `procps` (#15980)
+* chore(ios): update first voices distribution certificate (#16007)
+* chore(linux): release v18 on Ubuntu 26.04 Resolute (#16078)
+* chore: update multi-labeler to 5.0.0 (#16101)
+* chore(android): log legacy cloud keyboards (#16243)
+* fix(web): handle 'unload' message while attempting model 'load' (#16609)
+* fix(web): retry importScripts NetworkErrors in attempt to mitigate errors loading models (#16604)
 
 ## 18.0.249 stable 2026-03-27
 

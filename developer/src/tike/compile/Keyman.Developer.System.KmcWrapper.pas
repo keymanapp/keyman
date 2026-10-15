@@ -17,6 +17,7 @@ type
     function Run(const parameters: TArray<string>; const path, logFilename: string; Callback: TUtilExecuteCallbackEvent): Boolean;
   public
     function Compile(ProjectFile: TProjectFile; const infile, outfile: string; debug: Boolean; Callback: TUtilExecuteCallbackEvent = nil): Boolean;
+    function CompileForPublishing(ProjectFile: TProjectFile; const projectFilename: string; debug: Boolean; Callback: TUtilExecuteCallbackEvent = nil): Boolean;
     function Copy(const source, dest, cwd: string; relocateExternal: Boolean; Callback: TUtilExecuteCallbackEvent = nil): Boolean;
   end;
 
@@ -38,6 +39,39 @@ uses
   Keyman.Developer.System.KeymanDeveloperPaths;
 
 { TKmcWrapper }
+
+function TKmcWrapper.CompileForPublishing(
+  ProjectFile: TProjectFile;
+  const projectFilename: string;
+  debug: Boolean;
+  Callback: TUtilExecuteCallbackEvent
+): Boolean;
+var
+  cmdline: TArray<string>;
+begin
+  cmdline := [
+    'build',
+    '--log-format', 'tsv',
+    '--log-level', 'info',
+    '--for-publishing',
+    '--publish-only',
+    projectFilename
+  ];
+
+  if Assigned(FGlobalProject) and (FGlobalProject.Options.CompilerWarningsAsErrors) then
+    cmdline := cmdline + ['--compiler-warnings-as-errors']
+  else
+    cmdline := cmdline + ['--no-compiler-warnings-as-errors'];
+
+  if Assigned(FGlobalProject) and (not FGlobalProject.Options.WarnDeprecatedCode) then
+    cmdline := cmdline + ['--no-warn-deprecated-code'];
+
+  if debug then
+    cmdline := cmdline + ['--debug'];
+
+  Result := Run(cmdline, ExtractFileDir(projectFilename), projectFilename, Callback);
+end;
+
 
 function TKmcWrapper.Compile(
   ProjectFile: TProjectFile;

@@ -106,6 +106,9 @@
 
 HINSTANCE g_hInstance;
 
+void RefreshKeyboards();
+void LoadKeyboardSettings();
+
 /*******************************************************************************************/
 /*                                                                                         */
 /* Keyman Initialisation                                                                   */
@@ -216,7 +219,7 @@ BOOL InitThread()
 
   _td->FInitialising = TRUE;  // Control re-entrancy, this is thread safe because the variable is per-thread
 
-	RefreshKeyboards(TRUE);
+	LoadKeyboardSettings();
 
   _td->FInitialising = FALSE;  // Control re-entrancy, this is thread safe because the variable is per-thread
 
@@ -412,7 +415,9 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 	UpdateActiveWindows();
 
 	*Globals::Keyman_Initialised() = TRUE;
-	RefreshKeyboards(TRUE);   // I4786
+
+  // We initialize keyboards on the controller thread immediately
+  RefreshThreadKeyboardsIfRequired();
 
   SendDebugMessageFormat("Keyman is now initialised");
 
@@ -576,27 +581,15 @@ extern "C" DWORD _declspec(dllexport) WINAPI GetActiveKeymanID()
 //
 //---------------------------------------------------------------------------------------------------------
 
-// This function prevents a refresh event from being processed more than once
-// by a thread, for instance if a thread has multiple top-level windows
-BOOL UpdateRefreshTag(LONG tag)   // I1835 - Reduce chatter
-{
+void HandleRefresh(int code, LONG tag) {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
-  if(_td->RefreshTag_Thread != tag)
-  {
-    _td->RefreshTag_Thread = tag;
-    return TRUE;
-  }
-  return FALSE;
-}
+  if(!_td) return;
 
-void HandleRefresh(int code, LONG tag)
-{
   switch (code)
   {
   case KR_REQUEST_REFRESH:
     // This is sent by Keyman COM API, ApplyToRunningKeymanEngine
-    SendDebugMessageFormat("#### Refresh Requested ####");
+    SendDebugMessageFormat("HandleRefresh(KR_REQUEST_REFRESH, %d); global refresh tag = %d; input thread refresh tag = %d", tag, Globals::get_RefreshTag(), _td->RefreshTag_Thread);
 
     // We ask the master controller window to tell all instances
     // of keyman32/keyman64 that a refresh is coming through
@@ -608,41 +601,34 @@ void HandleRefresh(int code, LONG tag)
     break;
 
   case KR_PRE_REFRESH:
+
+    SendDebugMessageFormat("HandleRefresh(KR_PRE_REFRESH, %d); global refresh tag = %d; input thread refresh tag = %d", tag, Globals::get_RefreshTag(), _td->RefreshTag_Thread);
+
+    // The tag parameter will be zero for x86 controller, but will be the
+    // current tag for other architectures, coming from the x86 controller
+
+    if(Globals::get_InitialisingThread() != GetCurrentThreadId()) {
+      SendDebugMessageFormat("HandleRefresh: unexpected KR_PRE_REFRESH on a non-controller thread");
+      break;
+    }
+
 #ifndef _WIN64
-    // We only need to broadcast the message from Win32; this avoids
-    // a double-broadcast which could happen if both keyman32 and keyman64
-    // receive the message, as they have independently managed RefreshTags
+    // This RefreshTag is only ever incremented here by the controller thread
+    // for x86 so this is a thread safe operation
+    *Globals::RefreshTag() = Globals::get_RefreshTag() + 1;
 
-    // This RefreshTag is only ever incremented here by the master controller
-    // so this is a thread safe operation
-    tag = ++(*Globals::RefreshTag());
-
-    if (UpdateRefreshTag(tag)) {
-      // The Keyman process gets the update first
-      RefreshKeyboards(FALSE);
-      PostMessage(HWND_BROADCAST, wm_keyman_refresh, KR_REFRESH, tag);
+    if(Globals::get_hwndHostX64() != NULL) {
+      PostMessage(Globals::get_hwndHostX64(), wm_keyman_refresh, KR_PRE_REFRESH, Globals::get_RefreshTag());
     }
+    if(Globals::get_hwndHostARM64() != NULL) {
+      PostMessage(Globals::get_hwndHostARM64(), wm_keyman_refresh, KR_PRE_REFRESH, Globals::get_RefreshTag());
+    }
+#else
+    *Globals::RefreshTag() = tag;
 #endif
 
-    break;
-
-  case KR_REFRESH:
-    // All threads need to have their keyboard list
-    // refreshed after an update, but only once per
-    // refresh request
-    if (UpdateRefreshTag(tag)) {
-#ifdef _WIN64
-      if (Globals::get_InitialisingThread() == GetCurrentThreadId()) {
-        // If this is the keyman.x64 or keymanarm64 thread, then we should
-        // go ahead and process the refresh immediately so
-        // that global settings are updated
-        RefreshKeyboards(FALSE);
-      }
-      else
-#endif
-        // We'll update when we are called into action
-        ScheduleRefresh();
-    }
+    SendDebugMessageFormat("HandleRefresh: new tag = %d", Globals::get_RefreshTag());
+    RefreshThreadKeyboardsIfRequired();
     break;
 	}
 }
@@ -695,6 +681,40 @@ void LoadBaseLayoutSettings() {   // I4552   // I4583
   delete reg;
 }
 
+/**
+ * If (per-architecture) global refresh tag differs from the current thread
+ * refresh tag, that indicates that a change has happened to the list of loaded
+ * keyboards, and we need to refresh the list now.
+ */
+void RefreshThreadKeyboardsIfRequired() {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (!_td) {
+    return;
+  }
+
+  SendDebugMessageFormat("RefreshThreadKeyboardsIfRequired(): global refresh tag = %d; input thread refresh tag = %d", Globals::get_RefreshTag(), _td->RefreshTag_Thread);
+
+  if (_td->RefreshTag_Thread != Globals::get_RefreshTag()) {
+    _td->RefreshTag_Thread = Globals::get_RefreshTag();
+    RefreshKeyboards();
+  }
+}
+
+/**
+ * Read the keyboard switch hotkeys, and base layout settings
+ */
+void LoadKeyboardSettings() {
+#ifndef _WIN64
+  Hotkeys::Reload();   // I4326   // I4390
+#endif
+
+  // Read global underlying keyboard flags
+
+  if(Globals::get_InitialisingThread() == GetCurrentThreadId()) {
+    LoadBaseLayoutSettings();   // I4583
+  }
+}
+
 // -----------------------------------------------------------------------------------------------
 // -                                                                                             -
 // - RefreshKeyboards: ....                                                                      -
@@ -743,32 +763,8 @@ void RefreshKeyboardProfiles(INTKEYBOARDINFO *kp, BOOL isTransient) {
   }
 }
 
-void ScheduleRefresh() {
-  if (GetCurrentThreadId() == GetWindowThreadProcessId(GetForegroundWindow(), NULL)) {
-    RefreshKeyboards(FALSE);
-  }
-  else {
-    PKEYMAN64THREADDATA _td = ThreadGlobals();
-    if (!_td) {
-      return;
-    }
-    _td->RefreshRequired = TRUE;
-  }
-}
 
-void CheckScheduledRefresh() {
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if (!_td) {
-    return;
-  }
-  if (_td->RefreshRequired) {
-    RefreshKeyboards(FALSE);
-    _td->RefreshRequired = FALSE;
-  }
-}
-
-void RefreshKeyboards(BOOL Initialising)
-{
+void RefreshKeyboards() {
   OutputThreadDebugString("RefreshKeyboards");
 	char sz[_MAX_FNAME];
 	char oldname[_MAX_FNAME];
@@ -784,29 +780,17 @@ void RefreshKeyboards(BOOL Initialising)
 
 	oldname[0] = 0;
 
-	if(!Initialising)
-  {
-  	if(_td->lpActiveKeyboard)
-	  	strcpy(oldname, _td->lpActiveKeyboard->Name);
-
-		if(_td->lpActiveKeyboard) DeactivateDLLs(_td->lpActiveKeyboard);
-		_td->lpActiveKeyboard = NULL;
-		_td->ActiveKeymanID = KEYMANID_NONKEYMAN;
+  if(_td->lpActiveKeyboard) {
+    strcpy(oldname, _td->lpActiveKeyboard->Name);
   }
+
+  if(_td->lpActiveKeyboard) DeactivateDLLs(_td->lpActiveKeyboard);
+  _td->lpActiveKeyboard = NULL;
+  _td->ActiveKeymanID = KEYMANID_NONKEYMAN;
 
   ReleaseKeyboards(TRUE);
 
-	/* Read the "keyboard off hotkey", simulate Alt+Gr, Hotkeys-Toggle flags */
-
-#ifndef _WIN64
-  Hotkeys::Reload();   // I4326   // I4390
-#endif
-
-  // Read global underlying keyboard flags
-
-  if(Globals::get_InitialisingThread() == GetCurrentThreadId()) {
-    LoadBaseLayoutSettings();   // I4583
-  }
+  LoadKeyboardSettings();
 
 	/* Read the keyboards */
 
@@ -854,13 +838,13 @@ void RefreshKeyboards(BOOL Initialising)
 	}
   delete reg; // I2714
 
-  if(!Initialising)
-	  for(int i = 0; i < _td->nKeyboards; i++)
-		  if(!_strcmpi(_td->lpKeyboards[i].Name, oldname))
-		  {
-			  SelectKeyboard(_td->lpKeyboards[i].KeymanID);   // I3594
-			  break;
-		  }
+  for(int i = 0; i < _td->nKeyboards; i++) {
+    if(!_strcmpi(_td->lpKeyboards[i].Name, oldname))
+    {
+      SelectKeyboard(_td->lpKeyboards[i].KeymanID);   // I3594
+      break;
+    }
+  }
 
   _td->FInRefreshKeyboards = FALSE;
 

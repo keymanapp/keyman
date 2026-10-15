@@ -79,8 +79,10 @@ analytics for Debug are associated with an App Bundle ID
       Replace `SERIAL` with the device serial number listed in step 2.
 
 ### Compiling the app's offline help
+
 Keyman for Android help is maintained in the Markdown files in android/docs/help.
-The script `/resources/build/build-help.inc.sh` uses the `pandoc` tool to convert the Markdown files into html.
+The script `/resources/build/build-help.inc.sh` uses the `pandoc` tool to convert
+the Markdown files into html.
 
 ```bash
   # Convert markdown to html for offline help
@@ -95,7 +97,9 @@ There are two included sample projects that can be modified to test a keyboard.
 
 **android/Samples/KMSample1** app runs a bare Keyman app for testing a keyboard.
 
-**android/Samples/KMSample2** app provides prompts for setting KMSample2 as a system level keyboard.
+**android/Samples/KMSample2** app provides prompts for setting KMSample2 as a
+system level keyboard.
+
 Both sample apps include a default Tamil keyboard and sample dictionary.
 
 Building the debug versions of these projects follow the same steps as KMAPro:
@@ -106,12 +110,16 @@ Building the debug versions of these projects follow the same steps as KMAPro:
 
 ### Tests: KeyboardHarness
 
-**android/Tests/KeyboardHarness** app is a test harness for developers to troubleshoot keyboards.
+**android/Tests/KeyboardHarness** app is a test harness for developers to
+troubleshoot keyboards.
 
 1. Copy the keyboard js file and applicable ttf fonts to *android/Tests/KeyboardHarness/app/src/main/assets/*.
 2. In Keyman Developer
-  * Open the `keyboardharness.kpj` project and add your keyboard files to the keyboard package.
-  * Build the keyboardharness.kmp keyboard package
+
+   * Open the `keyboardharness.kpj` project and add your keyboard files to the
+     keyboard package.
+   * Build the keyboardharness.kmp keyboard package
+
 3. Add the keyboard in *android/Tests/KeyboardHarness/app/src/main/java/com/keyman/android/tests/keyboardHarness/MainActivity.java*
 4. cd to android/Tests/KeyboardHarness/
 5. `./build.sh configure build`
@@ -120,62 +128,74 @@ Building the debug versions of these projects follow the same steps as KMAPro:
 --------------------------------------------------------------
 
 ## How to Build Keyman Engine for Android
-1. Open a terminal or Git Bash prompt and go to the Android project folder (e.g. `cd ~/keyman/android/`)
+
+1. Open a terminal or Git Bash prompt and go to the Android project folder
+   (e.g. `cd ~/keyman/android/`)
 2. Run `./build.sh build:engine`
 
-Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imported in any project.
+Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be
+imported in any project.
 
 ## How to Use Keyman Engine for Android Library
 
 1. Add **keyman-engine.aar** into **[Your project folder]/app/libs/** folder.
-    a. We recommend [downloading](https://keyman.com/downloads/#android-engine) the the latest stable release of Keyman Engine and extracting the .aar file.
-    b. If you choose to use your own build of the Keyman Engine, get the library from **android/Samples/KMSample1/app/libs/keyman-engine.aar**
+
+    a. We recommend [downloading](https://keyman.com/downloads/#android-engine)
+        the the latest stable release of Keyman Engine and extracting the .aar file.
+
+    b. If you choose to use your own build of the Keyman Engine, get the library
+        from **android/Samples/KMSample1/app/libs/keyman-engine.aar**
 2. Open your project in Android Studio.
 3. Open **build.gradle** (Module: app) in "Gradle Scripts".
 4. Check that the `android{}` object, includes the following:
-```gradle
-android {
-    compileSdkVersion 35
 
-    // Don't compress kmp files so they can be copied via AssetManager
-    aaptOptions {
-        noCompress "kmp"
-    }
+    ```gradle
+    android {
+        compileSdkVersion 36
 
-    buildFeatures {
-        buildConfig = true
-    }
-```
+        // Don't compress kmp files so they can be copied via AssetManager
+        aaptOptions {
+            noCompress "kmp"
+        }
+
+        buildFeatures {
+            buildConfig = true
+        }
+    ```
+
 5. After the `android {}` object, include the following:
-````gradle
-repositories {
-    flatDir {
-        dirs 'libs'
+
+    ````gradle
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+        google()
+        mavenCentral()
     }
-    google()
-    mavenCentral()
-}
 
-dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.7.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-    implementation 'com.google.android.material:material:1.12.0'
-    api (name:'keyman-engine', ext:'aar')
-    implementation 'androidx.preference:preference:1.2.1'
+    dependencies {
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+        implementation 'androidx.appcompat:appcompat:1.7.0'
+        implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
+        implementation 'com.google.android.material:material:1.12.0'
+        api (name:'keyman-engine', ext:'aar')
+        implementation 'androidx.preference:preference:1.2.1'
 
-    // Include this if you want to have QR Codes displayed on Keyboard Info
-    implementation ('com.github.kenglxn.QRGen:android:3.0.1') {
-        transitive = true
+        // Include this if you want to have QR Codes displayed on Keyboard Info
+        implementation ('com.github.kenglxn.QRGen:android:3.0.1') {
+            transitive = true
+        }
     }
-}
+    ````
 
-````
-5. include `import com.keyman.engine.*;` to use Keyman Engine in a class.
+6. include `import com.keyman.engine.*;` to use Keyman Engine in a class.
 
 ### Keyman Engine for Android help content
+
 Keyman Engine for Android help is maintained in the Markdown files in android/docs/engine/.
 
 ## Design Documentation
 
-Internal design documents about features pertaining to Keyman for Android and Keyman Engine for Android are maintained in the Markdown files in android/docs/internal/.
+Internal design documents about features pertaining to Keyman for Android and
+Keyman Engine for Android are maintained in the Markdown files in android/docs/internal/.

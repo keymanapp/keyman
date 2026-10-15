@@ -28,7 +28,7 @@ import Distribution = LexicalModelTypes.Distribution;
 import Reversion = LexicalModelTypes.Reversion;
 import Suggestion = LexicalModelTypes.Suggestion;
 import Transform = LexicalModelTypes.Transform;
-import PromiseStore from "./promise-store.js";
+import { PromiseStore } from "./promise-store.js";
 import { OutgoingMessage } from '@keymanapp/lm-message-types';
 
 /// <reference types="worker-interface.d.ts" />
@@ -53,7 +53,7 @@ import { OutgoingMessage } from '@keymanapp/lm-message-types';
  * The top-level LMLayer will automatically starts up its own Web Worker.
  */
 
-export default class LMLayer {
+export class LMLayer {
   /**
    * The underlying worker instance. By default, this is the LMLayerWorker.
    */
@@ -177,7 +177,7 @@ export default class LMLayer {
     });
   }
 
-  revertSuggestion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
+  revertSuggestion(reversion: Reversion, context: Context, appendedOnly?: boolean): Promise<Suggestion[]> {
     let token = this._nextToken++;
     return new Promise((resolve, reject) => {
       this._revertPromises.make(token, resolve, reject);
@@ -185,15 +185,17 @@ export default class LMLayer {
         message: 'revert',
         token: token,
         reversion: reversion,
-        context: context
+        context: context,
+        appendedOnly: appendedOnly
       })
     });
   }
 
-  resetContext(context: Context) {
+  resetContext(context: Context, stateId: number) {
     this._worker.postMessage({
       message: 'reset-context',
-      context: context
+      context: context,
+      stateId: stateId
     });
   }
 

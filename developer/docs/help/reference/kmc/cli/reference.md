@@ -185,9 +185,24 @@ The following parameters are available:
 
 `-o <filename>`, `--out-file <filename>`
 
-: Overrides the default path and filename for the output file(s). Note that
-  some compilers emit multiple files, in which case, the output filenames
-  will vary by file extension.
+: Overrides the default path and filename for the output file(s). Note that some
+  compilers emit multiple files, in which case, the output filenames will vary
+  by file extension.
+
+  If the output filename ends in a forward slash (`/`) or backslash (`\\`), or
+  if multiple input files are specified, or if the output filename exists and is
+  already a folder, then the filename will be treated as a folder, and all
+  output files will be written within that.
+
+  An error will be raised if an output file is specified and already exists, and
+  is a regular file, but is expected to be a folder.
+
+`--continue-on-error`
+
+: When building multiple input files, continue building subsequent files even if
+  a file fails to build. Note that `kmc` will still abort if an internal error
+  is encountered.
+
 
 ## `kmc build file` additional options
 
@@ -197,6 +212,13 @@ The following parameters are available:
   causes a .keyboard-info or .model-info file to be emitted when compiling the
   project (which can also be controlled at a project level with the
   `skipMetadataFiles` option). This option is only valid for compiling projects.
+
+`--publish-only`
+
+: Skip building component files within a project, and only run the validation
+  step. Must be combined with `--for-publishing` in order to have an effect.
+  This option is only valid for compiling projects, and is mostly intended for
+  use by the IDE. Will fail if build artifacts for components are not present.
 
 ### Examples
 

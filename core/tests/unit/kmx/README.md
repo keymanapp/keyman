@@ -19,7 +19,7 @@ Following the comments are the normal rules of a Keyman keyboard.
 c Description: Tests Caps Lock env set
 ```
 
-- **option**: allows to put the system in a defined state. The example below sets the platform.
+- **option**: allows to put the system in a defined state. The example below sets the platform:
 
 ```text
 c option: &platform=linux
@@ -57,6 +57,20 @@ c keys: [K_1][K_CAPS][K_2][SHIFT K_3][K_4][K_CAPS][K_5][K_CAPS][K_6]
 c expected: pass.pass.pass.pass.pass.pass.
 ```
 
+### Expected Options
+
+- **expected option**: the resulting key/value pairs for the in-memory options.
+
+```text
+c expected option: foo=0
+```
+
+- **saved option**: the resulting key/value pairs of persisted options.
+
+```text
+c saved option: foo=0
+```
+
 ## Running the tests
 
 All tests can be run at once with `./build.sh --debug tests`.
@@ -65,12 +79,12 @@ Alternatively it's possible to run a single test with:
 
 ```bash
 cd core
-build/arch/debug/tests/unit/kmx/kmx '../common/test/keyboards/baseline/k_038___punctkeys.kmn' '../common/test/keyboards/baseline/k_038___punctkeys.kmx'
+build/arch/debug/tests/unit/kmx/kmx '../common/test/keyboards/baseline/k_0107___punctkeys.kmn' '../common/test/keyboards/baseline/k_0107___punctkeys.kmx'
 ```
 
 or shorter:
 
 ```bash
 cd core
-build/arch/debug/tests/unit/kmx/kmx '../common/test/keyboards/baseline/k_038___punctkeys'.km{n,x}
+build/arch/debug/tests/unit/kmx/kmx '../common/test/keyboards/baseline/k_0107___punctkeys'.km{n,x}
 ```

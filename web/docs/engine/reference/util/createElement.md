@@ -8,7 +8,7 @@ Create an unselectable HTML element for the *KeymanWeb* On-Screen keyboard and U
 
 ## Syntax
 
-```c
+```js
 keyman.util.createElement(nodeName);
 ```
 

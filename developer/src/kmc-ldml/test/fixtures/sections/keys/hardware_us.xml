@@ -8,7 +8,7 @@
   </keys>
 
   <layers formId="us">
-    <layer id="base" modifiers="none">
+    <layer modifiers="none">
       <row keys="grave 1 2 3 4 5 6 7 8 9 0 hyphen equal" />
       <row keys="q w e r t y u i o p open-square close-square backslash" />
       <row keys="a s d f g h j k l semi-colon apos" />

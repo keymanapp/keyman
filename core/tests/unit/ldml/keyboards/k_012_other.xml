@@ -14,13 +14,13 @@ will match the default layer
   <keys/>
 
   <layers formId="us">
-    <layer id="base" modifiers="none">
+    <layer modifiers="none">
       <row keys="b" /> <!-- number row -->
     </layer>
-    <layer id="shift" modifiers="shift">
+    <layer modifiers="shift">
       <row keys="s" /> <!-- number row -->
     </layer>
-    <layer id="other" modifiers="other">
+    <layer modifiers="other">
       <row keys="d" /> <!-- number row -->
     </layer>
   </layers>

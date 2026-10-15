@@ -1,16 +1,21 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Keyman Developer Server main program
+ */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import chalk from 'chalk';
 import express from 'express';
 import multer from 'multer';
 import * as ws from 'ws';
+import KEYMAN_VERSION from '@keymanapp/keyman-version';
 import { KeymanSentry } from './KeymanSentry.js';
-import { configuration } from './config.js';
-import { environment } from './environment.js';
+import { standardPaths } from './standardPaths.js';
 import setupRoutes from './routes.js';
 import { shutdown } from './shutdown.js';
 import { initTray } from './tray.js';
-import { loadOptions } from './options.js';
+import { getOption, loadOptions } from './options.js';
 
 const options = {
   ngrokLog: false,   // Set this to true if you need to see ngrok logs in the console
@@ -18,12 +23,12 @@ const options = {
 
 /* Lock file - report on PID and prevent multiple instances cleanly */
 
-console.log(`Starting Keyman Developer Server ${environment.versionWithTag}, listening on port ${configuration.port}.`);
-
 // We need to load the Keyman Developer options before attempting to initialize
 // Sentry. `loadOptions` silently suppresses exceptions and returns a default
 // set of options if an error occurs.
 await loadOptions();
+
+console.log(`Starting Keyman Developer Server ${KEYMAN_VERSION.VERSION_WITH_TAG}, listening on port ${getOption('web host port')}.`);
 
 KeymanSentry.init();
 try {
@@ -74,16 +79,17 @@ export async function run() {
 
   /* Setup routes */
 
-  setupRoutes(app, upload, wsServer, environment);
+  setupRoutes(app, upload, wsServer);
 
   /* Start the web server */
 
   let server = null;
   try {
-    server = app.listen(configuration.port);
+    server = app.listen(getOption("web host port"));
   } catch(err) {
     console.error(err);
     // TODO handle and cleanup EADDRINUSE, throw anything else
+    return;
   }
 
   /* Attach the web socket server */
@@ -96,14 +102,14 @@ export async function run() {
 
   /* Launch ngrok if enabled */
 
-  configuration.ngrokEndpoint = '';
-  if(configuration.useNgrok) {
+  standardPaths.ngrokEndpoint = '';
+  if(getOption("server use ngrok")) {
     await startNGrok();
   }
 
   /* Load the tray icon */
 
-  tray.start(configuration.port, configuration.ngrokEndpoint);
+  tray.start(getOption("web host port"), standardPaths.ngrokEndpoint);
 }
 
 async function loadNGrok() {
@@ -129,8 +135,8 @@ async function startNGrok() {
     let started = false;
     const listener = await ngrok.forward({
       proto: 'http',
-      addr: configuration.port,
-      authtoken: configuration.ngrokToken,
+      addr: getOption("web host port"),
+      authtoken: getOption("server ngrok token"),
       onLogEvent: (msg: string) => {
         if(options.ngrokLog) {
           console.log(chalk.cyan(('\n'+msg).split('\n').join('\n[ngrok] ').trim()));
@@ -139,19 +145,19 @@ async function startNGrok() {
       onStatusChange: (state: string) => {
         if(state == 'connected' && started) {
           // We only announce reconnection after initial start
-          configuration.ngrokEndpoint = listener.url() ?? '';
-          console.log(chalk.blueBright('ngrok tunnel reconnected at %s'), configuration.ngrokEndpoint);
+          standardPaths.ngrokEndpoint = listener.url() ?? '';
+          console.log(chalk.blueBright('ngrok tunnel reconnected at %s'), standardPaths.ngrokEndpoint);
         } else if(state == 'closed') {
-          configuration.ngrokEndpoint = '';
+          standardPaths.ngrokEndpoint = '';
           console.log(chalk.blueBright('ngrok tunnel closed'));
         }
       }
     });
     started = true;
-    configuration.ngrokEndpoint = listener.url();
-    console.log(chalk.blueBright('ngrok tunnel established at %s'), configuration.ngrokEndpoint);
+    standardPaths.ngrokEndpoint = listener.url() ?? "";
+    console.log(chalk.blueBright('ngrok tunnel established at %s'), standardPaths.ngrokEndpoint);
   } catch(e) {
-    configuration.ngrokEndpoint = '';
+    standardPaths.ngrokEndpoint = '';
     console.error(chalk.red('ngrok tunnel failed to connect with an error: %s'), e);
     return false;
   }
@@ -168,8 +174,8 @@ function getRunningInstancePid(pidFilename: string) {
 }
 
 function writeLockFile() {
-  const lockFilename = configuration.lockFilename.replaceAll(/[\\\/]/g, path.sep);
-  const pidFilename = configuration.pidFilename.replaceAll(/[\\\/]/g, path.sep);
+  const lockFilename = standardPaths.lockFilename.replaceAll(/[\\\/]/g, path.sep);
+  const pidFilename = standardPaths.pidFilename.replaceAll(/[\\\/]/g, path.sep);
 
   // console.debug(`Testing existence of ${lockFilename}`);
   if(fs.existsSync(lockFilename)) {

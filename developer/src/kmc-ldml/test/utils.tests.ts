@@ -224,11 +224,11 @@ describe('test of util/util.ts', () => {
     });
   });
   describe('isValidModifier()', () => {
-    it('should treat falsy values as valid', () => {
+    it('should treat falsy values as invalid', () => {
       for(const str of [
-        null, undefined, '', 'none'
+        null, undefined, ''
       ]) {
-        assert.ok(validModifier(str), `validModifier(${JSON.stringify(str)})`);
+        assert.notOk(validModifier(str), `validModifier(${JSON.stringify(str)})`);
       }
     });
     it('should treat bad values as invalid', () => {

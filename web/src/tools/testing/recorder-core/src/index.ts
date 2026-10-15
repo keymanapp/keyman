@@ -1,12 +1,11 @@
-import { Mock, type OutputTarget } from "keyman/engine/js-processor";
-import { KeyDistribution, KeyEvent } from "keyman/engine/keyboard";
+import { KeyDistribution, KeyEvent, type TextStore, SyntheticTextStore } from "keyman/engine/keyboard";
 
-import Proctor from "./proctor.js";
+import { Proctor } from "./proctor.js";
 
-export { default as Proctor } from "./proctor.js";
-export { default as NodeProctor } from "./nodeProctor.js";
+export { Proctor } from "./proctor.js";
+export { NodeProctor } from "./nodeProctor.js";
 
-import * as utils from "@keymanapp/web-utils";
+import * as utils from "keyman/common/web-utils";
 
 type EventTypeTag = 'key' | 'osk';
 type TaggedEventObject = { type: EventTypeTag }
@@ -217,15 +216,15 @@ export abstract class TestSequence<KeyRecord extends RecordedKeystroke | InputEv
 
   abstract hasOSKInteraction(): boolean;
 
-  async test(proctor: Proctor, target?: OutputTarget): Promise<{success: boolean, result: string}> {
-    // Start with an empty OutputTarget and a fresh KeyboardProcessor.
-    if(!target) {
-      target = new Mock();
+  async test(proctor: Proctor, textStore?: TextStore): Promise<{success: boolean, result: string}> {
+    // Start with an empty TextStore and a fresh KeyboardProcessor.
+    if(!textStore) {
+      textStore = new SyntheticTextStore();
     }
 
     proctor.before();
 
-    let result = await proctor.simulateSequence(this, target);
+    const result = await proctor.simulateSequence(this, textStore);
     proctor.assertEquals(result, this.output, this.msg);
 
     return {success: (result == this.output), result: result};

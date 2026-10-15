@@ -1,18 +1,18 @@
 (*
   Name:             kpinstallfont
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      14 Sep 2006
 
   Modified Date:    3 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Sep 2006 - mcdurdin - Fix bug where registry was still in read-only state
                     30 May 2007 - mcdurdin - I850 -  Fix font installation under Vista
                     19 Jun 2007 - mcdurdin - I815 - Install font for current user
@@ -40,15 +40,25 @@ uses
 function TKPInstallFont.Execute(const src_filename: string): Boolean;
 var
   filename, fontnm: string;
+  truetypeInfo: TTTInfo;
 begin
   Result := False;
 
-  with TTTInfo.Create(src_filename, [tfNames]) do
   try
-    fontnm := FullName;
-  finally
-    Free;
-  end;
+    truetypeInfo := TTTInfo.Create(src_filename, [tfNames]);
+    try
+      fontnm := truetypeInfo.FullName;
+    finally
+      FreeAndNil(truetypeInfo);
+    end;
+   except
+     on E:Exception do
+     begin
+       WarnFmt(KMN_W_InstallFont_CannotInstallFont,
+         VarArrayOf([ExtractFileName(src_filename), E.Message, 0]));
+       Exit;
+     end;
+   end;
 
   filename := GetFolderPath(CSIDL_FONTS) + ExtractFileName(src_filename);
 
@@ -107,7 +117,7 @@ begin
         VarArrayOf([ExtractFileName(filename), SysErrorMessage(GetLastError), Integer(GetLastError)]));
       Exit;
     end;
-    
+
     Result := True; // font should be uninstalled - it will be loaded by Keyman (I815)
   end;
 end;

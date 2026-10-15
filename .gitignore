@@ -186,3 +186,7 @@ lcov.info
 
 # flag file for build script
 .configured
+
+# see common/tools/api-extractor/README.md
+tsdoc.json
+api-extractor.json

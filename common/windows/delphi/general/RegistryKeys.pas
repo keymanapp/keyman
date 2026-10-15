@@ -127,9 +127,6 @@ const
   SRegValue_ProxyLogin                  = 'proxy login';
 
   SRegValue_AutoOpenOSK                       = 'auto open osk'; // CU, default true
-  SRegValue_AutoSwitchOSKPages                = 'auto switch osk pages'; // CU, default true
-  SRegValue_SwitchLanguageWithKeyboard        = 'switch language with keyboard'; // CU, default true
-  SRegValue_SwitchLanguageForAllApplications  = 'switch language for all applications'; // CU, default true
 
   SRegValue_DeepTSFIntegration = 'deep tsf integration'; // LM, 0=disable, 1=enable, 2=default
   SRegKey_AppIntegration = SRegKey_KeymanEngine_LM + '\App Integration'; //KM
@@ -285,6 +282,8 @@ const
   SRegValue_WindowsRunOnce_Setup       = 'keyman-setup.exe';                                // CU
 
   SRegValue_WindowsRun_Keyman          = 'Keyman';
+
+  SRegKey_StartupApproved_Run = 'Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run';  // CU
 
   SRegValue_LanguageCheckDisabledItems = 'language check disabled items'; // CU
 
