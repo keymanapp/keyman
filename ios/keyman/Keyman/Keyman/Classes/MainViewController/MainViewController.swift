@@ -77,7 +77,11 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   }
 
   var overlayWindow: UIWindow! {
-    return appDelegate?.overlayWindow
+    guard let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate else {
+      return nil
+    }
+
+    return sceneDelegate.overlayWindow
   }
 
   convenience init() {
