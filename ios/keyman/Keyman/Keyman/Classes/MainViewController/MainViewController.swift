@@ -67,7 +67,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
   private var keyboardPickerDismissedObserver: NotificationObserver?
   private var keyboardChangedObserver: NotificationObserver?
   private var keyboardRemovedObserver: NotificationObserver?
-  
+
   var shouldKeyboardBeVisible: Bool {
     return navigationController?.visibleViewController == self
   }
@@ -116,7 +116,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       forName: Notifications.keyboardRemoved,
       observer: self,
       function: MainViewController.keyboardRemoved)
-    
+
     NotificationCenter.default.addObserver(
       forName: UIApplication.willEnterForegroundNotification,
       object: nil,
@@ -191,7 +191,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
         // no textSize saved in UserDefaults, so use default size
         self.textSize = self.calculateDefaultTextSize()
       }
-    
+
       // default to system font so that we have a non-nil font that allows us to set size
       self.textView.font = UIFont.systemFont(ofSize: textSize)
 
@@ -212,7 +212,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       defaultIPhoneTextSize : defaultIPadTextSize
     return defaultSize
   }
-  
+
   private func constructAndAddInfoView() {
     // Setup Info View
     infoView = InfoViewController {
@@ -770,10 +770,15 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
                                style: .default, handler: nil)
     alert.addAction(clear)
     alert.addAction(cancel)
-    
+
     if UIDevice.current.userInterfaceIdiom == .phone {
-      present(alert, animated: false, completion: nil)
+      // Present directly - there is no matching navigation button to hover over.
+      // The "Clear text" button is part of the dropdown menu, which is no longer
+      // shown when this displays.
+      present(alert, animated: true, completion: nil)
     } else {
+      // See `setNavBarButtons()` - the "clear text" button is hosted by the nav
+      // bar at index 6 (`trashButton`).
       alert.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItems?[6]
       present(alert, animated: true, completion: nil)
     }
