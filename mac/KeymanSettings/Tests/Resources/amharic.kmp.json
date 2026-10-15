@@ -1,0 +1,215 @@
+{
+  "system": {
+    "fileVersion": "15.0",
+    "keymanDeveloperVersion": "17.0.330"
+  },
+  "options": {
+    "graphicFile": "sideimage.bmp",
+    "readmeFile": "readme.htm",
+    "licenseFile": "LICENSE.md",
+    "welcomeFile": "welcome.htm"
+  },
+  "info": {
+    "author": {
+      "description": "The Geʾez Frontier Foundation",
+      "url": "mailto:keyboards@ethiopic.org"
+    },
+    "copyright": {
+      "description": "© Geʾez Frontier Foundation, SIL International"
+    },
+    "name": {
+      "description": "GFF Amharic Keyboard"
+    },
+    "version": {
+      "description": "3.1.2"
+    },
+    "website": {
+      "description": "http://keyboards.ethiopic.org",
+      "url": "http://keyboards.ethiopic.org"
+    },
+    "description": {
+      "description": "<p>This is an Amharic (amh, አማርኛ) language mnemonic input method. It\nrequires a font supporting Ethiopic script under the Unicode 4.1\nstandard.</p>"
+    }
+  },
+  "relatedPackages": [
+    {
+      "id": "gff_amh_powerpack_7",
+      "relationship": "deprecates"
+    },
+    {
+      "id": "gff_amh_7",
+      "relationship": "deprecates"
+    }
+  ],
+  "files": [
+    {
+      "name": "readme.htm",
+      "description": "File readme.htm"
+    },
+    {
+      "name": "sideimage.bmp",
+      "description": "File sideimage.bmp"
+    },
+    {
+      "name": "AmharicTyping-Amharic.pdf",
+      "description": "File AmharicTyping-Amharic.pdf"
+    },
+    {
+      "name": "AmharicTyping-English.pdf",
+      "description": "File AmharicTyping-English.pdf"
+    },
+    {
+      "name": "OFL.txt",
+      "description": "File OFL.txt"
+    },
+    {
+      "name": "GNU-GPLv2.txt",
+      "description": "File GNU-GPLv2.txt"
+    },
+    {
+      "name": "welcome.htm",
+      "description": "File welcome.htm"
+    },
+    {
+      "name": "fantuwua.ttf",
+      "description": "Font Ethiopic Fantuwua"
+    },
+    {
+      "name": "FreeSerif.otf",
+      "description": "Font Free Serif"
+    },
+    {
+      "name": "goffer.ttf",
+      "description": "Font Ethiopic Yigezu Bisrat Goffer"
+    },
+    {
+      "name": "hiwua.ttf",
+      "description": "Font Ethiopic Hiwua"
+    },
+    {
+      "name": "jiret.ttf",
+      "description": "Font Ethiopia Jiret"
+    },
+    {
+      "name": "jiretsl.ttf",
+      "description": "Font Ethiopia Jiret Slant"
+    },
+    {
+      "name": "tint.ttf",
+      "description": "Font Ethiopic Tint"
+    },
+    {
+      "name": "washrab.ttf",
+      "description": "Font Ethiopic WashRa Bold"
+    },
+    {
+      "name": "washrabsl.ttf",
+      "description": "Font Ethiopic WashRa Bold Slant"
+    },
+    {
+      "name": "washrasb.ttf",
+      "description": "Font Ethiopic WashRa SemiBold"
+    },
+    {
+      "name": "washrasbsl.ttf",
+      "description": "Font Ethiopic WashRa SemiBold Slant"
+    },
+    {
+      "name": "wookianos.ttf",
+      "description": "Font Ethiopic Wookianos"
+    },
+    {
+      "name": "yebse.ttf",
+      "description": "Font Ethiopic Yebse"
+    },
+    {
+      "name": "gff_amharic.js",
+      "description": "File gff_amharic.js"
+    },
+    {
+      "name": "gff_amharic.kmx",
+      "description": "Keyboard አማርኛ (Amharic)"
+    },
+    {
+      "name": "Brana-Regular.ttf",
+      "description": "Font Brana"
+    },
+    {
+      "name": "gff_amharic.kvk",
+      "description": "File gff_amharic.kvk"
+    },
+    {
+      "name": "AbyssinicaSIL-Regular.ttf",
+      "description": "Font Abyssinica SIL"
+    },
+    {
+      "name": "AbyssinicaSILConnected-Regular.ttf",
+      "description": "Font Abyssinica SIL Connected"
+    },
+    {
+      "name": "LICENSE.md",
+      "description": ""
+    },
+    {
+      "name": "kmp.inf",
+      "description": "Package information"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    {
+      "displayFont": "AbyssinicaSIL-Regular.ttf",
+      "oskFont": "AbyssinicaSIL-Regular.ttf",
+      "name": "አማርኛ (Amharic)",
+      "id": "gff_amharic",
+      "version": "3.1.2",
+      "languages": [
+        {
+          "name": "Amharic",
+          "id": "am"
+        }
+      ],
+      "examples": [
+        {
+          "id": "am",
+          "keys": "T i e n a space y s T l N",
+          "text": "ጤና ይስጥልኝ",
+          "note": "\"Hello\""
+        }
+      ]
+    }
+  ],
+  "startMenu": {
+    "addUninstallEntry": true,
+    "folder": "GFF Amharic Keyboard",
+    "items": [
+      {
+        "filename": "welcome.htm",
+        "name": "Welcome"
+      },
+      {
+        "filename": "AmharicTyping-Amharic.pdf",
+        "name": "Amharic Keyboard Manual (Amharic)"
+      },
+      {
+        "filename": "AmharicTyping-English.pdf",
+        "name": "Amharic Keyboard Manual (English)"
+      },
+      {
+        "filename": "OFL.txt",
+        "name": "OFL (Abyssinica SIL Licence)"
+      },
+      {
+        "filename": "GNU-GPLv2.txt",
+        "name": "GPL (WashRa + Free Serif Licence)"
+      },
+      {
+        "filename": "http://keyboards.ethiopic.org/docs/AmharicTypingPractice.docx",
+        "name": "Amharic Typing Practice"
+      }
+    ]
+  }
+}

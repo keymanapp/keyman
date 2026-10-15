@@ -17,6 +17,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
+import ts from "typescript";
 import { readFileSync } from 'node:fs';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
 
@@ -37,6 +38,18 @@ describe("Verify Parser Against BNF Tests", () => {
     ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
     const sourceRules: Dictionary = getSourceRules(sourceBuffer);
     assert.deepEqual(bnfRules, sourceRules);
+  });
+  it.skip("really matches the BNF grammar rules", () => {
+    //const bnfBuffer: string = readFileSync(BNF_FILENAME).toString();
+    //const bnfRules: Dictionary = getBnfRules(bnfBuffer);
+    const sourceBuffer: string = [
+      '../../src/kmc-kmn/src/ng-compiler/kmn-analyzer.ts',
+      '../../src/kmc-kmn/src/ng-compiler/statement-analyzer.ts',
+      '../../src/kmc-kmn/src/ng-compiler/store-analyzer.ts',
+    ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
+    const sourceRules: Dictionary = getSourceRules2(sourceBuffer);
+    //assert.deepEqual(bnfRules, sourceRules);
+    assert.deepEqual(null, sourceRules);
   });
 });
 describe("Verify BNF Against Lexer Tests", () => {
@@ -165,6 +178,7 @@ function replaceOneOrManyRule(str: string): string {
   if (str != null && str.includes('OneOrManyRule')) {
     str = str.replace(/^OneOrManyRule\(/, '');
     str = str.replace(/\)$/, '');
+    str = replaceSubRule(str);
     str = str + '+';
   }
   return str;
@@ -174,6 +188,7 @@ function replaceManyRule(str: string): string {
   if (str != null && str.includes('ManyRule')) {
     str = str.replace(/ManyRule\(/, '');
     str = str.replace(/\)$/, '');
+    str = replaceSubRule(str);
     str = str + '*';
   }
   return str;
@@ -220,4 +235,182 @@ function replaceTokenElements(str: string): string {
         { return p1.toLowerCase(); });
   }
   return str;
+}
+
+function replaceSubRule(str: string): string {
+  if (str != null && str.includes('new')) {
+    str = str.replaceAll(/(?:new)(\S+)Rule\(\)/g,
+      (match, p1, offset, string, groups) =>
+        { return lowerCaseFirstLetter(p1); });
+  }
+  return str;
+}
+
+interface RuleInfo {
+    name: string;
+    expression: string | undefined;
+}
+
+function getSourceRules2(buffer: string): Dictionary {
+  const rules: Dictionary = {};
+
+  const sourceFile = ts.createSourceFile(
+    "combined-source.ts",
+    buffer,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS
+  );
+
+  const extractedRules: RuleInfo[] = [];
+
+  function visit(node: ts.Node): void {
+    if (ts.isClassDeclaration(node) || ts.isClassExpression(node)) {
+      const name = node.name?.text;
+
+      if (name?.endsWith("Rule")) {
+        extractedRules.push({
+          name,
+          expression: inspectRuleExpression(node, sourceFile)
+        });
+      }
+    }
+
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+
+  // Set a breakpoint here to inspect extractedRules.
+  return rules;
+}
+
+function inspectRuleExpression(
+  cls: ts.ClassDeclaration | ts.ClassExpression,
+  sourceFile: ts.SourceFile
+): string | undefined {
+  const constructor = cls.members.find(ts.isConstructorDeclaration);
+
+  if (!constructor?.body) return undefined;
+
+  const variables = new Map<string, ts.Expression>();
+
+  for (const statement of constructor.body.statements) {
+    if (!ts.isVariableStatement(statement)) continue;
+
+    for (const declaration of statement.declarationList.declarations) {
+      if (ts.isIdentifier(declaration.name) && declaration.initializer) {
+        variables.set(declaration.name.text, declaration.initializer);
+      }
+    }
+  }
+
+  const alternateTokens = inspectAlternateTokenRule(cls);
+    if (alternateTokens !== undefined) {
+      return alternateTokens;
+  }
+
+  const assignment = constructor.body.statements.find(statement =>
+    ts.isExpressionStatement(statement) &&
+    ts.isBinaryExpression(statement.expression) &&
+    statement.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+    ts.isPropertyAccessExpression(statement.expression.left) &&
+    statement.expression.left.expression.kind === ts.SyntaxKind.ThisKeyword &&
+    statement.expression.left.name.text === "rule"
+  );
+
+  if (!assignment || !ts.isExpressionStatement(assignment)) {
+    return undefined;
+  }
+
+  const expression = (assignment.expression as ts.BinaryExpression).right;
+
+  function describe(node: ts.Expression): string {
+    if (ts.isIdentifier(node)) {
+      const initializer = variables.get(node.text);
+      return initializer ? describe(initializer) : node.text;
+    }
+
+    if (ts.isArrayLiteralExpression(node)) {
+      return node.elements.map(describe).join(", ");
+    }
+
+    if (ts.isNewExpression(node)) {
+      const name = node.expression.getText(sourceFile);
+      const args: readonly ts.Expression[] = node.arguments ?? [];
+
+      switch (name) {
+        case "AlternateRule":
+          return args.length && ts.isArrayLiteralExpression(args[0])
+            ? args[0].elements.map(describe).join(" | ")
+            : `AlternateRule(${args.map(describe).join(", ")})`;
+
+        case "SequenceRule":
+          return args.length && ts.isArrayLiteralExpression(args[0])
+            ? args[0].elements.map(describe).join(" ")
+            : `SequenceRule(${args.map(describe).join(", ")})`;
+
+        case "TokenRule":
+          if (args.length > 0 && ts.isPropertyAccessExpression(args[0])) {
+            return args[0].name.text;
+          }
+          return `TokenRule(${args.map(describe).join(", ")})`;
+
+        case "ManyRule":
+          return args.length > 0
+            ? `${describe(args[0])}*`
+            : "ManyRule";
+
+        case "OneOrManyRule":
+          return args.length > 0
+            ? `${describe(args[0])}+`
+            : "OneOrManyRule";
+
+        case "OptionalRule":
+          return args.length > 0
+            ? `${describe(args[0])}?`
+            : "OptionalRule";
+
+        default:
+          return args.length
+            ? `${name}(${args.map(describe).join(", ")})`
+            : name;
+      }
+    }
+
+    return node.getText(sourceFile);
+  }
+
+  function inspectAlternateTokenRule(
+    cls: ts.ClassDeclaration | ts.ClassExpression
+  ): string | undefined {
+    if (cls.heritageClauses?.some(clause =>
+      clause.token === ts.SyntaxKind.ExtendsKeyword &&
+      clause.types.some(type => type.expression.getText() === "AlternateTokenRule")
+    )) {
+      const constructor = cls.members.find(ts.isConstructorDeclaration);
+      const superCall = constructor?.body?.statements.find(statement =>
+        ts.isExpressionStatement(statement) &&
+        ts.isCallExpression(statement.expression) &&
+        statement.expression.expression.kind === ts.SyntaxKind.SuperKeyword
+      );
+
+      if (superCall && ts.isExpressionStatement(superCall)) {
+        const args = (superCall.expression as ts.CallExpression).arguments;
+        const tokens = args[0];
+
+        if (tokens && ts.isArrayLiteralExpression(tokens)) {
+          return tokens.elements.map(token =>
+            ts.isPropertyAccessExpression(token)
+              ? token.name.text
+              : token.getText()
+          ).join(" | ");
+        }
+      }
+    }
+
+    return undefined;
+  }
+
+  return describe(expression);
 }

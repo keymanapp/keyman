@@ -29,8 +29,12 @@ type CompleteSearchPath<MappingType> = {
 
 export type PathResult<MappingType> = NullPath | IntermediateSearchPath | CompleteSearchPath<MappingType>;
 
-export function CORRECTION_QUEUE_COMPARATOR<T extends {currentCost: number}>(a: T, b: T) {
+export function PREDICTION_QUEUE_COMPARATOR<T extends {currentCost: number}>(a: T, b: T) {
   return a.currentCost - b.currentCost;
+}
+
+export function CORRECTION_QUEUE_COMPARATOR<T extends {correctionCost: number}>(a: T, b: T) {
+  return a.correctionCost - b.correctionCost;
 }
 
 /**

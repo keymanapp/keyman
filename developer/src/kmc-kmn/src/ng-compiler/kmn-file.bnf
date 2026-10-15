@@ -1,16 +1,14 @@
 kmnTree: line*
 line: compileTarget? content? NEWLINE
 compileTarget: KEYMAN|KEYMANONLY|KEYMANWEB|KMFL|WEAVER
-content: systemStoreAssign|capsAlwaysOff|capsOnOnly|shiftFreesCaps|
-  headerAssign|normalStoreAssign|ruleBlock
+content: systemStoreAssign|capsLockHeader|headerAssign|normalStoreAssign|ruleBlock
 text: plainText|outsStatement
 plainText: textRange|simpleText
 simpleText: STRING|virtualKey|U_CHAR|NAMED_CONSTANT|HANGUL|
   DECIMAL|HEXADECIMAL|OCTAL|NUL|deadkeyStatement|BEEP
 textRange: simpleText rangeEnd+
 rangeEnd: RANGE simpleText
-virtualKey: LEFT_SQ modifier* keyCode RIGHT_SQ
-modifier: SHIFT|CAPS|MODIFIER
+virtualKey: LEFT_SQ MODIFIER* keyCode RIGHT_SQ
 keyCode: KEY_CODE|STRING|DECIMAL
 ruleBlock: beginStatement|groupStatement|productionBlock
 beginStatement: BEGIN entryPoint? CHEVRON useStatement
@@ -19,11 +17,10 @@ useStatement: USE LEFT_BR groupName RIGHT_BR
 groupStatement: GROUP LEFT_BR groupName RIGHT_BR groupQualifier?
 groupName: groupNameElement+
 groupNameElement: PARAMETER|OCTAL|permittedKeyword
-permittedKeyword: ALWAYS|ANSI|BEEP|BEGIN|BITMAP_HEADER|CAPS|CONTEXT|
-  COPYRIGHT_HEADER|DECIMAL|FREES|HEXADECIMAL|HOTKEY_HEADER|KEY_CODE|
-  KEYS|LANGUAGE_HEADER|LAYOUT_HEADER|MATCH|MESSAGE_HEADER|NAME_HEADER|
-  NEWCONTEXT|NOMATCH|NUL|OCTAL|OFF|ON|ONLY|POSTKEYSTROKE|READONLY|
-  RETURN|SHIFT|UNICODE|USING|VERSION_HEADER
+permittedKeyword: ANSI|BEEP|BEGIN|BITMAP_HEADER|CONTEXT|COPYRIGHT_HEADER|
+  DECIMAL|HEXADECIMAL|HOTKEY_HEADER|KEY_CODE|KEYS|LANGUAGE_HEADER|
+  LAYOUT_HEADER|MATCH|MESSAGE_HEADER|NAME_HEADER|NEWCONTEXT|NOMATCH|NUL|
+  OCTAL|POSTKEYSTROKE|READONLY|RETURN|UNICODE|USING|VERSION_HEADER
 groupQualifier: usingKeys|READONLY
 usingKeys: USING KEYS
 productionBlock: lhsBlock CHEVRON rhsBlock
@@ -77,9 +74,7 @@ setNormalStore: SET LEFT_BR normalStoreName EQUAL text+ RIGHT_BR
 setSystemStore: SET LEFT_BR systemStoreNameForSet EQUAL text+ RIGHT_BR
 systemStoreNameForSet: systemStoreName|LAYER
 resetStore: RESET LEFT_BR normalStoreName RIGHT_BR
-capsAlwaysOff: CAPS ALWAYS OFF
-capsOnOnly: CAPS ON ONLY
-shiftFreesCaps: SHIFT FREES CAPS
+capsLockHeader: CAPSALWAYSOFF_HEADER|CAPSONONLY_HEADER|SHIFTFREESCAPS_HEADER
 headerAssign: headerName headerValue
 headerValue: text+|PARAMETER?
 headerName: BITMAP_HEADER|COPYRIGHT_HEADER|HOTKEY_HEADER|LANGUAGE_HEADER|

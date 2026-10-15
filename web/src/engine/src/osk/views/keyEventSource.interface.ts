@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { EventEmitter } from "eventemitter3";
 import { type KeyEvent, type ProcessorAction } from 'keyman/engine/keyboard';
 

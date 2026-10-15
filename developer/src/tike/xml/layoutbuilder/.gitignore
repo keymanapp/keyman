@@ -1,2 +1,3 @@
 # Copied from configure
-keymanweb-osk.ttf
+src/assets/fonts/keymanweb-osk.ttf
+build/

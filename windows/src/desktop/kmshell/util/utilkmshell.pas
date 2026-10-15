@@ -71,7 +71,6 @@ function IsKeyboardPackage(const FileName: string): Boolean;
 function IsKeyboardFile(const FileName: string): Boolean;
 function IsKeyboardSourceFile(const FileName: string): Boolean;
 function IsKeyboardPackageSourceFile(const FileName: string): Boolean;
-function IsKeymanAddinFile(const FileName: string): Boolean;
 function IsKeymanVisualKeyboard(const FileName: string): Boolean;
 function MAKELCID(wLanguageID, wSortID: WORD): DWORD;
 
@@ -137,12 +136,6 @@ function IsKeymanVisualKeyboard(const FileName: string): Boolean;
 begin
     if Length(FileName) < 5 then Result := False
     else Result := LowerCase(Copy(FileName, Length(FileName)-3, 4)) = '.kvk';
-end;
-
-function IsKeymanAddinFile(const FileName: string): Boolean;
-begin
-    if Length(FileName) < 5 then Result := False
-    else Result := LowerCase(Copy(FileName, Length(FileName)-3, 4)) = '.kma';
 end;
 
 function IsKeyboardSourceFile(const FileName: string): Boolean;

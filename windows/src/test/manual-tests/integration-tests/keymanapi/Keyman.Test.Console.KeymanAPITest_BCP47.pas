@@ -60,7 +60,6 @@ end;
 function GetShortKeyboardName(const FileName: string): string;
 begin
   if (LowerCase(ExtractFileExt(FileName)) = '.kmx') or
-      (LowerCase(ExtractFileExt(FileName)) = '.kxx') or
       (LowerCase(ExtractFileExt(FileName)) = '.kmp')
     then Result := ChangeFileExt(ExtractFileName(FileName), '')
     else Result := FileName;

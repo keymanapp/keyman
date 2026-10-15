@@ -1,24 +1,24 @@
 (*
   Name:             internalinterfaces
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      25 Jan 2011
 
   Modified Date:    17 Aug 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          25 Jan 2011 - mcdurdin - I2569 - Keyboard welcome should always shown from kmshell
                     01 Jan 2013 - mcdurdin - I3717 - V9.0 - Need ability to select base keyboard in Keyman Configuration
                     16 Apr 2014 - mcdurdin - I4169 - V9.0 - Mnemonic layouts should be recompiled to positional based on user-selected base keyboard
                     17 Aug 2014 - mcdurdin - I4376 - V9.0 - Unticked keyboards in configuration should be removed from language profile
                     17 Aug 2014 - mcdurdin - I4381 - V9.0 - Keyman keyboards should be removed from language bar when Keyman exits
-                    
+
 *)
 unit internalinterfaces;
 
@@ -41,7 +41,7 @@ type
   IIntKeymanInterface = interface
     ['{D1EBBED5-B9E3-4807-969D-DCF9E1FFB287}']
     function XMLClassName: WideString;
-    function Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString; 
+    function Serialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString;
     function DoSerialize(Flags: TOleEnum; const ImagePath: WideString; References: TStrings): WideString; // Wraps serialize with tag
   end;
 
@@ -67,7 +67,6 @@ type
     ['{4876E6DF-C557-46E2-84F4-787BE5F55DDA}']
     function RegKeyboard: TRegKeyboard;
     procedure ClearVisualKeyboard;
-    procedure UpdateBaseLayout;   // I4169
     procedure RefreshInstallation;
   end;
 

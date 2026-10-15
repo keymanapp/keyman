@@ -9,13 +9,10 @@
  */
 
 import { TokenType } from "./token-type.js";
-import { Token } from "./lexer.js";
 import { PermittedKeywordRule, TextRule } from "./kmn-analyzer.js";
 import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule } from "./recursive-descent.js";
-import { Rule, SingleChildRule, SingleChildRuleWithASTRebuild, SequenceRule, TokenRule } from "./recursive-descent.js";
+import { SingleChildRule, SingleChildRuleWithASTRebuild, SequenceRule, TokenRule } from "./recursive-descent.js";
 import { NodeType } from "./node-type.js";
-import { ASTNode } from "./tree-construction.js";
-import { TokenBuffer } from "./token-buffer.js";
 import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-rebuild.js";
 
 /**
@@ -28,10 +25,9 @@ import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-rebuild.
 export class SystemStoreAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new FirstNode());
-    const systemStore: Rule = new SystemStoreRule();
-    const text: Rule        = new TextRule();
-    const manyText: Rule    = new ManyRule(text);
-    this.rule = new SequenceRule([systemStore, manyText]);
+    const systemStore = new SystemStoreRule();
+    const manyText    = new ManyRule(new TextRule());
+    this.rule         = new SequenceRule([systemStore, manyText]);
   }
 }
 
@@ -43,10 +39,10 @@ export class SystemStoreAssignRule extends SingleChildRuleWithASTRebuild {
 export class SystemStoreRule extends SingleChildRule {
   public constructor() {
     super();
-    const store: Rule           = new TokenRule(TokenType.STORE);
-    const leftBracket: Rule     = new TokenRule(TokenType.LEFT_BR);
-    const systemStoreName: Rule = new SystemStoreNameRule();
-    const rightBracket          = new TokenRule(TokenType.RIGHT_BR);
+    const store           = new TokenRule(TokenType.STORE);
+    const leftBracket     = new TokenRule(TokenType.LEFT_BR);
+    const systemStoreName = new SystemStoreNameRule();
+    const rightBracket    = new TokenRule(TokenType.RIGHT_BR);
     this.rule = new SequenceRule([
       store,
       leftBracket,
@@ -103,10 +99,9 @@ export class SystemStoreNameRule extends AlternateTokenRule {
 export class NormalStoreAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.STORE));
-    const normalStore: Rule = new NormalStoreRule();
-    const text: Rule        = new TextRule();
-    const manyText: Rule    = new ManyRule(text);
-    this.rule = new SequenceRule([normalStore, manyText]);
+    const normalStore = new NormalStoreRule();
+    const manyText    = new ManyRule(new TextRule());
+    this.rule         = new SequenceRule([normalStore, manyText]);
   }
 }
 
@@ -120,11 +115,11 @@ export class NormalStoreAssignRule extends SingleChildRuleWithASTRebuild {
 export class NormalStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new StackedPair(NodeType.STORE, NodeType.STORENAME));
-    const store: Rule           = new TokenRule(TokenType.STORE, true);
-    const leftBracket: Rule     = new TokenRule(TokenType.LEFT_BR);
-    const normalStoreName: Rule = new NormalStoreNameRule();
-    const rightBracket: Rule    = new TokenRule(TokenType.RIGHT_BR);
-    this.rule = new SequenceRule([store, leftBracket, normalStoreName, rightBracket]);
+    const store           = new TokenRule(TokenType.STORE, true);
+    const leftBracket     = new TokenRule(TokenType.LEFT_BR);
+    const normalStoreName = new NormalStoreNameRule();
+    const rightBracket    = new TokenRule(TokenType.RIGHT_BR);
+    this.rule             = new SequenceRule([store, leftBracket, normalStoreName, rightBracket]);
   }
 }
 
@@ -139,8 +134,7 @@ export class NormalStoreNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if normal store name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.STORENAME));
-    const normalStoreNameElement: Rule = new NormalStoreNameElementRule();
-    this.rule = new OneOrManyRule(normalStoreNameElement);
+    this.rule = new OneOrManyRule(new NormalStoreNameElementRule());
   }
 }
 
@@ -155,10 +149,10 @@ export class NormalStoreNameRule extends SingleChildRuleWithASTRebuild {
 export class NormalStoreNameElementRule extends SingleChildRule {
   public constructor() {
     super();
-    const parameter: Rule        = new TokenRule(TokenType.PARAMETER, true);
-    const octal: Rule            = new TokenRule(TokenType.OCTAL, true);
-    const permittedKeyword: Rule = new PermittedKeywordRule();
-    this.rule = new AlternateRule([parameter, octal, permittedKeyword]);
+    const parameter        = new TokenRule(TokenType.PARAMETER, true);
+    const octal            = new TokenRule(TokenType.OCTAL, true);
+    const permittedKeyword = new PermittedKeywordRule();
+    this.rule              = new AlternateRule([parameter, octal, permittedKeyword]);
   }
 }
 
@@ -173,8 +167,7 @@ export class DeadkeyNameRule extends SingleChildRuleWithASTRebuild {
   // TODO-NG-COMPILER: warning/error if deadkey name consists of multiple elements
   public constructor() {
     super(new NewNodeOrTree(NodeType.DEADKEYNAME));
-    const deadkeyNameElement: Rule = new DeadkeyNameElementRule();
-    this.rule = new OneOrManyRule(deadkeyNameElement);
+    this.rule = new OneOrManyRule(new DeadkeyNameElementRule());
   }
 }
 
@@ -189,10 +182,10 @@ export class DeadkeyNameRule extends SingleChildRuleWithASTRebuild {
 export class DeadkeyNameElementRule extends SingleChildRule {
   public constructor() {
     super();
-    const parameter: Rule        = new TokenRule(TokenType.PARAMETER, true);
-    const octal: Rule            = new TokenRule(TokenType.OCTAL, true);
-    const permittedKeyword: Rule = new PermittedKeywordRule();
-    this.rule = new AlternateRule([parameter, octal, permittedKeyword]);
+    const parameter        = new TokenRule(TokenType.PARAMETER, true);
+    const octal            = new TokenRule(TokenType.OCTAL, true);
+    const permittedKeyword = new PermittedKeywordRule();
+    this.rule              = new AlternateRule([parameter, octal, permittedKeyword]);
   }
 }
 
@@ -202,9 +195,9 @@ export class DeadkeyNameElementRule extends SingleChildRule {
 export class StoreNameRule extends SingleChildRule {
   public constructor() {
     super();
-    const systemStoreName: Rule = new SystemStoreNameRule();
-    const normalStoreName: Rule = new NormalStoreNameRule();
-    this.rule = new AlternateRule([systemStoreName, normalStoreName]);
+    const systemStoreName = new SystemStoreNameRule();
+    const normalStoreName = new NormalStoreNameRule();
+    this.rule             = new AlternateRule([systemStoreName, normalStoreName]);
   }
 }
 
@@ -218,13 +211,12 @@ export class StoreNameRule extends SingleChildRule {
 export class SetNormalStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.SET));
-    const set: Rule             = new TokenRule(TokenType.SET, true);
-    const leftBracket: Rule     = new TokenRule(TokenType.LEFT_BR);
-    const normalStoreName: Rule = new NormalStoreNameRule();
-    const equal: Rule           = new TokenRule(TokenType.EQUAL);
-    const text: Rule            = new TextRule();
-    const oneOrManyText: Rule   = new OneOrManyRule(text);
-    const rightBracket: Rule    = new TokenRule(TokenType.RIGHT_BR);
+    const set             = new TokenRule(TokenType.SET, true);
+    const leftBracket     = new TokenRule(TokenType.LEFT_BR);
+    const normalStoreName = new NormalStoreNameRule();
+    const equal           = new TokenRule(TokenType.EQUAL);
+    const oneOrManyText   = new OneOrManyRule(new TextRule());
+    const rightBracket    = new TokenRule(TokenType.RIGHT_BR);
 
     this.rule = new SequenceRule([
       set,
@@ -247,13 +239,12 @@ export class SetNormalStoreRule extends SingleChildRuleWithASTRebuild {
 export class SetSystemStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new GivenNode(NodeType.SET));
-    const set: Rule                   = new TokenRule(TokenType.SET, true);
-    const leftBracket: Rule           = new TokenRule(TokenType.LEFT_BR);
-    const systemStoreNameForSet: Rule = new SystemStoreNameForSetRule();
-    const equal: Rule                 = new TokenRule(TokenType.EQUAL);
-    const text: Rule                  = new TextRule();
-    const oneOrManyText: Rule         = new OneOrManyRule(text);
-    const rightBracket: Rule          = new TokenRule(TokenType.RIGHT_BR);
+    const set                   = new TokenRule(TokenType.SET, true);
+    const leftBracket           = new TokenRule(TokenType.LEFT_BR);
+    const systemStoreNameForSet = new SystemStoreNameForSetRule();
+    const equal                 = new TokenRule(TokenType.EQUAL);
+    const oneOrManyText         = new OneOrManyRule(new TextRule());
+    const rightBracket          = new TokenRule(TokenType.RIGHT_BR);
 
     this.rule = new SequenceRule([
       set,
@@ -275,9 +266,9 @@ export class SetSystemStoreRule extends SingleChildRuleWithASTRebuild {
 export class SystemStoreNameForSetRule extends SingleChildRule {
   public constructor() {
     super();
-    const layer: Rule           = new TokenRule(TokenType.LAYER, true);
-    const systemStoreName: Rule = new SystemStoreNameRule();
-    this.rule = new AlternateRule([systemStoreName, layer]);
+    const layer           = new TokenRule(TokenType.LAYER, true);
+    const systemStoreName = new SystemStoreNameRule();
+    this.rule             = new AlternateRule([systemStoreName, layer]);
   }
 }
 
@@ -291,97 +282,29 @@ export class SystemStoreNameForSetRule extends SingleChildRule {
 export class ResetStoreRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new StackedPair(NodeType.RESET, NodeType.STORENAME));
-    const reset: Rule           = new TokenRule(TokenType.RESET, true);
-    const leftBracket: Rule     = new TokenRule(TokenType.LEFT_BR);
-    const normalStoreName: Rule = new NormalStoreNameRule();
-    const rightBracket: Rule    = new TokenRule(TokenType.RIGHT_BR);
+    const reset           = new TokenRule(TokenType.RESET, true);
+    const leftBracket     = new TokenRule(TokenType.LEFT_BR);
+    const normalStoreName = new NormalStoreNameRule();
+    const rightBracket    = new TokenRule(TokenType.RIGHT_BR);
     this.rule = new SequenceRule([reset, leftBracket, normalStoreName, rightBracket]);
   }
 }
 
 /**
- * An abstract base class for rules that match multiword caps lock
- * headers and map them to more modern caps lock system store commands.
+ * (BNF) see the BNF file (kmn-file.bnf)
  *
  * https://help.keyman.com/developer/language/reference/_keywordsbytype
- * https://help.keyman.com/developer/language/reference/caps
  */
-abstract class AbstractCapsLockStatementRule extends SingleChildRule {
-  public constructor(
-    /** type of token that will be created */
-    protected tokenType: TokenType,
-    /** type of node that will be added to the tree */
-    protected nodeType: NodeType,
-  ) {
-    super();
-  }
-
-  /**
-   * Parse a CapsLockStatementRule. A child class needs to identify
-   * the nodeType and tokenType that will be added to the AST if
-   * the parse is successful.
-   *
-   * @param tokenBuffer the TokenBuffer to parse
-   * @param node where to build the AST
-   * @returns true if this rule was successfully parsed
-   */
-  public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    if (this.rule.parse(tokenBuffer, new ASTNode())) {
-      // TODO-NG-COMPILER: warning/error for caps lock statements
-      node.addNewChildWithToken(this.nodeType, new Token(this.tokenType, '1'));
-      return true;
-    }
-    return false;
-  }
-}
-
-/**
- * (BNF) capsAlwaysOff: CAPS ALWAYS OFF
- *
- * https://help.keyman.com/developer/language/reference/_keywordsbytype
- * https://help.keyman.com/developer/language/reference/caps
- */
-export class CapsAlwaysOffRule extends AbstractCapsLockStatementRule {
+export class CapsLockHeaderRule extends AlternateTokenRule {
+  // TODO-NG-COMPILER: warning/error for caps lock header statements
   public constructor() {
-    super(TokenType.CAPSALWAYSOFF, NodeType.CAPSALWAYSOFF);
-    const caps: Rule   = new TokenRule(TokenType.CAPS);
-    const always: Rule = new TokenRule(TokenType.ALWAYS);
-    const off: Rule    = new TokenRule(TokenType.OFF);
-    this.rule = new SequenceRule([caps, always, off]);
+    super([
+      TokenType.CAPSALWAYSOFF_HEADER,
+      TokenType.CAPSONONLY_HEADER,
+      TokenType.SHIFTFREESCAPS_HEADER,
+    ], true);
   }
-}
-
-/**
- * (BNF) capsOnOnly: CAPS ON ONLY
- *
- * https://help.keyman.com/developer/language/reference/_keywordsbytype
- * https://help.keyman.com/developer/language/reference/caps
- */
-export class CapsOnOnlyRule extends AbstractCapsLockStatementRule {
-  public constructor() {
-    super(TokenType.CAPSONONLY, NodeType.CAPSONONLY);
-    const caps: Rule = new TokenRule(TokenType.CAPS);
-    const on: Rule   = new TokenRule(TokenType.ON);
-    const only: Rule = new TokenRule(TokenType.ONLY);
-    this.rule = new SequenceRule([caps, on, only]);
-  }
-}
-
-/**
- * (BNF) shiftFreesCaps: SHIFT FREES CAPS
- *
- * https://help.keyman.com/developer/language/reference/_keywordsbytype
- * https://help.keyman.com/developer/language/reference/caps
- */
-export class ShiftFreesCapsRule extends AbstractCapsLockStatementRule {
-  public constructor() {
-    super(TokenType.SHIFTFREESCAPS, NodeType.SHIFTFREESCAPS);
-    const shift: Rule = new TokenRule(TokenType.SHIFT);
-    const frees: Rule = new TokenRule(TokenType.FREES);
-    const caps: Rule  = new TokenRule(TokenType.CAPS);
-    this.rule = new SequenceRule([shift, frees, caps]);
-  }
-}
+};
 
 /**
  * (BNF) headerAssign: headerName headerValue
@@ -391,9 +314,9 @@ export class ShiftFreesCapsRule extends AbstractCapsLockStatementRule {
 export class HeaderAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new FirstNode());
-    const headerName: Rule  = new HeaderNameRule();
-    const headerValue: Rule = new HeaderValueRule();
-    this.rule = new SequenceRule([headerName, headerValue]);
+    const headerName  = new HeaderNameRule();
+    const headerValue = new HeaderValueRule();
+    this.rule         = new SequenceRule([headerName, headerValue]);
   }
 }
 
@@ -403,11 +326,9 @@ export class HeaderAssignRule extends SingleChildRuleWithASTRebuild {
 export class HeaderValueRule extends SingleChildRule {
   public constructor() {
     super();
-    const text: Rule          = new TextRule();
-    const oneOrManyText: Rule = new OneOrManyRule(text);
-    const parameter: Rule     = new TokenRule(TokenType.PARAMETER, true);
-    const optParameter: Rule  = new OptionalRule(parameter);
-    this.rule = new AlternateRule([oneOrManyText, optParameter]);
+    const oneOrManyText = new OneOrManyRule(new TextRule());
+    const optParameter  = new OptionalRule(new TokenRule(TokenType.PARAMETER, true));
+    this.rule           = new AlternateRule([oneOrManyText, optParameter]);
   }
 }
 

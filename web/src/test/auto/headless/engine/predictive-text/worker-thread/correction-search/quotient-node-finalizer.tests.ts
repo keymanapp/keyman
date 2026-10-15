@@ -99,9 +99,9 @@ describe('QuotientNodeFinalizer', () => {
 
       assert.equal(searchResult.type, 'complete');
       if(searchResult.type == 'complete') {
-        assert.equal(searchResult.mapping.totalCost, -Math.log(therefo.bestExample.p));
+        assert.equal(searchResult.mapping.correctionCost, -Math.log(therefo.bestExample.p));
         assert.isNotNaN(searchResult.cost);
-        assert.equal(searchResult.cost, searchResult.mapping.totalCost);
+        assert.isAtLeast(searchResult.cost, searchResult.mapping.totalCost);
       } else {
         return;
       }
@@ -129,9 +129,9 @@ describe('QuotientNodeFinalizer', () => {
 
       assert.equal(searchResult.type, 'complete');
       if(searchResult.type == 'complete') {
-        assert.isAbove(searchResult.mapping.totalCost, -Math.log(therefo.bestExample.p));
+        assert.isAbove(searchResult.mapping.correctionCost, -Math.log(therefo.bestExample.p));
         assert.isNotNaN(searchResult.cost);
-        assert.equal(searchResult.cost, searchResult.mapping.totalCost);
+        assert.isAtLeast(searchResult.cost, searchResult.mapping.totalCost);
       } else {
         return;
       }

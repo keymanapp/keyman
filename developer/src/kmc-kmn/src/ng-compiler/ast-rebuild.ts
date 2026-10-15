@@ -36,7 +36,7 @@ export class GivenNode extends ASTRebuild {
    */
   public apply(node: ASTNode): ASTNode {
     if (node.hasSoleChildOfType(this.nodeType)) {
-      const givenNode: ASTNode = node.removeSoleChildOfType(this.nodeType);
+      const givenNode = node.removeSoleChildOfType(this.nodeType);
       givenNode.addChildren(node.removeChildren());
       node.addChild(givenNode);
     }
@@ -94,7 +94,7 @@ export class NewNode extends ASTRebuild {
    * @returns the rebuilt tree, rooted at the new node
    */
   public apply(node: ASTNode): ASTNode {
-    const newNode: ASTNode = new ASTNode(this.nodeType);
+    const newNode = new ASTNode(this.nodeType);
     newNode.addChildren(node.removeChildren());
     node.addChild(newNode);
     return node;
@@ -125,7 +125,7 @@ export class NewNodeOrTree extends ASTRebuild {
     if (children.length === 1) {
       node.addNewChildWithToken(this.nodeType, children[0].token);
     } else {
-      const newNode: ASTNode = new ASTNode(this.nodeType);
+      const newNode = new ASTNode(this.nodeType);
       newNode.addChildren(children);
       node.addChild(newNode);
     }
@@ -146,7 +146,7 @@ export class FirstNode extends ASTRebuild {
    */
   public apply(node: ASTNode): ASTNode {
     if (node.hasChildren()) {
-      const firstNode: ASTNode = node.removeFirstChild();
+      const firstNode = node.removeFirstChild();
       firstNode.addChildren(node.removeChildren());
       node.addChild(firstNode);
     }

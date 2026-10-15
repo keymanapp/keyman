@@ -13,7 +13,7 @@ import { Lexer, Token } from '../../src/ng-compiler/lexer.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { BeginStatementRule, CompileTargetRule, ContentRule, EntryPointRule, GroupNameRule, KeystrokeElementRule, Parser } from '../../src/ng-compiler/kmn-analyzer.js';
 import { GroupQualifierRule, GroupStatementRule, InputBlockRule, InputContextRule, InputElementRule } from '../../src/ng-compiler/kmn-analyzer.js';
-import { KeystrokeRule, KmnTreeRule, LhsBlockRule, LineRule, ModifierRule } from '../../src/ng-compiler/kmn-analyzer.js';
+import { KeystrokeRule, KmnTreeRule, LhsBlockRule, LineRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { OutputStatementRule, PermittedKeywordRule, PlainTextRule, ProductionBlockRule, RhsBlockRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { RuleBlockRule, SimpleTextRule, TextRangeRule, TextRule, UseStatementRule } from '../../src/ng-compiler/kmn-analyzer.js';
 import { UsingKeysRule, VirtualKeyRule } from '../../src/ng-compiler/kmn-analyzer.js';
@@ -286,19 +286,19 @@ describe("KMN Analyser Tests", () => {
       tokenBuffer = stringToTokenBuffer('caps always off');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSALWAYSOFF));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSALWAYSOFF_HEADER));
     });
     it("can parse correctly (caps on only)", () => {
       tokenBuffer = stringToTokenBuffer('caps on only');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSONONLY));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.CAPSONONLY_HEADER));
     });
     it("can parse correctly (shift frees caps)", () => {
       tokenBuffer = stringToTokenBuffer('shift frees caps');
       const content: Rule = new ContentRule();
       assert.isTrue(content.parse(tokenBuffer, root));
-      assert.isNotNull(root.getSoleChildOfType(NodeType.SHIFTFREESCAPS));
+      assert.isNotNull(root.getSoleChildOfType(NodeType.SHIFTFREESCAPS_HEADER));
     });
     it("can parse correctly (header assign)", () => {
       tokenBuffer = stringToTokenBuffer('hotkey [SHIFT K_H]');
@@ -634,32 +634,6 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(virtualKeyNode.getSoleChildOfType(NodeType.MODIFIER));
     });
   });
-  describe("ModifierRule Tests", () => {
-    it("can construct a ModifierRule", () => {
-      tokenBuffer = stringToTokenBuffer('');
-      const modifier: Rule = new ModifierRule();
-      assert.isNotNull(modifier);
-    });
-    it("can parse correctly", () => {
-      [
-        'shift',
-        'caps',
-        'ctrl',
-        'lctrl',
-        'rctrl',
-        'alt',
-        'lalt',
-        'ralt',
-        'ncaps',
-      ].forEach((code) => {
-        tokenBuffer = stringToTokenBuffer(`${code} `);
-        const modifier: Rule = new ModifierRule();
-        root = new ASTNode();
-        assert.isTrue(modifier.parse(tokenBuffer, root));
-        assert.equal(root.getSoleChildOfType(NodeType.MODIFIER).getText(), code);
-      });
-    });
-  });
   describe("RuleBlockRule Tests", () => {
     it("can construct a RuleBlockRule", () => {
       tokenBuffer = stringToTokenBuffer('');
@@ -841,16 +815,13 @@ describe("KMN Analyser Tests", () => {
     it("can parse correctly", () => {
       // *_HEADER tokens must be followed by a space
       [
-        {input: 'always',        nodeType: NodeType.ALWAYS},
         {input: 'ansi',          nodeType: NodeType.ANSI},
         {input: 'beep',          nodeType: NodeType.BEEP},
         {input: 'begin',         nodeType: NodeType.BEGIN},
         {input: 'bitmap ',       nodeType: NodeType.BITMAP_HEADER},
-        {input: 'caps',          nodeType: NodeType.CAPS},
         {input: 'context',       nodeType: NodeType.CONTEXT},
         {input: 'copyright ',    nodeType: NodeType.COPYRIGHT_HEADER},
         {input: 'd1 ',           nodeType: NodeType.DECIMAL},
-        {input: 'frees',         nodeType: NodeType.FREES},
         {input: 'xa1 ',          nodeType: NodeType.HEXADECIMAL},
         {input: 'hotkey ',       nodeType: NodeType.HOTKEY_HEADER},
         {input: 'keys',          nodeType: NodeType.KEYS},
@@ -862,13 +833,9 @@ describe("KMN Analyser Tests", () => {
         {input: 'nomatch',       nodeType: NodeType.NOMATCH},
         {input: 'nul',           nodeType: NodeType.NUL},
         {input: '10 ',           nodeType: NodeType.OCTAL},
-        {input: 'off',           nodeType: NodeType.OFF},
-        {input: 'on',            nodeType: NodeType.ON},
-        {input: 'only',          nodeType: NodeType.ONLY},
         {input: 'postkeystroke', nodeType: NodeType.POSTKEYSTROKE},
         {input: 'readonly',      nodeType: NodeType.READONLY},
         {input: 'return',        nodeType: NodeType.RETURN},
-        {input: 'shift',         nodeType: NodeType.SHIFT},
         {input: 'unicode',       nodeType: NodeType.UNICODE},
         {input: 'using',         nodeType: NodeType.USING},
         {input: 'version ',      nodeType: NodeType.VERSION_HEADER},
