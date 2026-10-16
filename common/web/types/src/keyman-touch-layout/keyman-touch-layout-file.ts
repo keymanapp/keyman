@@ -33,6 +33,11 @@ export interface TouchLayoutPlatform {
 
 export type TouchLayoutLayerId = string;  // pattern = /^[a-zA-Z0-9_-]+$/
 
+/** hardware modifier combination to apply to key event when key is pressed
+ * TODO: this doesn't cover all the allowable values yet
+*/
+export type TouchLayoutModifierOverride = 'shift' | 'ctrl' | 'alt' | 'ctrlshift' | 'altshift' | 'ctrlalt' | 'ctrlaltshift';
+
 /** a layer with rows of keys on a touch layout */
 export interface TouchLayoutLayer {
   id: TouchLayoutLayerId;
@@ -78,9 +83,10 @@ export interface TouchLayoutKey {
   text?: string;
   /**
     * the modifier combination (not layer) that should be used in key events,
-    * for this key, overriding the layer that the key is a part of.
+    * for this key, overriding the default modifier (if any) associated with the layer
+    * that the key is a part of.
     */
-  layer?: TouchLayoutLayerId;
+  layer?/*modifierOverride*/: TouchLayoutModifierOverride;
   /** the next layer to switch to after this key is pressed */
   nextlayer?: TouchLayoutLayerId;
   /** font */
@@ -141,9 +147,10 @@ export interface TouchLayoutSubKey {
   text?: string;
   /**
     * the modifier combination (not layer) that should be used in key events,
-    * for this key, overriding the layer that the key is a part of.
+    * for this key, overriding the default modifier (if any) associated with the
+    * layer that the key is a part of.
     */
-  layer?: TouchLayoutLayerId;
+  layer?: TouchLayoutModifierOverride;
   /** the next layer to switch to after this key is pressed */
   nextlayer?: TouchLayoutLayerId;
   /** font */

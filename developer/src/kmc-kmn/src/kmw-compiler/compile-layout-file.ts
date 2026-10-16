@@ -84,7 +84,7 @@ function KeyIdType(FId: string): TKeyIdType {   // I4142
 }
 
 
-function CheckKey(
+function checkKey(
   platformId: string,
   FPlatform: TouchLayout.TouchLayoutPlatform,
   layer: TouchLayout.TouchLayoutLayer,
@@ -94,7 +94,8 @@ function CheckKey(
   FKeyType: TouchLayout.TouchLayoutKeySp,
   FRequiredKeys: TRequiredKey[],
   FDictionary: string[],
-  address: KeyAddress
+  address: KeyAddress,
+  modifierOverride: TouchLayout.TouchLayoutModifierOverride
 ): boolean {   // I4119
   //
   // Coerce missing ID and Text to empty strings for additional tests
@@ -185,6 +186,11 @@ function CheckKey(
         address
       }));
     }
+  }
+
+  if(modifierOverride !== undefined && modifierOverride !== null) {
+    // Note that this is called 'key.layer' in the .touch-layout-file; see touch-layout-file.md for history
+    // TODO: verify
   }
 
   return true;
@@ -357,7 +363,7 @@ function validateLayoutFileContent(data: TouchLayout.TouchLayoutFile, FDictionar
         }
         for(const key of row.key) {
           keyIndex++;
-          result = CheckKey(pid, platform, layer, key.id, key.text, key.nextlayer, key.sp, FRequiredKeys, FDictionary, {rowIndex, keyIndex}) && result;   // I4119
+          result = checkKey(pid, platform, layer, key.id, key.text, key.nextlayer, key.sp, FRequiredKeys, FDictionary, {rowIndex, keyIndex}, key.layer/*modifierOverride*/) && result;   // I4119
           if(key.sk) {
             let subKeyIndex = 0;
             if(!Array.isArray(key.sk)) {
@@ -366,8 +372,8 @@ function validateLayoutFileContent(data: TouchLayout.TouchLayoutFile, FDictionar
             }
             for(const subkey of key.sk) {
               subKeyIndex++;
-              result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
-                {rowIndex, keyIndex, subKeyIndex}) && result;
+              result = checkKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
+                {rowIndex, keyIndex, subKeyIndex}, subkey.layer/*modifierOverride*/) && result;
             }
           }
           let direction: keyof TouchLayout.TouchLayoutFlick;
@@ -378,8 +384,9 @@ function validateLayoutFileContent(data: TouchLayout.TouchLayoutFile, FDictionar
             }
             for(direction in key.flick) {
               warnGesturesIfNeeded(key.id);
-              result = CheckKey(pid, platform, layer, key.flick[direction].id, key.flick[direction].text,
-                key.flick[direction].nextlayer, key.flick[direction].sp, FRequiredKeys, FDictionary, {rowIndex, keyIndex, direction}) && result;
+              const subkey = key.flick[direction];
+              result = checkKey(pid, platform, layer, subkey.id, subkey.text,
+                subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary, {rowIndex, keyIndex, direction}, subkey.layer/*modifierOverride*/) && result;
             }
           }
 
@@ -392,8 +399,8 @@ function validateLayoutFileContent(data: TouchLayout.TouchLayoutFile, FDictionar
             for(const subkey of key.multitap) {
               multitapIndex++;
               warnGesturesIfNeeded(key.id);
-              result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
-                {rowIndex, keyIndex, multitapIndex}) && result;
+              result = checkKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
+                {rowIndex, keyIndex, multitapIndex}, subkey.layer/*modifierOverride*/) && result;
             }
           }
         }

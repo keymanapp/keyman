@@ -145,7 +145,7 @@ export class SubkeyPopup implements GestureHandler {
     ss.fontSize=computedStyle.fontSize;
     ss.visibility='hidden';
 
-    let layer = e['key'].layer;
+    let layer/*displayLayer*/ = e['key'].layer/*displayLayer*/;
     if (typeof (layer) != 'string' || layer == '') {
       // Use the currently-active layer.
       layer = vkbd.layerId;
