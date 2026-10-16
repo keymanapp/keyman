@@ -476,7 +476,9 @@ export class JSKeyboard implements Keyboard {
     Lkc.device = device;
 
     if(this.isMnemonic) {
-      Lkc.setMnemonicCode(key.layer.indexOf('shift') != -1, stateKeys['K_CAPS']);
+      // TOOD: potential confusion with layer vs modifierOverride again here, if
+      // we remove displayLayer populating modifierOverride in the future
+      Lkc.setMnemonicCode(key.layer/*modifierOverride*/.indexOf('shift') != -1, stateKeys['K_CAPS']);
     }
 
     // Performs common pre-analysis for both 'native' and 'embedded' OSK key & subkey input events.

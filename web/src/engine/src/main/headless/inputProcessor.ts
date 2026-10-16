@@ -451,7 +451,7 @@ export class InputProcessor {
       const contextWindowTextStore = contextWindow.toSyntheticTextStore();
 
       // Note - we don't yet do fat-fingering with longpress keys.
-      if(this.languageProcessor.isActive && keyDistribution && keyEvent.kbdLayer) {
+      if(this.languageProcessor.isActive && keyDistribution && keyEvent.kbdLayer) {   // TODO: keyEvent.kbdLayer is never used again, why tested here?
         // Tracks a 'deadline' for fat-finger ops, just in case both context is long enough
         // and device is slow enough that the calculation takes too long.
         //
