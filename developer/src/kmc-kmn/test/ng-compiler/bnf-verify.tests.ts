@@ -90,15 +90,19 @@ function visitRules(
   if ((ts.isClassDeclaration(node) || ts.isClassExpression(node)) &&
     node.name?.text.endsWith("Rule")
   ) {
-    const name       = lowerFirst(node.name.text.replace(/Rule$/, ""));
-    const expression = inspectRuleExpression(node, sourceFile);
+    const name = lowerFirst(node.name.text.replace(/Rule$/, ""));
+    const expr = inspectRuleExpression(node, sourceFile);
 
-    if (expression !== undefined) {
-      rules[name] = expression;
+    if (expr !== undefined) {
+      rules[name] = expr;
     }
   }
 
   ts.forEachChild(node, child => visitRules(child, sourceFile, rules));
+}
+
+function lowerFirst(text: string): string {
+  return text.charAt(0).toLowerCase() + text.slice(1);
 }
 
 function inspectRuleExpression(
@@ -193,9 +197,7 @@ function inspectAlternateTokenRule(
 ): string | undefined {
   if (cls.heritageClauses?.some(clause =>
     clause.token === ts.SyntaxKind.ExtendsKeyword &&
-    clause.types.some(type =>
-      type.expression.getText() === "AlternateTokenRule"
-    )
+    clause.types.some(type => type.expression.getText() === "AlternateTokenRule")
   )) {
     const constructor = cls.members.find(ts.isConstructorDeclaration);
 
@@ -206,7 +208,7 @@ function inspectAlternateTokenRule(
     );
 
     if (superCall && ts.isExpressionStatement(superCall)) {
-      const args = (superCall.expression as ts.CallExpression).arguments;
+      const args   = (superCall.expression as ts.CallExpression).arguments;
       const tokens = args[0];
 
       if (tokens && ts.isArrayLiteralExpression(tokens)) {
@@ -221,6 +223,22 @@ function inspectAlternateTokenRule(
 
   return undefined;
 }
+
+type RuleDescription = {
+  name: string;
+  separator?: string;
+  suffix?: string;
+  token?: boolean;
+};
+
+const ruleDescriptions: RuleDescription[] = [
+  { name: "AlternateRule", separator: "|" },
+  { name: "SequenceRule",  separator: " " },
+  { name: "TokenRule",     token: true },
+  { name: "ManyRule",      suffix: "*" },
+  { name: "OneOrManyRule", suffix: "+" },
+  { name: "OptionalRule",  suffix: "?" },
+];
 
 function describeExpression(
   node: ts.Expression,
@@ -259,43 +277,36 @@ function describeExpression(
     const describeArgs = () =>
       args.map(arg => describeExpression(arg, variables, properties, sourceFile));
 
-    switch (name) {
-      case "AlternateRule":
-        return args.length && ts.isArrayLiteralExpression(args[0])
-          ? describeArray(args[0].elements, variables, properties, sourceFile, "|")
-          : `AlternateRule(${describeArgs().join(", ")})`;
+    const rule = ruleDescriptions.find(rule => rule.name === name);
 
-      case "SequenceRule":
-        return args.length && ts.isArrayLiteralExpression(args[0])
-          ? describeArray(args[0].elements, variables, properties, sourceFile, " ")
-          : `SequenceRule(${describeArgs().join(", ")})`;
-
-      case "TokenRule":
-        if (args.length > 0 && ts.isPropertyAccessExpression(args[0])) {
-          return args[0].name.text;
-        }
-        return `TokenRule(${describeArgs().join(", ")})`;
-
-      case "ManyRule":
-        return args.length > 0
-          ? `${describeExpression(args[0], variables, properties, sourceFile)}*`
-          : "ManyRule";
-
-      case "OneOrManyRule":
-        return args.length > 0
-          ? `${describeExpression(args[0], variables, properties, sourceFile)}+`
-          : "OneOrManyRule";
-
-      case "OptionalRule":
-        return args.length > 0
-          ? `${describeExpression(args[0], variables, properties, sourceFile)}?`
-          : "OptionalRule";
-
-      default:
-        return args.length
-          ? `${lowerFirst(name.replace(/Rule$/, ""))}(${describeArgs().join(", ")})`
-          : lowerFirst(name.replace(/Rule$/, ""));
+    if (rule?.token) {
+      if (args.length > 0 && ts.isPropertyAccessExpression(args[0])) {
+        return args[0].name.text;
+      }
+      return `TokenRule(${describeArgs().join(", ")})`;
     }
+
+    if (rule?.separator !== undefined) {
+      return args.length > 0 && ts.isArrayLiteralExpression(args[0])
+        ? describeArray(
+            args[0].elements,
+            variables,
+            properties,
+            sourceFile,
+            rule.separator
+          )
+        : `${name}(${describeArgs().join(", ")})`;
+    }
+
+    if (rule?.suffix !== undefined) {
+      return args.length > 0
+        ? `${describeExpression(args[0], variables, properties, sourceFile)}${rule.suffix}`
+        : name;
+    }
+
+    return args.length
+      ? `${lowerFirst(name.replace(/Rule$/, ""))}(${describeArgs().join(", ")})`
+      : lowerFirst(name.replace(/Rule$/, ""));
   }
 
   return node.getText(sourceFile);
@@ -309,31 +320,30 @@ function describeArray(
   separator: string
 ): string {
   return elements
-    .map(element =>
-      describeExpression(element, variables, properties, sourceFile)
-    )
+    .map(element => describeExpression(element, variables, properties, sourceFile))
     .join(separator);
-}
-
-function lowerFirst(text: string): string {
-  return text.charAt(0).toLowerCase() + text.slice(1);
 }
 
 function findClassDeclaration(
   name: string,
   sourceFile: ts.SourceFile
 ): ts.ClassDeclaration | undefined {
-  let result: ts.ClassDeclaration | undefined;
+  const result: { value?: ts.ClassDeclaration } = {};
 
-  function visitNode(node: ts.Node): void {
-    if (ts.isClassDeclaration(node) && node.name?.text === name) {
-      result = node;
-      return;
-    }
-    ts.forEachChild(node, visitNode);
+  visitNode(sourceFile, name, result);
+
+  return result.value;
+}
+
+function visitNode(
+  node: ts.Node,
+  name: string,
+  result: { value?: ts.ClassDeclaration }
+): void {
+  if (ts.isClassDeclaration(node) && node.name?.text === name) {
+    result.value = node;
+    return;
   }
 
-  visitNode(sourceFile);
-
-  return result;
+  ts.forEachChild(node, child => visitNode(child, name, result));
 }
