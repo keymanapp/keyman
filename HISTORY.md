@@ -26,6 +26,32 @@
 * chore(common): remove `clearcontext`,`fix`,`switch`,`key` statements (#16726)
 * chore: move to 20.0-alpha (#16739)
 
+## 19.0.305 beta 2026-10-09
+
+* docs: remove repeated clean up instructions (#16745)
+* fix(web): prevent crash adding log entry for keystroke with `inputBreadCrumb` (#16762)
+* maint(ios): new iOS certificate (beta-19.0) (#16772)
+* docs(developer): fix typo in whatsnew (#16774)
+* fix(web): fix crash applying suggestions (#16786)
+
+## 19.0.304 beta 2026-10-08
+
+* docs(common): add `sentry-cli` version and update documentation (#16752)
+* chore(linux): update changelog with Debian version (#16758)
+
+## 19.0.303 beta 2026-10-07
+
+* fix(resources): export KEYMAN_TIER so we get beta tagging on release build (#16751)
+
+## 19.0.302 beta 2026-10-07
+
+* fix(mac): lower case 'k' for .pkg.download_info (#16743)
+* docs: update v19 whats-new (#16748)
+
+## 19.0.300 beta 2026-10-06
+
+* chore: move to beta
+
 ## 19.0.299 alpha 2026-10-05
 
 * chore(deps): bump ip-address from 10.5.0 to 10.7.2 in /developer/src/server/src/win32/trayicon/addon-src (#16698)
