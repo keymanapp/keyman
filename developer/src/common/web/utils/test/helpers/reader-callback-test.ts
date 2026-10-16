@@ -24,6 +24,10 @@ export interface CompilationCase {
    */
   subpath: string;
   /**
+   * message numbers. If present, must be a match for all messages reported; use to avoid complicated tests that deal with message parameters
+   */
+  messages?: number[];
+  /**
    * expected error messages. If falsy, expected to succeed. All must be present to pass.
    */
   errors?: CompilerEvent[];
@@ -110,15 +114,19 @@ export function testReaderCases(cases : CompilationCase[]) {
         assert.throws(() => reader.validate(source), testcase.throws);
       } else {
         assert.doesNotThrow(() => reader.validate(source), `validating ${testcase.subpath}`);
-        // if we expected errors or warnings, show them
-        if (testcase.errors) {
-          assert.includeDeepMembers(callbacks.messages, testcase.errors, 'expected errors to be included');
-        }
-        if (testcase.warnings) {
-          assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
-        } else if (!expectFailure) {
-          // no warnings, so expect zero messages
-          assert.deepEqual(callbacks.messages, [], 'expected zero messages');
+        if (testcase.messages) {
+          assert.sameDeepMembers(callbacks.messages.map(message => message.code), testcase.messages, 'expected messages to match');
+        } else {
+          // if we expected errors or warnings, show them
+          if (testcase.errors) {
+            assert.includeDeepMembers(callbacks.messages, testcase.errors, 'expected errors to be included');
+          }
+          if (testcase.warnings) {
+            assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
+          } else if (!expectFailure) {
+            // no warnings, so expect zero messages
+            assert.deepEqual(callbacks.messages, [], 'expected zero messages');
+          }
         }
 
         // run the user-supplied callback if any

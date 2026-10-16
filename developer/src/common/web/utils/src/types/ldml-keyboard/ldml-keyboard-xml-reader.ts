@@ -263,7 +263,15 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
       this.callbacks.reportMessage(DeveloperUtilsMessages.Error_ImportReadFail({base, path, subtag}));
       return false;
     }
-    const importXml: any = this.loadUnboxed(importData); // TODO-LDML: have to load as any because it is an arbitrary part
+
+    let importXml: any = null;
+    try {
+      importXml = this.loadUnboxed(importData);
+    } catch(e) {
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({e, path: importPath}));
+      return false;
+    }
+
     const importRootNode = importXml[subtag]; // e.g. <keys/>
     this.eventResolver.addFile(importPath, new TextDecoder().decode(importData)); // TODO: double decode
 
@@ -343,7 +351,7 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
     try {
       source = this.loadUnboxed(file);
     } catch(e) {
-      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({e}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({e, path:''}));
       return null;
     }
 
