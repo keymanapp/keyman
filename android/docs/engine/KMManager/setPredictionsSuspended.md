@@ -30,7 +30,7 @@ Use this method to temporarily disable predictions because of the currently sele
 
 ## History
 Added syntax in Keyman Engine for Android 18.0.
-Deprecated syntax in Keyman Engine for Android 19.0 in favor of [`setSuggestionType`](setSuggestionType).
+Deprecated syntax in Keyman Engine for Android 19.0 in favor of [`setInputType`](setInputType).
 
 ## See also
 * [getPredictionsSuspended](getPredictionsSuspended)

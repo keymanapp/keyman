@@ -23,7 +23,7 @@ Use this method to check if predictions are temporarily disabled because of the 
 
 ## History
 Added syntax in Keyman Engine for Android 18.0.
-Deprecated syntax in Keyman Engine for Android 19.0 in favor of [`defaultSuggestionModeForType`](defaultSuggestionModeForType).
+Deprecated syntax in Keyman Engine for Android 19.0 in favor of [`setInputType`](setInputType), as it better maintains predictive-text state.
 
 ## See also
 * [setPredictionsSuspended](setPredictionsSuspended)
