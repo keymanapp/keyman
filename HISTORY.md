@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.308 beta 2026-10-16
+
+* fix(web): use `key.displayLayer` rather than `key.layer` to look up corrections (#16831)
+
 ## 19.0.307 beta 2026-10-15
 
 * fix(developer): address range check error in bitmap editor (#16815)
