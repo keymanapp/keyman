@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 19.0.307 beta 2026-10-15
+
+* fix(developer): address range check error in bitmap editor (#16815)
+* maint(common): remove history-utils.sh (#16796)
+* docs(web): improve documentation on `addKeyboards`/`addKeyboardsForLanguage` (#16020)
+
+## 19.0.306 beta 2026-10-12
+
+* fix(web): don't crash on gestures when banner disabled (#16788)
+* maint(common): add lint for unitTestEndpoints usage (#16769)
+
 ## 19.0.305 beta 2026-10-09
 
 * docs: remove repeated clean up instructions (#16745)
