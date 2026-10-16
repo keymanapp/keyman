@@ -272,8 +272,8 @@ public class InputMethodUtil {
     }
     
     // Keyman is not running, launch to check accessibility and migrate data with specific command line argument
-    Logger.setup.debug("invokeKeymanInputMethodCheckAccessWithMigration(), calling launchKeymanInputMethodIndependently()")
-    try self.launchKeymanInputMethodIndependently(argument: kMigrateAndCheckCommand)
+    Logger.setup.debug("invokeKeymanInputMethodCheckAccessWithMigration(), calling launchKeymanInputMethodAsSeparateProcess()")
+    try self.launchKeymanInputMethodAsSeparateProcess(argument: kMigrateAndCheckCommand)
   }
 
   /**
@@ -341,29 +341,6 @@ public class InputMethodUtil {
    * launches the Keyman input method as an independent process with the specifed argument
    */
   func launchKeymanInputMethodAsSeparateProcess(argument: String = "") throws {
-    let openConfig = NSWorkspace.OpenConfiguration()
-    if !argument.isEmpty {
-      openConfig.arguments = [argument]
-    }
-    
-    guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
-      Logger.setup.error("launchKeymanInputMethodAsSeparateProcess, failed to create input method url")
-      LogUtil.errorBreadcrumb("launchKeymanInputMethodAsSeparateProcess, failed to create input method url", category: .setup)
-      throw KeymanInvocationError.inputMethodNotFound
-    }
-    
-    NSWorkspace.shared.openApplication(at: inputMethodUrl, configuration: openConfig) { (app, error) in
-      if let error = error {
-        Logger.setup.error("Could not launch Keyman input method at \(inputMethodUrl.cleanUrlPath()), due to error: \(error as NSError, privacy: .public)")
-        LogUtil.errorBreadcrumb("Could not launch Keyman input method at \(inputMethodUrl.cleanUrlPath()), due to error: \(error as NSError)", category: .setup)
-      }
-    }
-  }
-  
-  /**
-   * launches the Keyman input method as an independent process with the specifed argument
-   */
-  func launchKeymanInputMethodIndependently(argument: String = "") throws {
 
     guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
       Logger.setup.error("launchKeymanInputMethodIndependently, failed to create input method url")
@@ -372,6 +349,7 @@ public class InputMethodUtil {
     }
 
     let openConfig = NSWorkspace.OpenConfiguration()
+    // openConfig.environment = getSanitizedEnvironment()
     if !argument.isEmpty {
       openConfig.arguments = [argument]
     }
@@ -387,37 +365,61 @@ public class InputMethodUtil {
         Logger.setup.error("Could not launch Keyman input method at \(inputMethodUrl.cleanUrlPath()), due to error: \(error as NSError, privacy: .public)")
         LogUtil.errorBreadcrumb("Could not launch Keyman input method at \(inputMethodUrl.cleanUrlPath()), due to error: \(error as NSError)", category: .setup)
       } else {
-        Logger.setup.debug("Keyman launched independently with argument: \(argument, privacy: .public)")
+        Logger.setup.debug("Keyman launched as separate process with argument: \(argument, privacy: .public)")
       }
     }
   }
   
   /**
-   * launches the Keyman input method as an independent process with the specifed argument
+   * When this app is launched by the installer, it is possible to inherit context from the installer sandbox.
+   * During testing, this seemed to occur randomly less than 5% of the time, and it would cause the NSWorkspace.openApplication API to fail.
+   * As a precaution, check for any remnants of the installer environment and remove them.
    */
-  func launchKeymanInputMethodAsProcess(argument: String = "") throws {
-    guard let keymanBinaryUrl = self.buildKeymanBinaryUrl() else {
-      Logger.setup.error("launchKeymanInputMethodAsProcess, could not locate the internal binary inside the Keyman bundle")
-      throw KeymanInvocationError.inputMethodCouldNotBeInvoked
-    }
+  func getSanitizedEnvironment() -> [String: String] {
+    // clone the environment
+    let originalEnvironment = ProcessInfo.processInfo.environment
+    var cleanEnvironment = originalEnvironment
     
-    let process = Process()
-    process.executableURL = URL(fileURLWithPath: "/bin/bash")
+    // keys used by the macOS installer -- must be removed
+    let installerKeys = ["INSTALLER_PAYLOAD_DIR",
+                         "INSTALL_PKG_SESSION_ID",
+                         "LAUNCHCTL_ENV_REEXEC",
+                         "PACKAGE_PATH",
+                         "SHARED_INSTALLER_TEMP",
+                         "APPLE_PKGKIT_ESCALATING_ROOT",
+                         "SCRIPT_NAME",
+                         "PACKAGE_PATH",
+                         "DST_ROOT",
+                         "DST_VOLUME",
+                         "_"
+    ]
     
-    let shellCommand = "nohup \"\(keymanBinaryUrl.path)\" \(argument) > /dev/null 2>&1 &"
-    process.arguments = ["-c", shellCommand]
+    // check if any installer keys exist in the current environment
+    let foundInstallerKeys = installerKeys.filter { originalEnvironment.keys.contains($0) }
+    
+    if !foundInstallerKeys.isEmpty {
+      Logger.setup.warning("⚠️ Warning: inherited installer sandbox context detected. Keys found: \(foundInstallerKeys.joined(separator: ", ")). Cleaning environment to prevent launchd Error 162 (job spawn failed).")
  
-    Logger.setup.debug("launchKeymanInputMethodAsProcess, executing: \(shellCommand, privacy: .public)")
+      Logger.setup.debug("environment: \(originalEnvironment, privacy: .public)")
 
-    do {
-      try process.run()
-      Logger.setup.debug("launchKeymanInputMethodAsProcess, Keyman migration process spawned successfully. Awaiting distributed notifications...")
-    } catch {
-      Logger.setup.error("launchKeymanInputMethodAsProcess, failed to spawn the Keyman binary process: \(error)")
-      throw KeymanInvocationError.inputMethodCouldNotBeInvoked
+      // remove the problematic keys
+      for key in foundInstallerKeys {
+        Logger.setup.debug("removing: \(key, privacy: .public) with value: \(originalEnvironment[key] ?? "<empty>", privacy: .public)")
+        cleanEnvironment.removeValue(forKey: key)
+      }
+      
+      let userName = NSUserName()
+      
+      // reset these to something not installer related
+      cleanEnvironment["TMPDIR"] = NSTemporaryDirectory()
+      cleanEnvironment["PWD"] = "/Users/\(userName)"
+    } else {
+      Logger.setup.info("✅ Environment check passed: No installer sandbox context detected.")
     }
+    
+    return cleanEnvironment
   }
-  
+
   /**
    * Calls Keyman input method to check whether it has accessibility permission granted.
    * Receives response as distributed notification named `accessibilityStateResponse`

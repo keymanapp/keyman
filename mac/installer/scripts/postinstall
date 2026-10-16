@@ -80,11 +80,9 @@ if [ -n "$USER_NAME" ] && [ "$USER_NAME" != "loginwindow" ]; then
   USER_ID=$(stat -f "%u" /dev/console)
   echo "USER_ID is: $USER_ID"
 
-  APP_BINARY="/Applications/Keyman Configuration.app/Contents/MacOS/Keyman Configuration"
-
 # Launch the binary directly inside the user's system session context.
 # The trailing '&' runs it in the background.
-  launchctl asuser "$USER_ID" sudo -i -u "$USER_NAME" "$APP_BINARY" installation &
+  launchctl asuser "$USER_ID" open -a "/Applications/Keyman Configuration.app" --args installation &
 fi
 
 exit 0
