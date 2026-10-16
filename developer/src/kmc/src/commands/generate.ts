@@ -12,6 +12,7 @@ import { commanderOptionsToBaseOptions } from '../util/extendedCompilerOptions.j
 
 export function declareGenerate(program: Command) {
   const command = program.command('generate');
+  command.description('generate Keyman keyboard and lexical model projects');
   declareGenerateKmnKeyboard(command);
   declareGenerateLdmlKeyboard(command);
   declareGenerateLexicalModel(command);
@@ -21,19 +22,19 @@ function declareGenerateKmnKeyboard(command: Command) {
   const subCommand = command.command('keyman-keyboard <id>');
   BaseOptions.addAll(subCommand);
   subCommand
-    .description('Generate a .kmn keyboard project')
-    .option('-t, --target <target>', 'Target platforms',
+    .description('generate a .kmn keyboard project')
+    .option('-t, --target <target>', 'target platforms',
       (value, previous) => previous.concat([value]), [])
-    .option('-o, --out-path <path>', 'Output path (may exist)')
-    .option('-n, --name <name>', 'Keyboard descriptive name')
-    .option('-c, --copyright <copyright-name>', 'Copyright holder')
-    .option('-v, --version <version-string>', 'Keyboard version', '1.0')
+    .option('-o, --out-path <path>', 'output path (may exist)')
+    .option('-n, --name <name>', 'keyboard descriptive name')
+    .option('-c, --copyright <copyright-name>', 'copyright holder')
+    .option('-v, --version <version-string>', 'keyboard version', '1.0')
     .option('-L, --language-tag <bcp-47 tag>', 'BCP-47 language tag',
       (value, previous) => previous.concat([value]), [])
-    .option('-a, --author <author-name>', 'Name of keyboard author')
+    .option('-a, --author <author-name>', 'name of keyboard author')
     // TODO-GENERATE: icon support
     // .option('-i, --icon', 'Include a generated icon', true)
-    .option('-d, --description <description>', 'Short description of the project, Markdown')
+    .option('-d, --description <description>', 'short description of the project, Markdown')
     .action(generateKmnKeyboard);
 }
 
@@ -41,17 +42,17 @@ function declareGenerateLdmlKeyboard(command: Command) {
   const ldmlSubCommand = command.command('ldml-keyboard <id>');
   BaseOptions.addAll(ldmlSubCommand);
   ldmlSubCommand
-    .description('Generate an LDML .xml keyboard project')
-    .option('-t, --target <target>', 'Target platforms',
+    .description('generate an LDML .xml keyboard project')
+    .option('-t, --target <target>', 'target platforms',
       (value, previous) => previous.concat([value]), [])
-    .option('-o, --out-path <path>', 'Output path (may exist)')
-    .option('-n, --name <name>', 'Keyboard descriptive name')
-    .option('-c, --copyright <copyright-name>', 'Copyright holder') /* © yyyy <copyright-name> */
-    .option('-v, --version <version-string>', 'Keyboard version', '1.0.0')
+    .option('-o, --out-path <path>', 'output path (may exist)')
+    .option('-n, --name <name>', 'keyboard descriptive name')
+    .option('-c, --copyright <copyright-name>', 'copyright holder') /* © yyyy <copyright-name> */
+    .option('-v, --version <version-string>', 'keyboard version', '1.0.0')
     .option('-L, --language-tag <bcp-47 tag>', 'BCP-47 language tag',
       (value, previous) => previous.concat([value]), [])
-    .option('-a, --author <author-name>', 'Name of keyboard author')
-    .option('-d, --description <description>', 'Short description of the project, Markdown')
+    .option('-a, --author <author-name>', 'name of keyboard author')
+    .option('-d, --description <description>', 'short description of the project, Markdown')
     .action(generateLdmlKeyboard);
 }
 
@@ -59,15 +60,15 @@ function declareGenerateLexicalModel(command: Command) {
   const modelSubCommand = command.command('lexical-model <id>');
   BaseOptions.addAll(modelSubCommand);
   modelSubCommand
-    .description('Generate a wordlist lexical model project')
-    .option('-o, --out-path <path>', 'Output path (may exist)')
-    .option('-n, --name <name>', 'Lexical model descriptive name')
-    .option('-c, --copyright <copyright-name>', 'Copyright holder') /* © yyyy <copyright-name> */
-    .option('-v, --version <version-string>', 'Lexical model version', '1.0')
+    .description('generate a wordlist lexical model project')
+    .option('-o, --out-path <path>', 'output path (may exist)')
+    .option('-n, --name <name>', 'lexical model descriptive name')
+    .option('-c, --copyright <copyright-name>', 'copyright holder') /* © yyyy <copyright-name> */
+    .option('-v, --version <version-string>', 'lexical model version', '1.0')
     .option('-L, --language-tag <bcp-47 tag>', 'BCP-47 language tag',
       (value, previous) => previous.concat([value]), [])
-    .option('-a, --author <author-name>', 'Name of lexical model author')
-    .option('-d, --description <description>', 'Short description of the project, Markdown')
+    .option('-a, --author <author-name>', 'name of lexical model author')
+    .option('-d, --description <description>', 'short description of the project, Markdown')
     .action(generateLexicalModel);
 
     //TODO:required opts

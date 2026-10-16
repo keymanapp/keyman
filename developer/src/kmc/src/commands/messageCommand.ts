@@ -29,14 +29,18 @@ interface MessageOptions extends CompilerBaseOptions {
 export function declareMessage(program: Command) {
   program
     .command('message [messages...]')
-    .description(`Describe one or more compiler messages. Note: Markdown format is always written to files on disk.`)
+    .description(`describe one or more compiler messages`)
     .addHelpText('after', `
 Message identifiers can be:
  * numeric, e.g. "KM07006" or "7006", or
- * [namespace.]id, substring id supported; e.g. "kmc-kmn.INFO_MinimumEngineVersion" or "kmc-kmn." or "INFO_Min"`)
-    .addOption(new Option('-f, --format <format>', 'Output format').choices(['text', 'markdown', 'json']).default('text'))
-    .option('-o, --out-path <out-path>', 'Output path for Markdown files; output filename for text and json formats')
-    .option('-a, --all-messages', 'Emit descriptions for all messages (text, json)')
+ * [namespace.]id, substring id supported; e.g. "kmc-kmn.INFO_MinimumEngineVersion" or "kmc-kmn." or "INFO_Min"
+
+Additional notes:
+ * '--format markdown' implies '--all-messages', and requires an output path
+ * Default output for text, json is to console`)
+    .addOption(new Option('-f, --format <format>', 'output format').choices(['text', 'markdown', 'json']).default('text'))
+    .option('-o, --out-path <out-path>', 'output path for Markdown files; output filename for text and json formats (must exist)')
+    .option('-a, --all-messages', 'emit descriptions for all messages (text, json)')
     .action(messageCommand);
 }
 
