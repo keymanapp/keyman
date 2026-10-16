@@ -168,47 +168,30 @@ describe("Lexer Tests", () => {
       recogniseToken(TokenType.SHIFTFREESCAPS, '&SHIFTFREESCAPS');
       recogniseToken(TokenType.SHIFTFREESCAPS, '&ShiftFreesCaps');
     });
-    it("can recognise a CAPS token", () => {
-      recogniseToken(TokenType.CAPS, 'caps');
-      recogniseToken(TokenType.CAPS, 'CAPS');
-      recogniseToken(TokenType.CAPS, 'Caps');
+    it("can recognise a CAPSALWAYSOFF_HEADER token", () => {
+      recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'caps always off');
+      recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'CAPS ALWAYS OFF');
+      recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'Caps Always Off');
+      recogniseToken(TokenType.CAPSALWAYSOFF_HEADER, 'caps  always  off');
     });
-    it("can recognise an ALWAYS token", () => {
-      recogniseToken(TokenType.ALWAYS, 'always');
-      recogniseToken(TokenType.ALWAYS, 'ALWAYS');
-      recogniseToken(TokenType.ALWAYS, 'Always');
+    it("can recognise an CAPSONONLY_HEADER token", () => {
+      recogniseToken(TokenType.CAPSONONLY_HEADER, 'caps on only');
+      recogniseToken(TokenType.CAPSONONLY_HEADER, 'CAPS ON ONLY');
+      recogniseToken(TokenType.CAPSONONLY_HEADER, 'Caps On Only');
+      recogniseToken(TokenType.CAPSONONLY_HEADER, 'caps  on  only');
     });
-    it("can recognise an OFF token", () => {
-      recogniseToken(TokenType.OFF, 'off');
-      recogniseToken(TokenType.OFF, 'OFF');
-      recogniseToken(TokenType.OFF, 'Off');
-    });
-    it("can recognise an ON token", () => {
-      recogniseToken(TokenType.ON, 'on');
-      recogniseToken(TokenType.ON, 'ON');
-      recogniseToken(TokenType.ON, 'On');
-    });
-    it("can recognise an ONLY token", () => {
-      recogniseToken(TokenType.ONLY, 'only');
-      recogniseToken(TokenType.ONLY, 'ONLY');
-      recogniseToken(TokenType.ONLY, 'Only');
-    });
-    it("can recognise a SHIFT token", () => {
-      recogniseToken(TokenType.SHIFT, 'shift');
-      recogniseToken(TokenType.SHIFT, 'SHIFT');
-      recogniseToken(TokenType.SHIFT, 'Shift');
-    });
-    it("can recognise a FREES token", () => {
-      recogniseToken(TokenType.FREES, 'frees');
-      recogniseToken(TokenType.FREES, 'FREES');
-      recogniseToken(TokenType.FREES, 'Frees');
+    it("can recognise a SHIFTFREESCAPS_HEADER token", () => {
+      recogniseToken(TokenType.SHIFTFREESCAPS_HEADER, 'shift frees caps');
+      recogniseToken(TokenType.SHIFTFREESCAPS_HEADER, 'SHIFT FREES CAPS');
+      recogniseToken(TokenType.SHIFTFREESCAPS_HEADER, 'Shift Frees Caps');
+      recogniseToken(TokenType.SHIFTFREESCAPS_HEADER, 'shift  frees  caps');
     });
     it("can recognise a BITMAP_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'bitmap');
       recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'BITMAP');
       recogniseTokenFollowedBySpace(TokenType.BITMAP_HEADER, 'Bitmap');
     });
-    it("can recognise a COPYRIGHTP_HEADER token", () => {
+    it("can recognise a COPYRIGHT_HEADER token", () => {
       recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'copyright');
       recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'COPYRIGHT');
       recogniseTokenFollowedBySpace(TokenType.COPYRIGHT_HEADER, 'Copyright');
@@ -507,26 +490,32 @@ describe("Lexer Tests", () => {
       recogniseTokenFollowedByRightSquare(TokenType.OCTAL, '777');
     });
     it("can recognise a MODIFIER token", () => {
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'shift');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'lctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'rctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'alt');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'lalt');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ralt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'caps');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ncaps');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'SHIFT');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'CTRL');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'LCTRL');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'RCTRL');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'ALT');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'LALT');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'RALT');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'CAPS');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'NCAPS');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Shift');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Lctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Rctrl');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Alt');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Lalt');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ralt');
+      recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Caps');
       recogniseTokenFollowedBySpace(TokenType.MODIFIER, 'Ncaps');
     });
     it("can recognise a KEY_CODE token", () => {
@@ -662,7 +651,7 @@ describe("Lexer Tests", () => {
         ]
       );
     });
-    it("recognise a continuation followed by whitespace and a diallowed token as a PARAMETER", () => {
+    it("recognise a continuation followed by whitespace and a disallowed token as a PARAMETER", () => {
       recogniseTokens(
         '\\ beep\n',
         [
@@ -964,47 +953,11 @@ describe("Lexer Tests", () => {
     it("can recognise a capsalwaysoff store", () => {
       recogniseSystemStoreWithString(TokenType.CAPSALWAYSOFF, "1");
     });
-    it("can recognise a 'caps always off' statement", () => {
-      recogniseTokens(
-        'caps always off',
-        [
-          new Token(TokenType.CAPS, 'caps'),
-          new Token(TokenType.WHITESPACE, ' ', 1, 5),
-          new Token(TokenType.ALWAYS, 'always', 1, 6),
-          new Token(TokenType.WHITESPACE, ' ', 1, 12),
-          new Token(TokenType.OFF, 'off', 1, 13),
-        ]
-      );
-    });
     it("can recognise a capsononly store", () => {
       recogniseSystemStoreWithString(TokenType.CAPSONONLY, "1");
     });
-    it("can recognise a 'caps on only' statement", () => {
-      recogniseTokens(
-        'caps on only',
-        [
-          new Token(TokenType.CAPS, 'caps'),
-          new Token(TokenType.WHITESPACE, ' ', 1, 5),
-          new Token(TokenType.ON, 'on', 1, 6),
-          new Token(TokenType.WHITESPACE, ' ', 1, 8),
-          new Token(TokenType.ONLY, 'only', 1, 9),
-        ]
-      );
-    });
     it("can recognise a shiftfreescaps store", () => {
       recogniseSystemStoreWithString(TokenType.SHIFTFREESCAPS, "1");
-    });
-    it("can recognise a 'shift frees caps' statement", () => {
-      recogniseTokens(
-        'shift frees caps',
-        [
-          new Token(TokenType.SHIFT, 'shift'),
-          new Token(TokenType.WHITESPACE, ' ', 1, 6),
-          new Token(TokenType.FREES, 'frees', 1, 7),
-          new Token(TokenType.WHITESPACE, ' ', 1, 12),
-          new Token(TokenType.CAPS, 'caps', 1, 13),
-        ]
-      );
     });
     it("can recognise a begin statement (unicode)", () => {
       recogniseTokens(
@@ -1340,12 +1293,7 @@ describe("Lexer Tests", () => {
         '&capsononly',
         '&shiftfreescaps',
         'caps',
-        'always',
-        'off',
-        'on',
-        'only',
         'shift',
-        'frees',
         'beep',
         'begin',
         'context',
@@ -1368,12 +1316,14 @@ describe("Lexer Tests", () => {
         'message',
         'name',
         'version',
+        'shift',
         'ctrl',
         'lctrl',
         'rctrl',
         'alt',
         'lalt',
         'ralt',
+        'caps',
         'ncaps',
       ].forEach((text) => { handleInvalidKeyword(text); });
     });
