@@ -117,12 +117,16 @@ function inspectRuleExpression(
 ): string | undefined {
   const constructor = getConstructor(cls);
 
-  if (!constructor?.body) return undefined;
+  if (!constructor?.body) {
+    return undefined;
+  }
 
+  // It is assumed parent constructors do not use local variables in property
+  // assignments, as the Maps do not record constructor context
   const variables  = new Map<string, ts.Expression>();
   const properties = new Map<string, ts.Expression>();
-  
-  const context: RuleContext = {variables, properties, sourceFile };
+
+  const context: RuleContext = { variables, properties, sourceFile };
 
   for (const statement of constructor.body.statements) {
     if (!ts.isVariableStatement(statement)) continue;
@@ -137,15 +141,15 @@ function inspectRuleExpression(
   let currentClass: ts.ClassDeclaration | ts.ClassExpression | undefined = cls;
 
   while (currentClass) {
-    const constructor = getConstructor(currentClass);
+    const parentConstructor = getConstructor(currentClass);
 
-    if (constructor?.body) {
-      for (const statement of constructor.body.statements) {
+    if (parentConstructor?.body) {
+      for (const statement of parentConstructor.body.statements) {
         const assignment = getThisPropertyAssignment(statement);
 
         if (assignment) {
           const propertyName = (assignment.left as ts.PropertyAccessExpression).name.text;
-          if (!properties.has(propertyName)) {
+          if (!properties.has(propertyName)) { // child supercedes parent
             properties.set(propertyName, assignment.right);
           }
         }
@@ -165,21 +169,13 @@ function inspectRuleExpression(
     return alternateTokens;
   }
 
-  const assignment = constructor.body.statements
-    .map(getThisPropertyAssignment)
-    .find(assignment =>
-      assignment?.left &&
-      ts.isPropertyAccessExpression(assignment.left) &&
-      assignment.left.name.text === "rule"
-    );
+  const assignment = findThisPropertyAssignment(constructor.body.statements, "rule");
 
   if (!assignment) {
     return undefined;
   }
 
-  const expression = assignment.right;
-
-  return describeExpression(expression, context);
+  return describeExpression(assignment.right, context);
 }
 
 function getConstructor(
@@ -202,7 +198,9 @@ function getParentClassName(
 function getThisPropertyAssignment(
   statement: ts.Statement
 ): ts.BinaryExpression | undefined {
-  if (!ts.isExpressionStatement(statement)) return undefined;
+  if (!ts.isExpressionStatement(statement)) {
+    return undefined;
+  }
 
   const expression = statement.expression;
 
@@ -218,32 +216,39 @@ function getThisPropertyAssignment(
   return expression;
 }
 
+function findThisPropertyAssignment(
+  statements: ts.NodeArray<ts.Statement>,
+  propertyName: string
+): ts.BinaryExpression | undefined {
+  return statements
+    .map(getThisPropertyAssignment)
+    .find(assignment =>
+      assignment !== undefined &&
+      (assignment.left as ts.PropertyAccessExpression).name.text === propertyName
+    );
+}
+
 function inspectAlternateTokenRule(
   cls: ts.ClassDeclaration | ts.ClassExpression
 ): string | undefined {
   const extendsAlternateTokenRule = cls.heritageClauses?.some(clause =>
     clause.token === ts.SyntaxKind.ExtendsKeyword &&
-    clause.types.some(type =>type.expression.getText() === "AlternateTokenRule")
+    clause.types.some(type => type.expression.getText() === "AlternateTokenRule")
   );
 
-  if (!extendsAlternateTokenRule) return undefined;
+  if (!extendsAlternateTokenRule) {
+    return undefined;
+  }
 
   const constructor = getConstructor(cls);
   const statements  = constructor?.body?.statements;
 
-  if (!statements) return undefined;
+  if (!statements) {
+    return undefined;
+  }
 
-  const superCall = statements
-    .map(statement =>
-      ts.isExpressionStatement(statement) &&
-      ts.isCallExpression(statement.expression) &&
-      statement.expression.expression.kind === ts.SyntaxKind.SuperKeyword
-        ? statement.expression
-        : undefined
-    )
-    .find(call => call !== undefined);
-
-  const tokens = superCall?.arguments[0];
+  const superCall = getSuperCall(statements);
+  const tokens    = superCall?.arguments[0];
 
   if (!tokens || !ts.isArrayLiteralExpression(tokens)) {
     return undefined;
@@ -258,6 +263,23 @@ function inspectAlternateTokenRule(
     .join("|");
 }
 
+function getSuperCall(
+  statements: ts.NodeArray<ts.Statement>
+): ts.CallExpression | undefined {
+  for (const statement of statements) {
+    if (
+      ts.isExpressionStatement(statement) &&
+      ts.isCallExpression(statement.expression) &&
+      statement.expression.expression.kind === ts.SyntaxKind.SuperKeyword
+    ) {
+      return statement.expression;
+    }
+  }
+
+  return undefined;
+}
+
+// separator, suffix and token describe the special handling for each rule type
 type RuleDescription = {
   separator?: string;
   suffix?: string;
@@ -294,17 +316,11 @@ function describeExpression(
       : baseName(node.text);
   }
 
-  if (ts.isArrayLiteralExpression(node)) {
-    return node.elements
-      .map(element => describeExpression(element, context))
-      .join(", ");
-  }
-
   if (ts.isNewExpression(node)) {
     const name = node.expression.getText(context.sourceFile);
     const args: readonly ts.Expression[] = node.arguments ?? [];
 
-    // Describe each argument using the same context.
+    // Describe each argument using the same context
     const describeArgs = () =>
       args.map(arg => describeExpression(arg, context));
 
@@ -319,11 +335,7 @@ function describeExpression(
 
     if (rule?.separator !== undefined) {
       return args.length > 0 && ts.isArrayLiteralExpression(args[0])
-        ? describeArray(
-            args[0].elements,
-            context,
-            rule.separator
-          )
+        ? describeArray(args[0].elements, context, rule.separator)
         : `${name}(${describeArgs().join(", ")})`;
     }
 
