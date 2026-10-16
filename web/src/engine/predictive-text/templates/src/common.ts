@@ -60,7 +60,7 @@ export function buildMergedTransform(first: Transform, second: Transform): Trans
     deleteLeft: first.deleteLeft + mergedSecondDelete
   }
 
-  if(first.id && first.id == second.id) {
+  if(first.id !== undefined && first.id == second.id) {
     returnedObj.id = first.id;
   }
 
