@@ -98,6 +98,9 @@ public class InstallationState {
     if let taskFlag = dictionary[InstallationTaskType.enableInputMethod.rawValue] as? Bool {
       installationTasks.insert(InstallationTask(task: .enableInputMethod, completed: taskFlag))
     }
+    if let taskFlag = dictionary[InstallationTaskType.confirmEnabled.rawValue] as? Bool {
+      installationTasks.insert(InstallationTask(task: .confirmEnabled, completed: taskFlag))
+    }
     if let taskFlag = dictionary[InstallationTaskType.requestAccess.rawValue] as? Bool {
       installationTasks.insert(InstallationTask(task: .requestAccess, completed: taskFlag))
     }

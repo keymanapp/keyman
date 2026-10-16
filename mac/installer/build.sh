@@ -35,15 +35,21 @@ OUTPUT__DISTRIBUTION_XML="${KEYMAN_BUILD_PATH}/distribution.xml"
 # bundle IDs for installer packages
 INSTALL_INPUT_METHOD_BUNDLE_ID="com.keyman.im.installer"
 INSTALL_CONFIG_BUNDLE_ID="com.keyman.config.installer"
+INSTALL_KEYMAN_BUNDLE_ID="com.keyman.full.installer"
+
+  # temporary staging root directory
+PKG_STAGE="${KEYMAN_BUILD_PATH}/StagingRoot"
 
 # ---------------------
 
 function do_build() {
   archive_apps
   export_apps
-  create_packages
-  build_distribution_xml
-  combine_packages
+  #create_packages
+  build_new_distribution_xml
+  create_package_from_staging
+  #build_distribution_xml
+  #combine_packages
   builder_echo "build and package of Keyman installer complete"
 }
 
@@ -56,6 +62,7 @@ function do_clean() {
   rm -rf "${KEYMAN_BUILD_PATH}/keyman-config.pkg"
   rm -rf "${KEYMAN_BUILD_PATH}/keyman-input-method.pkg"
   rm -rf "${KEYMAN_BUILD_PATH}/upload/"
+  rm -rf "$PKG_STAGE"
 }
 
 function archive_apps() {
@@ -112,6 +119,85 @@ function create_packages() {
       "${KEYMAN_BUILD_PATH}/keyman-config.pkg"
 }
 
+function create_package_from_staging() {
+  builder_echo "setup staging directory for Keyman package"
+  
+  rm -rf "$PKG_STAGE" # clear cache
+
+  # Create the internal system paths
+  mkdir -p "${PKG_STAGE}/Applications"
+  mkdir -p "${PKG_STAGE}/Library/LaunchAgents"
+  mkdir -p "${PKG_STAGE}/Users/Shared/KeymanStaging"
+
+  # copy application files to package staging
+  cp -R "${KEYMAN_BUILD_PATH}/ConfigExport/Keyman Configuration.app" "${PKG_STAGE}/Applications/"
+  cp -R "${KEYMAN_BUILD_PATH}/KeymanExport/Keyman.app" "${PKG_STAGE}/Users/Shared/KeymanStaging/"
+
+  # copy LaunchAgent configuration file to package staging
+  cp ./com.keyman.deferred.plist "${PKG_STAGE}/Library/LaunchAgents/"
+
+  mkdir -p "$OUTPUT_DIRECTORY_PATH"
+
+  builder_echo "calling pkgbuild"
+
+  pkgbuild --root "$PKG_STAGE" \
+      --fakeroot \
+      --scripts ./scripts \
+      --install-location / \
+      --identifier "$INSTALL_KEYMAN_BUNDLE_ID" \
+      --version "$KEYMAN_VERSION" \
+      "${KEYMAN_BUILD_PATH}/keyman-component.pkg"
+
+  builder_echo "calling productbuild"
+
+  productbuild --distribution "${KEYMAN_BUILD_PATH}/distribution.xml" \
+      --package-path "${KEYMAN_BUILD_PATH}" \
+      --resources ./installer-resources \
+      --sign 5FCED4988F27D172C5628A16DBA4AE6CA0015D11 \
+    "$OUTPUT_PACKAGE_PATH"
+
+  builder_heading "Uploading install package to Apple for notarization"
+  mac_notarize "$OUTPUT_DIRECTORY_PATH" "$OUTPUT_PACKAGE_PATH"
+
+  builder_heading "Attempting to staple notarization to install package"
+  xcrun stapler staple "$OUTPUT_PACKAGE_PATH" || builder_die "stapler failed"
+}
+
+function build_new_distribution_xml(){
+cat <<EOF > "${OUTPUT__DISTRIBUTION_XML}"
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+    <title>Keyman for macOS</title>
+    <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
+    <welcome file="welcome.rtf" />
+    <license file="license.rtf" mime-type="text/rtf"/>
+    <!-- Light Mode Background -->
+    <background file="keyman-x20-y36-144.png" mime-type="image/png" alignment="center" scaling="none"/>
+    <!-- Dark Mode Background -->
+    <background-darkAqua file="keyman-x20-y36-144.png" mime-type="image/png" alignment="center" scaling="none"/>
+
+    <conclusion file="conclusion.rtf" mime-type="text/rtf"/>
+
+    <!-- Restrict to macOS 13 Ventura or newer -->
+    <allowed-os-versions>
+        <os-version min="13.0"/>
+    </allowed-os-versions>
+
+    <choices-outline>
+        <line choice="default"/>
+    </choices-outline>
+    
+    <choice id="default" visible="false" title="Keyman Core">
+        <pkg-ref id="com.keyman.full.installer"/>
+    </choice>
+
+    <pkg-ref id="com.keyman.full.installer" version="$KEYMAN_VERSION" onConclusion="none">keyman-component.pkg</pkg-ref>
+</installer-gui-script>
+EOF
+
+echo "Created distribution.xml at ${OUTPUT__DISTRIBUTION_XML}"
+}
+
 function build_distribution_xml(){
 cat <<EOF > "${OUTPUT__DISTRIBUTION_XML}"
 <?xml version="1.0" encoding="utf-8"?>
@@ -148,7 +234,7 @@ cat <<EOF > "${OUTPUT__DISTRIBUTION_XML}"
     <choice id="com.keyman.im.installer" visible="false">
         <pkg-ref id="com.keyman.im.installer"/>
     </choice>
-    <pkg-ref id="com.keyman.im.installer" version="$KEYMAN_VERSION" onConclusion="RequireRestart">keyman-input-method.pkg</pkg-ref>
+    <pkg-ref id="com.keyman.im.installer" version="$KEYMAN_VERSION" onConclusion="none">keyman-input-method.pkg</pkg-ref>
 </installer-gui-script>
 EOF
 
