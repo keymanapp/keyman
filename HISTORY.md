@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.254 stable 2026-10-16
+
+* chore(linux): replace deprecated `parse_version` (#16736)
+* chore(linux): update Debian standards version (#16713)
+* chore(linux): update changelog with Debian version (#16735)
+* fix(web): prevent crash adding log entry for keystroke with `inputBreadCrumb` (#16761)
+* maint(ios): new iOS certificate (stable-18.0) (#16773)
+* fix(web): don't crash if model isn't fully loaded yet (#16784)
+
 ## 18.0.253 stable 2026-10-02
 
 * fix(mac): disable the help button entirely in the title bar of OSK (#16680)
