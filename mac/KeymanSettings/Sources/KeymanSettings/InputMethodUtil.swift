@@ -349,7 +349,7 @@ public class InputMethodUtil {
     }
 
     let openConfig = NSWorkspace.OpenConfiguration()
-    // openConfig.environment = getSanitizedEnvironment()
+    openConfig.environment = getSanitizedEnvironment()
     if !argument.isEmpty {
       openConfig.arguments = [argument]
     }

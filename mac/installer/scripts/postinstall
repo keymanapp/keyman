@@ -14,35 +14,55 @@ echo "Keyman for Mac: postinstall script"
 USER_NAME=$(stat -f "%Su" /dev/console)
 echo "user name is: $USER_NAME"
 
+# get the numerical User ID of the active logged-in GUI user
+USER_ID=$(stat -f "%u" /dev/console)
+echo "USER_ID is: $USER_ID"
+
 # Get the home directory of the user
 USER_HOME=$(eval echo "~$USER_NAME")
 echo "user home directory is: $USER_HOME"
+
+STAGED_APP="/Users/Shared/KeymanStaging/Keyman.app"
+GLOBAL_PLIST="/Library/LaunchAgents/com.keyman.deferred.plist"
+TEMP_PLIST="/tmp/com.keyman.deferred.plist"
+SERVICE_TARGET="gui/${USER_ID}/com.keyman.deferred"
 
 # Define the source file path within the package payload
 # the input method, Keyman.app, is added to /tmp when building the installer
 # $3 is the target volume mount point, e.g., "/"
 
-SOURCE_FILE="$3tmp/Keyman.app"
-echo "source file is: $SOURCE_FILE"
+#SOURCE_FILE="$3tmp/Keyman.app"
+#echo "source file is: $SOURCE_FILE"
 
 # Define the path to the Input Methods directory in the user's Library
-DEST_DIR="$USER_HOME/Library/Input Methods"
-echo "destination directory is: $DEST_DIR"
+USER_IM_DIR="$USER_HOME/Library/Input Methods"
+echo "input methods directory is: $USER_IM_DIR"
 
 # Create the /Library/Input Methods directory if it doesn't exist
-if [ ! -d "$DEST_DIR" ]; then
-    mkdir -p "$DEST_DIR"
+#if [ ! -d "$USER_IM_DIR" ]; then
+#    mkdir -p "$USER_IM_DIR"
     # Set the user as owner of the Input Methods directory
-    chown "$USER_NAME":staff "$DEST_DIR"
-fi
+#    chown "$USER_NAME":staff "$USER_IM_DIR"
+#fi
 
 # Copy the input method to the destination directory
 # must use cp -R to maintain symbolic links and preserve permissions
 # if we use -r, the input method's code signature will be invalid and the system will not load it
-cp -R "$SOURCE_FILE" "$DEST_DIR/"
+#cp -R "$SOURCE_FILE" "$USER_IM_DIR/"
 
 # Set the user as owner
-chown -R "$USER_NAME":staff "$DEST_DIR/Keyman.app"
+#chown -R "$USER_NAME":staff "$USER_IM_DIR/Keyman.app"
+
+if [ -d "$STAGED_APP" ]; then
+  rm -rf "${USER_IM_DIR}/Keyman.app" # Clean out any older versions
+  mv "$STAGED_APP" "$USER_IM_DIR/"
+  
+  # Set the user as owner
+  chown -R "${USER_NAME}:staff" "${USER_IM_DIR}/Keyman.app"
+fi
+
+# clean up our temporary staging folder
+rm -rf /Users/Shared/KeymanStaging
 
 # TODO: see issue #5318
 # the following few lines must be updated to extract the package name from the path
@@ -68,21 +88,29 @@ pkill -u "$USER_NAME" -if "Keyman Configuration"
 pkill -u "$USER_NAME" -if "Keyman"
 
 # give the file system a couple seconds to commit changes
-sleep 2
+#sleep 2
 
 # check if there is a current user and we are not sitting at the login window, then
 # launch the Keyman Configuration under the current user with the custom install argument
 
-if [ -n "$USER_NAME" ] && [ "$USER_NAME" != "loginwindow" ]; then
-  echo "⚙️ starting Keyman Configuration"
+#if [ -n "$USER_NAME" ] && [ "$USER_NAME" != "loginwindow" ]; then
+  # Launch the binary directly inside the user's system session context.
+  # The trailing '&' runs it in the background.
+  #launchctl asuser "$USER_ID" open -a "/Applications/Keyman Configuration.app" --args installation &
+#fi
 
-  # get the numerical User ID of the active logged-in GUI user
-  USER_ID=$(stat -f "%u" /dev/console)
-  echo "USER_ID is: $USER_ID"
+# copy the global launch agent plist to a temporary location and change ownership to active user
+# this way, we can delete it after the config app runs
+cp "$GLOBAL_PLIST" "$TEMP_PLIST"
+chown "${USER_NAME}:staff" "$TEMP_PLIST"
 
-# Launch the binary directly inside the user's system session context.
-# The trailing '&' runs it in the background.
-  launchctl asuser "$USER_ID" open -a "/Applications/Keyman Configuration.app" --args installation &
-fi
+# use the temp plist to start the service
+echo "⚙️ boot, enable and kickstart launch agent"
+launchctl asuser "$USER_ID" launchctl bootstrap "gui/$USER_ID" "$TEMP_PLIST"
+launchctl asuser "$USER_ID" launchctl enable "$SERVICE_TARGET"
+launchctl asuser "$USER_ID" launchctl kickstart -k "$SERVICE_TARGET"
+
+# delete global plist immediately so it doesn't cause config to open on reboot
+rm -f "$GLOBAL_PLIST
 
 exit 0

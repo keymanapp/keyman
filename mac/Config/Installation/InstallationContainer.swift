@@ -49,6 +49,8 @@ public class InstallationContainer : ObservableObject {
     // If the installer launched the config app, then we must continue with the installation process.
     if ProcessInfo.processInfo.arguments.contains(installationArgument) {
       Logger.app.log("setting isLaunchedByInstaller to true")
+      InstallationContainer.cleanUpLaunchAgent()
+      
       isLaunchedByInstaller = true
     } else {
       Logger.app.debug("installation command line argument not specified")
@@ -91,6 +93,25 @@ public class InstallationContainer : ObservableObject {
       } else {
         self.startRepairCheck()
       }
+    }
+  }
+  
+  /**
+   * If we were invoked with the `installation` argument due to the Keyman LaunchAgent
+   * added during installation, then remove the LaunchAgent so that it only runs once at time of installation
+   * and does not automatically run again after a reboot.
+   */
+  static func cleanUpLaunchAgent() {
+    let agentPath = "/tmp/com.keyman.deferred.plist"
+    let fileManager = FileManager.default
+    
+    if fileManager.fileExists(atPath: agentPath) {
+      do {
+        try fileManager.removeItem(atPath: agentPath)
+        Logger.app.info("successfully removed the Keyman LaunchAgent plist file from disk")
+      } catch {
+        Logger.app.error("error: could not remove Keyman LaunchAgent plist: \(error.localizedDescription, privacy: .public)")
+     }
     }
   }
   
