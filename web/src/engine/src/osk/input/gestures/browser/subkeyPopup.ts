@@ -70,6 +70,7 @@ export class SubkeyPopup implements GestureHandler {
   private readonly gestureParams: GestureParams;
 
   readonly shouldLockLayer: boolean = false;
+  readonly kbdId: string;
 
   constructor(
     source: GestureSequence<KeyElement, string>,
@@ -81,6 +82,7 @@ export class SubkeyPopup implements GestureHandler {
     this.baseKey = e;
     this.source = source;
     this.gestureParams = gestureParams;
+    this.kbdId = vkbd.layoutKeyboard.id;
 
     if(vkbd.layerLocked) {
       this.shouldLockLayer = true;
@@ -509,6 +511,10 @@ export class SubkeyPopup implements GestureHandler {
     if(!lastCoord.item) {
       // If no key is returned by the gesture, there should neither be output
       // nor fat-finger distribution.
+      let msg = `Unexpected result from subkey-menu gesture, state ${latestStage.matchedId} - gesture item is nullish.\n`;
+      msg += `Active keyboard: ${this.kbdId}, base key id: ${this.baseKey.key.spec.elementID}\n`;
+      msg += this.source.trace('  ');
+      console.error(msg);
       return [];
     }
     const lastElementID = lastCoord.item.key.spec.elementID;
