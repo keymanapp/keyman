@@ -1,5 +1,5 @@
 import { CompilerCallbacks } from "./compiler-callbacks.js";
-import { ObjectWithCompileContext } from '@keymanapp/common-types';
+import { KMX, ObjectWithCompileContext } from '@keymanapp/common-types';
 import { KeymanXMLReader, XML_FILENAME_SYMBOL } from "./xml-utils.js";
 
 /**
@@ -410,6 +410,11 @@ export interface CompilerOptions extends CompilerBaseOptions {
    * Check filename conventions in packages
    */
   checkFilenameConventions?: boolean;
+  /**
+   * Target version of Keyman for compiled objects; default is minimum Keyman
+   * version that supports all features in the object
+   */
+  targetVersion?: KMX.KMX_Version;
 };
 
 export const defaultCompilerOptions: CompilerOptions = {
@@ -421,6 +426,7 @@ export const defaultCompilerOptions: CompilerOptions = {
   compilerWarningsAsErrors: false,
   warnDeprecatedCode: true,
   checkFilenameConventions: false,
+  targetVersion: undefined,
 }
 
 /**

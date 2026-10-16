@@ -20,8 +20,10 @@ export interface BUILDER_LOCA extends BUILDER_SECTION {
 
 export function build_loca(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILDER_LOCA {
   const loca: BUILDER_LOCA = {
-    ident: constants.hex_section_id(constants.section.loca),
-    size: constants.length_loca + constants.length_loca_item * kmxplus.loca.locales.length,
+    header: {
+      ident: constants.hex_section_id(constants.section.loca),
+      size: constants.length_loca + constants.length_loca_item * kmxplus.loca.locales.length,
+    },
     _offset: 0,
     count: kmxplus.loca.locales.length,
     items: []

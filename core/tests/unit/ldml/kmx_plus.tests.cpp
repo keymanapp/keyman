@@ -1,18 +1,37 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Keyman Core - KMX+ file format reader unit tests
+ */
+
 #include <cstdint>
+
 #include <gtest/gtest.h>
-#include <test_assert.h>
+
 #include "kmx/kmx_plus.h"
 #include "kmx/kmx_xstring.h"
 #include "../../../src/ldml/ldml_vkeys.hpp"
 #include <iostream>
 #include "ldml_test_utils.hpp"
 
+#include "../helpers/core_test_helpers.h"
+
 // needed for streaming operators
 #include "utfcodec.hpp"
 
 using namespace km::core::kmx;
 
-TEST(KMXPlusTest, test_COMP_KMXPLUS_KEYS_KEY) {
+namespace km {
+  namespace core {
+    namespace kmx {
+
+      // Declarations of helper functions
+      extern bool header_from_bytes(const uint8_t *data, KMX_DWORD length, KMX_DWORD fileVersion, uint32_t ident, COMP_KMXPLUS_HEADER &out);
+    }
+  }
+}
+
+TEST(KMXPlusTest, KeysKeyHandledCorrectly) {
   COMP_KMXPLUS_KEYS_KEY e[2] = {
       {
           0x00000127,  // to = U+0127 = 295
@@ -32,30 +51,30 @@ TEST(KMXPlusTest, test_COMP_KMXPLUS_KEYS_KEY) {
           0x00000000   // flags: CHAR
       }};
   std::u16string s0 = e[0].get_to_string();
-  test_assert_equal(s0.length(), 1);
-  test_assert_equal(s0.at(0), 0x0127);
-  test_assert(s0 == std::u16string(u"ħ"));
+  ASSERT_EQ(s0.length(), 1);
+  ASSERT_EQ(s0.at(0), 0x0127);
+  ASSERT_EQ(s0, std::u16string(u"ħ"));
 
   std::u16string s1 = e[1].get_to_string();
-  test_assert_equal(s1.length(), 2);
-  test_assert_equal(s1.at(0), 0xD83D);
-  test_assert_equal(s1.at(1), 0xDE40);
-  test_assert(s1 == std::u16string(u"🙀"));
+  ASSERT_EQ(s1.length(), 2);
+  ASSERT_EQ(s1.at(0), 0xD83D);
+  ASSERT_EQ(s1.at(1), 0xDE40);
+  ASSERT_EQ(s1, std::u16string(u"🙀"));
 
   // now, elems. Parallel.
   std::u16string es0 = elems[0].get_element_string();
-  test_assert_equal(es0.length(), 1);
-  test_assert_equal(es0.at(0), 0x0127);
-  test_assert(es0 == std::u16string(u"ħ"));
+  ASSERT_EQ(es0.length(), 1);
+  ASSERT_EQ(es0.at(0), 0x0127);
+  ASSERT_EQ(es0, std::u16string(u"ħ"));
 
   std::u16string es1 = elems[1].get_element_string();
-  test_assert_equal(es1.length(), 2);
-  test_assert_equal(es1.at(0), 0xD83D);
-  test_assert_equal(es1.at(1), 0xDE40);
-  test_assert(es1 == std::u16string(u"🙀"));
+  ASSERT_EQ(es1.length(), 2);
+  ASSERT_EQ(es1.at(0), 0xD83D);
+  ASSERT_EQ(es1.at(1), 0xDE40);
+  ASSERT_EQ(es1, std::u16string(u"🙀"));
 }
 
-TEST(KMXPlusTest, test_ldml_vkeys) {
+TEST(KMXPlusTest, VkeysHandledCorrectly) {
   km::core::ldml::vkeys vk;
 
 #define ADD_VKEY(k, m) { \
@@ -83,88 +102,88 @@ TEST(KMXPlusTest, test_ldml_vkeys) {
   vk.add(km::tests::get_vk("K_F"), 0, u""); // K_F as a 'gap' key
 
   bool found = false;
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_F"), 0, found), u"");
-  test_assert_equal(found, true); // K_F found, but empty string (gap)
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_TRUE(found); // K_F found, but empty string (gap)
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_ENTER"), 0, found), u"");
-  test_assert_equal(found, false); // K_ENTER not found, empty string
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_FALSE(found); // K_ENTER not found, empty string
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_A"), 0, found), u"K_A-0");
-  test_assert_equal(found, true); // expect
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_TRUE(found); // expect
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_A"), LCTRLFLAG, found), u"K_A-LCTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_A"), RCTRLFLAG, found), u"K_A-RCTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_A"), LALTFLAG, found), u"K_A-LALTFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_A"), RALTFLAG, found), u"K_A-RALTFLAG");
 
   // now try either-side keys :should get the same result with either or both
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_B"), LCTRLFLAG, found), u"K_B-K_CTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_B"), RCTRLFLAG, found), u"K_B-K_CTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_B"), LCTRLFLAG|RCTRLFLAG, found), u"K_B-K_CTRLFLAG");
 
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_B"), LALTFLAG, found), u"K_B-K_ALTFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_B"), RALTFLAG, found), u"K_B-K_ALTFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_B"), LALTFLAG|RALTFLAG, found), u"K_B-K_ALTFLAG");
 
   // OOOkay now try BOTH side
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_C"), LCTRLFLAG|LALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_C"), LCTRLFLAG|RALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_C"), RCTRLFLAG|LALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_C"), RCTRLFLAG|RALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
 
   // OOOkay now try either alt
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_D"), LCTRLFLAG|LALTFLAG, found), u"K_D-LALTFLAG|K_CTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_D"), LCTRLFLAG|RALTFLAG, found), u"K_D-RALTFLAG|K_CTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_D"), RCTRLFLAG|LALTFLAG, found), u"K_D-LALTFLAG|K_CTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_D"), RCTRLFLAG|RALTFLAG, found), u"K_D-RALTFLAG|K_CTRLFLAG");
 
   // OOOkay now try either ctrl
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_E"), LCTRLFLAG|LALTFLAG, found), u"K_E-K_ALTFLAG|LCTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_E"), LCTRLFLAG|RALTFLAG, found), u"K_E-K_ALTFLAG|LCTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_E"), RCTRLFLAG|LALTFLAG, found), u"K_E-K_ALTFLAG|RCTRLFLAG");
-  test_assert_equal(vk.lookup(km::tests::get_vk(
+  ASSERT_EQ(vk.lookup(km::tests::get_vk(
     "K_E"), RCTRLFLAG|RALTFLAG, found), u"K_E-K_ALTFLAG|RCTRLFLAG");
 }
 
-TEST(KMXPlusTest, test_uset) {
+TEST(KMXPlusTest, UsetHandledCorrectly) {
   const COMP_KMXPLUS_USET_RANGE r[] = {
     {0x61, 0x7a}, // [a-z]
     {0x127, 0x127} // [ħ]
   };
 
   SimpleUSet u0(&r[0], 2);
-  test_assert_equal(u0.contains(0x62), true); // b
-  test_assert_equal(u0.contains(0x41), false); // A
-  test_assert_equal(u0.contains(0x127), true); // ħ
+  ASSERT_TRUE(u0.contains(0x62)); // b
+  ASSERT_FALSE(u0.contains(0x41)); // A
+  ASSERT_TRUE(u0.contains(0x127)); // ħ
 
   SimpleUSet uempty;
-  test_assert_equal(uempty.contains(0x62), false);
-  test_assert_equal(uempty.contains(0x127), false);
+  ASSERT_FALSE(uempty.contains(0x62));
+  ASSERT_FALSE(uempty.contains(0x127));
 }
 
 /** tests of the COMP_KMXPLUS_STRS::valid_string() */
-TEST(KMXPlusTest, COMP_KMXPLUS_STRS_valid_string) {
+TEST(KMXPlusTest, StrsValidStringWorksCorrectly) {
   // one simple case
   EXPECT_TRUE(COMP_KMXPLUS_STRS::valid_string(
     u"Hello", 5));
@@ -263,7 +282,7 @@ TEST(KMXPlusTest, COMP_KMXPLUS_STRS_valid_string) {
   }
 }
 
-TEST(KMXPlusTest, COMP_KMXPLUS_STRS_withGoodStrings) {
+TEST(KMXPlusTest, StrsWithGoodStringsWorksCorrectly) {
   const auto len = 10;
   KMX_DWORD mystrs[len] = {
     COMP_KMXPLUS_STRS::IDENT,
@@ -282,22 +301,30 @@ TEST(KMXPlusTest, COMP_KMXPLUS_STRS_withGoodStrings) {
     0x00000000,  // null
 
     // data @ +7
-    0x0041,  // 'a'
+    0x0041,  // 'A'
     0x0000,  // null
   };
 
-  const COMP_KMXPLUS_HEADER *header = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(mystrs);
-  ASSERT_TRUE(header->valid(mystrs[1]));
-  const COMP_KMXPLUS_STRS *strs = reinterpret_cast<const COMP_KMXPLUS_STRS *>(mystrs);
-  ASSERT_TRUE(strs->valid(mystrs[1]));
+
+  COMP_KMXPLUS_HEADER header;
+  ASSERT_TRUE(header_from_bytes(reinterpret_cast<uint8_t*>(&mystrs[0]), len * 4, LDML_KMXPLUS_VERSION_17, COMP_KMXPLUS_STRS::IDENT, header));
+
+  ASSERT_EQ(header.fileVersion(), LDML_KMXPLUS_VERSION_17);
+  ASSERT_EQ(header.headerSize(), LDML_LENGTH_HEADER_17);
+  ASSERT_EQ(header.ident, LDML_SECTIONID_STRS);
+  ASSERT_EQ(header.size, len * 4);
+  ASSERT_EQ(header.version, LDML_KMXPLUS_VERSION_17);
+
+  const COMP_KMXPLUS_STRS *strs = reinterpret_cast<const COMP_KMXPLUS_STRS *>(&mystrs[2]);
+  ASSERT_TRUE(strs->valid(header, mystrs[1]));
   KMX_DWORD_unaligned mycount = strs->count;
   ASSERT_EQ(mycount, 2);
-  ASSERT_EQ(strs->get(0), u"");
-  ASSERT_EQ(strs->get(1), u"A");
+  ASSERT_EQ(strs->get(header, 0), u"");
+  ASSERT_EQ(strs->get(header, 1), u"A");
 }
 
 
-TEST(KMXPlusTest, COMP_KMXPLUS_STRS_withBadStrings) {
+TEST(KMXPlusTest, StrsWithBadStringsRejects) {
   const auto len = 10;
   KMX_DWORD mystrs[len] = {
     COMP_KMXPLUS_STRS::IDENT,
@@ -320,14 +347,15 @@ TEST(KMXPlusTest, COMP_KMXPLUS_STRS_withBadStrings) {
     0x0000,  // null
   };
 
-  const COMP_KMXPLUS_HEADER *header = reinterpret_cast<const COMP_KMXPLUS_HEADER *>(mystrs);
-  ASSERT_TRUE(header->valid(mystrs[1]));
-  const COMP_KMXPLUS_STRS *strs = reinterpret_cast<const COMP_KMXPLUS_STRS *>(mystrs);
-  ASSERT_FALSE(strs->valid(mystrs[1]));
-}
+  COMP_KMXPLUS_HEADER header;
+  ASSERT_TRUE(header_from_bytes(reinterpret_cast<uint8_t*>(mystrs), len * 4, LDML_KMXPLUS_VERSION_17, COMP_KMXPLUS_STRS::IDENT, header));
 
-GTEST_API_ int
-main(int argc, char **argv) {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  ASSERT_EQ(header.fileVersion(), LDML_KMXPLUS_VERSION_17);
+  ASSERT_EQ(header.headerSize(), LDML_LENGTH_HEADER_17);
+  ASSERT_EQ(header.ident, LDML_SECTIONID_STRS);
+  ASSERT_EQ(header.size, len * 4);
+  ASSERT_EQ(header.version, LDML_KMXPLUS_VERSION_17);
+
+  const COMP_KMXPLUS_STRS *strs = reinterpret_cast<const COMP_KMXPLUS_STRS *>(&mystrs[2]);
+  ASSERT_FALSE(strs->valid(header, mystrs[1]));
 }

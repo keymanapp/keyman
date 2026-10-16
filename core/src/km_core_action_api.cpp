@@ -13,8 +13,6 @@
 
 #include "keyman_core.h"
 
-#include "jsonpp.hpp"
-
 #include "processor.hpp"
 #include "state.hpp"
 #include "action.hpp"

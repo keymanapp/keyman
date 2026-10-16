@@ -18,7 +18,8 @@ Keyman configures two separate instances of this gesture engine - one for main k
 
 ----
 
-For the main keyboard implementation of Keyman Engine for Web, the full set of Keyman gesture components is defined in `web/src/engine/osk/src/input/gestures/specsForLayout.ts`.
+For the main keyboard implementation of Keyman Engine for Web, the full set of Keyman gesture
+components is defined in `web/src/engine/src/osk/input/gestures/specsForLayout.ts`.
 
 ### Longpresses
 
