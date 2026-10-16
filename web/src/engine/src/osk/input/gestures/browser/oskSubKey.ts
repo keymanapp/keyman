@@ -7,7 +7,7 @@ import { VisualKeyboard } from '../../../visualKeyboard.js';
 // and to gain Intellisense if more need to be added.
 
 export class OSKSubKey extends OSKKey {
-  constructor(spec: ActiveSubKey, layer: string) {
+  constructor(spec: ActiveSubKey, layer/*displayLayer*/: string) {
     if(typeof(layer) != 'string' || layer == '') {
       throw "The 'layer' parameter for subkey construction must be properly defined.";
     }

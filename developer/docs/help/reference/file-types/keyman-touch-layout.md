@@ -97,7 +97,7 @@ Character Keys"). Typically, you would use only the "common" virtual key
 
 - `U_####[_####]` is used as a shortcut for a key that will output those
   Unicode values, if no rule matches it. This is similar to the overloaded
-  behaviour for `K_` ids. Thus `####` must be valid Unicode characters. 
+  behaviour for `K_` ids. Thus `####` must be valid Unicode characters.
   The square bracket characters `[` and `]` indicate an optional portion of the sequence
   and are not to be included in the shortcut. E.g.
   `U_0259` would generate a schwa if no rule matches. It is still valid to
@@ -612,12 +612,56 @@ width is used between adjacent keys.
 
 ### layer
 
-To simplify correspondence with desktop keyboards and avoid the need for using a
-separate keyboard mapping program, touch layout keys can specify a desktop
-keyboard layer that the keystroke should be interpreted as coming from. Layer
-names of `shift`, `ctrl`, `alt`, `ctrlshift`, `altshift`, `ctrlalt` and
-`ctrlaltshift` can be used to simulate use of the appropriate modifier keys when
-processing rules.
+For historical reasons, this field is named `layer` but should be called
+`modifierOverride`. Layers and modifiers are related, but not interchangeable.
+This field does _not_ refer to the touch keyboard layout layer, but instead to a
+hardware keyboard modifier.
+
+The following strings can be used; key events for that key will include the
+corresponding modifiers.
+
+TODO: mark all but 'shift' and 'caps'??? as deprecated AND add 'shift', 'caps'?
+TODO: does 'caps' work here? Is it available in the touch layout editor?
+
+   id                          | Modifier
+  -----------------------------|-----------------
+  `"default"`                  | no modifier is applied
+  `"ctrl"`                     | either Ctrl
+  `"alt"`                      | either Alt
+  `"shift-ctrl"`               | Shift + Ctrl
+  `"shift-alt"`                | Shift + Alt
+  `"ctrl-alt"`                 | Ctrl + Alt
+  `"shift-ctrl-alt"`           | Shift + Ctrl + Alt
+  `"leftctrl"`                 | Left Ctrl
+  `"rightctrl"`                | Right Ctrl
+  `"leftalt"`                  | Left Alt
+  `"leftctrl-leftalt"`         | Left Ctrl + Left Alt
+  `"rightalt"`                 | Right Alt
+  `"rightctrl-rightalt"`       | Right Ctrl + Right Alt
+  `"leftctrl-shift"`           | Shift + Left Ctrl
+  `"rightctrl-shift"`          | Shift + Right Ctrl
+  `"leftalt-shift"`            | Shift + Left Alt
+  `"rightalt-shift"`           | Shift + Right Alt
+  `"leftctrl-leftalt-shift"`   | Shift + Left Ctrl + Left Alt
+  `"rightctrl-rightalt-shift"` | Shift + Right Ctrl + Right Alt
+
+These legacy identifiers are reserved but deprecated:
+
+   id              | Modifier
+  -----------------|--------------------
+  `"ctrlalt"`      | Ctrl + Alt
+  `"ctrlshift"`    | Ctrl + Shift
+  `"altshift"`     | Alt + Shift
+  `"ctrlaltshift"` | Ctrl + Alt + Shift
+
+The `layer` property overrides the default modifier that is associated with the
+layer. If the `layer` property is not set, then the applied key event will use
+the modifier derived from the layer id (from the table above); if there is no
+matching entry in the table, then there will be no modifiers associated with the
+event.
+
+For example, if the `layer` property for the `K_A` key is `ctrl-alt`, then
+pressing that key will generate a `[CTRL ALT K_A]` event in the Keyman keyboard.
 
 ### nextlayer
 

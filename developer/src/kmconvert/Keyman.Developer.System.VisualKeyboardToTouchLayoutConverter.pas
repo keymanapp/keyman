@@ -159,7 +159,7 @@ var
 type
   TLayoutShiftState = record Shift: Word; id: ansistring end;
 const
-  // These layer names match those in KeymanWeb, kmwosk.ts osk.modifierSpecials
+  // These layer names match those in KeymanWeb, defaultLayouts.ts/modifierSpecials
   ShiftStates: array[0..21] of TLayoutShiftState = (
     (Shift: KVKS_NORMAL; id: 'default'),
     (Shift: KVKS_SHIFT; id: 'shift'),

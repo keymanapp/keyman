@@ -45,7 +45,7 @@ interface AnalysisMetadata {
 const KeyTypesOfKeyMap = {
   id: 'string',
   text: 'string',
-  layer: 'string',
+  layer/*modifierOverride*/: 'string',
   nextlayer: 'string',
   font: 'string',
   fontsize: 'string',
@@ -105,7 +105,7 @@ export class ActiveKeyBase {
     pad: ActiveKeyBase.DEFAULT_PAD
   };
 
-  /** WARNING - DO NOT USE DIRECTLY outside of keyman/engine/keyboard! */
+  /** WARNING - DO NOT USE DIRECTLY outside of keyman/engine/keyboard! TODO: why? */
   id: TouchLayout.TouchLayoutKeyId;
   text: string;
   hint?: string;
@@ -118,7 +118,11 @@ export class ActiveKeyBase {
   width?: number;
   pad?: number;
 
+  /**modifierOverride */
   layer: string;
+  // TODO: why is displayLayer needed here? Isn't it derived from the layer in
+  // which the key is stored? (in which case an object reference would be
+  // better); also separate it from the TouchLayout interface members layer, nextlayer, etc.
   displayLayer: string;
   nextlayer: string;
   sp?: TouchLayoutKeySp;
@@ -175,13 +179,18 @@ export class ActiveKeyBase {
   }
 
   /**
-   * A unique identifier based on both the key ID & the 'desktop layer' to be used for the key.
+   * A unique identifier based on both the key ID & the desktop modifierOverride
+   * to be used for the key.
    *
-   * Allows diambiguation of scenarios where the same key ID is used twice within a layer, but
-   * with different innate modifiers.  (Refer to https://github.com/keymanapp/keyman/issues/4617)
-   * The 'desktop layer' may be omitted if it matches the key's display layer.
+   * Allows diambiguation of scenarios where the same key ID is used twice
+   * within a layer, but with different innate modifiers.  (Refer to
+   * https://github.com/keymanapp/keyman/issues/4617) The 'desktop
+   * modifierOverride' may be omitted if it matches the key's display layer and
+   * the display layer is one of the standard modifier-aware layer names in
+   * `modifierSpecials`.
    *
-   * Examples, given a 'default' display layer, matching keys to Keyman keyboard language:
+   * Examples, given a 'default' display layer, matching keys to Keyman keyboard
+   * language:
    *
    * ```
    * "K_Q"
@@ -200,8 +209,11 @@ export class ActiveKeyBase {
 
     let baseID = this.id || '';
 
-    if(this.displayLayer != this.layer) {
-      baseID = baseID + '+' + this.layer;
+    // TODO: conflation of displayLayer and modifierOverride; we need to clarify
+    //       what the coreID should be e.g. this.displayLayer=numeric,
+    //       this.layer=shift. This may work out okay, but we need to be clear.
+    if(this.displayLayer != this.layer/*modifierOverride*/) {
+      baseID = baseID + '+' + this.layer/*modifierOverride*/;
     }
 
     return baseID;
@@ -254,7 +266,10 @@ export class ActiveKeyBase {
     }
 
     this.displayLayer = displayLayer;
-    this.layer = this.layer || displayLayer;
+
+    // TODO: BUG: this means a key without a modifierOverride ends up with e.g.
+    // 'numeric' as modifierOverride, which we should avoid.
+    this.layer/*modifierOverride*/ = this.layer/*modifierOverride*/ || displayLayer;
 
     // Compute the key's base KeyEvent properties for use in future event generation
     // It's actually somewhat expensive to do this at the start, so we do a lazy-init.
@@ -370,8 +385,9 @@ export class ActiveKeyBase {
   private constructBaseKeyEvent(layout: ActiveLayout, displayLayer: string) {
     // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
     // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-    let layer = this.layer || displayLayer || '';
-    let keyName= this.id ? this.id.toUpperCase() : null;
+    // TODO: conflation of layer and modifierOverride, may be okay, but need to be clear
+    let layer = this.layer/*modifierOverride*/ || displayLayer || '';
+    let keyName= this.id ? this.id.toUpperCase() : null;  // TODO: rename to keyId: const keyId = this.id?.toUpperCase() ?? null;
 
     // Start:  mirrors _GetKeyEventProperties
 
@@ -383,10 +399,10 @@ export class ActiveKeyBase {
       Lcode: keyName ? Codes.keyCodes[keyName] : 0,
       LisVirtualKey: true,
       vkCode: 0,
-      kName: keyName,
-      kLayer: layer,
-      kbdLayer: displayLayer,
-      kNextLayer: this.nextlayer,
+      kName: keyName,                    // TODO: rename to keyId or id
+      kLayer: layer/*modifierOverride*/, // TODO: kLayer is unused so can rename without issue --> or remove?
+      kbdLayer: displayLayer,            // TODO: rename to displayLayer, used only in a test but never dereferenced?! --> or remove?
+      kNextLayer: this.nextlayer,        // TODO: is used, rename to `nextlayer` (lowercase 'l' to match touch layout schema?)
       device: null,
       isSynthetic: true
     };
@@ -840,6 +856,9 @@ export class ActiveLayout implements LayoutFormFactor{
   }
 
   static sanitize(rawLayout: TouchLayoutSpec) {
+    // TODO: should we apply a transform to rename key.layer to
+    // key.modifierOverride here so we can avoid all reference to .layer
+    // elsewhere in KMW?
     ActiveLayout.correctLayerEmptyRowBug(rawLayout.layer);
   }
 
@@ -847,6 +866,9 @@ export class ActiveLayout implements LayoutFormFactor{
    *
    * @param layout
    * @param formFactor
+   *
+   * TODO: rename this to `fillDefaultProperties` or similar? ('polyfill' is a
+   * term generally referencing browser compatibility and is thus unclear here)
    */
   static polyfill(layout: TouchLayoutSpec, keyboard: JSKeyboard, formFactor: DeviceSpec.FormFactor): ActiveLayout {
     /* c8 ignore start */

@@ -943,7 +943,8 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
     // When possible, correct to other keys on the same layer as the input key.
     // Keys with nextLayer can cause the underlying layer to shift, so determine
     // the actual correction layer before proceeding!
-    const layer = keySpec.layer ?? this.layerId;
+    // TODO: BUG: conflating modifierOverride and layer; use 'layerId' for the string of the layer; use 'layer' for OSKLayer; use 'modifierOverride' for the modifier...
+    const layer = keySpec.layer/*modifierOverride*/ ?? this.layerId;
     const correctiveLayout = buildCorrectiveLayout(this.kbdLayout.getLayer(layer), kbdAspectRatio);
     return keyTouchDistances(touchKbdPos, correctiveLayout);
   }
