@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.309 beta 2026-10-17
+
+* docs(linux): update instructions for building with Java (#16835)
+
 ## 19.0.308 beta 2026-10-16
 
 * fix(web): use `key.displayLayer` rather than `key.layer` to look up corrections (#16831)
