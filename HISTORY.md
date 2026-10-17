@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 20.0.5 alpha 2026-10-17
+
+* fix: set alpha tier after merge (#16841)
+
 ## 20.0.4 alpha 2026-10-14
 
 * refactor(web): clarify scope of `doShow`/`doHide` (#16589)
