@@ -26,12 +26,13 @@ interface MockedContext {
 
 describe('LMLayerWorker', function () {
   describe('#predict()', function () {
+
     it('should send back suggestions', async function () {
       // Initialize the worker with a model that will produce one suggestion.
       var fakePostMessage = sinon.fake();
       var filteredFakePostMessage = function(event: OutgoingMessage) {
         if(event.message == 'suggestions') {
-          let suggestions = event.suggestions;
+          const suggestions = event.suggestions;
 
           // Strip any IDs set by the model compositor.
           suggestions.forEach(function(suggestion: Suggestion) {
@@ -41,12 +42,12 @@ describe('LMLayerWorker', function () {
 
         fakePostMessage(event);
       }
-      var context: MockedContext = {
+      const context: MockedContext = {
         postMessage: filteredFakePostMessage
       };
       context.importScripts = importScriptsWith(context);
 
-      var worker = LMLayerWorker.install(context);
+      const worker = LMLayerWorker.install(context);
       configWorker(worker);
 
       worker.onMessage(createMessageEventWithData({
@@ -60,7 +61,7 @@ describe('LMLayerWorker', function () {
         message: 'ready',
       });
 
-      var token = randomToken();
+      const token = randomToken();
 
       // Now predict! We should get the suggestions back.
       worker.onMessage(createMessageEventWithData({
@@ -75,7 +76,7 @@ describe('LMLayerWorker', function () {
       await timedPromise(500);
 
       // Retrieve the internal 'dummy' suggestions for comparison.
-      var hazel = iGotDistractedByHazel();
+      const hazel = iGotDistractedByHazel();
 
       assert.isOk(fakePostMessage);
 

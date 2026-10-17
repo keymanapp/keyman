@@ -47,7 +47,7 @@ declare global {
 // 10.0+ dependent keyboards, like khmer_angkor, will otherwise fail to load.
 global['keyman'] = MinimalKeymanGlobal;
 
-let device: DeviceSpec = {
+const device: DeviceSpec = {
   formFactor: DeviceSpec.FormFactor.Phone,
   OS: DeviceSpec.OperatingSystem.iOS,
   browser: DeviceSpec.Browser.Safari,
@@ -61,7 +61,7 @@ KMWString.enableSupplementaryPlane(false);
 describe('InputProcessor', function() {
   describe('[[constructor]]', function () {
     it('should initialize without errors', function () {
-      let core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
+      const core = new InputProcessor(device, null, DEFAULT_PROCESSOR_INIT_OPTIONS);
       assert.isNotNull(core);
     });
 
@@ -106,7 +106,7 @@ describe('InputProcessor', function() {
     let testDistribution: KeyDistribution = [];
     let keyboardWithHarness: JSKeyboardInterface;
 
-    let mainWebScriptURL = require.resolve('@keymanapp/lm-worker/worker-main.wrapped.js');
+    const mainWebScriptURL = require.resolve('@keymanapp/lm-worker/worker-main.wrapped.js');
 
     // Easy peasy long context:  use the unminified main script for the predictive-text worker!
     let coreSourceCode = fs.readFileSync(mainWebScriptURL, 'utf-8');
@@ -121,13 +121,13 @@ describe('InputProcessor', function() {
       testDistribution = [];
 
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
+      const keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js'));
       keyboardWithHarness = keyboardLoader.harness as JSKeyboardInterface;
       keyboardWithHarness.activeKeyboard = keyboard;
 
       const layout = keyboard.layout(DeviceSpec.FormFactor.Phone).getLayer('default').row.flatMap((r) => r.key).flat();
-      for(let keySpec of layout) {
+      for(const keySpec of layout) {
         testDistribution.push({
           keySpec,
           elementID: keySpec.elementID,
@@ -143,34 +143,34 @@ describe('InputProcessor', function() {
 
       it('with minimal context (no fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
-        let context = new SyntheticTextStore("", 0);
+        const core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        const context = new SyntheticTextStore("", 0);
 
-        let keyboard = keyboardWithHarness.activeKeyboard;
-        let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
-        let key = layout.getLayer('default').getKey('K_A');
-        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
+        const keyboard = keyboardWithHarness.activeKeyboard;
+        const layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
+        const key = layout.getLayer('default').getKey('K_A');
+        const event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
-        let behavior = core.processKeyEvent(event, context, null);
+        const behavior = core.processKeyEvent(event, context, null);
         assert.isNotNull(behavior);
       });
 
       it('with extremely long context (' + KMWString.length(coreSourceCode) + ' chars, no fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new SyntheticTextStore(coreSourceCode, KMWString.length(coreSourceCode));
+        const context = new SyntheticTextStore(coreSourceCode, KMWString.length(coreSourceCode));
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
 
         // I mean, it IS long context, and time thresholding is disabled within Node.
-        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        const core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
 
-        let keyboard = keyboardWithHarness.activeKeyboard;
-        let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
-        let key = layout.getLayer('default').getKey('K_A');
-        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
+        const keyboard = keyboardWithHarness.activeKeyboard;
+        const layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
+        const key = layout.getLayer('default').getKey('K_A');
+        const event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
 
-        let behavior = core.processKeyEvent(event, context, null);
+        const behavior = core.processKeyEvent(event, context, null);
         assert.isNotNull(behavior);
       });
     });
@@ -182,22 +182,22 @@ describe('InputProcessor', function() {
 
       it('with minimal context (with fat-fingers)', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
-        let context = new SyntheticTextStore("", 0);
+        const core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        const context = new SyntheticTextStore("", 0);
 
-        let keyboard = keyboardWithHarness.activeKeyboard;
-        let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
-        let key = layout.getLayer('default').getKey('K_A');
-        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
+        const keyboard = keyboardWithHarness.activeKeyboard;
+        const layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
+        const key = layout.getLayer('default').getKey('K_A');
+        const event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
         event.keyDistribution = testDistribution;
 
-        let behavior = core.processKeyEvent(event, context, null);
+        const behavior = core.processKeyEvent(event, context, null);
         assert.isNotNull(behavior);
       });
 
       it('with extremely long context (' + KMWString.length(coreSourceCode) + ' chars, with fat-fingers)', function() {
         // Assumes no SMP chars in the source, which is fine.
-        let context = new SyntheticTextStore(coreSourceCode, KMWString.length(coreSourceCode));
+        const context = new SyntheticTextStore(coreSourceCode, KMWString.length(coreSourceCode));
 
         this.timeout(500);                // 500 ms, excluding text import.
                                           // These often run on VMs, so we'll be a bit generous.
@@ -206,15 +206,15 @@ describe('InputProcessor', function() {
                                           // 'without fat-fingers' test.
 
         // It IS long context, and time thresholding is disabled within Node.
-        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        const core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
 
-        let keyboard = keyboardWithHarness.activeKeyboard;
-        let layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
-        let key = layout.getLayer('default').getKey('K_A');
-        let event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
+        const keyboard = keyboardWithHarness.activeKeyboard;
+        const layout = keyboard.layout(DeviceSpec.FormFactor.Phone);
+        const key = layout.getLayer('default').getKey('K_A');
+        const event = keyboard.constructKeyEvent(key, device, core.keyboardProcessor.stateKeys);
         event.keyDistribution = testDistribution;
 
-        let behavior = core.processKeyEvent(event, context, null);
+        const behavior = core.processKeyEvent(event, context, null);
         assert.isNotNull(behavior);
       });
     });
@@ -222,14 +222,14 @@ describe('InputProcessor', function() {
 
   describe('Deadkeys bug #8568 - backspace should not reset all deadkeys', function () {
     let keyboardWithHarness: JSKeyboardInterface;
-    let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/8568_deadkeys.json'));
+    const testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/8568_deadkeys.json'));
     // For convenience we define the key sequence in a test file although we don't use the
     // rest of the recorder stuff since it uses only KeyboardProcessor, not InputProcessor.
-    let testDefinitions = new KeyboardTest(JSON.parse(testJSONtext.toString()));
+    const testDefinitions = new KeyboardTest(JSON.parse(testJSONtext.toString()));
 
     before(async function () {
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
+      const keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_8568_deadkeys.js'));
       keyboardWithHarness = keyboardLoader.harness as JSKeyboardInterface;
       keyboardWithHarness.activeKeyboard = keyboard;
@@ -239,17 +239,17 @@ describe('InputProcessor', function() {
     });
 
     const testsToRun: RecordedSequenceTestSet = testDefinitions.inputTestSets[0] as RecordedSequenceTestSet;
-    for (let testSet of testsToRun.testSet) {
+    for (const testSet of testsToRun.testSet) {
       it(testSet.msg ?? 'test', function() {
         this.timeout(32); // ms
-        let core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
-        let context = new SyntheticTextStore("", 0);
+        const core = new InputProcessor(device, null, {...DEFAULT_PROCESSOR_INIT_OPTIONS, keyboardInterface: keyboardWithHarness});
+        const context = new SyntheticTextStore("", 0);
 
-        let keyboard = keyboardWithHarness.activeKeyboard as JSKeyboard;
+        const keyboard = keyboardWithHarness.activeKeyboard as JSKeyboard;
 
-        for (let key of testSet.inputs) {
+        for (const key of testSet.inputs) {
           const keystroke = key as RecordedPhysicalKeystroke;
-          let keySpec: KeyEventSpec = {
+          const keySpec: KeyEventSpec = {
             Lcode: keystroke.keyCode,
             Lmodifiers: keystroke.modifiers,
             LmodifierChange: keystroke.modifierChanged,
@@ -261,7 +261,7 @@ describe('InputProcessor', function() {
             LisVirtualKey: keyboard.definesPositionalOrMnemonic // Only false for 1.0 keyboards.,
           };
 
-          let behavior = core.processKeyEvent(new KeyEvent(keySpec), context, null);
+          const behavior = core.processKeyEvent(new KeyEvent(keySpec), context, null);
           assert.isNotNull(behavior);
         }
         assert.equal(context.getText(), testSet.output);
@@ -302,7 +302,7 @@ describe('InputProcessor', function() {
 
     before(async () => {
       // Load the keyboard.
-      let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
+      const keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
       const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_simple_deadkeys.js'));
       keyboardWithHarness = keyboardLoader.harness as JSKeyboardInterface;
       keyboardWithHarness.activeKeyboard = keyboard;
