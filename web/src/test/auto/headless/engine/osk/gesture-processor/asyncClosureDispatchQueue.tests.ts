@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai'
 import { default as sinon, type SinonSpy } from 'sinon';
 import { AsyncClosureDispatchQueue, type QueueClosure } from 'keyman/engine/gesture-processor';

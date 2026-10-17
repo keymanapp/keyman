@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai';
 
 import { LMLayer, WebWorker }   from "@keymanapp/lexical-model-layer/web";

@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { LexicalModelTypes } from '@keymanapp/common-types';
 
 /**
