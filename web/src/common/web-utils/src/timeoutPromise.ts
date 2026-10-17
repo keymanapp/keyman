@@ -31,7 +31,7 @@ export class TimeoutPromise extends ManagedPromise<Boolean> {
     const resolve = this._resolve;
     this._resolve = (val) => {
       // b/c of the mismatch between the return types of DOM's window.setTimeout & Node's version
-      clearTimeout(this.timerHandle as any);
+      this.cancel();
       resolve(val);
     }
 
@@ -41,9 +41,15 @@ export class TimeoutPromise extends ManagedPromise<Boolean> {
     const reject = this._reject;
     this._reject = (val) => {
       // b/c of the mismatch between the return types of DOM's window.setTimeout & Node's version
-      clearTimeout(this.timerHandle as any);
+      this.cancel();
       reject(val);
     }
+  }
+  cancel() {
+    if(this.timerHandle) {
+      clearTimeout(this.timerHandle as any);
+    }
+    this.timerHandle = null;
   }
 }
 
