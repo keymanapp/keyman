@@ -18,19 +18,19 @@ export function declareCopy(program: Command) {
   const command = program.command('copy <project>');
   BaseOptions.addAll(command);
   command
-    .description('Copy a Keyman keyboard or lexical model project')
-    .option('-o, --out-path <path>', 'New name and path for project')
-    .option('-n, --dry-run', 'Show what would happen, without making changes')
-    .option('-r, --relocate-external', 'Copy external files into "external" folder')
+    .description('copy a Keyman keyboard or lexical model project')
+    .option('-o, --out-path <path>', 'new name and path for project')
+    .option('-n, --dry-run', 'show what would happen, without making changes')
+    .option('-r, --relocate-external', 'copy external files into "external" folder')
     .action(copyProject)
-    .addHelpText('before', `
-      <project> can be:
-      * a .kpj file, e.g. ./keyboards/khmer_angkor/khmer_angkor.kpj
-      * a local folder (with a .kpj file in it), e.g. ./keyboards/khmer_angkor
-      * a cloud keyboard or lexical model, cloud:id, e.g. cloud:khmer_angkor
-      * a GitHub repository, branch, and path, [https://]github.com/owner/repo/tree/branch/path
-        e.g. https://github.com/keyman-keyboards/khmer_angkor/tree/main/khmer_angkor.kpj or
-             github.com/keymanapp/keyboards/tree/master/release/k/khmer_angkor
+    .addHelpText('after', `
+<project> can be:
+  * a .kpj file, e.g. ./keyboards/khmer_angkor/khmer_angkor.kpj
+  * a local folder (with a .kpj file in it), e.g. ./keyboards/khmer_angkor
+  * a cloud keyboard or lexical model, cloud:id, e.g. cloud:khmer_angkor
+  * a GitHub repository, branch, and path, [https://]github.com/owner/repo/tree/branch/path
+    e.g. https://github.com/keyman-keyboards/khmer_angkor/tree/main/khmer_angkor.kpj or
+         github.com/keymanapp/keyboards/tree/master/release/k/khmer_angkor
     `);
   }
 
