@@ -1469,7 +1469,8 @@ begin
   FGlobalProject.Save;
 
   if not Assigned(FChildWindows) then
-    Exit(False);
+    // This should never happen
+    Exit(True);
 
   for i := 0 to FChildWindows.Count - 1 do
   begin
@@ -1498,7 +1499,8 @@ var
   i: Integer;
 begin
   if not Assigned(FChildWindows) then
-    Exit(False);
+    // This should never happen
+    Exit(True);
 
   for i := 0 to FChildWindows.Count - 1 do
     if not FChildWindows[i].CloseQuery then
