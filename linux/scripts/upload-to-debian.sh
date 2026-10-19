@@ -104,7 +104,7 @@ function push_to_github_and_create_pr() {
     # There shouldn't be any other commits on ${BRANCH} except the one we want to replace
     # (if any).
     ${NOOP} git push --force origin "${BRANCH}"
-    PR_NUMBER=$(gh pr list --draft --search "${PR_TITLE}" --base "${BASE}" --json number --jq '.[].number')
+    PR_NUMBER=$(gh pr list --draft --search "'${PR_TITLE}'" --base "${BASE}" --json number --jq '.[].number')
     if [[ -n ${PR_NUMBER} ]]; then
       builder_echo "PR #${PR_NUMBER} already exists"
     else
