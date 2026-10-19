@@ -1,13 +1,20 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Various helpers for LDML XML reader unit tests
+ */
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
 import 'mocha';
 import {assert} from 'chai';
+
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { loadFile, makePathToFixture } from './index.js';
+
 import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from '../../src/types/ldml-keyboard/ldml-keyboard-xml-reader.js';
-import { CompilerEvent } from '../../src/compiler-interfaces.js';
+import { CompilerError, CompilerErrorSeverity, CompilerEvent } from '../../src/compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile } from '../../src/types/ldml-keyboard/ldml-keyboard-xml.js';
 import { LDMLKeyboardTestDataXMLSourceFile } from '../../src/types/ldml-keyboard/ldml-keyboard-testdata-xml.js';
-import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { fileURLToPath } from 'url';
-import { dirname } from 'node:path';
 
 const readerOptions: LDMLKeyboardXMLSourceFileReaderOptions = {
   cldrImportsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL)),
@@ -24,9 +31,11 @@ export interface CompilationCase {
    */
   subpath: string;
   /**
-   * message numbers. If present, must be a match for all messages reported; use to avoid complicated tests that deal with message parameters
+   * message codes. If present, must be a match for all messages reported; use
+   * to avoid complicating unit tests with the actual text of messages and
+   * message parameters (we don't normally want to test message content)
    */
-  messages?: number[];
+  messageCodes?: number[];
   /**
    * expected error messages. If falsy, expected to succeed. All must be present to pass.
    */
@@ -78,12 +87,17 @@ export interface TestDataCase {
  * @param cases cases to run
  * @param compiler argument to loadSectionFixture()
  * @param callbacks argument to loadSectionFixture()
+ *
+ * TODO(lowpri): split .load and .validate test cases so we are properly unit testing
  */
 export function testReaderCases(cases : CompilationCase[]) {
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
   for (const testcase of cases) {
-    const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
+    const expectFailure =  // if true, we expect this to fail
+      testcase.throws ||
+      !!(testcase.errors) ||  // expect failure if test case contains any error messages
+      !!(testcase.messageCodes?.filter(code => CompilerError.severity(code) >= CompilerErrorSeverity.Error)?.length); // only mark as failed if we have error or fatal messages
     const testHeading = expectFailure ? `should fail to load: ${testcase.subpath}`:
                                         `should load: ${testcase.subpath}`;
     it(testHeading, function () {
@@ -114,8 +128,8 @@ export function testReaderCases(cases : CompilationCase[]) {
         assert.throws(() => reader.validate(source), testcase.throws);
       } else {
         assert.doesNotThrow(() => reader.validate(source), `validating ${testcase.subpath}`);
-        if (testcase.messages) {
-          assert.sameDeepMembers(callbacks.messages.map(message => message.code), testcase.messages, 'expected messages to match');
+        if (testcase.messageCodes) {
+          assert.sameDeepMembers(callbacks.messages.map(message => message.code), testcase.messageCodes, 'expected messages to match');
         } else {
           // if we expected errors or warnings, show them
           if (testcase.errors) {
