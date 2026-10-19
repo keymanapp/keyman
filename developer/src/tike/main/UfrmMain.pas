@@ -473,7 +473,9 @@ var
 implementation
 
 uses
+  System.Contnrs,
   System.Math,
+  System.Types,
   Winapi.WinInet,
   Winapi.ShlObj,
   Winapi.UxTheme,
@@ -688,19 +690,10 @@ begin
 end;
 
 procedure TfrmKeymanDeveloper.DoCloseCleanup;
-var
-  i: Integer;
 begin
   if FHasDoneCloseCleanup then
     Exit;
   FHasDoneCloseCleanup := True;
-
-  for i := FChildWindows.Count - 1 downto 0 do
-  begin
-    FChildWindows[i].Visible := False;
-    FChildWindows[i].Parent := nil;
-    FChildWindows[i].Release;   // I2595, probably not necessary
-  end;
 
   if IsGlobalProjectUIReady then
   begin
@@ -717,7 +710,6 @@ begin
   FreeAndNil(frmCharacterIdentifier);   // I4807
   FreeAndNil(frmMessages);
   FreeAndNil(frmHelp);
-//  FreeAndNil(frmDebugStatus);
 end;
 
 procedure TfrmKeymanDeveloper.FormCloseQuery(Sender: TObject;
