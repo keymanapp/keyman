@@ -32,11 +32,11 @@ for proj in ${projects}; do
     downloadSource debianpackage
 
     cd "${proj}-${version}"
-    if [[ -n "${DIST}" ]]; then
+    if [[ -n "${DIST:-}" ]]; then
         EXTRA_ARGS="--distribution ${DIST} --force-distribution"
     fi
     # shellcheck disable=SC2086
-    dch --newversion "${version}-${DEBREVISION-1}" ${EXTRA_ARGS} ""
+    dch --newversion "${version}-${DEBREVISION-1}" ${EXTRA_ARGS:-} ""
     debuild -d -S -sa -Zxz
     cd "${BASEDIR}"
 done
