@@ -195,6 +195,9 @@ push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH}" "${COMMIT_
 Test-bot: skip"
 
 # Are we in beta phase? Then use that as base branch for cherry-pick!
+# All changes in the beta branch get merged to master periodically during
+# the beta phase, so we'll eventually end up consistent across stable, 
+# beta, and alpha (master).
 if git branch -a | grep -q origin/beta; then
   BASE_BRANCH=beta
 else
