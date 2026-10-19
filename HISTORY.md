@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 19.0.310 beta 2026-10-19
+
+* fix(developer): handle xml parser errors in LDML imports (#16808)
+* refactor(developer): remove unused `throws` from LDML test harnesses (#16846)
+* fix(developer): Avoid clearing child window list in destructor to streamline shutdown (#16812)
+* fix(developer): guard access to possibly-nil `FChildWindows` (#16820)
+* fix(ios): load sentry earlier so we capture script errors in keymanweb-webview.js (#16828)
+* chore(linux): quote search team in upload-to-debian.sh so we find existing pull requests (#16850)
+* maint(linux): detect beta phase in `upload-to-debian.sh` (#16853)
+* fix(web): correctly handle base key selection during fat-finger calculation in subkey popup (#16832)
+* fix(web): fix multilayer-multitap correction to non-multitap sequence (#16842)
+* fix(android): selectively disable autocorrect based on context intent (#16644)
+
 ## 19.0.309 beta 2026-10-17
 
 * docs(linux): update instructions for building with Java (#16835)
