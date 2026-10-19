@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 20.0.6 alpha 2026-10-19
+
+* docs(common): move legacy history (#16799)
+
 ## 20.0.5 alpha 2026-10-17
 
 * fix: set alpha tier after merge (#16841)
