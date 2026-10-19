@@ -1,0 +1,13 @@
+store(&NAME) 'warn_call_used_on_unsupported_platform-desktop'
+
+c warning SHOULD be generated for desktop (due to inclusion of macosx, linus)
+store(&TARGETS) 'desktop'
+store(&VERSION) '10.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+store(dllfunc) 'dll.dll:func'
+
++ ' ' > call(dllfunc)

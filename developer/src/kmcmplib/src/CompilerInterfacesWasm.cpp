@@ -151,6 +151,7 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
     .property("displayMapFilename", &KMCMP_COMPILER_RESULT_EXTRA::displayMapFilename)
     .property("stores", &KMCMP_COMPILER_RESULT_EXTRA::stores)
     .property("groups", &KMCMP_COMPILER_RESULT_EXTRA::groups)
+    .property("platformTargets", &KMCMP_COMPILER_RESULT_EXTRA::platformTargets)
     ;
 
   emscripten::value_object<KMCMP_COMPILER_RESULT_EXTRA_STORE>("CompilerResultExtraStore")

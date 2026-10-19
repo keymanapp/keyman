@@ -1,0 +1,13 @@
+store(&NAME) 'warn_call_used_on_unsupported_platform-web'
+
+c warning should NOT be generated for web
+store(&TARGETS) 'web'
+store(&VERSION) '10.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+store(dllfunc) 'dll.dll:func'
+
++ ' ' > call(dllfunc)

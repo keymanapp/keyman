@@ -1,5 +1,11 @@
-import * as fs from 'fs';
-import * as path from 'path';
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Provide details on compiler error messages from kmc
+ */
+
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 import { Command, Option } from 'commander';
 import { escapeMarkdownChar, KeymanUrls, CompilerBaseOptions, CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerEvent, dedentCompilerMessageDetail } from '@keymanapp/developer-utils';
@@ -8,6 +14,10 @@ import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { exitProcess } from '../util/sysexits.js';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { CompilerMessageDetail, findMessageDetails, findMessagesById, getMessageIdentifiersSorted } from '../util/extendedCompilerOptions.js';
+
+// TODO: update chalk to 4.x
+import { default as chalk_interface } from 'chalk';
+const chalk = chalk_interface.default;
 
 type MessageFormat = 'text'|'markdown'|'json';
 
@@ -30,10 +40,29 @@ export function declareMessage(program: Command) {
   program
     .command('message [messages...]')
     .description(`Describe one or more compiler messages. Note: Markdown format is always written to files on disk.`)
+
+    // note: using term 'module' here rather than 'namespace' as that
+    // corresponds pretty closely to npm modules such as @keymanapp/kmc-kmn
     .addHelpText('after', `
-Message identifiers can be:
- * numeric, e.g. "KM07006" or "7006", or
- * [namespace.]id, substring id supported; e.g. "kmc-kmn.INFO_MinimumEngineVersion" or "kmc-kmn." or "INFO_Min"`)
+
+Message identifiers can be any of the following formats:
+
+ - kmc message format, numeric hexadecimal with optional "KM" prefix, e.g.
+     ${chalk.cyan("kmc message KM07006")}
+     ${chalk.cyan("kmc message 7006")}
+
+ - a module, with a "." suffix, which will list all messages in the module, e.g.
+     ${chalk.cyan("kmc message kmc-kmn.")}
+
+ - a source identifier, format "[module.]id", e.g. to list a specific message:
+     ${chalk.cyan("kmc message kmc-kmn.INFO_MinimumEngineVersion")}
+
+ - a source identifier substring, e.g. to lists all messages starting with "INFO_Min" in all namespaces
+     ${chalk.cyan("kmc message INFO_Min")}
+
+ - a decimal value, with "d" prefix (this form may be reported in diagnostic or unit test logs), e.g.
+     ${chalk.cyan("kmc message d5246977")}
+`)
     .addOption(new Option('-f, --format <format>', 'Output format').choices(['text', 'markdown', 'json']).default('text'))
     .option('-o, --out-path <out-path>', 'Output path for Markdown files; output filename for text and json formats')
     .option('-a, --all-messages', 'Emit descriptions for all messages (text, json)')
@@ -115,27 +144,42 @@ function parseMessageIdentifier(message: string, callbacks: CompilerCallbacks): 
 }
 
 function translateMessageInputToCode(message: string, callbacks: CompilerCallbacks): CompilerMessageDetail[] {
-  const pattern = /^(KM)?([0-9a-f]+)$/i;
-  const result = message.match(pattern);
-  if(!result) {
-    const { namespace, id } = parseMessageIdentifier(message.toLowerCase(), callbacks);
-    if(!namespace && !id) {
-      callbacks.reportMessage(InfrastructureMessages.Error_MessageNamespaceNameNotFound({message}));
-      return null;
-    }
 
-    // We assume that this is a INFO, HINT, ERROR, etc message, and do a substring search
-    const items = findMessagesById(namespace, id);
-    if(!items.length) {
+  // Match d#####
+  const decimalPattern = /^d(\d+)$/i;
+  const decimalResult = message.match(decimalPattern);
+  if(decimalResult) {
+    const code = Number.parseInt(decimalResult[1], 10);
+    if(Number.isNaN(code)) {
       callbacks.reportMessage(InfrastructureMessages.Error_UnrecognizedMessageCode({message}));
       return null;
     }
-
-    return items;
+    return [findMessageDetails(CompilerError.error(code), callbacks)];
   }
 
-  const code = Number.parseInt(result[2], 16);
-  return [findMessageDetails(code, callbacks)];
+  // Match KM#####
+  const pattern = /^(KM)?([0-9a-f]+)$/i;
+  const result = message.match(pattern);
+  if(result) {
+    const code = Number.parseInt(result[2], 16);
+    return [findMessageDetails(code, callbacks)];
+  }
+
+  // Match mesage identifier[s]
+  const { namespace, id } = parseMessageIdentifier(message.toLowerCase(), callbacks);
+  if(!namespace && !id) {
+    callbacks.reportMessage(InfrastructureMessages.Error_MessageNamespaceNameNotFound({message}));
+    return null;
+  }
+
+  // We assume that this is a INFO, HINT, ERROR, etc message, and do a substring search
+  const items = findMessagesById(namespace, id);
+  if(!items.length) {
+    callbacks.reportMessage(InfrastructureMessages.Error_UnrecognizedMessageCode({message}));
+    return null;
+  }
+
+  return items;
 }
 
 function initialize(options: any): MessageOptions {

@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 19.0.309 beta 2026-10-17
+
+* docs(linux): update instructions for building with Java (#16835)
+
+## 19.0.308 beta 2026-10-16
+
+* fix(web): use `key.displayLayer` rather than `key.layer` to look up corrections (#16831)
+
+## 19.0.307 beta 2026-10-15
+
+* fix(developer): address range check error in bitmap editor (#16815)
+* maint(common): remove history-utils.sh (#16796)
+* docs(web): improve documentation on `addKeyboards`/`addKeyboardsForLanguage` (#16020)
+
 ## 19.0.306 beta 2026-10-12
 
 * fix(web): don't crash on gestures when banner disabled (#16788)

@@ -112,8 +112,7 @@
     <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[new] %1$s</string>
 
     <!-- Context: Keyboard Info and Keyboard Settings -->
-    <string name="keyboard_qr_code" comment="QR Code description">
-      Scan this code to load this\nkeyboard on another device</string>
+    <string name="keyboard_qr_code" comment="QR Code description">Scan this code to load this\nkeyboard on another device</string>
 
 
     <!-- Context: Keyboard Help welcome.htm title -->

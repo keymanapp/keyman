@@ -1,6 +1,11 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 
 //
 // This mirrors UKeymanTargets.pas
+//
+// See also PLATFORMTARGETS_ in compiler.ts for numeric target values
 //
 
 export enum

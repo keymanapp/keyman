@@ -1,0 +1,7 @@
+#!/some/xml/interpreter <!-- will be a parser error -->
+<?xml version="1.0" encoding="UTF-8"?>
+<keys>
+    <!-- Special Symbols -->
+    <key id="interrobang" output="‽" />
+    <key id="snail" output="@" />
+</keys>
