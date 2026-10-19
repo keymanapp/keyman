@@ -1,1 +1,3 @@
 include ':kMAPro'
+include ':keyman-engine'
+project(':keyman-engine').projectDir = new File(settingsDir, '../KMEA/app')
