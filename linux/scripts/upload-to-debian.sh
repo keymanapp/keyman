@@ -195,6 +195,10 @@ push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH}" "${COMMIT_
 Test-bot: skip"
 
 # Create cherry-pick on master branch
+if git branch -a | grep -q origin/chore/linux/cherry-pick/changelog; then
+  git checkout chore/linux/cherry-pick/changelog
+  git pull origin chore/linux/cherry-pick/changelog
+fi
 git checkout -B chore/linux/cherry-pick/changelog origin/master
 git cherry-pick -x chore/linux/changelog
 push_to_github_and_create_pr chore/linux/cherry-pick/changelog master "${COMMIT_MESSAGE} 🍒" \
