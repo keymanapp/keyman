@@ -45,11 +45,8 @@ PKG_STAGE="${KEYMAN_BUILD_PATH}/StagingRoot"
 function do_build() {
   archive_apps
   export_apps
-  #create_packages
-  build_new_distribution_xml
+  build_distribution_xml
   create_package_from_staging
-  #build_distribution_xml
-  #combine_packages
   builder_echo "build and package of Keyman installer complete"
 }
 
@@ -101,24 +98,6 @@ function export_apps() {
       -exportPath "${KEYMAN_BUILD_PATH}/ConfigExport"
 }
 
-function create_packages() {
-  builder_echo "packaging Keyman input method"
-
-  pkgbuild --component "${KEYMAN_BUILD_PATH}/KeymanExport/Keyman.app" \
-      --install-location /tmp \
-      --identifier "$INSTALL_INPUT_METHOD_BUNDLE_ID" \
-      --scripts ./scripts \
-      --version "$KEYMAN_VERSION" \
-      "${KEYMAN_BUILD_PATH}/keyman-input-method.pkg"
-
-  builder_echo "packaging Keyman Configuration app"
-  pkgbuild --component "${KEYMAN_BUILD_PATH}/ConfigExport/Keyman Configuration.app" \
-      --install-location /Applications \
-      --identifier "$INSTALL_CONFIG_BUNDLE_ID" \
-      --version "$KEYMAN_VERSION" \
-      "${KEYMAN_BUILD_PATH}/keyman-config.pkg"
-}
-
 function create_package_from_staging() {
   builder_echo "setup staging directory for Keyman package"
   
@@ -163,7 +142,7 @@ function create_package_from_staging() {
   xcrun stapler staple "$OUTPUT_PACKAGE_PATH" || builder_die "stapler failed"
 }
 
-function build_new_distribution_xml(){
+function build_distribution_xml(){
 cat <<EOF > "${OUTPUT__DISTRIBUTION_XML}"
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="2">
@@ -196,68 +175,6 @@ cat <<EOF > "${OUTPUT__DISTRIBUTION_XML}"
 EOF
 
 echo "Created distribution.xml at ${OUTPUT__DISTRIBUTION_XML}"
-}
-
-function build_distribution_xml(){
-cat <<EOF > "${OUTPUT__DISTRIBUTION_XML}"
-<?xml version="1.0" encoding="utf-8"?>
-<installer-gui-script minSpecVersion="2">
-    <title>Keyman for macOS</title>
-    <welcome file="welcome.rtf" />
-    <license file="license.rtf" mime-type="text/rtf"/>
-    <!-- Light Mode Background -->
-    <background file="keyman-x20-y36-144.png" mime-type="image/png" alignment="center" scaling="none"/>
-    <!-- Dark Mode Background -->
-    <background-darkAqua file="keyman-x20-y36-144.png" mime-type="image/png" alignment="center" scaling="none"/>
-
-    <conclusion file="conclusion.rtf" mime-type="text/rtf"/>
-
-    <!-- Restrict to macOS 13 Ventura or newer -->
-    <allowed-os-versions>
-        <os-version min="13.0"/>
-    </allowed-os-versions>
-
-    <pkg-ref id="com.keyman.config.installer"/>
-    <pkg-ref id="com.keyman.im.installer"/>
-    <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
-    <choices-outline>
-        <line choice="default">
-            <line choice="com.keyman.config.installer"/>
-            <line choice="com.keyman.im.installer"/>
-        </line>
-    </choices-outline>
-    <choice id="default"/>
-    <choice id="com.keyman.config.installer" visible="false">
-        <pkg-ref id="com.keyman.config.installer"/>
-    </choice>
-    <pkg-ref id="com.keyman.config.installer" version="$KEYMAN_VERSION" onConclusion="none">keyman-config.pkg</pkg-ref>
-    <choice id="com.keyman.im.installer" visible="false">
-        <pkg-ref id="com.keyman.im.installer"/>
-    </choice>
-    <pkg-ref id="com.keyman.im.installer" version="$KEYMAN_VERSION" onConclusion="none">keyman-input-method.pkg</pkg-ref>
-</installer-gui-script>
-EOF
-
-echo "Created distribution.xml at ${OUTPUT__DISTRIBUTION_XML}"
-}
-
-function combine_packages() {
-  builder_echo "combining packages into product"
-
-  mkdir -p "$OUTPUT_DIRECTORY_PATH"
-
-  productbuild --distribution "${KEYMAN_BUILD_PATH}/distribution.xml" \
-      --package-path "${KEYMAN_BUILD_PATH}" \
-      --resources ./installer-resources \
-      --version "$KEYMAN_VERSION" \
-      --sign 5FCED4988F27D172C5628A16DBA4AE6CA0015D11 \
-      "$OUTPUT_PACKAGE_PATH"
-
-  builder_heading "Uploading install package to Apple for notarization"
-  mac_notarize "$OUTPUT_DIRECTORY_PATH" "$OUTPUT_PACKAGE_PATH"
-
-  builder_heading "Attempting to staple notarization to install package"
-  xcrun stapler staple "$OUTPUT_PACKAGE_PATH" || builder_die "stapler failed"
 }
 
 builder_run_action clean do_clean
