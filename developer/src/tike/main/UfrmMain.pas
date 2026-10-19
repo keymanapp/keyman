@@ -473,9 +473,7 @@ var
 implementation
 
 uses
-  System.Contnrs,
   System.Math,
-  System.Types,
   Winapi.WinInet,
   Winapi.ShlObj,
   Winapi.UxTheme,
@@ -564,6 +562,7 @@ begin
 
   Application.HookMainWindow(ActivateHook);
 
+  FChildWindows := TChildWindowList.Create;
   FFilesToOpen := TStringList.Create;
 
   try
@@ -593,8 +592,6 @@ begin
   modActionsDebugger := TmodActionsDebugger.Create(Self);
   modActionsMain := TmodActionsMain.Create(Self);
   modActionsModelEditor := TmodActionsModelEditor.Create(Self);
-
-  FChildWindows := TChildWindowList.Create;
 
   FProjectMRU := TMRUList.Create('Project');
   FProjectMRU.OnChange := ProjectMRUChange;
@@ -848,8 +845,11 @@ procedure TfrmKeymanDeveloper.WMUserInputLangChange(var Message: TMessage);
 var
   i: Integer;
 begin
-  for i := 0 to FChildWindows.Count - 1 do
-    PostMessage(FChildWindows[i].Handle, WM_USER_INPUTLANGCHANGE, Message.wParam, Message.LParam);
+  if Assigned(FChildWindows) then
+  begin
+    for i := 0 to FChildWindows.Count - 1 do
+      PostMessage(FChildWindows[i].Handle, WM_USER_INPUTLANGCHANGE, Message.wParam, Message.LParam);
+  end;
 end;
 
 procedure TfrmKeymanDeveloper.WMUserOpenFiles(var Message: TMessage);
@@ -969,10 +969,13 @@ begin
 
   RefreshProjectMRU;
 
-  for i := 0 to FChildWindows.Count - 1 do
-    if FChildWindows[i] is TfrmTikeEditor then
-      with FChildWindows[i] as TfrmTikeEditor do
-        CheckForReload;
+  if assigned(FChildWindows) then
+  begin
+    for i := 0 to FChildWindows.Count - 1 do
+      if FChildWindows[i] is TfrmTikeEditor then
+        with FChildWindows[i] as TfrmTikeEditor do
+          CheckForReload;
+  end;
 
   try
     FocusActiveChild;   // I4847   // I2986
@@ -1012,6 +1015,9 @@ procedure TfrmKeymanDeveloper.ShowChild(Window: TfrmTikeChild);
 var
   i, j: Integer;
 begin
+  if not Assigned(FChildWindows) then
+    Exit;
+
   for i := 0 to FChildWindows.Count - 1 do
     if FChildWindows[i] = Window then
     begin
@@ -1461,6 +1467,11 @@ var
   i: Integer;
 begin
   FGlobalProject.Save;
+
+  if not Assigned(FChildWindows) then
+    // This should never happen
+    Exit(True);
+
   for i := 0 to FChildWindows.Count - 1 do
   begin
     if FChildWindows[i] is TfrmProject then
@@ -1487,6 +1498,10 @@ function TfrmKeymanDeveloper.BeforeOpenProject: Boolean;
 var
   i: Integer;
 begin
+  if not Assigned(FChildWindows) then
+    // This should never happen
+    Exit(True);
+
   for i := 0 to FChildWindows.Count - 1 do
     if not FChildWindows[i].CloseQuery then
       Exit(False);
@@ -1498,6 +1513,9 @@ function TfrmKeymanDeveloper.OpenEditor(FFileName: string; frmClass: TfrmTikeEdi
 var
   i, n: Integer;
 begin
+  if not Assigned(FChildWindows) then
+    Exit(nil);
+
   for i := 0 to FChildWindows.Count - 1 do
     if FChildWindows[i] is TfrmTikeEditor then
       with FChildWindows[i] as TfrmTikeEditor do
@@ -1536,6 +1554,9 @@ function TfrmKeymanDeveloper.FindEditorByFileName(AFileName: string): TfrmTikeEd
 var
   i: Integer;
 begin
+  if not Assigned(FChildWindows) then
+    Exit(nil);
+
   for i := 0 to FChildWindows.Count - 1 do
   begin
     if (FChildWindows[i] is TfrmTikeEditor) then   // I4081
@@ -1850,8 +1871,11 @@ begin
   Screen.Cursor := crHourglass;
   try
     FUnicodeData.RefreshOptions;
-    for i := 0 to Self.FChildWindows.Count - 1 do
-      if Self.FChildWindows[i] is TfrmEditor then (Self.FChildWindows[i] as TfrmEditor).RefreshOptions;
+    if Assigned(Self.FChildWindows) then
+    begin
+      for i := 0 to Self.FChildWindows.Count - 1 do
+        if Self.FChildWindows[i] is TfrmEditor then (Self.FChildWindows[i] as TfrmEditor).RefreshOptions;
+    end;
     if ProjectForm <> nil then ProjectForm.RefreshOptions;
     if Assigned(frmMessages) then frmMessages.RefreshOptions;
     if Assigned(frmCharacterMapDock) then frmCharacterMapDock.RefreshOptions; // Recalculates grid after unicode data refresh
@@ -1870,6 +1894,9 @@ function TfrmKeymanDeveloper.ProjectForm: TfrmProject;
 var
   i: Integer;
 begin
+  if not Assigned(FChildWindows) then
+    Exit(nil);
+
   for i := 0 to FChildWindows.Count - 1 do
     if (FChildWindows[i] is TfrmProject) then
     begin
