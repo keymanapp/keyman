@@ -27,32 +27,15 @@ GLOBAL_PLIST="/Library/LaunchAgents/com.keyman.deferred.plist"
 TEMP_PLIST="/tmp/com.keyman.deferred.plist"
 SERVICE_TARGET="gui/${USER_ID}/com.keyman.deferred"
 
-# Define the source file path within the package payload
-# the input method, Keyman.app, is added to /tmp when building the installer
-# $3 is the target volume mount point, e.g., "/"
-
-#SOURCE_FILE="$3tmp/Keyman.app"
-#echo "source file is: $SOURCE_FILE"
-
 # Define the path to the Input Methods directory in the user's Library
 USER_IM_DIR="$USER_HOME/Library/Input Methods"
 echo "input methods directory is: $USER_IM_DIR"
 
-# Create the /Library/Input Methods directory if it doesn't exist
-#if [ ! -d "$USER_IM_DIR" ]; then
-#    mkdir -p "$USER_IM_DIR"
-    # Set the user as owner of the Input Methods directory
-#    chown "$USER_NAME":staff "$USER_IM_DIR"
-#fi
+# create the user's Input Methods directory if it doesn't exist
+mkdir -p "$USER_IM_DIR"
 
-# Copy the input method to the destination directory
-# must use cp -R to maintain symbolic links and preserve permissions
-# if we use -r, the input method's code signature will be invalid and the system will not load it
-#cp -R "$SOURCE_FILE" "$USER_IM_DIR/"
-
-# Set the user as owner
-#chown -R "$USER_NAME":staff "$USER_IM_DIR/Keyman.app"
-
+# install the input method 
+echo "move Keyman.app to Input Methods directory"
 if [ -d "$STAGED_APP" ]; then
   rm -rf "${USER_IM_DIR}/Keyman.app" # Clean out any older versions
   mv "$STAGED_APP" "$USER_IM_DIR/"
@@ -68,16 +51,14 @@ rm -rf /Users/Shared/KeymanStaging
 # the following few lines must be updated to extract the package name from the path
 # and write it to a file for retrieval by the config app so it can download the package
 
-# for #5318, add code here to extract package name from package path
+# add code here to extract package name from package path
 #echo "The installer package name is: $PACKAGE_PATH"
 
-# for #5318, define path of tmp file to write keyboard info
+# define path of tmp file to write keyboard info
 #KEYBOARD_FILE_PATH="$3/var/tmp/keyboard-to-install.txt"
 
-# for #5318, write keyboard file containing package name
+# write keyboard file containing package name
 #/bin/echo "sil_euro_latin" > "${KEYBOARD_FILE_PATH}"
-
-# run background process that launches Keyman Configuration app
 
 # first kill any old Keyman Configuration processes that are running
 # they would not receive the command line argument when we passed one
@@ -87,30 +68,18 @@ pkill -u "$USER_NAME" -if "Keyman Configuration"
 # also kill Keyman because Keyman Configuration will invoke it during install
 pkill -u "$USER_NAME" -if "Keyman"
 
-# give the file system a couple seconds to commit changes
-#sleep 2
-
-# check if there is a current user and we are not sitting at the login window, then
-# launch the Keyman Configuration under the current user with the custom install argument
-
-#if [ -n "$USER_NAME" ] && [ "$USER_NAME" != "loginwindow" ]; then
-  # Launch the binary directly inside the user's system session context.
-  # The trailing '&' runs it in the background.
-  #launchctl asuser "$USER_ID" open -a "/Applications/Keyman Configuration.app" --args installation &
-#fi
-
 # copy the global launch agent plist to a temporary location and change ownership to active user
 # this way, we can delete it after the config app runs
 cp "$GLOBAL_PLIST" "$TEMP_PLIST"
 chown "${USER_NAME}:staff" "$TEMP_PLIST"
 
 # use the temp plist to start the service
-echo "⚙️ boot, enable and kickstart launch agent"
+echo "⚙️ bootstrap launch agent to run Keyman Configuration"
 launchctl asuser "$USER_ID" launchctl bootstrap "gui/$USER_ID" "$TEMP_PLIST"
 launchctl asuser "$USER_ID" launchctl enable "$SERVICE_TARGET"
 launchctl asuser "$USER_ID" launchctl kickstart -k "$SERVICE_TARGET"
 
 # delete global plist immediately so it doesn't cause config to open on reboot
-rm -f "$GLOBAL_PLIST
+rm -f "$GLOBAL_PLIST"
 
 exit 0
