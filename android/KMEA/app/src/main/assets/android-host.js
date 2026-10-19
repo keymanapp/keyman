@@ -259,6 +259,11 @@ function enableSuggestions(model, suggestionType) {
   // the moment we actually register the new model.
   // Use console_debug
   console_debug('enableSuggestions(model, maySuggest='+suggestionType+')');
+  setBannerOptions(suggestionType);
+  registerModel(model);
+}
+
+function setBannerOptions(suggestionType) {
   const suggestionSettings = [
     // mayPredict, mayCorrect, mayAutoCorrect
     [false, false, false],  // 0 = SuggestionType.SUGGESTIONS_DISABLED
@@ -271,12 +276,6 @@ function enableSuggestions(model, suggestionType) {
   keyman.core.languageProcessor.mayPredict = t[0];
   keyman.core.languageProcessor.maySuggest = t[1];
   keyman.core.languageProcessor.mayAutoCorrect = t[2];
-
-  registerModel(model);
-}
-
-function setBannerOptions(mayPredict) {
-  keyman.core.languageProcessor.mayPredict = mayPredict;
 }
 
 function registerModel(model) {
