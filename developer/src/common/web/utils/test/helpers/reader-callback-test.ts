@@ -48,10 +48,6 @@ export interface CompilationCase {
    * optional callback with the section
    */
   callback?: (data: Buffer, source: LDMLKeyboardXMLSourceFile, subpath: string, callbacks: TestCompilerCallbacks ) => void;
-  /**
-   * if present, expect compiler to throw (use .* to match all)
-   */
-  throws?: RegExp;
 }
 
 
@@ -76,10 +72,6 @@ export interface TestDataCase {
    * optional callback with the section
    */
   callback?: (data: Buffer, source: LDMLKeyboardTestDataXMLSourceFile, subpath: string, callbacks: TestCompilerCallbacks ) => void;
-  /**
-   * if present, expect compiler to throw (use .* to match all)
-   */
-  throws?: RegExp;
 }
 
 /**
@@ -95,7 +87,6 @@ export function testReaderCases(cases : CompilationCase[]) {
   const callbacks = new TestCompilerCallbacks();
   for (const testcase of cases) {
     const expectFailure =  // if true, we expect this to fail
-      testcase.throws ||
       !!(testcase.errors) ||  // expect failure if test case contains any error messages
       !!(testcase.messageCodes?.filter(code => CompilerError.severity(code) >= CompilerErrorSeverity.Error)?.length); // only mark as failed if we have error or fatal messages
     const testHeading = expectFailure ? `should fail to load: ${testcase.subpath}`:
@@ -123,30 +114,27 @@ export function testReaderCases(cases : CompilationCase[]) {
       } else {
         assert.notOk(source, `loading ${testcase.subpath} (expected failure)`);
       }
-      // special case for an expected exception
-      if (testcase.throws) {
-        assert.throws(() => reader.validate(source), testcase.throws);
-      } else {
-        assert.doesNotThrow(() => reader.validate(source), `validating ${testcase.subpath}`);
-        if (testcase.messageCodes) {
-          assert.sameDeepMembers(callbacks.messages.map(message => message.code), testcase.messageCodes, 'expected messages to match');
-        } else {
-          // if we expected errors or warnings, show them
-          if (testcase.errors) {
-            assert.includeDeepMembers(callbacks.messages, testcase.errors, 'expected errors to be included');
-          }
-          if (testcase.warnings) {
-            assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
-          } else if (!expectFailure) {
-            // no warnings, so expect zero messages
-            assert.deepEqual(callbacks.messages, [], 'expected zero messages');
-          }
-        }
 
-        // run the user-supplied callback if any
-        if (testcase.callback) {
-          testcase.callback(data, source, testcase.subpath, callbacks);
+
+      assert.doesNotThrow(() => reader.validate(source), `validating ${testcase.subpath}`);
+      if (testcase.messageCodes) {
+        assert.sameDeepMembers(callbacks.messages.map(message => message.code), testcase.messageCodes, 'expected messages to match');
+      } else {
+        // if we expected errors or warnings, show them
+        if (testcase.errors) {
+          assert.includeDeepMembers(callbacks.messages, testcase.errors, 'expected errors to be included');
         }
+        if (testcase.warnings) {
+          assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
+        } else if (!expectFailure) {
+          // no warnings, so expect zero messages
+          assert.deepEqual(callbacks.messages, [], 'expected zero messages');
+        }
+      }
+
+      // run the user-supplied callback if any
+      if (testcase.callback) {
+        testcase.callback(data, source, testcase.subpath, callbacks);
       }
     });
   }
@@ -164,7 +152,7 @@ export function testTestdataReaderCases(cases : TestDataCase[]) {
   const callbacks = new TestCompilerCallbacks();
   const reader = new LDMLKeyboardXMLSourceFileReader(readerOptions, callbacks);
   for (const testcase of cases) {
-    const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
+    const expectFailure = !!(testcase.errors); // if true, we expect this to fail
     const testHeading = expectFailure ? `should fail to load: ${testcase.subpath}`:
                                         `should load: ${testcase.subpath}`;
     it(testHeading, function () {
