@@ -39,7 +39,7 @@
 #include "editsess.h"
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
 #include "../../../../common/windows/cpp/include/registry.h"
-#include "..\keymanmc\keymanmc.h"
+#include "../keymanmc/keymanmc.h"
 
 struct deadkeyinfo
 {
@@ -114,6 +114,11 @@ BOOL CKMTipTextService::_KeymanProcessKeystroke(ITfContext *pContext, WPARAM wPa
   // even if we generated it, so we can track Caps Lock state.
   if ((lParam & 0xFF0000) == 0xFF0000 &&
     wParam != VK_CAPITAL) {
+    return_SendDebugExit(FALSE);
+  }
+
+  if(!_InitKeymanIfNotAlreadyInitialized()) {
+    SendDebugMessage(L"Could not initialize keyman before keystroke");
     return_SendDebugExit(FALSE);
   }
 
@@ -315,15 +320,45 @@ CKeymanEditSession::KeymanIsTextSelected(const HRESULT hrGetSelection, const ULO
   return !isEmpty;
 }
 
+/**
+ * If Keyman has not yet been started, the TIP will not work correctly. This
+ * function attempts to reinitialize Keyman and the preserved keystroke
+ * bindings; this will fail fast if Keyman is still not running. This function
+ * does not start Keyman; it just initializes internal interfaces once
+ * keyman32.dll (or architecture variant) has been loaded.
+ *
+ * This internal interface initialization normally happens when the TIP is first
+ * activated by Windows, if Keyman has already been started earlier.
+ *
+ * @return TRUE if Keyman is initialized or has just been initialized.
+ */
+BOOL CKMTipTextService::_InitKeymanIfNotAlreadyInitialized() {
+  if(!_keymanInitialized) {
+    return TIPNotifyActivate(_activeGuidProfile == GUID_NULL ? NULL : &_activeGuidProfile);
+  }
+
+  return TRUE;
+}
+
 BOOL CKMTipTextService::TIPNotifyActivate(GUID *guidProfile)   // I3581   // I4274
 {
   SendDebugEntry();
 
-  //_UninitKeystrokeSink();   // I3590
+  _activeGuidProfile = guidProfile ? *guidProfile : GUID_NULL;
+
   if (!_InitKeystrokeSink()) {
     SendDebugMessage(L"_InitKeystrokeSink failed");
     return_SendDebugExit(FALSE);   // I3590
   }
+
+  // TODO: merge these two functions - pointless having separate entry points
+  if(!Keyman32Interface::TIPActivateEx(guidProfile != NULL)) {
+    _keymanInitialized = FALSE;
+    // TODO: _NotifyKeymanNotRunning();
+    return_SendDebugExit(FALSE);
+  }
+
+  _keymanInitialized = TRUE;
 
   if (!Keyman32Interface::TIPActivateKeyboard(guidProfile)) {
     SendDebugMessage(L"TIPActivateKeyboard failed");
@@ -337,22 +372,6 @@ BOOL CKMTipTextService::TIPNotifyActivate(GUID *guidProfile)   // I3581   // I42
   return_SendDebugExit(TRUE);
 }
 
-BOOL CKMTipTextService::_InitKeyman()   // I3590   // I4274
-{
-  SendDebugEntry();
-
-  if (!Keyman32Interface::TIPActivateEx(TRUE)) {
-    return_SendDebugExit(FALSE);
-  }
-
-  return_SendDebugExit(TRUE);
-}
-
-void CKMTipTextService::_UninitKeyman() {
-  SendDebugEntry();
-  Keyman32Interface::TIPActivateEx(FALSE);
-  SendDebugExit();
-}
 
 void CKMTipTextService::_TryAndStartKeyman() {
   if (!_tryAndStartKeyman)
