@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.311 beta 2026-10-20
+
+* fix(android): load sentry earlier so we capture script errors in keymanweb-webview.js (#16826)
+* chore(linux): Update debian changelog (#15812)
+
 ## 19.0.310 beta 2026-10-19
 
 * fix(developer): handle xml parser errors in LDML imports (#16808)
