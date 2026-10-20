@@ -832,6 +832,34 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
 }
 
 static void
+force_commit_oldest_queue_item(IBusKeymanEngine *keyman) {
+  g_assert(keyman != NULL);
+  IBusEngine* engine = (IBusEngine *)keyman;
+
+  if (keyman->commit_item <= keyman->commit_queue) {
+    return;
+  }
+
+  commit_queue_item *current_item = &keyman->commit_queue[0];
+  while (current_item->code_points_to_delete > 0) {
+    ibus_engine_forward_key_event(engine, KEYMAN_BACKSPACE_KEYSYM, KEYMAN_BACKSPACE, 0);
+    current_item->code_points_to_delete--;
+  }
+  if (current_item->char_buffer != NULL) {
+    commit_string(keyman, current_item->char_buffer);
+    g_free(current_item->char_buffer);
+    current_item->char_buffer = NULL;
+  }
+  if (current_item->emitting_keystroke) {
+    ibus_engine_forward_key_event(engine, current_item->keyval, current_item->keycode, current_item->state);
+  }
+  keyman->is_dirty = TRUE;
+  keyman->commit_item--;
+  memmove(keyman->commit_queue, &keyman->commit_queue[1], sizeof(commit_queue_item) * (MAX_QUEUE_SIZE - 1));
+  initialize_queue_items(keyman, MAX_QUEUE_SIZE - 1, 1);
+}
+
+static void
 finish_process_actions(IBusEngine *engine) {
   g_assert(engine != NULL);
   IBusKeymanEngine *keyman = (IBusKeymanEngine *)engine;
@@ -859,12 +887,11 @@ finish_process_actions(IBusEngine *engine) {
       g_message("%s: Ignoring modifier key", __FUNCTION__);
       break;
     default:
-      keyman->commit_item++;
-      if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE - 1]) {
-        g_error("Overflow of keyman commit_queue!");
-        // TODO: log to Sentry
-        keyman->commit_item--;
+      if (keyman->commit_item >= &keyman->commit_queue[MAX_QUEUE_SIZE - 1]) {
+        g_warning("Overflow of keyman commit_queue! Forcing commit of oldest queue item.");
+        force_commit_oldest_queue_item(keyman);
       }
+      keyman->commit_item++;
 
       // Forward a fake key event to get the correct order of events so that any backspace key we
       // generated will be processed before the character we're adding. We need to send a

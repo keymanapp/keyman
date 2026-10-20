@@ -108,7 +108,7 @@ KeymanSystemServiceClient::CallOrderedOutputSentinel() {
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
     KEYMAN_INTERFACE_NAME, "CallOrderedOutputSentinel", error, &msg, "");
   if (result < 0) {
-    g_error("%s: Failed to call method CallOrderedOutputSentinel: %s. %s. %s.",
+    g_warning("%s: Failed to call method CallOrderedOutputSentinel: %s. %s. %s.",
       __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
     sd_bus_error_free(error);
     return;

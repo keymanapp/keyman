@@ -33,7 +33,7 @@ public:
   int Loop();
   void SetCapsLockIndicatorOnDevices(uint32_t state);
   uint32_t GetCapsLockIndicatorOnDevices();
-  void CallOrderedOutputSentinel();
+  bool CallOrderedOutputSentinel();
 };
 
 #endif // __KEYMANSYSTEMSERVICE_H__
