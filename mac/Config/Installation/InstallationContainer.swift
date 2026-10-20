@@ -43,17 +43,13 @@ public class InstallationContainer : ObservableObject {
   fileprivate let inputMethodUtil: InputMethodUtil
   
   public init() {
-    var isLaunchedByInstaller = false
+    var isLaunchedByInstaller = InstallationContainer.isLaunchedByInstaller()
     
-    // Check to see if the app was launched directly from the installer's post-install script.
-    // If the installer launched the config app, then we must continue with the installation process.
-    if ProcessInfo.processInfo.arguments.contains(installationArgument) {
-      Logger.app.log("setting isLaunchedByInstaller to true")
+    // If the app was invoked by the installer, then it must clean up the launch agent.
+    // The launch agent is added by the installer and used to launch the config app,
+    // but we only want it to launch once and not launch again every time we boot.
+    if isLaunchedByInstaller {
       InstallationContainer.cleanUpLaunchAgent()
-      
-      isLaunchedByInstaller = true
-    } else {
-      Logger.app.debug("installation command line argument not specified")
     }
 
     let defaultsRepo: DefaultsRepository
@@ -93,6 +89,16 @@ public class InstallationContainer : ObservableObject {
       } else {
         self.startRepairCheck()
       }
+    }
+  }
+  
+  static func isLaunchedByInstaller() -> Bool {
+    if ProcessInfo.processInfo.arguments.contains(installationArgument) {
+      Logger.app.log("setting isLaunchedByInstaller to true")
+      return true
+    } else {
+      Logger.app.debug("installation command line argument not specified")
+      return false
     }
   }
   
