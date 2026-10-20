@@ -23,7 +23,7 @@ USER_HOME=$(eval echo "~$USER_NAME")
 echo "user home directory is: $USER_HOME"
 
 STAGED_APP="/Users/Shared/KeymanStaging/Keyman.app"
-GLOBAL_PLIST="/Library/LaunchAgents/com.keyman.deferred.plist"
+STAGED_PLIST="/Users/Shared/KeymanStaging/com.keyman.deferred.plist"
 TEMP_PLIST="/tmp/com.keyman.deferred.plist"
 SERVICE_TARGET="gui/${USER_ID}/com.keyman.deferred"
 
@@ -44,8 +44,10 @@ if [ -d "$STAGED_APP" ]; then
   chown -R "${USER_NAME}:staff" "${USER_IM_DIR}/Keyman.app"
 fi
 
-# clean up our temporary staging folder
-rm -rf /Users/Shared/KeymanStaging
+# copy the staged launch agent plist to a temporary location and change ownership to active user
+cp "$STAGED_PLIST" "$TEMP_PLIST"
+chown "${USER_NAME}:staff" "$TEMP_PLIST"
+chmod 644 "$TEMP_PLIST"
 
 # TODO: see issue #5318
 # the following few lines must be updated to extract the package name from the path
@@ -68,13 +70,8 @@ pkill -u "$USER_NAME" -x "Keyman Configuration"
 # also kill Keyman because Keyman Configuration will invoke it during install
 pkill -u "$USER_NAME" -x "Keyman"
 
-# 
-sleep 1
-
-# copy the global launch agent plist to a temporary location and change ownership to active user
-# this way, we can delete it after the config app runs
-cp "$GLOBAL_PLIST" "$TEMP_PLIST"
-chown "${USER_NAME}:staff" "$TEMP_PLIST"
+echo "clearing out stale launch agent registrations"
+launchctl asuser "$USER_ID" launchctl bootout "$SERVICE_TARGET" 2>/dev/null
 
 # use the temp plist to start the service
 echo "⚙️ bootstrap launch agent to run Keyman Configuration"
@@ -82,7 +79,10 @@ launchctl asuser "$USER_ID" launchctl bootstrap "gui/$USER_ID" "$TEMP_PLIST"
 launchctl asuser "$USER_ID" launchctl enable "$SERVICE_TARGET"
 launchctl asuser "$USER_ID" launchctl kickstart -k "$SERVICE_TARGET"
 
-# delete global plist immediately so it doesn't cause config to open on reboot
-rm -f "$GLOBAL_PLIST"
+
+# clean up our temporary staging folder
+rm -rf /Users/Shared/KeymanStaging
+# remove the temporary plist launch agent
+rm -f "$TEMP_PLIST"
 
 exit 0

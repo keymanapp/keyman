@@ -105,7 +105,6 @@ function create_package_from_staging() {
 
   # Create the internal system paths
   mkdir -p "${PKG_STAGE}/Applications"
-  mkdir -p "${PKG_STAGE}/Library/LaunchAgents"
   mkdir -p "${PKG_STAGE}/Users/Shared/KeymanStaging"
 
   # copy application files to package staging
@@ -113,7 +112,7 @@ function create_package_from_staging() {
   cp -R "${KEYMAN_BUILD_PATH}/KeymanExport/Keyman.app" "${PKG_STAGE}/Users/Shared/KeymanStaging/"
 
   # copy LaunchAgent configuration file to package staging
-  cp ./com.keyman.deferred.plist "${PKG_STAGE}/Library/LaunchAgents/"
+  cp ./com.keyman.deferred.plist "${PKG_STAGE}/Users/Shared/KeymanStaging/"
 
   mkdir -p "$OUTPUT_DIRECTORY_PATH"
 

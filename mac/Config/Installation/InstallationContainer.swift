@@ -43,15 +43,8 @@ public class InstallationContainer : ObservableObject {
   fileprivate let inputMethodUtil: InputMethodUtil
   
   public init() {
-    var isLaunchedByInstaller = InstallationContainer.isLaunchedByInstaller()
+    let isLaunchedByInstaller = InstallationContainer.isLaunchedByInstaller()
     
-    // If the app was invoked by the installer, then it must clean up the launch agent.
-    // The launch agent is added by the installer and used to launch the config app,
-    // but we only want it to launch once and not launch again every time we boot.
-    if isLaunchedByInstaller {
-      InstallationContainer.cleanUpLaunchAgent()
-    }
-
     let defaultsRepo: DefaultsRepository
     // create the settings repository, gaining access to the app group UserDefaults
     do {
@@ -99,25 +92,6 @@ public class InstallationContainer : ObservableObject {
     } else {
       Logger.app.debug("installation command line argument not specified")
       return false
-    }
-  }
-  
-  /**
-   * If we were invoked with the `installation` argument due to the Keyman LaunchAgent
-   * added during installation, then remove the LaunchAgent so that it only runs once at time of installation
-   * and does not automatically run again after a reboot.
-   */
-  static func cleanUpLaunchAgent() {
-    let agentPath = "/tmp/com.keyman.deferred.plist"
-    let fileManager = FileManager.default
-    
-    if fileManager.fileExists(atPath: agentPath) {
-      do {
-        try fileManager.removeItem(atPath: agentPath)
-        Logger.app.info("successfully removed the Keyman LaunchAgent plist file from disk")
-      } catch {
-        Logger.app.error("error: could not remove Keyman LaunchAgent plist: \(error.localizedDescription, privacy: .public)")
-     }
     }
   }
   
