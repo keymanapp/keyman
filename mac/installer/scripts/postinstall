@@ -63,10 +63,13 @@ rm -rf /Users/Shared/KeymanStaging
 # first kill any old Keyman Configuration processes that are running
 # they would not receive the command line argument when we passed one
 echo "sending kill command"
-pkill -u "$USER_NAME" -if "Keyman Configuration"
+pkill -u "$USER_NAME" -x "Keyman Configuration"
 
 # also kill Keyman because Keyman Configuration will invoke it during install
-pkill -u "$USER_NAME" -if "Keyman"
+pkill -u "$USER_NAME" -x "Keyman"
+
+# 
+sleep 1
 
 # copy the global launch agent plist to a temporary location and change ownership to active user
 # this way, we can delete it after the config app runs

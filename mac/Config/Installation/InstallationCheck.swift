@@ -384,12 +384,7 @@ public class InstallationCheck {
    */
   func createNewInstallationState(with neededTasks: Set<InstallationTask>) -> InstallationState {
     Logger.app.debug("completeNewInstallationEvaluation: created new installation state")
-    var fullTaskList = neededTasks
-    
-    // add prepareNewInstall InstallationTask
-//    fullTaskList.insert(InstallationTask.createNewInstallationTask(type: .prepareNewInstall))
-    
-    let installationState = InstallationState(version: self.inputMethodVersion, tasks: fullTaskList)
+    let installationState = InstallationState(version: self.inputMethodVersion, tasks: neededTasks)
     return installationState
   }
 
