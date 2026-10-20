@@ -17,7 +17,7 @@ function isOnAndroid() {
 const loc = document.location;
 // config.testFile generally starts with a '/', with the path resembling the actual full local
 // filesystem for the drive.
-const domain = `${loc.protocol}/${loc.host}`
+const domain = `${loc.protocol}//${loc.host}`;
 
 async function fetchRecording(jsonFilename: string): Promise<any> {
   const jsonResponse = await fetch(new URL(`${domain}/resources/json/${jsonFilename}.json`));
