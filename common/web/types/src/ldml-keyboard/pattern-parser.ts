@@ -427,7 +427,7 @@ export class VariableParser {
    * `$[1:variable]`
    * This regex matches the whole string.
    */
-  public static readonly MAPPED_SET_REFERENCE = /^\$\[1:([0-9A-Za-z_]{1,32})\]$/;
+  public static readonly MAPPED_SET_REFERENCE = /^\$\[[1-9]:([0-9A-Za-z_]{1,32})\]$/;
 
   /**
    * parse a string into references
