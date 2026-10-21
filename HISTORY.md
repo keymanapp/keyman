@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 20.0.7 alpha 2026-10-21
+
+* chore(web): add Keyman header to test files (#16857)
+
 ## 20.0.6 alpha 2026-10-19
 
 * docs(common): move legacy history (#16799)
