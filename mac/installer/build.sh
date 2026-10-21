@@ -56,8 +56,7 @@ function do_clean() {
   rm -rf "${KEYMAN_BUILD_PATH}/Keyman.xcarchive"
   rm -rf "${KEYMAN_BUILD_PATH}/ConfigExport"
   rm -rf "${KEYMAN_BUILD_PATH}/KeymanExport"
-  rm -rf "${KEYMAN_BUILD_PATH}/keyman-config.pkg"
-  rm -rf "${KEYMAN_BUILD_PATH}/keyman-input-method.pkg"
+  rm -rf "${KEYMAN_BUILD_PATH}/keyman-component.pkg"
   rm -rf "${KEYMAN_BUILD_PATH}/upload/"
   rm -rf "$PKG_STAGE"
 }
@@ -119,6 +118,7 @@ function create_package_from_staging() {
   builder_echo "calling pkgbuild"
 
   pkgbuild --root "$PKG_STAGE" \
+      --component-plist ./"KeymanConfigComponent.plist" \
       --fakeroot \
       --scripts ./scripts \
       --install-location / \
