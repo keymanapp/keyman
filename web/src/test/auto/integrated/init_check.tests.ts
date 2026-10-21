@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 // A simple "does device detection work properly" unit test.
 // We'll let things break after this reports, since this will likely signal a LOT of other failures.
 import { assert } from 'chai';

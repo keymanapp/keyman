@@ -1,4 +1,6 @@
 /*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
  * Unit tests for quote behaviors.
  */
 
