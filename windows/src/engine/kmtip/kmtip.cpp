@@ -86,6 +86,9 @@ CKMTipTextService::CKMTipTextService()
     _cPreservedKeyCount = 0;
     _dwDeepIntegration = 0;
 
+    _activeGuidProfile = GUID_NULL;
+    _keymanInitialized = FALSE;
+
     RegistryReadOnlyW reg(HKEY_CURRENT_USER);
     _tryAndStartKeyman = reg.OpenKeyReadOnly(REGSZ_KeymanEngineDebug_CU) && reg.ValueExists(REGSZ_Flag_UseAutoStartTask) && reg.ReadInteger(REGSZ_Flag_UseAutoStartTask) != 0;
 
