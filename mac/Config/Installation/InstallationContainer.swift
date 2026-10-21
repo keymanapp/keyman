@@ -28,6 +28,7 @@ private let installationArgument = "installation"
 
 @MainActor // run on the main actor since data is published directly to the UI
 public class InstallationContainer : ObservableObject {
+  // used to determine whether the installation window should be displayed
   @Published var installInProgress: Bool = false
   
   public var installationPhase: InstallationPhase {
@@ -67,7 +68,11 @@ public class InstallationContainer : ObservableObject {
     }
 
     self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil, isLaunchedByInstaller: isLaunchedByInstaller)
-    self.installInProgress = isLaunchedByInstaller || (self.installationCheck.installationPhase == .installationInProgress || self.installationCheck.installationPhase == .newInstallation)
+    
+    let installationPhaseAtInitTime = self.installationCheck.installationPhase
+    Logger.app.log("installation phase at init: \(installationPhaseAtInitTime.rawValue)")
+    
+    self.installInProgress = self.installationCheck.installationPhase.isActiveInstallation
 
     // If we can now confirm that the user restarted (the final task), then the installation
     // will be complete and there is no need to evaluate the state.
@@ -77,9 +82,9 @@ public class InstallationContainer : ObservableObject {
     } else {
       self.registerObservers()
 
-      if installInProgress {
+      if isLaunchedByInstaller {
         self.executeNewInstall()
-      } else {
+      } else if self.installationCheck.installationPhase == .installationComplete {
         self.startRepairCheck()
       }
     }
@@ -165,6 +170,8 @@ public class InstallationContainer : ObservableObject {
    */
   @objc func handleStartInstallationRepair(_ notification: Notification) {
     Logger.app.debug("handleStartInstallationRepair received")
+    
+    self.installInProgress = true
     
     // notify observers
     NotificationCenter.default.post(name: .installationRepairStarted, object: nil, userInfo: nil)
@@ -394,7 +401,7 @@ public class InstallationContainer : ObservableObject {
     }
     
     // whenever a task is completed, update the installInProgress flag
-    self.installInProgress = self.installationCheck.installationPhase == .installationInProgress || self.installationCheck.installationPhase == .newInstallation
+    self.installInProgress = self.installationCheck.installationPhase.isActiveInstallation
   }
 
   /**

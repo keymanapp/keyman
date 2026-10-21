@@ -27,17 +27,23 @@ public enum InstallationPhase: String {
   case inputMethodMissing
   case inputMethodOutdated
   case evaluatingInstallation
-  case newInstallation
   case installationInProgress
   case installationComplete
-  case installationRepairNeeded
   
   // indicates whether the installation contains tasks to complete installation
   public var hasTasks: Bool {
     switch self {
-    case .newInstallation,
-        .installationInProgress,
-        .installationRepairNeeded:
+    case .installationInProgress:
+      return true
+    default:
+      return false
+    }
+  }
+  
+  public var isActiveInstallation: Bool {
+    switch self {
+    case .evaluatingInstallation,
+        .installationInProgress:
       return true
     default:
       return false
@@ -46,9 +52,9 @@ public enum InstallationPhase: String {
 }
 
 enum InstallationStateCondition: String {
-  case stale
-  case new
+  case undefined
   case inProgress
+  case complete
 }
 
 @MainActor
@@ -79,21 +85,10 @@ public class InstallationCheck {
     if let state = self.installationState {
       if state.isComplete {
         return .installationComplete
-      } else {
-        if state.isNew {
-          return .newInstallation
-        } else if state.isRepair {
-          return .installationRepairNeeded
-        }
-        
-        return .installationInProgress
       }
     }
     
-    // In case installationState (optional) == nil --
-    // though we will never reach this case because if it is nil
-    // we return inputMethodMissing or inputMethodOutdated
-    return .newInstallation
+    return .installationInProgress
   }
   
   public init(defaultsRepo: DefaultsRepo, inputMethodUtil: InputMethodUtil, isLaunchedByInstaller: Bool) {
@@ -116,24 +111,28 @@ public class InstallationCheck {
     self.isInputMethodCurrent = keymanIsCurrent
     self.inputMethodVersion = keymanVersion
     
-    if isLaunchedByInstaller {
-      clearInstallationState()
-    }
     let installState = InstallationCheck.readInstallationState(from: defaultsRepo)
 
     if (keymanExists && keymanIsCurrent) {
-      // the input method is valid, examine the installation state recorded on disk
-      let installationStateCondition = InstallationCheck.evaluateInstallationState(state: installState, for: keymanVersion);
-      Logger.app.log("installationStateCondition: \(installationStateCondition.rawValue, privacy: .public)")
+      if isLaunchedByInstaller {
+        // this is a new installation: clear the InstallationState and evaluate before creating a new one
+        clearInstallationState()
+        self.isEvaluatingNewInstallation = true
+      } else {
+        // the input method is valid, examine the installation state recorded on disk
+        let installationStateCondition = InstallationCheck.evaluateInstallationState(state: installState, for: keymanVersion);
+        Logger.app.log("installationStateCondition: \(installationStateCondition.rawValue, privacy: .public)")
 
-      switch installationStateCondition {
-      case .inProgress:
-        self.installationState = installState     // resume with the existing installation
-      case .new:
-        self.isEvaluatingNewInstallation = true   // evaluate before creating a new InstallationState
-      case .stale:
-        self.clearInstallationState()             // delete the existing installation state from the UserDefaults
-        self.isEvaluatingNewInstallation = true   // evaluate before creating a new InstallationState
+        switch installationStateCondition {
+        case .inProgress:
+          Logger.app.debug("InstallationCheck: continuing with existing installation")
+          self.installationState = installState     // resume with the existing installation
+        case .complete:
+          self.installationState = installState     // use the existing installation for now
+          Logger.app.debug("InstallationCheck: installation is complete, ready to check for repairs")
+        case .undefined:
+          Logger.app.debug("InstallationCheck: no state on disk or state is invalid")
+        }
       }
     }
     
@@ -169,32 +168,29 @@ public class InstallationCheck {
   
   /**
    * Check the condition of the InstallationState as recorded in the UserDefaults.
-   * Determine whether it is `stale` and should be deleted
-   * (which then is treated as a new installation) or
-   * is `inProgress` and should be loaded and used, or
-   * is `new`. All new installations are re-evaluated to determine
-   * what tasks must be executed to complete the installation.
+   * Determine whether the state is `undefined`, `inProgress` or `complete`
+   *
+   * If no state is persisted, a new installation may be about to begin.
+   * In this case, as far as the UserDefaults are concerned, the installation is determined
+   * to be `undefined`. The current state is not needed and will be created though a new
+   * installation may have just been triggered by a command line argument passed to the
+   * config app from the installer.
    */
   static func evaluateInstallationState(state: InstallationState?, for version: String) -> InstallationStateCondition {
- 
-    // If the installationState does not exist, then this is a new installation.
-    // The installationState will be created when evaluation is complete.
-    guard state != nil else { return .new }
+    guard let installationState = state else { return .undefined }
     
-    var condition = InstallationStateCondition.inProgress
+    var condition = InstallationStateCondition.undefined
     
-    if let installState = state {
-      // If the installationState remains from a different install, mark it as stale.
-      // It will be deleted and we will evaluate for a new installation.
-      if installState.keymanVersion != version {
-        condition = .stale
-      } else if installState.isNew {
-        condition = .new
-      } else {
-        // If we're already in progress or completed or doing a repair, pick up where we left off
-        // Note that a completed installation will be checked for repairs
-        condition = .inProgress
-      }
+    // If the installationState remains from a different install, mark it as inactive.
+    // This should not occur, unless someone has manually changed the state.
+    if installationState.keymanVersion != version {
+      condition = .undefined
+    } else if installationState.isComplete {
+      condition = .complete
+      // A completed installation will be checked for repairs
+    } else if installationState.isInProgress {
+      // If we're already in progress or completed or doing a repair, pick up where we left off
+      condition = .inProgress
     }
 
     return condition
@@ -224,7 +220,7 @@ public class InstallationCheck {
   }
 
   /**
-   * For comopleted installations, called from init to evaluate whether repairs are needed.
+   * For completed installations, called from init to evaluate whether repairs are needed.
    * When the notification from the input method is received and the evaluation is done,
    * the installation can move out of the `evaluatingInstallation` phase
    */
