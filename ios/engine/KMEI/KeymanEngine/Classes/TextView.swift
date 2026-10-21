@@ -10,6 +10,8 @@ import AudioToolbox
 import UIKit
 import os.log
 
+let blankKeyboardWorkaroundDelay = 0.5
+
 public class TextView: UITextView, KeymanResponder {
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
@@ -22,6 +24,10 @@ public class TextView: UITextView, KeymanResponder {
   private var shouldUpdateKMText = false
 
   private var keyboardChangedObserver: NotificationObserver?
+
+  private var blankWorkaroundActive: Bool = false
+  private var workaroundWorkItem: DispatchWorkItem? = nil
+  private var hiddenDummyView: UITextView!
 
   // MARK: - Object Admin
   public convenience init() {
@@ -48,12 +54,62 @@ public class TextView: UITextView, KeymanResponder {
 
     inputAssistantItem.leadingBarButtonGroups = []
     inputAssistantItem.trailingBarButtonGroups = []
-    
+
     self.inputView = Manager.shared.inputViewController.view
 
     keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
                                                                      observer: self,
                                                                      function: TextView.keyboardChanged)
+    hiddenDummyView = UITextView(frame: self.frame)
+    hiddenDummyView.translatesAutoresizingMaskIntoConstraints = false
+    hiddenDummyView.backgroundColor = UIColor(named: "InputBackground")!
+    hiddenDummyView.isScrollEnabled = true
+    hiddenDummyView.isUserInteractionEnabled = true
+  }
+
+  public override func didMoveToWindow() {
+    if self.superview != nil {
+      if hiddenDummyView.superview == nil {
+        self.superview?.addSubview(hiddenDummyView)
+        self.superview?.sendSubviewToBack(hiddenDummyView)
+      }
+    } else {
+      hiddenDummyView.removeFromSuperview()
+    }
+  }
+
+  public func doBlankKeyboardWorkaround() -> Bool {
+    if #available(iOS 27.0, *) {
+      hiddenDummyView.becomeFirstResponder()
+
+      let workItem = DispatchWorkItem {
+        if self.isFirstResponder {
+          _ = self.doBlankKeyboardWorkaround()
+          return
+        }
+
+        _ = self.becomeFirstResponder()
+        if self.hiddenDummyView.superview != nil && self.superview == nil {
+          self.hiddenDummyView.removeFromSuperview()
+        }
+      }
+
+      workaroundWorkItem = workItem
+      DispatchQueue.main.asyncAfter(deadline: .now() + blankKeyboardWorkaroundDelay, execute: workItem)
+
+      return true
+    }
+    return false
+  }
+
+  fileprivate func cancelBlankWorkaround() {
+    workaroundWorkItem?.cancel()
+    workaroundWorkItem = nil
+    blankWorkaroundActive = false
+
+    if hiddenDummyView.superview != nil && self.superview == nil {
+      hiddenDummyView.removeFromSuperview()
+    }
   }
 
   // MARK: - Class Overrides
@@ -171,12 +227,14 @@ extension KeymanResponder where Self: TextView {
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   public func dismissKeyboard() {
+    self.cancelBlankWorkaround()
+
     let message = "TextView: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
     resignFirstResponder()
     Manager.shared.inputViewController.endEditing(true)
   }
-  
+
   public func summonKeyboard() {
     becomeFirstResponder()
   }
@@ -200,6 +258,16 @@ extension TextView: UITextViewDelegate {
   }
 
   public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+    if !blankWorkaroundActive {
+      blankWorkaroundActive = doBlankKeyboardWorkaround()
+
+      if blankWorkaroundActive {
+        return true
+      }
+    } else {
+      blankWorkaroundActive = false
+    }
+
     let leftToRightMark = "\u{200e}"
     let rightToLeftMark = "\u{200f}" // or "\u{202e}"
     let textWD = baseWritingDirection(for: beginningOfDocument, in: .forward)
