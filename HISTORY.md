@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.312 beta 2026-10-21
+
+* change(ios): select suggestion mode based on input context (#16806)
+* fix(ios): prevent clear-text crash under Liquid Glass (#16814)
+
 ## 19.0.311 beta 2026-10-20
 
 * fix(android): load sentry earlier so we capture script errors in keymanweb-webview.js (#16826)
