@@ -349,7 +349,6 @@ public class InputMethodUtil {
     }
 
     let openConfig = NSWorkspace.OpenConfiguration()
-    openConfig.environment = getSanitizedEnvironment()
     if !argument.isEmpty {
       openConfig.arguments = [argument]
     }
@@ -370,56 +369,6 @@ public class InputMethodUtil {
     }
   }
   
-  /**
-   * When this app is launched by the installer, it is possible to inherit context from the installer sandbox.
-   * During testing, this seemed to occur randomly less than 5% of the time, and it would cause the NSWorkspace.openApplication API to fail.
-   * As a precaution, check for any remnants of the installer environment and remove them.
-   */
-  func getSanitizedEnvironment() -> [String: String] {
-    // clone the environment
-    let originalEnvironment = ProcessInfo.processInfo.environment
-    var cleanEnvironment = originalEnvironment
-    
-    // keys used by the macOS installer -- must be removed
-    let installerKeys = ["INSTALLER_PAYLOAD_DIR",
-                         "INSTALL_PKG_SESSION_ID",
-                         "LAUNCHCTL_ENV_REEXEC",
-                         "PACKAGE_PATH",
-                         "SHARED_INSTALLER_TEMP",
-                         "APPLE_PKGKIT_ESCALATING_ROOT",
-                         "SCRIPT_NAME",
-                         "PACKAGE_PATH",
-                         "DST_ROOT",
-                         "DST_VOLUME",
-                         "_"
-    ]
-    
-    // check if any installer keys exist in the current environment
-    let foundInstallerKeys = installerKeys.filter { originalEnvironment.keys.contains($0) }
-    
-    if !foundInstallerKeys.isEmpty {
-      Logger.setup.warning("⚠️ Warning: inherited installer sandbox context detected. Keys found: \(foundInstallerKeys.joined(separator: ", ")). Cleaning environment to prevent launchd Error 162 (job spawn failed).")
- 
-      Logger.setup.debug("environment: \(originalEnvironment, privacy: .public)")
-
-      // remove the problematic keys
-      for key in foundInstallerKeys {
-        Logger.setup.debug("removing: \(key, privacy: .public) with value: \(originalEnvironment[key] ?? "<empty>", privacy: .public)")
-        cleanEnvironment.removeValue(forKey: key)
-      }
-      
-      let userName = NSUserName()
-      
-      // reset these to something not installer related
-      cleanEnvironment["TMPDIR"] = NSTemporaryDirectory()
-      cleanEnvironment["PWD"] = "/Users/\(userName)"
-    } else {
-      Logger.setup.info("✅ Environment check passed: No installer sandbox context detected.")
-    }
-    
-    return cleanEnvironment
-  }
-
   /**
    * Calls Keyman input method to check whether it has accessibility permission granted.
    * Receives response as distributed notification named `accessibilityStateResponse`

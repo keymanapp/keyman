@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Keyman is copyright (C) SIL Global. MIT License.
 
+# Accomplishes some important tasks after the main installation
+# - moves the Keyman input method from the staging directory to the User's Input Methods folder
+# - starts the configuration app by adding a Launch Agent from a temporary location
+# - the Launch Agent is removed immediately after booting so that it does not run again
+# - at startup and the user is not notified about it by the system
+
 # input parameters to this script
 # $1 - full path of installer package
 # $2 - path to the target installation folder
@@ -78,7 +84,6 @@ echo "⚙️ bootstrap launch agent to run Keyman Configuration"
 launchctl asuser "$USER_ID" launchctl bootstrap "gui/$USER_ID" "$TEMP_PLIST"
 launchctl asuser "$USER_ID" launchctl enable "$SERVICE_TARGET"
 launchctl asuser "$USER_ID" launchctl kickstart -k "$SERVICE_TARGET"
-
 
 # clean up our temporary staging folder
 rm -rf /Users/Shared/KeymanStaging
