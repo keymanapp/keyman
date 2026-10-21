@@ -38,7 +38,11 @@ USER_IM_DIR="$USER_HOME/Library/Input Methods"
 echo "input methods directory is: $USER_IM_DIR"
 
 # create the user's Input Methods directory if it doesn't exist
-mkdir -p "$USER_IM_DIR"
+if [ ! -d "$USER_IM_DIR" ]; then
+    mkdir -p "$USER_IM_DIR"
+    # Set the user as owner of the Input Methods directory
+    chown "$USER_NAME":staff "$USER_IM_DIR"
+fi
 
 # install the input method 
 echo "move Keyman.app to Input Methods directory"
@@ -71,7 +75,7 @@ chmod 644 "$TEMP_PLIST"
 # first kill any old Keyman Configuration processes that are running
 # they would not receive the command line argument when we passed one
 echo "sending kill command"
-pkill -u "$USER_NAME" -x "Keyman Configuration"
+pkill -u "$USER_NAME" -if '/Keyman Configuration.app/Contents/MacOS/Keyman Configuration'
 
 # also kill Keyman because Keyman Configuration will invoke it during install
 pkill -u "$USER_NAME" -x "Keyman"

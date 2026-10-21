@@ -30,7 +30,9 @@ private let installationArgument = "installation"
 public class InstallationContainer : ObservableObject {
   // used to determine whether the installation window should be displayed
   @Published var installInProgress: Bool = false
-  
+  // used to determine whether the installation window should be displayed with error
+  @Published var invalidInputMethod: Bool = false
+
   public var installationPhase: InstallationPhase {
     return self.installationCheck.installationPhase
   }
@@ -69,10 +71,15 @@ public class InstallationContainer : ObservableObject {
 
     self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil, isLaunchedByInstaller: isLaunchedByInstaller)
     
-    let installationPhaseAtInitTime = self.installationCheck.installationPhase
-    Logger.app.log("installation phase at init: \(installationPhaseAtInitTime.rawValue)")
+    let installationPhase = self.installationCheck.installationPhase
+    Logger.app.log("installation phase at init: \(installationPhase.rawValue)")
     
-    self.installInProgress = self.installationCheck.installationPhase.isActiveInstallation
+    if (installationPhase == .inputMethodMissing || installationPhase == .inputMethodOutdated) {
+      self.invalidInputMethod = true
+    }
+    self.installInProgress = installationPhase.isActiveInstallation
+
+    self.registerObservers()
 
     // If we can now confirm that the user restarted (the final task), then the installation
     // will be complete and there is no need to evaluate the state.
@@ -80,8 +87,6 @@ public class InstallationContainer : ObservableObject {
     if self.confirmRestartRequired() {
       self.confirmUserRestarted()
     } else {
-      self.registerObservers()
-
       if isLaunchedByInstaller {
         self.executeNewInstall()
       } else if self.installationCheck.installationPhase == .installationComplete {

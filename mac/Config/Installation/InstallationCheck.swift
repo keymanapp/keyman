@@ -86,6 +86,12 @@ public class InstallationCheck {
       if state.isComplete {
         return .installationComplete
       }
+    } else {
+      // If we have no installation state, then consider it complete.
+      // This will trigger a repair check.
+      // We also have no state in the case of a brand new install,
+      // but that would return as .isEvaluatingNewInstallation above.
+      return .installationComplete
     }
     
     return .installationInProgress

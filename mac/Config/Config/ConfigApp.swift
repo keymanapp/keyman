@@ -72,8 +72,8 @@ struct ConfigApp: App {
           .frame(width: 0, height: 0)
           .onAppear {
             // this evaluates to true if an installation is still in progress
-            if installation.installInProgress {
-              Logger.app.log("installation in progress, opening Installation window")
+            if installation.installInProgress || installation.invalidInputMethod {
+              Logger.app.log("installation attention needed, opening Installation window")
               openWindow(id: "install")
               NSApp.activate(ignoringOtherApps: true)
             }
