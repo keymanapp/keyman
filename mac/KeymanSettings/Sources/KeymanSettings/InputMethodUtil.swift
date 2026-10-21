@@ -42,7 +42,8 @@ public class InputMethodUtil {
   let kMigrateCommand = "migrate"
   let kAccessCommand = "access"
   let kCheckCommand = "check"
-  
+  let kMigrateAndCheckCommand = "migrateandcheck"
+
   public init() throws {
     try self.pathUtil = KeymanPaths()
   }
@@ -52,11 +53,13 @@ public class InputMethodUtil {
    */
   public func keymanInputMethodExists()  -> Bool {
     guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
-      Logger.setup.log("Keyman input method not found, failed to create input method url")
+      Logger.setup.error("Keyman input method not found, failed to create input method url")
       return false
     }
     
-    return FileManager.default.fileExists(atPath: inputMethodUrl.path(percentEncoded: false))
+    let keymanExists = FileManager.default.fileExists(atPath: inputMethodUrl.path(percentEncoded: false))
+    Logger.setup.debug("Keyman input method exists at \(inputMethodUrl.path(percentEncoded: false), privacy: .public):  \(keymanExists)")
+    return keymanExists
   }
   
   /**
@@ -249,7 +252,30 @@ public class InputMethodUtil {
       try self.launchKeymanInputMethodAsSeparateProcess(argument: kCheckCommand)
     }
   }
-  
+
+  /**
+   * Send a distributed notification to the input method to do two things:
+   * 1. migrate data if necessary
+   * 2. check the state of Accessibility permission
+   * If Keyman is running then kill it and invoke as separate process.
+   * However, Keyman should never be running because we only migrate data
+   * when Keyman Config is invoked from the installer.
+   */
+  func invokeKeymanInputMethodCheckAccessWithMigration() throws {
+    Logger.setup.info("invokeKeymanInputMethodCheckAccessWithMigration()")
+    LogUtil.infoBreadcrumb("invokeKeymanInputMethodCheckAccessWithMigration()", category: .setup)
+    
+    if self.isKeymanInputMethodRunning() {
+      // kill Keyman so that it refreshes its accessibility state
+      _ = self.killKeymanInputMethod()
+      Logger.setup.debug("invokeKeymanInputMethodCheckAccessWithMigration(), killed Keyman")
+    }
+    
+    // Keyman is not running, launch to check accessibility and migrate data with specific command line argument
+    Logger.setup.debug("invokeKeymanInputMethodCheckAccessWithMigration(), calling launchKeymanInputMethodAsSeparateProcess()")
+    try self.launchKeymanInputMethodAsSeparateProcess(argument: kMigrateAndCheckCommand)
+  }
+
   /**
    * Send a distributed notification to check the state of Accessibility permission.
    */
@@ -275,12 +301,19 @@ public class InputMethodUtil {
   }
 
   /**
+   * build the URL to the executable inside the Keyman Input Method
+   */
+  private func buildKeymanBinaryUrl() -> URL? {
+    return self.pathUtil.buildInputMethodBinaryUrl(fileName: self.keymanInputMethodApplicationName)
+  }
+
+  /**
    * run Keyman as a subprocess with the specifed argument and return the result
    */
   func invokeKeymanInputMethodAsSubProcess(argument: String) -> Int {
     var result = -1
     let process = Process()
-    if let executableUrl = self.pathUtil.buildInputMethodExecutableUrl(fileName: self.keymanInputMethodApplicationName) {
+    if let executableUrl = self.buildKeymanBinaryUrl() {
       process.executableURL = executableUrl
       Logger.setup.info("invoking Keyman at: \(String(describing: process.executableURL?.cleanUrlPath()), privacy: .public)")
       LogUtil.infoBreadcrumb("invoking Keyman at: \(String(describing: process.executableURL?.cleanUrlPath()))", category: .setup)
@@ -305,24 +338,33 @@ public class InputMethodUtil {
   }
   
   /**
-   * launches the Keyman input method as an independent process with the specifed argument and return the result
+   * launches the Keyman input method as an independent process with the specifed argument
    */
   func launchKeymanInputMethodAsSeparateProcess(argument: String = "") throws {
+
+    guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
+      Logger.setup.error("launchKeymanInputMethodIndependently, failed to create input method url")
+      LogUtil.errorBreadcrumb("launchKeymanInputMethodIndependently, failed to create input method url", category: .setup)
+      throw KeymanInvocationError.inputMethodNotFound
+    }
+
     let openConfig = NSWorkspace.OpenConfiguration()
     if !argument.isEmpty {
       openConfig.arguments = [argument]
     }
+    openConfig.addsToRecentItems = false
+    openConfig.activates = false
+    // force a standalone instance in case Keyman is already active
+    openConfig.createsNewApplicationInstance = true
+    // do not use another binary if this one cannot be launched
+    openConfig.allowsRunningApplicationSubstitution = false
     
-    guard let inputMethodUrl = pathUtil.buildInputMethodPathUrl(fileName: self.keymanInputMethodApplicationName) else {
-      Logger.setup.error("launchKeymanInputMethodAsSeparateProcess, failed to create input method url")
-      LogUtil.errorBreadcrumb("launchKeymanInputMethodAsSeparateProcess, failed to create input method url", category: .setup)
-      throw KeymanInvocationError.inputMethodNotFound
-    }
-    
-    NSWorkspace.shared.openApplication(at: inputMethodUrl, configuration: openConfig) { (app, error) in
+    NSWorkspace.shared.openApplication(at: inputMethodUrl, configuration: openConfig) { (runningApp, error) in
       if let error = error {
         Logger.setup.error("Could not launch Keyman input method at \(inputMethodUrl.cleanUrlPath()), due to error: \(error as NSError, privacy: .public)")
         LogUtil.errorBreadcrumb("Could not launch Keyman input method at \(inputMethodUrl.cleanUrlPath()), due to error: \(error as NSError)", category: .setup)
+      } else {
+        Logger.setup.debug("Keyman launched as separate process with argument: \(argument, privacy: .public)")
       }
     }
   }
@@ -344,9 +386,31 @@ public class InputMethodUtil {
       .minute(.twoDigits)
       .second(.twoDigits)
       .secondFraction(.fractional(3))
-    Logger.setup.log("doAsyncAccessibilityCheck, listening across process boundaries, time: \(Date().formatted(timeStyle))")
+    Logger.setup.log("doAsyncAccessibilityCheck, listening across process boundaries, time: \(Date().formatted(timeStyle), privacy: .public)")
   }
   
+  /**
+   * Only including for a new installation invoked from the installer.
+   * Calls Keyman input method to check whether it has accessibility permission granted
+   * while also instructing the input method to migrate data.
+   * Receives response as distributed notification named `accessibilityStateResponse`
+   */
+  public func doAsyncAccessibilityCheckWithMigration() {
+    do {
+      try self.invokeKeymanInputMethodCheckAccessWithMigration()
+    } catch {
+      Logger.setup.error("invoking Keyman failed: \(error as NSError, privacy: .public)")
+      LogUtil.errorBreadcrumb("invoking Keyman failed: \(error as NSError)", category: .setup)
+    }
+    
+    let timeStyle = Date.FormatStyle()
+      .hour(.twoDigits(amPM: Date.FormatStyle.Symbol.Hour.AMPMStyle.abbreviated))
+      .minute(.twoDigits)
+      .second(.twoDigits)
+      .secondFraction(.fractional(3))
+    Logger.setup.log("doAsyncAccessibilityCheckWithMigration, listening across process boundaries, time: \(Date().formatted(timeStyle), privacy: .public)")
+  }
+
   /**
    * Kill the application with the specified bundle Id
    * This is only permitted when running outside sandbox

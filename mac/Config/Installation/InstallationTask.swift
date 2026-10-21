@@ -15,6 +15,7 @@ public enum InstallationTaskType: String {
   case prepareNewInstall = "prepareNewInstall"  // only added for new installs
   case prepareNewRepair = "prepareRepair"       // only added for repairs
   case enableInputMethod = "enableInputMethod"  // triggers register and enable
+  case confirmEnabled = "confirmEnabled"          // confirms that Input Method was enabled
   case requestAccess = "requestAccess"          // causes prompt to user to grant Accessibility
   case confirmAccess = "confirmAccess"          // confirms that Accessibility was granted
   case requestRestart = "requestRestart"        // prompts user to restart machine

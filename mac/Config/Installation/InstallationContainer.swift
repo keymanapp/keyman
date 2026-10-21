@@ -9,6 +9,7 @@
 import SwiftUI
 import Combine
 import KeymanSettings
+import Carbon
 import OSLog
 
 // in-app notifications sent
@@ -20,10 +21,18 @@ public extension Notification.Name {
   static let accessibilityNotGranted = Notification.Name("installation.accessibility.not.granted")
   static let checkAccessibilitySuccess = Notification.Name("accessibility.success")
   static let checkAccessibilityFailure = Notification.Name("accessibility.failure")
+  static let inputMethodEnabled = Notification.Name("input.method.enabled")
 }
+
+private let installationArgument = "installation"
 
 @MainActor // run on the main actor since data is published directly to the UI
 public class InstallationContainer : ObservableObject {
+  // used to determine whether the installation window should be displayed
+  @Published var installInProgress: Bool = false
+  // used to determine whether the installation window should be displayed with error
+  @Published var invalidInputMethod: Bool = false
+
   public var installationPhase: InstallationPhase {
     return self.installationCheck.installationPhase
   }
@@ -37,6 +46,8 @@ public class InstallationContainer : ObservableObject {
   fileprivate let inputMethodUtil: InputMethodUtil
   
   public init() {
+    let isLaunchedByInstaller = InstallationContainer.isLaunchedByInstaller()
+    
     let defaultsRepo: DefaultsRepository
     // create the settings repository, gaining access to the app group UserDefaults
     do {
@@ -58,19 +69,58 @@ public class InstallationContainer : ObservableObject {
       fatalError("Unable to access group container path for InputMethodUtil: \(error.localizedDescription).")
     }
 
-    self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil)
+    self.installationCheck = InstallationCheck(defaultsRepo: defaultsRepo, inputMethodUtil: inputMethodUtil, isLaunchedByInstaller: isLaunchedByInstaller)
     
+    let installationPhase = self.installationCheck.installationPhase
+    Logger.app.log("installation phase at init: \(installationPhase.rawValue)")
+    
+    if (installationPhase == .inputMethodMissing || installationPhase == .inputMethodOutdated) {
+      self.invalidInputMethod = true
+    }
+    self.installInProgress = installationPhase.isActiveInstallation
+
+    self.registerObservers()
+
     // If we can now confirm that the user restarted (the final task), then the installation
     // will be complete and there is no need to evaluate the state.
     // Otherwise, evaluate the installation to prepare for a new installation or check for repairs.
     if self.confirmRestartRequired() {
       self.confirmUserRestarted()
     } else {
-      self.registerObservers()
-      self.installationCheck.startInstallationEvaluation()
+      if isLaunchedByInstaller {
+        self.executeNewInstall()
+      } else if self.installationCheck.installationPhase == .installationComplete {
+        self.startRepairCheck()
+      }
     }
   }
   
+  static func isLaunchedByInstaller() -> Bool {
+    if ProcessInfo.processInfo.arguments.contains(installationArgument) {
+      Logger.app.log("setting isLaunchedByInstaller to true")
+      return true
+    } else {
+      Logger.app.debug("installation command line argument not specified")
+      return false
+    }
+  }
+  
+  /**
+   * called immediately after startup when invoked from installer post-install script
+   */
+  func executeNewInstall() {
+    Logger.app.debug("executing new installation...")
+    self.installationCheck.startNewInstall()
+  }
+
+  /**
+   * called immediately after startup when installation was completed prior to launch
+   */
+  func startRepairCheck() {
+    Logger.app.debug("starting repair check...")
+    self.installationCheck.startRepairCheck()
+  }
+
   /**
    * register observers to learn of results of InstallationState evaluation
    */
@@ -101,6 +151,13 @@ public class InstallationContainer : ObservableObject {
       name: NSNotification.Name.accessibilityNotGranted,
       object: nil // Observe notifications from any sender
     )
+    let notificationName = Notification.Name(kTISNotifyEnabledKeyboardInputSourcesChanged as String)
+    DistributedNotificationCenter.default().addObserver(
+      self,
+      selector: #selector(self.handleInputSourcesChanged(_:)),
+      name: notificationName,
+      object: nil // Observe notifications from any sender
+    )
   }
 
   /**
@@ -119,8 +176,80 @@ public class InstallationContainer : ObservableObject {
   @objc func handleStartInstallationRepair(_ notification: Notification) {
     Logger.app.debug("handleStartInstallationRepair received")
     
+    self.installInProgress = true
+    
     // notify observers
     NotificationCenter.default.post(name: .installationRepairStarted, object: nil, userInfo: nil)
+  }
+
+  /**
+   * called when `kTISNotifyEnabledKeyboardInputSourcesChanged` is received
+   */
+  @objc func handleInputSourcesChanged(_ notification: Notification) {
+    Logger.app.debug("handleInputSourcesChanged received message: \(notification, privacy: .public)")
+
+    guard self.installationState != nil else { return }
+
+    let inputSourceState = self.checkInputSources()
+    
+    if inputSourceState.registered && inputSourceState.enabled {
+      // the confirmEnabled task can now be marked as completed
+      if let task = self.currentTask() {
+        if task.taskType == .confirmEnabled {
+          self.updateTaskAsCompleted(taskType: .confirmEnabled)
+        }
+      }
+      
+      // notify observers
+      NotificationCenter.default.post(name: .inputMethodEnabled, object: nil, userInfo: nil)
+    }
+  }
+  
+  /**
+   * uses Carbon TextInputSource APIs to examine the input source list and verify
+   * whether the Keyman input method is registered and enabled
+   */
+  public func checkInputSources() -> (registered: Bool, enabled: Bool) {
+    var inputSourceState: (registered: Bool, enabled: Bool) = (false, false)
+    
+    let inputSourceId = InputMethodUtil.keymanBundleId
+    let properties = [
+        kTISPropertyInputSourceID: inputSourceId as CFString
+    ] as CFDictionary
+
+    Logger.app.debug("Checking updated input sources")
+
+    // use includesAllInstalled = true, so we get unregistered input methods
+    guard let listRef = TISCreateInputSourceList(properties, true) else {
+      Logger.app.error("Unable to fetch input source list.")
+      return inputSourceState
+    }
+    
+    let inputSourceList = listRef.takeRetainedValue() as! [TISInputSource]
+    
+    if (!inputSourceList.isEmpty) {
+      guard let source = inputSourceList.first else {
+        return inputSourceState
+      }
+
+      guard let idPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceID),
+            let enabledPtr = TISGetInputSourceProperty(source, kTISPropertyInputSourceIsEnabled) else {
+        return inputSourceState
+      }
+      
+      inputSourceState.registered = true
+      
+      // Extract the string Identifier and boolean Enablement state
+      let sourceID = Unmanaged<CFString>.fromOpaque(idPtr).takeUnretainedValue() as String
+      let isEnabled = Unmanaged<CFBoolean>.fromOpaque(enabledPtr).takeUnretainedValue() as! Bool
+      
+      inputSourceState.enabled = isEnabled
+      Logger.app.debug("Source ID: \(sourceID, privacy: .public) | Is Enabled: \(isEnabled)")
+    } else {
+      Logger.app.debug("Keyman input source not registered in system.")
+    }
+    
+    return inputSourceState
   }
 
   /**
@@ -209,6 +338,8 @@ public class InstallationContainer : ObservableObject {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .enableInputMethod }) {
       return incompleteTask
+    } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .confirmEnabled }) {
+      return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .requestAccess }) {
       return incompleteTask
     } else if let incompleteTask = incompleteTasks.first(where: { $0.taskType == .confirmAccess }) {
@@ -242,6 +373,8 @@ public class InstallationContainer : ObservableObject {
       completedTask = true
     case .enableInputMethod:
       completedTask = self.enableKeymanInputMethod()
+    case .confirmEnabled:
+      completedTask = true
     case .requestAccess:
       completedTask = self.requestAccessibility()
     case .confirmAccess:
@@ -271,6 +404,9 @@ public class InstallationContainer : ObservableObject {
       self.installationCheck.installationState = updatedState
       self.writeInstallationState()
     }
+    
+    // whenever a task is completed, update the installInProgress flag
+    self.installInProgress = self.installationCheck.installationPhase.isActiveInstallation
   }
 
   /**

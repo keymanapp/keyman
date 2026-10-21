@@ -37,7 +37,7 @@ struct CompletedInstallView: View {
         Text("Installation complete")
           .font(.title2)
           .frame(maxWidth: .infinity, alignment: .leading)
-        NavigationButton(action: .dismiss)
+        NavigationButton(action: .dismissAndOpenConfigView)
       }
     }
   }
