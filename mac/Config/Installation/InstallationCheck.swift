@@ -192,7 +192,7 @@ public class InstallationCheck {
     
     var condition = InstallationStateCondition.undefined
     
-    // If the installationState remains from a different install, mark it as inactive.
+    // If the installationState remains from a different install, mark it as undefined.
     // This should not occur, unless someone has manually changed the state.
     if installationState.keymanVersion != version {
       condition = .undefined
