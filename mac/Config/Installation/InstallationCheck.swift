@@ -295,10 +295,10 @@ public class InstallationCheck {
 
   /**
    * Apply the accessibility result from either the input method response or the expired timer.
-   * Three scenarios where we may be using this result:
-   *  1. to evaluate remaining installation steps
+   * There are three scenarios where we may be using this result:
+   *  1. to evaluate the installation steps needed for a new installation
    *  2. to see if a completed installation is in need of repair
-   *  3. while walking user through installation, to check whether they have successfully added the Accessibility permission
+   *  3. while guiding the user through installation, to check whether they have successfully added the Accessibility permission
    */
   func applyAccessibilityResult(permissionGranted: Bool) {
     // should never happen, but if there is no installationState then interpret it as installation complete
