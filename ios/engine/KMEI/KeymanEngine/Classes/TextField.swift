@@ -11,6 +11,14 @@ import UIKit
 import os.log
 
 public class TextField: UITextField, KeymanResponder {
+  /**
+   The delay, in seconds, to wait before refreshing the keyboard to workaround
+   the iOS 27 blank-keyboard bug.
+
+   See #16674.
+   */
+  public static let blankKeyboardWorkaroundDelay = 0.5
+  
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -21,6 +29,30 @@ public class TextField: UITextField, KeymanResponder {
   private var delegateProxy: TextFieldDelegateProxy!
 
   private var keyboardChangedObserver: NotificationObserver?
+
+  // These fields all exist solely to workaround #16674.
+  // They may be safely removed once Apple fixes the underlying issue.
+  /**
+   A cancellable dispatch work item that will be triggered to complete the workaround process.
+
+   Its .cancel() method should be called the responder state for the current instance changes before completion.
+   */
+  private var workaroundWorkItem: DispatchWorkItem? = nil
+  /**
+   A hidden UITextView serving as a key component of the workaround.  See #16674.
+
+   Requires swapping to (1) another UITextView (2) using a different keyboard.
+   */
+  private var hiddenDummyView: UITextView!
+
+  /**
+   Denotes that the workaround is currently in an actively triggered state, with completion pending.
+   */
+  private var blankWorkaroundActive: Bool {
+    get {
+      return workaroundWorkItem != nil
+    }
+  }
 
   // MARK: - Object Admin
   deinit {
@@ -54,6 +86,74 @@ public class TextField: UITextField, KeymanResponder {
     keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
                                                                      observer: self,
                                                                      function: TextField.keyboardChanged)
+    /*
+     Initialize the workaround's hidden UITextView.
+
+     See: #16674.
+     */
+    hiddenDummyView = UITextView(frame: self.frame)
+    hiddenDummyView.translatesAutoresizingMaskIntoConstraints = false
+    hiddenDummyView.backgroundColor = UIColor(named: "InputBackground")!
+    hiddenDummyView.isScrollEnabled = true
+    hiddenDummyView.isUserInteractionEnabled = true
+  }
+
+  /**
+   Sets #16674's workaround-UITextView within the view hierarchy at the same level as
+   this TextView, allowing it to be part of the responder chain.
+   */
+  public override func didMoveToWindow() {
+    if self.superview != nil {
+      if hiddenDummyView.superview == nil {
+        self.superview?.addSubview(hiddenDummyView)
+        self.superview?.sendSubviewToBack(hiddenDummyView)
+      }
+    } else {
+      hiddenDummyView.removeFromSuperview()
+    }
+  }
+
+  /**
+   Initiates the iOS 27+ blank-keyboard workaround process, on iOS 27+ devices, when applicable.
+   See #16674.
+   */
+  public func doBlankKeyboardWorkaround() -> Bool {
+    if #available(iOS 27.0, *) {
+      hiddenDummyView.becomeFirstResponder()
+
+      let workItem = DispatchWorkItem {
+        if self.isFirstResponder {
+          _ = self.doBlankKeyboardWorkaround()
+          return
+        }
+
+        // Will synchronously re-trigger textViewShouldBeginEditing.
+        _ = self.becomeFirstResponder()
+        if self.hiddenDummyView.superview != nil && self.superview == nil {
+          self.hiddenDummyView.removeFromSuperview()
+        }
+
+        self.workaroundWorkItem = nil
+      }
+
+      workaroundWorkItem = workItem
+      DispatchQueue.main.asyncAfter(deadline: .now() + TextField.blankKeyboardWorkaroundDelay, execute: workItem)
+
+      return true
+    }
+    return false
+  }
+
+  /**
+   Cancels #16674's workaround processes until the next trigger.
+   */
+  fileprivate func cancelBlankWorkaround() {
+    workaroundWorkItem?.cancel()
+    workaroundWorkItem = nil
+
+    if hiddenDummyView.superview != nil && self.superview == nil {
+      hiddenDummyView.removeFromSuperview()
+    }
   }
 
   // MARK: - Class Overrides
@@ -158,6 +258,8 @@ extension KeymanResponder where Self: TextField {
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   public func dismissKeyboard() {
+    self.cancelBlankWorkaround()
+    
     let message = "TextField: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
     resignFirstResponder()
@@ -188,6 +290,19 @@ extension TextField: UITextFieldDelegate {
   }
 
   public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+    // We reach this point when we become the first responder.
+
+    // Part of the iOS 27+ blank-keyboard workaround.
+    // See #16674.
+    if !blankWorkaroundActive {
+      // If no workaround is active, we haven't started the workaround - do it!
+      if doBlankKeyboardWorkaround() {
+        // This method will be re-called by the workaround's async work item.
+        return true
+      }
+    } // else // the workaround is active; only now do we truly become first responder.
+    // End iOS 27+ blank-keyboard workaround.
+    
     let leftToRightMark = "\u{200e}"
     let rightToLeftOverride = "\u{202e}"
     let textWD = baseWritingDirection(for: beginningOfDocument, in: .forward)
