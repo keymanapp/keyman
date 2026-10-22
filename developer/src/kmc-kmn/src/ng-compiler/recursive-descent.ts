@@ -12,7 +12,7 @@ import { TokenBuffer } from "./token-buffer.js";
 import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TOKEN_TO_NODE } from "./token-to-node.js";
-import { ASTStrategy } from "./ast-strategy.js";
+import { ASTRebuild } from "./ast-rebuild.js";
 
 /**
  * Rule is the abstract base class of all the recursive-descent
@@ -58,17 +58,17 @@ export abstract class SingleChildRule extends Rule {
 }
 
 /**
- * SingleChildRule is the abstract base class of all the recursive-descent
- * syntax analyzer rules with a single child that use an ASTStrategy to
- * rebuild the tree after a successful parse.
+ * SingleChildRuleWithASTRebuild is the abstract base class of all the
+ * recursive-descent syntax analyzer rules with a single child that use
+ * an ASTRebuild to rebuild the tree after a successful parse.
  */
-export abstract class SingleChildRuleWithASTStrategy extends SingleChildRule {
+export abstract class SingleChildRuleWithASTRebuild extends SingleChildRule {
   /**
-   * Construct a SingleChildRuleWithASTStrategy
+   * Construct a SingleChildRuleWithASTRebuild
    */
   public constructor(
     /** the strategy used on the tree after a successful parse */
-    protected readonly strategy: ASTStrategy,
+    protected readonly strategy: ASTRebuild,
     /** the single child rule */
     rule: Rule=null
   ) {
@@ -76,18 +76,18 @@ export abstract class SingleChildRuleWithASTStrategy extends SingleChildRule {
   }
 
   /**
-   * Parse the rule and, if successful, apply the ASTStrategy
+   * Parse the rule and, if successful, apply the ASTRebuild
    *
    * @param tokenBuffer the TokenBuffer to parse
    * @param node where to build the AST
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const tmp: ASTNode = new ASTNode();
     // TODO-NG-COMPILER: fatal error if rule is null
     const parseSuccess: boolean = this.rule?.parse(tokenBuffer, tmp) ?? false;
     if (parseSuccess) {
-      node.addChild(this.strategy.apply(tmp).getSoleChild());
+      node.addChildren(this.strategy.apply(tmp).getChildren());
     }
     return parseSuccess;
   };
@@ -125,8 +125,8 @@ export class SequenceRule extends MultiChildRule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const save: number = tokenBuffer.currentPosition;
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const save = tokenBuffer.currentPosition;
+    const tmp  = new ASTNode();
 
     // TODO-NG-COMPILER: fatal error if rules is null or empty
     if (!this.rules?.length) {
@@ -159,7 +159,7 @@ export class AlternateRule extends MultiChildRule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const save: number = tokenBuffer.currentPosition;
+    const save = tokenBuffer.currentPosition;
     let tmp: ASTNode;
 
     // TODO-NG-COMPILER: fatal error if rules is null or empty
@@ -168,7 +168,7 @@ export class AlternateRule extends MultiChildRule {
     }
 
     for (const rule of this.rules) {
-      tmp = new ASTNode(NodeType.TMP);
+      tmp = new ASTNode();
       if (rule.parse(tokenBuffer, tmp)) {
         node.addChildren(tmp.getChildren());
         return true;
@@ -205,8 +205,8 @@ export class OptionalRule extends SingleChildRule {
    * @returns true
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const save: number = tokenBuffer.currentPosition;
-    const tmp: ASTNode = new ASTNode(NodeType.TMP);
+    const save = tokenBuffer.currentPosition;
+    const tmp  = new ASTNode();
 
     // TODO-NG-COMPILER: fatal error if rule is null
     if (this.rule == null) {
@@ -256,8 +256,8 @@ export class ManyRule extends SingleChildRule {
     }
 
     while (true) {
-      const save: number = tokenBuffer.currentPosition;
-      const tmp: ASTNode = new ASTNode(NodeType.TMP);
+      const save = tokenBuffer.currentPosition;
+      const tmp  = new ASTNode();
 
       if (this.rule.parse(tokenBuffer, tmp)) {
         node.addChildren(tmp.getChildren());
@@ -299,8 +299,8 @@ export class OneOrManyRule extends SingleChildRule {
     // TODO-NG-COMPILER: fatal error if rule is null
     let anyParseSuccess: boolean = false;
     do {
-      const save: number = tokenBuffer.currentPosition;
-      const tmp: ASTNode = new ASTNode(NodeType.TMP);
+      const save = tokenBuffer.currentPosition;
+      const tmp  = new ASTNode();
       if (this.rule?.parse(tokenBuffer, tmp)) {
         node.addChildren(tmp.getChildren());
         anyParseSuccess = true;
@@ -327,7 +327,7 @@ export class TokenRule extends Rule {
     /** the TokenType to potentially match */
     private readonly tokenType: TokenType,
     /** whether to add an ASTNode if the rule succeeds */
-    private readonly addNode: boolean=false
+    private readonly addNode=false
   ) {
     super();
   }
@@ -353,12 +353,12 @@ export class TokenRule extends Rule {
    * @returns true if this rule was successfully parsed
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const token: Token = tokenBuffer.currentToken();
+    const token = tokenBuffer.currentToken();
 
     if (token.isTokenType(this.tokenType)) {
       tokenBuffer.popToken();
       if (this.addNode) {
-        const nodeType: NodeType = TokenRule.tokenToNodeMap.get(token.tokenType);
+        const nodeType = TokenRule.tokenToNodeMap.get(token.tokenType);
         if (nodeType !== undefined) {
           node.addChild(new ASTNode(nodeType, token));
           // TODO-NG-COMPILER: warning if there is no valid mapping
@@ -413,12 +413,12 @@ export class AlternateTokenRule extends Rule {
    * @returns true if the current token was successfully matched
    */
   public parse(tokenBuffer: TokenBuffer, node: ASTNode): boolean {
-    const token: Token = tokenBuffer.currentToken();
+    const token = tokenBuffer.currentToken();
 
     if (this.tokenTypes.has(token.tokenType)) {
       tokenBuffer.popToken();
       if (this.addNode) {
-        const nodeType: NodeType = TokenRule.getNodeType(token.tokenType);
+        const nodeType = TokenRule.getNodeType(token.tokenType);
         if (nodeType !== undefined) {
           node.addChild(new ASTNode(nodeType, token));
           // TODO-NG-COMPILER: warning if there is no valid mapping
@@ -443,9 +443,9 @@ export class AlternateTokenRule extends Rule {
  * @returns true if the expected sequence of tokens was successfully matched
  */
 export function tokenSequence(tokenBuffer: TokenBuffer, tokens: Token[], tokenType: TokenType, numExpected: number): boolean {
-  let parseSuccess: boolean = true;
-  const save: number = tokenBuffer.currentPosition;
-  let token: Token = tokenBuffer.currentToken();
+  let parseSuccess = true;
+  const save = tokenBuffer.currentPosition;
+  let token  = tokenBuffer.currentToken();
   const tmpTokens: Token[] = [];
 
   for (let num=0; num<numExpected; num++) {
