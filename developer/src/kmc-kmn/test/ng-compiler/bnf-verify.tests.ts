@@ -31,6 +31,20 @@ describe("Verify BNF Against Lexer Tests", () => {
   });
 });
 describe("getSourceRules() Tests", () => {
+  it("can handle a simple rule", () => {
+    const sourceBuffer = `
+      import { SingleChildRule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
+      import { TokenType } from '../../src/ng-compiler/token-type.js';
+
+      export class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new TokenRule(TokenType.STRING);
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING" }, sourceRules);
+  });
   it("can handle a rule with one variable", () => {
     const sourceBuffer = `
       import { SingleChildRule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
@@ -39,12 +53,75 @@ describe("getSourceRules() Tests", () => {
       export class DummyRule extends SingleChildRule {
         public constructor() {
           super();
-          const dummyRule = new TokenRule(TokenType.STRING, true);
-          this.rule       = dummyRule;
+          const stringRule = new TokenRule(TokenType.STRING);
+          this.rule        = stringRule;
         }
       }`;
-      const sourceRules = getSourceRules(sourceBuffer);
-      assert.deepEqual({ dummy: "STRING" }, sourceRules);
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING" }, sourceRules);
+  });
+  it("can handle a rule with one inherited property", () => {
+    const sourceBuffer = `
+      import { Rule, SingleChildRule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
+      import { TokenType } from '../../src/ng-compiler/token-type.js';
+
+      abstract class AbstractDummyRule extends SingleChildRule {
+        protected stringRule: Rule;
+
+        public constructor() {
+          super()
+          this.stringRule = new TokenRule(TokenType.STRING);
+        }
+      }
+
+      export class DummyRule extends AbstractDummyRule {
+        public constructor() {
+          super();
+          this.rule = this.stringRule;
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING" }, sourceRules);
+  });
+  it("can handle a rule with one overridden property", () => {
+    const sourceBuffer = `
+      import { Rule, SingleChildRule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
+      import { TokenType } from '../../src/ng-compiler/token-type.js';
+
+      abstract class AbstractDummyRule extends SingleChildRule {
+        protected stringRule: Rule;
+
+        public constructor() {
+          super()
+          this.stringRule = new TokenRule(TokenType.STRING);
+        }
+      }
+
+      export class DummyRule extends AbstractDummyRule {
+        public constructor() {
+          super();
+          this.stringRule = new TokenRule(TokenType.BEEP);
+          this.rule       = this.stringRule;
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "BEEP" }, sourceRules);
+  });
+  it("can handle a SequenceRule", () => {
+    const sourceBuffer = `
+      import { SequenceRule, SingleChildRule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
+      import { TokenType } from '../../src/ng-compiler/token-type.js';
+
+      export class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          const leftBracket  = new TokenRule(TokenType.LEFT_BR);
+          const stringRule   = new TokenRule(TokenType.STRING);
+          const rightBracket = new TokenRule(TokenType.RIGHT_BR);
+          this.rule          = new SequenceRule([leftBracket, stringRule, rightBracket]);
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "LEFT_BR STRING RIGHT_BR" }, sourceRules);
   });
 });
 describe("Verify Parser Against BNF Tests", () => {

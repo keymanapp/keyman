@@ -58,9 +58,9 @@ export abstract class SingleChildRule extends Rule {
 }
 
 /**
- * SingleChildRule is the abstract base class of all the recursive-descent
- * syntax analyzer rules with a single child that use an ASTRebuild to
- * rebuild the tree after a successful parse.
+ * SingleChildRuleWithASTRebuild is the abstract base class of all the
+ * recursive-descent syntax analyzer rules with a single child that use
+ * an ASTRebuild to rebuild the tree after a successful parse.
  */
 export abstract class SingleChildRuleWithASTRebuild extends SingleChildRule {
   /**
