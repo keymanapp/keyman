@@ -10,6 +10,12 @@ import AudioToolbox
 import UIKit
 import os.log
 
+/**
+ The delay, in seconds, to wait before refreshing the keyboard to workaround
+ the iOS 27 blank-keyboard bug.
+
+ See #16674.
+ */
 let blankKeyboardWorkaroundDelay = 0.5
 
 public class TextView: UITextView, KeymanResponder {
@@ -25,9 +31,30 @@ public class TextView: UITextView, KeymanResponder {
 
   private var keyboardChangedObserver: NotificationObserver?
 
-  private var blankWorkaroundActive: Bool = false
+  // These fields all exist solely to workaround #16674.
+  // They may be safely removed once Apple fixes the underlying issue.
+  /**
+   A cancellable dispatch work item that will be triggered to complete the workaround process.
+   
+   Its .cancel() method should be called the responder state for the current instance changes before completion.
+   */
   private var workaroundWorkItem: DispatchWorkItem? = nil
+  /**
+   A hidden UITextView serving as a key component of the workaround.  See #16674.
+   
+   Requires swapping to (1) another UITextView (2) using a different keyboard.
+   */
   private var hiddenDummyView: UITextView!
+
+  /**
+   Denotes that the workaround is currently in an actively triggered state, with completion pending.
+   */
+  private var blankWorkaroundActive: Bool {
+    get {
+      return workaroundWorkItem != nil
+    }
+  }
+
 
   // MARK: - Object Admin
   public convenience init() {
@@ -60,6 +87,12 @@ public class TextView: UITextView, KeymanResponder {
     keyboardChangedObserver = NotificationCenter.default.addObserver(forName: Notifications.keyboardChanged,
                                                                      observer: self,
                                                                      function: TextView.keyboardChanged)
+    
+    /*
+     Initialize the workaround's hidden UITextView.
+     
+     See: #16674.
+     */
     hiddenDummyView = UITextView(frame: self.frame)
     hiddenDummyView.translatesAutoresizingMaskIntoConstraints = false
     hiddenDummyView.backgroundColor = UIColor(named: "InputBackground")!
@@ -67,6 +100,10 @@ public class TextView: UITextView, KeymanResponder {
     hiddenDummyView.isUserInteractionEnabled = true
   }
 
+  /**
+   Sets #16674's workaround-UITextView within the view hierarchy at the same level as
+   this TextView, allowing it to be part of the responder chain.
+   */
   public override func didMoveToWindow() {
     if self.superview != nil {
       if hiddenDummyView.superview == nil {
@@ -78,6 +115,10 @@ public class TextView: UITextView, KeymanResponder {
     }
   }
 
+  /**
+   Initiates the iOS 27+ blank-keyboard workaround process, on iOS 27+ devices, when applicable.
+   See #16674.
+   */
   public func doBlankKeyboardWorkaround() -> Bool {
     if #available(iOS 27.0, *) {
       hiddenDummyView.becomeFirstResponder()
@@ -88,10 +129,13 @@ public class TextView: UITextView, KeymanResponder {
           return
         }
 
+        // Will synchronously re-trigger textViewShouldBeginEditing.
         _ = self.becomeFirstResponder()
         if self.hiddenDummyView.superview != nil && self.superview == nil {
           self.hiddenDummyView.removeFromSuperview()
         }
+        
+        self.workaroundWorkItem = nil
       }
 
       workaroundWorkItem = workItem
@@ -102,10 +146,12 @@ public class TextView: UITextView, KeymanResponder {
     return false
   }
 
+  /**
+   Cancels #16674's workaround processes until the next trigger.
+   */
   fileprivate func cancelBlankWorkaround() {
     workaroundWorkItem?.cancel()
     workaroundWorkItem = nil
-    blankWorkaroundActive = false
 
     if hiddenDummyView.superview != nil && self.superview == nil {
       hiddenDummyView.removeFromSuperview()
@@ -258,15 +304,18 @@ extension TextView: UITextViewDelegate {
   }
 
   public func textViewShouldBeginEditing(_ textView: UITextView) -> Bool {
+    // We reach this point when we become the first responder.
+    
+    // Part of the iOS 27+ blank-keyboard workaround.
+    // See #16674.
     if !blankWorkaroundActive {
-      blankWorkaroundActive = doBlankKeyboardWorkaround()
-
-      if blankWorkaroundActive {
+      // If no workaround is active, we haven't started the workaround - do it!
+      if doBlankKeyboardWorkaround() {
+        // This method will be re-called by the workaround's async work item.
         return true
       }
-    } else {
-      blankWorkaroundActive = false
-    }
+    } // else // the workaround is active; only now do we truly become first responder.
+    // End iOS 27+ blank-keyboard workaround.
 
     let leftToRightMark = "\u{200e}"
     let rightToLeftMark = "\u{200f}" // or "\u{202e}"
