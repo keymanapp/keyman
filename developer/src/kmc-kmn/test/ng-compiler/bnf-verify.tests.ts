@@ -135,6 +135,7 @@ describe("getSourceRules() Tests", () => {
           const stringRule   = new TokenRule(TokenType.STRING);
           const rightBracket = new TokenRule(TokenType.RIGHT_BR);
           this.rule          = new SequenceRule([leftBracket, stringRule, rightBracket]);
+        }
       }`;
     const sourceRules = getSourceRules(sourceBuffer);
     assert.deepEqual({ dummy: "LEFT_BR STRING RIGHT_BR" }, sourceRules);
@@ -148,6 +149,7 @@ describe("getSourceRules() Tests", () => {
           const stringRule   = new TokenRule(TokenType.STRING);
           const rightBracket = new TokenRule(TokenType.RIGHT_BR);
           this.rule          = new AlternateRule([leftBracket, stringRule, rightBracket]);
+        }
       }`;
     const sourceRules = getSourceRules(sourceBuffer);
     assert.deepEqual({ dummy: "LEFT_BR|STRING|RIGHT_BR" }, sourceRules);
@@ -161,6 +163,7 @@ describe("getSourceRules() Tests", () => {
             TokenType.STRING,
             TokenType.RIGHT_BR,
           ]);
+        }
       }`;
     const sourceRules = getSourceRules(sourceBuffer);
     assert.deepEqual({ dummy: "LEFT_BR|STRING|RIGHT_BR" }, sourceRules);
@@ -171,6 +174,7 @@ describe("getSourceRules() Tests", () => {
         public constructor() {
           super();
           this.rule = new OptionalRule(new TokenRule(TokenType.STRING));
+        }
       }`;
     const sourceRules = getSourceRules(sourceBuffer);
     assert.deepEqual({ dummy: "STRING?" }, sourceRules);
@@ -181,6 +185,7 @@ describe("getSourceRules() Tests", () => {
         public constructor() {
           super();
           this.rule = new ManyRule(new TokenRule(TokenType.STRING));
+        }
       }`;
     const sourceRules = getSourceRules(sourceBuffer);
     assert.deepEqual({ dummy: "STRING*" }, sourceRules);
@@ -191,6 +196,7 @@ describe("getSourceRules() Tests", () => {
         public constructor() {
           super();
           this.rule = new OneOrManyRule(new TokenRule(TokenType.STRING));
+        }
       }`;
     const sourceRules = getSourceRules(sourceBuffer);
     assert.deepEqual({ dummy: "STRING+" }, sourceRules);
@@ -340,7 +346,8 @@ function inspectRuleExpression(
 
         if (assignment) {
           const propertyName = (assignment.left as ts.PropertyAccessExpression).name.text;
-          if (!properties.has(propertyName)) { // child supercedes parent
+          // child supercedes parent; doesn't handle multiple assignments in same constructor
+          if (!properties.has(propertyName)) { 
             properties.set(propertyName, assignment.right);
           }
         }
