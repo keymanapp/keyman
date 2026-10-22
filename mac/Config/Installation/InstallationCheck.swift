@@ -73,8 +73,9 @@ public class InstallationCheck {
   
   // used to enforce timeout on accessibility response from input method
   private var accessibilityTimeout: DispatchWorkItem?
-  private var awaitingAccessibilityResponse = false
+  private var isAwaitingAccessibilityResponse = false
   private let accessibilityTimeoutSeconds: TimeInterval = 3.0
+  private var isAwaitingMigration = false
 
   // a classification of the install state
   // provided so UI knows what to present to the user
@@ -175,6 +176,7 @@ public class InstallationCheck {
 
     if success {
       NotificationCenter.default.post(name: .dataMigrated, object: nil)
+      self.isAwaitingMigration = false
     }
     return success
   }
@@ -264,6 +266,7 @@ public class InstallationCheck {
    */
   public func doAsyncAccessibilityCheckWithMigration() {
     // call the input method to check whether Accessibility permission has been granted
+    self.isAwaitingMigration = true
     self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
     self.startAccessibilityResponseTimer()
   }
@@ -274,13 +277,13 @@ public class InstallationCheck {
    */
   func startAccessibilityResponseTimer() {
     accessibilityTimeout?.cancel()
-    awaitingAccessibilityResponse = true
+    isAwaitingAccessibilityResponse = true
     
     let work = DispatchWorkItem { [weak self] in
-      guard let self, self.awaitingAccessibilityResponse else { return }
-      self.awaitingAccessibilityResponse = false
+      guard let self, self.isAwaitingAccessibilityResponse else { return }
+      self.isAwaitingAccessibilityResponse = false
       Logger.app.error("accessibility response timed out after \(self.accessibilityTimeoutSeconds)s, assume not granted")
-      self.applyAccessibilityResult(permissionGranted: false)
+      self.applyAccessibilityResult(permissionGranted: false, timedOut: true)
     }
     accessibilityTimeout = work
     DispatchQueue.main.asyncAfter(deadline: .now() + accessibilityTimeoutSeconds, execute: work)
@@ -297,17 +300,18 @@ public class InstallationCheck {
     let granted = self.processAccessibilityResponse(with: message)
     
     DispatchQueue.main.async {
-      guard self.awaitingAccessibilityResponse else {
+      guard self.isAwaitingAccessibilityResponse else {
         // mostly ignore the late response from the input method, but if we are migrating
         // data due to a new install, then notify to update the package list again --
         // just in case more data was migrated after the timeout
-        if self.isMigrationNeeded() {
+        if self.isAwaitingMigration {
           NotificationCenter.default.post(name: .dataMigrated, object: nil)
+          self.isAwaitingMigration = false
         }
         Logger.app.debug("late accessibility received: \(message, privacy: .public)")
         return
       }
-      self.awaitingAccessibilityResponse = false
+      self.isAwaitingAccessibilityResponse = false
       self.accessibilityTimeout?.cancel()
       self.accessibilityTimeout = nil
       self.applyAccessibilityResult(permissionGranted: granted)
@@ -321,7 +325,7 @@ public class InstallationCheck {
    *  2. to see if a completed installation is in need of repair
    *  3. while guiding the user through installation, to check whether they have successfully added the Accessibility permission
    */
-  func applyAccessibilityResult(permissionGranted: Bool) {
+  func applyAccessibilityResult(permissionGranted: Bool, timedOut: Bool = false) {
     // should never happen, but if there is no installationState then interpret it as installation complete
     let installCompleted = self.installationState?.isComplete ?? true
 
@@ -334,8 +338,12 @@ public class InstallationCheck {
 
     if self.isEvaluatingNewInstallation {
       self.completeNewInstallationEvaluation(accessibilityPermissionGranted: permissionGranted)
-      if self.isMigrationNeeded() {
+      if self.isAwaitingMigration {
+        // update the packages list for migrated data but update again if the response eventually arrives
         NotificationCenter.default.post(name: .dataMigrated, object: nil)
+        if !timedOut {
+          self.isAwaitingMigration = false
+        }
       }
     } else if installCompleted {
       self.checkForRepair(accessibilityPermissionGranted: permissionGranted)
