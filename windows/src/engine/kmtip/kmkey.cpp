@@ -351,14 +351,18 @@ BOOL CKMTipTextService::TIPNotifyActivate(GUID *guidProfile)   // I3581   // I42
     return_SendDebugExit(FALSE);   // I3590
   }
 
-  // TODO: merge these two functions - pointless having separate entry points
-  if(!Keyman32Interface::TIPActivateEx(guidProfile != NULL)) {
+  if(!Keyman32Interface::TIPIsKeymanRunning()) {
     _keymanInitialized = FALSE;
-    // TODO: _NotifyKeymanNotRunning();
     return_SendDebugExit(FALSE);
   }
 
   _keymanInitialized = TRUE;
+
+  // TODO: merge these two functions - pointless having separate entry points
+  if(!Keyman32Interface::TIPActivateEx(guidProfile != NULL)) {
+    // TODO: _NotifyKeymanNotRunning();
+    return_SendDebugExit(FALSE);
+  }
 
   if (!Keyman32Interface::TIPActivateKeyboard(guidProfile)) {
     SendDebugMessage(L"TIPActivateKeyboard failed");
