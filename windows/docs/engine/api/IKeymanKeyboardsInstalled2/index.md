@@ -21,7 +21,7 @@ for installing additional keyboards.
 > > > >
 > > > > > **`IKeymanKeyboardsInstalled2`**
 > > > > >
-> > > > > > [`IKeymanKeyboardsInstalled3`](../IKeymanKeyboardsInstalled)
+> > > > > [`IKeymanKeyboardsInstalled3`](../IKeymanKeyboardsInstalled3)
 
 ## Methods
 

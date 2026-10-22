@@ -21,7 +21,7 @@ simplify distribution of keyboard layouts.
 > > >
 > > > > [`IKeymanPackageFile2`](../IKeymanPackageFile2)
 > > > >
-> > > > > [`IKeymanPackageFile3`](../IKeymanPackageFile3)
+> > > > [`IKeymanPackageFile3`](../IKeymanPackageFile3)
 
 ## Methods
 

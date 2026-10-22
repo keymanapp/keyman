@@ -17,9 +17,9 @@ specified base keyboard.
 > > [`IKeymanPackage`](../IKeymanPackage)
 > >
 > > > [`IKeymanPackageFile`](../IKeymanPackageFile)
+> > >
 > > > > [`IKeymanPackageFile2`](../IKeymanPackageFile2)
 > > > >
-> > >
 > > > > **`IKeymanPackageFile3`**
 
 ## Methods

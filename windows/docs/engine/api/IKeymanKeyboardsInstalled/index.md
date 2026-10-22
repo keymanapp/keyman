@@ -21,7 +21,7 @@ in Keyman Engine for Windows API.
 > > > >
 > > > > > [`IKeymanKeyboardsInstalled2`](../IKeymanKeyboardsInstalled2)
 > > > > >
-> > > > > > [`IKeymanKeyboardsInstalled3`](../IKeymanKeyboardsInstalled3)
+> > > > > [`IKeymanKeyboardsInstalled3`](../IKeymanKeyboardsInstalled3)
 
 ## Properties
 

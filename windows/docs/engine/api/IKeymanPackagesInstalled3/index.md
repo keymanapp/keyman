@@ -10,14 +10,16 @@ layouts against a specified base keyboard.
 
 ## Interface Hierarchy
 
-`IDispatch`  
+`IDispatch`
 
-> [`IKeymanObject`](../IKeymanObject)  
+> [`IKeymanObject`](../IKeymanObject)
 >
-> > [`IKeymanCollection`](../IKeymanCollection)  
+> > [`IKeymanCollection`](../IKeymanCollection)
 > >
-> > > [`IKeymanPackagesInstalled`](../IKeymanPackagesInstalled)  
+> > > [`IKeymanPackagesInstalled`](../IKeymanPackagesInstalled)
 > > >
+> > > > [`IKeymanPackagesInstalled2`](../IKeymanPackagesInstalled2)
+> > > >
 > > > > **`IKeymanPackagesInstalled3`**
 
 ## Methods
