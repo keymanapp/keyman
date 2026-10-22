@@ -10,15 +10,15 @@ import AudioToolbox
 import UIKit
 import os.log
 
-/**
- The delay, in seconds, to wait before refreshing the keyboard to workaround
- the iOS 27 blank-keyboard bug.
-
- See #16674.
- */
-let blankKeyboardWorkaroundDelay = 0.5
-
 public class TextView: UITextView, KeymanResponder {
+  /**
+   The delay, in seconds, to wait before refreshing the keyboard to workaround
+   the iOS 27 blank-keyboard bug.
+
+   See #16674.
+   */
+  public static let blankKeyboardWorkaroundDelay = 0.5
+  
   // viewController should be set to main view controller to enable keyboard picker.
   public var viewController: UIViewController?
 
@@ -139,7 +139,7 @@ public class TextView: UITextView, KeymanResponder {
       }
 
       workaroundWorkItem = workItem
-      DispatchQueue.main.asyncAfter(deadline: .now() + blankKeyboardWorkaroundDelay, execute: workItem)
+      DispatchQueue.main.asyncAfter(deadline: .now() + TextView.blankKeyboardWorkaroundDelay, execute: workItem)
 
       return true
     }
