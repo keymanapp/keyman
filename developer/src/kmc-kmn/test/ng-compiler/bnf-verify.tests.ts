@@ -17,30 +17,46 @@ interface Dictionary {
 }
 
 const BNF_FILENAME = '../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf';
+const BNF_BUFFER: string = readFileSync(BNF_FILENAME).toString();
 
-describe("Verify Parser Against BNF Tests", () => {
-  it("matches the BNF grammar rules", () => {
-    const bnfBuffer: string = readFileSync(BNF_FILENAME).toString();
-    const bnfRules: Dictionary = getBnfRules(bnfBuffer);
-    const sourceBuffer: string = [
-      '../../src/kmc-kmn/src/ng-compiler/kmn-analyzer.ts',
-      '../../src/kmc-kmn/src/ng-compiler/statement-analyzer.ts',
-      '../../src/kmc-kmn/src/ng-compiler/store-analyzer.ts',
-    ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
-    const sourceRules: Dictionary = getSourceRules(sourceBuffer);
-    assert.deepEqual(bnfRules, sourceRules);
-  });
-});
 describe("Verify BNF Against Lexer Tests", () => {
   it("contains all the Lexer tokens", () => {
-    const bnfBuffer: string = readFileSync(BNF_FILENAME).toString()
-    const match = [...bnfBuffer.matchAll(/[A-Z_]{2,}/g)];
+    const match = [...BNF_BUFFER.matchAll(/[A-Z_]{2,}/g)];
     const bnfTokens = match.map((x) => x[0]);
     bnfTokens.push('COMMENT', 'CONTINUATION', 'EOF', 'WHITESPACE');
     bnfTokens.sort();
     const bnfTokenSet = new Set<String>(bnfTokens);
     const tokenTypes: string[] = Object.keys(TokenType).sort();
     assert.deepEqual([...bnfTokenSet], tokenTypes);
+  });
+});
+describe("getSourceRules() Tests", () => {
+  it("can handle a rule with one variable", () => {
+    const sourceBuffer = `
+      import { SingleChildRule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
+      import { TokenType } from '../../src/ng-compiler/token-type.js';
+
+      export class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          const dummyRule = new TokenRule(TokenType.STRING, true);
+          this.rule       = dummyRule;
+        }
+      }`;
+      const sourceRules = getSourceRules(sourceBuffer);
+      assert.deepEqual({ dummy: "STRING" }, sourceRules);
+  });
+});
+describe("Verify Parser Against BNF Tests", () => {
+  it("matches the BNF grammar rules", () => {
+    const bnfRules    = getBnfRules(BNF_BUFFER);
+    const sourceBuffer: string = [
+      '../../src/kmc-kmn/src/ng-compiler/kmn-analyzer.ts',
+      '../../src/kmc-kmn/src/ng-compiler/statement-analyzer.ts',
+      '../../src/kmc-kmn/src/ng-compiler/store-analyzer.ts',
+  ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual(bnfRules, sourceRules);
   });
 });
 
