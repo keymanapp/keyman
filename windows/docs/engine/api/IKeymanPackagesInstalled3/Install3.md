@@ -41,6 +41,10 @@ void Install3(string Filename, bool Force, int BaseKeyboardID)
 :   Installs a package, optionally with input method for default
     language
 
+[`IKeymanPackagesInstalled3::Install3`](../IKeymanPackagesInstalled3/Install3)
+:   Installs a package from a path and compiles its keyboard layouts
+    against a specified base keyboard
+
 [`IKeymanPackageFile3::Install3`](../IKeymanPackageFile3/Install3)
-:   Installs a package and compiles its keyboard layouts against a
-    specified base keyboard
+Installs a package file and compiles its keyboard layouts
+    against a specified base keyboard

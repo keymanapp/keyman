@@ -46,6 +46,6 @@ void Install(bool Force)
 :   Installs a keyboard file, optionally with input method for default
     language
 
-[`IKeymanKeyboardFile3::Install3()`](Install3)
+[`IKeymanKeyboardFile3::Install3()`](../IKeymanKeyboardFile3/Install3)
 :   Installs the keyboard file and compiles its layout against the
     specified base keyboard.

@@ -6,7 +6,7 @@ title: IKeymanKeyboardInstalled2 Interface
 
 The `IKeymanKeyboardInstalled2` interface describes a keyboard file that
 has been installed and allows modification of [keyboard option
-values](Options) for the keyboard file.
+values](../IKeymanKeyboardInstalled/Options) for the keyboard file.
 
 ## Interface Hierarchy
 
