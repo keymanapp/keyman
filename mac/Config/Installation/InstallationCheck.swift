@@ -334,7 +334,7 @@ public class InstallationCheck {
       .minute(.twoDigits)
       .second(.twoDigits)
       .secondFraction(.fractional(3))
-    Logger.app.debug("applyAccessibilityResult: \(permissionGranted), time: \(Date().formatted(timeStyle), privacy: .public)")
+    Logger.app.debug("applyAccessibilityResult: \(permissionGranted), timedOut: \(timedOut), time: \(Date().formatted(timeStyle), privacy: .public)")
 
     if self.isEvaluatingNewInstallation {
       self.completeNewInstallationEvaluation(accessibilityPermissionGranted: permissionGranted)
@@ -346,7 +346,10 @@ public class InstallationCheck {
         }
       }
     } else if installCompleted {
-      self.checkForRepair(accessibilityPermissionGranted: permissionGranted)
+      // if timed out, then skip the repair check rather than assuming Accessibility not granted
+      if !timedOut {
+        self.checkForRepair(accessibilityPermissionGranted: permissionGranted)
+      }
     } else {
       NotificationCenter.default.post(
         name: permissionGranted ? .accessibilityGranted : .accessibilityNotGranted, object: nil)
