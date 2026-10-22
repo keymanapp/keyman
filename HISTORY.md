@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.313 beta 2026-10-22
+
+* fix(mac): installer directly launches config app (#16755)
+* fix(android): pass on backspace keyevent when pressed at start of context (#16856)
+
 ## 19.0.312 beta 2026-10-21
 
 * change(ios): select suggestion mode based on input context (#16806)
