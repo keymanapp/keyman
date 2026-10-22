@@ -64,12 +64,17 @@ public class InstallationCheck {
   // with isEvaluatingNewInstallation==true, we are awaiting
   // message from input method to determine what tasks are needed
   public var isEvaluatingNewInstallation: Bool
-  fileprivate let isInputMethodInstalled: Bool
-  fileprivate let isInputMethodCurrent: Bool
-  fileprivate let inputMethodVersion: String
-  fileprivate let configurationVersion: String
-  fileprivate let defaultsRepository: DefaultsRepo
-  fileprivate let inputMethodUtil: InputMethodUtil
+  private let isInputMethodInstalled: Bool
+  private let isInputMethodCurrent: Bool
+  private let inputMethodVersion: String
+  private let configurationVersion: String
+  private let defaultsRepository: DefaultsRepo
+  private let inputMethodUtil: InputMethodUtil
+  
+  // used to enforce timeout on accessibility response from input method
+  private var accessibilityTimeout: DispatchWorkItem?
+  private var awaitingAccessibilityResponse = false
+  private let accessibilityTimeoutSeconds: TimeInterval = 3.0
 
   // a classification of the install state
   // provided so UI knows what to present to the user
@@ -222,24 +227,103 @@ public class InstallationCheck {
     // call the input method to check whether Accessibility permission has been granted
     if (self.isLaunchedByInstaller) {
       self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
+      self.startAccessibilityResponseTimer()
     }
   }
 
   /**
    * For completed installations, called from init to evaluate whether repairs are needed.
-   * When the notification from the input method is received and the evaluation is done,
-   * the installation can move out of the `evaluatingInstallation` phase
    */
   public func startRepairCheck() {
     guard self.isReadyForRepairCheckAtStartup() else {
       Logger.app.debug("startRepairCheck invoked when not ready for repair")
       return
     }
-      
-    // call the input method to check whether Accessibility permission has been granted
-    self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
+    
+    self.doAsyncAccessibilityCheck()
   }
 
+  /**
+   * Call the input method to check whether Accessibility permission has been granted and
+   * start a timer in case there is no response and we need to timeout.
+   */
+  public func doAsyncAccessibilityCheck() {
+    // call the input method to check whether Accessibility permission has been granted
+    self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
+    self.startAccessibilityResponseTimer()
+  }
+
+  /**
+   * Call immediately after call to `inputMethodUtil.doAsyncAccessibilityCheck`
+   * Used to enforce a timeout on the response from the input method.
+   */
+  func startAccessibilityResponseTimer() {
+    accessibilityTimeout?.cancel()
+    awaitingAccessibilityResponse = true
+    
+    let work = DispatchWorkItem { [weak self] in
+      guard let self, self.awaitingAccessibilityResponse else { return }
+      self.awaitingAccessibilityResponse = false
+      Logger.app.error("accessibility response timed out after \(self.accessibilityTimeoutSeconds)s, assume not granted")
+      self.applyAccessibilityResult(permissionGranted: false)
+    }
+    accessibilityTimeout = work
+    DispatchQueue.main.asyncAfter(deadline: .now() + accessibilityTimeoutSeconds, execute: work)
+  }
+    
+  /**
+   * called when `NSNotification.Name.accessibilityStateResponse` is received
+   */
+  @objc func handleAccessibilityResponse(_ notification: Notification) {
+    guard let message = notification.object as? String else {
+      Logger.app.debug("handleAccessibilityResponse, received but did not include message")
+      return
+    }
+    let granted = self.processAccessibilityResponse(with: message)
+    
+    DispatchQueue.main.async {
+      guard self.awaitingAccessibilityResponse else {
+        Logger.app.debug("late accessibility response ignored: \(message, privacy: .public)")
+        return
+      }
+      self.awaitingAccessibilityResponse = false
+      self.accessibilityTimeout?.cancel()
+      self.accessibilityTimeout = nil
+      self.applyAccessibilityResult(permissionGranted: granted)
+    }
+  }
+
+  /**
+   * Apply the accessibility result from either the input method response or the expired timer.
+   * Three scenarios where we may be using this result:
+   *  1. to evaluate remaining installation steps
+   *  2. to see if a completed installation is in need of repair
+   *  3. while walking user through installation, to check whether they have successfully added the Accessibility permission
+   */
+  func applyAccessibilityResult(permissionGranted: Bool) {
+    // should never happen, but if there is no installationState then interpret it as installation complete
+    let installCompleted = self.installationState?.isComplete ?? true
+
+    let timeStyle = Date.FormatStyle()
+      .hour(.twoDigits(amPM: Date.FormatStyle.Symbol.Hour.AMPMStyle.abbreviated))
+      .minute(.twoDigits)
+      .second(.twoDigits)
+      .secondFraction(.fractional(3))
+    Logger.app.debug("applyAccessibilityResult: \(permissionGranted), time: \(Date().formatted(timeStyle), privacy: .public)")
+
+    if self.isEvaluatingNewInstallation {
+      self.completeNewInstallationEvaluation(accessibilityPermissionGranted: permissionGranted)
+      if self.isLaunchedByInstaller {
+        NotificationCenter.default.post(name: .dataMigrated, object: nil)
+      }
+    } else if installCompleted {
+      self.checkForRepair(accessibilityPermissionGranted: permissionGranted)
+    } else {
+      NotificationCenter.default.post(
+        name: permissionGranted ? .accessibilityGranted : .accessibilityNotGranted, object: nil)
+    }
+  }
+  
   /**
    * Returns true if we should check at app startup whether the installation needs repair.
    * Simply returns true if the installation is complete.
@@ -254,7 +338,8 @@ public class InstallationCheck {
       return false
     }
     
-    let readyForRepairCheck = self.installationState?.isComplete == true
+    // should never happen, but if there is no installationState then interpret it as installation complete
+    let readyForRepairCheck = self.installationState?.isComplete ?? true
     
     Logger.app.debug("isReadyForRepairCheckAtStartup: \(readyForRepairCheck)")
 
@@ -284,63 +369,12 @@ public class InstallationCheck {
       name: NSNotification.Name.accessibilityStateResponse,
       object: nil // Observe notifications from any sender
     )
-
-    // TODO: add timeout in case response is not received
-    // see issue #16579
   }
     
-  /**
-   * called when `NSNotification.Name.accessibilityStateResponse` is received
-   */
-  @objc func handleAccessibilityResponse(_ notification: Notification) {
-    var installCompleted = false
-    
-    // Extract message from the notification if available
-    if let message = notification.object as? String {
-      let permissionGranted = self.processAccessibilityResponse(with: message)
-      
-      Logger.app.debug("handleAccessibilityResponse, message: \(message, privacy: .public)")
-      
-      if let state = self.installationState {
-        installCompleted = state.isComplete
-      }
-      
-      if self.isEvaluatingNewInstallation {
-        // if evaluating the current state for a new installation,
-        // complete the evaluation using the results of the permission check
-        self.completeNewInstallationEvaluation(accessibilityPermissionGranted: permissionGranted)
-        
-        // for a new install, we triggered migration
-        if self.isLaunchedByInstaller {
-          NotificationCenter.default.post(name: .dataMigrated, object: nil)
-        }
-      } else if installCompleted {
-        // if this is a completed install, check whether repairs are needed
-        self.checkForRepair(accessibilityPermissionGranted: permissionGranted)
-      } else {
-        // otherwise, this is for an install step, post results
-        if permissionGranted {
-          NotificationCenter.default.post(name: .accessibilityGranted, object: nil)
-        } else {
-          NotificationCenter.default.post(name: .accessibilityNotGranted, object: nil)
-        }
-      }
-    } else {
-      Logger.app.debug("handleAccessibilityResponse, received but did not include message")
-    }
-  }
-
   /**
    * Process the distributed notification message that we received from the Keyman input method.
    */
   func processAccessibilityResponse(with message: String) -> Bool {
-    let timeStyle = Date.FormatStyle()
-      .hour(.twoDigits(amPM: Date.FormatStyle.Symbol.Hour.AMPMStyle.abbreviated))
-      .minute(.twoDigits)
-      .second(.twoDigits)
-      .secondFraction(.fractional(3))
-    Logger.app.debug("processAccessibilityResponse received message: \(message, privacy: .public), time: \(Date().formatted(timeStyle), privacy: .public)")
-
     // if the message indicates that access was granted, then return true
     return !message.isEmpty && message == kAccessibilityPermissionGrantedMessage
   }
