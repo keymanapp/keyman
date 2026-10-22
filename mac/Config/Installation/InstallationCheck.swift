@@ -151,16 +151,18 @@ public class InstallationCheck {
   }
 
   /**
-   * Check the user defaults to see whether a migration is needed
+   * Determine whether we need to request the input method to migrate data.
    */
   public func isMigrationNeeded() -> Bool {
     var migrationNeeded = true
     
-    if self.defaultsRepository.readDataModelVersion() >= dataModelVersionStoreInGroupContainer {
-      migrationNeeded = false
-    }
-
-    Logger.app.debug("isMigrationNeeded: \(migrationNeeded)")
+    migrationNeeded = self.isLaunchedByInstaller
+    
+    // The logic here could be more complex later if we are able to migrate data
+    // from within the config app, but for now, migrate whenever we are launched
+    // by the installer.
+    
+    Logger.app.debug("isMigrationNeeded(): \(migrationNeeded)")
     return migrationNeeded
   }
   
@@ -225,9 +227,10 @@ public class InstallationCheck {
     }
 
     // call the input method to check whether Accessibility permission has been granted
-    if (self.isLaunchedByInstaller) {
-      self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
-      self.startAccessibilityResponseTimer()
+    if (self.isMigrationNeeded()) {
+      self.doAsyncAccessibilityCheckWithMigration()
+    } else {
+      self.doAsyncAccessibilityCheck()
     }
   }
 
@@ -246,10 +249,22 @@ public class InstallationCheck {
   /**
    * Call the input method to check whether Accessibility permission has been granted and
    * start a timer in case there is no response and we need to timeout.
+   * Receives response as distributed notification named `accessibilityStateResponse`
    */
   public func doAsyncAccessibilityCheck() {
     // call the input method to check whether Accessibility permission has been granted
     self.inputMethodUtil.doAsyncAccessibilityCheck(forceInputMethodRestart: false)
+    self.startAccessibilityResponseTimer()
+  }
+
+  /**
+   * Call the  input method to check whether it has accessibility permission granted
+   * while also instructing the input method to migrate data.
+   * Receives response as distributed notification named `accessibilityStateResponse`
+   */
+  public func doAsyncAccessibilityCheckWithMigration() {
+    // call the input method to check whether Accessibility permission has been granted
+    self.inputMethodUtil.doAsyncAccessibilityCheckWithMigration()
     self.startAccessibilityResponseTimer()
   }
 
@@ -283,7 +298,13 @@ public class InstallationCheck {
     
     DispatchQueue.main.async {
       guard self.awaitingAccessibilityResponse else {
-        Logger.app.debug("late accessibility response ignored: \(message, privacy: .public)")
+        // mostly ignore the late response from the input method, but if we are migrating
+        // data due to a new install, then notify to update the package list again --
+        // just in case more data was migrated after the timeout
+        if self.isMigrationNeeded() {
+          NotificationCenter.default.post(name: .dataMigrated, object: nil)
+        }
+        Logger.app.debug("late accessibility received: \(message, privacy: .public)")
         return
       }
       self.awaitingAccessibilityResponse = false
@@ -313,7 +334,7 @@ public class InstallationCheck {
 
     if self.isEvaluatingNewInstallation {
       self.completeNewInstallationEvaluation(accessibilityPermissionGranted: permissionGranted)
-      if self.isLaunchedByInstaller {
+      if self.isMigrationNeeded() {
         NotificationCenter.default.post(name: .dataMigrated, object: nil)
       }
     } else if installCompleted {
