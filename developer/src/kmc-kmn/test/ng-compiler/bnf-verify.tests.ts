@@ -33,10 +33,7 @@ describe("Verify BNF Against Lexer Tests", () => {
 describe("getSourceRules() Tests", () => {
   it("can handle a simple rule", () => {
     const sourceBuffer = `
-      import { SingleChildRule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
-      import { TokenType } from '../../src/ng-compiler/token-type.js';
-
-      export class DummyRule extends SingleChildRule {
+      class DummyRule extends SingleChildRule {
         public constructor() {
           super();
           this.rule = new TokenRule(TokenType.STRING);
@@ -47,10 +44,7 @@ describe("getSourceRules() Tests", () => {
   });
   it("can handle a rule with one variable", () => {
     const sourceBuffer = `
-      import { SingleChildRule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
-      import { TokenType } from '../../src/ng-compiler/token-type.js';
-
-      export class DummyRule extends SingleChildRule {
+      class DummyRule extends SingleChildRule {
         public constructor() {
           super();
           const stringRule = new TokenRule(TokenType.STRING);
@@ -62,9 +56,6 @@ describe("getSourceRules() Tests", () => {
   });
   it("can handle a rule with one inherited property", () => {
     const sourceBuffer = `
-      import { Rule, SingleChildRule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
-      import { TokenType } from '../../src/ng-compiler/token-type.js';
-
       abstract class AbstractDummyRule extends SingleChildRule {
         protected stringRule: Rule;
 
@@ -74,7 +65,7 @@ describe("getSourceRules() Tests", () => {
         }
       }
 
-      export class DummyRule extends AbstractDummyRule {
+      class DummyRule extends AbstractDummyRule {
         public constructor() {
           super();
           this.rule = this.stringRule;
@@ -85,9 +76,6 @@ describe("getSourceRules() Tests", () => {
   });
   it("can handle a rule with one overridden property", () => {
     const sourceBuffer = `
-      import { Rule, SingleChildRule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
-      import { TokenType } from '../../src/ng-compiler/token-type.js';
-
       abstract class AbstractDummyRule extends SingleChildRule {
         protected stringRule: Rule;
 
@@ -97,7 +85,7 @@ describe("getSourceRules() Tests", () => {
         }
       }
 
-      export class DummyRule extends AbstractDummyRule {
+      class DummyRule extends AbstractDummyRule {
         public constructor() {
           super();
           this.stringRule = new TokenRule(TokenType.BEEP);
@@ -107,12 +95,40 @@ describe("getSourceRules() Tests", () => {
     const sourceRules = getSourceRules(sourceBuffer);
     assert.deepEqual({ dummy: "BEEP" }, sourceRules);
   });
+  it("can handle a property set from a variable", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        protected two: Rule;
+
+        public constructor() {
+          super();
+          const one = new TokenRule(TokenType.BEEP);
+          this.two  = one;
+          this.rule = this.two;
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "BEEP" }, sourceRules);
+  });
+  it("can handle a property set from a property", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        protected one: Rule;
+        protected two: Rule;
+
+        public constructor() {
+          super();
+          this.one  = new TokenRule(TokenType.BEEP);
+          this.two  = this.one;
+          this.rule = this.two;
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "BEEP" }, sourceRules);
+  });
   it("can handle a SequenceRule", () => {
     const sourceBuffer = `
-      import { SequenceRule, SingleChildRule, TokenRule } from '../../src/ng-compiler/recursive-descent.js';
-      import { TokenType } from '../../src/ng-compiler/token-type.js';
-
-      export class DummyRule extends SingleChildRule {
+      class DummyRule extends SingleChildRule {
         public constructor() {
           super();
           const leftBracket  = new TokenRule(TokenType.LEFT_BR);
@@ -122,6 +138,76 @@ describe("getSourceRules() Tests", () => {
       }`;
     const sourceRules = getSourceRules(sourceBuffer);
     assert.deepEqual({ dummy: "LEFT_BR STRING RIGHT_BR" }, sourceRules);
+  });
+  it("can handle an AlternateRule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          const leftBracket  = new TokenRule(TokenType.LEFT_BR);
+          const stringRule   = new TokenRule(TokenType.STRING);
+          const rightBracket = new TokenRule(TokenType.RIGHT_BR);
+          this.rule          = new AlternateRule([leftBracket, stringRule, rightBracket]);
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "LEFT_BR|STRING|RIGHT_BR" }, sourceRules);
+  });
+  it("can handle an AlternateTokenRule", () => {
+    const sourceBuffer = `
+      class DummyRule extends AlternateTokenRule {
+        public constructor() {
+          super([
+            TokenType.LEFT_BR,
+            TokenType.STRING,
+            TokenType.RIGHT_BR,
+          ]);
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "LEFT_BR|STRING|RIGHT_BR" }, sourceRules);
+  });
+  it("can handle an OptionalRule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new OptionalRule(new TokenRule(TokenType.STRING));
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING?" }, sourceRules);
+  });
+  it("can handle a ManyRule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new ManyRule(new TokenRule(TokenType.STRING));
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING*" }, sourceRules);
+  });
+  it("can handle a OneOrManyRule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new OneOrManyRule(new TokenRule(TokenType.STRING));
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING+" }, sourceRules);
+  });
+  it("can handle a complex rule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          const optCompileTarget = new OptionalRule(new CompileTargetRule());
+          const optContent       = new OptionalRule(new ContentRule());
+          const newline          = new TokenRule(TokenType.NEWLINE, true);
+          this.rule = new SequenceRule([optCompileTarget, optContent, newline]);
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "compileTarget? content? NEWLINE" }, sourceRules);
   });
 });
 describe("Verify Parser Against BNF Tests", () => {
@@ -233,11 +319,23 @@ function inspectRuleExpression(
 
   let currentClass: ts.ClassDeclaration | ts.ClassExpression | undefined = cls;
 
-  while (currentClass) {
-    const parentConstructor = getConstructor(currentClass);
+  const visited = new Set<string>();
 
-    if (parentConstructor?.body) {
-      for (const statement of parentConstructor.body.statements) {
+  while (currentClass) {
+    const className = currentClass.name?.text;
+
+    if (className && visited.has(className)) {
+      break;
+    }
+
+    if (className) {
+      visited.add(className);
+    }
+
+    const currentConstructor = getConstructor(currentClass);
+
+    if (currentConstructor?.body) {
+      for (const statement of currentConstructor.body.statements) {
         const assignment = getThisPropertyAssignment(statement);
 
         if (assignment) {
@@ -313,12 +411,19 @@ function findThisPropertyAssignment(
   statements: ts.NodeArray<ts.Statement>,
   propertyName: string
 ): ts.BinaryExpression | undefined {
-  return statements
-    .map(getThisPropertyAssignment)
-    .find(assignment =>
-      assignment !== undefined &&
-      (assignment.left as ts.PropertyAccessExpression).name.text === propertyName
-    );
+  for (const statement of statements) {
+    const assignment = getThisPropertyAssignment(statement);
+
+    if (
+      assignment &&
+      ts.isPropertyAccessExpression(assignment.left) &&
+      assignment.left.name.text === propertyName
+    ) {
+      return assignment;
+    }
+  }
+
+  return undefined;
 }
 
 function inspectAlternateTokenRule(
