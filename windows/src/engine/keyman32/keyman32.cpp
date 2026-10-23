@@ -14,7 +14,7 @@
   Todo:
   Notes:
   History:          01 Aug 2006 - mcdurdin - Clean up SelectKeyboard and Visual Keyboard updating
-                    14 Sep 2006 - mcdurdin - Fix bugs with multiple InitialiseProcess calls causing Keyman to fail to start up correctly
+                    14 Sep 2006 - mcdurdin - Fix bugs with multiple InitProcess calls causing Keyman to fail to start up correctly
                     14 Sep 2006 - mcdurdin - Fix buffer overflow with Keyman_ForceKeyboard causing shift states to be flushed in Keyman Developer debugger
                     04 Dec 2006 - mcdurdin - Add Vista support
                     04 Dec 2006 - mcdurdin - Add Keyman_IsProductLoaded function
@@ -198,8 +198,7 @@ void DoChangeWindowMessageFilter()
   FreeLibrary(hUser32);
 }
 
-BOOL InitThread()
-{
+BOOL InitThread() {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td)
   {
@@ -219,6 +218,8 @@ BOOL InitThread()
 
   _td->FInitialising = TRUE;  // Control re-entrancy, this is thread safe because the variable is per-thread
 
+  ISerialKeyEventClient::Startup();
+
 	LoadKeyboardSettings();
 
   _td->FInitialising = FALSE;  // Control re-entrancy, this is thread safe because the variable is per-thread
@@ -227,19 +228,28 @@ BOOL InitThread()
 }
 
 /*
-  Compatibility flags. Search for the use of these for
-  more documentation on why they exist.
+  Compatibility flags. Search for the use of these for more documentation on why
+  they exist.
+
+  TODO: this is only used by serialkeyeventserver and lowlevelkeyboardhook,
+        which both run in the keyman32/keyman64/keymanarm64 process context, so
+        we should make it private to that context
 */
 void Initialise_Flag_ShouldSerializeInput() {
   flag_ShouldSerializeInput = Reg_GetDebugFlag(REGSZ_Flag_ShouldSerializeInput, TRUE);
 }
 
-BOOL InitialiseProcess() {
+/**
+ * Initialize this library's process state once Keyman has been initialized
+ * system-wide. This is called by each thread, so the first thread to run it
+ * will do initialization. It finishes by doing the thread-specific init also.
+ */
+BOOL InitProcess() {
 	SendDebugEntry();
 
 	if(InterlockedExchange(&FStartedInitialise, TRUE))
 	{
-		//SendDebugMessage("InitialiseProcess: Failed because process is already initialising");
+		//SendDebugMessage("InitProcess: Failed because process is already initialising");
     BOOL result = InitThread();
     return_SendDebugExit(result);
 	}
@@ -345,9 +355,9 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 {
 	HINSTANCE hinst;
 
-  SendDebugEntry();
-
   Globals::LoadDebugSettings();
+
+  SendDebugEntry();
 
 	if(Globals::get_Keyman_Initialised())
  	{
@@ -390,10 +400,10 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
     return_SendDebugExit(FALSE);
   }
 
-	if(!InitialiseProcess())
+	if(!InitProcess())
  	{
  	  SendDebugMessage("Failed to initialise for current process");
-    // SetLastError: InitialiseProcess will return an error code  // I3143   // I3523
+    // SetLastError: InitProcess will return an error code  // I3143   // I3523
 		return_SendDebugExit(FALSE);	/* Failed to verify certificate */
 	}
 
