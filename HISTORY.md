@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.314 beta 2026-10-23
+
+* fix(windows): attempt to reinitialize Keyman on each keystroke in TIP (#16862)
+* docs(developer): add caution for on-screen to use Fill from layout, add Design and Code view sections, and update images (#16756)
+
 ## 19.0.313 beta 2026-10-22
 
 * fix(mac): installer directly launches config app (#16755)
