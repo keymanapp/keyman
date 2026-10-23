@@ -257,16 +257,15 @@ public class InputMethodUtil {
    * Send a distributed notification to the input method to do two things:
    * 1. migrate data if necessary
    * 2. check the state of Accessibility permission
-   * If Keyman is running then kill it and invoke as separate process.
-   * However, Keyman should never be running because we only migrate data
-   * when Keyman Config is invoked from the installer.
+   * If Keyman is running then kill it and invoke Keyman as separate process.
+   * However, Keyman should never be running because we only migrate data when the
+   * config app is invoked from the installer and the installer also kills the input method.
    */
   func invokeKeymanInputMethodCheckAccessWithMigration() throws {
     Logger.setup.info("invokeKeymanInputMethodCheckAccessWithMigration()")
     LogUtil.infoBreadcrumb("invokeKeymanInputMethodCheckAccessWithMigration()", category: .setup)
     
     if self.isKeymanInputMethodRunning() {
-      // kill Keyman so that it refreshes its accessibility state
       _ = self.killKeymanInputMethod()
       Logger.setup.debug("invokeKeymanInputMethodCheckAccessWithMigration(), killed Keyman")
     }
