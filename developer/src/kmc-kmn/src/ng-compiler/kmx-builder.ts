@@ -7,7 +7,7 @@
  */
 
 import { ASTNode } from './tree-construction.js';
-import { DwFileVersion, DwSystemID, DW_FILE_VERSION_MAP, KMX_FILEID_COMPILED } from './kmx-constants.js';
+import { DwFileVersion, DwSystemID, DW_FILE_VERSION_MAP, KMX_FILEID_COMPILED, DwFlags } from './kmx-constants.js';
 import { NodeType } from './node-type.js';
 
 /**
@@ -43,18 +43,29 @@ export class KmxBuilder {
     this.model.compStore.push(new CompStore(DwSystemID.TSS_CUSTOMKEYMANEDITIONNAME, 'Keyman'));
 
     // dwFileVersion
-    const versionNode = this.root.getDescendents(NodeType.VERSION)[0];
-    // TODO-NG-COMPILER: error for invalid version
-    const versionText = versionNode?.getText() ?? '';
-    const valueText   = versionNode?.getTextOfType(NodeType.STRING) ?? '';
-    this.model.dwFileVersion = this.versionToDwFileVersion(valueText);
-    this.model.compStore.push(new CompStore(DwSystemID.TSS_VERSION, versionText));
+    const versionNode        = this.root.getDescendents(NodeType.VERSION)[0];
+    // TODO-NG-COMPILER: error for invalid or missing version
+    const versionName        = versionNode?.getText() ?? '';
+    const versionString      = versionNode?.getTextOfType(NodeType.STRING) ?? '';
+    this.model.dwFileVersion = this.versionToDwFileVersion(versionString);
+    this.model.compStore.push(new CompStore(DwSystemID.TSS_VERSION, versionString, versionName));
 
     //TODO-NG-COMPILER: consider including deprecated variables: dwCheckSum, KeyboardID, IsRegistered, version, StartGroup_ANSI
 
+    // dwFlags
+    //TODO-NG-COMPILER: include code to handle SHIFTFREESCAPS_HEADER, CAPSONONLY_HEADER and CAPSALWAYSOFF_HEADER
+    const shiftFreesCapsNode = this.root.getDescendents(NodeType.SHIFTFREESCAPS)[0];
+    if (shiftFreesCapsNode) {
+      const shiftFreesCapsName   = shiftFreesCapsNode?.getText() ?? '';
+      const shiftFreesCapsString = shiftFreesCapsNode?.getTextOfType(NodeType.STRING) ?? '';
+      if (shiftFreesCapsString === '"1"' || shiftFreesCapsString === "'1'") {
+        this.model.dwFlags |= DwFlags.KF_SHIFTFREESCAPS;
+      }
+      this.model.compStore.push(new CompStore(DwSystemID.TSS_SHIFTFREESCAPS, shiftFreesCapsString, shiftFreesCapsName));
+    }
   }
 
-  private versionToDwFileVersion(text: String): DwFileVersion {
+  private versionToDwFileVersion(text: string): DwFileVersion {
     text = text.replace(/^['|"]|['"]$/gm, '');
     return DW_FILE_VERSION_MAP.get(Number(text));
   }
@@ -84,11 +95,9 @@ export class KmxModel {
 }
 
 export class CompStore {
-  public dpName: Number;
   constructor(
     public readonly dwSystemID: DwSystemID,
-    public readonly dpString: String
-  ) {
-    this.dpName = 0;
-  }
+    public readonly dpString: string,
+    public readonly dpName=''
+  ) {}
 }

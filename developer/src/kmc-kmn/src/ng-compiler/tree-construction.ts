@@ -157,7 +157,7 @@ export class ASTNode {
    *
    * @returns token text or an empty string
    */
-  public getText(): String {
+  public getText(): string {
     return this.token?.text ?? '';
   }
 
@@ -168,7 +168,7 @@ export class ASTNode {
    * @param requiredType the required type
    * @returns token text or an empty string
    */
-  public getTextOfType(requiredType: NodeType): String  {
+  public getTextOfType(requiredType: NodeType): string  {
     const child: ASTNode = this.getSoleChildOfType(requiredType);
     return child?.getText() ?? '';
   }

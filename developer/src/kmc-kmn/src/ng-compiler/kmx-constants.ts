@@ -29,7 +29,7 @@ export enum DwFileVersion {
   VERSION_160 = 0x00001000,
   VERSION_170 = 0x00001100,
   VERSION_190 = 0x00001300,
-}
+};
 
 export const DW_FILE_VERSION_MAP = new Map<Number, DwFileVersion>([
   [3.0,  DwFileVersion.VERSION_30],
@@ -100,4 +100,13 @@ export enum DwSystemID {
   TSS_NEWLAYER                  = 42,
   TSS_OLDLAYER                  = 43,
   TSS_DISPLAYMAP                = 44
-}
+};
+
+export enum DwFlags {
+  KF_SHIFTFREESCAPS   = 0x00000001,
+  KF_CAPSONONLY       = 0x00000002,
+  KF_CAPSALWAYSOFF    = 0x00000004,
+  KF_LOGICALLAYOUT    = 0x00000008, // unused, do not set
+  KF_AUTOMATICVERSION = 0x00000010,
+  KF_KMXPLUS          = 0x00000020
+};

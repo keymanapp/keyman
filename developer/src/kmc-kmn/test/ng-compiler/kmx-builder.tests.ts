@@ -16,7 +16,7 @@ import { readFile } from './token-buffer.tests.js';
 import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
 import { stringToTokenBuffer } from './kmn-analyzer.tests.js';
 import { Parser } from '../../src/ng-compiler/kmn-analyzer.js';
-import { DwFileVersion, DwSystemID } from '../../src/ng-compiler/kmx-constants.js';
+import { DwFileVersion, DwFlags, DwSystemID } from '../../src/ng-compiler/kmx-constants.js';
 import { NodeType } from '../../src/ng-compiler/node-type.js';
 import { Token } from '../../src/ng-compiler/lexer.js';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
@@ -56,7 +56,23 @@ describe("KmxBuilder Tests", () => {
         builder['buildHeader']();
         assert.equal(builder['model'].dwFileVersion, DwFileVersion.VERSION_60);
         assert.isTrue(builder['model'].compStore.some(
-          (cs: CompStore) => (cs.dwSystemID == DwSystemID.TSS_VERSION && cs.dpString == '&version')));
+          (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_VERSION && cs.dpString === "'6.0'" && cs.dpName === '&version')));
+      });
+      it("can handle no caps locks stores", () => {
+        const builder = new KmxBuilder(root);
+        builder['buildHeader']();
+        assert.equal(builder['model'].dwFlags, 0x0);
+      });
+      it("can handle a SHIFTFREESCAPS store", () => {
+        const shiftFreeCapsNode = new ASTNode(NodeType.SHIFTFREESCAPS, new Token(TokenType.SHIFTFREESCAPS, '&shiftfreescaps'));
+        storesNode.addChild(shiftFreeCapsNode);
+        const stringNode = new ASTNode(NodeType.STRING, new Token(TokenType.STRING, '"1"'));
+        shiftFreeCapsNode.addChild(stringNode);
+        const builder = new KmxBuilder(root);
+        builder['buildHeader']();
+        assert.equal(builder['model'].dwFlags, DwFlags.KF_SHIFTFREESCAPS);
+        assert.isTrue(builder['model'].compStore.some(
+          (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_SHIFTFREESCAPS && cs.dpString === '"1"' && cs.dpName === '&shiftfreescaps')));
       });
     });
     it("can provide in-memory model for baseline keyboards", function() {
