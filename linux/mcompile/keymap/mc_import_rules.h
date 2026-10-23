@@ -1,7 +1,16 @@
+/*
+ * Keyman is copyright (C)  SIL Global. MIT License.
+ *
+ * Mnemonic layout support for Linux
+ */
+
 
 #pragma once
 #ifndef MC_IMPORT_RULES_H
 #define MC_IMPORT_RULES_H
+
+#include <vector>
+#include "km_types.h"
 
 /** @brief Base class for Deadkey*/
 class DeadKey {
