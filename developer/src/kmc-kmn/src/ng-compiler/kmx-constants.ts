@@ -8,6 +8,8 @@
  * KMX enums for the Semantic Model Builder (KmxBuilder)
  */
 
+export const KMX_FILEID_COMPILED = 0x5354584B; // KXTS
+
 /* These have been placed in version numerical order for ease of access */
 
 export enum DwFileVersion {

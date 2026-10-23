@@ -7,7 +7,7 @@
  */
 
 import { ASTNode } from './tree-construction.js';
-import { DwFileVersion, DwSystemID, DW_FILE_VERSION_MAP } from './kmx-constants.js';
+import { DwFileVersion, DwSystemID, DW_FILE_VERSION_MAP, KMX_FILEID_COMPILED } from './kmx-constants.js';
 import { NodeType } from './node-type.js';
 
 /**
@@ -49,6 +49,9 @@ export class KmxBuilder {
     const valueText   = versionNode?.getTextOfType(NodeType.STRING) ?? '';
     this.model.dwFileVersion = this.versionToDwFileVersion(valueText);
     this.model.compStore.push(new CompStore(DwSystemID.TSS_VERSION, versionText));
+
+    //TODO-NG-COMPILER: consider including deprecated variables: dwCheckSum, KeyboardID, IsRegistered, version, StartGroup_ANSI
+
   }
 
   private versionToDwFileVersion(text: String): DwFileVersion {
@@ -61,7 +64,22 @@ export class KmxBuilder {
  * KmxModel is an in-memory model of a KMX file.
  */
 export class KmxModel {
+  dwIdentifier = KMX_FILEID_COMPILED;
   dwFileVersion: DwFileVersion;
+  dwCheckSum   = 0x0; // deprecated
+  KeyboardID   = 0x0; // deprecated
+  IsRegistered = 0x1; // deprecated
+  version      = 0x0; // deprecated
+  cxStoreArray: number;
+  cxGroupArray: number;
+  dpStoreArray: number;
+  dpGroupArray: number;
+  StartGroup_ANSI    = 0xFFFFFFFF; // deprecated
+  StartGroup_Unicode = 0xFFFFFFFF;
+  dwFlags: number;
+  dwHotKey: number;
+  dpBitmapOffset: number;
+  dwBitmapSize: number;
   compStore: CompStore[] = [];
 }
 
