@@ -76,8 +76,8 @@ export class KmxModel {
   dpGroupArray: number;
   StartGroup_ANSI    = 0xFFFFFFFF; // deprecated
   StartGroup_Unicode = 0xFFFFFFFF;
-  dwFlags: number;
-  dwHotKey: number;
+  dwFlags  = 0x0;
+  dwHotKey = 0x0;
   dpBitmapOffset: number;
   dwBitmapSize: number;
   compStore: CompStore[] = [];

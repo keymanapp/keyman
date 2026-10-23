@@ -30,7 +30,7 @@ describe("KmxBuilder Tests", () => {
   describe("KmxBuilder", () => {
     it("can construct a KmxBuilder", () => {
       root = new ASTNode();
-      const builder: KmxBuilder = new KmxBuilder(root);
+      const builder = new KmxBuilder(root);
       assert.isNotNull(builder);
     });
     describe("KmxBuilder.buildHeader", () => {
@@ -71,6 +71,19 @@ describe("KmxBuilder Tests", () => {
         const builder: KmxBuilder = new KmxBuilder(root);
         assert.isNotNull(builder.build(), `${name}.kmn`);
       });
+    });
+  });
+});
+describe("KmxModel Tests", () => {
+  describe("KmxModel", () => {
+    it("has correct values for deprecated header variables", () => {
+      const builder = new KmxBuilder(new ASTNode());
+      const model   = builder.build();
+      assert.equal(model.dwCheckSum,      0x0);
+      assert.equal(model.KeyboardID,      0x0);
+      assert.equal(model.IsRegistered,    0x1);
+      assert.equal(model.version,         0x0);
+      assert.equal(model.StartGroup_ANSI, 0xFFFFFFFF);
     });
   });
 });
