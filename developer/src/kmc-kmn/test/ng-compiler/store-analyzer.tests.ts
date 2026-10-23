@@ -440,7 +440,7 @@ describe("KMN Store Analyser Tests", () => {
     });
   });
   describe("SystemStoreNameForSetRule Tests", () => {
-    it("can construct a SSystemStoreNameForSetRule", () => {
+    it("can construct a SystemStoreNameForSetRule", () => {
       tokenBuffer = stringToTokenBuffer('');
       const systemStoreNameForSet: Rule = new SystemStoreNameForSetRule();
       assert.isNotNull(systemStoreNameForSet);
