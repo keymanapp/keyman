@@ -411,5 +411,7 @@ certificates for the build.
 
 * sentry-cli (optional)
   - Uploading symbols for Sentry-based error reporting
-  - https://github.com/getsentry/sentry-cli/releases/tag/1.70.0
-    (TODO: update to newer version)
+
+  See <https://docs.sentry.io/cli/installation/> for the installation, and
+  check [minimum-versions.md](../minimum-versions.md) for the required version of
+  `sentry-cli`.
