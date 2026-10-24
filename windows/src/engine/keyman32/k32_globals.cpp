@@ -132,8 +132,6 @@ PKEYMAN64THREADDATA Globals_InitThread()
   }
   LeaveCriticalSection(&csGlobals);
 
-  ISerialKeyEventClient::Startup();
-
   return lpvData;
 }
 
@@ -465,15 +463,9 @@ BOOL Globals::ResetControllers()  // I3092
   return TRUE;
 }
 
-BOOL Globals::CheckControllers()
-{
-  return TRUE;  // I2722
-}
-
 BOOL Globals::IsControllerWindow(HWND hwnd)
 {
   if(!Lock()) return FALSE;
-  CheckControllers();
   DWORD tid = GetWindowThreadProcessId(hwnd, NULL);
 	for(int i = 0; i < f_MaxControllerThreads; i++)
 		if(tid == f_ControllerThreads[i])
@@ -489,7 +481,6 @@ BOOL Globals::IsControllerWindow(HWND hwnd)
 BOOL Globals::IsControllerThread(DWORD tid)
 {
   if(!Lock()) return FALSE;
-  CheckControllers();
 	for(int i = 0; i < f_MaxControllerThreads; i++)
   {
     if(f_ControllerThreads[i] == tid)
@@ -506,7 +497,6 @@ void Globals::PostMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 {
   if(!Lock()) return;
   SendDebugEntry();
-  CheckControllers();
 	if(f_MasterController == NULL)
 	{
 		SendDebugMessageFormat("no controllers [%x : %x, %x]", msg, wParam, lParam);
@@ -534,7 +524,6 @@ LRESULT Globals::SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 {
   if(!Lock()) return 0;
   SendDebugEntry();
-  CheckControllers();
 	if(f_MasterController == NULL)
 	{
     Unlock();
