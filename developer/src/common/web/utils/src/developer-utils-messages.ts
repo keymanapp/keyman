@@ -53,8 +53,8 @@ export class DeveloperUtilsMessages {
       `Problem reading test data: expected single ${def(o.subtag)} element, found multiple`);
 
   static ERROR_InvalidXml = SevError | 0x0008;
-  static Error_InvalidXml = (o:{e: any}) =>
-  m(this.ERROR_InvalidXml, `The XML file could not be read: ${(o.e ?? '').toString()}`);
+  static Error_InvalidXml = (o:{e: any, path: string}) =>
+  m(this.ERROR_InvalidXml, `The XML file ${o.path ? `'${o.path}' ` : ''}could not be read: ${(o.e ?? '').toString()}`);
 
   static ERROR_InvalidPackageFile = SevError | 0x0009;
   static Error_InvalidPackageFile = (o:{e:any}) => m(

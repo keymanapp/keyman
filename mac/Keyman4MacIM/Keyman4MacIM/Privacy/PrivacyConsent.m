@@ -38,6 +38,7 @@
 NSString *kMigrateCommand = @"migrate";
 NSString *kAccessCommand = @"access";
 NSString *kCheckCommand = @"check";
+NSString *kMigrateAndCheckCommand = @"migrateandcheck";
 
 // notification messages sent to Keyman Configuration
 NSString *kAcessibilityPermissionGrantedMessage = @"granted";

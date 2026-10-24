@@ -930,6 +930,20 @@ export class KmnCompilerMessages {
     `A store can contain only characters, deadkeys, virtual keys, and 'outs()' statements.`,
   );
 
+  static WARN_CallUsedOnUnsupportedPlatform                = SevWarn | 0x0BF;
+  static Warn_CallUsedOnUnsupportedPlatform                = () => mc(
+    this.WARN_CallUsedOnUnsupportedPlatform,
+    `The \`call()\` statement is not supported on macOS or Linux platforms.`, `
+    The \`call()\` statement is supported on Windows and web-based platforms,
+    including mobile and tablet. The target platforms can be specified in
+    the \`&targets\` system store; avoid the use of generic platforms such as
+    \`'any'\` or \`'desktop'\`. Note that the implementation of your call
+    target will differ across platforms; see
+    [\`call()\` statement](https://help.keyman.com/developer/language/reference/call)
+    in the documentation for more details.
+    `
+  );
+
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
   static Fatal_BufferOverflow                                 = () => mc(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
 

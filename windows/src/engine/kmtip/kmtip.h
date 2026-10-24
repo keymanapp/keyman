@@ -95,14 +95,13 @@ private:
     BOOL _InitThreadMgrSink();
     BOOL _InitKeystrokeSink();
     BOOL _InitPreservedKeys();   // I4274
-    BOOL _InitKeyman();
+    BOOL _InitKeymanIfNotAlreadyInitialized();
 
     HRESULT _PreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr);
 
     // uninit methods
     void _UninitThreadMgrSink();
     void _UninitKeystrokeSink();
-    void _UninitKeyman();
 
     void _TryAndStartKeyman();
 
@@ -131,6 +130,8 @@ private:
     DWORD _dwDeepIntegration;   // I4375
 
     BOOL _tryAndStartKeyman;
+    GUID _activeGuidProfile;
+    BOOL _keymanInitialized;
 
     LONG _cRef;     // COM ref count
 };

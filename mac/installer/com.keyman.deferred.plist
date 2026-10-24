@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://apple.com">
+<plist version="1.0">
+<dict>
+    <!-- the unique system identifier for this background agent -->
+    <key>Label</key>
+    <string>com.keyman.deferred</string>
+
+    <!-- the program execution and parameter array -->
+    <key>ProgramArguments</key>
+    <array>
+        <!-- the absolute path the underlying application binary file -->
+        <string>/Applications/Keyman Configuration.app/Contents/MacOS/Keyman Configuration</string>
+        
+        <!-- the argument to trigger Keyman config to complete installation -->
+        <string>installation</string>
+    </array>
+
+    <!-- the app only launches on demand via the postinstall script -->
+    <key>RunAtLoad</key>
+    <false/>
+
+    <!-- ensures the application runs directly inside the visual user desktop session -->
+    <key>LimitLoadToSessionType</key>
+    <array>
+        <string>Aqua</string>
+    </array>
+</dict>
+</plist>

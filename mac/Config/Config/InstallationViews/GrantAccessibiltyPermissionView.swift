@@ -9,6 +9,10 @@
 import SwiftUI
 import AppKit
 
+/**
+ * navigate directly to System Settings > Privacy & Security > Accessibility
+ * For macOS 27 Golden Gate, this pane is renamed from 'Accessibility' to 'Device Control and Data Access'
+ */
 func openAccessibilitySettings() {
   if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
     NSWorkspace.shared.open(url)
