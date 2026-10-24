@@ -17,7 +17,9 @@ will not have been installed but can be any keyboard file on disk.
 > >
 > > > **`IKeymanKeyboardFile`**  
 > > >
-> > > > [`IKeymanKeyboardFile2`](../IKeymanKeyboardFile2)  
+> > > > [`IKeymanKeyboardFile2`](../IKeymanKeyboardFile2)
+> > > >
+> > > > [`IKeymanKeyboardFile3`](../IKeymanKeyboardFile3)
 
 ## Properties
 

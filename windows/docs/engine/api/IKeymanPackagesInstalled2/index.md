@@ -9,15 +9,17 @@ in Keyman Engine.
 
 ## Interface Hierarchy
 
-`IDispatch`  
+`IDispatch`
 
-> [`IKeymanObject`](../IKeymanObject)  
+> [`IKeymanObject`](../IKeymanObject)
 >
-> > [`IKeymanCollection`](../IKeymanCollection)  
+> > [`IKeymanCollection`](../IKeymanCollection)
 > >
-> > > [`IKeymanPackagesInstalled`](../IKeymanPackagesInstalled)  
+> > > [`IKeymanPackagesInstalled`](../IKeymanPackagesInstalled)
 > > >
-> > > > **`IKeymanPackagesInstalled2`**  
+> > > > **`IKeymanPackagesInstalled2`**
+> > > >
+> > > > [`IKeymanPackagesInstalled3`](../IKeymanPackagesInstalled3)
 
 ## Methods
 
