@@ -86,6 +86,7 @@ export const Codes = {
   /**
    * Get modifier key state from layer id
    *
+   * @deprecated Use `modifierStringToState` from `@keymanapp/common-types`; note that 'caps' is also matched
    * @param       {string}      layerId       layer id (e.g. ctrlshift)
    * @return      {number}                    modifier key state (desktop keyboards)
    */
@@ -128,6 +129,7 @@ export const Codes = {
   /**
    * Get state key state from layer id
    *
+   * @deprecated Use `modifierStringToState` from `@keymanapp/common-types`; note that modifiers are also matched
    * @param       {string}      layerId       layer id (e.g. caps)
    * @return      {number}                    modifier key state (desktop keyboards)
    */

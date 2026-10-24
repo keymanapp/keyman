@@ -122,7 +122,7 @@ describe('InputProcessor', function() {
 
       // Load the keyboard.
       let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
-      const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js'));
+      const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_chirality.js')) as JSKeyboard;
       keyboardWithHarness = keyboardLoader.harness as JSKeyboardInterface;
       keyboardWithHarness.activeKeyboard = keyboard;
 
@@ -230,7 +230,7 @@ describe('InputProcessor', function() {
     before(async function () {
       // Load the keyboard.
       let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
-      const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_8568_deadkeys.js'));
+      const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_8568_deadkeys.js')) as JSKeyboard;
       keyboardWithHarness = keyboardLoader.harness as JSKeyboardInterface;
       keyboardWithHarness.activeKeyboard = keyboard;
 
@@ -303,7 +303,7 @@ describe('InputProcessor', function() {
     before(async () => {
       // Load the keyboard.
       let keyboardLoader = new NodeKeyboardLoader(new JSKeyboardInterface({}, MinimalKeymanGlobal, new VariableStoreTestSerializer()));
-      const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_simple_deadkeys.js'));
+      const keyboard = await keyboardLoader.loadKeyboardFromPath(require.resolve('@keymanapp/common-test-resources/keyboards/test_simple_deadkeys.js')) as JSKeyboard;
       keyboardWithHarness = keyboardLoader.harness as JSKeyboardInterface;
       keyboardWithHarness.activeKeyboard = keyboard;
 

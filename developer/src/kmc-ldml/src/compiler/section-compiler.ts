@@ -1,14 +1,14 @@
 import { KMXPlus } from "@keymanapp/common-types";
 import { CompilerCallbacks, LDMLKeyboard } from "@keymanapp/developer-utils";
-import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
+import { KMXPlusVersion, SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 
 /** newable interface to SectionCompiler c'tor */
-export type SectionCompilerNew = new (source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) => SectionCompiler;
+export type SectionCompilerNew = new (source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks, targetVersion: KMXPlusVersion) => SectionCompiler;
 export abstract class SectionCompiler {
   protected readonly keyboard3: LDMLKeyboard.LKKeyboard;
   protected readonly callbacks: CompilerCallbacks;
 
-  constructor(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks) {
+  constructor(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, callbacks: CompilerCallbacks, public readonly targetVersion: KMXPlusVersion) {
     this.keyboard3 = source.keyboard3;
     this.callbacks = callbacks;
   }

@@ -6,11 +6,11 @@ export class VariableStoreCookieSerializer implements VariableStoreSerializer {
     return `KeymanWeb_${keyboardID}_Option_${storeName}`;
   }
 
-  public loadStore(keyboardID: string, storeName: string): string {
+  public loadStore(keyboardID: string, storeName: string): string | undefined {
     // Note, for historical reasons, we pass a VariableStores object into the
     // cookie serializer but expect only a single value to be loaded
     const storeCookieSerializer = new CookieSerializer<VariableStores>(this.getStoreCookieName(keyboardID, storeName));
-    return storeCookieSerializer.load(decodeURIComponent)[storeName];
+    return storeCookieSerializer.load(decodeURIComponent)[storeName] ?? undefined;
   }
 
   public saveStore(keyboardID: string, storeName: string, storeValue: string) {

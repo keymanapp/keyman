@@ -14,10 +14,6 @@
 
 #include "keyman_core.h"
 
-
-// Forward declarations
-class json;
-
 namespace km {
 namespace core
 {
