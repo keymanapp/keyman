@@ -85,13 +85,14 @@ export class PredictionContext extends EventEmitter<PredictionContextEventMap> {
       this.currentTextStore && langProcessor.state == 'configured';
 
     this.suggestionApplier = (suggestion, processorAction) => {
-      if(validSuggestionState()) {
+      if (validSuggestionState()) {
         const results = langProcessor.applySuggestion(suggestion, this.currentTextStore, getLayerId, processorAction);
-        results.reversion.then((reversion) => this._immediateReversion = reversion);
-        return results.appendedProcessorAction;
-      } else {
-        return null;
+        if (results) {
+          results.reversion.then((reversion) => this._immediateReversion = reversion);
+          return results.appendedProcessorAction;
+        }
       }
+      return null;
     }
 
     this.suggestionReverter = async (reversion) => {
