@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from "chai";
 import { DEFAULT_PROCESSOR_INIT_OPTIONS } from 'keyman/test/resources';
 import { JSKeyboardProcessor } from "keyman/engine/js-processor";

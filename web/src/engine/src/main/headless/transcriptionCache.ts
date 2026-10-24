@@ -22,7 +22,7 @@ export class TranscriptionCache extends RewindableCache<Transcription> {
     });
 
     return entries
-      .map(({key, entry}) => `Context state ${key}'s keystroke:\n${entry.keystroke.inputBreadcrumb ?? ''}`)
+      .map(({key, entry}) => `Context state ${key}'s keystroke:\n${entry?.keystroke?.inputBreadcrumb ?? ''}`)
       .join('\n');
   }
 }
