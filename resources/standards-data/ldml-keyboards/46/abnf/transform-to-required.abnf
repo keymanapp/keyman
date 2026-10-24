@@ -49,7 +49,7 @@ string-variable = "${" var-id "}"
 var-id = 1*32IDCHAR
 
 ; special case for a mapped set variable
-mapped-set = "$[1:" var-id "]"
+mapped-set = "$[" DIGIT ":" var-id "]"
 
 ; group for everything BUT syntax chars.
 content-char      =  ASCII-PUNCT / ALPHA / DIGIT / NON-ASCII
