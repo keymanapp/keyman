@@ -25,9 +25,9 @@ if [ -d "upload" ]; then
   rm -rf upload
 fi
 
-#Include script dependency
-. $KEYMAN_ROOT/resources/build/history/history-utils.sh         #includes the following
-#. ../resources/build/utils.inc.sh
+# Include script dependency
+. "$KEYMAN_ROOT/resources/build/utils.inc.sh"
+
 
 BUILD_NUMBER="${KEYMAN_VERSION}"
 
@@ -35,8 +35,6 @@ KEYMAN_CHANGELOG="changelog-${BUILD_NUMBER}-${KEYMAN_TIER}.txt"
 CHANGELOG_PATH="upload/$BUILD_NUMBER/$KEYMAN_CHANGELOG"
 
 WORK_DIR=`pwd`
-
-BUILD_COUNTER="$((${BUILD_NUMBER##*.}))"
 
 UPLOAD_BASE="upload"
 UPLOAD_FOLDER="${BUILD_NUMBER}"
@@ -47,8 +45,8 @@ mkdir -p "${UPLOAD_DIR}"
 # First, we prep the files for publication: write changelog
 
 echo "Writing changelog to $CHANGELOG_PATH"
-get_version_notes "ios" "${BUILD_NUMBER}" "$KEYMAN_TIER" > $CHANGELOG_PATH
-echo "* Minor fixes and performance improvements" >> $CHANGELOG_PATH
+echo "* Minor fixes and performance improvements" > $CHANGELOG_PATH
+echo "* See keyman.com/ios for full change history" >> $CHANGELOG_PATH
 
 # Strip emoji as App Store does not allow emoji in changelogs
 node "$KEYMAN_ROOT/resources/tools/strip-emoji" < "$CHANGELOG_PATH" > "$CHANGELOG_PATH.1"
