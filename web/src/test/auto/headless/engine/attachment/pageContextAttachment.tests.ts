@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai';
 // @ts-ignore  // Type info unavailable; doing a npm-install for it breaks things much worse in other ways.
 import { JSDOM } from 'jsdom';

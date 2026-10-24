@@ -1,5 +1,43 @@
 # Keyman Version History
 
+## 20.0.7 alpha 2026-10-21
+
+* chore(web): add Keyman header to test files (#16857)
+
+## 20.0.6 alpha 2026-10-19
+
+* docs(common): move legacy history (#16799)
+
+## 20.0.5 alpha 2026-10-17
+
+* fix: set alpha tier after merge (#16841)
+
+## 20.0.4 alpha 2026-10-14
+
+* refactor(web): clarify scope of `doShow`/`doHide` (#16589)
+* refactor(web): update function comments and cleanup (#16591)
+
+## 20.0.3 alpha 2026-10-09
+
+* maint(ios): new iOS certificate (alpha-20.0) (#16771)
+
+## 20.0.2 alpha 2026-10-07
+
+* fix(mac): lower case 'k' for .pkg.download_info (#16744)
+
+## 20.0.1 alpha 2026-10-06
+
+* chore: add epics to HISTORY.md (#16729)
+* fix(android): refresh current keyboard when resuming main activity (#16645)
+* fix(mac): apply backspace to correct location (#16634)
+* docs: add acceptance tests from dokimion (#16693)
+* chore(developer): warn on v19 deprecated language features (#16710)
+* fix(developer): check `any()` and `index()` for invalid use of virtual keys (#16717)
+* fix(developer): emit compile error when unsupported statements encountered in stores (#16723)
+* chore(common): move CODE__SIZE declaration to common (#16724)
+* chore(common): remove `clearcontext`,`fix`,`switch`,`key` statements (#16726)
+* chore: move to 20.0-alpha (#16739)
+
 ## 19.0.314 beta 2026-10-23
 
 * fix(windows): attempt to reinitialize Keyman on each keystroke in TIP (#16862)
@@ -1891,6 +1929,15 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.254 stable 2026-10-16
+
+* chore(linux): replace deprecated `parse_version` (#16736)
+* chore(linux): update Debian standards version (#16713)
+* chore(linux): update changelog with Debian version (#16735)
+* fix(web): prevent crash adding log entry for keystroke with `inputBreadCrumb` (#16761)
+* maint(ios): new iOS certificate (stable-18.0) (#16773)
+* fix(web): don't crash if model isn't fully loaded yet (#16784)
 
 ## 18.0.253 stable 2026-10-02
 
