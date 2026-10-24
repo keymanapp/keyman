@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai';
 
 import { SyntheticTextStore, findCommonSubstringEndIndex } from 'keyman/engine/keyboard';
