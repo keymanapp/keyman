@@ -1,4 +1,6 @@
 /*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
  * Integration tests for the model compositor with the trie model.
  */
 

@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 // KeymanWeb test suite - processing of the Karma configuration's client.args parameter.
 
 import { DeviceDetector } from 'keyman/engine/main';

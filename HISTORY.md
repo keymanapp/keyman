@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 20.0.7 alpha 2026-10-21
+
+* chore(web): add Keyman header to test files (#16857)
+
+## 20.0.6 alpha 2026-10-19
+
+* docs(common): move legacy history (#16799)
+
+## 20.0.5 alpha 2026-10-17
+
+* fix: set alpha tier after merge (#16841)
+
+## 20.0.4 alpha 2026-10-14
+
+* refactor(web): clarify scope of `doShow`/`doHide` (#16589)
+* refactor(web): update function comments and cleanup (#16591)
+
+## 20.0.3 alpha 2026-10-09
+
+* maint(ios): new iOS certificate (alpha-20.0) (#16771)
+
 ## 20.0.2 alpha 2026-10-07
 
 * fix(mac): lower case 'k' for .pkg.download_info (#16744)
@@ -16,6 +37,32 @@
 * chore(common): move CODE__SIZE declaration to common (#16724)
 * chore(common): remove `clearcontext`,`fix`,`switch`,`key` statements (#16726)
 * chore: move to 20.0-alpha (#16739)
+
+## 19.0.305 beta 2026-10-09
+
+* docs: remove repeated clean up instructions (#16745)
+* fix(web): prevent crash adding log entry for keystroke with `inputBreadCrumb` (#16762)
+* maint(ios): new iOS certificate (beta-19.0) (#16772)
+* docs(developer): fix typo in whatsnew (#16774)
+* fix(web): fix crash applying suggestions (#16786)
+
+## 19.0.304 beta 2026-10-08
+
+* docs(common): add `sentry-cli` version and update documentation (#16752)
+* chore(linux): update changelog with Debian version (#16758)
+
+## 19.0.303 beta 2026-10-07
+
+* fix(resources): export KEYMAN_TIER so we get beta tagging on release build (#16751)
+
+## 19.0.302 beta 2026-10-07
+
+* fix(mac): lower case 'k' for .pkg.download_info (#16743)
+* docs: update v19 whats-new (#16748)
+
+## 19.0.300 beta 2026-10-06
+
+* chore: move to beta
 
 ## 19.0.299 alpha 2026-10-05
 
@@ -1830,6 +1877,15 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.254 stable 2026-10-16
+
+* chore(linux): replace deprecated `parse_version` (#16736)
+* chore(linux): update Debian standards version (#16713)
+* chore(linux): update changelog with Debian version (#16735)
+* fix(web): prevent crash adding log entry for keystroke with `inputBreadCrumb` (#16761)
+* maint(ios): new iOS certificate (stable-18.0) (#16773)
+* fix(web): don't crash if model isn't fully loaded yet (#16784)
 
 ## 18.0.253 stable 2026-10-02
 
