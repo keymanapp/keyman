@@ -52,7 +52,22 @@ struct MainConfigView: View {
     packageSelectedForHelpUrl = url
     selectedTab = 1
   }
-    
+  
+  /**
+   * Begin installation of a .kmp file, either dropped on the view or opened from Finder.
+   * Presents PackageConfirmationView on success, or the failure alert on error.
+   */
+  private func beginKmpInstall(url: URL) -> Bool {
+    do {
+      packageInstallHelper = try settings.initiateKmpFileInstallation(at: url)
+      return true
+    } catch {
+      self.alertMessage = error.localizedDescription
+      self.isShowingDropKmpAlert = true
+      return false
+    }
+  }
+
   var body: some View {
     TabView (selection: $selectedTab) {
       VStack {
@@ -141,14 +156,7 @@ struct MainConfigView: View {
             self.isShowingDropKmpAlert = true
             return false // the drop failed
           }
-          do {
-            packageInstallHelper = try settings.initiateKmpFileInstallation(at: droppedFileUrl)
-            return true // the drop was successful
-          } catch {
-            self.alertMessage = error.localizedDescription
-            self.isShowingDropKmpAlert = true
-            return false
-          }
+          return beginKmpInstall(url: droppedFileUrl)
         } isTargeted: { hovering in
           isHovering = hovering
         }
@@ -206,6 +214,24 @@ struct MainConfigView: View {
           .tabItem { Text("Help") }
           .tag(1)
       }
+    }
+    .onOpenURL { url in
+      // only handle files
+      guard url.isFileURL else { return }
+      
+      // only handle if we are not busy with an install
+      guard packageInstallHelper == nil,
+            !isShowingAddKeyboardSheet,
+            !settings.isInstallationInProgress() else {
+        Logger.app.info("ignoring opened kmp file '\(url.lastPathComponent, privacy: .public)', installation already in progress")
+        return
+      }
+
+      NSApp.activate(ignoringOtherApps: true)
+
+      Logger.app.info("opened kmp file: \(url.lastPathComponent, privacy: .public)")
+      selectedTab = 0   // show the Keyboards tab so the confirmation sheet and new row are visible
+      _ = beginKmpInstall(url: url)
     }
   }
 }
