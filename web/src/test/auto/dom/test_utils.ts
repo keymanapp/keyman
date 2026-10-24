@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 // Defines an object for dynamically adding elements for testing purposes.
 // Designed for use with the robustAttachment.html fixture.
 

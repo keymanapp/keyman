@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 
