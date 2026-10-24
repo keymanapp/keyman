@@ -336,6 +336,12 @@ export class LdmlCompilerMessages {
     more than one, at most one form may omit the \`minDeviceWidth\` attribute.
   `);
 
+  static ERROR_InvalidTargetVersion = SevError | 0x0036;
+  static Error_InvalidTargetVersion = (o: {version: number}) => m(
+    this.ERROR_InvalidTargetVersion,
+    `Target version ${def(o.version)} is not a valid version. Only 17.0 and 19.0 target versions are currently supported for LDML keyboards."`,
+  );
+
   //
   // Transform syntax errors begin at ...F00 (SevErrorTransform)
 

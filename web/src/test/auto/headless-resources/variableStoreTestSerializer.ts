@@ -10,8 +10,8 @@ export class VariableStoreTestSerializer implements VariableStoreSerializer {
     return `KeymanWeb_${keyboardID}_Option_${storeName}`;
   }
 
-  loadStore(keyboardID: string, storeName: string): string {
-    return this.stores[this.getStoreName(keyboardID, storeName)] ?? '';
+  loadStore(keyboardID: string, storeName: string): string | undefined {
+    return this.stores[this.getStoreName(keyboardID, storeName)] ?? undefined;
   }
 
   saveStore(keyboardID: string, storeName: string, storeValue: string): void {
