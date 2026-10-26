@@ -167,8 +167,10 @@ export class KmnTreeRebuild extends ASTRebuild {
       const lineNum  = systemStore.token.lineNum;
       const lineNode = lineNodes.find((line) => line.token.lineNum === lineNum);
       if (lineNode) {
-        systemStore.addNewChildWithToken(NodeType.STRING,
-          new Token(TokenType.STRING, lineNode.token.line));
+        systemStore.addNewChildWithToken(
+          NodeType.STRING,
+          new Token(TokenType.STRING, lineNode.token.line)
+        );
       }
     });
   }

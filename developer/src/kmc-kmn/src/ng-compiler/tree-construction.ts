@@ -9,6 +9,13 @@
 import { Token } from "./lexer.js";
 import { NodeType } from "./node-type.js";
 
+export interface TokenBounds {
+  firstLine: number | null;
+  firstChar: number | null;
+  lastLine: number  | null;
+  lastChar: number  | null;
+}
+
 /**
  * ASTNode objects form the abstract syntax tree created by the recursive-
  * descent parser. The class provides methods used for building, testing
@@ -318,6 +325,41 @@ export class ASTNode {
 
     this.children = children;
     return blocks;
+  }
+
+  public getTokenBounds(): TokenBounds {
+    let firstLine = Infinity;
+    let firstChar = Infinity;
+    let lastLine  = -Infinity;
+    let lastChar  = -Infinity;
+
+    const visit = (node: ASTNode) => {
+      const token = node.token;
+
+      if (token) {
+        const start = [token.lineNum, token.charNum];
+        const end   = [token.lineNum, token.charNum + token.text.length];
+
+        if (start[0] < firstLine || (start[0] === firstLine && start[1] < firstChar)) {
+          [firstLine, firstChar] = start;
+        }
+
+        if (end[0] > lastLine || (end[0] === lastLine && end[1] > lastChar)) {
+          [lastLine, lastChar] = end;
+        }
+      }
+
+      node.children.forEach(visit);
+    };
+
+    visit(this);
+
+    return {
+      firstLine: firstLine === Infinity ? null : firstLine,
+      firstChar: firstLine === Infinity ? null : firstChar,
+      lastLine:  lastLine === -Infinity ? null : lastLine,
+      lastChar:  lastLine === -Infinity ? null : lastChar,
+    };
   }
 
   public toString(): string {
