@@ -56,8 +56,8 @@ export class KmxBuilder {
     //TODO-NG-COMPILER: include code to handle SHIFTFREESCAPS_HEADER, CAPSONONLY_HEADER and CAPSALWAYSOFF_HEADER
     const shiftFreesCapsNode = this.root.getDescendents(NodeType.SHIFTFREESCAPS)[0];
     if (shiftFreesCapsNode) {
-      const shiftFreesCapsName   = shiftFreesCapsNode?.getText() ?? '';
-      const shiftFreesCapsString = shiftFreesCapsNode?.getTextOfType(NodeType.STRING) ?? '';
+      const shiftFreesCapsName   = shiftFreesCapsNode.getText() ?? '';
+      const shiftFreesCapsString = shiftFreesCapsNode.getTextOfType(NodeType.STRING) ?? '';
       if (this.stripQuoteMarks(shiftFreesCapsString) === '1') {
         this.model.dwFlags |= DwFlags.KF_SHIFTFREESCAPS;
       }
@@ -65,8 +65,8 @@ export class KmxBuilder {
     }
     const capsOnOnlyNode = this.root.getDescendents(NodeType.CAPSONONLY)[0];
     if (capsOnOnlyNode) {
-      const capsOnOnlyName   = capsOnOnlyNode?.getText() ?? '';
-      const capsOnOnlyString = capsOnOnlyNode?.getTextOfType(NodeType.STRING) ?? '';
+      const capsOnOnlyName   = capsOnOnlyNode.getText() ?? '';
+      const capsOnOnlyString = capsOnOnlyNode.getTextOfType(NodeType.STRING) ?? '';
       if (this.stripQuoteMarks(capsOnOnlyString) === '1') {
         this.model.dwFlags |= DwFlags.KF_CAPSONONLY;
       }
@@ -74,13 +74,23 @@ export class KmxBuilder {
     }
     const capsAlwaysOffNode = this.root.getDescendents(NodeType.CAPSALWAYSOFF)[0];
     if (capsAlwaysOffNode) {
-      const capsAlwaysOffName   = capsAlwaysOffNode?.getText() ?? '';
-      const capsAlwaysOffString = capsAlwaysOffNode?.getTextOfType(NodeType.STRING) ?? '';
+      const capsAlwaysOffName   = capsAlwaysOffNode.getText() ?? '';
+      const capsAlwaysOffString = capsAlwaysOffNode.getTextOfType(NodeType.STRING) ?? '';
       if (this.stripQuoteMarks(capsAlwaysOffString) === '1') {
         this.model.dwFlags |= DwFlags.KF_CAPSALWAYSOFF;
       }
       this.model.compStore.push(new CompStore(DwSystemID.TSS_CAPSALWAYSOFF, capsAlwaysOffString, capsAlwaysOffName));
     }
+
+    // dwHotKey
+    //TODO-NG-COMPILER: include code to handle HOTKEY_HEADER
+    //TODO-NG-COMPILER: code to handle anything but a single virtual key argument
+    // const hotKeyNode = this.root.getDescendents(NodeType.HOTKEY)[0];
+    // if (hotKeyNode) {
+    //   const hotKeyName     = hotKeyNode.getText() ?? '';
+    //   const virtualKeyNode = hotKeyNode.getSoleChildOfType(NodeType.VIRTUAL_KEY);
+    //   this.model.compStore.push(new CompStore(DwSystemID.TSS_HOTKEY, '', hotKeyName));
+    // }
   }
 
   private stripQuoteMarks(text: string): string {

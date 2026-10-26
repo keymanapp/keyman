@@ -18,6 +18,7 @@ import { NodeType } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
 import { ASTRebuild, GivenNode, NewNode, NewNodeOrTree } from "./ast-rebuild.js";
+import { Token } from "./lexer.js";
 
 /**
  * The Next Generation Parser for the Keyman Keyboard Language.
@@ -78,6 +79,7 @@ export class KmnTreeRebuild extends ASTRebuild {
     const groupNodes     = this.gatherGroups(node);
     const storesNode     = this.gatherStores(node);
     node.addChildren([storesNode, ...node.removeChildren(), ...groupNodes, sourceCodeNode]);
+    this.addSystemStoreStrings(node);
     return node;
   };
 
@@ -155,6 +157,20 @@ export class KmnTreeRebuild extends ASTRebuild {
     const sourceCodeNode = new ASTNode(NodeType.SOURCE_CODE);
     sourceCodeNode.addChildren(lineNodes);
     return sourceCodeNode;
+  }
+
+  private addSystemStoreStrings(node: ASTNode) {
+    const systemStoreNodes = (node.getSoleChildOfType(NodeType.STORES)?.getChildren() ?? [])
+      .filter((store) => store.nodeType !== NodeType.STORE);
+    const lineNodes = node.getSoleChildOfType(NodeType.SOURCE_CODE)?.getChildren() ?? [];
+    systemStoreNodes.forEach((systemStore) => {
+      const lineNum  = systemStore.token.lineNum;
+      const lineNode = lineNodes.find((line) => line.token.lineNum === lineNum);
+      if (lineNode) {
+        systemStore.addNewChildWithToken(NodeType.STRING,
+          new Token(TokenType.STRING, lineNode.token.line));
+      }
+    });
   }
 }
 
