@@ -74,6 +74,28 @@ describe("KmxBuilder Tests", () => {
         assert.isTrue(builder['model'].compStore.some(
           (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_SHIFTFREESCAPS && cs.dpString === '"1"' && cs.dpName === '&shiftfreescaps')));
       });
+      it("can handle a CAPSONONLY store", () => {
+        const capsOnOnlyNode = new ASTNode(NodeType.CAPSONONLY, new Token(TokenType.CAPSONONLY, '&capsononly'));
+        storesNode.addChild(capsOnOnlyNode);
+        const stringNode = new ASTNode(NodeType.STRING, new Token(TokenType.STRING, '"1"'));
+        capsOnOnlyNode.addChild(stringNode);
+        const builder = new KmxBuilder(root);
+        builder['buildHeader']();
+        assert.equal(builder['model'].dwFlags, DwFlags.KF_CAPSONONLY);
+        assert.isTrue(builder['model'].compStore.some(
+          (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_CAPSONONLY && cs.dpString === '"1"' && cs.dpName === '&capsononly')));
+      });
+      it("can handle a CAPSALWAYSOFF store", () => {
+        const capsAlwaysOffNode = new ASTNode(NodeType.CAPSALWAYSOFF, new Token(TokenType.CAPSALWAYSOFF, '&capsalwaysoff'));
+        storesNode.addChild(capsAlwaysOffNode);
+        const stringNode = new ASTNode(NodeType.STRING, new Token(TokenType.STRING, '"1"'));
+        capsAlwaysOffNode.addChild(stringNode);
+        const builder = new KmxBuilder(root);
+        builder['buildHeader']();
+        assert.equal(builder['model'].dwFlags, DwFlags.KF_CAPSALWAYSOFF);
+        assert.isTrue(builder['model'].compStore.some(
+          (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_CAPSALWAYSOFF && cs.dpString === '"1"' && cs.dpName === '&capsalwaysoff')));
+      });
     });
     it("can provide in-memory model for baseline keyboards", function() {
       if (!existsSync(PATH_TO_BASELINE)) {

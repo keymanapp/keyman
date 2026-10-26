@@ -58,15 +58,37 @@ export class KmxBuilder {
     if (shiftFreesCapsNode) {
       const shiftFreesCapsName   = shiftFreesCapsNode?.getText() ?? '';
       const shiftFreesCapsString = shiftFreesCapsNode?.getTextOfType(NodeType.STRING) ?? '';
-      if (shiftFreesCapsString === '"1"' || shiftFreesCapsString === "'1'") {
+      if (this.stripQuoteMarks(shiftFreesCapsString) === '1') {
         this.model.dwFlags |= DwFlags.KF_SHIFTFREESCAPS;
       }
       this.model.compStore.push(new CompStore(DwSystemID.TSS_SHIFTFREESCAPS, shiftFreesCapsString, shiftFreesCapsName));
     }
+    const capsOnOnlyNode = this.root.getDescendents(NodeType.CAPSONONLY)[0];
+    if (capsOnOnlyNode) {
+      const capsOnOnlyName   = capsOnOnlyNode?.getText() ?? '';
+      const capsOnOnlyString = capsOnOnlyNode?.getTextOfType(NodeType.STRING) ?? '';
+      if (this.stripQuoteMarks(capsOnOnlyString) === '1') {
+        this.model.dwFlags |= DwFlags.KF_CAPSONONLY;
+      }
+      this.model.compStore.push(new CompStore(DwSystemID.TSS_CAPSONONLY, capsOnOnlyString, capsOnOnlyName));
+    }
+    const capsAlwaysOffNode = this.root.getDescendents(NodeType.CAPSALWAYSOFF)[0];
+    if (capsAlwaysOffNode) {
+      const capsAlwaysOffName   = capsAlwaysOffNode?.getText() ?? '';
+      const capsAlwaysOffString = capsAlwaysOffNode?.getTextOfType(NodeType.STRING) ?? '';
+      if (this.stripQuoteMarks(capsAlwaysOffString) === '1') {
+        this.model.dwFlags |= DwFlags.KF_CAPSALWAYSOFF;
+      }
+      this.model.compStore.push(new CompStore(DwSystemID.TSS_CAPSALWAYSOFF, capsAlwaysOffString, capsAlwaysOffName));
+    }
+  }
+
+  private stripQuoteMarks(text: string): string {
+    return text.replace(/^['"]|['"]$/gm, '');
   }
 
   private versionToDwFileVersion(text: string): DwFileVersion {
-    text = text.replace(/^['|"]|['"]$/gm, '');
+    text = this.stripQuoteMarks(text);
     return DW_FILE_VERSION_MAP.get(Number(text));
   }
 }
