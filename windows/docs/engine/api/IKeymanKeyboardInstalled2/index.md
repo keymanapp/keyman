@@ -24,7 +24,7 @@ values](../IKeymanKeyboardInstalled/Options) for the keyboard file.
 ## Methods
 
 [`MCompileForBaseKeyboard()`](MCompileForBaseKeyboard)
-:  Compiles all installed keyboard layouts against that the supplied base keyboard ID.
+:  Recompiles the keyboard layout against the supplied base keyboard ID.
 
 ## History
 
