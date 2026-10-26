@@ -214,6 +214,44 @@ describe('visual-keyboard-compiler', function() {
     assert.equal(vk.keys[0].text, '12'); // marker stripped from `1<marker>2`
   });
 
+  it('should strip markers from key.output (more markers, #16895)', async function() {
+    // #16895: marker with code 0x000A was not being stripped due to a regex non-match on /./
+    const xml = stripIndent`
+      <?xml version="1.0"?>
+      <keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="de" conformsTo="45">
+        <info author="author" name="Test Markers"/>
+
+        <keys>
+          <key id="dead-caret" output="\\m{caret}"/>
+          <key id="dead-acute" output="\\m{acute}"/>
+          <key id="dead-grave" output="\\m{grave}"/>
+          <key id="dead-cedilla" output="\\m{cedilla}"/>
+          <key id="dead-ogonek" output="\\m{ogonek}"/>
+          <key id="dead-diaresis" output="\\m{diaresis}"/>
+          <key id="dead-ringabove" output="\\m{ringabove}"/>
+          <key id="dead-dotbelow" output="\\m{dotbelow}"/>
+          <key id="dead-dotabove" output="\\m{dotabove}"/>
+          <key id="dead-doubleacute" output="\\m{doubleacute}"/>
+          <key id="dead-caron" output="\\m{caron}"/>
+          <key id="dead-breve" output="\\m{breve}"/>
+        </keys>
+
+        <layers formId="us">
+          <layer modifiers="none">
+            <row keys="dead-caret dead-acute dead-grave dead-cedilla dead-ogonek dead-diaresis dead-ringabove dead-dotbelow dead-dotabove dead-doubleacute dead-caron dead-breve"/>
+          </layer>
+        </layers>
+      </keyboard3>
+    `;
+
+    const vk = await loadVisualKeyboardFromXml(xml, 'test');
+    assert.equal(vk.keys.length, 12);
+
+    for(let i = 0; i < vk.keys.length; i++) {
+      assert.equal(vk.keys[i].text, '');
+    }
+  });
+
   it('should read string variables in display.display', async function() {
     const xml = stripIndent`
       <?xml version="1.0" encoding="UTF-8"?>
