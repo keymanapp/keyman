@@ -35,15 +35,18 @@ OUTPUT__DISTRIBUTION_XML="${KEYMAN_BUILD_PATH}/distribution.xml"
 # bundle IDs for installer packages
 INSTALL_INPUT_METHOD_BUNDLE_ID="com.keyman.im.installer"
 INSTALL_CONFIG_BUNDLE_ID="com.keyman.config.installer"
+INSTALL_KEYMAN_BUNDLE_ID="com.keyman.full.installer"
+
+  # temporary staging root directory
+PKG_STAGE="${KEYMAN_BUILD_PATH}/StagingRoot"
 
 # ---------------------
 
 function do_build() {
   archive_apps
   export_apps
-  create_packages
   build_distribution_xml
-  combine_packages
+  create_package_from_staging
   builder_echo "build and package of Keyman installer complete"
 }
 
@@ -53,9 +56,9 @@ function do_clean() {
   rm -rf "${KEYMAN_BUILD_PATH}/Keyman.xcarchive"
   rm -rf "${KEYMAN_BUILD_PATH}/ConfigExport"
   rm -rf "${KEYMAN_BUILD_PATH}/KeymanExport"
-  rm -rf "${KEYMAN_BUILD_PATH}/keyman-config.pkg"
-  rm -rf "${KEYMAN_BUILD_PATH}/keyman-input-method.pkg"
+  rm -rf "${KEYMAN_BUILD_PATH}/keyman-component.pkg"
   rm -rf "${KEYMAN_BUILD_PATH}/upload/"
+  rm -rf "$PKG_STAGE"
 }
 
 function archive_apps() {
@@ -94,22 +97,48 @@ function export_apps() {
       -exportPath "${KEYMAN_BUILD_PATH}/ConfigExport"
 }
 
-function create_packages() {
-  builder_echo "packaging Keyman input method"
+function create_package_from_staging() {
+  builder_echo "setup staging directory for Keyman package"
+  
+  rm -rf "$PKG_STAGE" # clear cache
 
-  pkgbuild --component "${KEYMAN_BUILD_PATH}/KeymanExport/Keyman.app" \
-      --install-location /tmp \
-      --identifier "$INSTALL_INPUT_METHOD_BUNDLE_ID" \
+  # Create the internal system paths
+  mkdir -p "${PKG_STAGE}/Applications"
+  mkdir -p "${PKG_STAGE}/Users/Shared/KeymanStaging"
+
+  # copy application files to package staging
+  cp -R "${KEYMAN_BUILD_PATH}/ConfigExport/Keyman Configuration.app" "${PKG_STAGE}/Applications/"
+  cp -R "${KEYMAN_BUILD_PATH}/KeymanExport/Keyman.app" "${PKG_STAGE}/Users/Shared/KeymanStaging/"
+
+  # copy LaunchAgent configuration file to package staging
+  cp ./com.keyman.deferred.plist "${PKG_STAGE}/Users/Shared/KeymanStaging/"
+
+  mkdir -p "$OUTPUT_DIRECTORY_PATH"
+
+  builder_echo "calling pkgbuild"
+
+  pkgbuild --root "$PKG_STAGE" \
+      --component-plist ./"KeymanConfigComponent.plist" \
+      --fakeroot \
       --scripts ./scripts \
+      --install-location / \
+      --identifier "$INSTALL_KEYMAN_BUNDLE_ID" \
       --version "$KEYMAN_VERSION" \
-      "${KEYMAN_BUILD_PATH}/keyman-input-method.pkg"
+      "${KEYMAN_BUILD_PATH}/keyman-component.pkg"
 
-  builder_echo "packaging Keyman Configuration app"
-  pkgbuild --component "${KEYMAN_BUILD_PATH}/ConfigExport/Keyman Configuration.app" \
-      --install-location /Applications \
-      --identifier "$INSTALL_CONFIG_BUNDLE_ID" \
-      --version "$KEYMAN_VERSION" \
-      "${KEYMAN_BUILD_PATH}/keyman-config.pkg"
+  builder_echo "calling productbuild"
+
+  productbuild --distribution "${KEYMAN_BUILD_PATH}/distribution.xml" \
+      --package-path "${KEYMAN_BUILD_PATH}" \
+      --resources ./installer-resources \
+      --sign 5FCED4988F27D172C5628A16DBA4AE6CA0015D11 \
+    "$OUTPUT_PACKAGE_PATH"
+
+  builder_heading "Uploading install package to Apple for notarization"
+  mac_notarize "$OUTPUT_DIRECTORY_PATH" "$OUTPUT_PACKAGE_PATH"
+
+  builder_heading "Attempting to staple notarization to install package"
+  xcrun stapler staple "$OUTPUT_PACKAGE_PATH" || builder_die "stapler failed"
 }
 
 function build_distribution_xml(){
@@ -117,6 +146,7 @@ cat <<EOF > "${OUTPUT__DISTRIBUTION_XML}"
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="2">
     <title>Keyman for macOS</title>
+    <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
     <welcome file="welcome.rtf" />
     <license file="license.rtf" mime-type="text/rtf"/>
     <!-- Light Mode Background -->
@@ -131,47 +161,19 @@ cat <<EOF > "${OUTPUT__DISTRIBUTION_XML}"
         <os-version min="13.0"/>
     </allowed-os-versions>
 
-    <pkg-ref id="com.keyman.config.installer"/>
-    <pkg-ref id="com.keyman.im.installer"/>
-    <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
     <choices-outline>
-        <line choice="default">
-            <line choice="com.keyman.config.installer"/>
-            <line choice="com.keyman.im.installer"/>
-        </line>
+        <line choice="default"/>
     </choices-outline>
-    <choice id="default"/>
-    <choice id="com.keyman.config.installer" visible="false">
-        <pkg-ref id="com.keyman.config.installer"/>
+    
+    <choice id="default" visible="false" title="Keyman Core">
+        <pkg-ref id="com.keyman.full.installer"/>
     </choice>
-    <pkg-ref id="com.keyman.config.installer" version="$KEYMAN_VERSION" onConclusion="none">keyman-config.pkg</pkg-ref>
-    <choice id="com.keyman.im.installer" visible="false">
-        <pkg-ref id="com.keyman.im.installer"/>
-    </choice>
-    <pkg-ref id="com.keyman.im.installer" version="$KEYMAN_VERSION" onConclusion="RequireRestart">keyman-input-method.pkg</pkg-ref>
+
+    <pkg-ref id="com.keyman.full.installer" version="$KEYMAN_VERSION" onConclusion="none">keyman-component.pkg</pkg-ref>
 </installer-gui-script>
 EOF
 
 echo "Created distribution.xml at ${OUTPUT__DISTRIBUTION_XML}"
-}
-
-function combine_packages() {
-  builder_echo "combining packages into product"
-
-  mkdir -p "$OUTPUT_DIRECTORY_PATH"
-
-  productbuild --distribution "${KEYMAN_BUILD_PATH}/distribution.xml" \
-      --package-path "${KEYMAN_BUILD_PATH}" \
-      --resources ./installer-resources \
-      --version "$KEYMAN_VERSION" \
-      --sign 5FCED4988F27D172C5628A16DBA4AE6CA0015D11 \
-      "$OUTPUT_PACKAGE_PATH"
-
-  builder_heading "Uploading install package to Apple for notarization"
-  mac_notarize "$OUTPUT_DIRECTORY_PATH" "$OUTPUT_PACKAGE_PATH"
-
-  builder_heading "Attempting to staple notarization to install package"
-  xcrun stapler staple "$OUTPUT_PACKAGE_PATH" || builder_die "stapler failed"
 }
 
 builder_run_action clean do_clean

@@ -7,7 +7,7 @@
  *
  */
 
-import { CompilerCallbacks, DeveloperUtilsMessages, Keylayout, KeymanXMLReader } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, Keylayout, KeymanXMLReader } from "@keymanapp/developer-utils";
 import { util, SchemaValidators } from '@keymanapp/common-types';
 import { ConverterMessages } from '../converter-messages.js';
 import boxXmlArray = util.boxXmlArray;
@@ -90,8 +90,8 @@ export class KeylayoutFileReader {
     }
     if (!SchemaValidators.default.keylayout(source)) {
       for (const err of (<any>SchemaValidators.default.keylayout).errors) {
-        this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({
-          e: err.instancePath
+        this.callbacks.reportMessage(ConverterMessages.Error_InvalidFile({
+          errorText: err.instancePath
         }));
       }
       return false;

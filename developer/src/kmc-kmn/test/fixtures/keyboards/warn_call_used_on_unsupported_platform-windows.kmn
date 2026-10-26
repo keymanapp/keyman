@@ -1,0 +1,13 @@
+store(&NAME) 'warn_call_used_on_unsupported_platform-windows'
+
+c warning should NOT be generated for windows
+store(&TARGETS) 'windows'
+store(&VERSION) '10.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+store(dllfunc) 'dll.dll:func'
+
++ ' ' > call(dllfunc)

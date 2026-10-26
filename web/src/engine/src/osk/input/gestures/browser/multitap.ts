@@ -114,23 +114,43 @@ export class Multitap implements GestureHandler {
       const coord = tap.sources[0].currentSample;
 
       const baseSpec = this.baseKey.key.spec;
-      const baseDistances = vkbd.getSimpleTapCorrectionDistances(coord, baseSpec as ActiveKey);
-      // If the key is on a different layer than is shown, what if the user meant to hit a different key?
-      // (Bypass if the tap is part of a modipress gesture.)
-      if(coord.stateToken != vkbd.layerId && !tap.matchedId.includes('modipress')) {
-        const matchKey = vkbd.layerGroup.findNearestKey({...coord, stateToken: vkbd.layerId});
+      let baseDistances = vkbd.getSimpleTapCorrectionDistances(coord, baseSpec as ActiveKey);
 
-        // That said, if they directly touched a non-output key, simplify and assume
-        // that they hit the intended key.
-        if(correctionKeyFilter(matchKey.key.spec)) {
-          // Replace the key at the current location for the current layer key
-          // with the multitap base key.
-          const p = baseDistances.get(matchKey.key.spec.elementID);
-          if(p == null) {
-            console.warn(`Could not find fat-finger probability for current layer's key:  current key = ${matchKey.key.spec.elementID}, current layer = ${vkbd.layerId}, keyboard = ${this.keyboardId}`);
-          } else {
-            baseDistances.delete(matchKey.key.spec.elementID);
-            baseDistances.set(coord.item.key.spec.elementID, p);
+      // If the key is on a different layer than is shown, what if the user
+      // meant to hit a key on the new layer instead of multitapping?
+      //
+      // (If the tap is part of a modipress gesture, bypass - modipress keys don't output.)
+      //
+      // coord.stateToken - the original layer at the start of the multitap.
+      // So, if the layer is no longer the same, and it's not a modipress operation...
+      if(coord.stateToken != vkbd.layerId) {
+        const newLayerTappedKey = coord.item?.key.spec;
+
+        if(newLayerTappedKey && !tap.matchedId.includes('modipress')) {
+          const matchKey = vkbd.layerGroup.findNearestKey({...coord, stateToken: vkbd.layerId});
+          baseDistances = vkbd.getSimpleTapCorrectionDistances(coord, matchKey.key.spec as ActiveKey);
+
+          // That said, if they directly touched a non-output key, simplify and assume
+          // that they hit the intended key.
+          if(correctionKeyFilter(matchKey.key.spec)) {
+            // Replace the key at the current location for the current layer key
+            // with the multitap base key.
+            const distTuple = baseDistances.get(matchKey.key.spec.elementID);
+            if(distTuple == null) {
+              console.warn(`Could not find fat-finger probability for current layer's key:\n  current key = ${matchKey.key.spec.elementID}, base key = ${baseSpec.elementID}, current layer = ${vkbd.layerId}, keyboard = ${this.keyboardId}`);
+            } else {
+              baseDistances.set(matchKey.key.spec.elementID, {
+                ... distTuple,
+                // Treat the new-layer's tapped key (aliased by multitapping) as
+                // being twice as far away.
+                distance: distTuple.distance * 2
+              });
+              // The original multitapped key gets the original distance.
+              baseDistances.set(baseSpec.elementID, {
+                distance: distTuple.distance,
+                keySpec: baseSpec
+              });
+            }
           }
         }
       }
