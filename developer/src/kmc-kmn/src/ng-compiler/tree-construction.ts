@@ -179,7 +179,7 @@ export class ASTNode {
    * @returns the sole child node or null
    */
   public getSoleChild(): ASTNode {
-    const children: ASTNode[] = this.getChildren();
+    const children = this.getChildren();
     return (children.length == 1) ? children[0] : null;
   }
 
@@ -189,7 +189,7 @@ export class ASTNode {
    * @returns the sole child node or null
    */
   public getSoleChildOfType(requiredType: NodeType): ASTNode {
-    const children: ASTNode[] = this.getChildrenOfType(requiredType);
+    const children = this.getChildrenOfType(requiredType);
     return (children.length == 1) ? children[0] : null;
   }
 
@@ -217,7 +217,7 @@ export class ASTNode {
    * @returns an array of child nodes
    */
   public removeChildren(): ASTNode[] {
-    const list: ASTNode[] = this.getChildren();
+    const list = this.getChildren();
     this.children = [];
     return list;
   }

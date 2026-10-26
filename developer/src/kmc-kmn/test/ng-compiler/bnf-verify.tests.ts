@@ -6,15 +6,6 @@
  * Tests for KMC KMN Next Generation Parser (Recursive Descent/Verify against BNF)
  */
 
-/*
- * This grammar rule test is somewhat brittle as it depends on the local variable
- * names used in the Rule assigned to this.rule in each of the implemented source
- * code rules. These are processed and then checked against the processed
- * non-terminals and terminals in the BNF grammar rules for equality. A more thorough
- * test would check the actual classes of each source code variable, but would
- * require much more parsing of the TypeScript source code.
- */
-
 import 'mocha';
 import { assert } from 'chai';
 import ts from "typescript";
@@ -26,42 +17,215 @@ interface Dictionary {
 }
 
 const BNF_FILENAME = '../../src/kmc-kmn/src/ng-compiler/kmn-file.bnf';
+const BNF_BUFFER: string = readFileSync(BNF_FILENAME).toString();
 
-describe("Verify Parser Against BNF Tests", () => {
-  it("matches the BNF grammar rules", () => {
-    const bnfBuffer: string = readFileSync(BNF_FILENAME).toString();
-    const bnfRules: Dictionary = getBnfRules(bnfBuffer);
-    const sourceBuffer: string = [
-      '../../src/kmc-kmn/src/ng-compiler/kmn-analyzer.ts',
-      '../../src/kmc-kmn/src/ng-compiler/statement-analyzer.ts',
-      '../../src/kmc-kmn/src/ng-compiler/store-analyzer.ts',
-    ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
-    const sourceRules: Dictionary = getSourceRules(sourceBuffer);
-    assert.deepEqual(bnfRules, sourceRules);
-  });
-  it.skip("really matches the BNF grammar rules", () => {
-    //const bnfBuffer: string = readFileSync(BNF_FILENAME).toString();
-    //const bnfRules: Dictionary = getBnfRules(bnfBuffer);
-    const sourceBuffer: string = [
-      '../../src/kmc-kmn/src/ng-compiler/kmn-analyzer.ts',
-      '../../src/kmc-kmn/src/ng-compiler/statement-analyzer.ts',
-      '../../src/kmc-kmn/src/ng-compiler/store-analyzer.ts',
-    ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
-    const sourceRules: Dictionary = getSourceRules2(sourceBuffer);
-    //assert.deepEqual(bnfRules, sourceRules);
-    assert.deepEqual(null, sourceRules);
-  });
-});
 describe("Verify BNF Against Lexer Tests", () => {
   it("contains all the Lexer tokens", () => {
-    const bnfBuffer: string = readFileSync(BNF_FILENAME).toString()
-    const match = [...bnfBuffer.matchAll(/[A-Z_]{2,}/g)];
+    const match = [...BNF_BUFFER.matchAll(/[A-Z_]{2,}/g)];
     const bnfTokens = match.map((x) => x[0]);
     bnfTokens.push('COMMENT', 'CONTINUATION', 'EOF', 'WHITESPACE');
     bnfTokens.sort();
     const bnfTokenSet = new Set<String>(bnfTokens);
     const tokenTypes: string[] = Object.keys(TokenType).sort();
     assert.deepEqual([...bnfTokenSet], tokenTypes);
+  });
+});
+describe("getSourceRules() Tests", () => {
+  it("can handle a simple rule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new TokenRule(TokenType.STRING);
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING" }, sourceRules);
+  });
+  it("can handle a rule with one variable", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          const stringRule = new TokenRule(TokenType.STRING);
+          this.rule        = stringRule;
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING" }, sourceRules);
+  });
+  it("can handle a rule with one inherited property", () => {
+    const sourceBuffer = `
+      abstract class AbstractDummyRule extends SingleChildRule {
+        protected stringRule: Rule;
+
+        public constructor() {
+          super()
+          this.stringRule = new TokenRule(TokenType.STRING);
+        }
+      }
+
+      class DummyRule extends AbstractDummyRule {
+        public constructor() {
+          super();
+          this.rule = this.stringRule;
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING" }, sourceRules);
+  });
+  it("can handle a rule with one overridden property", () => {
+    const sourceBuffer = `
+      abstract class AbstractDummyRule extends SingleChildRule {
+        protected stringRule: Rule;
+
+        public constructor() {
+          super()
+          this.stringRule = new TokenRule(TokenType.STRING);
+        }
+      }
+
+      class DummyRule extends AbstractDummyRule {
+        public constructor() {
+          super();
+          this.stringRule = new TokenRule(TokenType.BEEP);
+          this.rule       = this.stringRule;
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "BEEP" }, sourceRules);
+  });
+  it("can handle a property set from a variable", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        protected two: Rule;
+
+        public constructor() {
+          super();
+          const one = new TokenRule(TokenType.BEEP);
+          this.two  = one;
+          this.rule = this.two;
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "BEEP" }, sourceRules);
+  });
+  it("can handle a property set from a property", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        protected one: Rule;
+        protected two: Rule;
+
+        public constructor() {
+          super();
+          this.one  = new TokenRule(TokenType.BEEP);
+          this.two  = this.one;
+          this.rule = this.two;
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "BEEP" }, sourceRules);
+  });
+  it("can handle a SequenceRule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          const leftBracket  = new TokenRule(TokenType.LEFT_BR);
+          const stringRule   = new TokenRule(TokenType.STRING);
+          const rightBracket = new TokenRule(TokenType.RIGHT_BR);
+          this.rule          = new SequenceRule([leftBracket, stringRule, rightBracket]);
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "LEFT_BR STRING RIGHT_BR" }, sourceRules);
+  });
+  it("can handle an AlternateRule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          const leftBracket  = new TokenRule(TokenType.LEFT_BR);
+          const stringRule   = new TokenRule(TokenType.STRING);
+          const rightBracket = new TokenRule(TokenType.RIGHT_BR);
+          this.rule          = new AlternateRule([leftBracket, stringRule, rightBracket]);
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "LEFT_BR|STRING|RIGHT_BR" }, sourceRules);
+  });
+  it("can handle an AlternateTokenRule", () => {
+    const sourceBuffer = `
+      class DummyRule extends AlternateTokenRule {
+        public constructor() {
+          super([
+            TokenType.LEFT_BR,
+            TokenType.STRING,
+            TokenType.RIGHT_BR,
+          ]);
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "LEFT_BR|STRING|RIGHT_BR" }, sourceRules);
+  });
+  it("can handle an OptionalRule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new OptionalRule(new TokenRule(TokenType.STRING));
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING?" }, sourceRules);
+  });
+  it("can handle a ManyRule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new ManyRule(new TokenRule(TokenType.STRING));
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING*" }, sourceRules);
+  });
+  it("can handle a OneOrManyRule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new OneOrManyRule(new TokenRule(TokenType.STRING));
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "STRING+" }, sourceRules);
+  });
+  it("can handle a complex rule", () => {
+    const sourceBuffer = `
+      class DummyRule extends SingleChildRule {
+        public constructor() {
+          super();
+          const optCompileTarget = new OptionalRule(new CompileTargetRule());
+          const optContent       = new OptionalRule(new ContentRule());
+          const newline          = new TokenRule(TokenType.NEWLINE, true);
+          this.rule = new SequenceRule([optCompileTarget, optContent, newline]);
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ dummy: "compileTarget? content? NEWLINE" }, sourceRules);
+  });
+});
+describe("Verify Parser Against BNF Tests", () => {
+  it("matches the BNF grammar rules", () => {
+    const bnfRules    = getBnfRules(BNF_BUFFER);
+    const sourceBuffer: string = [
+      '../../src/kmc-kmn/src/ng-compiler/kmn-analyzer.ts',
+      '../../src/kmc-kmn/src/ng-compiler/statement-analyzer.ts',
+      '../../src/kmc-kmn/src/ng-compiler/store-analyzer.ts',
+  ].reduce((str, filename) => { return str + readFileSync(filename).toString(); }, '');
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual(bnfRules, sourceRules);
   });
 });
 
@@ -73,7 +237,7 @@ function getBnfRules(buffer:string): Dictionary {
   lines.forEach((line) => {
     const match = line.match(/(.*)\s*:\s*(.*)/)
     if (match) {
-      rules[match[1]] = replaceElementNames(match[2]);
+      rules[match[1]] = match[2];
     }
   });
   return rules;
@@ -87,213 +251,67 @@ function wrapLines(buffer:string): string {
   return buffer.replaceAll(/[^\S\r\n]*(\r\n|\n|\r)[^\S\r\n]+/g, '');
 }
 
-function replaceElementNames(str: string): string {
-  if (str != null) {
-    str = str.replaceAll(/\b([a-zA-Z]+)_([a-zA-Z])([a-zA-Z]*)\b/g,
-      (match, p1, p2, p3, offset, string, groups) =>
-        { return p1.toLowerCase() + p2.toUpperCase() + p3.toLowerCase(); });
-    str = str.replaceAll(/\b([A-Z]+)\b/g,
-      (match, p1, offset, string, groups) => { return p1.toLowerCase(); })
-    str = str.replaceAll(/\b(if|string|return)\b/g,
-      (match, p1, offset, string, groups) => { return p1 + 'Rule'; })
-    str = str.replaceAll(/\b(baselayout|layer|platform)Shortcut\b/g, '$1');
-    str = str.replaceAll(/\bleftBr\b/g, 'leftBracket');
-    str = str.replaceAll(/\brightBr\b/g, 'rightBracket');
-    str = str.replaceAll(/\bleftSq\b/g, 'leftSquare');
-    str = str.replaceAll(/\brightSq\b/g, 'rightSquare');
-  }
-  return str;
-}
-
-function getSourceRules(buffer:string): Dictionary {
-    const rules: Dictionary = {};
-    // Rules that extend AlternateTokenRule
-    let matches = buffer.matchAll(/export\s+class\s+(\S+)Rule\s+extends\s+AlternateTokenRule.+?super\(\[([^\]]+)/sg);
-    for (const match of matches) {
-      const name  = lowerCaseFirstLetter(match[1]);
-      rules[name] = removeOneLineComments(match[2]);
-      rules[name] = removeWhiteSpace(rules[name]);
-      rules[name] = replaceCommas(rules[name]);
-      rules[name] = replaceTokenElements(rules[name]);
-      rules[name] = replaceElementNames(rules[name]);
-    }
-    // Other Rules
-    matches = buffer.matchAll(/export\s+class\s+(\S+)Rule\s+extends\s+(?!AlternateTokenRule).+?constructor\(\)\s*\{[^}]+this.rule\s*=\s*new([^;}]+)[^}]+\}/sg);
-    for (const match of matches) {
-      const name  = lowerCaseFirstLetter(match[1]);
-      rules[name] = removeWhiteSpace(match[2]);
-      rules[name] = replaceSequenceRule(rules[name]);
-      rules[name] = replaceAlternateRule(rules[name]);
-      rules[name] = replaceOneOrManyRule(rules[name]);
-      rules[name] = replaceManyRule(rules[name]);
-      rules[name] = replaceThisOnElements(rules[name]);
-      rules[name] = replaceOptElements(rules[name]);
-      rules[name] = replaceOneOrManyElements(rules[name]);
-      rules[name] = replaceManyElements(rules[name]);
-      rules[name] = replaceElementNames(rules[name]);
-    }
-    return rules;
-}
-
-function lowerCaseFirstLetter(str: string): string {
-  return (str == null || str.length < 1) ? str :
-    str.charAt(0).toLowerCase() + str.slice(1);
-}
-
-function removeOneLineComments(str: string): string {
-  return str.replaceAll(/\/\/[^\r\n]*/g, '');
-}
-
-function removeWhiteSpace(str: string): string {
-  return str.replaceAll(/\s/g, '');
-}
-
-function replaceCommas(str: string): string {
-  if (str != null) {
-    str = str.replace(/,$/, '');
-    str = str.replaceAll(/,/g, '|');
-  }
-  return str;
-}
-
-function replaceSequenceRule(str: string): string {
-  if (str != null && str.includes('SequenceRule')) {
-    str = str.replace(/^SequenceRule\(\[/, '');
-    str = str.replace(/,?\]\)$/, '');
-    str = str.replaceAll(/,/g, ' ');
-  }
-  return str;
-}
-
-function replaceAlternateRule(str: string): string {
-  if (str != null && str.includes('AlternateRule')) {
-    str = str.replace(/^AlternateRule\(\[/, '');
-    str = str.replace(/,?\]\)$/, '');
-    str = str.replaceAll(/,/g, '|');
-  }
-  return str;
-}
-
-function replaceOneOrManyRule(str: string): string {
-  if (str != null && str.includes('OneOrManyRule')) {
-    str = str.replace(/^OneOrManyRule\(/, '');
-    str = str.replace(/\)$/, '');
-    str = replaceSubRule(str);
-    str = str + '+';
-  }
-  return str;
-}
-
-function replaceManyRule(str: string): string {
-  if (str != null && str.includes('ManyRule')) {
-    str = str.replace(/ManyRule\(/, '');
-    str = str.replace(/\)$/, '');
-    str = replaceSubRule(str);
-    str = str + '*';
-  }
-  return str;
-}
-
-function replaceThisOnElements(str: string): string {
-  if (str != null && str.includes('this.')) {
-    str = str.replaceAll(/(?:this\.)([^|\s]*)/g, '$1')
-  }
-  return str;
-}
-
-function replaceOptElements(str: string): string {
-  if (str != null && str.includes('opt')) {
-    str = str.replaceAll(/(?:opt)(\S)([^|\s]*)/g,
-      (match, p1, p2, offset, string, groups) =>
-        { return p1.toLowerCase()+p2+'?'; });
-  }
-  return str;
-}
-
-function replaceOneOrManyElements(str: string): string {
-  if (str != null && str.includes('oneOrMany')) {
-    str = str.replaceAll(/(?:oneOrMany)(\S)([^|\s]*)/g,
-      (match, p1, p2, offset, string, groups) =>
-        { return p1.toLowerCase()+p2+'+'; });
-  }
-  return str;
-}
-
-function replaceManyElements(str: string): string {
-  if (str != null && str.includes('many')) {
-    str = str.replaceAll(/(?:many)(\S)([^|\s]*)/g,
-      (match, p1, p2, offset, string, groups) =>
-        { return p1.toLowerCase()+p2+'*'; });
-  }
-  return str;
-}
-
-function replaceTokenElements(str: string): string {
-  if (str != null && str.includes('TokenType.')) {
-    str = str.replaceAll(/(?:TokenType\.)([^|\s]*)/g,
-      (match, p1, offset, string, groups) =>
-        { return p1.toLowerCase(); });
-  }
-  return str;
-}
-
-function replaceSubRule(str: string): string {
-  if (str != null && str.includes('new')) {
-    str = str.replaceAll(/(?:new)(\S+)Rule\(\)/g,
-      (match, p1, offset, string, groups) =>
-        { return lowerCaseFirstLetter(p1); });
-  }
-  return str;
-}
-
-interface RuleInfo {
-    name: string;
-    expression: string | undefined;
-}
-
-function getSourceRules2(buffer: string): Dictionary {
+function getSourceRules(buffer: string): Dictionary {
   const rules: Dictionary = {};
 
   const sourceFile = ts.createSourceFile(
-    "combined-source.ts",
+    "",
     buffer,
     ts.ScriptTarget.Latest,
     true,
     ts.ScriptKind.TS
   );
 
-  const extractedRules: RuleInfo[] = [];
+  visitRules(sourceFile, sourceFile, rules);
 
-  function visit(node: ts.Node): void {
-    if (ts.isClassDeclaration(node) || ts.isClassExpression(node)) {
-      const name = node.name?.text;
-
-      if (name?.endsWith("Rule")) {
-        extractedRules.push({
-          name,
-          expression: inspectRuleExpression(node, sourceFile)
-        });
-      }
-    }
-
-    ts.forEachChild(node, visit);
-  }
-
-  visit(sourceFile);
-
-  // Set a breakpoint here to inspect extractedRules.
   return rules;
 }
+
+function visitRules(
+  node: ts.Node,
+  sourceFile: ts.SourceFile,
+  rules: Dictionary
+): void {
+  if ((ts.isClassDeclaration(node) || ts.isClassExpression(node)) &&
+    node.name?.text.endsWith("Rule")
+  ) {
+    const name = baseName(node.name.text);
+    const expr = inspectRuleExpression(node, sourceFile);
+
+    if (expr !== undefined) {
+      rules[name] = expr;
+    }
+  }
+
+  ts.forEachChild(node, child => visitRules(child, sourceFile, rules));
+}
+
+function baseName(text: string): string {
+  return (text.charAt(0).toLowerCase() + text.slice(1)).replace(/Rule$/, "");
+}
+
+type RuleContext = {
+  variables: Map<string, ts.Expression>;
+  properties: Map<string, ts.Expression>;
+  sourceFile: ts.SourceFile;
+};
 
 function inspectRuleExpression(
   cls: ts.ClassDeclaration | ts.ClassExpression,
   sourceFile: ts.SourceFile
 ): string | undefined {
-  const constructor = cls.members.find(ts.isConstructorDeclaration);
+  const constructor = getConstructor(cls);
 
-  if (!constructor?.body) return undefined;
+  if (!constructor?.body) {
+    return undefined;
+  }
 
-  const variables = new Map<string, ts.Expression>();
+  // It is assumed parent constructors do not use local variables in property
+  // assignments, as the Maps do not record constructor context
+  const variables  = new Map<string, ts.Expression>();
+  const properties = new Map<string, ts.Expression>();
+
+  const context: RuleContext = { variables, properties, sourceFile };
 
   for (const statement of constructor.body.statements) {
     if (!ts.isVariableStatement(statement)) continue;
@@ -305,112 +323,271 @@ function inspectRuleExpression(
     }
   }
 
-  const alternateTokens = inspectAlternateTokenRule(cls);
-    if (alternateTokens !== undefined) {
-      return alternateTokens;
-  }
+  let currentClass: ts.ClassDeclaration | ts.ClassExpression | undefined = cls;
 
-  const assignment = constructor.body.statements.find(statement =>
-    ts.isExpressionStatement(statement) &&
-    ts.isBinaryExpression(statement.expression) &&
-    statement.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
-    ts.isPropertyAccessExpression(statement.expression.left) &&
-    statement.expression.left.expression.kind === ts.SyntaxKind.ThisKeyword &&
-    statement.expression.left.name.text === "rule"
-  );
+  const visited = new Set<string>();
 
-  if (!assignment || !ts.isExpressionStatement(assignment)) {
-    return undefined;
-  }
+  while (currentClass) {
+    const className = currentClass.name?.text;
 
-  const expression = (assignment.expression as ts.BinaryExpression).right;
-
-  function describe(node: ts.Expression): string {
-    if (ts.isIdentifier(node)) {
-      const initializer = variables.get(node.text);
-      return initializer ? describe(initializer) : node.text;
+    if (className && visited.has(className)) {
+      break;
     }
 
-    if (ts.isArrayLiteralExpression(node)) {
-      return node.elements.map(describe).join(", ");
+    if (className) {
+      visited.add(className);
     }
 
-    if (ts.isNewExpression(node)) {
-      const name = node.expression.getText(sourceFile);
-      const args: readonly ts.Expression[] = node.arguments ?? [];
+    const currentConstructor = getConstructor(currentClass);
 
-      switch (name) {
-        case "AlternateRule":
-          return args.length && ts.isArrayLiteralExpression(args[0])
-            ? args[0].elements.map(describe).join(" | ")
-            : `AlternateRule(${args.map(describe).join(", ")})`;
+    if (currentConstructor?.body) {
+      for (const statement of currentConstructor.body.statements) {
+        const assignment = getThisPropertyAssignment(statement);
 
-        case "SequenceRule":
-          return args.length && ts.isArrayLiteralExpression(args[0])
-            ? args[0].elements.map(describe).join(" ")
-            : `SequenceRule(${args.map(describe).join(", ")})`;
-
-        case "TokenRule":
-          if (args.length > 0 && ts.isPropertyAccessExpression(args[0])) {
-            return args[0].name.text;
+        if (assignment) {
+          const propertyName = (assignment.left as ts.PropertyAccessExpression).name.text;
+          // child supercedes parent; doesn't handle multiple assignments in same constructor
+          if (!properties.has(propertyName)) { 
+            properties.set(propertyName, assignment.right);
           }
-          return `TokenRule(${args.map(describe).join(", ")})`;
-
-        case "ManyRule":
-          return args.length > 0
-            ? `${describe(args[0])}*`
-            : "ManyRule";
-
-        case "OneOrManyRule":
-          return args.length > 0
-            ? `${describe(args[0])}+`
-            : "OneOrManyRule";
-
-        case "OptionalRule":
-          return args.length > 0
-            ? `${describe(args[0])}?`
-            : "OptionalRule";
-
-        default:
-          return args.length
-            ? `${name}(${args.map(describe).join(", ")})`
-            : name;
-      }
-    }
-
-    return node.getText(sourceFile);
-  }
-
-  function inspectAlternateTokenRule(
-    cls: ts.ClassDeclaration | ts.ClassExpression
-  ): string | undefined {
-    if (cls.heritageClauses?.some(clause =>
-      clause.token === ts.SyntaxKind.ExtendsKeyword &&
-      clause.types.some(type => type.expression.getText() === "AlternateTokenRule")
-    )) {
-      const constructor = cls.members.find(ts.isConstructorDeclaration);
-      const superCall = constructor?.body?.statements.find(statement =>
-        ts.isExpressionStatement(statement) &&
-        ts.isCallExpression(statement.expression) &&
-        statement.expression.expression.kind === ts.SyntaxKind.SuperKeyword
-      );
-
-      if (superCall && ts.isExpressionStatement(superCall)) {
-        const args = (superCall.expression as ts.CallExpression).arguments;
-        const tokens = args[0];
-
-        if (tokens && ts.isArrayLiteralExpression(tokens)) {
-          return tokens.elements.map(token =>
-            ts.isPropertyAccessExpression(token)
-              ? token.name.text
-              : token.getText()
-          ).join(" | ");
         }
       }
     }
 
+    const parentName = getParentClassName(currentClass, sourceFile);
+
+    currentClass = parentName
+      ? findClassDeclaration(parentName, sourceFile)
+      : undefined;
+  }
+
+  const alternateTokens = inspectAlternateTokenRule(cls);
+
+  if (alternateTokens !== undefined) {
+    return alternateTokens;
+  }
+
+  const assignment = findThisPropertyAssignment(constructor.body.statements, "rule");
+
+  if (!assignment) {
     return undefined;
   }
 
-  return describe(expression);
+  return describeExpression(assignment.right, context);
+}
+
+function getConstructor(
+  cls: ts.ClassDeclaration | ts.ClassExpression
+): ts.ConstructorDeclaration | undefined {
+  return cls.members.find(ts.isConstructorDeclaration);
+}
+
+function getParentClassName(
+  cls: ts.ClassDeclaration | ts.ClassExpression,
+  sourceFile: ts.SourceFile
+): string | undefined {
+  const clause = cls.heritageClauses?.find(
+    clause => clause.token === ts.SyntaxKind.ExtendsKeyword
+  );
+
+  return clause?.types[0]?.expression.getText(sourceFile);
+}
+
+function getThisPropertyAssignment(
+  statement: ts.Statement
+): ts.BinaryExpression | undefined {
+  if (!ts.isExpressionStatement(statement)) {
+    return undefined;
+  }
+
+  const expression = statement.expression;
+
+  if (
+    !ts.isBinaryExpression(expression) ||
+    expression.operatorToken.kind !== ts.SyntaxKind.EqualsToken ||
+    !ts.isPropertyAccessExpression(expression.left) ||
+    expression.left.expression.kind !== ts.SyntaxKind.ThisKeyword
+  ) {
+    return undefined;
+  }
+
+  return expression;
+}
+
+function findThisPropertyAssignment(
+  statements: ts.NodeArray<ts.Statement>,
+  propertyName: string
+): ts.BinaryExpression | undefined {
+  for (const statement of statements) {
+    const assignment = getThisPropertyAssignment(statement);
+
+    if (
+      assignment &&
+      ts.isPropertyAccessExpression(assignment.left) &&
+      assignment.left.name.text === propertyName
+    ) {
+      return assignment;
+    }
+  }
+
+  return undefined;
+}
+
+function inspectAlternateTokenRule(
+  cls: ts.ClassDeclaration | ts.ClassExpression
+): string | undefined {
+  const extendsAlternateTokenRule = cls.heritageClauses?.some(clause =>
+    clause.token === ts.SyntaxKind.ExtendsKeyword &&
+    clause.types.some(type => type.expression.getText() === "AlternateTokenRule")
+  );
+
+  if (!extendsAlternateTokenRule) {
+    return undefined;
+  }
+
+  const constructor = getConstructor(cls);
+  const statements  = constructor?.body?.statements;
+
+  if (!statements) {
+    return undefined;
+  }
+
+  const superCall = getSuperCall(statements);
+  const tokens    = superCall?.arguments[0];
+
+  if (!tokens || !ts.isArrayLiteralExpression(tokens)) {
+    return undefined;
+  }
+
+  return tokens.elements
+    .map(token =>
+      ts.isPropertyAccessExpression(token)
+        ? token.name.text
+        : token.getText()
+    )
+    .join("|");
+}
+
+function getSuperCall(
+  statements: ts.NodeArray<ts.Statement>
+): ts.CallExpression | undefined {
+  for (const statement of statements) {
+    if (
+      ts.isExpressionStatement(statement) &&
+      ts.isCallExpression(statement.expression) &&
+      statement.expression.expression.kind === ts.SyntaxKind.SuperKeyword
+    ) {
+      return statement.expression;
+    }
+  }
+
+  return undefined;
+}
+
+// separator, suffix and token describe the special handling for each rule type
+type RuleDescription = {
+  separator?: string;
+  suffix?: string;
+  token?: boolean;
+};
+
+const ruleDescriptions = new Map<string, RuleDescription>([
+  ["AlternateRule", { separator: "|" }],
+  ["SequenceRule",  { separator: " " }],
+  ["TokenRule",     { token: true }],
+  ["ManyRule",      { suffix: "*" }],
+  ["OneOrManyRule", { suffix: "+" }],
+  ["OptionalRule",  { suffix: "?" }],
+]);
+
+function describeExpression(
+  node: ts.Expression,
+  context: RuleContext
+): string {
+  if (
+    ts.isPropertyAccessExpression(node) &&
+    node.expression.kind === ts.SyntaxKind.ThisKeyword
+  ) {
+    const initializer = context.properties.get(node.name.text);
+    return initializer
+      ? describeExpression(initializer, context)
+      : node.name.text;
+  }
+
+  if (ts.isIdentifier(node)) {
+    const initializer = context.variables.get(node.text);
+    return initializer
+      ? describeExpression(initializer, context)
+      : baseName(node.text);
+  }
+
+  if (ts.isNewExpression(node)) {
+    const name = node.expression.getText(context.sourceFile);
+    const args: readonly ts.Expression[] = node.arguments ?? [];
+
+    // Describe each argument using the same context
+    const describeArgs = () =>
+      args.map(arg => describeExpression(arg, context));
+
+    const rule = ruleDescriptions.get(name);
+
+    if (rule?.token) {
+      if (args.length > 0 && ts.isPropertyAccessExpression(args[0])) {
+        return args[0].name.text;
+      }
+      return `TokenRule(${describeArgs().join(", ")})`;
+    }
+
+    if (rule?.separator !== undefined) {
+      return args.length > 0 && ts.isArrayLiteralExpression(args[0])
+        ? describeArray(args[0].elements, context, rule.separator)
+        : `${name}(${describeArgs().join(", ")})`;
+    }
+
+    if (rule?.suffix !== undefined) {
+      return args.length > 0
+        ? `${describeExpression(args[0], context)}${rule.suffix}`
+        : name;
+    }
+
+    const ruleName = baseName(name);
+
+    return args.length
+      ? `${ruleName}(${describeArgs().join(", ")})`
+      : ruleName;
+  }
+
+  return node.getText(context.sourceFile);
+}
+
+function describeArray(
+  elements: ts.NodeArray<ts.Expression>,
+  context: RuleContext,
+  separator: string
+): string {
+  return elements
+    .map(element => describeExpression(element, context))
+    .join(separator);
+}
+
+function findClassDeclaration(
+  name: string,
+  sourceFile: ts.SourceFile
+): ts.ClassDeclaration | undefined {
+  let result: ts.ClassDeclaration | undefined;
+
+  function visit(node: ts.Node): void {
+    if (result) return;
+
+    if (ts.isClassDeclaration(node) && node.name?.text === name) {
+      result = node;
+      return;
+    }
+
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+
+  return result;
 }

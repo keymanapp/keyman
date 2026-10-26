@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { ContextManager } from 'keyman/app/browser';
 import { textStoreForElement } from 'keyman/engine/attachment';
 import { TextAreaElementTextStore } from 'keyman/engine/element-text-stores';
