@@ -245,6 +245,15 @@ from command line. But note that you do need to update your `JAVA_HOME` env
 var to the associated version before opening Android Studio and loading any
 Android projects. `JAVA_HOME_11` is mostly used by CI.
 
+## Optional Tools
+
+- sentry-cli (optional)
+  - Uploading symbols for Sentry-based error reporting
+
+  See <https://docs.sentry.io/cli/installation/> for the installation, and
+  check [minimum-versions.md](../minimum-versions.md) for the required version of
+  `sentry-cli`.
+
 ## Docker Builder
 
 The Docker builder allows you to perform a build from anywhere Docker is supported.
