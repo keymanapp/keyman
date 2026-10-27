@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 20.0.8 alpha 2026-10-27
+
+* fix(developer): strip markers correctly in ldml to kvk compiler (#16901)
+
 ## 20.0.7 alpha 2026-10-21
 
 * chore(web): add Keyman header to test files (#16857)
