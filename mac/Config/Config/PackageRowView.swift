@@ -45,6 +45,7 @@ public struct PackageRowView: View {
   }
   
   public var body: some View {
+    //  wrapping the outer loop in a Section fixes the Ventura layout bug
     ForEach(packages, id: \.id) { package in
       ForEach(isSingleKeyboardPackage ? package.keyboards : package.keyboards.onlyFirst) { keyboard in
         DisclosureGroup(isExpanded: isExpanded(package: package)) {
@@ -52,9 +53,7 @@ public struct PackageRowView: View {
           if expandedPackageID == package.id {
             PackageInfoView(package: package, showAlertFunction: { package in
               idToDelete = package.id
-              //showDeleteAlert(for: package)
             })
-              .transition(.move(edge: .top))
           }
         }
         label: {
@@ -64,7 +63,7 @@ public struct PackageRowView: View {
               // if the package contains one keyboard, show the keyboard name, otherwise show the package name
               Text(isSingleKeyboardPackage ? keyboard.name: package.packageName)
                 .font(.title)
-
+              
               // see keyboard help button
               if let url = package.helpFileUrl {
                 IconButtonView(
@@ -111,26 +110,15 @@ public struct PackageRowView: View {
             }
           }
           .contentShape(Rectangle())
-          // handles when the HStack is clicked by the user
-          .onTapGesture {
-            withAnimation () {
-              if self.expandedPackageID == package.id {
-                self.expandedPackageID = nil
-              } else {
-                self.expandedPackageID = package.id
-              }
-            }
-          }
         }
-        .listRowBackground(
-            Rectangle()
-              .fill(cardColor) // native Mac card color = Color(.controlBackgroundColor)
+        .disclosureGroupStyle(ChevronDisclosureStyle())
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+          RoundedRectangle(cornerRadius: 8).fill(cardColor)
         )
       }
     }
-    // animate changes in the package list
-    .animation(.easeInOut, value: packages)
-    .padding(.vertical, 8)
   }
   
   // the helper method to generate the custom binding for whether a package's disclosure group is expanded or not
@@ -141,9 +129,7 @@ public struct PackageRowView: View {
       // setter handles when the chevron arrow is clicked by the user
       // $0 = true when disclosure group is open and $0 = false when disclosure group is closed
       set: { isExpanded in
-        withAnimation {
         expandedPackageID = isExpanded ? package.id : nil }
-      }
     )
   }
   

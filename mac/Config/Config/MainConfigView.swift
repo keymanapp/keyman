@@ -98,21 +98,22 @@ struct MainConfigView: View {
             .frame(minWidth: 800, minHeight: 600)
        }
         
-        List {
-          // the view  for single keyboard packages
-          PackageRowView(packages: settings.singleKeyboardPackages, isSingleKeyboardPackage: true, expandedPackageID: $expandedPackageID,
-                         idToDelete: $idToDelete, showHelpTab: { url in
-          showHelpTab(for: url)})
-          
-          // the view  for multi keyboard packages
-          PackageRowView(packages: settings.multiKeyboardPackages, isSingleKeyboardPackage: false, expandedPackageID: $expandedPackageID,
-                         idToDelete: $idToDelete, showHelpTab: { url in
-            showHelpTab(for: url) })
+        ScrollView {
+          LazyVStack(alignment: .leading, spacing: 8) {          // the view  for single keyboard packages
+            PackageRowView(packages: settings.singleKeyboardPackages, isSingleKeyboardPackage: true, expandedPackageID: $expandedPackageID,
+                           idToDelete: $idToDelete, showHelpTab: { url in
+              showHelpTab(for: url)})
+            
+            // the view  for multi keyboard packages
+            PackageRowView(packages: settings.multiKeyboardPackages, isSingleKeyboardPackage: false, expandedPackageID: $expandedPackageID,
+                           idToDelete: $idToDelete, showHelpTab: { url in
+              showHelpTab(for: url)})
+            .padding(8)
+          }
         }
-        .listStyle(.inset)
-        
+        .background(canvasColor)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
         // confirmation dialog for deleting a package
-        
         .confirmationDialog(
           "Are you sure you want to delete the Keyman package '\(packageNameToDelete)'?",
           isPresented: Binding(
