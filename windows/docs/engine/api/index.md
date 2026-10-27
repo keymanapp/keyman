@@ -34,6 +34,7 @@ instantiated with `CreateObject("keymanapi.Keyman")`.
 > > > > [`IKeymanKeyboardsInstalled`](IKeymanKeyboardsInstalled)
 > > > >
 > > > > > [`IKeymanKeyboardsInstalled2`](IKeymanKeyboardsInstalled2)
+> > > > > [`IKeymanKeyboardsInstalled3`](IKeymanKeyboardsInstalled3)
 > > > >
 > > > > [`IKeymanPackageContentKeyboards`](IKeymanPackageContentKeyboards)
 > > >
@@ -44,6 +45,7 @@ instantiated with `CreateObject("keymanapi.Keyman")`.
 > > > [`IKeymanPackagesInstalled`](IKeymanPackagesInstalled)
 > > >
 > > > > [`IKeymanPackagesInstalled2`](IKeymanPackagesInstalled2)
+> > > > [`IKeymanPackagesInstalled3`](IKeymanPackagesInstalled3)
 > >
 > > [`IKeymanControl`](IKeymanControl)
 > > [`IKeymanError`](IKeymanError)
@@ -53,8 +55,10 @@ instantiated with `CreateObject("keymanapi.Keyman")`.
 > > > [`IKeymanKeyboardFile`](IKeymanKeyboardFile)
 > > >
 > > > > [`IKeymanKeyboardFile2`](IKeymanKeyboardFile2)
+> > > > [`IKeymanKeyboardFile3`](IKeymanKeyboardFile3)
 > > >
 > > > [`IKeymanKeyboardInstalled`](IKeymanKeyboardInstalled)
+> > > [`IKeymanKeyboardInstalled2`](IKeymanKeyboardInstalled2)
 > >
 > > [`IKeymanKeyboardLanguage`](IKeymanKeyboardLanguage)
 > >
@@ -70,6 +74,7 @@ instantiated with `CreateObject("keymanapi.Keyman")`.
 > > > [`IKeymanPackageFile`](IKeymanPackageFile)
 > > >
 > > > > [`IKeymanPackageFile2`](IKeymanPackageFile2)
+> > > > [`IKeymanPackageFile3`](IKeymanPackageFile3)
 > > >
 > > > [`IKeymanPackageInstalled`](IKeymanPackageInstalled)
 > >
@@ -78,5 +83,3 @@ instantiated with `CreateObject("keymanapi.Keyman")`.
 > > [`IKeymanSystemInfo`](IKeymanSystemInfo)
 > > [`IKeymanVisualKeyboard`](IKeymanVisualKeyboard)
 > > [`IKeymanBCP47Canonicalization`](IKeymanBCP47Canonicalization)
-
-
