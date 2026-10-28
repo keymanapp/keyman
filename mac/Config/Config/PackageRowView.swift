@@ -45,7 +45,6 @@ public struct PackageRowView: View {
   }
   
   public var body: some View {
-    //  wrapping the outer loop in a Section fixes the Ventura layout bug
     ForEach(packages, id: \.id) { package in
       ForEach(isSingleKeyboardPackage ? package.keyboards : package.keyboards.onlyFirst) { keyboard in
         DisclosureGroup(isExpanded: isExpanded(package: package)) {
