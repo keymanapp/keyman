@@ -31,12 +31,13 @@ public class TextView: UITextView, KeymanResponder {
 
   private var keyboardChangedObserver: NotificationObserver?
 
-  // These fields all exist solely to workaround #16674.
+  // `workaroundWorkItem`, `hiddenDummyView`, `blankWorkaroundActive`, and
+  // `blankKeyboardWorkaroundDelay` all exist solely to workaround #16674.
   // They may be safely removed once Apple fixes the underlying issue.
   /**
-   A cancellable dispatch work item that will be triggered to complete the workaround process.
+   A cancellable dispatch work item that will be triggered to complete the workaround process.  See #16674.
    
-   Its .cancel() method should be called the responder state for the current instance changes before completion.
+   Its .cancel() method should be called when the responder state for the current instance changes before completion.
    */
   private var workaroundWorkItem: DispatchWorkItem? = nil
   /**
@@ -47,7 +48,7 @@ public class TextView: UITextView, KeymanResponder {
   private var hiddenDummyView: UITextView!
 
   /**
-   Denotes that the workaround is currently in an actively triggered state, with completion pending.
+   Denotes that the workaround is currently in an actively triggered state, with completion pending.  See #16674.
    */
   private var blankWorkaroundActive: Bool {
     get {
