@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.316 beta 2026-10-28
+
+* fix(mac): double-click on .kmp begins package installation (#16881)
+* change(mac): use common name for certificate when code-signing installer package (#16915)
+
 ## 19.0.315 beta 2026-10-27
 
 * docs(windows): document engine apis MCompileForBaseKeyboard and Install3 (#16877)
