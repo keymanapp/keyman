@@ -33,6 +33,72 @@ function asProcessedToken(text: string) {
   };
 }
 
+// Taken from `sil.km.gcc` v2.0
+const khmerGCCBreaker: LexicalModelTypes.WordBreakingFunction = (str) => {
+  const whitespaceRegex = /\s|\u200b|\n|\r/;
+  const tokens = str.split(whitespaceRegex);
+
+  for(let i=0; i < tokens.length; i++) {
+    const token = tokens[i];
+    if(token.length == 0) {
+      tokens.splice(i, 1);
+      i--;
+      continue;
+    } else if(token.length == 1 && whitespaceRegex.test(token)) {
+      tokens.splice(i, 1);
+      i--;
+      continue;
+    }
+
+    // Certain punctuation marks should be considered a separate token from the word they're next to.
+    const punctuationMarks = ['«', '»', '$', '#' /* add extras here */];
+    const punctSplitIndices = [];
+
+    // Find if and where each mark exists within the token
+    for(let i = 0; i < punctuationMarks.length; i++) {
+      const split = token.indexOf(punctuationMarks[i]);
+      if(split >= 0) {
+        punctSplitIndices.push(split);
+      }
+    }
+
+    // Sort and pick the earliest mark's location.  If none exists, use -1.
+    punctSplitIndices.sort();
+    const splitPoint = punctSplitIndices[0] === undefined ? -1 : punctSplitIndices[0];
+
+    if(splitPoint > -1) {
+      const left = token.substring(0, splitPoint);  // (0, -1) => ''
+      const punct = token.substring(splitPoint, splitPoint+1);
+      const right = token.substring(splitPoint+1);  // Starting past the end of the string => ''
+
+      if(left) {
+        tokens.splice(i++, 0, left);
+      }
+      tokens.splice(i++, 1, punct);
+      if(right) {
+        tokens.splice(i, 0, right);
+      }
+      // Ensure that the next iteration puts `i` immediately after the punctuation token... even if
+      // there was a `right` portion, as it may have extra marks that also need to be spun off.
+      i--;
+    }
+  }
+
+  let latestIndex = 0;
+  return tokens.map(function(token) {
+    const start = str.indexOf(token, latestIndex);
+    latestIndex = start + token.length;
+    return {
+      left: start,
+      start: start,
+      right: start + token.length,
+      end: start + token.length,
+      length: token.length,
+      text: token
+    }
+  });
+};
+
 describe('Tokenization functions', function() {
   describe('tokenize', function() {
     it('tokenizes English using defaults, pre-whitespace caret', function() {
@@ -107,9 +173,9 @@ describe('Tokenization functions', function() {
       // Technically, we're editing the start of the first token on the right
       // when in this context.
       let expectedResult = {
-        left: ['The', ' ', 'quick', ' ', 'brown', ' ', 'fox', ' '].map(asProcessedToken),
+        left: ['The', ' ', 'quick', ' ', 'brown', ' ', 'fox', ' ', ''].map(asProcessedToken),
         right: ['jumped', ' ', 'over', ' ', 'the', ' ', 'lazy', ' ', 'dog', ' '].map(asProcessedToken),
-        caretSplitsToken: false
+        caretSplitsToken: true
       };
 
       assert.deepEqual(tokenization, expectedResult);
@@ -174,6 +240,24 @@ describe('Tokenization functions', function() {
       assert.deepEqual(tokenization, expectedResult);
     });
 
+    it('properly handles contexts with just whitespace', function() {
+      // Wordbreaking on a empty space => no word.
+      let context = {
+        left: ' ', startOfBuffer: true,
+        right: '', endOfBuffer: true
+      };
+
+      let tokenization = models.tokenize(wordBreakers.default, context);
+
+      let expectedResult: models.Tokenization = {
+        left: [' ', ''].map(asProcessedToken),
+        right: [],
+        caretSplitsToken: false
+      };
+
+      assert.deepEqual(tokenization, expectedResult);
+    });
+
     it('properly handles empty-context cases', function() {
       // Wordbreaking on a empty space => no word.
       let context = {
@@ -184,7 +268,9 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       let expectedResult: models.Tokenization = {
-        left: [],
+        left: [{
+          text: ''
+        }],
         right: [],
         caretSplitsToken: false
       };
@@ -197,7 +283,9 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(wordBreakers.default, null);
 
       let expectedResult: models.Tokenization = {
-        left: [],
+        left: [{
+          text: ''
+        }],
         right: [],
         caretSplitsToken: false
       };
@@ -547,7 +635,7 @@ describe('Tokenization functions', function() {
         tokenized.left
           .filter((entry) => !entry.isWhitespace)
           .map((entry) => entry.text),
-        ['the', 'quick', 'brown', 'fox', 'jumped', 'over', 'the', 'lazy', 'dog']
+        ['the', 'quick', 'brown', 'fox', 'jumped', 'over', 'the', 'lazy', 'dog', '']
       );
 
       // This time, with whitespaces.
@@ -570,12 +658,25 @@ describe('Tokenization functions', function() {
           'lazy',
           ' ',
           'dog',
-          '  '
+          '  ',
+          ''
         ]
       );
     });
 
-    //
+    it('properly models an empty, end-of-context token even if the wordbreaker itself does not', () => {
+      const context = {
+        left: '  ការ ',
+        right: ''
+      }
+
+      const spans = khmerGCCBreaker(context.left);
+      // Basic setup check
+      assert.deepEqual(spans.map((s) => s.text), ['ការ']);
+
+      const tokens = models.tokenize(khmerGCCBreaker, context)
+      assert.deepEqual(tokens.left.map((t) => t.text), ['  ', 'ការ', ' ', '']);
+    });
   });
 
   describe('getLastPreCaretToken', function() {

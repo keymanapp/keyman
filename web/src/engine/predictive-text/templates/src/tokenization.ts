@@ -29,6 +29,26 @@ export interface Tokenization {
   caretSplitsToken: boolean
 }
 
+export function enforceFinalEmptySpan(spans: LexicalModelTypes.Span[], str: string) {
+  let emptyToken = {
+    left: str.length,
+    start: str.length,
+    right: str.length,
+    end: str.length,
+    length: 0,
+    text: ''
+  };
+
+  // If a new word should be starting at the current caret position,
+  // ensure an empty '' token indicates this.
+  let tailToken = spans[spans.length - 1];
+  if(!tailToken || tailToken.end != str.length) {
+    spans.push(emptyToken);
+  }
+
+  return spans;
+}
+
 export function tokenize(
   wordBreaker: LexicalModelTypes.WordBreakingFunction,
   context: Partial<LexicalModelTypes.Context>,
@@ -50,7 +70,7 @@ export function tokenize(
     endOfBuffer: undefined
   };
 
-  const leftSpans  = wordBreaker(context.left  || '') || [];
+  const leftSpans  = enforceFinalEmptySpan(wordBreaker(context.left  || '') || [], context.left || '');
   const rightSpans = wordBreaker(context.right || '') || [];
 
   const tokenization: Tokenization = {
