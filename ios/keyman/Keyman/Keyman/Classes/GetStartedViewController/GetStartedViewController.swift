@@ -33,10 +33,6 @@ class GetStartedViewController: UIViewController, UITableViewDelegate, UITableVi
 
     let icon = UIImageView(image: #imageLiteral(resourceName: "887-notepad.png"))
     navItem.leftBarButtonItem = UIBarButtonItem(customView: icon)
-//    if #available(iOS 26.0, *) {
-//      navItem.leftBarButtonItem?.hidesSharedBackground = true
-//      navItem.rightBarButtonItem?.hidesSharedBackground = true
-//    }
 
     tableView.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 15)
     let frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 63)

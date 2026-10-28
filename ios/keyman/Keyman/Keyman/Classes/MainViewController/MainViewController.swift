@@ -442,11 +442,6 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
       }
 
       let barButtonItem = UIBarButtonItem(customView: customButton)
-
-//      // Could hide the Liquid Glass button styling with this.
-//      if #available(iOS 26.0, *) {
-//        barButtonItem.hidesSharedBackground = true
-//      }
       return barButtonItem
     }
   }
