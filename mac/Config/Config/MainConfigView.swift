@@ -31,6 +31,9 @@ struct MainConfigView: View {
   // item being targeted for deletion
   @State private var idToDelete: UUID? = nil
 
+  // to track all the IDs so we can detect when a new one is added and expand it
+  @State private var knownPackageIDs: Set<UUID> = []
+  
   private var packageNameToDelete: String {
     guard let uuid = idToDelete else { return "this item" }
     guard let package = settings.findInstalledPackage(with: uuid) else { return "this item" }
@@ -39,12 +42,15 @@ struct MainConfigView: View {
 
   @Environment(\.colorScheme) var colorScheme
   var canvasColor: Color {
-      colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.94)
+    colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.94)
   }
   var cardColor: Color {
-      colorScheme == .dark ? Color(white: 0.20) : Color(.white)
+    colorScheme == .dark ? Color(white: 0.20) : Color(.white)
   }
-
+  var windowColor: Color {
+    colorScheme == .dark ? Color(white: 0.18) : Color(white: 0.99)
+  }
+  
   /**
    * Assigns packageSelectedForHelpUrl the url argument and changes the selected tab to the help tab
    */
@@ -68,20 +74,24 @@ struct MainConfigView: View {
     }
   }
 
+  private var allPackageIDs: [UUID] {
+    settings.singleKeyboardPackages.map(\.id) + settings.multiKeyboardPackages.map(\.id)
+  }
+  
   var body: some View {
     TabView (selection: $selectedTab) {
       VStack {
         // uncomment this Button to force sentry error (must edit scheme and disable 'Debug executable' to test)
         /*
-          Button("Capture Sentry Error") {
-            let testError = NSError(domain: "SentryTest", code: 404, userInfo: [NSLocalizedDescriptionKey: "Testing Sentry from Keyman Config on Mac"])
-            SentrySDK.capture(error: testError)
-          }
-          .padding()
-          .buttonStyle(.borderedProminent)
-          .tint(.red)
+         Button("Capture Sentry Error") {
+         let testError = NSError(domain: "SentryTest", code: 404, userInfo: [NSLocalizedDescriptionKey: "Testing Sentry from Keyman Config on Mac"])
+         SentrySDK.capture(error: testError)
+         }
+         .padding()
+         .buttonStyle(.borderedProminent)
+         .tint(.red)
          */
-       // the add keyboard button
+        // the add keyboard button
         LabelButtonView(
           action: { isShowingAddKeyboardSheet = true },
           label: "Add Keyboard",
@@ -93,10 +103,10 @@ struct MainConfigView: View {
         // binds the visibility state to the sheet builder
         .sheet(isPresented: $isShowingAddKeyboardSheet) {
           AddKeyboardView()
-            // disable escape key for closing view to avoid issues with canceling downloads
+          // disable escape key for closing view to avoid issues with canceling downloads
             .interactiveDismissDisabled(true)
             .frame(minWidth: 800, minHeight: 600)
-       }
+        }
         
         ScrollView {
           LazyVStack(alignment: .leading, spacing: 8) {          // the view  for single keyboard packages
@@ -108,12 +118,24 @@ struct MainConfigView: View {
             PackageRowView(packages: settings.multiKeyboardPackages, isSingleKeyboardPackage: false, expandedPackageID: $expandedPackageID,
                            idToDelete: $idToDelete, showHelpTab: { url in
               showHelpTab(for: url)})
-            .padding(8)
           }
+        }
+        // initialize the set of known packages
+        .onAppear {
+          knownPackageIDs = Set(allPackageIDs)
+        }
+        .onChange(of: allPackageIDs) { newIDs in
+          if !knownPackageIDs.isEmpty,
+             let newID = newIDs.first(where: { !knownPackageIDs.contains($0) }) {
+            withAnimation(.easeInOut(duration: 0.25)) {
+              expandedPackageID = newID
+            }
+          }
+          knownPackageIDs = Set(newIDs)
         }
         .background(canvasColor)
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        // confirmation dialog for deleting a package
+       // confirmation dialog for deleting a package
         .confirmationDialog(
           "Are you sure you want to delete the Keyman package '\(packageNameToDelete)'?",
           isPresented: Binding(
@@ -201,6 +223,7 @@ struct MainConfigView: View {
         Spacer()
       }
       .padding([.leading, .trailing, .bottom])
+      .background(windowColor)
       .tabItem { Text("Keyboards") }
       .tag(0)
       
