@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 20.0.9 alpha 2026-10-29
+
+* chore(deps): bump brace-expansion from 5.0.9 to 5.0.12 in /developer/src/server/src/win32/trayicon/addon-src (#16798)
+* chore(deps): bump ip-address from 10.7.2 to 10.7.4 in /developer/src/server/src/win32/trayicon/addon-src (#16880)
+* chore(deps): bump serialize-javascript and mocha in /resources/build/pr-build-status (#16899)
+* chore(deps-dev): bump git-diff from 2.0.6 to 2.0.7 (#16919)
+
 ## 20.0.8 alpha 2026-10-27
 
 * fix(developer): strip markers correctly in ldml to kvk compiler (#16901)
