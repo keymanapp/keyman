@@ -37,7 +37,7 @@ struct ConfigApp: App {
   }
 
   var body: some Scene {
-    Window("Configuration", id: "config") {
+    Window("Keyboards", id: "config") {
       MainConfigView()
         .frame(
           minWidth: 600, maxWidth: 1000,
@@ -48,16 +48,18 @@ struct ConfigApp: App {
           openWindow(id: "install")
         }
     }
+    .windowStyle(.hiddenTitleBar)
     // the size of the window when first opened
-        .defaultSize(width: 800, height: 600)
-        .windowResizability(.contentSize)
-        // config window receives any opened files
-        .handlesExternalEvents(matching: ["*"])
+    .defaultSize(width: 800, height: 600)
+    .windowResizability(.contentSize)
+    // config window receives any opened files
+    .handlesExternalEvents(matching: ["*"])
     
     Window("Installation", id: "install") {
       MainInstallView()
         .environmentObject(installation)
     }
+    .windowStyle(.hiddenTitleBar)
     .windowResizability(.contentSize)
     .defaultSize(width: 600, height: 500)
     // installation window receives no opened files
