@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import * as KeymanOSK from 'keyman/engine/osk';
 import { DeviceDetector } from 'keyman/engine/main';
 

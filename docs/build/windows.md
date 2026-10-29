@@ -412,8 +412,6 @@ certificates for the build.
 * sentry-cli (optional)
   - Uploading symbols for Sentry-based error reporting
 
-  bash:
-  ```bash
-  # bash
-  curl -sL https://sentry.io/get-cli/ | bash
-  ```
+  See <https://docs.sentry.io/cli/installation/> for the installation, and
+  check [minimum-versions.md](../minimum-versions.md) for the required version of
+  `sentry-cli`.

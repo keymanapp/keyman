@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai';
 
 import { CORRECTION_SEARCH_THRESHOLDS, TokenizedIntermediatePrediction, ModelCompositor, shouldStopSearchingEarly } from "@keymanapp/lm-worker/test-index";
