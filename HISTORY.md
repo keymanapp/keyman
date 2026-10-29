@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.317 beta 2026-10-29
+
+* fix(ios): add workaround for iOS 27+ blank keyboard (#16873)
+* change(ios): improve styling under iOS's Liquid Glass UI (#16818)
+* chore: logging for pr-build-status (#16918)
+
 ## 19.0.316 beta 2026-10-28
 
 * fix(mac): double-click on .kmp begins package installation (#16881)
