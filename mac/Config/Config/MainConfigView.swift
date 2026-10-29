@@ -42,15 +42,12 @@ struct MainConfigView: View {
 
   @Environment(\.colorScheme) var colorScheme
   var canvasColor: Color {
-    colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.94)
+    colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.92)
   }
   var cardColor: Color {
     colorScheme == .dark ? Color(white: 0.20) : Color(.white)
   }
-  var windowColor: Color {
-    colorScheme == .dark ? Color(white: 0.18) : Color(white: 0.99)
-  }
-  
+
   /**
    * Assigns packageSelectedForHelpUrl the url argument and changes the selected tab to the help tab
    */
@@ -80,7 +77,7 @@ struct MainConfigView: View {
   
   var body: some View {
     TabView (selection: $selectedTab) {
-      VStack {
+      VStack(spacing: 0) {
         // uncomment this Button to force sentry error (must edit scheme and disable 'Debug executable' to test)
         /*
          Button("Capture Sentry Error") {
@@ -96,10 +93,12 @@ struct MainConfigView: View {
           action: { isShowingAddKeyboardSheet = true },
           label: "Add Keyboard",
           systemImage: "plus",
-          font: .title2
+          font: .title3
         )
         .clipShape(.capsule)
-        .padding([.top, .leading, .trailing])
+        .padding(.top, 14)
+        .padding(.bottom, 20)
+        .padding(.horizontal)
         // binds the visibility state to the sheet builder
         .sheet(isPresented: $isShowingAddKeyboardSheet) {
           AddKeyboardView()
@@ -133,7 +132,6 @@ struct MainConfigView: View {
           }
           knownPackageIDs = Set(newIDs)
         }
-        .background(canvasColor)
         .clipShape(RoundedRectangle(cornerRadius: 10))
        // confirmation dialog for deleting a package
         .confirmationDialog(
@@ -220,10 +218,9 @@ struct MainConfigView: View {
         }
 
         // the Spacer pushes the contents of the VStack to the top of the VStack
-        Spacer()
+//        Spacer()
       }
       .padding([.leading, .trailing, .bottom])
-      .background(windowColor)
       .tabItem { Text("Keyboards") }
       .tag(0)
       
@@ -239,6 +236,7 @@ struct MainConfigView: View {
           .tag(1)
       }
     }
+    .background(canvasColor.ignoresSafeArea())
     .onOpenURL { url in
       // only handle files
       guard url.isFileURL else { return }

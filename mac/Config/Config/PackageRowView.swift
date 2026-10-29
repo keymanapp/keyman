@@ -22,9 +22,9 @@ public struct PackageRowView: View {
       colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.94)
   }
   var cardColor: Color {
-      colorScheme == .dark ? Color(white: 0.20) : Color(.white)
+    colorScheme == .dark ? Color(white: 0.22) : Color(white: 1.0)
   }
-
+  
   // could be settings.singleKeyboardPackages or settings.multiKeyboardPackages
   let packages: [KeymanPackage]
   // a boolean for whether or not a package contains multiple keyboards
@@ -61,14 +61,15 @@ public struct PackageRowView: View {
             HStack {
               // if the package contains one keyboard, show the keyboard name, otherwise show the package name
               Text(isSingleKeyboardPackage ? keyboard.name: package.packageName)
-                .font(.title)
+                .font(.title2)
               
               // see keyboard help button
               if let url = package.helpFileUrl {
                 IconButtonView(
                   action: { showHelpTab(url) },
                   systemImage: "questionmark.circle",
-                  font: .title2,
+                  font: .title3
+                    .bold(),
                   helpText: "Show keyboard help"
                 )
               }
