@@ -235,7 +235,7 @@ BOOL AIWin2000Unicode::PostKeys()
     _td->pSerialKeyEventClient->SignalServer(pInputs, i);
   }
 
-  SendDebugMessageFormat("sending input finished");
+  SendDebugMessageFormat("sending input finished (last error=%d)", GetLastError());
 
   delete[] pInputs;
 

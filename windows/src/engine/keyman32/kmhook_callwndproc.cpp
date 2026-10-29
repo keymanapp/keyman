@@ -123,38 +123,30 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 		  GetKeyState(VK_SHIFT), GetAsyncKeyState(VK_SHIFT));
   */
       PKEYMAN64THREADDATA _td = ThreadGlobals();
-      if(!_td)
-      {
-        if(!Globals::CheckControllers())
-        {
-          DebugLastError("CheckControllers");
-          return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
-        }
-
-        if(!Globals_InitThread())
-        {
-          DebugLastError("Globals_InitThread");
+      if(!_td) {
+        if(!Globals_InitThread()) {
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
 
         _td = ThreadGlobals();
-	      if(!_td)
-        {
+	      if(!_td) {
           DebugLastError("ThreadGlobals");
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
       }
 
-      if(!_td->FInitialised)			// Keyman keyboard is being selected for first time in active process
-      {
-        if(!Globals::CheckControllers())
-        {
-          DebugLastError("CheckControllers");
-          return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
-        }
-        if(!InitialiseProcess())
-        {
-          DebugLastError("InitialiseProcess");
+      if(!_td->FInitialised) {
+        // Keyman keyboard is being selected for first time in active process.
+        // keyman32.dll may already be in memory, having been loaded by
+        // kmtip.dll or other API callers. So we need to make sure that we
+        // initialize only after Keyman itself has been initialized from the
+        // controller process
+        //
+        // Note: we check `get_Keyman_Initialised()` here rather than in
+        // `InitProcess()` itself, so that the call to `InitProcess()` from
+        // `Keyman_Initialise()` can finish before `Keyman_Initialised` is set
+        // to TRUE.
+        if(!Globals::get_Keyman_Initialised() || !InitProcess()) {
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
       }
