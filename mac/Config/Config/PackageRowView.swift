@@ -18,9 +18,6 @@ public struct PackageRowView: View {
   // used to identify the selected KeymanPackage for the delete package alert
    
   @Environment(\.colorScheme) var colorScheme
-  var canvasColor: Color {
-      colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.94)
-  }
   var cardColor: Color {
     colorScheme == .dark ? Color(white: 0.22) : Color(white: 1.0)
   }

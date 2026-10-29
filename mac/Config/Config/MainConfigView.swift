@@ -44,9 +44,6 @@ struct MainConfigView: View {
   var canvasColor: Color {
     colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.92)
   }
-  var cardColor: Color {
-    colorScheme == .dark ? Color(white: 0.20) : Color(.white)
-  }
 
   /**
    * Assigns packageSelectedForHelpUrl the url argument and changes the selected tab to the help tab
@@ -108,7 +105,8 @@ struct MainConfigView: View {
         }
         
         ScrollView {
-          LazyVStack(alignment: .leading, spacing: 8) {          // the view  for single keyboard packages
+          LazyVStack(alignment: .leading, spacing: 8) {
+            // the view  for single keyboard packages
             PackageRowView(packages: settings.singleKeyboardPackages, isSingleKeyboardPackage: true, expandedPackageID: $expandedPackageID,
                            idToDelete: $idToDelete, showHelpTab: { url in
               showHelpTab(for: url)})
@@ -132,7 +130,7 @@ struct MainConfigView: View {
           }
           knownPackageIDs = Set(newIDs)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
        // confirmation dialog for deleting a package
         .confirmationDialog(
           "Are you sure you want to delete the Keyman package '\(packageNameToDelete)'?",
@@ -147,9 +145,6 @@ struct MainConfigView: View {
               Logger.app.info("deleting package.id: \(uuid)")
               LogUtil.infoBreadcrumb("deleting package.id: \(uuid)", category: .app)
 
-              // use multiple expanded states?
-              //expandedStates.removeValue(forKey: uuid)
-              
               withAnimation(.easeInOut(duration: 0.3)) {
                 expandedPackageID = nil
                 settings.removeInstalledPackage(with: uuid)
@@ -216,9 +211,6 @@ struct MainConfigView: View {
           // disable escape key for closing view to avoid issues with canceling downloads
           .interactiveDismissDisabled(true)
         }
-
-        // the Spacer pushes the contents of the VStack to the top of the VStack
-//        Spacer()
       }
       .padding([.leading, .trailing, .bottom])
       .tabItem { Text("Keyboards") }
