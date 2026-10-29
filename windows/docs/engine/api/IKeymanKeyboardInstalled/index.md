@@ -6,17 +6,19 @@ title: IKeymanKeyboardInstalled Interface
 
 The `IKeymanKeyboardInstalled` interface describes a keyboard file that
 has been installed and allows modification of [keyboard option
-values](Options) for the keyboard file.
+values](../IKeymanKeyboardInstalled/Options) for the keyboard file.
 
 ## Interface Hierarchy
 
-`IDispatch`  
+`IDispatch`
 
-> [`IKeymanObject`](../IKeymanObject)  
+> [`IKeymanObject`](../IKeymanObject)
 >
-> > [`IKeymanKeyboard`](../IKeymanKeyboard)  
+> > [`IKeymanKeyboard`](../IKeymanKeyboard)
 > >
-> > > **`IKeymanKeyboardInstalled`**  
+> > > **`IKeymanKeyboardInstalled`**
+> > >
+> > > [`IKeymanKeyboardInstalled2`](../IKeymanKeyboardInstalled2)
 
 ## Properties
 
