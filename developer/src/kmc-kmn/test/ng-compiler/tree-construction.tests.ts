@@ -12,11 +12,16 @@ import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
 import { NodeType } from '../../src/ng-compiler/node-type.js';
 import { Token } from '../../src/ng-compiler/lexer.js';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
+import { stringToTokenBuffer } from './kmn-analyzer.tests.js';
+import { TokenBuffer } from '../../src/ng-compiler/token-buffer.js';
+import { Rule } from '../../src/ng-compiler/recursive-descent.js';
+import { LineRule } from '../../src/ng-compiler/kmn-analyzer.js';
 
-let root: ASTNode      = null;
-let bitmap: ASTNode    = null;
-let copyright: ASTNode = null;
-let version: ASTNode   = null;
+let root: ASTNode            = null;
+let bitmap: ASTNode          = null;
+let copyright: ASTNode       = null;
+let version: ASTNode         = null;
+let tokenBuffer: TokenBuffer = null;
 
 function initVariables(): void {
   root      = new ASTNode();
@@ -639,6 +644,46 @@ describe("Tree Construction Tests", () => {
         assert.equal(group1.toString(), '[GROUP,[GROUP,1],{[PRODUCTION,[MATCH,1]],[PRODUCTION,[MATCH,2]],[PRODUCTION,[MATCH,3]]}]');
         assert.equal(group2.toString(), '[GROUP,[GROUP,2],{[PRODUCTION,[MATCH,4]]}]');
         assert.equal(root.toString(), '[TMP,{[BITMAP],[COPYRIGHT],[VERSION]}]');
+      });
+    });
+    describe("ASTNode.getTokenBounds()", () => {
+      beforeEach(() => {
+        root = new ASTNode();
+      });
+      it("can handle a system store assignment", () => {
+        tokenBuffer = stringToTokenBuffer('store(&bitmap) "filename"');
+        const systemStoreAssign: Rule = new LineRule();
+        systemStoreAssign.parse(tokenBuffer, root);
+        const bitmapNode = root.getSoleChildOfType(NodeType.BITMAP);
+        const bounds     = bitmapNode.getTokenBounds();
+        assert.deepEqual(bounds, {firstLine: 1, firstChar: 16, lastLine: 1, lastChar: 26});
+        const lineNode = root.getSoleChildOfType(NodeType.LINE);
+        const source   = lineNode.token.line.slice(bounds.firstChar-1, bounds.lastChar);
+        assert.equal(source, '"filename"');
+      });
+      it("can handle a normal store assignment (two u_char)", () => {
+        tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 U+1781');
+        const normalStoreAssign: Rule = new LineRule();
+        normalStoreAssign.parse(tokenBuffer, root);
+        const storeNode = root.getSoleChildOfType(NodeType.STORE);
+        storeNode.removeSoleChildOfType(NodeType.STORENAME);
+        const bounds = storeNode.getTokenBounds();
+        assert.deepEqual(bounds, {firstLine: 1, firstChar: 14, lastLine: 1, lastChar: 27});
+        const lineNode = root.getSoleChildOfType(NodeType.LINE);
+        const source   = lineNode.token.line.slice(bounds.firstChar-1, bounds.lastChar);
+        assert.equal(source, 'U+1780 U+1781');
+      });
+      it("can handle a normal store assignment (two u_char with continuation)", () => {
+        tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\nU+1781');
+        const normalStoreAssign: Rule = new LineRule();
+        normalStoreAssign.parse(tokenBuffer, root);
+        const storeNode = root.getSoleChildOfType(NodeType.STORE);
+        storeNode.removeSoleChildOfType(NodeType.STORENAME);
+        const bounds = storeNode.getTokenBounds();
+        assert.deepEqual(bounds, {firstLine: 1, firstChar: 14, lastLine: 2, lastChar: 7});
+        //const lineNode = root.getSoleChildOfType(NodeType.LINE);
+        //const source   = lineNode.token.line.slice(bounds.firstChar-1, bounds.lastChar);
+        //assert.equal(source, 'U+1780 U+1781');
       });
     });
     describe("ASTNode.toString()", () => {

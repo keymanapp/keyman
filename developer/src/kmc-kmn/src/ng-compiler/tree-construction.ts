@@ -352,7 +352,7 @@ export class ASTNode {
       node.children.forEach(visit);
     };
 
-    visit(this);
+    this.children.forEach(visit); // do not include root
 
     return {
       firstLine: firstLine === Infinity ? null : firstLine,
