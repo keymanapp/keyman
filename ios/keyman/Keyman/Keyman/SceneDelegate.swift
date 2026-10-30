@@ -1,10 +1,11 @@
-//
-//  AppDelegate.swift
-//  Keyman
-//
-//  Created by Gabriel Wong on 2017-09-07.
-//  Copyright © 2017 SIL International. All rights reserved.
-//
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by Joshua A. Prins-Horton (jahorton) on 2026-10-01.
+ *
+ * Implements the entrypoint for scene-based operations within
+ * Keyman for iPhone and iPad.
+ */
 
 import KeymanEngine
 import UIKit
@@ -15,29 +16,16 @@ import os.log
 // Note:  this needs to be kept separate from AppDelegate; unintended behavior
 // may result if one object implements both.  (Two separate instances of the same,
 // supposedly-singleton object!)
-class SceneDelegate: UIResponder, UISceneDelegate {
+/**
+ Manages the visual user interface lifecycle of app instances.
+ */
+class SceneDelegate: NSObject, UISceneDelegate {
   private var _overlayWindow: UIWindow?
   private var _mainScene: UIWindowScene?
 
   var window: UIWindow?
   var viewController: MainViewController!
   var navigationController: UINavigationController?
-
-  func commonStart() {
-    // Override point for customization after application launch.
-    viewController = MainViewController()
-    let navigationController = UINavigationController(rootViewController: viewController)
-
-    // Navigation bar became translucent by default in iOS7 SDK, however we don't want it to be translucent.
-    navigationController.navigationBar.isTranslucent = false
-
-    window!.rootViewController = navigationController
-    window!.makeKeyAndVisible()
-
-    // TODO: look in documents directory for .zip / .kmp files
-    // TODO: OR browse documents Dir from new keyboard window
-    // self.installAdhocKeyboard(filePath: "")
-  }
 
   func scene(
     _ scene: UIScene,
@@ -64,14 +52,20 @@ class SceneDelegate: UIResponder, UISceneDelegate {
 
     window = UIWindow(windowScene: windowScene)
     _mainScene = windowScene
-    commonStart()
-  }
+    
+    // Override point for customization after application launch.
+    viewController = MainViewController()
+    let navigationController = UINavigationController(rootViewController: viewController)
 
-  func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+    // Navigation bar became translucent by default in iOS7 SDK, however we don't want it to be translucent.
+    navigationController.navigationBar.isTranslucent = false
 
-    SentryManager.start()
-    return true
+    window!.rootViewController = navigationController
+    window!.makeKeyAndVisible()
+
+    // TODO: look in documents directory for .zip / .kmp files
+    // TODO: OR browse documents Dir from new keyboard window
+    // self.installAdhocKeyboard(filePath: "")
   }
 
   func sceneDidEnterBackground(_ scene: UIScene) {
@@ -84,7 +78,9 @@ class SceneDelegate: UIResponder, UISceneDelegate {
     perform(#selector(self.registerCustomFonts), with: nil, afterDelay: 1.0)
   }
 
-  // Might be from this setup?
+  /**
+   Used to dim other app contents when overlaying activity indicators or the "Get Started" menu.
+   */
   var overlayWindow: UIWindow {
     let mainScene = self._mainScene!
 

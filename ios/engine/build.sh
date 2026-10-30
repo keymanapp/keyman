@@ -80,6 +80,9 @@ function do_carthage() {
 
   # --no-use-binaries: due to https://github.com/Carthage/Carthage/issues/3134,
   # which affects the sentry-cocoa dependency.
+  #
+  # XCODE_XCCONFIG_FILE allows us override the minimum iOS deployment target that our Carthage
+  # dependencies use; use of Xcode 27 requires a minimum target of 15.0.
   XCODE_XCCONFIG_FILE="$KEYMAN_ROOT/ios/override.xcconfig" carthage build --use-xcframeworks --no-use-binaries --platform iOS || carthage_die "Carthage dependency loading failed"
 
   popd > /dev/null
