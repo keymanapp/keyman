@@ -709,6 +709,12 @@ describe("Tree Construction Tests", () => {
         const source   = tokenBoundsSlice(lineNode.token.line, lineNode.token.lineNum, bounds);
         assert.equal(source, 'U+1780\\\r\nU+1781');
       });
+      it("can handle a tree with no tokens", () => {
+        const storeNode = new ASTNode(NodeType.STORE);
+        root.addChild(storeNode);
+        const bounds = storeNode.getTokenBounds();
+        assert.deepEqual(bounds, {firstLine: null, firstChar: null, lastLine: null, lastChar: null});
+      });
     });
     describe("ASTNode.toString()", () => {
       beforeEach(() => {
@@ -751,6 +757,64 @@ describe("Tree Construction Tests", () => {
         root.addChild(source);
         assert.equal(root.toText(), 'line1\nline2\nline3\n');
       });
+    });
+  });
+  describe("tokenBoundsSlice()", () => {
+    it("can handle null in bounds.firstLine", () => {
+      assert.equal(tokenBoundsSlice("test", 1, {firstLine: null, firstChar: 1, lastLine: 1, lastChar: 2}), '');
+    });
+    it("can handle null in bounds.firstChar", () => {
+      assert.equal(tokenBoundsSlice("test", 1, {firstLine: 1, firstChar: null, lastLine: 1, lastChar: 2}), '');
+    });
+    it("can handle null in bounds.lastLine", () => {
+      assert.equal(tokenBoundsSlice("test", 1, {firstLine: 1, firstChar: 1, lastLine: null, lastChar: 2}), '');
+    });
+    it("can handle null in bounds.firstLine", () => {
+      assert.equal(tokenBoundsSlice("test", 1, {firstLine: 1, firstChar: 1, lastLine: 1, lastChar: null}), '');
+    });
+    it("can handle bounds.firstLine < lineNum", () => {
+      assert.equal(tokenBoundsSlice("test", 10, {firstLine: 1, firstChar: 1, lastLine: 10, lastChar: 2}), '');
+    });
+    it("can handle bounds.firstChar < 1", () => {
+      assert.equal(tokenBoundsSlice("test", 1, {firstLine: 1, firstChar: 0, lastLine: 1, lastChar: 2}), '');
+    });
+    it("can handle bounds.lastLine < bounds.firstLine", () => {
+      assert.equal(tokenBoundsSlice("test", 10, {firstLine: 10, firstChar: 1, lastLine: 9, lastChar: 2}), '');
+    });
+    it("can handle bounds.lastLine < bounds.firstLine", () => {
+      assert.equal(tokenBoundsSlice("test", 10, {firstLine: 10, firstChar: 1, lastLine: 9, lastChar: 2}), '');
+    });
+    it("can handle a single line", () => {
+      const bounds = {firstLine: 1, firstChar: 16, lastLine: 1, lastChar: 26};
+      assert.equal(tokenBoundsSlice('store(&bitmap) "filename"', 1, bounds), '"filename"');
+    });
+    it("can handle a two lines line (LF)", () => {
+      const bounds = {firstLine: 1, firstChar: 14, lastLine: 2, lastChar: 7};
+      assert.equal(tokenBoundsSlice('store(c_out) U+1780\\\nU+1781', 1, bounds), 'U+1780\\\nU+1781');
+    });
+    it("can handle a two lines line (CR)", () => {
+      const bounds = {firstLine: 1, firstChar: 14, lastLine: 2, lastChar: 7};
+      assert.equal(tokenBoundsSlice('store(c_out) U+1780\\\rU+1781', 1, bounds), 'U+1780\\\rU+1781');
+    });
+    it("can handle a two lines line (CRLF)", () => {
+      const bounds = {firstLine: 1, firstChar: 14, lastLine: 2, lastChar: 7};
+      assert.equal(tokenBoundsSlice('store(c_out) U+1780\\\r\nU+1781', 1, bounds), 'U+1780\\\r\nU+1781');
+    });
+    it("can handle bounds.lastLine overflow", () => {
+      const bounds = {firstLine: 11, firstChar: 14, lastLine: 13, lastChar: 7};
+      assert.equal(tokenBoundsSlice('store(c_out) U+1780\\\nU+1781', 11, bounds), '');
+    });
+    it("can handle bounds.firstChar overflow", () => {
+      const bounds = {firstLine: 1, firstChar: 100, lastLine: 2, lastChar: 7};
+      assert.equal(tokenBoundsSlice('store(c_out) U+1780\\\nU+1781', 1, bounds), '');
+    });
+    it("can handle bounds.lastChar overflow", () => {
+      const bounds = {firstLine: 1, firstChar: 14, lastLine: 2, lastChar: 100};
+      assert.equal(tokenBoundsSlice('store(c_out) U+1780\\\nU+1781', 1, bounds), '');
+    });
+    it("can handle end < start", () => {
+      const bounds = {firstLine: 2, firstChar: 7, lastLine: 2, lastChar: 5};
+      assert.equal(tokenBoundsSlice('store(c_out) U+1780\\\nU+1781', 1, bounds), '');
     });
   });
 });
