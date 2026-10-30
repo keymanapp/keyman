@@ -9,17 +9,19 @@ for installing additional keyboards.
 
 ## Interface Hierarchy
 
-`IDispatch`  
+`IDispatch`
 
-> [`IKeymanObject`](../IKeymanObject)  
+> [`IKeymanObject`](../IKeymanObject)
 >
-> > [`IKeymanCollection`](../IKeymanCollection)  
+> > [`IKeymanCollection`](../IKeymanCollection)
 > >
-> > > [`IKeymanKeyboards`](../IKeymanKeyboards)  
+> > > [`IKeymanKeyboards`](../IKeymanKeyboards)
 > > >
-> > > > [`IKeymanKeyboardsInstalled`](../IKeymanKeyboardsInstalled)  
+> > > > [`IKeymanKeyboardsInstalled`](../IKeymanKeyboardsInstalled)
 > > > >
-> > > > > **`IKeymanKeyboardsInstalled2`**  
+> > > > > **`IKeymanKeyboardsInstalled2`**
+> > > > >
+> > > > > [`IKeymanKeyboardsInstalled3`](../IKeymanKeyboardsInstalled3)
 
 ## Methods
 

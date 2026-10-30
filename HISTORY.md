@@ -1,5 +1,39 @@
 # Keyman Version History
 
+## 19.0.318 beta 2026-10-30
+
+* fix(mac): show package disclosure groups in macOS Ventura (#16911)
+* fix(developer): disable http compression in Server to mitigate Node2Shell (#16908)
+* docs(windows): clean api index formatting (#16913)
+* fix(developer): cast as unsigned to avoid ERangeError (#16823)
+* fix(ios): remove Liquid Glass blur effect seen in iOS 27 from system-keyboard mode (#16885)
+
+## 19.0.317 beta 2026-10-29
+
+* fix(ios): add workaround for iOS 27+ blank keyboard (#16873)
+* change(ios): improve styling under iOS's Liquid Glass UI (#16818)
+* chore: logging for pr-build-status (#16918)
+
+## 19.0.316 beta 2026-10-28
+
+* fix(mac): double-click on .kmp begins package installation (#16881)
+* change(mac): use common name for certificate when code-signing installer package (#16915)
+
+## 19.0.315 beta 2026-10-27
+
+* docs(windows): document engine apis MCompileForBaseKeyboard and Install3 (#16877)
+* fix(developer): strip markers correctly in ldml to kvk compiler (#16900)
+
+## 19.0.314 beta 2026-10-23
+
+* fix(windows): attempt to reinitialize Keyman on each keystroke in TIP (#16862)
+* docs(developer): add caution for on-screen to use Fill from layout, add Design and Code view sections, and update images (#16756)
+
+## 19.0.313 beta 2026-10-22
+
+* fix(mac): installer directly launches config app (#16755)
+* fix(android): pass on backspace keyevent when pressed at start of context (#16856)
+
 ## 19.0.312 beta 2026-10-21
 
 * change(ios): select suggestion mode based on input context (#16806)

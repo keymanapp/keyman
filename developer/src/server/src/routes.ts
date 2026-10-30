@@ -27,7 +27,12 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
 
   /* Middleware - JSON and logging */
 
-  app.use(express.json()); // for parsing application/json
+  // mitigate Node2Shell CVE-2026-111497 (#16904)
+  const middlewareOptions = {inflate:false};
+  app.use(express.raw(middlewareOptions));
+  app.use(express.text(middlewareOptions));
+  app.use(express.urlencoded(middlewareOptions));
+  app.use(express.json(middlewareOptions)); // for parsing application/json
 
   app.use(function (req, _res, next) {
     console.log(req.method + ' ' + req.path);

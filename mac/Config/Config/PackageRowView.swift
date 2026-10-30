@@ -18,13 +18,10 @@ public struct PackageRowView: View {
   // used to identify the selected KeymanPackage for the delete package alert
    
   @Environment(\.colorScheme) var colorScheme
-  var canvasColor: Color {
-      colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.94)
-  }
   var cardColor: Color {
-      colorScheme == .dark ? Color(white: 0.20) : Color(.white)
+    colorScheme == .dark ? Color(white: 0.22) : Color(white: 1.0)
   }
-
+  
   // could be settings.singleKeyboardPackages or settings.multiKeyboardPackages
   let packages: [KeymanPackage]
   // a boolean for whether or not a package contains multiple keyboards
@@ -52,9 +49,7 @@ public struct PackageRowView: View {
           if expandedPackageID == package.id {
             PackageInfoView(package: package, showAlertFunction: { package in
               idToDelete = package.id
-              //showDeleteAlert(for: package)
             })
-              .transition(.move(edge: .top))
           }
         }
         label: {
@@ -63,14 +58,15 @@ public struct PackageRowView: View {
             HStack {
               // if the package contains one keyboard, show the keyboard name, otherwise show the package name
               Text(isSingleKeyboardPackage ? keyboard.name: package.packageName)
-                .font(.title)
-
+                .font(.title2)
+              
               // see keyboard help button
               if let url = package.helpFileUrl {
                 IconButtonView(
                   action: { showHelpTab(url) },
                   systemImage: "questionmark.circle",
-                  font: .title2,
+                  font: .title3
+                    .bold(),
                   helpText: "Show keyboard help"
                 )
               }
@@ -111,26 +107,15 @@ public struct PackageRowView: View {
             }
           }
           .contentShape(Rectangle())
-          // handles when the HStack is clicked by the user
-          .onTapGesture {
-            withAnimation () {
-              if self.expandedPackageID == package.id {
-                self.expandedPackageID = nil
-              } else {
-                self.expandedPackageID = package.id
-              }
-            }
-          }
         }
-        .listRowBackground(
-            Rectangle()
-              .fill(cardColor) // native Mac card color = Color(.controlBackgroundColor)
+        .disclosureGroupStyle(ChevronDisclosureStyle())
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+          RoundedRectangle(cornerRadius: 8).fill(cardColor)
         )
       }
     }
-    // animate changes in the package list
-    .animation(.easeInOut, value: packages)
-    .padding(.vertical, 8)
   }
   
   // the helper method to generate the custom binding for whether a package's disclosure group is expanded or not
@@ -141,9 +126,7 @@ public struct PackageRowView: View {
       // setter handles when the chevron arrow is clicked by the user
       // $0 = true when disclosure group is open and $0 = false when disclosure group is closed
       set: { isExpanded in
-        withAnimation {
         expandedPackageID = isExpanded ? package.id : nil }
-      }
     )
   }
   
