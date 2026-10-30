@@ -6,8 +6,10 @@
  * KMC KMN Next Generation Parser (ASTRebuild)
  */
 
-import { NodeType } from "./node-type.js";
-import { ASTNode } from "./tree-construction.js";
+import { Token } from "./lexer.js";
+import { NodeType, SYSTEM_STORES_NODETYPES } from "./node-type.js";
+import { TokenType } from "./token-type.js";
+import { ASTNode, tokenBoundsSlice } from "./tree-construction.js";
 
 /**
  * An abstract strategy for rebuilding an AST
@@ -182,3 +184,25 @@ export class ChangeNode extends ASTRebuild {
     return node;
   };
 }
+
+export class AddSystemStoreSource extends ASTRebuild {
+  public constructor() {
+    super();
+  }
+
+  public apply(node: ASTNode): ASTNode {
+    for (const nodeType of SYSTEM_STORES_NODETYPES) {
+      if (node.hasSoleChildOfType(nodeType)) {
+        const systemStoreNode = node.getSoleChildOfType(nodeType);
+        const bounds          = systemStoreNode.getTokenBounds();
+        const lineNode        = node.getSoleChildOfType(NodeType.LINE);
+        const source          = tokenBoundsSlice(lineNode.token.line, lineNode.token.lineNum, bounds);
+        const token           = new Token(TokenType.STRING, source, bounds.firstLine, bounds.firstChar);
+        systemStoreNode.addNewChildWithToken(NodeType.SOURCE, token);
+        return node;
+      }
+    }
+    return node;
+  }
+}
+

@@ -14,11 +14,10 @@ import { AnyStatementRule, CallStatementRule, ContextStatementRule, DeadkeyState
 import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatementRule, SaveStatementRule } from "./statement-analyzer.js";
 import { CapsLockHeaderRule, HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyzer.js";
 import { SetNormalStoreRule, SetSystemStoreRule, SystemStoreAssignRule } from "./store-analyzer.js";
-import { NodeType } from "./node-type.js";
+import { NodeType, SYSTEM_STORES_NODETYPES } from "./node-type.js";
 import { ASTNode } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { ASTRebuild, GivenNode, NewNode, NewNodeOrTree } from "./ast-rebuild.js";
-import { Token } from "./lexer.js";
+import { AddSystemStoreSource, ASTRebuild, GivenNode, NewNode, NewNodeOrTree } from "./ast-rebuild.js";
 
 /**
  * The Next Generation Parser for the Keyman Keyboard Language.
@@ -79,46 +78,10 @@ export class KmnTreeRebuild extends ASTRebuild {
     const groupNodes     = this.gatherGroups(node);
     const storesNode     = this.gatherStores(node);
     node.addChildren([storesNode, ...node.removeChildren(), ...groupNodes, sourceCodeNode]);
-    this.addSystemStoreStrings(node);
     return node;
   };
 
-  private static STORES_NODETYPES = [
-    NodeType.BITMAP,
-    NodeType.CASEDKEYS,
-    NodeType.COPYRIGHT,
-    NodeType.DISPLAYMAP,
-    NodeType.ETHNOLOGUECODE,
-    NodeType.HOTKEY,
-    NodeType.INCLUDECODES,
-    NodeType.KEYBOARDVERSION,
-    NodeType.KMW_EMBEDCSS,
-    NodeType.KMW_EMBEDJS,
-    NodeType.KMW_HELPFILE,
-    NodeType.KMW_HELPTEXT,
-    NodeType.KMW_RTL,
-    NodeType.LANGUAGE,
-    NodeType.LAYOUTFILE,
-    NodeType.MESSAGE,
-    NodeType.MNEMONICLAYOUT,
-    NodeType.NAME,
-    NodeType.TARGETS,
-    NodeType.VERSION,
-    NodeType.VISUALKEYBOARD,
-    NodeType.WINDOWSLANGUAGES,
-    NodeType.CAPSALWAYSOFF,
-    NodeType.CAPSONONLY,
-    NodeType.SHIFTFREESCAPS,
-    NodeType.BITMAP_HEADER,
-    NodeType.COPYRIGHT_HEADER,
-    NodeType.HOTKEY_HEADER,
-    NodeType.LANGUAGE_HEADER,
-    NodeType.LAYOUT_HEADER,
-    NodeType.MESSAGE_HEADER,
-    NodeType.NAME_HEADER,
-    NodeType.VERSION_HEADER,
-    NodeType.STORE,
-  ];
+  private static STORES_NODETYPES = [...SYSTEM_STORES_NODETYPES, NodeType.STORE];
 
   /**
    * Removes the all store nodes (i.e. matching STORES_NODETYPES) from
@@ -158,30 +121,14 @@ export class KmnTreeRebuild extends ASTRebuild {
     sourceCodeNode.addChildren(lineNodes);
     return sourceCodeNode;
   }
-
-  private addSystemStoreStrings(node: ASTNode) {
-    const systemStoreNodes = (node.getSoleChildOfType(NodeType.STORES)?.getChildren() ?? [])
-      .filter((store) => store.nodeType !== NodeType.STORE);
-    const lineNodes = node.getSoleChildOfType(NodeType.SOURCE_CODE)?.getChildren() ?? [];
-    systemStoreNodes.forEach((systemStore) => {
-      const lineNum  = systemStore.token.lineNum;
-      const lineNode = lineNodes.find((line) => line.token.lineNum === lineNum);
-      if (lineNode) {
-        systemStore.addNewChildWithToken(
-          NodeType.STRING,
-          new Token(TokenType.STRING, lineNode.token.line)
-        );
-      }
-    });
-  }
 }
 
 /**
  * (BNF) line: compileTarget? content? NEWLINE
  */
-export class LineRule extends SingleChildRule {
+export class LineRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
-    super();
+    super(new AddSystemStoreSource());
     const optCompileTarget = new OptionalRule(new CompileTargetRule());
     const optContent       = new OptionalRule(new ContentRule());
     const newline          = new TokenRule(TokenType.NEWLINE, true);

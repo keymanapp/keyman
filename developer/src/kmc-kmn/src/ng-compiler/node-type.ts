@@ -103,6 +103,7 @@ export enum NodeType {
   SHIFT                 = "SHIFT",                 // https://help.keyman.com/developer/language/reference/_keywordsbytype
   SHIFTFREESCAPS        = "SHIFTFREESCAPS",        // https://help.keyman.com/developer/language/reference/caps
   SHIFTFREESCAPS_HEADER = "SHIFTFREESCAPS_HEADER", // https://help.keyman.com/developer/language/reference/_keywordsbytype
+  SOURCE                = "SOURCE",
   SOURCE_CODE           = "SOURCE_CODE",
   STORE                 = "STORE",                 // https://help.keyman.com/developer/language/reference/store
   STORENAME             = "STORENAME",             // https://help.keyman.com/developer/language/reference/store
@@ -122,3 +123,39 @@ export enum NodeType {
   WEAVER                = "WEAVER",                // https://help.keyman.com/developer/language/guide/compile-targets
   WINDOWSLANGUAGES      = "WINDOWSLANGUAGES",      // https://help.keyman.com/developer/language/reference/windowslanguages
 };
+
+export const SYSTEM_STORES_NODETYPES = [
+  NodeType.BITMAP,
+  NodeType.CASEDKEYS,
+  NodeType.COPYRIGHT,
+  NodeType.DISPLAYMAP,
+  NodeType.ETHNOLOGUECODE,
+  NodeType.HOTKEY,
+  NodeType.INCLUDECODES,
+  NodeType.KEYBOARDVERSION,
+  NodeType.KMW_EMBEDCSS,
+  NodeType.KMW_EMBEDJS,
+  NodeType.KMW_HELPFILE,
+  NodeType.KMW_HELPTEXT,
+  NodeType.KMW_RTL,
+  NodeType.LANGUAGE,
+  NodeType.LAYOUTFILE,
+  NodeType.MESSAGE,
+  NodeType.MNEMONICLAYOUT,
+  NodeType.NAME,
+  NodeType.TARGETS,
+  NodeType.VERSION,
+  NodeType.VISUALKEYBOARD,
+  NodeType.WINDOWSLANGUAGES,
+  NodeType.CAPSALWAYSOFF,
+  NodeType.CAPSONONLY,
+  NodeType.SHIFTFREESCAPS,
+  NodeType.BITMAP_HEADER,
+  NodeType.COPYRIGHT_HEADER,
+  NodeType.HOTKEY_HEADER,
+  NodeType.LANGUAGE_HEADER,
+  NodeType.LAYOUT_HEADER,
+  NodeType.MESSAGE_HEADER,
+  NodeType.NAME_HEADER,
+  NodeType.VERSION_HEADER,
+];
