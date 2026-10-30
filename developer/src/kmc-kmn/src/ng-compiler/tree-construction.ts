@@ -400,3 +400,51 @@ export class ASTNode {
     return text;
   }
 }
+
+export function tokenBoundsSlice(line: string, lineNum: number, bounds: TokenBounds): string {
+  const { firstLine, firstChar, lastLine, lastChar } = bounds;
+
+  if (
+    firstLine === null || firstChar === null ||
+    lastLine  === null || lastChar  === null ||
+    firstLine < lineNum   || firstChar < 1 ||
+    lastLine  < firstLine || lastChar < 1
+  ) {
+    // TODO-NG-COMPILER: fatal compiler error
+    return "";
+  }
+
+  // record the starting string index of each line
+  const lineStarts = [0];
+
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === "\r") {
+      if (line[i + 1] === "\n") {
+        i++; // treat CRLF as a single line ending
+      }
+      lineStarts.push(i + 1);
+    } else if (line[i] === "\n") {
+      lineStarts.push(i + 1);
+    }
+  }
+
+  const firstIndex = firstLine - lineNum;
+  const lastIndex  = lastLine  - lineNum;
+
+  if (lastIndex >= lineStarts.length) {
+    // TODO-NG-COMPILER: fatal compiler error
+    return "";
+  }
+
+  // restore zero indexing before slice
+  const start = lineStarts[firstIndex] + firstChar - 1;
+  const end   = lineStarts[lastIndex]  + lastChar  - 1;
+
+  if (start > line.length || end > line.length || end < start) {
+    // TODO-NG-COMPILER: fatal compiler error
+    return "";
+  }
+
+  return line.slice(start, end);
+}
+

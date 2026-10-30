@@ -8,7 +8,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { ASTNode } from '../../src/ng-compiler/tree-construction.js';
+import { ASTNode, tokenBoundsSlice } from '../../src/ng-compiler/tree-construction.js';
 import { NodeType } from '../../src/ng-compiler/node-type.js';
 import { Token } from '../../src/ng-compiler/lexer.js';
 import { TokenType } from '../../src/ng-compiler/token-type.js';
@@ -658,7 +658,7 @@ describe("Tree Construction Tests", () => {
         const bounds     = bitmapNode.getTokenBounds();
         assert.deepEqual(bounds, {firstLine: 1, firstChar: 16, lastLine: 1, lastChar: 26});
         const lineNode = root.getSoleChildOfType(NodeType.LINE);
-        const source   = lineNode.token.line.slice(bounds.firstChar-1, bounds.lastChar);
+        const source   = tokenBoundsSlice(lineNode.token.line, lineNode.token.lineNum, bounds);
         assert.equal(source, '"filename"');
       });
       it("can handle a normal store assignment (two u_char)", () => {
@@ -670,10 +670,10 @@ describe("Tree Construction Tests", () => {
         const bounds = storeNode.getTokenBounds();
         assert.deepEqual(bounds, {firstLine: 1, firstChar: 14, lastLine: 1, lastChar: 27});
         const lineNode = root.getSoleChildOfType(NodeType.LINE);
-        const source   = lineNode.token.line.slice(bounds.firstChar-1, bounds.lastChar);
+        const source   = tokenBoundsSlice(lineNode.token.line, lineNode.token.lineNum, bounds);
         assert.equal(source, 'U+1780 U+1781');
       });
-      it("can handle a normal store assignment (two u_char with continuation)", () => {
+      it("can handle a normal store assignment (two u_char with continuation and LR)", () => {
         tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\nU+1781');
         const normalStoreAssign: Rule = new LineRule();
         normalStoreAssign.parse(tokenBuffer, root);
@@ -681,9 +681,33 @@ describe("Tree Construction Tests", () => {
         storeNode.removeSoleChildOfType(NodeType.STORENAME);
         const bounds = storeNode.getTokenBounds();
         assert.deepEqual(bounds, {firstLine: 1, firstChar: 14, lastLine: 2, lastChar: 7});
-        //const lineNode = root.getSoleChildOfType(NodeType.LINE);
-        //const source   = lineNode.token.line.slice(bounds.firstChar-1, bounds.lastChar);
-        //assert.equal(source, 'U+1780 U+1781');
+        const lineNode = root.getSoleChildOfType(NodeType.LINE);
+        const source   = tokenBoundsSlice(lineNode.token.line, lineNode.token.lineNum, bounds);
+        assert.equal(source, 'U+1780\\\nU+1781');
+      });
+      it("can handle a normal store assignment (two u_char with continuation and CR)", () => {
+        tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\rU+1781');
+        const normalStoreAssign: Rule = new LineRule();
+        normalStoreAssign.parse(tokenBuffer, root);
+        const storeNode = root.getSoleChildOfType(NodeType.STORE);
+        storeNode.removeSoleChildOfType(NodeType.STORENAME);
+        const bounds = storeNode.getTokenBounds();
+        assert.deepEqual(bounds, {firstLine: 1, firstChar: 14, lastLine: 2, lastChar: 7});
+        const lineNode = root.getSoleChildOfType(NodeType.LINE);
+        const source   = tokenBoundsSlice(lineNode.token.line, lineNode.token.lineNum, bounds);
+        assert.equal(source, 'U+1780\\\rU+1781');
+      });
+      it("can handle a normal store assignment (two u_char with continuation and CRLF)", () => {
+        tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\r\nU+1781');
+        const normalStoreAssign: Rule = new LineRule();
+        normalStoreAssign.parse(tokenBuffer, root);
+        const storeNode = root.getSoleChildOfType(NodeType.STORE);
+        storeNode.removeSoleChildOfType(NodeType.STORENAME);
+        const bounds = storeNode.getTokenBounds();
+        assert.deepEqual(bounds, {firstLine: 1, firstChar: 14, lastLine: 2, lastChar: 7});
+        const lineNode = root.getSoleChildOfType(NodeType.LINE);
+        const source   = tokenBoundsSlice(lineNode.token.line, lineNode.token.lineNum, bounds);
+        assert.equal(source, 'U+1780\\\r\nU+1781');
       });
     });
     describe("ASTNode.toString()", () => {
