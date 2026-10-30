@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 19.0.318 beta 2026-10-30
+
+* fix(mac): show package disclosure groups in macOS Ventura (#16911)
+* fix(developer): disable http compression in Server to mitigate Node2Shell (#16908)
+* docs(windows): clean api index formatting (#16913)
+* fix(developer): cast as unsigned to avoid ERangeError (#16823)
+* fix(ios): remove Liquid Glass blur effect seen in iOS 27 from system-keyboard mode (#16885)
+
 ## 19.0.317 beta 2026-10-29
 
 * fix(ios): add workaround for iOS 27+ blank keyboard (#16873)
