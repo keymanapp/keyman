@@ -8,16 +8,19 @@ import { CompilerCallbacks } from '@keymanapp/developer-utils';
 import { CompilerEvent } from '@keymanapp/developer-utils';
 import { CompilerOptions } from '@keymanapp/developer-utils';
 import { KeymanCompiler } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifactOptional } from '@keymanapp/developer-utils';
 import { KeymanCompilerArtifacts } from '@keymanapp/developer-utils';
 import { KeymanCompilerResult } from '@keymanapp/developer-utils';
 
 // @public
 export class Converter implements KeymanCompiler {
     init(callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean>;
-    // Warning: (ae-forgotten-export) The symbol "ConverterResult" needs to be exported by the entry point main.d.ts
     run(inputFilename: string, outputFilename?: string): Promise<ConverterResult>;
-    // Warning: (ae-forgotten-export) The symbol "ConverterArtifacts" needs to be exported by the entry point main.d.ts
     write(artifacts: ConverterArtifacts): Promise<boolean>;
+}
+
+// @public (undocumented)
+export interface ConverterArtifacts extends KeymanCompilerArtifacts {
 }
 
 // Warning: (ae-internal-missing-underscore) The name "ConverterMessages" should be prefixed with an underscore because the declaration is marked as @internal
@@ -94,6 +97,23 @@ export class ConverterMessages {
 // @public
 export interface ConverterOptions extends CompilerOptions {
     failIfIncomplete?: boolean;
+}
+
+// @public (undocumented)
+export interface ConverterResult extends KeymanCompilerResult {
+    artifacts: ConverterArtifacts;
+}
+
+// @public
+export interface ConverterToKmnArtifacts extends ConverterArtifacts {
+    keymanTouchLayout?: KeymanCompilerArtifactOptional;
+    kmn?: KeymanCompilerArtifactOptional;
+    kvks?: KeymanCompilerArtifactOptional;
+}
+
+// @public (undocumented)
+export interface ConverterToKmnResult extends ConverterResult {
+    artifacts: ConverterToKmnArtifacts;
 }
 
 // (No @packageDocumentation comment for this package)

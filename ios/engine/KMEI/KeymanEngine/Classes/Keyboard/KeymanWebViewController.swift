@@ -184,6 +184,13 @@ class KeymanWebViewController: UIViewController {
         webView!.isInspectable = true
       }
     }
+    
+    // Kill the default Liquid Glass top-edge blur effect.
+    // See #16875.  Somehow it only became a problem with iOS 27.0,
+    // but fortunately it's safe to apply this fix even with 26.0.
+    if #available(iOS 26.0, *) {
+      webView!.scrollView.topEdgeEffect.isHidden = true
+    }
 
     // Disable WKWebView default layout-constraint manipulations. We ensure
     // safe-area boundaries are respected via InputView / InputViewController
