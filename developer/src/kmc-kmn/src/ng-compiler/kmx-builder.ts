@@ -85,12 +85,12 @@ export class KmxBuilder {
     // dwHotKey
     //TODO-NG-COMPILER: include code to handle HOTKEY_HEADER
     //TODO-NG-COMPILER: code to handle anything but a single virtual key argument
-    // const hotKeyNode = this.root.getDescendents(NodeType.HOTKEY)[0];
-    // if (hotKeyNode) {
-    //   const hotKeyName     = hotKeyNode.getText() ?? '';
-    //   const virtualKeyNode = hotKeyNode.getSoleChildOfType(NodeType.VIRTUAL_KEY);
-    //   this.model.compStore.push(new CompStore(DwSystemID.TSS_HOTKEY, '', hotKeyName));
-    // }
+    const hotKeyNode = this.root.getDescendents(NodeType.HOTKEY)[0];
+    if (hotKeyNode) {
+      const hotKeyName = hotKeyNode.getText() ?? '';
+      const source     = hotKeyNode.getTextOfType(NodeType.SOURCE);
+      this.model.compStore.push(new CompStore(DwSystemID.TSS_HOTKEY, source, hotKeyName));
+    }
   }
 
   private stripQuoteMarks(text: string): string {
