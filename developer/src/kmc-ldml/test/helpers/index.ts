@@ -241,10 +241,6 @@ export interface CompilationCase {
    */
   callback?: (sect: KMXPlus.Section, subpath: string, callbacks: TestCompilerCallbacks ) => void;
   /**
-   * if present, expect compiler to throw (use .* to match all)
-   */
-  throws?: RegExp;
-  /**
    * Optional dependent sections to load.  Will be strs+list+elem if falsy.
    */
   dependencies?: (SectionCompilerNew)[];
@@ -301,9 +297,8 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
   for (const testcase of cases) {
-    const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
+    const expectFailure = !!(testcase.errors); // if true, we expect this to fail
     const testHeading = `${testcase.subpath}: ` + (
-      testcase.throws ? `should fail to compile with an exception` :
       typeof testcase.errors === 'boolean' ? `should fail to compile with errors` :
       testcase.errors?.length ? `should fail to compile with errors: ${messagesToString(testcase.errors)}` :
       testcase.warnings?.length ? `should compile with hints or warnings: ${messagesToString(testcase.warnings)}` :
@@ -312,11 +307,6 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
 
     it(testHeading, async function () {
       callbacks.clear();
-      // special case for an expected exception
-      if (testcase.throws) {
-        assert.throws(async () => await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies), testcase.throws, 'expected exception from compilation');
-        return;
-      }
       const section = await loadSectionFixture(compiler, testcase.subpath, callbacks, testcase.dependencies || dependencies);
       let messagesToCheck = callbacks.messages;
       // scrub offsets from messages to reduce churn in the test casws

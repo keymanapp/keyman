@@ -31,6 +31,9 @@ struct MainConfigView: View {
   // item being targeted for deletion
   @State private var idToDelete: UUID? = nil
 
+  // to track all the IDs so we can detect when a new one is added and expand it
+  @State private var knownPackageIDs: Set<UUID> = []
+  
   private var packageNameToDelete: String {
     guard let uuid = idToDelete else { return "this item" }
     guard let package = settings.findInstalledPackage(with: uuid) else { return "this item" }
@@ -39,10 +42,7 @@ struct MainConfigView: View {
 
   @Environment(\.colorScheme) var colorScheme
   var canvasColor: Color {
-      colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.94)
-  }
-  var cardColor: Color {
-      colorScheme == .dark ? Color(white: 0.20) : Color(.white)
+    colorScheme == .dark ? Color(white: 0.12) : Color(white: 0.92)
   }
 
   /**
@@ -52,52 +52,86 @@ struct MainConfigView: View {
     packageSelectedForHelpUrl = url
     selectedTab = 1
   }
-    
+  
+  /**
+   * Begin installation of a .kmp file, either dropped on the view or opened from Finder.
+   * Presents PackageConfirmationView on success, or the failure alert on error.
+   */
+  private func beginKmpInstall(url: URL) -> Bool {
+    do {
+      packageInstallHelper = try settings.initiateKmpFileInstallation(at: url)
+      return true
+    } catch {
+      self.alertMessage = error.localizedDescription
+      self.isShowingDropKmpAlert = true
+      return false
+    }
+  }
+
+  private var allPackageIDs: [UUID] {
+    settings.singleKeyboardPackages.map(\.id) + settings.multiKeyboardPackages.map(\.id)
+  }
+  
   var body: some View {
     TabView (selection: $selectedTab) {
-      VStack {
+      VStack(spacing: 0) {
         // uncomment this Button to force sentry error (must edit scheme and disable 'Debug executable' to test)
         /*
-          Button("Capture Sentry Error") {
-            let testError = NSError(domain: "SentryTest", code: 404, userInfo: [NSLocalizedDescriptionKey: "Testing Sentry from Keyman Config on Mac"])
-            SentrySDK.capture(error: testError)
-          }
-          .padding()
-          .buttonStyle(.borderedProminent)
-          .tint(.red)
+         Button("Capture Sentry Error") {
+         let testError = NSError(domain: "SentryTest", code: 404, userInfo: [NSLocalizedDescriptionKey: "Testing Sentry from Keyman Config on Mac"])
+         SentrySDK.capture(error: testError)
+         }
+         .padding()
+         .buttonStyle(.borderedProminent)
+         .tint(.red)
          */
-       // the add keyboard button
+        // the add keyboard button
         LabelButtonView(
           action: { isShowingAddKeyboardSheet = true },
           label: "Add Keyboard",
           systemImage: "plus",
-          font: .title2
+          font: .title3
         )
         .clipShape(.capsule)
-        .padding([.top, .leading, .trailing])
+        .padding(.top, 14)
+        .padding(.bottom, 20)
+        .padding(.horizontal)
         // binds the visibility state to the sheet builder
         .sheet(isPresented: $isShowingAddKeyboardSheet) {
           AddKeyboardView()
-            // disable escape key for closing view to avoid issues with canceling downloads
+          // disable escape key for closing view to avoid issues with canceling downloads
             .interactiveDismissDisabled(true)
             .frame(minWidth: 800, minHeight: 600)
-       }
-        
-        List {
-          // the view  for single keyboard packages
-          PackageRowView(packages: settings.singleKeyboardPackages, isSingleKeyboardPackage: true, expandedPackageID: $expandedPackageID,
-                         idToDelete: $idToDelete, showHelpTab: { url in
-          showHelpTab(for: url)})
-          
-          // the view  for multi keyboard packages
-          PackageRowView(packages: settings.multiKeyboardPackages, isSingleKeyboardPackage: false, expandedPackageID: $expandedPackageID,
-                         idToDelete: $idToDelete, showHelpTab: { url in
-            showHelpTab(for: url) })
         }
-        .listStyle(.inset)
         
-        // confirmation dialog for deleting a package
-        
+        ScrollView {
+          LazyVStack(alignment: .leading, spacing: 8) {
+            // the view  for single keyboard packages
+            PackageRowView(packages: settings.singleKeyboardPackages, isSingleKeyboardPackage: true, expandedPackageID: $expandedPackageID,
+                           idToDelete: $idToDelete, showHelpTab: { url in
+              showHelpTab(for: url)})
+            
+            // the view  for multi keyboard packages
+            PackageRowView(packages: settings.multiKeyboardPackages, isSingleKeyboardPackage: false, expandedPackageID: $expandedPackageID,
+                           idToDelete: $idToDelete, showHelpTab: { url in
+              showHelpTab(for: url)})
+          }
+        }
+        // initialize the set of known packages
+        .onAppear {
+          knownPackageIDs = Set(allPackageIDs)
+        }
+        .onChange(of: allPackageIDs) { newIDs in
+          if !knownPackageIDs.isEmpty,
+             let newID = newIDs.first(where: { !knownPackageIDs.contains($0) }) {
+            withAnimation(.easeInOut(duration: 0.25)) {
+              expandedPackageID = newID
+            }
+          }
+          knownPackageIDs = Set(newIDs)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+       // confirmation dialog for deleting a package
         .confirmationDialog(
           "Are you sure you want to delete the Keyman package '\(packageNameToDelete)'?",
           isPresented: Binding(
@@ -111,9 +145,6 @@ struct MainConfigView: View {
               Logger.app.info("deleting package.id: \(uuid)")
               LogUtil.infoBreadcrumb("deleting package.id: \(uuid)", category: .app)
 
-              // use multiple expanded states?
-              //expandedStates.removeValue(forKey: uuid)
-              
               withAnimation(.easeInOut(duration: 0.3)) {
                 expandedPackageID = nil
                 settings.removeInstalledPackage(with: uuid)
@@ -141,14 +172,7 @@ struct MainConfigView: View {
             self.isShowingDropKmpAlert = true
             return false // the drop failed
           }
-          do {
-            packageInstallHelper = try settings.initiateKmpFileInstallation(at: droppedFileUrl)
-            return true // the drop was successful
-          } catch {
-            self.alertMessage = error.localizedDescription
-            self.isShowingDropKmpAlert = true
-            return false
-          }
+          return beginKmpInstall(url: droppedFileUrl)
         } isTargeted: { hovering in
           isHovering = hovering
         }
@@ -187,9 +211,6 @@ struct MainConfigView: View {
           // disable escape key for closing view to avoid issues with canceling downloads
           .interactiveDismissDisabled(true)
         }
-
-        // the Spacer pushes the contents of the VStack to the top of the VStack
-        Spacer()
       }
       .padding([.leading, .trailing, .bottom])
       .tabItem { Text("Keyboards") }
@@ -206,6 +227,25 @@ struct MainConfigView: View {
           .tabItem { Text("Help") }
           .tag(1)
       }
+    }
+    .background(canvasColor.ignoresSafeArea())
+    .onOpenURL { url in
+      // only handle files
+      guard url.isFileURL else { return }
+      
+      // only handle if we are not busy with an install
+      guard packageInstallHelper == nil,
+            !isShowingAddKeyboardSheet,
+            !settings.isInstallationInProgress() else {
+        Logger.app.info("ignoring opened kmp file '\(url.lastPathComponent, privacy: .public)', installation already in progress")
+        return
+      }
+
+      NSApp.activate(ignoringOtherApps: true)
+
+      Logger.app.info("opened kmp file: \(url.lastPathComponent, privacy: .public)")
+      selectedTab = 0   // show the Keyboards tab so the confirmation sheet and new row are visible
+      _ = beginKmpInstall(url: url)
     }
   }
 }

@@ -6,7 +6,7 @@ Keyman Developer 19 has the following significant changes:
 
 - Updated to Unicode 17.0 (#14728)
 - Updated langtags.json, ISO639-3, language-subtag-registry (#16371)
-- Validate a keyboard or lexical model project frmo within Keyman Developer (#16076)
+- Validate a keyboard or lexical model project from within Keyman Developer (#16076)
 - Support for line numbers in LDML keyboard compiler messages (#13375)
 - Convert from .keylayout (macOS keyboards, Ukelele) into .kmn (#12191)
 - Compiler improvements - prevent illegal constructs (#16723, #16726, #36710, #16717)

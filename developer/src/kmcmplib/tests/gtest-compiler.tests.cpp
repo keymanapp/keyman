@@ -1332,6 +1332,12 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_context_valid, tstr));
 
+    // fileKeyboard.extra required for call() platform validation; we are
+    // testing parser here so provide a good default platform for call()
+    fileKeyboard.extra = new KMCMP_COMPILER_RESULT_EXTRA;
+    fileKeyboard.extra->targets = COMPILETARGETS_KMX;
+    fileKeyboard.extra->platformTargets = PLATFORMTARGETS_WINDOWS;
+
     // call, KmnCompilerMessages::ERROR_501FeatureOnly_Call
     fileKeyboard.version = VERSION_50;
     u16cpy(str, u"call");
