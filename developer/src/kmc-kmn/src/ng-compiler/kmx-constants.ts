@@ -110,3 +110,9 @@ export enum DwFlags {
   KF_AUTOMATICVERSION = 0x00000010,
   KF_KMXPLUS          = 0x00000020
 };
+
+export enum DwHotKey {
+  HK_ALT   = 0x00010000,
+  HK_CTRL  = 0x00020000,
+  HK_SHIFT = 0x00040000,
+};

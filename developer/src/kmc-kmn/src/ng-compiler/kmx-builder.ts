@@ -7,7 +7,7 @@
  */
 
 import { ASTNode } from './tree-construction.js';
-import { DwFileVersion, DwSystemID, DW_FILE_VERSION_MAP, KMX_FILEID_COMPILED, DwFlags } from './kmx-constants.js';
+import { DwFileVersion, DwSystemID, DW_FILE_VERSION_MAP, KMX_FILEID_COMPILED, DwFlags, DwHotKey } from './kmx-constants.js';
 import { NodeType } from './node-type.js';
 
 /**
@@ -87,8 +87,20 @@ export class KmxBuilder {
     //TODO-NG-COMPILER: code to handle anything but a single virtual key argument
     const hotKeyNode = this.root.getDescendents(NodeType.HOTKEY)[0];
     if (hotKeyNode) {
-      const hotKeyName = hotKeyNode.getText() ?? '';
-      const source     = hotKeyNode.getTextOfType(NodeType.SOURCE);
+      const hotKeyName    = hotKeyNode.getText() ?? '';
+      const source        = hotKeyNode.getTextOfType(NodeType.SOURCE);
+      this.model.dwHotKey = 0x0; //TODO-NG-COMPILER: keycode needed
+      const modifierNodes = hotKeyNode.getDescendents(NodeType.MODIFIER);
+      const modifiers     = modifierNodes.map((node) => node.getText());
+      if (modifiers.some((modifier) => ['ALT', 'LALT', 'RALT'].includes(modifier))) {
+        this.model.dwHotKey |= DwHotKey.HK_ALT;
+      }
+      if (modifiers.some((modifier) => ['CTRL', 'LCTRL', 'RCTRL'].includes(modifier))) {
+        this.model.dwHotKey |= DwHotKey.HK_CTRL;
+      }
+      if (modifiers.includes('SHIFT')) {
+        this.model.dwHotKey |= DwHotKey.HK_SHIFT;
+      }
       this.model.compStore.push(new CompStore(DwSystemID.TSS_HOTKEY, source, hotKeyName));
     }
   }

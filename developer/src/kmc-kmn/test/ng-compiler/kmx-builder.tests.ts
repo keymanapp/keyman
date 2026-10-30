@@ -87,7 +87,7 @@ describe("KmxBuilder Tests", () => {
         assert.isTrue(builder['model'].compStore.some(
           (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_CAPSALWAYSOFF && cs.dpString === '"1"' && cs.dpName === '&capsalwaysoff')));
       });
-      it("can handle a HOTKEY store", () => {
+      it("can handle a HOTKEY store (keycode)", () => {
         tokenBuffer = stringToTokenBuffer('store(&hotkey) [K_A]');
         const lineRule: Rule = new LineRule();
         assert.isTrue(lineRule.parse(tokenBuffer, root));
@@ -95,6 +95,33 @@ describe("KmxBuilder Tests", () => {
         builder['buildHeader']();
         assert.isTrue(builder['model'].compStore.some(
           (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_HOTKEY && cs.dpString === 'K_A' && cs.dpName === '&hotkey')));
+      });
+      it("can handle a HOTKEY store (ALT and keycode)", () => {
+        tokenBuffer = stringToTokenBuffer('store(&hotkey) [ALT K_A]');
+        const lineRule: Rule = new LineRule();
+        assert.isTrue(lineRule.parse(tokenBuffer, root));
+        const builder = new KmxBuilder(root);
+        builder['buildHeader']();
+        assert.isTrue(builder['model'].compStore.some(
+          (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_HOTKEY && cs.dpString === 'ALT K_A' && cs.dpName === '&hotkey')));
+      });
+      it("can handle a HOTKEY store (CTRL and keycode)", () => {
+        tokenBuffer = stringToTokenBuffer('store(&hotkey) [CTRL K_A]');
+        const lineRule: Rule = new LineRule();
+        assert.isTrue(lineRule.parse(tokenBuffer, root));
+        const builder = new KmxBuilder(root);
+        builder['buildHeader']();
+        assert.isTrue(builder['model'].compStore.some(
+          (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_HOTKEY && cs.dpString === 'CTRL K_A' && cs.dpName === '&hotkey')));
+      });
+      it("can handle a HOTKEY store (SHIFT and keycode)", () => {
+        tokenBuffer = stringToTokenBuffer('store(&hotkey) [SHIFT K_A]');
+        const lineRule: Rule = new LineRule();
+        assert.isTrue(lineRule.parse(tokenBuffer, root));
+        const builder = new KmxBuilder(root);
+        builder['buildHeader']();
+        assert.isTrue(builder['model'].compStore.some(
+          (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_HOTKEY && cs.dpString === 'SHIFT K_A' && cs.dpName === '&hotkey')));
       });
     });
     it("can provide in-memory model for baseline keyboards", function() {
