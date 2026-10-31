@@ -70,7 +70,10 @@ describe("KMN Analyser Tests", () => {
       const children = root.getChildren();
       assert.equal(children.length, 2);
       assert.equal(children[0].nodeType, NodeType.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeType.STRING);
+      const storeChildren = children[0].getChildren();
+      assert.equal(storeChildren.length, 2);
+      assert.equal(storeChildren[0].nodeType, NodeType.STRING);
+      assert.equal(storeChildren[1].nodeType, NodeType.SOURCE);
       assert.equal(children[1].nodeType, NodeType.LINE);
     });
     it("can parse correctly (no space before, no comment, space before newline)", () => {
@@ -80,7 +83,10 @@ describe("KMN Analyser Tests", () => {
       const children = root.getChildren();
       assert.equal(children.length, 2);
       assert.equal(children[0].nodeType, NodeType.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeType.STRING);
+            const storeChildren = children[0].getChildren();
+      assert.equal(storeChildren.length, 2);
+      assert.equal(storeChildren[0].nodeType, NodeType.STRING);
+      assert.equal(storeChildren[1].nodeType, NodeType.SOURCE);
       assert.equal(children[1].nodeType, NodeType.LINE);
     });
     it("can parse correctly (space before, no comment)", () => {
@@ -90,7 +96,10 @@ describe("KMN Analyser Tests", () => {
       const children = root.getChildren();
       assert.equal(children.length, 2);
       assert.equal(children[0].nodeType, NodeType.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeType.STRING);
+            const storeChildren = children[0].getChildren();
+      assert.equal(storeChildren.length, 2);
+      assert.equal(storeChildren[0].nodeType, NodeType.STRING);
+      assert.equal(storeChildren[1].nodeType, NodeType.SOURCE);
       assert.equal(children[1].nodeType, NodeType.LINE);
     });
     it("can parse correctly (no space before, comment)", () => {
@@ -100,7 +109,10 @@ describe("KMN Analyser Tests", () => {
       const children = root.getChildren();
       assert.equal(children.length, 2);
       assert.equal(children[0].nodeType, NodeType.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeType.STRING);
+            const storeChildren = children[0].getChildren();
+      assert.equal(storeChildren.length, 2);
+      assert.equal(storeChildren[0].nodeType, NodeType.STRING);
+      assert.equal(storeChildren[1].nodeType, NodeType.SOURCE);
       assert.equal(children[1].nodeType, NodeType.LINE);
     });
     it("can parse correctly (space before, comment)", () => {
@@ -110,10 +122,13 @@ describe("KMN Analyser Tests", () => {
       const children = root.getChildren();
       assert.equal(children.length, 2);
       assert.equal(children[0].nodeType, NodeType.BITMAP);
-      assert.equal(children[0].getSoleChild().nodeType, NodeType.STRING);
+            const storeChildren = children[0].getChildren();
+      assert.equal(storeChildren.length, 2);
+      assert.equal(storeChildren[0].nodeType, NodeType.STRING);
+      assert.equal(storeChildren[1].nodeType, NodeType.SOURCE);
       assert.equal(children[1].nodeType, NodeType.LINE);
     });
-    it("can parse correctly (variable store assign, comment)", () => {
+    it("can parse correctly (normal store assign, comment)", () => {
       tokenBuffer = stringToTokenBuffer('store(c_out) U+1780 c a comment\n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(tokenBuffer, root));
@@ -123,7 +138,7 @@ describe("KMN Analyser Tests", () => {
       assert.equal(children[0].getSoleChildOfType(NodeType.STORENAME).getText(), 'c_out');
       assert.equal(children[1].nodeType, NodeType.LINE);
     });
-    it("can parse correctly (variable store assign, continuation, comment)", () => {
+    it("can parse correctly (normal store assign, continuation, comment)", () => {
       tokenBuffer = stringToTokenBuffer('store(c_out) U+1780\\\nU+1781 c a comment\n');
       const line: Rule = new LineRule();
       assert.isTrue(line.parse(tokenBuffer, root));
@@ -134,7 +149,7 @@ describe("KMN Analyser Tests", () => {
       assert.equal(children[0].getChildrenOfType(NodeType.U_CHAR).length, 2);
       assert.equal(children[1].nodeType, NodeType.LINE);
     });
-    it("can parse correctly (multi line variable store assignment, comment)", () => {
+    it("can parse correctly (multi line normal store assignment, comment)", () => {
       const line1 = 'store(c_out)           U+1780 U+1781 U+1782 U+1783 U+1784 \\\n';
       const line2 = '    	   	   	          U+1785 U+1786 U+1787 U+1788 U+1789 \\\n';
       const line3 = '    	   	   	          U+178A U+178B U+178C U+178D U+178E \\\n';
@@ -202,7 +217,10 @@ describe("KMN Analyser Tests", () => {
       assert.equal(children.length, 3);
       assert.equal(children[0].nodeType, NodeType.KEYMAN);
       assert.equal(children[1].nodeType, NodeType.BITMAP);
-      assert.equal(children[1].getSoleChild().nodeType, NodeType.STRING);
+      const storeChildren = children[1].getChildren();
+      assert.equal(storeChildren.length, 2);
+      assert.equal(storeChildren[0].nodeType, NodeType.STRING);
+      assert.equal(storeChildren[1].nodeType, NodeType.SOURCE);
       assert.equal(children[2].nodeType, NodeType.LINE);
     });
     it("can parse correctly (compile target, plus, virtual key, u_char)", () => {
@@ -520,9 +538,9 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
       assert.equal(children[0].nodeType, NodeType.VIRTUAL_KEY);
-      assert.equal(children[0].getSoleChild().getText(), 'K_A');
+      assert.equal(children[0].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_A');
       assert.equal(children[1].nodeType, NodeType.VIRTUAL_KEY);
-      assert.equal(children[1].getSoleChild().getText(), 'K_C');
+      assert.equal(children[1].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_C');
     });
     it("can parse correctly (multiple virtual key range)", () => {
       tokenBuffer = stringToTokenBuffer('[K_A]..[K_C]..[K_E]');
@@ -532,11 +550,11 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
       assert.equal(children[0].nodeType, NodeType.VIRTUAL_KEY);
-      assert.equal(children[0].getSoleChild().getText(), 'K_A');
+      assert.equal(children[0].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_A');
       assert.equal(children[1].nodeType, NodeType.VIRTUAL_KEY);
-      assert.equal(children[1].getSoleChild().getText(), 'K_C');
+      assert.equal(children[1].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_C');
       assert.equal(children[2].nodeType, NodeType.VIRTUAL_KEY);
-      assert.equal(children[2].getSoleChild().getText(), 'K_E');
+      assert.equal(children[2].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_E');
     });
   });
   describe("VirtualKeyRule Tests", () => {

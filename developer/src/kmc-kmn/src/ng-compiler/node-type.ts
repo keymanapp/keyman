@@ -64,6 +64,7 @@ export enum NodeType {
   LAYER_SHORTCUT        = "LAYER_SHORTCUT",        // https://help.keyman.com/developer/language/reference/layer
   LAYOUTFILE            = "LAYOUTFILE",            // https://help.keyman.com/developer/language/reference/layoutfile
   LAYOUT_HEADER         = "LAYOUT_HEADER",         // https://help.keyman.com/developer/language/reference/_keywordsbytype
+  LEFT_SQ               = "LEFT_SQ",               // https://help.keyman.com/developer/language/guide/virtual-keys
   LHS                   = "LHS",                   // https://help.keyman.com/developer/language/guide/rules
   LINE                  = "LINE",                  // https://help.keyman.com/developer/language/guide/long-lines
   MATCH                 = "MATCH",                 // https://help.keyman.com/developer/language/reference/match
@@ -97,12 +98,14 @@ export enum NodeType {
   RESET                 = "RESET",                 // https://help.keyman.com/developer/language/reference/reset
   RETURN                = "RETURN",                // https://help.keyman.com/developer/language/reference/return
   RHS                   = "RHS",                   // https://help.keyman.com/developer/language/guide/rules
+  RIGHT_SQ              = "RIGHT_SQ",              // https://help.keyman.com/developer/language/guide/virtual-keys
   ROOT                  = "ROOT",
   SAVE                  = "SAVE",                  // https://help.keyman.com/developer/language/reference/save
   SET                   = "SET",                   // https://help.keyman.com/developer/language/reference/set
   SHIFT                 = "SHIFT",                 // https://help.keyman.com/developer/language/reference/_keywordsbytype
   SHIFTFREESCAPS        = "SHIFTFREESCAPS",        // https://help.keyman.com/developer/language/reference/caps
   SHIFTFREESCAPS_HEADER = "SHIFTFREESCAPS_HEADER", // https://help.keyman.com/developer/language/reference/_keywordsbytype
+  SOURCE                = "SOURCE",
   SOURCE_CODE           = "SOURCE_CODE",
   STORE                 = "STORE",                 // https://help.keyman.com/developer/language/reference/store
   STORENAME             = "STORENAME",             // https://help.keyman.com/developer/language/reference/store
@@ -122,3 +125,39 @@ export enum NodeType {
   WEAVER                = "WEAVER",                // https://help.keyman.com/developer/language/guide/compile-targets
   WINDOWSLANGUAGES      = "WINDOWSLANGUAGES",      // https://help.keyman.com/developer/language/reference/windowslanguages
 };
+
+export const SYSTEM_STORES_NODETYPES = [
+  NodeType.BITMAP,
+  NodeType.CASEDKEYS,
+  NodeType.COPYRIGHT,
+  NodeType.DISPLAYMAP,
+  NodeType.ETHNOLOGUECODE,
+  NodeType.HOTKEY,
+  NodeType.INCLUDECODES,
+  NodeType.KEYBOARDVERSION,
+  NodeType.KMW_EMBEDCSS,
+  NodeType.KMW_EMBEDJS,
+  NodeType.KMW_HELPFILE,
+  NodeType.KMW_HELPTEXT,
+  NodeType.KMW_RTL,
+  NodeType.LANGUAGE,
+  NodeType.LAYOUTFILE,
+  NodeType.MESSAGE,
+  NodeType.MNEMONICLAYOUT,
+  NodeType.NAME,
+  NodeType.TARGETS,
+  NodeType.VERSION,
+  NodeType.VISUALKEYBOARD,
+  NodeType.WINDOWSLANGUAGES,
+  NodeType.CAPSALWAYSOFF,
+  NodeType.CAPSONONLY,
+  NodeType.SHIFTFREESCAPS,
+  NodeType.BITMAP_HEADER,
+  NodeType.COPYRIGHT_HEADER,
+  NodeType.HOTKEY_HEADER,
+  NodeType.LANGUAGE_HEADER,
+  NodeType.LAYOUT_HEADER,
+  NodeType.MESSAGE_HEADER,
+  NodeType.NAME_HEADER,
+  NodeType.VERSION_HEADER,
+];
