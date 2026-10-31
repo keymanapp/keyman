@@ -77,8 +77,8 @@ describe("KMN Store Analyser Tests", () => {
       const casedkeysNode = root.getSoleChildOfType(NodeType.CASEDKEYS)
       assert.isNotNull(casedkeysNode);
       const children = casedkeysNode.getChildrenOfType(NodeType.VIRTUAL_KEY);
-      assert.equal(children[0].getSoleChild().getText(), 'K_A');
-      assert.equal(children[1].getSoleChild().getText(), 'K_B');
+      assert.equal(children[0].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_A');
+      assert.equal(children[1].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_B');
     });
     it("can parse correctly (casedkeys virtual key range)", () => {
       tokenBuffer = stringToTokenBuffer('store(&casedkeys) [K_A]..[K_C]');
@@ -88,8 +88,8 @@ describe("KMN Store Analyser Tests", () => {
       assert.isNotNull(casedkeysNode);
       const rangeNode = casedkeysNode.getSoleChildOfType(NodeType.RANGE);
       const children  = rangeNode.getChildrenOfType(NodeType.VIRTUAL_KEY);
-      assert.equal(children[0].getSoleChild().getText(), 'K_A');
-      assert.equal(children[1].getSoleChild().getText(), 'K_C');
+      assert.equal(children[0].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_A');
+      assert.equal(children[1].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_C');
     });
     it("can parse correctly (casedkeys character range)", () => {
       tokenBuffer = stringToTokenBuffer('store(&casedkeys) "a".."c"');

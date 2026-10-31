@@ -64,6 +64,7 @@ export enum NodeType {
   LAYER_SHORTCUT        = "LAYER_SHORTCUT",        // https://help.keyman.com/developer/language/reference/layer
   LAYOUTFILE            = "LAYOUTFILE",            // https://help.keyman.com/developer/language/reference/layoutfile
   LAYOUT_HEADER         = "LAYOUT_HEADER",         // https://help.keyman.com/developer/language/reference/_keywordsbytype
+  LEFT_SQ               = "LEFT_SQ",               // https://help.keyman.com/developer/language/guide/virtual-keys
   LHS                   = "LHS",                   // https://help.keyman.com/developer/language/guide/rules
   LINE                  = "LINE",                  // https://help.keyman.com/developer/language/guide/long-lines
   MATCH                 = "MATCH",                 // https://help.keyman.com/developer/language/reference/match
@@ -97,6 +98,7 @@ export enum NodeType {
   RESET                 = "RESET",                 // https://help.keyman.com/developer/language/reference/reset
   RETURN                = "RETURN",                // https://help.keyman.com/developer/language/reference/return
   RHS                   = "RHS",                   // https://help.keyman.com/developer/language/guide/rules
+  RIGHT_SQ              = "RIGHT_SQ",              // https://help.keyman.com/developer/language/guide/virtual-keys
   ROOT                  = "ROOT",
   SAVE                  = "SAVE",                  // https://help.keyman.com/developer/language/reference/save
   SET                   = "SET",                   // https://help.keyman.com/developer/language/reference/set

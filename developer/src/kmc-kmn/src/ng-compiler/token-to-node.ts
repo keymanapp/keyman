@@ -108,6 +108,8 @@ export const TOKEN_TO_NODE = [
   {tokenType: TokenType.LAYOUTFILE,            nodeType: NodeType.LAYOUTFILE},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenType.LAYOUT_HEADER,         nodeType: NodeType.LAYOUT_HEADER},
+  // https://help.keyman.com/developer/language/guide/virtual-keys
+  {tokenType: TokenType.LEFT_SQ,               nodeType: NodeType.LEFT_SQ},
   // https://help.keyman.com/developer/language/reference/match
   {tokenType: TokenType.MATCH,                 nodeType: NodeType.MATCH},
   // https://help.keyman.com/developer/language/reference/message
@@ -156,6 +158,8 @@ export const TOKEN_TO_NODE = [
   {tokenType: TokenType.RESET,                 nodeType: NodeType.RESET},
   // https://help.keyman.com/developer/language/reference/return
   {tokenType: TokenType.RETURN,                nodeType: NodeType.RETURN},
+  // https://help.keyman.com/developer/language/guide/virtual-keys
+  {tokenType: TokenType.RIGHT_SQ,              nodeType: NodeType.RIGHT_SQ},
   // https://help.keyman.com/developer/language/reference/save
   {tokenType: TokenType.SAVE,                  nodeType: NodeType.SAVE},
   // https://help.keyman.com/developer/language/reference/set

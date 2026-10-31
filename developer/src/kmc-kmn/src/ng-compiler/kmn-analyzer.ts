@@ -280,10 +280,10 @@ export class RangeEndRule extends SingleChildRule {
 export class VirtualKeyRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
     super(new NewNode(NodeType.VIRTUAL_KEY));
-    const leftSquare   = new TokenRule(TokenType.LEFT_SQ);
+    const leftSquare   = new TokenRule(TokenType.LEFT_SQ, true);
     const manyModifier = new ManyRule(new TokenRule(TokenType.MODIFIER, true));
     const keyCode      = new KeyCodeRule();
-    const rightSquare  = new TokenRule(TokenType.RIGHT_SQ);
+    const rightSquare  = new TokenRule(TokenType.RIGHT_SQ, true);
     this.rule = new SequenceRule([
       leftSquare, manyModifier, keyCode, rightSquare
     ]);

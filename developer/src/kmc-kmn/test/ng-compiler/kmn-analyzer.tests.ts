@@ -538,9 +538,9 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
       assert.equal(children[0].nodeType, NodeType.VIRTUAL_KEY);
-      assert.equal(children[0].getSoleChild().getText(), 'K_A');
+      assert.equal(children[0].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_A');
       assert.equal(children[1].nodeType, NodeType.VIRTUAL_KEY);
-      assert.equal(children[1].getSoleChild().getText(), 'K_C');
+      assert.equal(children[1].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_C');
     });
     it("can parse correctly (multiple virtual key range)", () => {
       tokenBuffer = stringToTokenBuffer('[K_A]..[K_C]..[K_E]');
@@ -550,11 +550,11 @@ describe("KMN Analyser Tests", () => {
       assert.isNotNull(rangeNode);
       const children = rangeNode.getChildren();
       assert.equal(children[0].nodeType, NodeType.VIRTUAL_KEY);
-      assert.equal(children[0].getSoleChild().getText(), 'K_A');
+      assert.equal(children[0].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_A');
       assert.equal(children[1].nodeType, NodeType.VIRTUAL_KEY);
-      assert.equal(children[1].getSoleChild().getText(), 'K_C');
+      assert.equal(children[1].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_C');
       assert.equal(children[2].nodeType, NodeType.VIRTUAL_KEY);
-      assert.equal(children[2].getSoleChild().getText(), 'K_E');
+      assert.equal(children[2].getSoleChildOfType(NodeType.KEY_CODE).getText(), 'K_E');
     });
   });
   describe("VirtualKeyRule Tests", () => {
