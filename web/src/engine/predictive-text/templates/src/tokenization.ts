@@ -30,20 +30,17 @@ export interface Tokenization {
 }
 
 export function enforceFinalEmptySpan(spans: LexicalModelTypes.Span[], str: string) {
-  let emptyToken = {
-    left: str.length,
-    start: str.length,
-    right: str.length,
-    end: str.length,
-    length: 0,
-    text: ''
-  };
-
   // If a new word should be starting at the current caret position,
   // ensure an empty '' token indicates this.
-  let tailToken = spans[spans.length - 1];
-  if(!tailToken || tailToken.end != str.length) {
-    spans.push(emptyToken);
+  if(spans.length == 0 || spans[spans.length-1].end != str.length) {
+    spans.push({
+      left: str.length,
+      start: str.length,
+      right: str.length,
+      end: str.length,
+      length: 0,
+      text: ''
+    } as LexicalModelTypes.Span);
   }
 
   return spans;
