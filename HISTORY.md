@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.319 beta 2026-11-02
+
+* chore(developer): cleanup `kmc --help` (#16801)
+* fix(mac): add timeout for accessibility permissions check (#16878)
+
 ## 19.0.318 beta 2026-10-30
 
 * fix(mac): show package disclosure groups in macOS Ventura (#16911)
