@@ -201,6 +201,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     View view = getLayoutInflater().inflate(R.layout.qr_layout, null);
     if (DependencyUtil.libraryExists(LibraryType.QRCODE)) {
       LinearLayout qrLayout = (LinearLayout) view.findViewById(R.id.qrLayout);
+      listView.setFooterDividersEnabled(false);
       listView.addFooterView(qrLayout);
 
       String url = KMString.format(QRCodeUtil.QR_CODE_URL_FORMATSTR, kbID);

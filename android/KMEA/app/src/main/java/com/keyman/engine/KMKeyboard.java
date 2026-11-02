@@ -41,7 +41,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.ExtractedText;
 import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
@@ -66,6 +65,7 @@ final class KMKeyboard extends WebView {
   private String keyboardID;
   private String keyboardName;
   private String keyboardVersion;
+  private String languageID;
 
   private boolean shouldIgnoreTextChange = false;
   private boolean shouldIgnoreSelectionChange = false;
@@ -453,6 +453,10 @@ final class KMKeyboard extends WebView {
     DisplayMetrics dms = context.getResources().getDisplayMetrics();
     int kbWidth = (int) (dms.widthPixels / dms.density);
 
+    // Refresh the setting whenever the view is reloaded;
+    // we may have swapped between app and system keyboards.
+    KMManager.refreshSuggestionType(this.keyboardType);
+
     // Get the correct keyboard height for current orientation
     int kbHeight = KMManager.getKeyboardHeight(context);
 
@@ -657,6 +661,7 @@ final class KMKeyboard extends WebView {
     this.keyboardID = keyboardID;
     this.keyboardName = keyboardName;
     this.keyboardVersion = keyboardVersion;
+    this.languageID = languageID;
     currentKeyboard = kbKey;
     saveCurrentKeyboardIndex();
 
@@ -745,6 +750,7 @@ final class KMKeyboard extends WebView {
     this.keyboardID = keyboardID;
     this.keyboardName = keyboardName;
     this.keyboardVersion = keyboardVersion;
+    this.languageID = languageID;
     currentKeyboard = kbKey;
     keyboardSet = true;
     saveCurrentKeyboardIndex();
@@ -826,6 +832,10 @@ final class KMKeyboard extends WebView {
    */
   private String getDataRootPath() {
     return context.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
+  }
+
+  public String getLanguageID() {
+    return this.languageID;
   }
 
   private String getPackageRootUrl(String packageID) {

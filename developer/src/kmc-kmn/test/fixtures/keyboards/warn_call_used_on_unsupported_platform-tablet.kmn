@@ -1,0 +1,14 @@
+store(&NAME) 'warn_call_used_on_unsupported_platform-tablet'
+
+
+c warning should NOT be generated for tablet
+store(&TARGETS) 'tablet'
+store(&VERSION) '10.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+store(dllfunc) 'dll.dll:func'
+
++ ' ' > call(dllfunc)

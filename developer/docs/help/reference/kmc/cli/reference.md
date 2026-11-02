@@ -505,6 +505,14 @@ folder, and the files in that folder will follow the
 
 : A short description of the project, in Markdown. (default: lexical model name)
 
+## `kmc convert` options
+
+Converts keyboard source files between formats e.g. .keylayout -> .kmn keeping the original name and saving the output with new extention 
+
+`-p, --out-path <filename>`
+
+: The target folder to write the copied project.
+
 ## `kmc copy` options
 
 Copies a keyboard or lexical model project, renaming files matching the original

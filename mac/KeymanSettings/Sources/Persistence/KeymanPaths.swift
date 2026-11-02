@@ -113,9 +113,9 @@ public struct KeymanPaths {
   }
   
   fileprivate func logPaths() {
-    Logger.setup.debug("container: \(self.keyman19ContainerDirectory.cleanUrlPath())")
-    Logger.setup.debug("preferences: \(self.keyman19PreferencesDirectory.cleanUrlPath())")
-    Logger.setup.debug("keyman 19 packages: \(self.keyman19PackagesDirectory.cleanUrlPath())")
+    Logger.setup.debug("container: \(self.keyman19ContainerDirectory.cleanUrlPath(), privacy: .public)")
+    Logger.setup.debug("preferences: \(self.keyman19PreferencesDirectory.cleanUrlPath(), privacy: .public)")
+    Logger.setup.debug("keyman 19 packages: \(self.keyman19PackagesDirectory.cleanUrlPath(), privacy: .public)")
   }
   
   /**
@@ -144,7 +144,7 @@ public struct KeymanPaths {
   /**
    * build the URL to the executable inside the specified Input Method app
    */
-  public func buildInputMethodExecutableUrl(fileName:String) -> URL? {
+  public func buildInputMethodBinaryUrl(fileName:String) -> URL? {
     if let inputMethodUrl = self.buildInputMethodPathUrl(fileName: fileName) {
       let executableName = inputMethodUrl.deletingPathExtension().lastPathComponent
       return inputMethodUrl.appendingPathComponent("Contents/MacOS/\(executableName)")

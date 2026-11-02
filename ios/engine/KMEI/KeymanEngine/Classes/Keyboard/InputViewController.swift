@@ -342,6 +342,9 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       self.swallowBackspaceTextChange = false
       return
     }
+    
+    let suggestionType = determineSuggestionType()
+    keymanWeb.suggestionType = suggestionType
 
     let contextBeforeInput = textDocumentProxy.documentContextBeforeInput ?? ""
     let selection = textDocumentProxy.selectedText ?? ""
@@ -352,6 +355,31 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     setContextState(text: context, range: NSMakeRange(bLength, sLength))
     // Within the app, this is triggered after every keyboard input.
     // We should NOT call .resetContext() here for this reason.
+  }
+  
+  /**
+    Determines the correct predictive-text settings for the active context, regardless of
+    active language and model.
+   */
+  func determineSuggestionType() -> SuggestionType {
+    let inputKeyboardType = textDocumentProxy.keyboardType
+    
+    if inputKeyboardType == nil || (textDocumentProxy.isSecureTextEntry ?? false) {
+      return .disabled
+    } else {
+      switch inputKeyboardType {
+        case .asciiCapableNumberPad, .decimalPad, .phonePad,  .numberPad, .numbersAndPunctuation:
+          return .disabled
+        case .emailAddress, .namePhonePad, .URL, .webSearch:
+          return .predictAndCorrect
+        default:
+          let autocorrectionType = textDocumentProxy.autocorrectionType
+          if autocorrectionType == .no {
+            return .predictAndCorrect
+          }
+          return .autocorrect
+      }
+    }
   }
 
   // Pre-condition:  no text is selected.  As this is currently only called by `insertText`

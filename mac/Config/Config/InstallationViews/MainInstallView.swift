@@ -41,6 +41,7 @@ struct MainInstallView: View {
       case .prepareNewInstall: currentPage = .initialInstall
       case .prepareNewRepair: currentPage = .initialRepair
       case .enableInputMethod: currentPage = .enableInputMethod
+      case .confirmEnabled: currentPage = .enableInputMethod
       case .requestAccess: currentPage = .allowSecurityPermission
       case .confirmAccess: currentPage = .allowSecurityPermission
       case .requestRestart: currentPage = .restartMac
@@ -81,7 +82,7 @@ struct MainInstallView: View {
       case .enableInputMethod: EnableInputMethodView(namespace: animation, onContinue: chooseCurrentPage)
       case .allowSecurityPermission: GrantAccessibiltyPermissionView(namespace: animation, onContinue: chooseCurrentPage)
       case .rerunInstaller: RerunInstallerView(namespace: animation)
-      case .restartMac: RestartComputerView(namespace: animation)
+      case .restartMac: RestartMacView(namespace: animation)
       }
     }
     // While the installer is evaluating the Keyman installation, the loading screen will be shown

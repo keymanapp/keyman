@@ -52,6 +52,10 @@
                   summary += addStatus(o, 'check', status.context, status.state);
                 } else if(status.context == 'Ubuntu Packaging') {
                   summary += addStatus(o, 'build', status.context, status.state);
+                } else if(status.context == 'Linux source verification') {
+                  // Ignore Linux source verification -- we won't block automerge
+                  // for this at this point
+                  summary += addLog(`Skipping ${status.context}`);
                 } else if(status.context == 'npm pack/publish') {
                   summary += addStatus(o, 'build', status.context, status.state);
                 } else if(status.context == 'Keyman Core - ARM64 test') {
@@ -178,7 +182,9 @@
               const checkStatus = status == 'pending' ? 'in_progress' : 'completed';
               const conclusion = checkStatus == 'in_progress' ? undefined : (status == 'success' ? 'success' : 'failure');
 
-              await github.rest.checks.update({
+              console.log(`Updating check ${checkRunId} to ${checkStatus}/${conclusion}, description '${description}'`);
+
+              const check = await github.rest.checks.update({
                 owner,
                 repo,
                 check_run_id: checkRunId,
@@ -189,6 +195,7 @@
                   summary
                 }
               });
+              console.log(`Check updated`);
             }
 
 // CLONE:END

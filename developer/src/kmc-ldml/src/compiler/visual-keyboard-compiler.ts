@@ -140,7 +140,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     const display = source.disp?.disps?.find(d => d.id.value == keydef.id.value || d.to.value == keydef.to.value);
     const value = display?.display.value ?? keydef.to.value;
     // strip markers from the output (these are valid in keydef.to, but not in display.display, nor in kvk)
-    return value.replaceAll(/\uffff\u0008./g, '');
+    return value.replaceAll(/\uffff\u0008[\u0001-\uFFFF]/g, '');
   }
 
   private translateLayerModifiersToVisualKeyboardShift(modifiers: number): VisualKeyboard.VisualKeyboardShiftState {

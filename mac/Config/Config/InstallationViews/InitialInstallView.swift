@@ -42,7 +42,7 @@ struct InitialInstallView: View {
         .padding(.bottom, 8)
       
       HStack {
-        Text("Proceed to continue with installation")
+        Text("Click continue to complete installation")
           .font(.title2)
           .multilineTextAlignment(.leading)
           .frame(maxWidth: .infinity, alignment: .leading)

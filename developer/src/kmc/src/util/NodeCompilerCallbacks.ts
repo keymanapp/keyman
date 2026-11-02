@@ -97,7 +97,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
         nativeFilename = nativeFilename[0].toUpperCase() + nativeFilename.substring(1);
       }
       if(filename != nativeFilename) {
-        this.reportMessage(InfrastructureMessages.Hint_FilenameHasDifferingCase({
+        this.reportMessage(InfrastructureMessages.Warn_FilenameHasDifferingCase({
           reference: path.basename(originalFilename),
           filename: path.basename(nativeFilename)
         }));

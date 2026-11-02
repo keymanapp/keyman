@@ -1,5 +1,70 @@
 # Keyman Version History
 
+## 19.0.318 beta 2026-10-30
+
+* fix(mac): show package disclosure groups in macOS Ventura (#16911)
+* fix(developer): disable http compression in Server to mitigate Node2Shell (#16908)
+* docs(windows): clean api index formatting (#16913)
+* fix(developer): cast as unsigned to avoid ERangeError (#16823)
+* fix(ios): remove Liquid Glass blur effect seen in iOS 27 from system-keyboard mode (#16885)
+
+## 19.0.317 beta 2026-10-29
+
+* fix(ios): add workaround for iOS 27+ blank keyboard (#16873)
+* change(ios): improve styling under iOS's Liquid Glass UI (#16818)
+* chore: logging for pr-build-status (#16918)
+
+## 19.0.316 beta 2026-10-28
+
+* fix(mac): double-click on .kmp begins package installation (#16881)
+* change(mac): use common name for certificate when code-signing installer package (#16915)
+
+## 19.0.315 beta 2026-10-27
+
+* docs(windows): document engine apis MCompileForBaseKeyboard and Install3 (#16877)
+* fix(developer): strip markers correctly in ldml to kvk compiler (#16900)
+
+## 19.0.314 beta 2026-10-23
+
+* fix(windows): attempt to reinitialize Keyman on each keystroke in TIP (#16862)
+* docs(developer): add caution for on-screen to use Fill from layout, add Design and Code view sections, and update images (#16756)
+
+## 19.0.313 beta 2026-10-22
+
+* fix(mac): installer directly launches config app (#16755)
+* fix(android): pass on backspace keyevent when pressed at start of context (#16856)
+
+## 19.0.312 beta 2026-10-21
+
+* change(ios): select suggestion mode based on input context (#16806)
+* fix(ios): prevent clear-text crash under Liquid Glass (#16814)
+
+## 19.0.311 beta 2026-10-20
+
+* fix(android): load sentry earlier so we capture script errors in keymanweb-webview.js (#16826)
+* chore(linux): Update debian changelog (#15812)
+
+## 19.0.310 beta 2026-10-19
+
+* fix(developer): handle xml parser errors in LDML imports (#16808)
+* refactor(developer): remove unused `throws` from LDML test harnesses (#16846)
+* fix(developer): Avoid clearing child window list in destructor to streamline shutdown (#16812)
+* fix(developer): guard access to possibly-nil `FChildWindows` (#16820)
+* fix(ios): load sentry earlier so we capture script errors in keymanweb-webview.js (#16828)
+* chore(linux): quote search team in upload-to-debian.sh so we find existing pull requests (#16850)
+* maint(linux): detect beta phase in `upload-to-debian.sh` (#16853)
+* fix(web): correctly handle base key selection during fat-finger calculation in subkey popup (#16832)
+* fix(web): fix multilayer-multitap correction to non-multitap sequence (#16842)
+* fix(android): selectively disable autocorrect based on context intent (#16644)
+
+## 19.0.309 beta 2026-10-17
+
+* docs(linux): update instructions for building with Java (#16835)
+
+## 19.0.308 beta 2026-10-16
+
+* fix(web): use `key.displayLayer` rather than `key.layer` to look up corrections (#16831)
+
 ## 19.0.307 beta 2026-10-15
 
 * fix(developer): address range check error in bitmap editor (#16815)

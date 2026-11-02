@@ -9,15 +9,17 @@ will not have been installed but can be any keyboard file on disk.
 
 ## Interface Hierarchy
 
-`IDispatch`  
+`IDispatch`
 
-> [`IKeymanObject`](../IKeymanObject)  
+> [`IKeymanObject`](../IKeymanObject)
 >
-> > [`IKeymanKeyboard`](../IKeymanKeyboard)  
+> > [`IKeymanKeyboard`](../IKeymanKeyboard)
 > >
-> > > [`IKeymanKeyboardFile`](../IKeymanKeyboardFile)  
+> > > [`IKeymanKeyboardFile`](../IKeymanKeyboardFile)
 > > >
-> > > > **`IKeymanKeyboardFile2`**  
+> > > > **`IKeymanKeyboardFile2`**
+> > > >
+> > > > [`IKeymanKeyboardFile3`](../IKeymanKeyboardFile3)
 
 ## Methods
 

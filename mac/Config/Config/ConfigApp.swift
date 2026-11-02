@@ -25,7 +25,7 @@ struct ConfigApp: App {
   @Environment(\.openWindow) private var openWindow
   
   init() {
-    Logger.app.log("Starting Keyman Configuration, version: \(ConfigAppUtil.versionWithTag), versionWithTag: \(ConfigAppUtil.versionWithTag)")
+    Logger.app.log("Starting Keyman Configuration, version: \(ConfigAppUtil.versionWithTag, privacy: .public), versionWithTag: \(ConfigAppUtil.versionWithTag, privacy: .public)")
     let sentryDsnUrl = "https://960f8b8e574c46e3be385d60ce8e1fea@o1005580.ingest.sentry.io/5983522"
 
     // Initialize Sentry only once here
@@ -37,31 +37,33 @@ struct ConfigApp: App {
   }
 
   var body: some Scene {
-    Window("Configuration", id: "main-config") {
+    Window("Keyboards", id: "config") {
       MainConfigView()
         .frame(
-            minWidth: 600, maxWidth: 1000,
-            minHeight: 400, maxHeight: .infinity
+          minWidth: 600, maxWidth: 1000,
+          minHeight: 400, maxHeight: .infinity
         )
         .environmentObject(settings)
-        .task {
-          if !installation.getHasDisplayedInstallationComplete() {
-            openWindow(id: "install")
-          }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in openWindow(id: "install")
+        .onReceive(NotificationCenter.default.publisher(for: .installationRepairStarted)) { notification in
+          openWindow(id: "install")
         }
     }
+    .windowStyle(.hiddenTitleBar)
     // the size of the window when first opened
-        .defaultSize(width: 800, height: 600)
-        .windowResizability(.contentSize)
+    .defaultSize(width: 800, height: 600)
+    .windowResizability(.contentSize)
+    // config window receives any opened files
+    .handlesExternalEvents(matching: ["*"])
     
     Window("Installation", id: "install") {
       MainInstallView()
         .environmentObject(installation)
     }
+    .windowStyle(.hiddenTitleBar)
     .windowResizability(.contentSize)
     .defaultSize(width: 600, height: 500)
+    // installation window receives no opened files
+    .handlesExternalEvents(matching: [])
     .commands {
       CommandGroup(replacing: .appInfo) {
         Button {
@@ -69,6 +71,19 @@ struct ConfigApp: App {
         } label: {
           Label("About Keyman Configuration", systemImage: "info.circle")
         }
+      }
+      // include an invisible command group to run when the app boots
+      CommandGroup(after: .appInfo) {
+        Color.clear
+          .frame(width: 0, height: 0)
+          .onAppear {
+            // this evaluates to true if an installation is still in progress
+            if installation.installInProgress || installation.invalidInputMethod {
+              Logger.app.log("installation attention needed, opening Installation window")
+              openWindow(id: "install")
+              NSApp.activate(ignoringOtherApps: true)
+            }
+          }
       }
     }
     

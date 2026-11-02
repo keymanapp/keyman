@@ -10,6 +10,12 @@
   <!-- DOMRect only exists as of Chrome 61... thus coming later than ES6. -->
   <script src="other-polyfills.js"></script>
   <script src="keyman-sentry.js"></script>
+  <script>
+    const sentryManager = new KeymanSentryManager({
+      hostPlatform: "android"
+    });
+    sentryManager.init();
+  </script>
   <script src="keymanweb-webview.js"></script>
   <script src="android-host.js"></script>
   <style type="text/css">

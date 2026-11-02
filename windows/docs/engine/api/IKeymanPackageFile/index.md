@@ -11,15 +11,17 @@ simplify distribution of keyboard layouts.
 
 ## Interface Hierarchy
 
-`IDispatch`  
+`IDispatch`
 
-> [`IKeymanObject`](../IKeymanObject)  
+> [`IKeymanObject`](../IKeymanObject)
 >
-> > [`IKeymanPackage`](../IKeymanPackage)  
+> > [`IKeymanPackage`](../IKeymanPackage)
 > >
-> > > **`IKeymanPackageFile`**  
+> > > **`IKeymanPackageFile`**
 > > >
-> > > > [`IKeymanPackageFile2`](../IKeymanPackageFile2)  
+> > > > [`IKeymanPackageFile2`](../IKeymanPackageFile2)
+> > > >
+> > > > [`IKeymanPackageFile3`](../IKeymanPackageFile3)
 
 ## Methods
 

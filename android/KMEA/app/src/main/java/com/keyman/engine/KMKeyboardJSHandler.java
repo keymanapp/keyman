@@ -158,6 +158,26 @@ public class KMKeyboardJSHandler {
           }
         }
 
+        CharSequence charsContext = null;
+        if(deleteLeft > 0) {
+          // Get current text prior to insertion point (only needed if we will
+          // be deleting or replacing text); see performLeftDeletions for
+          // info on originalBufferLength
+          int originalBufferLength = deleteLeft*2 + 16; // characters
+          charsContext = getCharacterSequence(ic, originalBufferLength);
+
+          if(deleteLeft == 1 && s.isEmpty() && dr == 0 && (charsContext == null || charsContext.length() <= 0)) {
+            // special case to emit Bksp to editor when there is no context
+            // before cursor and equivalent of Bksp has been sent from Keyman.
+            // This is used e.g. in Google Keep to delete a checklist item or
+            // merge it with previous item, when the cursor is at the start of
+            // the field (#11195)
+            keyDownUp(KeyEvent.KEYCODE_DEL, 0);
+            ic.endBatchEdit();
+            return;
+          }
+        }
+
         if (s.length() > 0 && s.charAt(0) == '\n') {
           if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
             // Special handling of ENTER key
@@ -216,7 +236,7 @@ public class KMKeyboardJSHandler {
             k.setShouldIgnoreTextChange(true);
             k.setShouldIgnoreSelectionChange(true);
           }
-          performLeftDeletions(ic, deleteLeft);
+          performLeftDeletions(ic, charsContext, deleteLeft);
         }
 
         // Perform right-deletions
@@ -314,20 +334,19 @@ public class KMKeyboardJSHandler {
     }
   }
 
-  /*
-  // Chromium up until version M81 had a bug where deleteSurroundingText deletes an entire
-  // grapheme cluster instead of one code-point. See Chromium issue #1024738
-  // https://bugs.chromium.org/p/chromium/issues/detail?id=1024738
-  //
-  // We'll retrieve up to (dn*2+16) characters before the cursor to collect enough characters
-  // for surrogate pairs + a long grapheme cluster.
-  // This buffer will be used to put back characters as-needed
-  */
-  private static void performLeftDeletions(InputConnection ic, int dn) {
-    int originalBufferLength = dn*2 + 16; // characters
-    CharSequence charsBackup = getCharacterSequence(ic, originalBufferLength);
+  /**
+   * Chromium up until version M81 had a bug where deleteSurroundingText deletes
+   * an entire grapheme cluster instead of one code-point. See Chromium issue
+   * https://crbug.com/1024738
+   *
+   * We'll retrieve up to (deleteLeft*2+16) characters before the cursor to
+   * collect enough characters for surrogate pairs + a long grapheme cluster.
+   * This buffer will be used to put back characters as-needed.
+   */
+  private static void performLeftDeletions(InputConnection ic, CharSequence charsContext, int deleteLeft) {
+    int originalBufferLength = deleteLeft*2 + 16; // characters
 
-    int lastIndex = charsBackup.length()-1;
+    int lastIndex = charsContext.length()-1;
 
     // Exit if there's no context to delete
     if (lastIndex < 0) {
@@ -335,24 +354,24 @@ public class KMKeyboardJSHandler {
     }
 
     // Count the number of characters which are surrogate pairs
-    int numPairs = CharSequenceUtil.countSurrogatePairs(charsBackup, dn);
+    int numPairs = CharSequenceUtil.countSurrogatePairs(charsContext, deleteLeft);
 
-    // Chop dn+numPairs code points from the end of charsBackup
+    // Chop deleteLeft+numPairs code points from the end of charsContext
     // subSequence indices are start(inclusive) to end(exclusive)
     int start = 0;
-    int end = charsBackup.length() - (dn + numPairs);
+    int end = charsContext.length() - (deleteLeft + numPairs);
     CharSequence expectedChars;
     try {
-      expectedChars = charsBackup.subSequence(start, end);
+      expectedChars = charsContext.subSequence(start, end);
     } catch (IndexOutOfBoundsException e) {
       KMLog.LogException(TAG,
-        KMString.format("Bad subSequence of start %d, end is %d, length %d, dn %d, numPairs %d",
-        start, end, charsBackup.length(), dn, numPairs), e);
+        KMString.format("Bad subSequence of start %d, end is %d, length %d, deleteLeft %d, numPairs %d",
+        start, end, charsContext.length(), deleteLeft, numPairs), e);
       expectedChars = "";
     }
-    ic.deleteSurroundingText(dn + numPairs, 0);
+    ic.deleteSurroundingText(deleteLeft + numPairs, 0);
     // Shorten the retrieved context by exactly as many characters as were just deleted.
-    CharSequence newContext = getCharacterSequence(ic, originalBufferLength - dn - numPairs);
+    CharSequence newContext = getCharacterSequence(ic, originalBufferLength - deleteLeft - numPairs);
 
     CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
     if (charsToRestore.length() > 0) {
@@ -401,7 +420,7 @@ public class KMKeyboardJSHandler {
         KMLog.LogException(TAG,
           KMString.format("Bad subSequence of start %d, end is %d",
           start, end), e);
-      }      
+      }
     }
 
     return sequence;

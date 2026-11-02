@@ -1,4 +1,5 @@
 store(&NAME) 'error_store_contains_unsupported_statement-call'
+store(&TARGETS) 'windows'
 store(&VERSION) '9.0'
 
 begin Unicode > use(main)

@@ -92,6 +92,7 @@
 #include "CharToKeyConversion.h"
 #include "CasedKeys.h"
 #include <vector>
+#include <map>
 #include <xstring.h>
 #include <codecvt>
 #include <locale>
@@ -122,6 +123,7 @@ namespace kmcmp{
   int BeginLine[4];
 
   KMX_BOOL IsValidCallStore(PFILE_STORE fs);
+  void CheckIfCallUsedOnUnsupportedPlatform(PFILE_KEYBOARD fk);
   void CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
   KMX_DWORD UTF32ToUTF16(int n, int *n1, int *n2);
   KMX_DWORD CheckUTF16(int n);
@@ -138,7 +140,7 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode);
-KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &targets);
+KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &compileTargets, int &platformTargets);
 KMX_BOOL DoesStoreContainInvalidStatement(PKMX_WCHAR store);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p);
@@ -1238,7 +1240,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
       ReportCompilerMessage(KmnCompilerMessages::ERROR_90FeatureOnlyTargets);
       return FALSE;
     }
-    if(!GetCompileTargetsFromTargetsStore(sp->dpString, fk->extra->targets)) {
+    if(!GetCompileTargetsFromTargetsStore(sp->dpString, fk->extra->targets, fk->extra->platformTargets)) {
       return FALSE;
     }
     break;
@@ -1351,21 +1353,27 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
  * @param targets     (output)
  * @return FALSE if no targets found or invalid targets found
  */
-KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &targets) {
-  // Compile to .kmx
-  const std::vector<std::u16string> KMXKeymanTargets{
-    u"windows", u"macosx", u"linux", u"desktop"
-  };
-
-  // Compile to .js
-  const std::vector<std::u16string> KMWKeymanTargets{
-    u"web", u"iphone", u"ipad", u"androidphone", u"androidtablet",
-    u"mobile", u"tablet"
+KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &compileTargets, int &platformTargets) {
+  // Corresponds to PLATFORMTARGETS_
+  const std::map<std::u16string, int> TargetTokens{
+    {u"androidphone", PLATFORMTARGETS_ANDROIDPHONE},
+    {u"androidtablet", PLATFORMTARGETS_ANDROIDTABLET},
+    {u"any", PLATFORMTARGETS_ANY},
+    {u"desktop", PLATFORMTARGETS_DESKTOP},
+    {u"ipad", PLATFORMTARGETS_IPAD},
+    {u"iphone", PLATFORMTARGETS_IPHONE},
+    {u"linux", PLATFORMTARGETS_LINUX},
+    {u"macosx", PLATFORMTARGETS_MACOSX},
+    {u"mobile", PLATFORMTARGETS_MOBILE},
+    {u"tablet", PLATFORMTARGETS_TABLET},
+    {u"web", PLATFORMTARGETS_WEB},
+    {u"windows", PLATFORMTARGETS_WINDOWS}
   };
 
   const std::u16string AnyTarget = u"any";
 
-  targets = 0;
+  compileTargets = 0;
+  platformTargets = 0;
   auto p = new KMX_WCHAR[u16len(store)+1];
   auto q = p;
   *p = 0;
@@ -1378,31 +1386,16 @@ KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &targets) {
       *q++ = ' ';
       *q = 0;
     }
-    bool found = false;
     if(*token) {
-      if(AnyTarget == token) {
-        targets |= COMPILETARGETS_KMX | COMPILETARGETS_JS;
-        found = true;
-      }
-      for(auto target: KMXKeymanTargets) {
-        if(target == token) {
-          targets |= COMPILETARGETS_KMX;
-          found = true;
-        }
-      }
-      for(auto target: KMWKeymanTargets) {
-        if(target == token) {
-          targets |= COMPILETARGETS_JS;
-          found = true;
-        }
-      }
-
-      if(!found) {
+      auto it = TargetTokens.find(token);
+      if(it != TargetTokens.end()) {
+        platformTargets |= it->second;
+      } else {
         ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidTarget, {
           /*target*/ string_from_u16string(token).c_str()
         });
         delete[] p;
-        targets = 0;
+        platformTargets = 0;
         return FALSE;
       }
 
@@ -1417,9 +1410,16 @@ KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR *store, int &targets) {
   u16cpy(store, p);
   delete[] p;
 
-  if(targets == 0) {
+  if(platformTargets == 0) {
     ReportCompilerMessage(KmnCompilerMessages::ERROR_NoTargetsSpecified);
     return FALSE;
+  }
+
+  if(platformTargets & PLATFORMTARGETS__KMX) {
+    compileTargets |= COMPILETARGETS_KMX;
+  }
+  if(platformTargets & PLATFORMTARGETS__KMW) {
+    compileTargets |= COMPILETARGETS_JS;
   }
 
   return TRUE;
@@ -2480,6 +2480,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
         if (!kmcmp::IsValidCallStore(&fk->dpStoreArray[i])) return KmnCompilerMessages::ERROR_InvalidCall;
         kmcmp::CheckStoreUsage(fk, i, FALSE, FALSE, TRUE);
+        kmcmp::CheckIfCallUsedOnUnsupportedPlatform(fk);
 
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_CALL;
@@ -3932,6 +3933,23 @@ KMX_BOOL kmcmp::IsValidCallStore(PFILE_STORE fs)
       return FALSE;
 
   return i == 1;
+}
+
+/**
+ * As of Keyman 19, the `call()` statement is not supported on Linux or macOS --
+ * it will simply be ignored. Report a warning if a keyboard that targets either
+ * of those platforms includes `call()`. Note that `call()` semantics are
+ * slightly different between web and Windows platforms, but that is not checked
+ * here.
+ */
+void kmcmp::CheckIfCallUsedOnUnsupportedPlatform(PFILE_KEYBOARD fk) {
+  if(kmcmp::CompileTarget == CKF_KEYMAN) {
+    // We don't need to check this for CKF_KEYMANWEB, because call() is
+    // supported for all platforms there; this prevents a repeated warning
+    if(fk->extra->platformTargets & PLATFORMTARGETS__FEATURE_UNSUPPORTED__CALL) {
+      ReportCompilerMessage(KmnCompilerMessages::WARN_CallUsedOnUnsupportedPlatform);
+    }
+  }
 }
 
 ///////////////////

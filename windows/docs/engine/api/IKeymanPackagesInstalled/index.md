@@ -17,7 +17,9 @@ Keyman Engine.
 > >
 > > > **`IKeymanPackagesInstalled`**  
 > > >
-> > > > [`IKeymanPackagesInstalled2`](../IKeymanPackagesInstalled2)  
+> > > > [`IKeymanPackagesInstalled2`](../IKeymanPackagesInstalled2)
+> > > >
+> > > > [`IKeymanPackagesInstalled3`](../IKeymanPackagesInstalled3)
 
 ## Properties
 

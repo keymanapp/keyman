@@ -178,6 +178,17 @@ describe('ldml keyboard xml reader tests', function () {
       ],
     },
     {
+      subpath: 'invalid-import-local-bad-xml.xml',
+      loadfail: true,
+      messageCodes: [
+        DeveloperUtilsMessages.ERROR_InvalidXml,
+        // Note: test harness calls .validate() even if .load() fails; in kmc we
+        // don't call .validate() if .load() fails, so we don't receive
+        // ERROR_SchemaValidationError in normal use
+        DeveloperUtilsMessages.ERROR_SchemaValidationError,
+      ],
+    },
+    {
       subpath: 'invalid-import-path.xml',
       loadfail: true,
       errors: [

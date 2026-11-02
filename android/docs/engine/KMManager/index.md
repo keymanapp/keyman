@@ -161,8 +161,8 @@ The KMManager is the core class which provides most of the methods and constants
 [`getOrientation()`](getOrientation)
 : returns the device's current orientation (Portrait vs Landscape)
 
-[`getPredictionsSuspended()`](getPredictionsSuspended)
-: returns whether predictions are temporarily disabled because the currently selected text field is a hidden password text field or a numeric text field. 
+~~`getPredictionsSuspended()`~~ `(Deprecated)`
+: returns whether predictions are temporarily disabled because the currently selected text field is a hidden password text field or a numeric text field.
 
 [`getSpacebarText()`](getSpacebarText)
 : returns the current text display pattern for the spacebar
@@ -254,6 +254,9 @@ The KMManager is the core class which provides most of the methods and constants
 [`setHTMLBanner()`](setHTMLBanner)
 : sets the contents of an HTML banner for Keyman Engine to display when suggestions aren't available
 
+[`setInputType()`](setInputType)
+: informs the engine about what type of input text is expected, allowing it to configure predictive-text accordingly
+
 [`setKeyboard()`](setKeyboard)
 : sets the keyboard to be used
 
@@ -269,8 +272,8 @@ The KMManager is the core class which provides most of the methods and constants
 [`setMaySendCrashReport()`](setMaySendCrashReport)
 : sets whether Keyman Engine can send crash reports over the network to Sentry
 
-[`setPredictionsSuspended()`](setPredictionsSuspended)
-: sets whether predictions are temporarily disabled because the currently selected text field is a hidden password text field or a numeric text field. 
+~~`setPredictionsSuspended()`~~ `(Deprecated)`
+: sets whether predictions are temporarily disabled because the currently selected text field is a hidden password text field or a numeric text field.
 
 [`setShouldAllowSetKeyboard()`](setShouldAllowSetKeyboard)
 : sets whether Keyman Engine allows setting a keyboard other than the default keyboard

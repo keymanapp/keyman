@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="25098" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="25073"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -22,7 +20,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <navigationBar tag="786586" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mHd-8N-aLO">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="54"/>
                     <items>
                         <navigationItem title="Get Started" id="hTZ-IR-g2X">
                             <barButtonItem key="rightBarButtonItem" title="Done" id="fqb-b7-uYN"/>
@@ -30,7 +28,7 @@
                     </items>
                 </navigationBar>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="60" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="LeX-TH-9uh">
-                    <rect key="frame" x="0.0" y="44" width="320" height="524"/>
+                    <rect key="frame" x="0.0" y="54" width="320" height="514"/>
                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="BHR-iq-jVb"/>
@@ -38,7 +36,6 @@
                     </connections>
                 </tableView>
             </subviews>
-            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
                 <constraint firstItem="mHd-8N-aLO" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="1Ph-ud-csW"/>
                 <constraint firstAttribute="trailing" secondItem="mHd-8N-aLO" secondAttribute="trailing" id="Ihe-cJ-5sW"/>
@@ -49,6 +46,7 @@
                 <constraint firstAttribute="trailing" secondItem="LeX-TH-9uh" secondAttribute="trailing" id="ud3-Rj-MM7"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="139" y="154"/>
         </view>
     </objects>
 </document>

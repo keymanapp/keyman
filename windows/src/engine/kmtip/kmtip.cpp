@@ -86,6 +86,9 @@ CKMTipTextService::CKMTipTextService()
     _cPreservedKeyCount = 0;
     _dwDeepIntegration = 0;
 
+    _activeGuidProfile = GUID_NULL;
+    _keymanInitialized = FALSE;
+
     RegistryReadOnlyW reg(HKEY_CURRENT_USER);
     _tryAndStartKeyman = reg.OpenKeyReadOnly(REGSZ_KeymanEngineDebug_CU) && reg.ValueExists(REGSZ_Flag_UseAutoStartTask) && reg.ReadInteger(REGSZ_Flag_UseAutoStartTask) != 0;
 
@@ -209,11 +212,6 @@ STDAPI CKMTipTextService::ActivateEx(ITfThreadMgr *ptim, TfClientId tid, DWORD d
     goto ExitError;
 	}
 
-  if(!_InitKeyman()) {
-		SendDebugMessage(L"Could not initialise Keyman");
-    goto ExitError;
-  }
-
   // start tracking the focus doc
   if(_pThreadMgr->GetFocus(&pFocusDoc) == S_OK) {
     // The system will call OnSetFocus only for focus events after Activate
@@ -231,47 +229,8 @@ ExitError:
   return E_FAIL;
 }
 
-STDAPI CKMTipTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId)
-{
-  SendDebugEntry();
-  ITfDocumentMgr *pFocusDoc;
-
-  _cPreservedKeyCount = 0;   // I3588   // I3714
-  _PreservedKeys = NULL;   // I3588   // I3714
-
-  _pThreadMgr = pThreadMgr;
-  _pThreadMgr->AddRef();
-
-  _tfClientId = tfClientId;
-
-  if (!_InitThreadMgrSink())
-	{
-		SendDebugMessage(L"Could not initialise thread manager sink");
-    goto ExitError;
-	}
-
-  if(!_InitKeyman())	{
-    _TryAndStartKeyman();
-		SendDebugMessage(L"Could not initialise Keyman");
-    //goto ExitError;
-	}
-
-  // start tracking the focus doc
-  if (_pThreadMgr->GetFocus(&pFocusDoc) == S_OK)
-  {
-    // The system will call OnSetFocus only for focus events after Activate
-    // is called.
-    OnSetFocus(pFocusDoc, NULL);
-    pFocusDoc->Release();
-  }
-
-  SendDebugExit();
-  return S_OK;
-
-ExitError:
-  Deactivate(); // cleanup any half-finished init   // I3706
-  SendDebugExit();
-  return E_FAIL;
+STDAPI CKMTipTextService::Activate(ITfThreadMgr *pThreadMgr, TfClientId tfClientId) {
+  return ActivateEx(pThreadMgr, tfClientId, 0);
 }
 
 //+---------------------------------------------------------------------------
@@ -286,7 +245,6 @@ STDAPI CKMTipTextService::Deactivate()
 
   _UninitThreadMgrSink();
   _UninitKeystrokeSink();
-  _UninitKeyman();
 
   // we MUST release all refs to _pThreadMgr in Deactivate
   SafeReleaseClear(_pThreadMgr);

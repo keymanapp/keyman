@@ -39,9 +39,17 @@ void Install(string Filename, bool Force, bool InstallDefaultLanguage)
 [`IKeymanPackagesInstalled::Install`](../IKeymanPackagesInstalled/Install)
 :   Installs a package file and input method for default language
 
+[`IKeymanPackagesInstalled3::Install3`](../IKeymanPackagesInstalled3/Install3)
+:   Installs a package from a path and compiles its keyboard layouts
+    against a specified base keyboard
+
 [`IKeymanPackageFile::Install`](../IKeymanPackageFile/Install)
 :   Installs a package file and input method for default language
 
 [`IKeymanPackageFile2::Install2`](../IKeymanPackageFile2/Install2)
 :   Installs a package file, optionally with input method for default
     language
+
+[`IKeymanPackageFile3::Install3`](../IKeymanPackageFile3/Install3)
+:   Installs a package file and compiles its keyboard layouts
+    against a specified base keyboard
