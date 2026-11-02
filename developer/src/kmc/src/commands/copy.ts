@@ -19,7 +19,7 @@ export function declareCopy(program: Command) {
   BaseOptions.addAll(command);
   command
     .description('copy a Keyman keyboard or lexical model project')
-    .option('-o, --out-path <path>', 'new name and path for project')
+    .requiredOption('-o, --out-path <path>', 'output path, last component of which forms id for project (must not exist)')
     .option('-n, --dry-run', 'show what would happen, without making changes')
     .option('-r, --relocate-external', 'copy external files into "external" folder')
     .action(copyProject)
@@ -31,6 +31,11 @@ export function declareCopy(program: Command) {
   * a GitHub repository, branch, and path, [https://]github.com/owner/repo/tree/branch/path
     e.g. https://github.com/keyman-keyboards/khmer_angkor/tree/main/khmer_angkor.kpj or
          github.com/keymanapp/keyboards/tree/master/release/k/khmer_angkor
+
+The last component of the output path will be the new id of the project, e.g.
+if -o /tmp/my_new_keyboard is given, then /tmp/my_new_keyboard/my_new_keyboard.kpj will
+be created. The output folder must not currently exist and parent folders will be created
+if necessary.
     `);
   }
 
