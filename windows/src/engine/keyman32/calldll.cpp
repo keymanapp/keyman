@@ -41,22 +41,24 @@ static LPIMDLL AddIMDLL(LPINTKEYBOARDINFO lpkbi, LPSTR kbdpath, LPSTR dllfilenam
 
 	if(j < lpkbi->nIMDLLs) return &lpkbi->IMDLLs[j];
 
-	char drive[_MAX_DRIVE], dir[_MAX_DIR], fullname[_MAX_PATH], newdllname[_MAX_FNAME];
+  char drive[_MAX_DRIVE], dir[_MAX_DIR], fullname[_MAX_PATH], newdllname[_MAX_FNAME];
+  char dllname[_MAX_FNAME], dllext[_MAX_EXT], newdllext[_MAX_EXT];   // I3094
 
 	strcpy_s(fullname, _countof(fullname), kbdpath);
 	_splitpath_s(fullname, drive, _countof(drive), dir, _countof(dir), NULL, 0, NULL, 0);   // I3547
-
-#ifdef _WIN64
-  char dllname[_MAX_FNAME], dllext[_MAX_EXT], newdllext[_MAX_EXT];   // I3094
   _splitpath_s(dllfilename, NULL, 0, NULL, 0, dllname, _countof(dllname), dllext, _countof(dllext));   // I3547
-  strcpy_s(newdllext, _countof(newdllext), ".x64");   // I3547
+
+#if defined(_M_ARM64)
+  strcpy_s(newdllext, _countof(newdllext), ".arm64");
+#elif defined(_M_X64)
+  strcpy_s(newdllext, _countof(newdllext), ".x64"); // I3547
+#else
+  newdllext[0] = '\0';
+#endif
+
   strcat_s(newdllext, _countof(newdllext), dllext);   // I3547
   _makepath_s(fullname, _countof(fullname), drive, dir, dllname, newdllext);   // I3547
   _makepath_s(newdllname, _countof(newdllname), NULL, NULL, dllname, newdllext);   // I3547
-#else
-	_makepath_s(fullname, _countof(fullname), drive, dir, dllfilename, NULL);   // I3547
-  strcpy_s(newdllname, _countof(newdllname), dllfilename);  // I3094   // I3547
-#endif
 
 	/* Load the DLL */
 
