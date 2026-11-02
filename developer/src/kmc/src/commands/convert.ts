@@ -19,8 +19,11 @@ export function declareConvert(program: Command) {
   command
     // TODO kmc-convert: add more conversions later, then alter text here
     //.description('Convert keyboard source files between formats:')
-    .description('Convert keyboard source files from keylayout -> .kmn:')
-    .option('-p, --out-path <path>', 'Path for output files')
+    .description('convert keyboard source files between formats')
+    .addHelpText('after', `
+Current supported conversion formats are:
+* from macOS (Ukelele) .keylayout -> Keyman .kmn`)
+    .option('-o, --out-path <path>', 'path where output files will be written (must exist)')
     // TODO kmc-convert: add more conversions later, then File extension for output files is required
     // .requiredOption('-t, --out-type <type>', 'File extension for output files, e.g. .kmn, required')
     .action(async (filenames: string[], _options: any, commander: any): Promise<never|void> => {

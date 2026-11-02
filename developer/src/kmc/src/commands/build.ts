@@ -27,27 +27,7 @@ interface OutFileSpecification {
 
 export function declareBuild(program: Command) {
   // TODO: localization?
-  const buildCommand = program
-    .command('build')
-
-    // These options are only used with build file but are included here so that
-    // they are visible in `kmc build --help`
-    .option('-d, --debug', 'Include debug information in output')
-    .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build; overrides project-level warnings-as-errors option')
-    .option('-W, --no-compiler-warnings-as-errors', 'Warnings do not fail the build; overrides project-level warnings-as-errors option')
-    .option('-m, --message <number>', 'Adjust severity of info, hint or warning message to Disable (default), Info, Hint, Warn or Error (option can be repeated)',
-      (value, previous) => previous.concat([value]), [])
-    .option('--no-compiler-version', 'Exclude compiler version metadata from output')
-    .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles')
-    .option('--continue-on-error', 'Continue build of subsequent files even if earlier files have errors');
-
-  BuildBaseOptions.addAll(buildCommand);
-
-  buildCommand.command('file [infile...]', {isDefault: true})
-    .description(`Compile one or more source files or projects ('file' subcommand is default).`)
-    .option('--for-publishing', 'Verify that project meets @keymanapp repository requirements')
-    .option('--publish-only', 'Only run the for-publishing validation, skip all other build steps')
-    .addHelpText('after', `
+  const fileHelpText = `
 Supported file types:
 * folder: Keyman project in folder
 * .kpj: Keyman project
@@ -58,25 +38,49 @@ Supported file types:
 
 File lists can be referenced with @filelist.txt.
 
-If no input file is supplied, kmc will build the current folder.`)
+If no input file is supplied, kmc will build the current folder.`;
+
+  const buildCommand = program
+    .command('build')
+    .description('compile one or more source files or projects')
+    .addHelpText('after', fileHelpText)
+
+    // These options are only used with build file but are included here so that
+    // they are visible in `kmc build --help`
+    .option('-d, --debug', 'include debug information in output')
+    .option('-w, --compiler-warnings-as-errors', 'causes warnings to fail the build; overrides project-level warnings-as-errors option')
+    .option('-W, --no-compiler-warnings-as-errors', 'warnings do not fail the build; overrides project-level warnings-as-errors option')
+    .option('-m, --message <number>', 'adjust severity of info, hint or warning message to Disable (default), Info, Hint, Warn or Error (option can be repeated)',
+      (value, previous) => previous.concat([value]), [])
+    .option('--no-compiler-version', 'exclude compiler version metadata from output')
+    .option('--no-warn-deprecated-code', 'turn off warnings for deprecated code styles')
+    .option('--continue-on-error', 'continue build of subsequent files even if earlier files have errors');
+
+  BuildBaseOptions.addAll(buildCommand);
+
+  buildCommand.command('file [infile...]', {isDefault: true})
+    .description(`compile one or more source files or projects ('file' subcommand is default)`)
+    .option('--for-publishing', 'verify that project meets @keymanapp repository requirements')
+    .option('--publish-only', 'only run the for-publishing validation, skip all other build steps')
+    .addHelpText('after', fileHelpText)
 
     .action(buildFile);
 
   buildCommand
     .command('ldml-test-data <infile>')
-    .description('Convert LDML keyboard test .xml to .json')
+    .description('convert LDML keyboard test .xml to .json')
     .action(buildTestData);
 
   buildCommand
     .command('windows-package-installer <infile>')
-    .description('Build an executable installer for Windows for a Keyman package')
-    .requiredOption('--msi <msiFilename>', 'Location of keymandesktop.msi')
-    .requiredOption('--exe <exeFilename>', 'Location of setup.exe')
-    .requiredOption('--license <licenseFilename>', 'Location of license.txt')
-    .option('--title-image [titleImageFilename]', 'Location of title image')
-    .option('--app-name [applicationName]', 'Installer property: name of the application to be installed', 'Keyman')
-    .option('--start-disabled', 'Installer property: do not enable keyboards after installation completes')
-    .option('--start-with-configuration', 'Installer property: start Keyman Configuration after installation completes')
+    .description('build an executable installer for Windows for a Keyman package')
+    .requiredOption('--msi <msiFilename>', 'location of keymandesktop.msi')
+    .requiredOption('--exe <exeFilename>', 'location of setup.exe')
+    .requiredOption('--license <licenseFilename>', 'location of license.txt')
+    .option('--title-image [titleImageFilename]', 'location of title image')
+    .option('--app-name [applicationName]', 'installer property: name of the application to be installed', 'Keyman')
+    .option('--start-disabled', 'installer property: do not enable keyboards after installation completes')
+    .option('--start-with-configuration', 'installer property: start Keyman Configuration after installation completes')
     .action(buildWindowsPackageInstaller);
 }
 

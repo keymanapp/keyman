@@ -39,7 +39,7 @@ interface MessageOptions extends CompilerBaseOptions {
 export function declareMessage(program: Command) {
   program
     .command('message [messages...]')
-    .description(`Describe one or more compiler messages. Note: Markdown format is always written to files on disk.`)
+    .description(`describe one or more compiler messages. Note: Markdown format is always written to files on disk.`)
 
     // note: using term 'module' here rather than 'namespace' as that
     // corresponds pretty closely to npm modules such as @keymanapp/kmc-kmn
@@ -62,9 +62,14 @@ Message identifiers can be any of the following formats:
 
  - a decimal value, with "d" prefix (this form may be reported in diagnostic or unit test logs), e.g.
      ${chalk.cyan("kmc message d5246977")}
+
+Additional notes:
+
+ - '--format markdown' implies '--all-messages', and requires an output path
+ - Default output for text, json is to console
 `)
     .addOption(new Option('-f, --format <format>', 'Output format').choices(['text', 'markdown', 'json']).default('text'))
-    .option('-o, --out-path <out-path>', 'Output path for Markdown files; output filename for text and json formats')
+    .option('-o, --out-path <out-path>', 'Output path for Markdown files; output filename for text and json formats (path must exist)')
     .option('-a, --all-messages', 'Emit descriptions for all messages (text, json)')
     .action(messageCommand);
 }
