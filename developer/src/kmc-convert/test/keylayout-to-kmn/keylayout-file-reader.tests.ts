@@ -10,9 +10,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { Keylayout } from "@keymanapp/developer-utils";
-import { compilerTestCallbacks, makePathToFixture } from './helpers/index.js';
-import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
-import { KL_KeyMap, KL_KeyMapSelect } from "../../common/web/utils/src/types/keylayout/keylayout-xml.js";
+import { compilerTestCallbacks, makePathToFixture } from '../helpers/index.js';
+import { KeylayoutFileReader } from '../../src/keylayout-to-kmn/keylayout-file-reader.js';
 
 describe('KeylayoutFileReader', function () {
 
@@ -129,7 +128,7 @@ describe("read() ", function () {
 });
 
 describe('findMapIndexinKeymap ', function () {
-  const keyMapSelect: KL_KeyMapSelect = {
+  const keyMapSelect: Keylayout.KL_KeyMapSelect = {
     mapIndex: '',
     modifier: []
   };
@@ -160,7 +159,7 @@ describe('findMapIndexinKeymap ', function () {
 });
 
 describe('findIndexinKeymapSelect ', function () {
-  const keyMap: KL_KeyMap = {
+  const keyMap: Keylayout.KL_KeyMap = {
     index: '',
     key: []
   };

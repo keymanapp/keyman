@@ -3,10 +3,16 @@
  *
  * Output artifacts available from kmc-convert
  */
-import { KeymanCompilerArtifactOptional, KeymanCompilerArtifacts } from '@keymanapp/developer-utils';
+import { KeymanCompilerArtifact, KeymanCompilerArtifactOptional, KeymanCompilerArtifacts } from '@keymanapp/developer-utils';
 import { KeymanCompilerResult } from "@keymanapp/developer-utils";
 
-export interface ConverterArtifacts extends KeymanCompilerArtifacts { }
+export interface ConverterArtifacts extends KeymanCompilerArtifacts {
+  /**
+   * Full filename of the primary output file, which will vary by converter
+   * type; data will be empty. Used primarily for logging and infrastructure
+   */
+  defaultOutput: KeymanCompilerArtifact;
+}
 
 /**
  * @public

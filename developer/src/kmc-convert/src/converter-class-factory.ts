@@ -4,9 +4,11 @@
  * Lists all the available converters and finds matching converter
  */
 import { KeylayoutToKmnConverter } from './keylayout-to-kmn/keylayout-to-kmn-converter.js';
+import { KvkToKvksConverter } from './kvk-to-kvks/kvk-to-kvks-converter.js';
 
 const converters = [
   KeylayoutToKmnConverter,
+  KvkToKvksConverter,
 ];
 
 export class ConverterClassFactory {
