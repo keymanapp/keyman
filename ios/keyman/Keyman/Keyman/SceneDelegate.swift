@@ -13,11 +13,10 @@ import WebKit
 import Sentry
 import os.log
 
-// Note:  this needs to be kept separate from AppDelegate; unintended behavior
-// may result if one object implements both.  (Two separate instances of the same,
-// supposedly-singleton object!)
 /**
- Manages the visual user interface lifecycle of app instances.
+ * Manages the visual user interface lifecycle of app instances.
+ * 
+ * Note: this needs to be kept separate from AppDelegate 
  */
 class SceneDelegate: NSObject, UISceneDelegate {
   private var _overlayWindow: UIWindow?
