@@ -38,7 +38,7 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
     return Uint8Array.from(buffer);
   }
 
-  protected async loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
+  protected loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Keyboard {
     let script;
     try {
       script = new vm.Script(scriptSrc);
@@ -53,6 +53,6 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
 
     const keyboard = this.harness.loadedKeyboard;
     this.harness.loadedKeyboard = null;
-    return Promise.resolve(keyboard);
+    return keyboard;
   }
 }

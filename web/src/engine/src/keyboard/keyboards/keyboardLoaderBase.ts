@@ -69,10 +69,10 @@ export abstract class KeyboardLoaderBase {
     }
 
     // .js keyboard
-    return await this.loadKeyboardFromScript(script, errorBuilder);
+    return this.loadKeyboardFromScript(script, errorBuilder);
   }
 
   protected abstract loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array>;
 
-  protected abstract loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard>;
+  protected abstract loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Keyboard;
 }

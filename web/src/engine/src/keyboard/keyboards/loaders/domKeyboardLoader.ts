@@ -54,7 +54,7 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     return new Uint8Array(buffer);
   }
 
-  protected async loadKeyboardFromScript(script: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
+  protected loadKeyboardFromScript(script: string, errorBuilder: KeyboardLoadErrorBuilder): Keyboard {
     try {
       this.evalScriptInContext(script, this.harness._jsGlobal);
     } catch (e) {
