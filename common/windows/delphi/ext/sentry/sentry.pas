@@ -53,7 +53,7 @@ const
 
 const
   SENTRY_SDK_NAME = 'sentry.native';
-  SENTRY_SDK_VERSION = '0.6.0';
+  SENTRY_SDK_VERSION = '0.12.1';
   SENTRY_SDK_USER_AGENT = SENTRY_SDK_NAME + '/' + SENTRY_SDK_VERSION;
 
 {$IF DEFINED(MSWINDOWS)}
@@ -68,9 +68,9 @@ type
 // The library internally uses the system malloc and free functions to manage
 // memory.  It does not use realloc.  The reason for this is that on unix
 // platforms we fall back to a simplistic page allocator once we have
-// encountered a SIGSEGV or other terminating signal as malloc is no longer
+// encountered a SIGSEGV or another terminating signal as malloc is no longer
 // safe to use.  Since we cannot portably reallocate allocations made on the
-// pre-existing allocator we're instead not using realloc.
+// pre-existing allocator, we're instead not using realloc.
 //
 // Note also that after SIGSEGV sentry_free() becomes a noop.
 
@@ -97,6 +97,8 @@ type
     SENTRY_VALUE_TYPE_NULL = 0,
     SENTRY_VALUE_TYPE_BOOL,
     SENTRY_VALUE_TYPE_INT32,
+    SENTRY_VALUE_TYPE_INT64,
+    SENTRY_VALUE_TYPE_UINT64,
     SENTRY_VALUE_TYPE_DOUBLE,
     SENTRY_VALUE_TYPE_STRING,
     SENTRY_VALUE_TYPE_LIST,
@@ -110,12 +112,12 @@ type
 // so that alignment for the type can be properly determined.
 //
 // Values must be released with `sentry_value_decref`.  This lowers the
-// internal refcount by one.  If the refcount hits zero it's freed.  Some
-// values like primitives have no refcount (like null) so operations on
+// internal refcount by one.  If the refcount hits zero, it's freed.  Some
+// values like primitives have no refcount (like null), so operations on
 // those are no-ops.
 //
-// In addition values can be frozen.  Some values like primitives are always
-// frozen but lists and dicts are not and can be frozen on demand.  This
+// In addition, values can be frozen.  Some values like primitives are always
+// frozen, but lists and dicts are not and can be frozen on demand.  This
 // automatically happens for some shared values in the event payload like
 // the module list.
 //
@@ -178,6 +180,20 @@ function sentry_value_new_int32(
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
 //
+// Creates a new 64bit signed integer value.
+//
+function sentry_value_new_int64(
+  value: Int64
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
+//
+// Creates a new 64bit unsigned integer value.
+//
+function sentry_value_new_uint64(
+  value: UInt64
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
+//
 // Creates a new double value.
 //
 function sentry_value_new_double(
@@ -198,6 +214,11 @@ function sentry_value_new_string(
   value: PAnsiChar
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
+function sentry_value_new_string_n(
+  value: PAnsiChar;
+  value_len: Integer
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
 //
 // Create a new list value.
 //
@@ -207,6 +228,21 @@ function sentry_value_new_list: sentry_value_t; cdecl; external sentry_dll  dela
 // Creates a new object.
 //
 function sentry_value_new_object: sentry_value_t; cdecl; external sentry_dll  delayed;
+
+//
+// Creates a new user object.
+// Will return a sentry_value_new_null if all parameters are null.
+//
+// This DOES NOT set the user object, this should still be done with
+// sentry_set_user(), passing the return of this function as a parameter
+//
+function sentry_value_new_user(id: PAnsiChar;
+    username: PAnsiChar; email: PAnsiChar; ip_address: PAnsiChar
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+function sentry_value_new_user_n(id: PAnsiChar; id_len: Integer;
+    username: PAnsiChar; username_len: Integer; email: PAnsiChar;
+    email_len: Integer; ip_address: PAnsiChar; ip_address_len: Integer
+): sentry_value_t; cdecl; external sentry_dll  delayed;
 
 //
 // Returns the type of the value passed.
@@ -224,6 +260,13 @@ function sentry_value_get_type(
 function sentry_value_set_by_key(
   value: sentry_value_t;
   const k: PAnsiChar;
+  v: sentry_value_t
+): Integer; cdecl; external sentry_dll  delayed;
+
+function sentry_value_set_by_key_n(
+  value: sentry_value_t;
+  const k: PAnsiChar;
+  k_len: Integer;
   v: sentry_value_t
 ): Integer; cdecl; external sentry_dll  delayed;
 
@@ -270,7 +313,7 @@ function sentry_value_remove_by_index(
 ): Integer; cdecl; external sentry_dll  delayed;
 
 //
-// Looks up a value in a map by key.  If missing a null value is returned.
+// Looks up a value in a map by key. If missing, a null value is returned.
 // The returned value is borrowed.
 //
 function sentry_value_get_by_key(
@@ -278,14 +321,17 @@ function sentry_value_get_by_key(
   const k: PAnsiChar
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
+function sentry_value_get_by_key_n(
+  value: sentry_value_t;
+  const k: PAnsiChar;
+  k_len: Integer
+): sentry_value_t; cdecl; external sentry_dll  delayed;
 
 //
-
-// Looks up a value in a map by key.  If missing a null value is returned.
-
+// Looks up a value in a map by key. If missing, a null value is returned.
 // The returned value is owned.
 //
-// If the caller no longer needs the value it must be released with
+// If the caller no longer needs the value, it must be released with
 // `sentry_value_decref`.
 //
 function sentry_value_get_by_key_owned(
@@ -293,8 +339,14 @@ function sentry_value_get_by_key_owned(
   const k: PAnsiChar
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
+function sentry_value_get_by_key_owned_n(
+  value: sentry_value_t;
+  const k: PAnsiChar;
+  k_len: Integer
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
 //
-// Looks up a value in a list by index.  If missing a null value is returned.
+// Looks up a value in a list by index. If missing, a null value is returned.
 // The returned value is borrowed.
 //
 function sentry_value_get_by_index(
@@ -302,10 +354,10 @@ function sentry_value_get_by_index(
   index: size_t): sentry_value_t; cdecl; external sentry_dll  delayed;
 
 //
-// Looks up a value in a list by index.  If missing a null value is returned.
+// Looks up a value in a list by index. If missing, a null value is returned.
 // The returned value is owned.
 //
-// If the caller no longer needs the value it must be released with
+// If the caller no longer needs the value, it must be released with
 // `sentry_value_decref`.
 //
 function sentry_value_get_by_index_owned(
@@ -315,7 +367,7 @@ function sentry_value_get_by_index_owned(
 //
 // Returns the length of the given map or list.
 //
-// If an item is not a list or map the return value is 0.
+// If an item is not a list or map, the return value is 0.
 //
 function sentry_value_get_length(
   value: sentry_value_t
@@ -327,6 +379,20 @@ function sentry_value_get_length(
 function sentry_value_as_int32(
   value: sentry_value_t
 ): Integer; cdecl; external sentry_dll  delayed;
+
+//
+// Converts a value into a 64bit signed integer.
+//
+function sentry_value_as_int64(
+  value: sentry_value_t
+): Int64; cdecl; external sentry_dll  delayed;
+
+//
+// Converts a value into a 64bit unsigned integer.
+//
+function sentry_value_as_uint64(
+  value: sentry_value_t
+): UInt64; cdecl; external sentry_dll  delayed;
 
 //
 // Converts a value into a double value.
@@ -360,7 +426,7 @@ function sentry_value_is_null(
 // Serialize a sentry value to JSON.
 //
 // The string is freshly allocated and must be freed with
-// `sentry_string_free`.
+// `sentry_free`.
 //
 function sentry_value_to_json(
   value: sentry_value_t
@@ -370,6 +436,7 @@ function sentry_value_to_json(
 // Sentry levels for events and breadcrumbs.
 //
 type sentry_level_e = (
+    SENTRY_LEVEL_TRACE = -2,
     SENTRY_LEVEL_DEBUG = -1,
     SENTRY_LEVEL_INFO = 0,
     SENTRY_LEVEL_WARNING = 1,
@@ -400,14 +467,31 @@ function sentry_value_new_message_event(
   const text: PAnsiChar
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
+function sentry_value_new_message_event_n(
+  level: sentry_level_t;
+  const logger: PAnsiChar;
+  logger_len: Integer;
+  const text: PAnsiChar;
+  text_len: Integer
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
 //
 // Creates a new Breadcrumb with a specific type and message.
 //
 // See https://develop.sentry.dev/sdk/event-payloads/breadcrumbs/
 //
+// Either parameter can be NULL in which case no such attributes are created.
+//
 function sentry_value_new_breadcrumb(
   const _type: PAnsiChar;
   const message: PAnsiChar
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
+function sentry_value_new_breadcrumb_n(
+  const _type: PAnsiChar;
+  _type_len: Integer;
+  const message: PAnsiChar;
+  message_len: Integer
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
 //
@@ -427,6 +511,13 @@ function {SENTRY_EXPERIMENTAL_API} sentry_value_new_exception(
     const value: PAnsiChar
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
+function {SENTRY_EXPERIMENTAL_API} sentry_value_new_exception_n(
+    const _type: PAnsiChar;
+    _type_len: Integer;
+    const value: PAnsiChar;
+    value_len: Integer
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
 //
 // Creates a new Thread value.
 //
@@ -442,6 +533,12 @@ function {SENTRY_EXPERIMENTAL_API} sentry_value_new_thread(
     const name: PAnsiChar
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
+function {SENTRY_EXPERIMENTAL_API} sentry_value_new_thread_n(
+    id: UInt64;
+    const name: PAnsiChar;
+    name_len: Integer
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
 //
 // Creates a new Stack Trace conforming to the Stack Trace Interface.
 //
@@ -450,7 +547,7 @@ function {SENTRY_EXPERIMENTAL_API} sentry_value_new_thread(
 // The returned object needs to be attached to either an exception
 // event, or a thread object.
 //
-// If `ips` is NULL the current stack trace is captured, otherwise `len`
+// If `ips` is NULL, the current stack trace is captured. Otherwise, `len`
 // stack trace instruction pointers are attached to the event.
 //
 function {SENTRY_EXPERIMENTAL_API} sentry_value_new_stacktrace(
@@ -461,9 +558,9 @@ function {SENTRY_EXPERIMENTAL_API} sentry_value_new_stacktrace(
 //
 // Sets the Stack Trace conforming to the Stack Trace Interface in a value.
 //
-// The value argument must be either an exception or thread object.
+// The value argument must be either an exception or a thread object.
 //
-// If `ips` is NULL the current stack trace is captured, otherwise `len` stack
+// If `ips` is NULL the current stack trace is captured. Otherwise, `len` stack
 // trace instruction pointers are attached to the event.
 //
 procedure {SENTRY_EXPERIMENTAL_API} sentry_value_set_stacktrace(
@@ -498,7 +595,7 @@ procedure {SENTRY_EXPERIMENTAL_API} sentry_event_add_thread(
 // Serialize a sentry value to msgpack.
 //
 // The string is freshly allocated and must be freed with
-// `sentry_string_free`.  Since msgpack is not zero terminated
+// `sentry_free`. Since msgpack is not zero terminated,
 // the size is written to the `size_out` parameter.
 //
 function sentry_value_to_msgpack(
@@ -510,30 +607,29 @@ function sentry_value_to_msgpack(
 // Adds a stack trace to an event.
 //
 // The stack trace is added as part of a new thread object.
-// This function is **deprecated** in favor of using
-// `sentry_value_new_stacktrace` in combination with `sentry_value_new_thread`
-// and `sentry_event_add_thread`.
 //
-// If `ips` is NULL the current stack trace is captured, otherwise `len`
+// If `ips` is NULL, the current stack trace is captured. Otherwise, `len`
 // stack trace instruction pointers are attached to the event.
 //
+
 procedure sentry_event_value_add_stacktrace(
   event: sentry_value_t;
   ips: Pointer;
   len: Integer
 
 ); cdecl; external sentry_dll  delayed;
-
-
+deprecated 'Use `sentry_value_new_stacktrace` in combination with `sentry_value_new_thread` and `sentry_event_add_thread` instead'
 
 //
-// This represents the OS dependent user context in the case of a crash, and can
+// This represents the OS-dependent user context in the case of a crash and can
 // be used to manually capture a crash.
 //
 type
   sentry_ucontext_s = record
 {$IF DEFINED(MSWINDOWS)}
     exception_ptrs: EXCEPTION_POINTERS;
+{$ELSE IF DEFINED(SENTRY_PLATFORM_PS)}
+    data: Integer;
 {$ELSE}
     signum: Integer;
     siginfo: siginfo_t;
@@ -547,10 +643,14 @@ type
 //
 // Unwinds the stack from the given address.
 //
-// If the address is given in `addr` the stack is unwound form there.  Otherwise
-// (NULL is passed) the current instruction pointer is used as start address.
-// The stack trace is written to `stacktrace_out` with up to `max_len` frames
-// being written.  The actual number of unwound stackframes is returned.
+// If the address is given in `addr`, the stack is unwound from there.
+// Otherwise (NULL is passed), the current instruction pointer is used as
+// the start address.
+// Unwinding with a given `addr` is not supported on all platforms.
+//
+// The stack trace in the form of instruction-addresses is written to the
+// caller allocated `stacktrace_out`, with up to `max_len` frames being written.
+// The actual number of unwound stack frames is returned.
 //
 function sentry_unwind_stack(
   addr: Pointer;
@@ -561,8 +661,13 @@ function sentry_unwind_stack(
 //
 // Unwinds the stack from the given context.
 //
-// The stack trace is written to `stacktrace_out` with up to `max_len` frames
-// being written.  The actual number of unwound stackframes is returned.
+// The caller is responsible for constructing an appropriate
+// `sentry_ucontext_t`. Unwinding from a user context is not supported on all
+// platforms.
+//
+// The stack trace in the form of instruction-addresses is written to the
+// caller allocated `stacktrace_out`, with up to `max_len` frames being written.
+// The actual number of unwound stack frames is returned.
 //
 function sentry_unwind_stack_from_ucontext(
   const uctx: psentry_ucontext_t;
@@ -585,38 +690,43 @@ type
   psentry_uuid_t = ^sentry_uuid_t;
 
 //
-// Creates the nil uuid.
+// Creates the nil UUID.
 //
 function sentry_uuid_nil: sentry_uuid_t; cdecl; external sentry_dll  delayed;
 
 //
-// Creates a new uuid4.
+// Creates a new UUID4.
 //
 function sentry_uuid_new_v4: sentry_uuid_t; cdecl; external sentry_dll  delayed;
 
 //
-// Parses a uuid from a string.
+// Parses a UUID from a string.
 //
 function sentry_uuid_from_string(
   const str: PAnsiChar
 ): sentry_uuid_t; cdecl; external sentry_dll  delayed;
 
+function sentry_uuid_from_string_n(
+  const str: PAnsiChar;
+  str_len: Integer
+): sentry_uuid_t; cdecl; external sentry_dll  delayed;
+
 //
-// Creates a uuid from bytes.
+// Creates a UUID from bytes.
 //
 function sentry_uuid_from_bytes(
   const bytes: PAnsiChar // TODO check signature
 ): sentry_uuid_t; cdecl; external sentry_dll  delayed;
 
 //
-// Checks if the uuid is nil.
+// Checks if the UUID is nil.
 //
 function sentry_uuid_is_nil(
   const uuid: psentry_uuid_t
 ): Integer; cdecl; external sentry_dll  delayed;
 
 //
-// Returns the bytes of the uuid.
+// Returns the bytes of the UUID.
 //
 procedure sentry_uuid_as_bytes(
   const uuid: psentry_uuid_t;
@@ -624,7 +734,7 @@ procedure sentry_uuid_as_bytes(
 ); cdecl; external sentry_dll  delayed;
 
 //
-// Formats the uuid into a string buffer.
+// Formats the UUID into a string buffer.
 //
 procedure sentry_uuid_as_string(
   const uuid: psentry_uuid_t;
@@ -635,7 +745,7 @@ type
 //
 // A Sentry Envelope.
 //
-// The Envelope is an abstract type which represents a payload being sent to
+// The Envelope is an abstract type that represents a payload being sent to
 // sentry. It can contain one or more items, typically an Event.
 // See https://develop.sentry.dev/sdk/envelopes/
 //
@@ -649,6 +759,22 @@ type
 procedure sentry_envelope_free(
   envelope: sentry_envelope_t
 ); cdecl; external sentry_dll  delayed;
+
+//
+// Given an Envelope, returns the header if present.
+//
+// This returns a borrowed value to the headers in the Envelope.
+//
+function sentry_envelope_get_header(
+  const envelope: psentry_envelope_t;
+  const key: PAnsiChar
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
+function sentry_envelope_get_header_n(
+  const envelope: psentry_envelope_t;
+  const key: PAnsiChar;
+  key_len: Integer
+): sentry_value_t; cdecl; external sentry_dll  delayed;
 
 //
 // Given an envelope returns the embedded event if there is one.
@@ -671,7 +797,7 @@ function {SENTRY_EXPERIMENTAL_API} sentry_envelope_get_transaction(
 //
 // Serializes the envelope
 //
-// The return value needs to be freed with sentry_string_free().
+// The return value needs to be freed with `sentry_free`.
 //
 function sentry_envelope_serialize(
   const envelope: psentry_envelope_t;
@@ -681,7 +807,7 @@ function sentry_envelope_serialize(
 //
 // Serializes the envelope into a file.
 //
-// `path` is assumed to be in platform-specific filesystem path encoding.
+// `path` is assumed to be in a platform-specific filesystem path encoding.
 //
 // Returns 0 on success.
 //
@@ -689,6 +815,63 @@ function sentry_envelope_write_to_file(
   const envelope: psentry_envelope_t;
   const path: PAnsiChar
 ): Integer; cdecl; external sentry_dll  delayed;
+
+function sentry_envelope_write_to_file_n(
+  const envelope: psentry_envelope_t;
+  const path: PAnsiChar;
+  path_len: Integer
+): Integer; cdecl; external sentry_dll  delayed;
+
+//
+// De-serializes an envelope.
+//
+// The return value needs to be freed with sentry_envelope_free().
+//
+// Returns NULL on failure.
+//
+function sentry_envelope_deserialize(
+  buf: PAnsiChar;
+  buf_len: Integer
+): psentry_envelope_t; cdecl; external sentry_dll  delayed;
+
+//
+// De-serializes an envelope from a file.
+//
+// `path` is assumed to be in a platform-specific filesystem path encoding.
+//
+// API Users on windows are encouraged to use `sentry_envelope_read_from_filew`
+// instead.
+//
+function sentry_envelope_read_from_file(
+  path: PAnsiChar
+): psentry_envelope_t; cdecl; external sentry_dll  delayed;
+
+function sentry_envelope_read_from_file_n(
+  path: PAnsiChar;
+  path_len: Integer
+): psentry_envelope_t; cdecl; external sentry_dll  delayed;
+
+{$if defined(SENTRY_PLATFORM_WINDOWS)}
+//
+// Wide char versions of `sentry_envelope_read_from_file` and
+// `sentry_envelope_read_from_file_n`.
+//
+function sentry_envelope_read_from_filew(
+  path: PWideChar
+): psentry_envelope_t; cdecl; external sentry_dll  delayed;
+
+function sentry_envelope_read_from_filew_n(
+  path: PWideChar;
+  path_len: Integer
+): psentry_envelope_t; cdecl; external sentry_dll  delayed;
+{$endif}
+
+//
+// Submits an envelope, first checking for consent.
+//
+procedure sentry_capture_envelope(
+  envelope: psentry_envelope_t
+); cdecl; external sentry_dll  delayed;
 
 //
 // The Sentry Client Options.
@@ -709,14 +892,14 @@ type
 // Envelopes will be submitted to the transport in a _fire and forget_ fashion,
 // and the transport must send those envelopes _in order_.
 //
-// A transport has the following hooks, all of which
-// take the user provided `state` as last parameter. The transport state needs
-// to be set with `sentry_transport_set_state` and typically holds handles and
-// other information that can be reused across requests.
+// Transport has the following hooks, all of which
+// take the user-provided `state` as the last parameter. The transport state
+// needs to be set with `sentry_transport_set_state` and typically holds handles
+// and other information that can be reused across requests.
 //
-// * `send_func`: This function will take ownership of an envelope, and is
+// * `send_func`: This function will take ownership of an envelope and is
 //   responsible for freeing it via `sentry_envelope_free`.
-// * `startup_func`: This hook will be called by sentry inside of `sentry_init`
+// * `startup_func`: This hook will be called by sentry inside `sentry_init`
 //   and instructs the transport to initialize itself. Failures will bubble up
 //   to `sentry_init`.
 // * `shutdown_func`: Instructs the transport to flush its queue and shut down.
@@ -724,11 +907,11 @@ type
 //   return `true` when the transport was flushed and shut down successfully.
 //   In case of `false`, sentry will log an error, but continue with freeing the
 //   transport.
-// * `free_func`: Frees the transports `state`. This hook might be called even
+// * `free_func`: Frees the transport `state`. This hook might be called even
 //   though `shutdown_func` returned `false` previously.
 //
 // The transport interface might be extended in the future with hooks to flush
-// its internal queue without shutting down, and to dump its internal queue to
+// its internal queue without shutting down and to dump its internal queue to
 // disk in case of a hard crash.
 //
 type
@@ -744,7 +927,7 @@ type
   _sentry_transport_flush_func = function(timeout: UInt64; state: Pointer): Integer; cdecl;
 
 //
-// Creates a new transport with an initial `send_func`.
+// Creates transport with an initial `send_func`.
 //
 function sentry_transport_new(
     send_func: _sentry_transport_new_func
@@ -773,7 +956,7 @@ procedure sentry_transport_set_free_func(
 // Sets the transport startup hook.
 //
 // This hook is called from within `sentry_init` and will get a reference to the
-// options which can be used to initialize a transports internal state.
+// options which can be used to initialize transport internal state.
 // It should return `0` on success. A failure will bubble up to `sentry_init`.
 //
 procedure sentry_transport_set_startup_func(
@@ -808,7 +991,7 @@ procedure sentry_transport_set_shutdown_func(
 ); cdecl; external sentry_dll  delayed;
 
 //
-// Generic way to free a transport.
+// Generic way to free transport.
 //
 procedure sentry_transport_free(
     transport: psentry_transport_t
@@ -817,26 +1000,23 @@ procedure sentry_transport_free(
 //
 // Create a new function transport.
 //
-// It is a convenience function which works with a borrowed `data`, and will
-// automatically free the envelope, so the user provided function does not need
+// It is a convenience function that works with a borrowed `data`, and will
+// automatically free the envelope, so the user-provided function does not need
 // to do that.
-//
-// This function is *deprecated* and will be removed in a future version.
-// It is here for backwards compatibility. Users should migrate to the
-// `sentry_transport_new` API.
 //
 function sentry_new_function_transport(
     func: _sentry_transport_new_func;
     data: Pointer
 ): psentry_transport_t; cdecl; external sentry_dll  delayed;
+deprecated 'Use `sentry_transport_new` instead';
 
 //
 // This represents an interface for user-defined backends.
 //
-// Backends are responsible to handle crashes. They are maintained at runtime
+// Backends are responsible for handling crashes. They are maintained at runtime
 // via various life-cycle hooks from the sentry-core.
 //
-// At this point none of those interfaces are exposed in the API including
+// At this point none of those interfaces are exposed in the API, including
 // creation and destruction. The main use-case of the backend in the API at this
 // point is to disable it via `sentry_options_set_backend` at runtime before it
 // is initialized.
@@ -855,6 +1035,14 @@ type sentry_user_consent_t = (
     SENTRY_USER_CONSENT_UNKNOWN = -1,
     SENTRY_USER_CONSENT_GIVEN = 1,
     SENTRY_USER_CONSENT_REVOKED = 0
+);
+
+//
+// The crash handler strategy.
+//
+type sentry_handler_strategy_t = (
+    SENTRY_HANDLER_STRATEGY_DEFAULT = 0,
+    SENTRY_HANDLER_STRATEGY_CHAIN_AT_START = 1
 );
 
 //
@@ -878,17 +1066,38 @@ procedure sentry_options_set_transport(
   transport: psentry_transport_t
 ); cdecl; external sentry_dll  delayed;
 
+{$if defined(SENTRY_PLATFORM_NX)}
+//
+// Function to start a network connection.
+// This is called on a background thread, so it must be thread-safe.
+//
+procedure sentry_options_set_network_connect_func(
+  opts: psentry_options_t;
+  network_connect_func: pointer // TODO: should be pointer to function
+); cdecl; external sentry_dll  delayed;
+
+//
+// If false (the default), the SDK won't add PII or other sensitive data to the
+// payload. For example, a pseudo-random identifier combining device and app ID.
+//
+procedure sentry_options_set_send_default_pii(
+  opts: psentry_options_t;
+  value: Integer
+); cdecl; external sentry_dll  delayed;
+
+{$endif}
+
 //
 // Type of the `before_send` callback.
 //
 // The callback takes ownership of the `event`, and should usually return that
 // same event. In case the event should be discarded, the callback needs to
-// call `sentry_value_decref` on the provided event, and return a
+// call `sentry_value_decref` on the provided event and return a
 // `sentry_value_new_null()` instead.
 //
-// This function may be invoked inside of a signal handler and must be safe for
+// This function may be invoked inside a signal handler and must be safe for
 // that purpose, see https://man7.org/linux/man-pages/man7/signal-safety.7.html.
-// On Windows, it may be called from inside of a `UnhandledExceptionFilter`, see
+// On Windows, it may be called from inside a `UnhandledExceptionFilter`, see
 // the documentation on SEH (structured exception handling) for more information
 // https://docs.microsoft.com/en-us/windows/win32/debug/structured-exception-handling
 //
@@ -896,7 +1105,7 @@ type
   sentry_event_function_t = function(
     event: sentry_value_t;
     hint: Pointer;
-    closure: Pointer
+    user_data: Pointer
   ): sentry_value_t; cdecl;
 
 //
@@ -907,7 +1116,7 @@ type
 procedure sentry_options_set_before_send(
   opts: psentry_options_t;
   func: sentry_event_function_t;
-  data: Pointer
+  user_data: Pointer
 ); cdecl; external sentry_dll  delayed;
 
 //
@@ -915,16 +1124,19 @@ procedure sentry_options_set_before_send(
 //
 // The `on_crash` callback replaces the `before_send` callback for crash events.
 // The interface is analogous to `before_send` in that the callback takes
-// ownership of the `event`, and should usually return that same event. In case
+// ownership of the `event` and should usually return that same event. In case
 // the event should be discarded, the callback needs to call
-// `sentry_value_decref` on the provided event, and return a
+// `sentry_value_decref` on the provided event and return a
 // `sentry_value_new_null()` instead.
 //
-// Only the `inproc` backend currently fills the passed-in event with useful
-// data and processes any modifications to the return value. Since both
-// `breakpad` and `crashpad` use minidumps to capture the crash state, the
-// passed-in event is empty when using these backends, and they ignore any
-// changes to the return value.
+// Only the `inproc` backend currently fills the passed-in event with crash
+// meta-data. Since both `breakpad` and `crashpad` use minidumps to capture the
+// crash state, the passed-in event is empty when using these backends. Changes
+// to the event from inside the hooks will be passed along, but in the case of
+// the minidump backends these changes might get overwritten during server-side
+// ingestion and processing. This primarily affects the exception payloads which
+// are auto-generated from the minidump content. See
+// https://github.com/getsentry/sentry-native/issues/1147 for details.
 //
 // If you set this callback in the options, it prevents a concurrently enabled
 // `before_send` callback from being invoked in the crash case. This allows for
@@ -942,9 +1154,9 @@ procedure sentry_options_set_before_send(
 //    `on_crash` callback with the option to filter (on all backends) or enrich
 //    (only inproc) the crash event
 //
-// This function may be invoked inside of a signal handler and must be safe for
+// This function may be invoked inside a signal handler and must be safe for
 // that purpose, see https://man7.org/linux/man-pages/man7/signal-safety.7.html.
-// On Windows, it may be called from inside of a `UnhandledExceptionFilter`, see
+// On Windows, it may be called from inside a `UnhandledExceptionFilter`, see
 // the documentation on SEH (structured exception handling) for more information
 // https://docs.microsoft.com/en-us/windows/win32/debug/structured-exception-handling
 //
@@ -953,15 +1165,15 @@ procedure sentry_options_set_before_send(
 //  - does not work with crashpad on macOS.
 //  - for breakpad on Linux the `uctx` parameter is always NULL.
 //  - on Windows the crashpad backend can capture fast-fail crashes which
-// by-pass SEH. Since `on_crash` is called by a local exception-handler, it will
-// not be invoked when such a crash happened, even though a minidump will be
-// sent.
+//    bypass SEH. Since `on_crash` is called by a local exception-handler, it
+//    will not be invoked when such a crash happened, even though a minidump
+//    will be sent.
 //
 type
   sentry_crash_function_t = function(
     const uctx: psentry_ucontext_t;
     event: sentry_value_t;
-    closure: Pointer
+    user_data: Pointer
   ): sentry_value_t; cdecl;
 
 //
@@ -980,7 +1192,13 @@ procedure {SENTRY_API} sentry_options_set_on_crash(
 //
 procedure sentry_options_set_dsn(
   opts: psentry_options_t;
-  const dns: PAnsiChar
+  const dsn: PAnsiChar
+); cdecl; external sentry_dll  delayed;
+
+procedure sentry_options_set_dsn_n(
+  opts: psentry_options_t;
+  const dsn: PAnsiChar;
+  dsn_length: Integer
 ); cdecl; external sentry_dll  delayed;
 
 //
@@ -1015,6 +1233,12 @@ procedure sentry_options_set_release(
   const release: PAnsiChar
 ); cdecl; external sentry_dll  delayed;
 
+procedure sentry_options_set_release_n(
+  opts: psentry_options_t;
+  const release: PAnsiChar;
+  release_len: Integer
+); cdecl; external sentry_dll  delayed;
+
 //
 // Gets the release.
 //
@@ -1029,6 +1253,15 @@ procedure sentry_options_set_environment(
   opts: psentry_options_t;
   const environment: PAnsiChar
 ); cdecl; external sentry_dll  delayed;
+
+procedure sentry_options_set_environment_n(
+  opts: psentry_options_t;
+  const environment: PAnsiChar;
+  environment_n: Integer
+); cdecl; external sentry_dll  delayed;
+
+//---UPDATED TO HERE FOR 0.12.1---
+//https://github.com/getsentry/sentry-native/compare/0.6.0...0.12.1#diff-9c77242571e813d699b88663fdc7d7ad7bb5b481a3c1af8d34e1a9e242cbf076R1136
 
 //
 // Gets the environment.

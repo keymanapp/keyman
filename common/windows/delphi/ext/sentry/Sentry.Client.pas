@@ -333,7 +333,7 @@ destructor TSentryClient.Destroy;
 begin
   FInstance := nil;
   if FSentryInit then
-    sentry_shutdown;
+    sentry_close;
   FSentryInit := False;
   if FVectoredExceptionHandler <> nil then
     RemoveVectoredExceptionHandler(FVectoredExceptionHandler);
@@ -346,7 +346,7 @@ end;
 ///
 procedure TSentryClient.DoTerminate;
 begin
-  sentry_shutdown;
+  sentry_close;
   ExitProcess(1);
 end;
 
