@@ -71,7 +71,7 @@ The following parameters are available:
 
 : Generate a wordlist lexical model project
 
-`kmc copy origin -o target`
+`kmc copy [options] <origin> <id>`
 
 : Copy and rename a keyboard project
 
@@ -507,13 +507,16 @@ folder, and the files in that folder will follow the
 
 ## `kmc convert` options
 
-Converts keyboard source files between formats e.g. .keylayout -> .kmn keeping the original name and saving the output with new extention 
+Converts keyboard source files between formats e.g. .keylayout -> .kmn keeping the original name and saving the output with new extention
 
 `-p, --out-path <filename>`
 
 : The target folder to write the copied project.
 
 ## `kmc copy` options
+
+Pass `<origin>` and `<id>` parameters. The target `<id>` will be created as a
+folder in the output path.
 
 Copies a keyboard or lexical model project, renaming files matching the original
 project ID according to the output filename. Can copy projects from the
@@ -535,9 +538,14 @@ following sources:
 
 `-o, --out-path <filename>`
 
-: The target folder to write the copied project. The folder must not exist.
-  The folder basename will become the ID of the new project, so the .kpj,
-  .kps, .kmn and similar files will be renamed to match that ID.
+: The target folder to write the copied project. The folder may exist. If
+  omitted, the current folder will be used. The target `<id>` will be created as
+  a folder in the output path (and this subfolder must not already exist).
+
+  Deprecation note: if `<id>` is not passed as a separate parameter, the folder
+  basename will become the ID of the new project, so the .kpj, .kps, .kmn and
+  similar files will be renamed to match that ID. This mode will be removed
+  in a future version.
 
 `-n, --dry-run`
 

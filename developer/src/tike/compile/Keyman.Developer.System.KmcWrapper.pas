@@ -107,26 +107,43 @@ begin
   Result := Run(cmdline, ExtractFileDir(infile), infile, Callback);
 end;
 
+{*
+ * Copy a project (with file renaming) using 'kmc copy'
+ *
+ * @param source              The project to copy from - a folder or a .kpj filename
+ * @param dest                The project file to copy to, must be in form of 'C:\some\path\project\project.kpj'.
+ * @param cwd                 The current folder for running the command
+ * @param relocateExternal    If true, use --relocate-external
+ * @param Callback            Logging callback
+ *}
 function TKmcWrapper.Copy(const source, dest, cwd: string;
   relocateExternal: Boolean;
   Callback: TUtilExecuteCallbackEvent): Boolean;
 var
-  destFilename, destPath: string;
+  outPath, destFilename, destPath: string;
   cmdline: TArray<string>;
 begin
+  // We should be passed a single path, e.g. 'C:\some\path\project\project.kpj'.
+  // We need to split it to pass the following to kmc:
+  // * outPath: 'C:\some\path'
+  // * destFilename: 'project'
+
   if not dest.EndsWith('.kpj') then
     raise Exception.Create('Invalid destination "'+dest+'" for TKmcWrapper.copy: must be a filename ending in .kpj');
+
   destFilename := ChangeFileExt(ExtractFileName(dest), '');
   destPath := ExtractFileDir(dest);
+  outPath := ExtractFileDir(destPath);
+
   if ExtractFileName(destPath) <> destFilename then
     raise Exception.Create('Invalid destination "'+dest+'" for TKmcWrapper.copy: filename must match target folder name');
 
   cmdline := [
     'copy',
-    '--out-path', destPath,
+    '--out-path', outPath,
     '--log-format', 'tsv',
     '--log-level', 'info',
-    source
+    source, destFilename
   ];
 
   if relocateExternal then
