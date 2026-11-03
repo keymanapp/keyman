@@ -59,7 +59,7 @@ class Constants {
   /**
    * The current CLDR version
    */
-  readonly cldr_version_latest = '46';
+  readonly cldr_version_latest = '49';
   /**
    * The version for testdata files
    */
@@ -582,8 +582,8 @@ class Constants {
   }
 };
 
-/** There's no data or DTD change in 45, 46, 46.1, 47 so map them all to 46 at present. */
-const cldrTreatAsLatest: Set<string> = new Set(['45', '46.1', '47']);
+/** There's no incompatible DTD change in 45+ so map them all to current at present. */
+const cldrTreatAsLatest: Set<string> = new Set(['45', '46.1', '47', '48', '48.1', '48.2', '48.3', '49']);
 
 export const constants = new Constants();
 

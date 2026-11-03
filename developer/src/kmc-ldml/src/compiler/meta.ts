@@ -67,6 +67,12 @@ export class MetaCompiler extends SectionCompiler {
                                                  {compileContext: this.keyboard3.version});
     result.settings =
       (this.keyboard3.settings?.normalization == "disabled" ? KeyboardSettings.normalizationDisabled : 0);
+    if (this.keyboard3.info?.attribution) {
+      this.callbacks.debug(`meta: Ignored value attribution=${this.keyboard3.info?.attribution}`);
+    }
+    if (this.keyboard3.draft) {
+      this.callbacks.debug(`meta: Ignored value draft=${this.keyboard3.draft}`);
+    }
     return result;
   }
 }
