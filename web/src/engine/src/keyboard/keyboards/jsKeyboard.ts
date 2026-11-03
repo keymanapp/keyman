@@ -123,9 +123,9 @@ export class JSKeyboard implements Keyboard {
    */
   get variableStores(): VariableStores {
     const storeNames = this.scriptObject['KVS'];
-    let values: VariableStores = {};
+    const values: VariableStores = {};
     if(Array.isArray(storeNames)) {
-      for(let store of storeNames) {
+      for(const store of storeNames) {
         values[store] = this.scriptObject[store];
       }
     }
@@ -143,7 +143,7 @@ export class JSKeyboard implements Keyboard {
   set variableStores(values: VariableStores) {
     const storeNames = this.scriptObject['KVS'];
     if(Array.isArray(storeNames)) {
-      for(let store of storeNames) {
+      for(const store of storeNames) {
         // If the value is not present in the cache, don't overwrite it;
         // while this is not used in initial implementation, we could use
         // it in future to update a single variable store value rather than
@@ -292,7 +292,7 @@ export class JSKeyboard implements Keyboard {
     }
 
     // Only exists in KMW 10.0+, but before that Web had no chirality support, so... return false.
-    let layers = this._legacyLayoutSpec['KLS'];
+    const layers = this._legacyLayoutSpec['KLS'];
     if(!layers) {
       return false;
     }
@@ -337,7 +337,7 @@ export class JSKeyboard implements Keyboard {
   }
 
   get usesSupplementaryPlaneChars(): boolean {
-    let kbd = this.scriptObject;
+    const kbd = this.scriptObject;
     // I3319 - SMP extension, I3363 (Build 301)
     return kbd && ((kbd['KS'] && kbd['KS'] == 1) || kbd['KN'] == 'Hieroglyphic');
   }
@@ -414,7 +414,7 @@ export class JSKeyboard implements Keyboard {
     // Final check - do we construct a layout, or is this a case where helpText / insertHelpHTML should take over?
     if(rawSpecifications) {
       // Now to generate a layout from our raw specifications.
-      let layout: TouchLayoutSpec = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this, formFactor);
+      const layout: TouchLayoutSpec = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this, formFactor);
       layout.isDefault = true;
       return layout;
     } else {
@@ -431,7 +431,7 @@ export class JSKeyboard implements Keyboard {
    * @param formFactor {string} The desired form factor for the layout.
    */
   public layout(formFactor: DeviceSpec.FormFactor): ActiveLayout {
-    let rawLayout = this.findOrConstructLayout(formFactor);
+    const rawLayout = this.findOrConstructLayout(formFactor);
 
     if(rawLayout) {
       // Prevents accidentally reprocessing layouts; it's a simple enough check.
@@ -449,9 +449,9 @@ export class JSKeyboard implements Keyboard {
   }
 
   public refreshLayouts() {
-    let formFactors = [ DeviceSpec.FormFactor.Desktop, DeviceSpec.FormFactor.Phone, DeviceSpec.FormFactor.Tablet ];
+    const formFactors = [ DeviceSpec.FormFactor.Desktop, DeviceSpec.FormFactor.Phone, DeviceSpec.FormFactor.Tablet ];
 
-    let _this = this;
+    const _this = this;
 
     formFactors.forEach(function(form) {
       _this.layoutStates[form] = LayoutState.NOT_LOADED;

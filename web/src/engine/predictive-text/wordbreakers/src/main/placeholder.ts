@@ -14,7 +14,7 @@ export function placeholder(phrase: string): LexicalModelTypes.Span[] {
   let nextStart = 0;
   return phrase.split(/\s+/).map(utterance => {
     // XXX: The indices are NOT accurate to the original phrase!
-    let span = {
+    const span = {
       start: nextStart,
       end: nextStart + utterance.length,
       text: utterance,

@@ -39,17 +39,17 @@ var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker});
 
 function toToken(text: string) {
-  let isWhitespace = text == ' ';
-  let token = ContextToken.fromRawText(plainModel, text);
+  const isWhitespace = text == ' ';
+  const token = ContextToken.fromRawText(plainModel, text);
   token.isWhitespace = isWhitespace;
   return token;
 }
 
 let TOKEN_TRANSFORM_SEED = 0;
 function toTransitionToken(text: string, transitionId?: number) {
-  let idSeed = transitionId === undefined ? TOKEN_TRANSFORM_SEED++ : transitionId;
-  let isWhitespace = text == ' ';
-  let token = ContextToken.fromRawText(plainModel, '');
+  const idSeed = transitionId === undefined ? TOKEN_TRANSFORM_SEED++ : transitionId;
+  const isWhitespace = text == ' ';
+  const token = ContextToken.fromRawText(plainModel, '');
   const textAsTransform = { insert: text, deleteLeft: 0, id: idSeed };
   token.addInput({
     segment: {
@@ -95,7 +95,7 @@ describe('ContextTokenization', function() {
   describe("<constructor>", () => {
     it("constructs from just a token array", () => {
       const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-      let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
+      const tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
       assert.isNotOk(tokenization.transitionEdits);
@@ -110,7 +110,7 @@ describe('ContextTokenization', function() {
 
       // We _could_ flesh this out a bit more... but it's not really needed for this test.
       const edgeWindow = buildEdgeWindow(tokens, emptyTransform, false, testEdgeWindowSpec);
-      let transitionEdits: TransitionEdge = {
+      const transitionEdits: TransitionEdge = {
         alignment: {
           merges: [],
           splits: [],
@@ -126,7 +126,7 @@ describe('ContextTokenization', function() {
         inputSubsetId: generateSubsetId()
       };
 
-      let tokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
+      const tokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
 
       assert.deepEqual(tokenization.tokens.map((entry) => entry.exampleInput), rawTextTokens);
       assert.deepEqual(tokenization.tokens.map((entry) => entry.isWhitespace), rawTextTokens.map((entry) => entry == ' '));
@@ -147,7 +147,7 @@ describe('ContextTokenization', function() {
 
       // We _could_ flesh this out a bit more... but it's not really needed for this test.
       const edgeWindow = buildEdgeWindow(tokens, emptyTransform, false, testEdgeWindowSpec);
-      let transitionEdits: TransitionEdge = {
+      const transitionEdits: TransitionEdge = {
         alignment: {
           merges: [],
           splits: [],
@@ -163,8 +163,8 @@ describe('ContextTokenization', function() {
         inputSubsetId: generateSubsetId()
       };
 
-      let baseTokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
-      let cloned = new ContextTokenization(baseTokenization);
+      const baseTokenization = new ContextTokenization(tokens, transitionEdits, null /* dummy val */);
+      const cloned = new ContextTokenization(baseTokenization);
 
       assert.sameOrderedMembers(
         cloned.tokens.map((token) => token.searchModule),
@@ -185,7 +185,7 @@ describe('ContextTokenization', function() {
 
   it('exampleInput', () => {
     const rawTextTokens = ['an', ' ', 'apple', ' ', 'a', ' ', 'day'];
-    let tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
+    const tokenization = new ContextTokenization(rawTextTokens.map((text => toToken(text))));
 
     assert.deepEqual(tokenization.exampleInput, rawTextTokens);
   });
@@ -573,8 +573,8 @@ describe('ContextTokenization', function() {
         targetTokens
       );
       const tailIndex = tokenization.tokens.length - 1;
-      for(let i of inputTransformMap.keys()) {
-        let transform = {...inputTransformMap.get(i)};
+      for(const i of inputTransformMap.keys()) {
+        const transform = {...inputTransformMap.get(i)};
         if(i > -2) {
           // If of a greater index, we erased the old token; the deleteLeft
           // was applied there, not to its replacement.
@@ -646,8 +646,8 @@ describe('ContextTokenization', function() {
       }]);
 
       const tailIndex = tokenization.tokens.length - 1;
-      for(let i of inputTransformMap.keys()) {
-        let transform = {...inputTransformMap.get(i)};
+      for(const i of inputTransformMap.keys()) {
+        const transform = {...inputTransformMap.get(i)};
         if(i > -2) {
           // If of a greater index, we erased the old token; the deleteLeft
           // was applied there, not to its replacement.
@@ -699,8 +699,8 @@ describe('ContextTokenization', function() {
       );
 
       const tailIndex = tokenization.tokens.length - 1;
-      for(let i of inputTransformMap.keys()) {
-        let transform = {...inputTransformMap.get(i)};
+      for(const i of inputTransformMap.keys()) {
+        const transform = {...inputTransformMap.get(i)};
         if(i > -1) {
           // If of a greater index, we erased the old token; the deleteLeft
           // was applied there, not to its replacement.

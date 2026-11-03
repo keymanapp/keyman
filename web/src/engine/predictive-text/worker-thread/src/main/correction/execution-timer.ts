@@ -299,7 +299,7 @@ export class ExecutionTimer {
   get executionTime(): number {
     const buckets = Object.values(this.buckets);
     let total = 0;
-    for(let bucket of buckets) {
+    for(const bucket of buckets) {
       total += bucket.timeSpent;
     }
 
@@ -316,7 +316,7 @@ export class ExecutionTimer {
     const buckets = Object.values(this.buckets);
     let total = 0;
 
-    for(let bucket of buckets) {
+    for(const bucket of buckets) {
       total += bucket.outlierTime;
     }
 

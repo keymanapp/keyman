@@ -23,16 +23,16 @@ describe("GesturePath", function() {
   // other automated tests for the module.
   describe("canary tests: serialization & deserialization", function() {
     it('from fixture', () => {
-      let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/simple_ne_move.json`, 'utf-8');
-      let fullSerializedJSON = JSON.parse(testJSONtext);
-      let rawPathObject = fullSerializedJSON.inputs[0].path;
+      const testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/simple_ne_move.json`, 'utf-8');
+      const fullSerializedJSON = JSON.parse(testJSONtext);
+      const rawPathObject = fullSerializedJSON.inputs[0].path;
 
       if(rawPathObject.segments) {
         // Left-over fixture data from before we removed subsegmentation.
         delete rawPathObject.segments;
       }
 
-      let reconstructedPath = GestureDebugPath.deserialize(rawPathObject);
+      const reconstructedPath = GestureDebugPath.deserialize(rawPathObject);
       assert.isFalse(reconstructedPath.wasCancelled);
 
       assert.sameDeepOrderedMembers([].concat(reconstructedPath.coords), rawPathObject.coords);
@@ -50,8 +50,8 @@ describe("GesturePath", function() {
         t: 0
       };
 
-      let path = new GestureDebugPath();
-      let turtle = new TouchpathTurtle(initialSample);
+      const path = new GestureDebugPath();
+      const turtle = new TouchpathTurtle(initialSample);
       turtle.on('sample', (sample) => path.extend(sample));
 
       turtle.move(90, 2, 20, 2);

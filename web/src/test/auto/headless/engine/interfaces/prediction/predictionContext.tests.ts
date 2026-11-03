@@ -88,7 +88,7 @@ describe("PredictionContext", () => {
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
 
-    let textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
+    const textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
     const initialTextStore = SyntheticTextStore.from(textStore);
     const promise = predictiveContext.setCurrentTextStore(textStore);
 
@@ -107,7 +107,7 @@ describe("PredictionContext", () => {
     assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 0));
 
     textStore.insertTextBeforeCaret('e'); // appl| + e = apple
-    let transcription = textStore.buildTranscriptionFrom(initialTextStore, null, true);
+    const transcription = textStore.buildTranscriptionFrom(initialTextStore, null, true);
     await langProcessor.predict(transcription, dummiedGetLayer());
 
     // First predict call results:  our second set of dummy suggestions, the first of which includes
@@ -127,7 +127,7 @@ describe("PredictionContext", () => {
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
 
-    let textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
+    const textStore = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
     const initialTextStore = SyntheticTextStore.from(textStore);
     const promise = predictiveContext.setCurrentTextStore(textStore);
 
@@ -203,7 +203,7 @@ describe("PredictionContext", () => {
 
     const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
-    let textState = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
+    const textState = new SyntheticTextStore("appl", 4); // "appl|", with '|' as the caret position.
 
     await predictiveContext.setCurrentTextStore(textState);
 
@@ -214,7 +214,7 @@ describe("PredictionContext", () => {
 
     let previousTextState = SyntheticTextStore.from(textState);
     textState.insertTextBeforeCaret('e'); // appl| + e = apple
-    let transcription = textState.buildTranscriptionFrom(previousTextState, null, true);
+    const transcription = textState.buildTranscriptionFrom(previousTextState, null, true);
     await langProcessor.predict(transcription, dummiedGetLayer());
 
     // Verify setup.
