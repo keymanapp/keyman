@@ -137,15 +137,20 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
     // Keyman keyboard is being selected for first time in active process.
     // keyman32.dll may already be in memory, having been loaded by kmtip.dll or
     // other API callers. So we need to make sure that we initialize only after
-    // Keyman itself has been initialized from the controller process
+    // Keyman itself has been initialized from the controller process.
     //
-    // Note: we check `get_Keyman_Initialised()` here rather than in
-    // `InitProcess()` itself, so that the call to `InitProcess()` from
-    // `Keyman_Initialise()` can finish before `Keyman_Initialised` is set to
-    // TRUE.
-    if(!Globals::get_Keyman_Initialised() || !InitProcess()) {
+    // Note: we do not want to call `InitProcess()` unless the global
+    // `Keyman_Initialise()` call has already completed.
+    if(!Globals::get_Keyman_Initialised()) {
       // I2435 - Prevent Keyman from re-initialising when it is shutting down  // I3253   // I3532
       return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+    }
+
+    if(!InitProcess()) {
+      // InitProcess() is hopefully unlikely to fail; if it does, we may not
+      // be able to log an error, but we'll try.
+      SendDebugMessageFormat("InitProcess failed after Keyman was initialized (error=%d)", GetLastError());
+      return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
     }
   }
 
