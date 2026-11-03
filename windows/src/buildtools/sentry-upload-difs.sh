@@ -10,7 +10,7 @@
 #
 # This script also uploads sourcemap data for Desktop configuration pages.
 #
-# Prerequisites: SENTRY_AUTH_TOKEN, SENTRY_URL, SENTRY_ORG variables must
+# Prerequisites: SENTRY_AUTH_TOKEN, SENTRY_ORG variables must
 # be configured.
 #
 
