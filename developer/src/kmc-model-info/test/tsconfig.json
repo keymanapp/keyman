@@ -7,7 +7,6 @@
       "outDir": "../build/test",
       "esModuleInterop": true,
       "allowSyntheticDefaultImports": true,
-      "baseUrl": ".",
   },
   "include": [
       "**/*.tests.ts",

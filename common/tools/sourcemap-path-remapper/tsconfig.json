@@ -13,7 +13,6 @@
     "target": "es6",
     "types": ["node"],
     "downlevelIteration": true,
-    "baseUrl": "./",
     "outDir": "build/",
     "tsBuildInfoFile": "build/tsconfig.tsbuildinfo",
     "rootDir": "./src/"

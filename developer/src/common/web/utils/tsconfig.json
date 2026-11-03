@@ -4,7 +4,6 @@
   "compilerOptions": {
       "rootDir": ".",
       "outDir": "./build/",
-      "baseUrl": ".",
 
       /** for ttfmeta */
       "allowJs": true,
