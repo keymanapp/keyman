@@ -125,7 +125,7 @@ BOOL IsSysTrayWindow(HWND hwnd);
 #define ShowDlgItem(hdlg, id, fShow ) ShowWindow( GetDlgItem( (hdlg), (id) ), (fShow) ? SW_SHOW : SW_HIDE )
 #define EnableDlgItem(hdlg, id, fEnable ) EnableWindow( GetDlgItem( (hdlg), (id) ), (fEnable) )
 
-BOOL InitialiseProcess();
+BOOL InitProcess();
 BOOL UninitialiseProcess(BOOL Lock);
 
 BOOL IsFocusedThread();
