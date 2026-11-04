@@ -119,9 +119,24 @@ export class LMLayerWorker {
   }
 
   public error(message: string, error?: any) {
-    // error isn't a fan of being cloned across the worker boundary.
+    // Error is not a transferable object, so extract relevant properties:
+    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects
     this.cast('error', {
       log: message,
+      error: (error && error.stack) ? error.stack : undefined
+    });
+  }
+
+  public modelError(message: string, url: string, error?: any) {
+    // TODO: we may use this in the future to provide more details to the
+    //       user when the error occurs in a model rather than in our code.
+    // For now, we capture at least the URL of the model we attempted to load.
+
+    // Error is not a transferable object, so extract relevant properties:
+    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Transferable_objects
+    this.cast('error', {
+      log: message,
+      url,
       error: (error && error.stack) ? error.stack : undefined
     });
   }
@@ -266,10 +281,10 @@ export class LMLayerWorker {
     // If built correctly, the model's script file will auto-register the model with loadModel() above.
     try {
       this._importScripts(url);
-    } catch (err) {
+    } catch (err: any) {
       // Does not catch errors thrown within the imported script.
       // Does catch errors with the model script's file-path.
-      this.error(`Error occurred when attempting to load dictionary at '${url}'`, err);
+      this.modelError((err?.message ?? `Unknown error`), url, err);
 
       // Remain in the model-unloaded state; the load attempt was unsuccessful.
     }

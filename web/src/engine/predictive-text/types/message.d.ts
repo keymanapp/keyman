@@ -39,6 +39,7 @@ type OutgoingMessage = ErrorMessage | ReadyMessage | SuggestionMessage | Current
 interface ErrorMessage {
   message: 'error';
   error?: any;
+  url?: string;
   log: string;
 }
 
