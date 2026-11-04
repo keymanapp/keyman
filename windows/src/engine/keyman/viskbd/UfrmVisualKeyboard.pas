@@ -297,7 +297,6 @@ const
 procedure TfrmVisualKeyboard.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
-  ResetShiftStates; // I1144
   Action := caFree;
 end;
 
@@ -620,6 +619,7 @@ end;
 procedure TfrmVisualKeyboard.FormDestroy(Sender: TObject);
 begin
   SaveSettings;
+  ResetShiftStates;
 
   FreeAndNil(FOnScreenKeyboard);
   FreeAndNil(FCharacterMap);
