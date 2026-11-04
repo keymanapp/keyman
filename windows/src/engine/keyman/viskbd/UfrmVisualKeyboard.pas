@@ -627,8 +627,6 @@ begin
   FreeAndNil(FFontHelper);
 
   cmi := nil;
-
-  Application.OnMessage := nil;
 end;
 
 function TfrmVisualKeyboard.FormHelp(Command: Word; Data: NativeInt; var CallHelp: Boolean): Boolean;
@@ -1398,7 +1396,16 @@ end;
 
 procedure TfrmVisualKeyboard.MnuOSK_Close(Sender: TObject);
 begin
-  PostMessage(frmKeyman7Main.Handle, WM_USER_VisualKeyboardClosed, 0, 0);   // I4242
+  // If the user closes the OSK from the X button in the OSK toolbar, it is
+  // appropriate to pop the 'OSK was closed' hint (assuming hints are enabled),
+  // because the user may not know how to find the OSK again. This is the only
+  // way in which the 'OSK was closed' hint is popped.
+  //
+  // Note that if the user double-clicks the Keyman icon, presses the OSK
+  // hotkey, or selects the On Screen Keyboard menu item(s) from the Keyman
+  // menu, the hint is deliberately not shown, as in those cases the user can
+  // simply repeat the action to show the OSK again.
+  PostMessage(frmKeyman7Main.Handle, WM_USER_VisualKeyboardClosed, 0, 0);   // I4242; request 'OSK was closed' hint
   Close;
 end;
 
