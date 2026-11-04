@@ -205,11 +205,13 @@ export class LMLayer {
   private onMessage(event: MessageEvent): void {
     const payload: OutgoingMessage = event.data;
     if (payload.message === 'error') {
-      if (payload.error) {
-        console.error(`${payload.log}\n${payload.error}`);
-      } else {
-        console.error(payload.log);
-      }
+      // if (payload.url) {
+        // TODO: do we want to make model errors more visible to end users?
+      // }
+      let message = payload.log;
+      if(payload.url) message += `\n${payload.url}`;
+      if(payload.error) message += `\n${payload.error}`;
+      console.error(message);
     }
     else if (payload.message === 'ready') {
       this._declareLMLayerReady(event.data.configuration);
