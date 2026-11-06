@@ -525,7 +525,7 @@ begin
   finally
     Free;
   end;
-  if Assigned(frmVisualKeyboard) then // I1096 - silent exception when Keyman closes
+  if VisualKeyboardVisible then // I1096 - silent exception when Keyman closes
   begin
     FreeAndNil(frmVisualKeyboard);  // I2692
   end;
@@ -678,7 +678,7 @@ begin
   end
   else if Message.Msg = WM_FONTCHANGE then  // 1374 - Support font helper
   begin
-    if Assigned(frmVisualKeyboard) then
+    if VisualKeyboardVisible then
       frmVisualKeyboard.Dispatch(Message);
     Result := False;
   end
@@ -1448,7 +1448,7 @@ begin
     UpdateOSKVisibility;
   end;
 
-  if Assigned(frmVisualKeyboard) then   // I3949
+  if VisualKeyboardVisible then   // I3949
   begin
     frmVisualKeyboard.RefreshSelectedKeyboard;  // I2398
   end;
@@ -1675,7 +1675,7 @@ procedure TfrmKeyman7Main.HideVisualKeyboard;
 begin
   if not Assigned(kmcom) and not StartKeymanEngine then Exit;
 
-  if Assigned(frmVisualKeyboard) then // I1274 - Avoid crash when closing OSK when already closed!
+  if VisualKeyboardVisible then // I1274 - Avoid crash when closing OSK when already closed!
     frmVisualKeyboard.Release;
 end;
 
@@ -1683,7 +1683,7 @@ procedure TfrmKeyman7Main.ShowVisualKeyboard(Page: TOSKActivePage);
 begin
   if not Assigned(kmcom) and not StartKeymanEngine then Exit;
 
-  if not Assigned(frmVisualKeyboard) then  // I1274 - Related, don't recreate OSK if already exists
+  if not VisualKeyboardVisible then  // I1274 - Related, don't recreate OSK if already exists
   begin
     frmVisualKeyboard := TfrmVisualKeyboard.Create(nil);
     frmVisualKeyboard.FreeNotification(Self);
@@ -1832,7 +1832,7 @@ begin
   if FInUpdateOSKVisibility then Exit;
   FInUpdateOSKVisibility := True;
 
-  if (ActiveKeymanID  <> KEYMANID_NONKEYMAN) and not Assigned(frmVisualKeyboard) then   // I3949
+  if (ActiveKeymanID  <> KEYMANID_NONKEYMAN) and not VisualKeyboardVisible then   // I3949
     ShowVisualKeyboard;
 
   FInUpdateOSKVisibility := False;
