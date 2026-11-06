@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.320 beta 2026-11-06
+
+* fix(windows): change init order so threads don't init before Keyman (#16883)
+* fix(windows): reset modifiers when destroying OSK (#16940)
+* refactor(windows): add comment about why OSK close hint only shows in one context (#16941)
+
 ## 19.0.319 beta 2026-11-02
 
 * chore(developer): cleanup `kmc --help` (#16801)
