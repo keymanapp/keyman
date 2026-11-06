@@ -418,6 +418,11 @@ describe('tran', function () {
       subpath: `sections/tran/ok-${n}.xml`,
       errors: false,
     })),
+    // bugs fixed
+    ...['two-set-references'].map(n => ({
+      subpath: `sections/tran/tran-${n}.xml`,
+      errors: false,
+    })),
     // cases that share the same error code
     ...[1, 2, 3].map(n => ({
       subpath: `sections/tran/fail-matches-nothing-${n}.xml`,
