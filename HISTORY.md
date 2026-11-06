@@ -1934,6 +1934,16 @@
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
 
+## 18.0.255 stable 2026-11-06
+
+* maint(linux): support uninitialized DIST and EXTRA_ARGS variables in debian.sh (#16847)
+* chore(linux): quote search team in upload-to-debian.sh so we find existing pull requests (#16851)
+* chore(linux): Update debian changelog (#15811)
+* fix(developer): handle .gitignore in npm-based installations of kmc-generate (#16869)
+* fix(developer): disable http compression in Server to mitigate Node2Shell (#16905)
+* fix(ios): add workaround for iOS 27+ blank keyboard (#16903)
+* fix(ios): remove Liquid Glass blur effect seen in iOS 27 from system-keyboard mode (#16902)
+
 ## 18.0.254 stable 2026-10-16
 
 * chore(linux): replace deprecated `parse_version` (#16736)
