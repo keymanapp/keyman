@@ -1,6 +1,5 @@
 /*
- * Keyman is 2025 copyright (C) SIL International. MIT License.
-
+ * Keyman is copyright (C) SIL International. MIT License.
  *
  * Created by S. Schmitt on 2025-05-12
  *
@@ -91,7 +90,7 @@ export class KeylayoutToKmnConverter {
    * @brief  member function to run read/convert/write
    * @param  inputFilename the ukelele .keylayout-file to be converted
    * @param  outputFilename the resulting keyman .kmn-file
-   * @return null on success
+   * @return null on failure
    */
   async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult | null> {
 
@@ -127,7 +126,8 @@ export class KeylayoutToKmnConverter {
     }
     const result: ConverterToKmnResult = {
       artifacts: {
-        kmn: { data: outputKmn, filename: processedData?.kmnFilename ?? '' }
+        defaultOutput: { data: null, filename: processedData.kmnFilename },
+        kmn: { data: outputKmn, filename: processedData.kmnFilename }
       }
     };
     return result;

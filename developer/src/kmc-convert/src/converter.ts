@@ -5,12 +5,11 @@
  */
 import {
   CompilerCallbacks,
-  CompilerOptions,
   defaultCompilerOptions,
   KeymanCompiler
 } from "@keymanapp/developer-utils";
 import { ConverterClassFactory } from './converter-class-factory.js';
-import { ConverterArtifacts, ConverterResult } from "./main.js";
+import { ConverterArtifacts, ConverterOptions, ConverterResult } from "./main.js";
 import { ConverterMessages } from "./converter-messages.js";
 
 /**
@@ -22,7 +21,7 @@ import { ConverterMessages } from "./converter-messages.js";
 
 export class Converter implements KeymanCompiler {
   private callbacks: CompilerCallbacks;
-  private options: CompilerOptions;
+  private options: ConverterOptions;
 
   /**
    * Initialize the converter. Copies options.
@@ -31,7 +30,7 @@ export class Converter implements KeymanCompiler {
    * @param options   - Compiler options
    * @returns           false if initialization fails
    */
-  async init(callbacks: CompilerCallbacks, options: CompilerOptions): Promise<boolean> {
+  async init(callbacks: CompilerCallbacks, options: ConverterOptions): Promise<boolean> {
     this.options = { ...options };
     this.callbacks = callbacks;
     return true;
@@ -49,7 +48,7 @@ export class Converter implements KeymanCompiler {
    * @returns         Source artifacts on success, null on failure.
    */
   async run(inputFilename: string, outputFilename?: string): Promise<ConverterResult> {
-    const converterOptions: CompilerOptions = {
+    const converterOptions: ConverterOptions = {
       ...defaultCompilerOptions,
       ...this.options,
     };
@@ -58,15 +57,20 @@ export class Converter implements KeymanCompiler {
       throw new Error('Input filename is required');
     }
 
-    const ConverterClass = ConverterClassFactory.find(inputFilename, outputFilename ?? '.kmn');
+    const ConverterClass = ConverterClassFactory.find(inputFilename, converterOptions.target);
     if (!ConverterClass) {
-      this.callbacks.reportMessage(ConverterMessages.Error_NoConverterFound({ inputFilename, outputFilename: outputFilename ?? '' }));
+      this.callbacks.reportMessage(ConverterMessages.Error_NoConverterFound({ inputFilename, outputFilename: converterOptions.target }));
       return null;
     }
 
     const converter = new ConverterClass(this.callbacks, converterOptions);
     const result = await converter.run(inputFilename, outputFilename);
     // Note: any subsequent errors in conversion will have been reported by the converter
+    if(result) {
+      if(!result.artifacts.defaultOutput || !result.artifacts.defaultOutput.filename) {
+        throw new Error(`Expected artifacts.defaultOutput to be set; ${result.artifacts}`);
+      }
+    }
     return result ? result : null;
   }
 
@@ -84,7 +88,7 @@ export class Converter implements KeymanCompiler {
    */
   async write(artifacts: ConverterArtifacts): Promise<boolean> {
     for (const key of Object.keys(artifacts)) {
-      if (artifacts[key]) {
+      if (key != 'defaultOutput' && artifacts[key]) {
         this.callbacks.fs.writeFileSync(artifacts[key].filename, artifacts[key].data);
       }
     }

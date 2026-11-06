@@ -11,6 +11,11 @@ import { CompilerOptions } from "@keymanapp/developer-utils";
  */
 export interface ConverterOptions extends CompilerOptions {
   /**
+   * Target file format extension, required, e.g. '.kmn'
+   */
+  target: string;
+
+  /**
    * Fail if the keyboard conversion is not 100% complete
    */
   failIfIncomplete?: boolean;

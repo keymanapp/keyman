@@ -15,6 +15,7 @@ builder_describe "Test Keyman Keyboard Compiler kmc command line e2e" \
   ":basic                Basic sanity tests" \
   ":analyze              Test 'kmc analyze' command" \
   ":build                Test 'kmc build' command" \
+  ":convert              Test 'kmc convert' command" \
   ":copy                 Test 'kmc copy' command'" \
   ":generate             Test 'kmc generate' command" \
   ":message              Test 'kmc message' command"
@@ -29,6 +30,14 @@ FAILED_TESTS=0
 PASSED_TESTS=0
 SKIPPED_TESTS=0
 
+#
+# Simple harness to run kmc and verify output and report
+#
+# Parameters:
+#   1: EXPECTED_EXIT:  exit code expected
+#   2: EXPECTED_MATCH: regular expression match from output of command (use "." if no good string)
+#   ...: all additional parameters passed to kmc
+#
 function run_kmc() {
   local EXPECTED_EXIT=$1
   local EXPECTED_MATCH="$2"
@@ -108,15 +117,25 @@ function do_test_build() {
 }
 
 function do_test_analyze() {
-  builder_heading "kmc analyze"
+  builder_heading "TODO: add 'kmc analyze' tests"
+}
+
+function do_test_convert() {
+  run_kmc 0 "." convert ./fixtures/command-line-tests/convert/khmer_angkor.kvk -t .kvks
+  diff --strip-trailing-cr -q ./fixtures/command-line-tests/convert/khmer_angkor.kvks ./fixtures/command-line-tests/convert/khmer_angkor.expected.kvks
+  rm -f ./fixtures/command-line-tests/convert/khmer_angkor.kvks
+
+  run_kmc 1 "error: required option" convert ./fixtures/command-line-tests/convert/khmer_angkor.kvk
+  run_kmc 1 "KM0C009" convert ./fixtures/command-line-tests/convert/khmer_angkor.kvk -t foo
+  run_kmc 1 "KM0C009" convert ./fixtures/command-line-tests/convert/khmer_angkor.bar -t kvks
 }
 
 function do_test_copy() {
-  builder_heading "kmc copy"
+  builder_heading "TODO: add 'kmc copy' tests"
 }
 
 function do_test_generate() {
-  builder_heading "kmc generate"
+  builder_heading "TODO: add 'kmc generate' tests"
 }
 
 function do_test_message() {
@@ -127,6 +146,7 @@ function do_test_message() {
 builder_run_action test:basic    do_test_basic
 builder_run_action test:analyze  do_test_analyze
 builder_run_action test:build    do_test_build
+builder_run_action test:convert  do_test_convert
 builder_run_action test:copy     do_test_copy
 builder_run_action test:generate do_test_generate
 builder_run_action test:message  do_test_message

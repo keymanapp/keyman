@@ -247,17 +247,20 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   messageSpecialColor(event: CompilerEvent) {
     switch(event.code) {
       case InfrastructureMessages.INFO_BuildingFile:
+      case InfrastructureMessages.INFO_ConvertingFile:
       case InfrastructureMessages.INFO_CopyingProject:
       case InfrastructureMessages.INFO_GeneratingProject:
       case InfrastructureMessages.INFO_ValidatingProject:
         return color.whiteBright;
       case InfrastructureMessages.INFO_FileNotBuiltSuccessfully:
+      case InfrastructureMessages.INFO_FileNotConvertedSuccessfully:
       case InfrastructureMessages.INFO_ProjectNotBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectNotCopiedSuccessfully:
       case InfrastructureMessages.INFO_ProjectNotGeneratedSuccessfully:
       case InfrastructureMessages.INFO_ProjectNotValidatedSuccessfully:
         return color.red;
       case InfrastructureMessages.INFO_FileBuiltSuccessfully:
+      case InfrastructureMessages.INFO_FileConvertedSuccessfully:
       case InfrastructureMessages.INFO_ProjectBuiltSuccessfully:
       case InfrastructureMessages.INFO_ProjectCopiedSuccessfully:
       case InfrastructureMessages.INFO_ProjectGeneratedSuccessfully:
