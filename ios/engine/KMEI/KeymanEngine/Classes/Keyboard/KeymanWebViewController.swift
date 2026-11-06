@@ -159,14 +159,21 @@ class KeymanWebViewController: UIViewController {
   override func loadView() {
     let config = WKWebViewConfiguration()
     let prefs = WKPreferences()
-    prefs.javaScriptEnabled = true
+
+    let pagePrefs = WKWebpagePreferences()
+    pagePrefs.allowsContentJavaScript = true
+
+    // Explicitly grant universal context to custom scheme pipelines
     config.preferences = prefs
+    config.defaultWebpagePreferences = pagePrefs
+
     config.suppressesIncrementalRendering = false
     config.userContentController = self.userContentController
     config.setURLSchemeHandler(schemeHandler, forURLScheme: schemeHandler.scheme)
 
     webView = KeymanWebView(frame: CGRect(origin: .zero, size: keyboardSize), configuration: config)
-    webView!.isOpaque = false
+
+    webView!.isOpaque = true
     webView!.translatesAutoresizingMaskIntoConstraints = false
     webView!.backgroundColor = UIColor.clear
     webView!.navigationDelegate = self
@@ -659,6 +666,7 @@ extension KeymanWebViewController: WKNavigationDelegate {
     guard url.lastPathComponent == Resources.kmwFilename && (url.fragment?.isEmpty ?? true) else {
       return
     }
+
     keyboardLoaded(self)
     delegate?.keyboardLoaded(self)
   }
