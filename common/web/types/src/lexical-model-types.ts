@@ -572,9 +572,10 @@ export interface Configuration {
  *          phrase, each span which representing a word.
  */
 export interface WordBreakingFunction {
-  // invariant: span[i].end <= span[i + 1].start
+  // invariant: span[i].end = span[i + 1].start
   // invariant: for all span[i] and span[i + 1], there does not exist a span[k]
   //            where span[i].end <= span[k].start AND span[k].end <= span[i + 1].start
+  //            except for a context-final empty token.
   (phrase: string): Span[];
 }
 
