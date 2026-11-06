@@ -304,10 +304,10 @@ public final class FileUtils {
    * @param v1 String
    * @param v2 String
    * @return int
-   *   -2 if v1 or v2 is invalid
-   *    0 if v1 = v2
-   *   -1 if v1 < v2
-   *    1 if v1 > v2
+   *   -2 if v1 or v2 is invalid (VERSION_INVALID)
+   *    0 if v1 = v2 (VERSION_EQUAL)
+   *   -1 if v1 < v2 (VERSION_LOWER)
+   *    1 if v1 > v2 (VERSION_GREATER)
    */
   public static int compareVersions(String v1, String v2) {
     // returns;
