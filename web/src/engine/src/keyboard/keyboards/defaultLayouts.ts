@@ -26,7 +26,7 @@ import { type JSKeyboard } from "./jsKeyboard.js";
 export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | /*5 | 6 | 7 |*/ 8 | 9 | 10;
 
 export interface LayoutLayer extends LayoutLayerBase {
-  // Post-processing elements.
+  // shorthand references for commonly used keys and properties
   shiftKey?: LayoutKey,
   capsKey?: LayoutKey,
   numKey?: LayoutKey,
@@ -35,7 +35,7 @@ export interface LayoutLayer extends LayoutLayerBase {
   nextlayer?: string
 };
 export interface LayoutFormFactor extends LayoutFormFactorSpec {
-  // To facilitate those post-processing elements.
+  // To facilitate shorthand references in LayoutLayer
   layer: LayoutLayer[]
 };
 

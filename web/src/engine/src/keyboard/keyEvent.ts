@@ -32,7 +32,7 @@ export interface KeyEventSpec {
   LisVirtualKey?: boolean;
   vkCode?: number;
   kName: string;
-  kLayer?: string;   // The key's layer property
+  kLayer?/*is this modifierOverride?*/: string;   // The key's layer property // TODO: kLayer vs layer vs modifierOverride
   kbdLayer?: string; // The virtual keyboard's active layer
   kNextLayer?: string;
 
@@ -72,7 +72,7 @@ export class KeyEvent implements KeyEventSpec {
   LisVirtualKey?: boolean;
   vkCode?: number;
   kName: string;
-  kLayer?: string;   // The key's layer property
+  kLayer?/*is this modifierOverride*/: string;   // The key's layer property  // TODO: kLayer vs layer vs modifierOverride
   kbdLayer?: string; // The virtual keyboard's active layer
   kNextLayer?: string;
   baseTranscriptionToken?: number;
