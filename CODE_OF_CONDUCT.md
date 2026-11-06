@@ -36,6 +36,10 @@ Examples of unacceptable behavior include:
 * Other conduct which could reasonably be considered inappropriate in a
   professional setting
 
+## Large Language Model usage policy
+
+* [LLM Usage Policy](docs/policies/llm-usage-policy.md)
+
 ## Enforcement Responsibilities
 
 Community leaders are responsible for clarifying and enforcing our standards of
