@@ -210,7 +210,9 @@ jobs:
               const checkStatus = status == 'pending' ? 'in_progress' : 'completed';
               const conclusion = checkStatus == 'in_progress' ? undefined : (status == 'success' ? 'success' : 'failure');
 
-              await github.rest.checks.update({
+              console.log(`Updating check ${checkRunId} to ${checkStatus}/${conclusion}, description '${description}'`);
+
+              const check = await github.rest.checks.update({
                 owner,
                 repo,
                 check_run_id: checkRunId,
@@ -221,6 +223,7 @@ jobs:
                   summary
                 }
               });
+              console.log(`Check updated`);
             }
 
             const { owner, repo } = context.repo;

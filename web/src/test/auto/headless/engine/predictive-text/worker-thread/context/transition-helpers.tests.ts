@@ -187,11 +187,7 @@ function generateFixtureForTokenizationOutboundTransition (
 
     // CURRENTLY NOT DONE:  adding new or replacement tokens for text to be placed after 'quotientNodeToExtend'.
 
-    const transitionedTokenization = new ContextTokenization(
-      srcTokenization.tokens.slice(0, srcTokenization.tokens.length - 1 + relativeTailIndex).concat(token),
-      tokenizationEdge,
-      null
-    );
+    const transitionedTokenization = new ContextTokenization(srcTokenization.tokens.slice(0, srcTokenization.tokens.length - 1 + relativeTailIndex).concat(token));
 
     return {
       /**
@@ -366,7 +362,6 @@ function assertMatchingToken(actual: ContextToken, expected: ContextToken, msg: 
 function assertMatchingTokenization(actual: ContextTokenization, expected: ContextTokenization, msg: string) {
   assert.equal(actual.tokens.length, expected.tokens.length, msg);
   assert.deepEqual(actual.exampleInput, expected.exampleInput, msg);
-  assert.deepEqual(actual.transitionEdits, expected.transitionEdits, msg);
 
   for(let j=0; j < actual.tokens.length; j++) {
     const nestedMsg = `${msg}, token ${j}`;
@@ -571,7 +566,7 @@ describe('transitionTokenizations', () => {
       },
       p: 1
     }]
-    const precomputedTransition = precomputeTransitions([baseState.tokenization], dist);
+    const precomputedTransition = precomputeTransitions(baseState.tokenizations, dist);
 
     const result = transitionTokenizations(precomputedTransition.subsets, dist);
 

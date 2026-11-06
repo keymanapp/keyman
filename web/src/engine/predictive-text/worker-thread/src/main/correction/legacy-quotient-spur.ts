@@ -15,6 +15,8 @@ import { PREDICTION_QUEUE_COMPARATOR, PathResult } from './correction-searchable
 import { SearchNode } from './distance-modeler.js';
 import { SearchQuotientNode, PathInputProperties } from './search-quotient-node.js';
 import { SearchQuotientSpur } from './search-quotient-spur.js';
+import { SearchQuotientRoot } from './search-quotient-root.js';
+import { LegacyQuotientRoot } from './legacy-quotient-root.js';
 import { TokenResultMapping } from './token-result-mapping.js';
 
 import Distribution = LexicalModelTypes.Distribution;
@@ -58,6 +60,10 @@ export class LegacyQuotientSpur extends SearchQuotientSpur {
 
   construct(parentNode: SearchQuotientNode, inputs?: Distribution<Transform>, inputSource?: PathInputProperties): this {
     return new LegacyQuotientSpur(parentNode, inputs, inputSource) as this;
+  }
+
+  constructRoot(): SearchQuotientRoot {
+    return new LegacyQuotientRoot(this.model);
   }
 
   protected buildEdgesFromResults(priorResults: ReadonlyArray<TokenResultMapping>, inputs?: Distribution<Transform>): SearchNode[] {

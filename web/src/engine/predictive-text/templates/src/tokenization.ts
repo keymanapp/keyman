@@ -95,6 +95,10 @@ export function tokenize(
     currentIndex = nextIndex;
   }
 
+  if(tokenization.left.length == 0) {
+    tokenization.left.push({text: '', isWhitespace: false});
+  }
+
   // New step 2: handle any rejoins needed.
 
   // Handle any desired special handling for directly-pre-caret scenarios - where for this
