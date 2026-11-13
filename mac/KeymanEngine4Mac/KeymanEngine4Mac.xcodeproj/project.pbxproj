@@ -594,7 +594,7 @@
 				);
 				INSTALL_PATH = "";
 				"LIBRARY_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../core/build/mac/debug";
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -647,7 +647,7 @@
 				);
 				INSTALL_PATH = "";
 				"LIBRARY_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../core/build/mac/release";
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -682,7 +682,7 @@
 					"$(PROJECT_DIR)/../../core/build/mac-x86_64/debug/subprojects/icu/source/i18n",
 					"$(PROJECT_DIR)/../../core/build/mac/debug",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				ONLY_ACTIVE_ARCH = NO;
 				"OTHER_LDFLAGS[arch=*]" = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.KeymanEngine4Mac;
@@ -722,7 +722,7 @@
 					"$(PROJECT_DIR)/../../core/build/mac-x86_64/release/subprojects/icu/source/i18n",
 					"$(PROJECT_DIR)/../../core/build/mac/release",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				"OTHER_LDFLAGS[arch=*]" = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.KeymanEngine4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -747,7 +747,7 @@
 				);
 				INFOPLIST_FILE = KeymanEngine4MacTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Tavultesoft.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -763,7 +763,7 @@
 				);
 				INFOPLIST_FILE = KeymanEngine4MacTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "Tavultesoft.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
