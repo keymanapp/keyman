@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.321 beta 2026-11-16
+
+* chore(mac): update minimum supported version to macOS 13 Ventura (#16942)
+* fix(android): capture all keyboard webview console messages in Engine (#16829)
+* chore(developer): track console messages to Sentry in Server (#16937)
+
 ## 19.0.320 beta 2026-11-06
 
 * fix(windows): change init order so threads don't init before Keyman (#16883)
