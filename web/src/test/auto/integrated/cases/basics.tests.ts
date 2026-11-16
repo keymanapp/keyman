@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai';
 
 import { DEVICE_DETECT_FAILURE, setupKMW, teardownKMW } from "../test_utils.js";

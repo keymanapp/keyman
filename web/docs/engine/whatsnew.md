@@ -1,5 +1,5 @@
 ---
-title: What's New in KeymanWeb 19.0
+title: What's New in KeymanWeb 20.0
 ---
 
 * **BREAKING** `file:` protocol is no longer supported, as keyboards are loaded

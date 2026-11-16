@@ -1,14 +1,15 @@
-/***
- KeymanWeb 19.0
-  Copyright 2025 SIL International
-
-  NOTE: in previous versions of Keyman Engine for Web, these methods were set on the standard
-  JS String type in a manner considered a "side-effect".  (When inspecting older versions, it may help
-  to know that they were originally implemented within a file named kmwstring.ts.)
-  *
-  These methods seek to support SMP-aware string functionality within the Web engine, as many
-  keyboards exist that utilize characters within such ranges.
-***/
+/*
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * NOTE: in previous versions of Keyman Engine for Web, these methods were set
+ * on the standard JS String type in a manner considered a "side-effect".  (When
+ * inspecting older versions, it may help to know that they were originally
+ * implemented within a file named kmwstring.ts.)
+ *
+ * These methods seek to support SMP-aware string functionality within the Web
+ * engine, as many keyboards exist that utilize characters within such ranges.
+ */
 
 /**
  * Indicates if functionality supporting Supplementary Multilingual Plane (SMP)

@@ -1,4 +1,6 @@
-/**
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
  * The custom wordbreaker used by the sil.km.gcc model as of
  * https://github.com/keymanapp/lexical-models/pull/265.
  * @type {WordBreakingFunction}
