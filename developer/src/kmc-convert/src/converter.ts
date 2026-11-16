@@ -11,6 +11,7 @@ import {
 import { ConverterClassFactory } from './converter-class-factory.js';
 import { ConverterArtifacts, ConverterOptions, ConverterResult } from "./main.js";
 import { ConverterMessages } from "./converter-messages.js";
+import { ConverterInterface } from "./converter-interface.js";
 
 /**
  * @public
@@ -63,7 +64,7 @@ export class Converter implements KeymanCompiler {
       return null;
     }
 
-    const converter = new ConverterClass(this.callbacks, converterOptions);
+    const converter: ConverterInterface = new ConverterClass(this.callbacks, converterOptions);
     const result = await converter.run(inputFilename, outputFilename);
     // Note: any subsequent errors in conversion will have been reported by the converter
     if(result) {

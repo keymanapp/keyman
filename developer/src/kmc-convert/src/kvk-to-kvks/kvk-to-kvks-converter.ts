@@ -11,14 +11,15 @@ import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KvkFileReader, VisualKeyboard } from "@keymanapp/common-types";
 import { KvksFileWriter } from "@keymanapp/developer-utils";
 import { ConverterMessages } from '../converter-messages.js';
-import { ConverterToKmnResult } from "../main.js";
+import { ConverterResult, ConverterToKmnResult } from "../main.js";
+import { ConverterInterface } from "../converter-interface.js";
 
 /**
  * decompile a .kvk file to a .kvks file
  */
-export class KvkToKvksConverter {
-  static readonly INPUT_FILE_EXTENSION = '.kvk';
-  static readonly OUTPUT_FILE_EXTENSION = '.kvks';
+export class KvkToKvksConverter implements ConverterInterface {
+  public static readonly INPUT_FILE_EXTENSION = '.kvk';
+  public static readonly OUTPUT_FILE_EXTENSION = '.kvks';
 
   constructor(private callbacks: CompilerCallbacks, _options: CompilerOptions) {
     // currently unused: this.options = { ..._options };
@@ -30,7 +31,7 @@ export class KvkToKvksConverter {
    * @param  outputFilename the resulting keyman .kvks file; .kmn and .keyman-touch-layout will be undefined
    * @return null on failure
    */
-  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult | null> {
+  public async run(inputFilename: string, outputFilename?: string): Promise<ConverterResult | null> {
 
     if (!inputFilename) {
       throw new Error('Input filename is required');
