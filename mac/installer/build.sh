@@ -131,7 +131,7 @@ function create_package_from_staging() {
   productbuild --distribution "${KEYMAN_BUILD_PATH}/distribution.xml" \
       --package-path "${KEYMAN_BUILD_PATH}" \
       --resources ./installer-resources \
-      --sign 5FCED4988F27D172C5628A16DBA4AE6CA0015D11 \
+      --sign "Developer ID Installer: Summer Institute of Linguistics, Inc (SIL) (3YE4W86L3G)" \
     "$OUTPUT_PACKAGE_PATH"
 
   builder_heading "Uploading install package to Apple for notarization"
