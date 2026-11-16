@@ -23,7 +23,7 @@ import Distribution = LexicalModelTypes.Distribution;
 import Transform = LexicalModelTypes.Transform;
 import TrieModel = models.TrieModel;
 
-var plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
+const plainModel = new TrieModel(jsonFixture('models/tries/english-1000'),
   {wordBreaker: defaultBreaker});
 
 // https://www.compart.com/en/unicode/block/U+1D400
@@ -53,7 +53,7 @@ describe('ContextToken', function() {
 
   describe('fromRawText', () => {
     it("may construct a fresh ContextToken from a model and plain text", () => {
-      let token = ContextToken.fromRawText(plainModel, "and");
+      const token = ContextToken.fromRawText(plainModel, "and");
 
       assert.equal(token.searchModule.bestExample.text, 'and');
       assert.equal(token.exampleInput, 'and');
@@ -71,7 +71,7 @@ describe('ContextToken', function() {
 
     it("may assign a transition ID to the constructed ContextToken", () => {
       const TRANSITION_ID = 6;
-      let token = ContextToken.fromRawText(plainModel, "and", false, TRANSITION_ID);
+      const token = ContextToken.fromRawText(plainModel, "and", false, TRANSITION_ID);
 
       assert.equal(token.searchModule.bestExample.text, 'and');
       assert.equal(token.exampleInput, 'and');
@@ -90,22 +90,22 @@ describe('ContextToken', function() {
 
   describe("<constructor>", () => {
     it("constructs from SearchQuotient root nodes", async () => {
-      let token = new ContextToken(new LegacyQuotientRoot(plainModel));
+      const token = new ContextToken(new LegacyQuotientRoot(plainModel));
 
       assert.equal(token.searchModule.inputCount, 0);
       assert.isEmpty(token.exampleInput);
       assert.isFalse(token.isWhitespace);
 
       // While searchSpace has no inputs, it _can_ match lexicon entries (via insertions).
-      let searchIterator = getBestMatches([token.searchModule], new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
-      let firstEntry = await searchIterator.next();
+      const searchIterator = getBestMatches([token.searchModule], new ExecutionTimer(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY));
+      const firstEntry = await searchIterator.next();
       assert.isFalse(firstEntry.done);
     });
 
     it("may clone a previously-existing ContextToken", () => {
       // Same as in a test above, since we verified that it works correctly.
-      let baseToken = ContextToken.fromRawText(plainModel, "and");
-      let clonedToken = new ContextToken(baseToken);
+      const baseToken = ContextToken.fromRawText(plainModel, "and");
+      const clonedToken = new ContextToken(baseToken);
 
       assert.equal(clonedToken.searchModule, baseToken.searchModule);
       // Deep equality on .searchModule can't be directly checked due to the

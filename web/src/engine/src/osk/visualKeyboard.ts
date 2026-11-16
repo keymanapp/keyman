@@ -311,8 +311,8 @@ export class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardVi
       ...DEFAULT_GESTURE_PARAMS,
     };
 
-    this._fixedWidthScaling  = this.device.touchable && !this.isStatic;
-    this._fixedHeightScaling = this.device.touchable && !this.isStatic;
+    this._fixedWidthScaling  = this.config.device.touchable && !this.isStatic;
+    this._fixedHeightScaling = this.config.device.touchable && !this.isStatic;
 
     // Create the collection of HTML elements from the device-dependent layout object
     const Lkbd = document.createElement('div');
