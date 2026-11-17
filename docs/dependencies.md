@@ -5,6 +5,9 @@ current and in the next version of Keyman. The exact versions should be looked
 up in [minimum-versions.md](minimum-versions.md), the `package.json` files and
 other places.
 
+The most important information in this document is the list of dependencies that
+have cross-branch impact due to installation on CI agents.
+
 This document should be updated when planning the next version.
 
 ## What version to choose
@@ -26,10 +29,11 @@ This document should be updated when planning the next version.
 ## Opening Remarks
 
 - The **v19** and **v20** columns in the following tables mean the
-  version of the component used in Keyman 19 resp. Keyman 20.
+  version of the component used in Keyman 19 (actual) and Keyman 20 (intention).
 - The **cross branch CI impact** column marks components that can
   only be installed once on a build agent. Updating the component
-  might require changes to both the stable and the master (alpha) branch.
+  might require changes to both the stable and the master (alpha) 
+  branch, and may also impact builds on feature branches.
 
 ## Target operating system and platform versions
 
@@ -58,12 +62,12 @@ Target                               | v19    | v20                 | cross bran
 KEYMAN_MIN_VERSION_NODE_MAJOR        | 20     | 26                  |                       |
 KEYMAN_MIN_VERSION_NPM               | 10.5.1 | 12.2.1              |                       |
 KEYMAN_MIN_VERSION_EMSCRIPTEN        | 3.1.64 | 6.0.13+ if possible |                       |
-KEYMAN_MIN_VERSION_VISUAL_STUDIO     | 2022   | 2026                |                       |
+KEYMAN_MIN_VERSION_VISUAL_STUDIO     | 2022   | 2026                |     X                 |
 KEYMAN_MIN_VERSION_MESON             | 1.0.0  | 1.3.2               |     X [1]             |
 KEYMAN_VERSION_XCODE                 | 26.2   | no change           |     X                 |
-KEYMAN_VERSION_GRADLE                | 8.12   | 9.8.2+ if possible  |                       |
-Android Studio                       |        | latest              |                       |
-Delphi                               |        | no change           |                       |
+KEYMAN_VERSION_GRADLE                | 8.12   | 9.8.2+ if possible  |     ?                 |
+Android Studio                       |        | latest              |     ?                 |
+Delphi                               |        | no change           |     X                 |
 Sentry CLI                           | 2.31.0 | 3.8.2 (@sentry/cli) |    [2]                |
 Sentry - Android                     | 5.9.0  | 8.62.0              |                       |
 Sentry - iOS                         | 8.58   | 9.31.0              |                       |
@@ -73,13 +77,13 @@ Sentry - web/js (@sentry/browser)    | 8.55.0 | 11.9.0              |           
 Sentry - Developer/js (@sentry/node) | 7.57.0 | 11.9.0              |                       |
 Sentry - PHP                         | 3.22.1 | 4.34.0              |                       |
 Sentry - native Windows (+Delphi)    | 0.6.0  | 0.17.4              |                       |
-Crowdin CLI                          | v4     | no change           |                       |
+Crowdin CLI                          | v4     | no change           |     X                 |
 GHA runner version - Linux           |        |                     |                       |
 GHA runner version - Windows         |        |                     |                       |
-WiX (Windows Installer XML)          |        |                     |                       |
-Carthage (macOS, iOS)                | | replace with Swift Package Manager |               |
-Cocoapods (macOS)                    | | replace with Swift Package Manager |               |
-Python 2.7 macOS                     |        | remove              |                       |
+WiX (Windows Installer XML)          |        |                     |     X                 |
+Carthage (macOS, iOS)                | | replace with Swift Package Manager |   X           |
+Cocoapods (macOS)                    | | replace with Swift Package Manager |   X           |
+Python 2.7 macOS                     |        | remove              |     X                 |
 esbuild                              | 0.28.1 | 0.28.1 or .2        |                       |
 
 - [1] Meson 1.3.2 is the max version available on Ubuntu 24.04
