@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.322 beta 2026-11-17
+
+* fix(linux): allow to specify tests as arguments (#16968)
+
 ## 19.0.321 beta 2026-11-16
 
 * chore(mac): update minimum supported version to macOS 13 Ventura (#16942)
