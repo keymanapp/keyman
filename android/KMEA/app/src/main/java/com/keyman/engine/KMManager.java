@@ -479,11 +479,11 @@ public final class KMManager {
 
   /**
    * Set the Keyman Engine mode based on the Chrome version
-   * @param aContext
    * @param webView - If provided, the Chrome version of the WebView is determined
    */
-  public static void setEngineWebViewVersionStatus(Context aContext, WebView webView) {
-    engineWebViewVersionStatus = WebViewUtils.getEngineWebViewVersionStatus(aContext, webView, "");
+  private static void setEngineWebViewVersionStatus(WebView webView) {
+    String chromeVersion = WebViewUtils.extractChromeVersionFromUserAgentString(webView.getSettings().getUserAgentString());
+    engineWebViewVersionStatus = WebViewUtils.getEngineWebViewVersionStatus(chromeVersion);
   }
 
   // Check if a keyboard namespace is reserved
@@ -841,7 +841,7 @@ public final class KMManager {
       keyboard.showBanner(true);
       sendLongpressDelay();
     }
-    setEngineWebViewVersionStatus(appContext, keyboard);
+    setEngineWebViewVersionStatus(keyboard);
   }
 
   public static String getLanguagePredictionPreferenceKey(String langID) {

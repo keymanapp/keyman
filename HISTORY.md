@@ -1,5 +1,30 @@
 # Keyman Version History
 
+## 19.0.321 beta 2026-11-16
+
+* chore(mac): update minimum supported version to macOS 13 Ventura (#16942)
+* fix(android): capture all keyboard webview console messages in Engine (#16829)
+* chore(developer): track console messages to Sentry in Server (#16937)
+
+## 19.0.320 beta 2026-11-06
+
+* fix(windows): change init order so threads don't init before Keyman (#16883)
+* fix(windows): reset modifiers when destroying OSK (#16940)
+* refactor(windows): add comment about why OSK close hint only shows in one context (#16941)
+
+## 19.0.319 beta 2026-11-02
+
+* chore(developer): cleanup `kmc --help` (#16801)
+* fix(mac): add timeout for accessibility permissions check (#16878)
+
+## 19.0.318 beta 2026-10-30
+
+* fix(mac): show package disclosure groups in macOS Ventura (#16911)
+* fix(developer): disable http compression in Server to mitigate Node2Shell (#16908)
+* docs(windows): clean api index formatting (#16913)
+* fix(developer): cast as unsigned to avoid ERangeError (#16823)
+* fix(ios): remove Liquid Glass blur effect seen in iOS 27 from system-keyboard mode (#16885)
+
 ## 19.0.317 beta 2026-10-29
 
 * fix(ios): add workaround for iOS 27+ blank keyboard (#16873)
