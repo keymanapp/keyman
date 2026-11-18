@@ -11,15 +11,16 @@ import { BaseOptions } from '../util/baseOptions.js';
 import { exitProcess } from '../util/sysexits.js';
 import { CopierOptions, KeymanProjectCopier } from '@keymanapp/kmc-copy';
 import { commanderOptionsToBaseOptions } from '../util/extendedCompilerOptions.js';
+import { posix } from 'node:path';
 
 /* c8 ignore start */
 
 export function declareCopy(program: Command) {
-  const command = program.command('copy <project>');
+  const command = program.command('copy <origin> [id]');
   BaseOptions.addAll(command);
   command
     .description('copy a Keyman keyboard or lexical model project')
-    .requiredOption('-o, --out-path <path>', 'output path, last component of which forms id for project (must not exist)')
+    .option('-o, --out-path <path>', 'output path (may exist)')
     .option('-n, --dry-run', 'show what would happen, without making changes')
     .option('-r, --relocate-external', 'copy external files into "external" folder')
     .action(copyProject)
@@ -32,18 +33,19 @@ export function declareCopy(program: Command) {
     e.g. https://github.com/keyman-keyboards/khmer_angkor/tree/main/khmer_angkor.kpj or
          github.com/keymanapp/keyboards/tree/master/release/k/khmer_angkor
 
-The last component of the output path will be the new id of the project, e.g.
-if -o /tmp/my_new_keyboard is given, then /tmp/my_new_keyboard/my_new_keyboard.kpj will
-be created. The output folder must not currently exist and parent folders will be created
-if necessary.
-    `);
+A new subfolder will be made either in the current folder, or in the output path, with the
+same name as the <id> parameter. This subfolder must not already exist.
+
+Deprecation note (19.0): if <id> is not passed as a parameter, the last component of the
+output path will be the new id of the project. This mode is deprecated and will be removed
+in a future version of kmc.`);
   }
 
-function commanderOptionsToCopierOptions(options: any): CopierOptions {
+function commanderOptionsToCopierOptions(id: string, options: any): CopierOptions {
   const result: CopierOptions = {
     ...commanderOptionsToBaseOptions(options),
     // CopierOptions
-    outPath: options.outPath,
+    outPath: id ? posix.join(options.outPath?.replace(/\\/g, '/') ?? '', id) : options.outPath,
     dryRun: options.dryRun ?? false,
     relocateExternalFiles: options.relocateExternal ?? false,
   };
@@ -52,23 +54,33 @@ function commanderOptionsToCopierOptions(options: any): CopierOptions {
 
 const MaxDryRunCopyLogMessages = 10000;
 
-async function copyProject(ids: string | string[], _options: any, commander: any): Promise<never|void> {
+async function copyProject(projects: string | string[], ids: string | string[], _options: any, commander: any): Promise<never|void> {
+  const source = Array.isArray(projects) ? projects[0] : projects;
+  const target = Array.isArray(ids) ? ids[0] : ids;
+
   const commanderOptions = commander.optsWithGlobals();
-  const options = commanderOptionsToCopierOptions(commanderOptions);
+  const options = commanderOptionsToCopierOptions(target, commanderOptions);
   const callbacks = new NodeCompilerCallbacks(options);
-  if(!await doCopy(callbacks, ids, options)) {
+
+  if(!target) {
+    if(!commanderOptions.outPath) {
+      callbacks.reportMessage(InfrastructureMessages.Error_CopyRequiresOutPath());
+      return await exitProcess(1);
+    }
+    callbacks.reportMessage(InfrastructureMessages.Warn_CopyWithoutIdIsDeprecated());
+  }
+
+  if(!await doCopy(callbacks, source, options)) {
     return await exitProcess(1);
   }
 }
 
 /* c8 ignore stop */
 
-async function doCopy(callbacks: NodeCompilerCallbacks, sources: string | string[], options: CopierOptions): Promise<boolean> {
+async function doCopy(callbacks: NodeCompilerCallbacks, sources: string, options: CopierOptions): Promise<boolean> {
   const source = sources;
 
-  if(!source || typeof source != 'string') {
-    // Note that commander can pass an array for the ids parameter, so we
-    // constrain here
+  if(!source) {
     callbacks.reportMessage(InfrastructureMessages.Error_CopyRequiresSource());
     return false;
   }

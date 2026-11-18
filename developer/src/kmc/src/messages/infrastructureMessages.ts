@@ -11,6 +11,8 @@ const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
 export class InfrastructureMessages {
+  //------------------------------------------------------------------------------|
+
   static FATAL_UnexpectedException = SevFatal | 0x0001;
   static Fatal_UnexpectedException = (o:{e: any}) => CompilerMessageSpecWithException(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
 
@@ -153,8 +155,13 @@ export class InfrastructureMessages {
   static ERROR_CopyRequiresOutPath = SevError | 0x0022;
   static Error_CopyRequiresOutPath = () => m(
     this.ERROR_CopyRequiresOutPath,
-    `The copy command requires the --out-path, -o parameter`
-  );
+    `The 'id' parameter should be provided; if it is not, then the --out-path parameter is required`,
+    `Deprecated usage: you should pass the target id as the second parameter on
+    the command line rather than the final component of the output path. This
+    change was made so that the \`--out-path\` parameter for \`kmc copy\` will have
+    the same meaning as other kmc commands.
+  `);
+  //------------------------------------------------------------------------------|
 
   // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
   static INFO_CopyingProject = SevInfo | 0x0023;
@@ -252,6 +259,18 @@ export class InfrastructureMessages {
     this.INFO_FileNotConvertedSuccessfully,
     `${def(o.relativeFilename)} could not be converted.`,
   )});
+
+  static WARN_CopyWithoutIdIsDeprecated = SevWarn | 0x0030;
+  static Warn_CopyWithoutIdIsDeprecated = () => m(
+    this.WARN_CopyWithoutIdIsDeprecated,
+    `Deprecated usage: you should pass the target id as the second parameter on the command line rather than the final component of the output path.`, `
+    This change was made so that the \`--out-path\` parameter for \`kmc copy\`
+    will have the same meaning as other kmc commands.
+  `);
+
+  //------------------------------------------------------------------------------|
+  // max length of detail message lines (checked by verifyCompilerMessagesObject) |
+  //------------------------------------------------------------------------------|
 
 }
 
