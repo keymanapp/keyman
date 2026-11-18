@@ -229,5 +229,29 @@ export class InfrastructureMessages {
     However, as a file already exists with the same name, kmc cannot continue.
   `);
 
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  // We use base filename for shorter starting message; successful completion has relative output filename
+  static INFO_ConvertingFile = SevInfo | 0x002D;
+  static Info_ConvertingFile = (o:{filename:string,relativeFilename:string,outputBaseFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_ConvertingFile,
+    `Converting ${def(o.relativeFilename)} to ${def(o.outputBaseFilename)}`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  // We use relative for output filename here so user can find it
+  static INFO_FileConvertedSuccessfully = SevInfo | 0x002E;
+  static Info_FileConvertedSuccessfully = (o:{filename:string,relativeFilename:string,outputRelativeFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_FileConvertedSuccessfully,
+    `${def(o.relativeFilename)} converted successfully to ${def(o.outputRelativeFilename)}.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  // We use base output filename here for shorter message
+  static INFO_FileNotConvertedSuccessfully = SevInfo | 0x002F;
+  static Info_FileNotConvertedSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_FileNotConvertedSuccessfully,
+    `${def(o.relativeFilename)} could not be converted.`,
+  )});
+
 }
 

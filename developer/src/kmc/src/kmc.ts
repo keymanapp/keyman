@@ -59,12 +59,12 @@ async function run() {
     .addOption(new Option('--no-error-reporting', 'disable error reporting to keyman.com (overriding user settings)'))
     .addOption(new Option('--error-reporting', 'enable error reporting to keyman.com (overriding user settings)'));
 
-  declareBuild(program);
   declareAnalyze(program);
+  declareBuild(program);
   declareConvert(program);
-  declareMessage(program);
-  declareGenerate(program);
   declareCopy(program);
+  declareGenerate(program);
+  declareMessage(program);
 
   /* Future commands:
   declareClean(program);

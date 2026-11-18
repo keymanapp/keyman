@@ -1,6 +1,5 @@
 /*
- * Keyman is 2025 copyright (C) SIL International. MIT License.
-
+ * Keyman is copyright (C) SIL International. MIT License.
  *
  * Created by S. Schmitt on 2025-05-12
  *
@@ -12,7 +11,8 @@ import { CompilerCallbacks, CompilerOptions, Keylayout } from "@keymanapp/develo
 import { KmnFileWriter } from './kmn-file-writer.js';
 import { KeylayoutFileReader } from './keylayout-file-reader.js';
 import { ConverterMessages } from '../converter-messages.js';
-import { ConverterToKmnResult } from "../main.js";
+import { ConverterResult, ConverterToKmnResult } from "../main.js";
+import { ConverterInterface } from "../converter-interface.js";
 
 /**
  * Interface for all data read from a .keylayout file. Also contains all rules processed from input data.
@@ -74,12 +74,14 @@ export class Rule {
 
 }
 
-export class KeylayoutToKmnConverter {
-  static readonly INPUT_FILE_EXTENSION = '.keylayout';
-  static readonly OUTPUT_FILE_EXTENSION = '.kmn';
-  static readonly SKIP_COMMENTED_LINES = false;
-  static readonly MAX_CTRL_CHARACTER = 0x20;                      // the hightest control character we print out as a Unicode CodePoint (U+0020)
-  static readonly MAX_KEY_IDENTIFIER = 49;                        // We only use key Nr 0 (A) -> key Nr 49 (Space)
+export class KeylayoutToKmnConverter implements ConverterInterface {
+  public static readonly INPUT_FILE_EXTENSION = '.keylayout';
+  public static readonly OUTPUT_FILE_EXTENSION = '.kmn';
+
+  // These used in kmn-file-writer at present
+  public static readonly SKIP_COMMENTED_LINES = false;
+  public static readonly MAX_CTRL_CHARACTER = 0x20;                      // the hightest control character we print out as a Unicode CodePoint (U+0020)
+  public static readonly MAX_KEY_IDENTIFIER = 49;                        // We only use key Nr 0 (A) -> key Nr 49 (Space)
 
   private options: CompilerOptions;
 
@@ -91,9 +93,9 @@ export class KeylayoutToKmnConverter {
    * @brief  member function to run read/convert/write
    * @param  inputFilename the ukelele .keylayout-file to be converted
    * @param  outputFilename the resulting keyman .kmn-file
-   * @return null on success
+   * @return null on failure
    */
-  async run(inputFilename: string, outputFilename?: string): Promise<ConverterToKmnResult | null> {
+  public async run(inputFilename: string, outputFilename?: string): Promise<ConverterResult | null> {
 
     if (!inputFilename) {
       throw new Error('Input filename is required');
@@ -127,7 +129,8 @@ export class KeylayoutToKmnConverter {
     }
     const result: ConverterToKmnResult = {
       artifacts: {
-        kmn: { data: outputKmn, filename: processedData?.kmnFilename ?? '' }
+        defaultOutput: { data: null, filename: processedData.kmnFilename },
+        kmn: { data: outputKmn, filename: processedData.kmnFilename }
       }
     };
     return result;
