@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 19.0.323 beta 2026-11-18
+
+* feat(developer): convert .kvk to .kvks (decompile) (#16931)
+* fix(developer): add <id> parameter for `kmc copy` (#16935)
+* fix(web): provide url for errors in models (#16938)
+
 ## 19.0.322 beta 2026-11-17
 
 * fix(linux): allow to specify tests as arguments (#16968)
