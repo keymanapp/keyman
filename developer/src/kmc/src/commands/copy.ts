@@ -78,6 +78,14 @@ async function copyProject(projects: string | string[], ids: string | string[], 
 /* c8 ignore stop */
 
 async function doCopy(callbacks: NodeCompilerCallbacks, sources: string, options: CopierOptions): Promise<boolean> {
+
+  // On Windows, we can use / rather than \ internally
+  if(process.platform === 'win32') {
+    sources = sources.replace(/\\/g, '/');
+  }
+  // Remove trailing slash for folders for consistency
+  sources = sources.endsWith('/') ? sources.substring(0, sources.length-1) : sources;
+
   const source = sources;
 
   if(!source) {
