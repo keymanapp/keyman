@@ -46,17 +46,17 @@ async function clickOnEnter(e,id)
   }
 }
 
-async function removeKeyboard() {
+function removeKeyboard() {
   let sKbd = document.getElementById('kbd_id4').value;
-  let result = await keyman.removeKeyboards(sKbd);
+  let result = keyman.removeKeyboards(sKbd);
   keyman.ui.updateKeyboardList();
 }
 
 // Removes keyboard on Enter (as well as pressing button)
-async function removeOnEnter(e)
+function removeOnEnter(e)
 {
   e = e || window.event;
   if(e.keyCode == 13) {
-    await removeKeyboard();
+    removeKeyboard();
   }
 }
