@@ -105,7 +105,7 @@
       <FileType>.htm</FileType>
     </File>
     <File>
-      <Name>..\..\..\shared\fonts\noto\Ahom\NotoSerifAhom-Regular.ttf</Name>
+      <Name>.\shared\fonts\noto\Ahom\NotoSerifAhom-Regular.ttf</Name>
       <Description>Font Noto Serif Ahom Regular</Description>
       <CopyLocation>0</CopyLocation>
       <FileType>.ttf</FileType>
@@ -116,8 +116,8 @@
       <Name>Ahom Star</Name>
       <ID>ahom_star</ID>
       <Version>1.0.1</Version>
-      <OSKFont>..\..\..\shared\fonts\noto\Ahom\NotoSerifAhom-Regular.ttf</OSKFont>
-      <DisplayFont>..\..\..\shared\fonts\noto\Ahom\NotoSerifAhom-Regular.ttf</DisplayFont>
+      <OSKFont>.\shared\fonts\noto\Ahom\NotoSerifAhom-Regular.ttf</OSKFont>
+      <DisplayFont>.\shared\fonts\noto\Ahom\NotoSerifAhom-Regular.ttf</DisplayFont>
       <Languages>
         <Language ID="aho-Ahom">Ahom (Ahom)</Language>
       </Languages>
