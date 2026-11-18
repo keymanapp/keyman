@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 20.0.10 alpha 2026-11-18
+
+* docs(common): add dependencies document (#16967)
+
 ## 20.0.9 alpha 2026-10-29
 
 * chore(deps): bump brace-expansion from 5.0.9 to 5.0.12 in /developer/src/server/src/win32/trayicon/addon-src (#16798)
