@@ -786,7 +786,7 @@ process_capslock_action(km_core_caps_state caps_state) {
 }
 
 static void
-commit_current_queue_item(IBusKeymanEngine *keyman) {
+commit_current_queue_item(IBusKeymanEngine *keyman, gboolean force) {
   // only called for non-compliant apps
   g_assert(keyman != NULL);
   IBusEngine* engine = (IBusEngine *)keyman;
@@ -805,12 +805,14 @@ commit_current_queue_item(IBusKeymanEngine *keyman) {
       current_item->code_points_to_delete--;
     }
     keyman->is_dirty = TRUE;
-    // don't remove the item from the queue yet - we need to process it
-    // again for the output and keystrokes. Instead emit the sentinel key
-    // again.
-    g_message("%s: Forcing ordered output", __FUNCTION__);
-    call_ordered_output_sentinel();
-    return;
+    if (!force) {
+      // don't remove the item from the queue yet - we need to process it
+      // again for the output and keystrokes. Instead emit the sentinel key
+      // again.
+      g_message("%s: Forcing ordered output", __FUNCTION__);
+      call_ordered_output_sentinel();
+      return;
+    }
   }
   if (current_item->char_buffer != NULL) {
     g_autofree gchar *debug = NULL;
@@ -859,12 +861,14 @@ finish_process_actions(IBusEngine *engine) {
       g_message("%s: Ignoring modifier key", __FUNCTION__);
       break;
     default:
-      keyman->commit_item++;
-      if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE - 1]) {
-        g_warning("Overflow of keyman commit_queue!");
+      if (keyman->commit_item >= &keyman->commit_queue[MAX_QUEUE_SIZE - 1]) {
+        g_warning("Overflow of keyman commit_queue! Forcing commit of oldest queue item.");
         // TODO: log to Sentry
-        keyman->commit_item--;
+        commit_current_queue_item(keyman, TRUE);
+        keyman->commit_item++;
+        return;
       }
+      keyman->commit_item++;
 
       // Forward a fake key event to get the correct order of events so that any backspace key we
       // generated will be processed before the character we're adding. We need to send a
@@ -954,7 +958,7 @@ ibus_keyman_engine_process_key_event(
           i, item->keyval, item->keycode, item->state, item->char_buffer,
           item->emitting_keystroke, item->code_points_to_delete);
     }
-    commit_current_queue_item(keyman);
+    commit_current_queue_item(keyman, FALSE);
     return TRUE;
   }
 
