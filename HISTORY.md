@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.324 beta 2026-11-20
+
+* fix(linux): automatically load `uinput` kernel module (#16976)
+
 ## 19.0.323 beta 2026-11-18
 
 * feat(developer): convert .kvk to .kvks (decompile) (#16931)
