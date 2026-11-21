@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 19.0.325 beta 2026-11-21
+
+* fix(linux): don't abort on error (#16977)
+
 ## 19.0.324 beta 2026-11-20
 
 * fix(linux): automatically load `uinput` kernel module (#16976)
