@@ -895,11 +895,20 @@ final class KMKeyboard extends WebView {
         breadcrumb.setData("keyboardVersion", this.keyboardVersion);
       }
       Sentry.addBreadcrumb(breadcrumb);
+
+      // While many errors are captured from inside the webview itself by
+      // KeymanSentryClient, startup errors will not be captured there. As it
+      // may be difficult to differentiate, we'll continue to capture console
+      // errors to Sentry here, which means that errors will be duplicated
+      // between keyman-web and keyman-android in Sentry.
       //
-      // We now rely on Sentry within KMW to capture these errors
-      // We'll continue to capture breadcrumbs so we can associate
-      // java-side errors with javascript-side errors.
-      //Sentry.captureMessage(message, SentryLevel.ERROR);
+      // TODO: In the future, we may opt to disable this logging at some point
+      //       after page load to reduce this duplication.
+
+      Sentry.setTag("chromeVersion", WebViewUtils.extractChromeVersionFromUserAgentString(
+        this.getSettings().getUserAgentString()
+      ));
+      Sentry.captureMessage(message, SentryLevel.ERROR);
       //
     }
   }

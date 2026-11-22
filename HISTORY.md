@@ -53,6 +53,30 @@
 * chore(common): remove `clearcontext`,`fix`,`switch`,`key` statements (#16726)
 * chore: move to 20.0-alpha (#16739)
 
+## 19.0.325 beta 2026-11-21
+
+* fix(linux): don't abort on error (#16977)
+
+## 19.0.324 beta 2026-11-20
+
+* fix(linux): automatically load `uinput` kernel module (#16976)
+
+## 19.0.323 beta 2026-11-18
+
+* feat(developer): convert .kvk to .kvks (decompile) (#16931)
+* fix(developer): add <id> parameter for `kmc copy` (#16935)
+* fix(web): provide url for errors in models (#16938)
+
+## 19.0.322 beta 2026-11-17
+
+* fix(linux): allow to specify tests as arguments (#16968)
+
+## 19.0.321 beta 2026-11-16
+
+* chore(mac): update minimum supported version to macOS 13 Ventura (#16942)
+* fix(android): capture all keyboard webview console messages in Engine (#16829)
+* chore(developer): track console messages to Sentry in Server (#16937)
+
 ## 19.0.320 beta 2026-11-06
 
 * fix(windows): change init order so threads don't init before Keyman (#16883)

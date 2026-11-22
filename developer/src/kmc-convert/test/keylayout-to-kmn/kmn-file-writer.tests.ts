@@ -10,10 +10,10 @@
 import 'mocha';
 import { assert } from 'chai';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
-import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
-import { KmnFileWriter, UnicodeCharacterConversion, ReplacedOutputString } from '../src/keylayout-to-kmn/kmn-file-writer.js';
-import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
+import { compilerTestCallbacks, compilerTestOptions, makePathToFixture } from '../helpers/index.js';
+import { KeylayoutToKmnConverter, ProcessedData, Rule } from '../../src/keylayout-to-kmn/keylayout-to-kmn-converter.js';
+import { KmnFileWriter, UnicodeCharacterConversion, ReplacedOutputString } from '../../src/keylayout-to-kmn/kmn-file-writer.js';
+import { KeylayoutFileReader } from '../../src/keylayout-to-kmn/keylayout-file-reader.js';
 import { Keylayout } from '@keymanapp/developer-utils';
 
 describe('KmnFileWriter', function () {

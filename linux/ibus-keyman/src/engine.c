@@ -861,7 +861,7 @@ finish_process_actions(IBusEngine *engine) {
     default:
       keyman->commit_item++;
       if (keyman->commit_item > &keyman->commit_queue[MAX_QUEUE_SIZE - 1]) {
-        g_error("Overflow of keyman commit_queue!");
+        g_warning("Overflow of keyman commit_queue!");
         // TODO: log to Sentry
         keyman->commit_item--;
       }

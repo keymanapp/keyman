@@ -9,7 +9,7 @@ import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { BaseOptions } from '../util/baseOptions.js';
 import { exitProcess } from '../util/sysexits.js';
-import { Converter, ConverterOptions } from '@keymanapp/kmc-convert';
+import { Converter, ConverterOptions, ConverterResult } from '@keymanapp/kmc-convert';
 import { CompilerCallbacks } from '@keymanapp/developer-utils';
 
 export function declareConvert(program: Command) {
@@ -21,11 +21,12 @@ export function declareConvert(program: Command) {
     //.description('Convert keyboard source files between formats:')
     .description('convert keyboard source files between formats')
     .addHelpText('after', `
-Current supported conversion formats are:
-* from macOS (Ukelele) .keylayout -> Keyman .kmn`)
+Supported file format conversions:
+* macOS (Ukelele) .keylayout -> Keyman .kmn
+* Keyman binary .kvk -> Keyman source .kvks
+`)
+    .requiredOption('-t, --target <target>', 'File extension for output files, e.g. .kmn, .kvks (required)')
     .option('-o, --out-path <path>', 'path where output files will be written (must exist)')
-    // TODO kmc-convert: add more conversions later, then File extension for output files is required
-    // .requiredOption('-t, --out-type <type>', 'File extension for output files, e.g. .kmn, required')
     .action(async (filenames: string[], _options: any, commander: any): Promise<never|void> => {
       const options = commander.optsWithGlobals();
       const callbacks = new NodeCompilerCallbacks({logLevel: options.logLevel});
@@ -33,14 +34,38 @@ Current supported conversion formats are:
       for(const filename of filenames) {
         const outputFilename = path.join(
           options.outPath ?? path.dirname(filename),
-          path.basename(filename, path.extname(filename)) + options.outType
+          path.basename(filename, path.extname(filename)) + options.target
         );
 
-        if(!await convert(callbacks, options, filename, outputFilename)) {
+        if(!await doConvert(callbacks, options, filename, outputFilename)) {
           return await exitProcess(1);
         }
       }
     });
+}
+
+async function doConvert(
+  callbacks: CompilerCallbacks,
+  options: ConverterOptions,
+  inputFilename: string,
+  outputFilename: string,
+): Promise<boolean> {
+  try {
+    const relativeFilename = path.relative(process.cwd(), inputFilename).replace(/\\/g, '/');
+    callbacks.reportMessage(InfrastructureMessages.Info_ConvertingFile({filename: inputFilename, relativeFilename, outputBaseFilename: path.basename(outputFilename)}));
+    const result = await convert(callbacks, options, inputFilename, outputFilename);
+    if(!result) {
+      callbacks.reportMessage(InfrastructureMessages.Info_FileNotConvertedSuccessfully({filename:inputFilename, relativeFilename}));
+      return false;
+    }
+
+    const outputRelativeFilename = path.relative(process.cwd(), result.artifacts.defaultOutput.filename).replace(/\\/g, '/');
+    callbacks.reportMessage(InfrastructureMessages.Info_FileConvertedSuccessfully({filename:inputFilename, relativeFilename, outputRelativeFilename}));
+    return true;
+  } catch(e) {
+    callbacks.reportMessage(InfrastructureMessages.Fatal_UnexpectedException({e}));
+    return false;
+  }
 }
 
 async function convert(
@@ -48,27 +73,22 @@ async function convert(
   options: ConverterOptions,
   inputFilename: string,
   outputFilename: string,
-): Promise<boolean> {
-  try {
-    const converter = new Converter();
-    if(!await converter.init(callbacks, options)) {
-      return false;
-    }
-
-    const result = await converter.run(inputFilename, outputFilename);
-    if(!result) {
-      return false;
-    }
-
-    if(!await converter.write(result.artifacts)) {
-      return false;
-    }
-  } catch(e) {
-    callbacks.reportMessage(InfrastructureMessages.Fatal_UnexpectedException({e}));
-    return false;
+): Promise<ConverterResult> {
+  const converter = new Converter();
+  if(!await converter.init(callbacks, options)) {
+    return null;
   }
 
-  return true;
+  const result = await converter.run(inputFilename, outputFilename);
+  if(!result) {
+    return null;
+  }
+
+  if(!await converter.write(result.artifacts)) {
+    return null;
+  }
+
+  return result;
 }
 
 /**
