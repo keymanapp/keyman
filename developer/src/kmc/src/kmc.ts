@@ -56,15 +56,15 @@ async function run() {
     // searched for in process.argv, in order to avoid depending on Commander to
     // start Sentry, and to ensure that we capture errors as early as possible
     // in launch
-    .addOption(new Option('--no-error-reporting', 'Disable error reporting to keyman.com (overriding user settings)'))
-    .addOption(new Option('--error-reporting', 'Enable error reporting to keyman.com (overriding user settings)'));
+    .addOption(new Option('--no-error-reporting', 'disable error reporting to keyman.com (overriding user settings)'))
+    .addOption(new Option('--error-reporting', 'enable error reporting to keyman.com (overriding user settings)'));
 
-  declareBuild(program);
   declareAnalyze(program);
+  declareBuild(program);
   declareConvert(program);
-  declareMessage(program);
-  declareGenerate(program);
   declareCopy(program);
+  declareGenerate(program);
+  declareMessage(program);
 
   /* Future commands:
   declareClean(program);

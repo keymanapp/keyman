@@ -123,38 +123,35 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 		  GetKeyState(VK_SHIFT), GetAsyncKeyState(VK_SHIFT));
   */
       PKEYMAN64THREADDATA _td = ThreadGlobals();
-      if(!_td)
-      {
-        if(!Globals::CheckControllers())
-        {
-          DebugLastError("CheckControllers");
-          return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
-        }
-
-        if(!Globals_InitThread())
-        {
-          DebugLastError("Globals_InitThread");
+      if(!_td) {
+        if(!Globals_InitThread()) {
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
 
         _td = ThreadGlobals();
-	      if(!_td)
-        {
+	      if(!_td) {
           DebugLastError("ThreadGlobals");
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
       }
 
-      if(!_td->FInitialised)			// Keyman keyboard is being selected for first time in active process
-      {
-        if(!Globals::CheckControllers())
-        {
-          DebugLastError("CheckControllers");
+      if(!_td->FInitialised) {
+        // Keyman keyboard is being selected for first time in active process.
+        // keyman32.dll may already be in memory, having been loaded by
+        // kmtip.dll or other API callers. So we need to make sure that we
+        // initialize only after Keyman itself has been initialized from the
+        // controller process.
+        //
+        // Note: we do not want to call `InitProcess()` unless the global
+        // `Keyman_Initialise()` call has already completed.
+        if(!Globals::get_Keyman_Initialised()) {
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
-        if(!InitialiseProcess())
-        {
-          DebugLastError("InitialiseProcess");
+
+        if(!InitProcess()) {
+          // InitProcess() is hopefully unlikely to fail; if it does, we may not
+          // be able to log an error, but we'll try.
+          SendDebugMessageFormat("InitProcess failed after Keyman was initialized (error=%d)", GetLastError());
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
       }
