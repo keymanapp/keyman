@@ -85,4 +85,10 @@ export class DeveloperUtilsMessages {
     this.ERROR_NotAPackageFile,
     `Package source file is not a valid .kps file because it is missing the <Package> root element.`,
   );
+
+  static ERROR_UnsupportedPackageFileVersion = SevError | 0x000E;
+  static Error_UnsupportedPackageFileVersion = (o:{version:string}) => m(
+    this.ERROR_UnsupportedPackageFileVersion,
+    `Package source file is an unsupported version '${def(o.version)}'`,
+  );
 };
