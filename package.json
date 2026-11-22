@@ -52,6 +52,7 @@
     "developer/src/server",
     "developer/src/tike/xml/layoutbuilder",
     "common/test/resources",
+    "common/web/eslint-plugin-keyman",
     "common/web/keyman-version",
     "common/web/langtags",
     "common/web/sentry-manager",
@@ -68,7 +69,8 @@
     "@keymanapp/hextobin": "file:common/tools/hextobin",
     "@keymanapp/keyman-version": "file:common/web/keyman-version",
     "@keymanapp/langtags": "file:common/web/langtags",
-    "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml"
+    "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml",
+    "@keymanapp/eslint-plugin-keyman": "file:common/web/eslint-plugin-keyman"
   },
   "overrides": {
     "ajv-cli": {

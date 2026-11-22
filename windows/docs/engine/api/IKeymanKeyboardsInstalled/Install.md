@@ -42,3 +42,7 @@ void Install(string Filename, bool Force)
 [`IKeymanKeyboardFile2::Install2`](../IKeymanKeyboardFile2/Install2)
 :   Installs a keyboard file, optionally with input method for default
     language
+
+[`IKeymanKeyboardsInstalled3::Install3()`](../IKeymanKeyboardsInstalled3/Install3)
+:   Installs the keyboard file and compiles its layout against the
+    specified base keyboard

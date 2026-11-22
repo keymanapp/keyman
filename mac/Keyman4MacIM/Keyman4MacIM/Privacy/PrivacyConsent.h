@@ -14,6 +14,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // command strings passed from Keyman Configuration
+extern NSString *kMigrateAndCheckCommand;
 extern NSString *kMigrateCommand;
 extern NSString *kAccessCommand;
 extern NSString *kCheckCommand;

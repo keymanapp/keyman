@@ -291,6 +291,8 @@ namespace KmnCompilerMessages {
 
     ERROR_StoreContainsUnsupportedStatement =           SevError | 0x0BE,
 
+    WARN_CallUsedOnUnsupportedPlatform =                SevWarn | 0x0BF,
+
     FATAL_BufferOverflow =                              SevFatal | 0x0C0
 //    FATAL_Break =                                       SevFatal | 0x0C1,      unused
   };

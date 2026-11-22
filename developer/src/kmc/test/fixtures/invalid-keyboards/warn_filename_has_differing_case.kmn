@@ -1,4 +1,4 @@
-store(&name) 'hint_filename_has_differing_case'
+store(&name) 'warn_filename_has_differing_case'
 store(&version) '7.0'
 
 begin unicode > use(main)

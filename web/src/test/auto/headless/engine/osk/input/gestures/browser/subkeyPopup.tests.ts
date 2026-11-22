@@ -49,6 +49,9 @@ describe('subkey menu width', () => {
     sinon.stub(visualKeyboard, 'width').get(() => oskWidth);
 
     // Create property. "as any" is required in TS since property is readonly
+    (visualKeyboard as any).layoutKeyboard = {id: "test_keyboard"};
+
+    // Create property. "as any" is required in TS since property is readonly
     (visualKeyboard as any).kbdDiv = null;
     sinon.stub(visualKeyboard, 'kbdDiv').value(document.createElement('div'));
     return visualKeyboard;
