@@ -10,9 +10,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { Keylayout } from "@keymanapp/developer-utils";
-import { compilerTestCallbacks, makePathToFixture } from './helpers/index.js';
-import { KeylayoutFileReader } from '../src/keylayout-to-kmn/keylayout-file-reader.js';
-import { KL_KeyMap, KL_KeyMapSelect } from "../../common/web/utils/src/types/keylayout/keylayout-xml.js";
+import { compilerTestCallbacks, makePathToFixture } from '../helpers/index.js';
+import { KeylayoutFileReader } from '../../src/keylayout-to-kmn/keylayout-file-reader.js';
 
 describe('KeylayoutFileReader', function () {
 
@@ -129,7 +128,7 @@ describe("read() ", function () {
 });
 
 describe('findMapIndexinKeymap ', function () {
-  const keyMapSelect: KL_KeyMapSelect = {
+  const keyMapSelect: Keylayout.KL_KeyMapSelect = {
     mapIndex: '',
     modifier: []
   };
@@ -153,14 +152,14 @@ describe('findMapIndexinKeymap ', function () {
   ].forEach(function (values) {
     it(("findMapIndexinKeymap(keyMapSelect.mapIndex = '" + values[0] + "')").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
       keyMapSelect.mapIndex = values[0] as string;
-      const result = sutR.findMapIndexinKeymap(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMapSelect);
+      const result = sutR.unitTestEndpoints.findMapIndexinKeymap(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMapSelect);
       assert.isTrue(result === values[1]);
     });
   });
 });
 
 describe('findIndexinKeymapSelect ', function () {
-  const keyMap: KL_KeyMap = {
+  const keyMap: Keylayout.KL_KeyMap = {
     index: '',
     key: []
   };
@@ -183,7 +182,7 @@ describe('findIndexinKeymapSelect ', function () {
   ].forEach(function (values) {
     it(("findIndexinKeymapSelect(keyMap.index = '" + values[0] + "')").padEnd(40, " ") + "should return " + "'" + values[1] + "'", async function () {
       keyMap.index = values[0] as string;
-      const result = sutR.findIndexinKeymapSelect(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMap);
+      const result = sutR.unitTestEndpoints.findIndexinKeymapSelect(jsonO as Keylayout.KeylayoutXMLSourceFile, keyMap);
       assert.isTrue(result === values[1]);
     });
   });
@@ -200,7 +199,7 @@ describe('checkForCorrespondingElements ', function () {
   ].forEach(function (values) {
     it(("checkForCorrespondingElements in " + values[0]).padEnd(40, " ") + " should return " + "'" + values[1] + "'", async function () {
       const jsonO: Keylayout.KeylayoutXMLSourceFile | null = sutR.read(compilerTestCallbacks.loadFile(makePathToFixture(values[0] as string)));
-      const result = sutR.checkForCorrespondingElements(jsonO as Keylayout.KeylayoutXMLSourceFile);
+      const result = sutR.unitTestEndpoints.checkForCorrespondingElements(jsonO as Keylayout.KeylayoutXMLSourceFile);
       assert.isTrue(result === values[1]);
     });
   });

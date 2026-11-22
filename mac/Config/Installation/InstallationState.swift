@@ -43,11 +43,11 @@ public class InstallationState {
   }
 
   /**
-   * The installation has at least one task complete and at least one remaining to complete.
+   * The installation has at least one task remaining to complete.
    * It does not matter if this is a repair or not.
    */
   public var isInProgress: Bool {
-    return tasks.contains(where: { !$0.isComplete }) && tasks.contains(where: { $0.isComplete})
+    return tasks.contains(where: { !$0.isComplete })
   }
 
   init(version: String, dateRestartRequested: Date? = nil, isRepair: Bool = false, hasDisplayedInstallComplete: Bool = false, tasks: Set<InstallationTask>) {
@@ -97,6 +97,9 @@ public class InstallationState {
     }
     if let taskFlag = dictionary[InstallationTaskType.enableInputMethod.rawValue] as? Bool {
       installationTasks.insert(InstallationTask(task: .enableInputMethod, completed: taskFlag))
+    }
+    if let taskFlag = dictionary[InstallationTaskType.confirmEnabled.rawValue] as? Bool {
+      installationTasks.insert(InstallationTask(task: .confirmEnabled, completed: taskFlag))
     }
     if let taskFlag = dictionary[InstallationTaskType.requestAccess.rawValue] as? Bool {
       installationTasks.insert(InstallationTask(task: .requestAccess, completed: taskFlag))

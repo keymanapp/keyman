@@ -23,7 +23,7 @@ describe('commandOptionsMessageToCompilerOptionsMessage', function () {
     {input: 'KM05002:ERROR', result: {code: InfrastructureMessages.INFO_BuildingFile, level: CompilerErrorSeverity.Error } },
 
     // Test hint and warn messages
-    {input: 'KM05009:E', result: {code: InfrastructureMessages.HINT_FilenameHasDifferingCase, level: CompilerErrorSeverity.Error } },
+    {input: 'KM05014:E', result: {code: InfrastructureMessages.HINT_ProjectIsVersion10, level: CompilerErrorSeverity.Error } },
 
     // Test different allowable patterns
     {input: '5002', result: {code: InfrastructureMessages.INFO_BuildingFile, level: 'disable' } },

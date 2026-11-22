@@ -119,12 +119,14 @@ public final class KMTextView extends AppCompatEditText {
       public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
           activeView = v;
+          KMManager.setInputType(KeyboardType.KEYBOARD_TYPE_INAPP, ((KMTextView)v).getInputType());
           if (KMManager.InAppKeyboard != null && KMManager.InAppKeyboardWebViewClient.getKeyboardLoaded()) {
             updateTextContext();
           }
           showKeyboard();
         } else {
           activeView = null;
+          KMManager.setInputType(KeyboardType.KEYBOARD_TYPE_INAPP, 0);
           dismissKeyboard();
         }
       }
