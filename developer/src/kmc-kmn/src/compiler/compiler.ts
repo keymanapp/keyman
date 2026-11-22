@@ -45,6 +45,34 @@ export const COMPILETARGETS_KMX =   0x01;
 export const COMPILETARGETS_JS =    0x02;
 export const COMPILETARGETS__MASK = 0x03;
 
+/*
+ * Platform target values, corresponding to kmcmplibapi.h.
+ * - See also: common-types / keyman-targets.ts (string values)
+ */
+
+export const PLATFORMTARGETS_ANDROIDPHONE =  0x001;
+export const PLATFORMTARGETS_ANDROIDTABLET = 0x002;
+export const PLATFORMTARGETS_IPAD =          0x004;
+export const PLATFORMTARGETS_IPHONE =        0x008;
+export const PLATFORMTARGETS_LINUX =         0x010;
+export const PLATFORMTARGETS_MACOSX =        0x020;
+export const PLATFORMTARGETS_WEB =           0x040;
+export const PLATFORMTARGETS_WINDOWS =       0x080;
+
+export const PLATFORMTARGETS_DESKTOP =       (PLATFORMTARGETS_WINDOWS | PLATFORMTARGETS_MACOSX | PLATFORMTARGETS_LINUX);
+export const PLATFORMTARGETS_MOBILE =        (PLATFORMTARGETS_ANDROIDPHONE | PLATFORMTARGETS_IPHONE);
+export const PLATFORMTARGETS_TABLET =        (PLATFORMTARGETS_ANDROIDTABLET | PLATFORMTARGETS_IPAD);
+export const PLATFORMTARGETS_ANY =           (PLATFORMTARGETS_DESKTOP | PLATFORMTARGETS_WEB | PLATFORMTARGETS_MOBILE | PLATFORMTARGETS_TABLET);
+
+export const PLATFORMTARGETS__KMX =          (PLATFORMTARGETS_DESKTOP);
+export const PLATFORMTARGETS__KMW =          (PLATFORMTARGETS_WEB | PLATFORMTARGETS_MOBILE | PLATFORMTARGETS_TABLET);
+
+export const PLATFORMTARGETS__MASK =         0x0FF;
+
+// call() is supported on Windows and web platforms, currently
+export const PLATFORMTARGETS__FEATURE__CALL =               (PLATFORMTARGETS_WINDOWS | PLATFORMTARGETS__KMW);
+export const PLATFORMTARGETS__FEATURE_UNSUPPORTED__CALL =   (PLATFORMTARGETS_MACOSX | PLATFORMTARGETS_LINUX);
+
 /**
  * @internal
  * Data in CompilerResultExtra comes from kmcmplib. This is used by other
@@ -52,13 +80,17 @@ export const COMPILETARGETS__MASK = 0x03;
  */
 export interface KmnCompilerResultExtra {
   /**
-   * A bitmask, consisting of COMPILETARGETS_KMX and/or COMPILETARGETS_JS
+   * Target compiled file formats, a bitmask, consisting of COMPILETARGETS_KMX and/or COMPILETARGETS_JS
    */
   targets: number;
   kvksFilename?: string;
   displayMapFilename?: string;
   stores: CompilerResultExtraStore[];
   groups: CompilerResultExtraGroup[];
+  /**
+   * Supported platforms, a bitmask, consisting of PLATFORMTARGETS_ values
+   */
+  platformTargets: number;
 };
 
 /** @internal */
@@ -227,6 +259,7 @@ export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSet
         kvksFilename: wasm_result.extra.kvksFilename,
         stores: [],
         groups: [],
+        platformTargets: wasm_result.extra.platformTargets,
       },
       displayMap: null
     };
