@@ -7,6 +7,9 @@ export * from './correction/context-transition.js';
 export * from './correction/correction-searchable.js';
 export * from './correction/correction-result-mapping.js';
 export * from './correction/distance-modeler.js';
+export * from './correction/deletion-quotient-spur.js';
+export * from './correction/insertion-quotient-spur.js';
+export * from './correction/substitution-quotient-spur.js';
 export * from './correction/execution-timer.js';
 export * from './correction/search-quotient-cluster.js';
 export * from './correction/search-quotient-spur.js';
@@ -19,6 +22,8 @@ export { ExtendedEditOperation, SegmentableDistanceCalculation } from './correct
 export * from './correction/tokenization-subsets.js';
 export * from './correction/transition-helpers.js';
 export * from './correction/token-result-mapping.js';
+export * from './correction/tokenization-corrector.js';
+export * from './correction/tokenization-result-mapping.js';
 export {
     determinePunctuationFromModel, determineModelWordbreaker,
     determineModelTokenizer, detectCurrentCasing

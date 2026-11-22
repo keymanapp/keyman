@@ -240,7 +240,7 @@ export abstract class SearchQuotientNode implements CorrectionSearchable<SearchN
    */
   protected saveResult(result: TokenResultMapping): boolean {
     const priorMatch = this.returnedValues[result.matchString];
-    if(priorMatch !== undefined && priorMatch.totalCost <= result.totalCost) {
+    if(priorMatch !== undefined && priorMatch.currentCost <= result.currentCost) {
       return false;
     }
 
