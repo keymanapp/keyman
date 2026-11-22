@@ -25,9 +25,6 @@ function Keyboard_test_context_in_context()
   this.gs=function(t,e) {
     return this.g_main_0(t,e);
   };
-  this.gs=function(t,e) {
-    return this.g_main_0(t,e);
-  };
   this.g_main_0=function(t,e) {
     var k=KeymanWeb,r=0,m=0;
     if(k.KKM(e, modCodes.SHIFT | modCodes.VIRTUAL_KEY /* 0x4010 */, keyCodes.K_1 /* 0x31 */)) {

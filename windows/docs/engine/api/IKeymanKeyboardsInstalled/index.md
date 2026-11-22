@@ -9,17 +9,19 @@ in Keyman Engine for Windows API.
 
 ## Interface Hierarchy
 
-`IDispatch`  
+`IDispatch`
 
-> [`IKeymanObject`](../IKeymanObject)  
+> [`IKeymanObject`](../IKeymanObject)
 >
-> > [`IKeymanCollection`](../IKeymanCollection)  
+> > [`IKeymanCollection`](../IKeymanCollection)
 > >
-> > > [`IKeymanKeyboards`](../IKeymanKeyboards)  
+> > > [`IKeymanKeyboards`](../IKeymanKeyboards)
 > > >
-> > > > **`IKeymanKeyboardsInstalled`**  
+> > > > **`IKeymanKeyboardsInstalled`**
 > > > >
-> > > > > [`IKeymanKeyboardsInstalled2`](../IKeymanKeyboardsInstalled2)  
+> > > > > [`IKeymanKeyboardsInstalled2`](../IKeymanKeyboardsInstalled2)
+> > > > >
+> > > > > [`IKeymanKeyboardsInstalled3`](../IKeymanKeyboardsInstalled3)
 
 ## Properties
 

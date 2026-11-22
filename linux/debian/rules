@@ -68,6 +68,8 @@ override_dh_auto_install:
 	dh_auto_install --sourcedir=linux/keyman-config --buildsystem=pybuild $@
 	dh $@ --with-python3 --with bash-completion
 	dh_python3 -O--buildsystem=pybuild
+	# Not needed on Debian - uinput is compiled into the kernel
+	rm $(CURDIR)/debian/tmp/usr/lib/modules-load.d/keyman-uinput.conf
 
 override_dh_missing:
 	dh_missing --fail-missing
