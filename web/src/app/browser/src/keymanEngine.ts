@@ -77,28 +77,28 @@ export class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, Context
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
     this.contextManager.on('textstorechange', (textStore) => {
-      const e = (textStore as AbstractElementTextStore<any>)?.getElement();
+      const elem = (textStore as AbstractElementTextStore<any>)?.getElement();
       if(this.osk) {
-        (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
+        (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = elem;
       }
 
       if(this.config.hostDevice.touchable && textStore) {
-        this.ensureElementVisibility(e);
+        this.ensureElementVisibility(elem);
       }
     });
   }
 
-  public ensureElementVisibility(e: HTMLElement): void {
-    if(!e || !this.osk) {
+  public ensureElementVisibility(elem: HTMLElement): void {
+    if(!elem || !this.osk) {
       return;
     }
 
     // Get the absolute position of the caret
-    const y = getAbsoluteY(e);
+    const y = getAbsoluteY(elem);
     const t = window.pageYOffset;
     let dy = y-t;
     if(y >= t) {
-      dy -= (window.innerHeight - this.osk._Box.offsetHeight - e.offsetHeight - 2);
+      dy -= (window.innerHeight - this.osk._Box.offsetHeight - elem.offsetHeight - 2);
       if(dy < 0) {
         dy=0;
       }

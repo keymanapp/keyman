@@ -1,8 +1,8 @@
 ---
-title: What's New in Keyman 19.0 for Android
+title: What's New in Keyman 20.0 for Android
 ---
 
-Here are some of the new features we have added to Keyman 19.0 for Android:
+Here are some of the new features we have added to Keyman 20.0 for Android:
 
 - Keyboard search is now localized for several languages (#15510)
 - Support for dark mode (#15827)

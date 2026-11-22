@@ -1,5 +1,58 @@
 # Keyman Version History
 
+## 20.0.10 alpha 2026-11-18
+
+* docs(common): add dependencies document (#16967)
+
+## 20.0.9 alpha 2026-10-29
+
+* chore(deps): bump brace-expansion from 5.0.9 to 5.0.12 in /developer/src/server/src/win32/trayicon/addon-src (#16798)
+* chore(deps): bump ip-address from 10.7.2 to 10.7.4 in /developer/src/server/src/win32/trayicon/addon-src (#16880)
+* chore(deps): bump serialize-javascript and mocha in /resources/build/pr-build-status (#16899)
+* chore(deps-dev): bump git-diff from 2.0.6 to 2.0.7 (#16919)
+
+## 20.0.8 alpha 2026-10-27
+
+* fix(developer): strip markers correctly in ldml to kvk compiler (#16901)
+
+## 20.0.7 alpha 2026-10-21
+
+* chore(web): add Keyman header to test files (#16857)
+
+## 20.0.6 alpha 2026-10-19
+
+* docs(common): move legacy history (#16799)
+
+## 20.0.5 alpha 2026-10-17
+
+* fix: set alpha tier after merge (#16841)
+
+## 20.0.4 alpha 2026-10-14
+
+* refactor(web): clarify scope of `doShow`/`doHide` (#16589)
+* refactor(web): update function comments and cleanup (#16591)
+
+## 20.0.3 alpha 2026-10-09
+
+* maint(ios): new iOS certificate (alpha-20.0) (#16771)
+
+## 20.0.2 alpha 2026-10-07
+
+* fix(mac): lower case 'k' for .pkg.download_info (#16744)
+
+## 20.0.1 alpha 2026-10-06
+
+* chore: add epics to HISTORY.md (#16729)
+* fix(android): refresh current keyboard when resuming main activity (#16645)
+* fix(mac): apply backspace to correct location (#16634)
+* docs: add acceptance tests from dokimion (#16693)
+* chore(developer): warn on v19 deprecated language features (#16710)
+* fix(developer): check `any()` and `index()` for invalid use of virtual keys (#16717)
+* fix(developer): emit compile error when unsupported statements encountered in stores (#16723)
+* chore(common): move CODE__SIZE declaration to common (#16724)
+* chore(common): remove `clearcontext`,`fix`,`switch`,`key` statements (#16726)
+* chore: move to 20.0-alpha (#16739)
+
 ## 19.0.325 beta 2026-11-21
 
 * fix(linux): don't abort on error (#16977)
@@ -1950,6 +2003,25 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.255 stable 2026-11-06
+
+* maint(linux): support uninitialized DIST and EXTRA_ARGS variables in debian.sh (#16847)
+* chore(linux): quote search team in upload-to-debian.sh so we find existing pull requests (#16851)
+* chore(linux): Update debian changelog (#15811)
+* fix(developer): handle .gitignore in npm-based installations of kmc-generate (#16869)
+* fix(developer): disable http compression in Server to mitigate Node2Shell (#16905)
+* fix(ios): add workaround for iOS 27+ blank keyboard (#16903)
+* fix(ios): remove Liquid Glass blur effect seen in iOS 27 from system-keyboard mode (#16902)
+
+## 18.0.254 stable 2026-10-16
+
+* chore(linux): replace deprecated `parse_version` (#16736)
+* chore(linux): update Debian standards version (#16713)
+* chore(linux): update changelog with Debian version (#16735)
+* fix(web): prevent crash adding log entry for keystroke with `inputBreadCrumb` (#16761)
+* maint(ios): new iOS certificate (stable-18.0) (#16773)
+* fix(web): don't crash if model isn't fully loaded yet (#16784)
 
 ## 18.0.253 stable 2026-10-02
 

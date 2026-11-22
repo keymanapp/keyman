@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { PageContextAttachment } from 'keyman/engine/attachment';
 import { DeviceSpec, timedPromise } from 'keyman/common/web-utils';
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';

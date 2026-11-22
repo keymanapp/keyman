@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai';
 import { LMLayerWorkerCode } from "@keymanapp/lm-worker/worker-main.wrapped.js";
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';

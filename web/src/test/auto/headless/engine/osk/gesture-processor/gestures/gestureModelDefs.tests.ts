@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai';
 
 import { GestureModelDefs, gestures } from 'keyman/engine/gesture-processor';
