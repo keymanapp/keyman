@@ -176,8 +176,8 @@ export const builder: Builder = {
     $('#selSubKeyLayerOverride option').remove();
     $('#addLayerList option').remove();
 
-    add($selKeyLayerOverride, '', '(current layer)');
-    add($selSubKeyLayerOverride, '', '(current layer)');
+    add($selKeyLayerOverride, '', '(current layer)');  //TODO: modifierOverride
+    add($selSubKeyLayerOverride, '', '(current layer)');  //TODO: modifierOverride
     add($addLayerList, '', '(custom)');
 
 
@@ -202,13 +202,14 @@ export const builder: Builder = {
       for(var j = 0; j < layer.row.length; j++) {
         var row = layer.row[j];
         for(var k = 0; k < row.key.length; k++) {
-          if(typeof row.key[k].layer != 'undefined' && modifierNames.indexOf(row.key[k].layer) < 0) {
-            modifierNames.push(row.key[k].layer);
+          if(typeof row.key[k].layer/*modifierOverride*/ != 'undefined' && modifierNames.indexOf(row.key[k].layer/*modifierOverride*/) < 0) {
+            modifierNames.push(row.key[k].layer/*modifierOverride*/);
           }
+          // TODO: BUG: flicks and multitaps are not enumerated
           if(typeof row.key[k].sk != 'undefined') {
             for(var l = 0; l < row.key[k].sk.length; l++) {
-              if(typeof row.key[k].sk[l].layer != 'undefined' && modifierNames.indexOf(row.key[k].sk[l].layer) < 0) {
-                modifierNames.push(row.key[k].sk[l].layer);
+              if(typeof row.key[k].sk[l].layer/*modifierOverride*/ != 'undefined' && modifierNames.indexOf(row.key[k].sk[l].layer/*modifierOverride*/) < 0) {
+                modifierNames.push(row.key[k].sk[l].layer/*modifierOverride*/);
               }
             }
           }
@@ -221,17 +222,18 @@ export const builder: Builder = {
     };
 
     if(!builder.showAllModifierCombinations) {
-      // Add any layer names that are already referenced
+      // Add any modifiers that are already referenced
       for(modifier = 0; modifier < builderConstants.validModifierCombinations.length; modifier++) {
         var name = builderConstants.getModifierCombinationName(builderConstants.validModifierCombinations[modifier]);
         if(!alreadyAdded(builderConstants.validModifierCombinations[modifier]) && isUsed(name)) {
-          add($selKeyLayerOverride, name);
-          add($selSubKeyLayerOverride, name);
+          add($selKeyLayerOverride, name); //modifierOverride
+          add($selSubKeyLayerOverride, name); //modifierOverride
         }
       }
     }
   },
 
+  // TODO: some conflation between LayerId and modifierOverride here too
   getModifierCombinationFromLayerId: function(id) {
     for(var i = 0; i < builderConstants.validModifierCombinations.length; i++) {
       if(builderConstants.getModifierCombinationName(builderConstants.validModifierCombinations[i]) == id) {
@@ -241,6 +243,7 @@ export const builder: Builder = {
     return 0;
   },
 
+  // TODO: some conflation between LayerId and modifierOverride here too
   isLayerIdShifted: function(id) {
     return (builder.getModifierCombinationFromLayerId(id) & builderConstants.modifierCodes.SHIFT) != 0;
   },
@@ -424,7 +427,7 @@ export const builder: Builder = {
           .data('font', key.font)
           .data('fontsize', key.fontsize)
           .data('nextlayer', key.nextlayer)
-          .data('layer', key.layer)
+          .data('layer', key.layer/*modifierOverride*/)
           .data('text', key.text)
           .data('hint', key.hint)
           .data('longpress', key.sk)
@@ -447,7 +450,7 @@ export const builder: Builder = {
         $('.text', nkey).text(builder.renameSpecialKey(text));
         builder.updateHint($(nkey));
 
-        if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(builder.getStandardKeyCap(key.id, key.layer ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
+        if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(builder.getStandardKeyCap(key.id, key.layer/*modifierOverride*/ ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
 
 
         builder.updateKeyId(nkey);
@@ -483,7 +486,7 @@ export const builder: Builder = {
   },
 
   updateKeyId: function (nkey) {
-    $('.id', nkey).text(($(nkey).data('layer') || '') + ' ' + $(nkey).data('id'));
+    $('.id', nkey).text(($(nkey).data('layer') || '') + ' ' + $(nkey).data('id')); //TODO:modifierOverride
   },
 
   selectPlatform: function (val) {
@@ -1095,6 +1098,7 @@ const selKeyNextLayerChange = builder.wrapChange(function (evt: JQueryEventObjec
 
 $('#selKeyNextLayer').change(selKeyNextLayerChange);
 
+// TODO: modifierOverride
 const selKeyLayerOverrideChange = builder.wrapChange(function (evt: JQueryEventObject) {
   $(evt.currentTarget).val() === '' ?
     builder.selectedKey().removeData('layer') :

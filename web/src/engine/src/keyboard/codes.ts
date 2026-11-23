@@ -54,7 +54,7 @@ export const Codes = {
   // Define standard keycode numbers (exposed for use by other modules)
   keyCodes: {
     ...USVirtualKeyCodes,
-  } as {[name: string]: number},
+  } as {[name: string]: number},  // TODO: rename 'name' to 'id'
 
   codesUS: [
     ['0123456789',';=,-./`', '[\\]\''],
@@ -88,9 +88,15 @@ export const Codes = {
    *
    * @param       {string}      layerId       layer id (e.g. ctrlshift)
    * @return      {number}                    modifier key state (desktop keyboards)
+   *
+   * TODO: conflation of layerId and modifierOverride
+   * TODO: rename to getModifierFromLayerId or getModifierConstantFromModifierOverride or something
    */
    getModifierState(layerId: string): number {
     var modifier=0;
+
+    // TODO: this allows any order of modifiers in the override string, which is not technically within spec
+
     if(layerId.indexOf('shift') >= 0) {
       modifier |= ModifierKeyConstants.K_SHIFTFLAG;
     }
@@ -130,6 +136,8 @@ export const Codes = {
    *
    * @param       {string}      layerId       layer id (e.g. caps)
    * @return      {number}                    modifier key state (desktop keyboards)
+   *
+   * TODO: conflation of layerId and modifierOverride
    */
   getStateFromLayer(layerId: string): number {
     var modifier=0;

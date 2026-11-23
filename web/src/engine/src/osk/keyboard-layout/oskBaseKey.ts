@@ -81,8 +81,8 @@ export class OSKBaseKey extends OSKKey {
       }
 
       // If a subkey doesn't have a defined layer property, copy it from the base key's layer by default.
-      if(!bsk[bsn].layer) {
-        bsk[bsn].layer = btn.key.layer
+      if(!bsk[bsn].layer/*modifierOverride*/) {
+        bsk[bsn].layer/*modifierOverride*/ = btn.key.layer/*modifierOverride*/;
       }
     }
   }

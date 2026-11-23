@@ -345,6 +345,8 @@ export class JSKeyboardProcessor extends EventEmitter<EventMap> implements Keybo
     }
 
     // Identify next layer, if required by key
+    // TODO: is this whole function applicable only to desktop keyboards? We should perhaps clarify
+    // TODO: otherwise, this should be done ONLY in the OSK construction from VK for keyboards that don't have a touch layout; it should not be a general fallback
     if(!nextLayer) {
       switch(keyName) {
         case 'K_LSHIFT':
