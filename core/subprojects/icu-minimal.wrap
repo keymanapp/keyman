@@ -1,8 +1,8 @@
 [wrap-file]
 directory = icu
-source_url = https://github.com/unicode-org/icu/releases/download/release-73-1/icu4c-73_1-src.tgz
-source_filename = icu4c-73_1-src.tgz
-source_hash = a457431de164b4aa7eca00ed134d00dfbf88a77c6986a10ae7774fc076bb8c45
+source_url = https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz
+source_filename = icu4c-77_1-src.tgz
+source_hash = 3a2e7a47604ba702f345878308e6fefeca612ee895cf4a5f222e7955fabfe0c0
 ## TODO-LDML: Note, need meson 0.55.0 to use patch_directory
 patch_directory = icu
 
