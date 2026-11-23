@@ -81,7 +81,7 @@ int keyman_sentry_init(bool is_keyman_developer, const char *logger) {
 }
 
 void keyman_sentry_shutdown() {
-  sentry_shutdown();
+  sentry_close();
   free(g_logger);
   g_logger = NULL;
 }
