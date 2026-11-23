@@ -3,5 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {},
-  "main": "build/src/index.js"
+  "main": "build/src/index.js",
+  "devDependencies": {
+    "@types/node": "^25.6.0"
+  }
 }

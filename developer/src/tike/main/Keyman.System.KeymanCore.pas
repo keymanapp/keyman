@@ -81,7 +81,7 @@ const
   );
 
 const
-  keymancore = 'keymancore-2.dll';
+  keymancore = 'keymancore-3.dll';
 
 procedure km_core_context_items_dispose(
   context_items: pkm_core_context_item
@@ -229,12 +229,6 @@ function km_core_state_options_update(
   new_opts: pkm_core_option_item
 ): km_core_status; cdecl; external keymancore delayed;
 
-function km_core_state_options_to_json(
-  state: pkm_core_state;
-  buf: PAnsiChar;
-  var space: Integer
-): km_core_status; cdecl; external keymancore delayed;
-
 type
   km_core_keyboard_attrs = record
     version_string: pkm_core_cu;
@@ -291,12 +285,6 @@ function km_core_state_action_items(
 function km_core_state_get_actions(
   state: pkm_core_state
 ): pkm_core_actions; cdecl; external keymancore delayed;
-
-function km_core_state_to_json(
-  state: pkm_core_state;
-  buf: PAnsiChar;
-  space: pinteger
-): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_state_context_clear(
   state: pkm_core_state

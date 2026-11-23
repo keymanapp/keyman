@@ -6,15 +6,29 @@ import * as fs from "node:fs";
 import { fileURLToPath } from 'node:url';
 
 /**
- * Builds a path to the fixture with the given path components.
+ * Builds a path to the /developer/src/common/web/utils fixture with the given
+ * path components.
  *
- * e.g., makePathToFixture('example.qaa.trivial')
- * e.g., makePathToFixture('example.qaa.trivial', 'model.ts')
+ * e.g., makePathToFixture('example.qaa.trivial') e.g.,
+ * makePathToFixture('example.qaa.trivial', 'model.ts')
  *
  * @param components One or more path components.
  */
  export function makePathToFixture(...components: string[]): string {
   return fileURLToPath(new URL(path.join('..', '..', '..', 'test', 'fixtures', ...components), import.meta.url));
+}
+
+/**
+ * Builds a path to the /common/test file with the given path components. Note
+ * that this links to the base of /common/test, not /common/test/fixtures,
+ * because the /common/test folder currently has a mix of paths.
+ *
+ * e.g., makePathToFixture('basic.xml')
+ *
+ * @param components One or more path components.
+ */
+export function makePathToCommonFixture(...components: string[]): string {
+  return fileURLToPath(new URL(path.join('..', '..', '..', '..', '..', '..', '..', '..', 'common', 'test', ...components), import.meta.url));
 }
 
 export function loadFile(filename: string | URL): Buffer {

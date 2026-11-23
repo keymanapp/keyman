@@ -16,6 +16,7 @@
   "references": [
     { "path": "../../keyman-version" },
     { "path": "../../../../core/include/ldml/"},
+    { "path": "../../../tools/hextobin/" },
     { "path": "../" },
   ],
 }

@@ -52,6 +52,7 @@ If no input file is supplied, kmc will build the current folder.`;
     .option('-W, --no-compiler-warnings-as-errors', 'warnings do not fail the build; overrides project-level warnings-as-errors option')
     .option('-m, --message <number>', 'adjust severity of info, hint or warning message to Disable (default), Info, Hint, Warn or Error (option can be repeated)',
       (value, previous) => previous.concat([value]), [])
+    .option('--target-version <number>', 'Target version of Keyman for compiled objects (default is minimum version that supports all features in the object)')
     .option('--no-compiler-version', 'exclude compiler version metadata from output')
     .option('--no-warn-deprecated-code', 'turn off warnings for deprecated code styles')
     .option('--continue-on-error', 'continue build of subsequent files even if earlier files have errors');

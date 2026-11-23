@@ -268,9 +268,14 @@ export class InfrastructureMessages {
     will have the same meaning as other kmc commands.
   `);
 
+  static ERROR_InvalidTargetVersion = SevError | 0x0031;
+  static Error_InvalidTargetVersion = (o:{targetVersion:string}) => m(
+    this.ERROR_InvalidTargetVersion,
+    `Target version parameter '${def(o.targetVersion)}' is not a valid Keyman version.`,
+  );
+  
   //------------------------------------------------------------------------------|
   // max length of detail message lines (checked by verifyCompilerMessagesObject) |
   //------------------------------------------------------------------------------|
-
 }
 

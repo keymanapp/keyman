@@ -9,7 +9,7 @@
 This document discusses the binary format for KMXPlus, which contains keyboards
 converted from source LDML data.
 
-Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
+Specification: <https://unicode.org/reports/tr35/tr35-keyboards.html>
 
 ## C7043.1 Principles
 
@@ -23,23 +23,46 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
   String data items are identified with `str:`, indicating a 32 bit index into
   the `strs` table.
 - All offsets are 32-bit little-endian values.  For all sections except for the
-  `'sect'` section (which see), offsets are relative to the beginning of each
+  `'sect'`/`'sec2'` section (which see), offsets are relative to the beginning of each
   section and must fall within the `size` of the section.
 - Data fields are not necessarily aligned to 32-bit or 64-bit boundaries.
 
 ## C7043.2 Sections
 
 - Data is divided into several sections. The very first section is the `'sect'`
-  section which is the table of contents.
-- All sections begin with a 32-bit (four character) section identifier, and a
-  32-bit section size.
-- Other than the `sect` table itself, the rest of the sections follow in binary
-  order in the file.  In other words, the binary ordering of the section
+  section which is the table of contents. For version 19+, the section has the
+  identifier `'sec2'`.
+
+- Other than the `sect`/`sec2` table itself, the rest of the sections follow in
+  binary order in the file.  In other words, the binary ordering of the section
   identifiers determines the order of the file layout.
+
+### Section headers
+
+Every section has a header. The header format and size changed in version 19.
+
+- For version 17 (the first release of KMX+, aligned with Keyman versions), all
+  sections begin with a 32-bit (four character) section identifier, and a 32-bit
+  section size.
+
+- For version 19 onwards, the header also includes a 32-bit section
+  version: `00 00 00 11` - v17, or `00 00 00 13` - v19; other versions may
+  follow.
+
+| ∆ | Bits | Name    | Description                                |
+|---|------|---------|--------------------------------------------|
+| 0 |  32  | ident   | e.g. `sect`, `sec2`, `keys`...             |
+| 4 |  32  | size    | int: Length of section, including header   |
+| 8 |  32  | version | int: Version of the section (version 19+)  |
+
+A version 17 header is thus 8 bytes, whereas a version 19+ header is 12 bytes.
+
+This header is not shown in the section descriptions below; all offsets shown
+are relative to the start of the content in the section.
 
 ### Required sections
 
-- The `sect` section is always required for a valid KMX Plus file.
+- The `sect`/`sec2` section is always required for a valid KMX Plus file.
 - The `key2` section is required by core’s ldml_processor loader, for the
   `key2.kmap` subtable.
 - The `strs` section is effectively required in most cases.
@@ -47,27 +70,26 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
   sections.
 - A valid keyboard will need most or all of the sections present to be usable.
 
-### C7043.2.1 `sect`—Section Table of contents
+### C7043.2.1 `sect`/`sec2`—Section Table of contents
 
 The very first section is a table of contents listing the rest of the sections.
 The table of contents does not list itself.
 
-Unlike all other sections, all byte offsets are relative to start of the `sect`
-section and do not have to be located within the `size` of the section.
+Unlike all other sections, all byte offsets are relative to start of the
+`sect`/`sec2` section -- i.e. the start of the KMX+ data blob itself -- and do
+not have to be located within the `size` of the section.
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-| 0 |  32  | ident   | `sect`                                   |
-| 4 |  32  | size    | int: Length of section                   |
-| 8 |  32  | total   | int: KMXPlus entire length               |
-|12 |  32  | count   | int: Number of following section headers |
+| 0 |  32  | total   | int: KMXPlus entire length               |
+| 4 |  32  | count   | int: Number of following section headers |
 
 Then for `count` repetitions:
 
 | ∆ | Bits | Name    | Description                                       |
 |---|------|---------|---------------------------------------------------|
-|16+|  32  | sect    | Section identity, e.g. `loca`                     |
-|20+|  32  | offset  | off: offset relative to `dpKMXPlus` of section    |
+| 8+|  32  | sect    | Section identity, e.g. `loca`                     |
+|12+|  32  | offset  | off: offset relative to start of KMX+ data blob   |
 
 This list is in sorted order based on the `sect` identifier.
 
@@ -79,16 +101,14 @@ See [C7043.2.11](#c7043211-tran-and-bksptransforms).
 
 | ∆ | Bits | Name     | Description                              |
 |---|------|----------|------------------------------------------|
-| 0 |  32  | ident    | `elem`                                   |
-| 4 |  32  | size     | int: Length of section                   |
-| 8 |  32  | count    | int: Number of element string entries    |
+| 0 |  32  | count    | int: Number of element string entries    |
 
 Then for each element string:
 
 | ∆ | Bits | Name          | Description                                   |
 |---|------|---------------|-----------------------------------------------|
-|16+|  32  | offset        | off: Offset to element string                 |
-|20+|  32  | length        | int: Number of elements in element string     |
+| 4+|  32  | offset        | off: Offset to element string                 |
+| 8+|  32  | length        | int: Number of elements in element string     |
 
 The first entry in the element string list MUST be the null element string,
 which has zero length and zero offset.
@@ -120,15 +140,13 @@ Each element string is made up of elements with the following item structure:
 
 ### C7043.2.5 Removed: old-format `keys`
 
-_this section has been merged into the new `keys.kmap`_
+_this section has been merged into the new `key2.kmap`_
 
 ### C7043.2.6 `loca`—Locales
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-| 0 |  32  | ident   | `loca`                                   |
-| 4 |  32  | size    | int: Length of section                   |
-| 8 |  32  | count   | int: Number of locales                   |
+| 0 |  32  | count   | int: Number of locales                   |
 
 `count` is always ≥1, because a keyboard always has a primary locale identifier.
 
@@ -136,7 +154,7 @@ For each locale ID in `count`
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-|16+|  32  | locale  | str: Locale ID in BCP47 format           |
+| 4+|  32  | locale  | str: Locale ID in BCP47 format           |
 
 The first locale ID is always the primary locale identifier.  The rest of the
 locale IDs (starting at offset 16) are in sorted binary order.
@@ -145,15 +163,13 @@ locale IDs (starting at offset 16) are in sorted binary order.
 
 | ∆ | Bits | Name          | Description                         |
 |---|------|---------------|-------------------------------------|
-| 0 |  32  | ident         | `meta`                              |
-| 4 |  32  | size          | int: Length of section              |
-| 8 |  32  | author        | str: Keyboard author                |
-|12 |  32  | conform       | str: CLDR 'conformsTo' version      |
-|16 |  32  | layout        | str: layout type                    |
-|20 |  32  | name          | str: keyboard nme                   |
-|24 |  32  | indicator     | str: indicator                      |
-|28 |  32  | version       | str: keyboard version               |
-|32 |  32  | settings      | int: keyboard settings              |
+| 0 |  32  | author        | str: Keyboard author                |
+| 4 |  32  | conform       | str: CLDR 'conformsTo' version      |
+| 8 |  32  | layout        | str: layout type                    |
+|12 |  32  | name          | str: keyboard name                  |
+|16 |  32  | indicator     | str: indicator                      |
+|20 |  32  | version       | str: keyboard version               |
+|24 |  32  | settings      | int: keyboard settings              |
 
 The `settings` is a 32-bit bitfield as below:
 
@@ -175,16 +191,14 @@ All strings are stored in the Strings section.
 
 | ∆ | Bits | Name          | Description                         |
 |---|------|---------------|-------------------------------------|
-| 0 |  32  | ident         | `strs`                              |
-| 4 |  32  | size          | int: Length of section              |
-| 8 |  32  | count         | int: Number of strings              |
+| 0 |  32  | count         | int: Number of strings              |
 
 Then for each string:
 
 | ∆ | Bits | Name          | Description                                   |
 |---|------|---------------|-----------------------------------------------|
-|12+|  32  | offset        | off: Offset to string                         |
-|16+|  32  | length        | int: Length of string in UTF-16LE code units  |
+| 4+|  32  | offset        | off: Offset to string                         |
+| 8+|  32  | length        | int: Length of string in UTF-16LE code units  |
 
 After the string offset table comes the actual UTF-16LE data. There is a null
 (\u0000) after each string, which is _not_ included in the string length.
@@ -214,12 +228,10 @@ and the `backspace` table has the ident `bksp`.
 
 | ∆ | Bits | Name           | Description                              |
 |---|------|----------------|------------------------------------------|
-| 0 |  32  | ident          | `tran` / `bksp`                          |
-| 4 |  32  | size           | int: Length of section                   |
-| 8 |  32  | groupCount     | int: Number of transformGroups           |
-|12 |  32  | transformCount | int: Number of transforms                |
-|16 |  32  | reorderCount   | int: Number of reorders                  |
-|20+|  -   | groups         | transformGroup subtable                  |
+| 0 |  32  | groupCount     | int: Number of transformGroups           |
+| 4 |  32  | transformCount | int: Number of transforms                |
+| 8 |  32  | reorderCount   | int: Number of reorders                  |
+|12+|  -   | groups         | transformGroup subtable                  |
 | - |  -   | transforms     | transforms subtable                      |
 | - |  -   | reorders       | reorders subtable                        |
 
@@ -292,34 +304,35 @@ Represents layers on the keyboard.
 
 | ∆ | Bits | Name       | Description                              |
 |---|------|------------|------------------------------------------|
-| 0 |  32  | ident      | `layr`                                   |
-| 4 |  32  | size       | int: Length of section                   |
-| 8 |  32  | listCount  | int: Number of layer lists               |
-|12 |  32  | layerCount | int: number of layer entries             |
-|16 |  32  | rowCount   | int: number of row entries               |
-|20 |  32  | keyCount   | int: number of key entries               |
-|24 | var  | lists      | layer list sub-table                     |
+| 0 |  32  | formCount  | int: Number of layer forms               |
+| 4 |  32  | layerCount | int: number of layer entries             |
+| 8 |  32  | rowCount   | int: number of row entries               |
+|12 |  32  | keyCount   | int: number of key entries               |
+|16 | var  | forms      | layer form sub-table                     |
 | - | var  | layers     | layers sub-table                         |
 | - | var  | rows       | rows sub-table                           |
 | - | var  | keys       | keys sub-table                           |
 
-### `layr.lists` subtable
+### `layr.forms` subtable
 
-Each layer list corresponds to one `<layers>` element.
-There are `listCount` total lists.
+Each layer form corresponds to one `<layers>` element.
+There are `formCount` total forms.
+
+Note: renamed from `lists` to `forms` in Keyman 19, to increase clarity
+and differentiate from other uses of `list`.
 
 | ∆ | Bits | Name             | Description                                |
 |---|------|------------------|--------------------------------------------|
 | 0+|  32  | hardware         | str: name of hardware layout.              |
 | 4+|  32  | layer            | int: index to first layer element          |
-| 8+|  32  | count            | int: number of layer elements in this list |
+| 8+|  32  | count            | int: number of layer elements in this form |
 |12+|  32  | minDeviceWidth   | int: min device width in millimeters, or 0 |
 
-- `hardware` is the name of a form, or the string `touch`
+- `hardware` is the name of a form, or the string `"touch"`.
 
 See UTS #35 section 7 for details about these values.
 
-Layer lists are sorted by `hardware` string, then minDeviceWidth ascending.
+Layer forms are sorted by `hardware` string, then minDeviceWidth ascending.
 
 ### `layr.layers` subtable
 
@@ -336,7 +349,7 @@ both with `id="abc"`, but one with key flags of 0x0000 and one with keyflags of 
 | 8+|  32  | row        | int: index into rows area (next section)       |
 |12+|  32  | count      | int: number of `rows` elements for this layer  |
 
-- for `mod` see `keys.key.mod`
+- for `mod` see `key2.kmap.mod`
 
 ### `layr.rows` subtable
 
@@ -361,10 +374,8 @@ There are `keyCount` total key entries.
 
 | ∆ | Bits | Name          | Description                              |
 |---|------|---------------|------------------------------------------|
-| 0 |  32  | ident         | `disp`                                   |
-| 4 |  32  | size          | int: Length of section                   |
-| 8 |  32  | count         | int: Total number of disp elements       |
-|12 |  32  | baseCharacter | str: If non-null, default base.          |
+| 0 |  32  | count         | int: Total number of disp elements       |
+| 4 |  32  | baseCharacter | str: If non-null, default base.          |
 
 The default `baseCharacter` is U+25CC, if `baseCharacter` is null.
 
@@ -372,9 +383,9 @@ For each element:
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-|16+|  32  | to      | str: to string                           |
-|20+|  32  | id      | str: id string                           |
-|24+|  32  | display | str: output display string               |
+| 8+|  32  | to      | str: to string                           |
+|12+|  32  | id      | str: id string                           |
+|16+|  32  | display | str: output display string               |
 
 Either `to` or `id` must be set, not both.
 Entries with an `to` field are sorted in a binary codepoint sort on the `to` field,
@@ -385,13 +396,11 @@ on the `id` field.
 
 | ∆ | Bits | Name        | Description                              |
 |---|------|-------------|------------------------------------------|
-| 0 |  32  | ident       | `key2`                                   |
-| 4 |  32  | size        | int: Length of section                   |
-| 8 |  32  | keyCount    | int: Number of keys                      |
-|12 |  32  | flicksCount | int: Number of flick lists               |
-|16 |  32  | flickCount  | int: Number of flick elements            |
-|20 |  32  | kmapCount   | int: Number of kmap elements             |
-|24 | var  | keys        | keys sub-table                           |
+| 0 |  32  | keyCount    | int: Number of keys                      |
+| 4 |  32  | flicksCount | int: Number of flick lists               |
+| 8 |  32  | flickCount  | int: Number of flick elements            |
+|12 |  32  | kmapCount   | int: Number of kmap elements             |
+|16 | var  | keys        | keys sub-table                           |
 | - | var  | flicks      | flick lists sub-table                    |
 | - | var  | flick       | flick elements sub-table                 |
 | - | var  | kmap        | key map sub-table                        |
@@ -400,17 +409,17 @@ on the `id` field.
 
 For each key:
 
-| ∆ | Bits | Name             | Description                                              |
-|---|------|----------------  |----------------------------------------------------------|
-| 0+|  32  | to               | str: output string OR UTF-32LE codepoint                 |
-| 4+|  32  | flags            | int: per-key flags                                       |
-| 8+|  32  | id               | str: key id                                              |
-|12+|  32  | switch           | str: layer id to switch to                               |
-|16+|  32  | width            | int: key width*10 (supports 0.1 as min width)            |
+| ∆ | Bits | Name             | Description                                                     |
+|---|------|----------------  |-----------------------------------------------------------------|
+| 0+|  32  | to               | str: output string OR UTF-32LE codepoint                        |
+| 4+|  32  | flags            | int: per-key flags                                              |
+| 8+|  32  | id               | str: key id                                                     |
+|12+|  32  | switch           | str: layer id to switch to                                      |
+|16+|  32  | width            | int: key width*10 (supports 0.1 as min width)                   |
 |20+|  32  | longPress        | list: index into `list` section with longPress key id list or 0 |
-|24+|  32  | longPressDefault | str: default longpress key id or 0                           |
+|24+|  32  | longPressDefault | str: default longpress key id or 0                              |
 |28+|  32  | multiTap         | list: index into `list` section with multiTap key id list or 0  |
-|32+|  32  | flicks           | int: index into `key2.flicks` subtable                   |
+|32+|  32  | flicks           | int: index into `key2.flicks` subtable                          |
 
 - `id`: The original string id from XML. This may be 0 to save space (i.e.
   omit the string id).
@@ -463,8 +472,9 @@ Elements are ordered by the `flicks.keyId`, and secondarily by the directions li
 
 #### `key2.kmap` key map subtable
 
-This table (formerly the `keys` section)
-The keys are sorted in ascending order based on the `vkey`, `mod` fields.
+In this table (formerly the `keys` section), the keys are sorted in ascending
+order based on the `vkey`, `mod` fields. Note that there may be multiple `keys`
+that resolve to a single `vkey`+`mod` pair.
 
 For each key:
 
@@ -491,7 +501,7 @@ For each key:
 |  0x0020  | `ctrl`    | `K_CTRLFLAG`       | Either Control                                |
 |  0x0040  | `alt`     | `K_ALTFLAG`        | Either Alt                                    |
 |  0x0100  | `caps`    | `CAPITALFLAG`      | Caps lock                                     |
-|  0x10000 | `other` | n/a                  | Other (not used in conjunction with others)   |
+| 0x10000  | `other`   | n/a                | Other (not used in conjunction with others)   |
 
 TODO-LDML: Note that conforming to other keyman values, left versus right shift
 cannot be distinguished.
@@ -500,11 +510,9 @@ cannot be distinguished.
 
 | ∆ | Bits | Name          | Description                              |
 |---|------|---------------|------------------------------------------|
-| 0 |  32  | ident         | `list`                                   |
-| 4 |  32  | size          | int: Length of section                   |
-| 8 |  32  | listCount     | int: Total number of lists elements      |
-|12 |  32  | indexCount    | int: Total number of index elements      |
-|16 | var  | lists         | list sub-table                           |
+| 0 |  32  | listCount     | int: Total number of lists elements      |
+| 4 |  32  | indexCount    | int: Total number of index elements      |
+| 8 | var  | lists         | list sub-table                           |
 | - | var  | indices       | index sub-table                          |
 
 #### `list.lists` sub-table
@@ -535,10 +543,8 @@ The strings order are significant.  There is not a 'null' string at the end of e
 
 | ∆ | Bits | Name          | Description                              |
 |---|------|---------------|------------------------------------------|
-| 0 |  32  | ident         | `vars`                                   |
-| 4 |  32  | size          | int: Length of section                   |
-| 8 |  32  | markers       | list: Index to marker list, or 0         |
-|12 |  32  | varCount      | int: Total number of variable elements   |
+| 0 |  32  | markers       | list: Index to marker list, or 0         |
+| 4 |  32  | varCount      | int: Total number of variable elements   |
 | - | var  | varEntries    | variables sub-table                      |
 
 #### C7043.2.17.1 `vars.varEntries` subtable
@@ -572,11 +578,9 @@ the latter being the single codepoint `q`.
 
 | ∆ | Bits | Name          | Description                              |
 |---|------|---------------|------------------------------------------|
-| 0 |  32  | ident         | `uset`                                   |
-| 4 |  32  | size          | int: Length of section                   |
-| 8 |  32  | usetCount     | int: Total number of range lists         |
-|12 |  32  | rangeCount    | int: Total number of range elements      |
-|16 | var  | usets         | uset list sub-table                      |
+| 0 |  32  | usetCount     | int: Total number of range lists         |
+| 4 |  32  | rangeCount    | int: Total number of range elements      |
+| 8 | var  | usets         | uset list sub-table                      |
 | - | var  | ranges        | range sub-table                          |
 
 #### `uset.usets` sub-table
