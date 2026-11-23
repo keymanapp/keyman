@@ -81,58 +81,66 @@ title: Dependency Graph
 %% For rendering, use e.g. https://mermaid.live
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph TD;
-    OSK["/web/src/engine/osk"];
-    KeyboardSpec["/web/src/engine/keyboard"];
-    JSProc["/web/src/engine/js-processor"];
-    OSK-->KeyboardSpec;
     WebUtils["/web/src/common/web-utils"];
+    KeyboardSpec["/web/src/engine/keyboard"];
     KeyboardSpec---->WebUtils;
-    Wordbreakers["@keymanapp/models-wordbreakers<br>(/web/src/engine/predictive-text/wordbreakers)"];
-    Models["@keymanapp/models-templates<br>(/web/src/engine/predictive-text/templates/)"];
-    Models-->WebUtils;
-    LMWorker["@keymanapp/lm-worker<br>(/web/src/engine/predictive-text/worker-thread)"];
-    LMWorker-->Models;
-    LMWorker-->Wordbreakers;
-    LMLayer["@keymanapp/lexical-model-layer<br>(/web/src/engine/predictive-text/worker-main)"];
-    LMLayer-->LMWorker;
+
+    JSProc["/web/src/engine/js-processor"];
+
+    OSK["/web/src/engine/osk"];
+    OSK-->KeyboardSpec;
     Gestures["/web/src/engine/gesture-processor"];
     Gestures-->WebUtils;
 
     subgraph PredText["PredText: WebWorker + its interface"]
-        LMLayer;
-        LMWorker;
-        Models;
-        Wordbreakers;
+        LMLayer["/web/src/engine/predictive-text/worker-main"];
+        LMWorker["/web/src/engine/predictive-text/worker-thread"];
+        Models["/web/src/engine/predictive-text/templates"];
+        Wordbreakers["/web/src/engine/predictive-text/wordbreakers"];
+
+        Models-->Wordbreakers;
+        LMWorker-->Wordbreakers;
+        LMWorker-->Models;
+        LMLayer-->LMWorker;
     end
+
+    Models-->WebUtils;
 
     subgraph Headless["`**Headless**
     Fully headless components`"]
         direction LR
         KeyboardSpec;
         JSProc-->KeyboardSpec;
+        JSProc-->WebUtils;
         WebUtils;
+        HeadlessEngine["web/src/main/headless"];
+        HeadlessEngine-->JSProc;
+        HeadlessEngine-->LMLayer;
+        Interfaces[web/src/engine/interfaces];
+
         PredText;
-        Gestures;
     end
 
     subgraph ClassicWeb["`**ClassicWeb**
     Intermediate-level engine modules`"]
+        Events[web/src/engine/events];
         Elements["/web/src/engine/element-text-stores"];
         Elements-->JSProc;
         KeyboardStorage["/web/src/engine/keyboard-storage"];
+        KeyboardStorage--->KeyboardSpec;
         KeyboardStorage-->Interfaces;
         DomUtils["/web/src/engine/dom-utils"];
         DomUtils-->WebUtils;
-        DomUtils-->KeyboardSpec;
+        OSK---->Interfaces;
         OSK-->DomUtils;
         OSK-->Gestures;
-        Interfaces["/web/src/engine/interfaces"];
-        Interfaces-->KeyboardSpec;
-        OSK-->Interfaces;
+        OSK--->Events;
         CommonEngine["/web/src/engine/main"];
-        CommonEngine-->Device;
+        CommonEngine-->Interfaces;
         CommonEngine-->KeyboardStorage;
         CommonEngine-->OSK;
+        CommonEngine-->Events;
+        CommonEngine--->HeadlessEngine;
         Attachment["/web/src/engine/attachment"];
         Attachment-->DomUtils;
         Attachment-->Elements;
@@ -142,10 +150,14 @@ graph TD;
     Keyman Engine for Web (top-level libraries)`"]
         Browser["/web/src/app/browser"];
         WebView["/web/src/app/webview"];
+        UIModules["web/src/app/ui"];
 
         WebView--->CommonEngine;
 
         Browser--->CommonEngine;
         Browser-->Attachment;
+        Browser---->Events;
+
+        UIModules-->Browser;
     end
 ```
