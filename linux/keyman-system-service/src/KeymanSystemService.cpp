@@ -69,10 +69,11 @@ on_call_ordered_output_sentinel(
 ) {
   *ret_error = SD_BUS_ERROR_NULL;
 
-  int result = sd_bus_reply_method_return(msg, "");
   KeymanSystemService* service = static_cast<KeymanSystemService*>(user_data);
-  service->CallOrderedOutputSentinel();
-  return result;
+  if (!service->CallOrderedOutputSentinel()) {
+    return sd_bus_error_setf(ret_error, SD_BUS_ERROR_FAILED, "Ordered output device not available");
+  }
+  return sd_bus_reply_method_return(msg, "");
 }
 
 static int32_t
@@ -241,11 +242,11 @@ KeymanSystemService::GetCapsLockIndicatorOnDevices() {
 }
 
 // Emit a ordered output sentinel key event
-void
+bool
 KeymanSystemService::CallOrderedOutputSentinel() {
   if (!kbd_ordered_output) {
     syslog(LOG_USER | LOG_ERR, "%s: No keyboard initialized", __FUNCTION__);
-    return;
+    return false;
   }
-  kbd_ordered_output->PressSentinelKey();
+  return kbd_ordered_output->PressSentinelKey();
 }
