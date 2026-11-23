@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE regressiontest SYSTEM "http://www.tavultesoft.com/keymandev/regtest.dtd">
+<regressiontest>
+  <info>
+    <version>6.0</version>
+    <systemkeyboard>00000409</systemkeyboard>
+    <keyboard>C:\keyman\keyboards\keyboards\release\k\khmer_angkor\build\khmer_angkor.kmx</keyboard>
+    <beginmode>Unicode</beginmode>
+  </info>
+  <events>
+    <event>
+       <key><shiftstate><shift/></shiftstate><vkey>K_RBRKT</vkey></key>
+       <postcontext><text>ឧ</text></postcontext>
+    </event>
+    <event>
+       <key><shiftstate><shift/></shiftstate><vkey>K_6</vkey></key>
+       <postcontext><text>ឱ</text></postcontext>
+    </event>
+  </events></regressiontest>
