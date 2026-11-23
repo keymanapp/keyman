@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 20.0.11 alpha 2026-11-23
+
+* fix(resources): auto retry for pr-build-status github API calls (#16997)
+
 ## 20.0.10 alpha 2026-11-18
 
 * docs(common): add dependencies document (#16967)
