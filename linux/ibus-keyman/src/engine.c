@@ -785,6 +785,16 @@ process_capslock_action(km_core_caps_state caps_state) {
   set_capslock_indicator(caps_state);
 }
 
+/**
+ * Commit the first item in the commit queue.
+ *
+ * @param keyman  A pointer to the IBusKeymanEngine instance.
+ * @param force   If FALSE (the common case), emit the sentinel key to
+ *                ensure ordered output.
+ *                If TRUE, commit the item without waiting for the sentinel
+ *                key to be processed and remove the item from the queue.
+ *                This is necessary if the queue overflows.
+ */
 static void
 commit_current_queue_item(IBusKeymanEngine *keyman, gboolean force) {
   // only called for non-compliant apps
@@ -862,6 +872,10 @@ finish_process_actions(IBusEngine *engine) {
       break;
     default:
       if (keyman->commit_item >= &keyman->commit_queue[MAX_QUEUE_SIZE - 1]) {
+        // This is an error edge case so we no longer guarantee
+        // ordered output. This prevents the buffer overflowing;
+        // commit_current_queue_item decrements commit_item so we
+        // can now increment again.
         g_warning("Overflow of keyman commit_queue! Forcing commit of oldest queue item.");
         // TODO: log to Sentry
         commit_current_queue_item(keyman, TRUE);
