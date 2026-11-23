@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 19.0.326 beta 2026-11-23
+
+* fix(linux): return DBus error if ordered output is not available (#16978)
+* fix(linux): prevent queue overflow and keystroke lockup (#16979)
+
 ## 19.0.325 beta 2026-11-21
 
 * fix(linux): don't abort on error (#16977)
