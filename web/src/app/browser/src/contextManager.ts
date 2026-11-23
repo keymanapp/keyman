@@ -79,13 +79,13 @@ export class ContextManager extends ContextManagerBase<BrowserConfiguration> {
     return this._eventsObj();
   }
 
-  public initialize(): void {
-    this.on('keyboardasyncload', (stub, completion) => {
-      this.engineConfig.alertHost?.wait('Installing keyboard<br/>' + stub.name);
+  protected keyboardAsyncLoaded() {
+    this.engineConfig.alertHost?.wait(); // cancels the wait.
+  }
 
-      completion.then(() => {
-        this.engineConfig.alertHost?.wait(); // cancels the wait.
-      });
+  public initialize(): void {
+    this.on('keyboardasyncload', (stub) => {
+      this.engineConfig.alertHost?.wait('Installing keyboard<br/>' + stub.name);
     });
 
     this.engineConfig.deferForInitialization.then(() => {

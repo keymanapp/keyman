@@ -189,29 +189,23 @@ export class ContextManager extends ContextManagerBase<WebviewConfiguration> {
     }
   }
 
-  protected prepareKeyboardForActivation(
-    keyboardId: string,
-    languageCode?: string
-  ): {keyboard: Promise<Keyboard>, metadata: KeyboardStub} {
-    const originalKeyboard = this.activeKeyboard;
-    const activatingKeyboard = super.prepareKeyboardForActivation(keyboardId, languageCode);
+  protected async prepareKeyboardForActivation(keyboardId: string, metadata: KeyboardStub): Promise<Keyboard> {
+    const originalKeyboardId = this.activeKeyboard?.keyboard?.id;
+    const keyboard = await super.prepareKeyboardForActivation(keyboardId, metadata);
 
     // Erasing precomputed layout information attached to the keyboard object probably isn't
     // necessary at this point - osk.refreshLayout() exists and automatically handles any
     // needed recalculations itself.
     //
     // That said, it's best to keep it around for now and verify later.
-    if(originalKeyboard?.metadata?.id == activatingKeyboard?.metadata?.id) {
-      activatingKeyboard.keyboard = activatingKeyboard.keyboard.then((kbd) => {
-        // TODO-embed-osk-in-kmx: Do we need to refresh layouts for KMX keyboards also?
-        if (kbd instanceof JSKeyboard) {
-          kbd.refreshLayouts();
-        }
-        return kbd;
-      });
+    if(originalKeyboardId == keyboardId) {
+      // TODO-embed-osk-in-kmx: Do we need to refresh layouts for KMX keyboards also?
+      if (keyboard instanceof JSKeyboard) {
+        keyboard.refreshLayouts();
+      }
     }
 
-    return activatingKeyboard;
+    return keyboard;
   }
 
   public resetContext(): void {

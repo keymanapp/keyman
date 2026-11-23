@@ -1,5 +1,5 @@
 import { EventEmitter } from 'eventemitter3';
-import { ManagedPromise } from 'keyman/common/web-utils';
+import { TimeoutPromise } from 'keyman/common/web-utils';
 import { type Keyboard, type TextStore } from 'keyman/engine/keyboard';
 import { type JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/keyboard-storage';
@@ -28,11 +28,9 @@ interface EventMap {
    * the first time in the user's current session, which is an asynchronous operation.  It is called
    * once the async request is initiated.
    * @param metadata  The registered properties for the keyboard being asynchronously loaded
-   * @param onload    A Promise that resolves with `null` when loading successfully completes or
-   *                  with an `error` if it fails.
    * @returns
    */
-  'keyboardasyncload': (metadata: KeyboardStub, onload: Promise<Error>) => void;
+  'keyboardasyncload': (metadata: KeyboardStub) => void;
 
   /**
    * This event is raised whenever a keyboard is fully activated and set as the current active
@@ -195,7 +193,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * @param textStore
    * @returns
    */
-  protected async deferredKeyboardActivation(
+  /*private async deferredKeyboardActivation(
     kbdPromise: Promise<Keyboard>,
     metadata: KeyboardStub,
     textStore: TextStore
@@ -222,7 +220,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     } else {
       return null;
     }
-  }
+  }*/
 
   /**
    * Specifies the keyboard id and the language code to use when a 'default' keyboard
@@ -248,19 +246,19 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
   public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
     // TODO:  relocate default keyboard behavior here once we can also move core error handling for
     // unfound stubs here.
-    const wasNull = !this.activeKeyboard;
+    const previousKeyboardId = this.activeKeyboard?.keyboard?.id;
+
+    const originalKeyboardTextStore = this.currentKeyboardSrcTextStore();
 
     // If there was a previous activation attempt set and still active for the specified keyboard textStore,
     // cancel it.  For example, if the user selects a preloaded keyboard after having tried to select one
     // still async-loading, we should go with the later setting - the preloaded one.
-    this.findAndPopActivation(this.currentKeyboardSrcTextStore());
+    this.findAndPopActivation(originalKeyboardTextStore);
 
-    const activatingKeyboard = this.prepareKeyboardForActivation(keyboardId, languageCode);
+    const metadata = keyboardId ? this.findKeyboardStubForActivation(keyboardId, languageCode) : null;
+    const keyboard = await this.prepareKeyboardForActivation(keyboardId, metadata);
 
-    const originalKeyboardTextStore = this.currentKeyboardSrcTextStore();
-
-    const keyboard = await activatingKeyboard.keyboard;
-    if(keyboard == null && activatingKeyboard.metadata) {
+    if(keyboard == null && metadata) {
       // The activation was async and was cancelled - either by `beforeKeyboardChange` first-pass
       // cancellation or because a different keyboard was requested before completion of the async load.
       return false;
@@ -278,28 +276,36 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
      * event.
      */
     if(this.currentKeyboardSrcTextStore() == originalKeyboardTextStore) {
-      this.emit('beforekeyboardchange', activatingKeyboard.metadata);
+      this.emit('beforekeyboardchange', metadata);
     }
 
-    let kbdStubPair: KeyboardInfoPair = null;
-    if(keyboard) {
-      kbdStubPair = {
-        keyboard: keyboard,
-        metadata: activatingKeyboard.metadata
-      };
-    }
-
-    this.activateKeyboardForTextStore(kbdStubPair, originalKeyboardTextStore);
+    this.activateKeyboardForTextStore(keyboard ? { keyboard, metadata } : null, originalKeyboardTextStore);
 
     // Only trigger `keyboardchange` events when they will affect the active context.
-    // (!wasNull || !!keyboard) - blocks events for `null` -> `null` transitions.
     // (keyman/keymanweb.com#96)
-    if(this.currentKeyboardSrcTextStore() == originalKeyboardTextStore && (!wasNull || !!keyboard)) {
+    if(this.currentKeyboardSrcTextStore() == originalKeyboardTextStore && keyboard?.id != previousKeyboardId) {
       // Will trigger KeymanEngine handler that passes keyboard to the OSK, displays it.
       this.emit('keyboardchange', this.activeKeyboard);
     }
 
     return true;
+  }
+
+  protected findKeyboardStubForActivation(
+    keyboardId: string,
+    languageCode?: string
+  ): KeyboardStub {
+    // Check that the saved keyboard is currently registered
+    const requestedStub: KeyboardStub = this.keyboardCache.getStub(keyboardId, languageCode || '');
+    if(!requestedStub) {
+      const availableStubList = this.keyboardCache.getStubList().map(stub => `${stub.KI}@${stub.KLC}`);
+      throw new Error(`No matching stub has been registered for keyboard ${keyboardId}.  Available stubs: ${JSON.stringify(availableStubList)}`);
+    }
+
+    return requestedStub;
+  }
+
+  protected keyboardAsyncLoaded() {
   }
 
   /**
@@ -313,94 +319,89 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * @param languageCode
    * @returns
    */
-  protected prepareKeyboardForActivation(
-    keyboardId: string,
-    languageCode?: string
-  ): {keyboard: Promise<Keyboard>, metadata: KeyboardStub} {
-    if (!keyboardId) {
-      return {
-        keyboard: Promise.resolve(null),
-        metadata: null
-      }
-    }
-
-    // Set default language code
-    languageCode ||= '';
-
-    // Check that the saved keyboard is currently registered
-    const requestedStub: KeyboardStub = this.keyboardCache.getStub(keyboardId, languageCode);
-    if(!requestedStub) {
-      const availableStubList = this.keyboardCache.getStubList().map(stub => `${stub.KI}@${stub.KLC}`);
-      throw new Error(`No matching stub has been registered for keyboard ${keyboardId}.  Available stubs: ${JSON.stringify(availableStubList)}`);
-    }
+  protected async prepareKeyboardForActivation(keyboardId: string, metadata: KeyboardStub): Promise<Keyboard> {
 
     // Check if current keyboard matches requested keyboard, but not (necessarily) stub
     if (keyboardId == this.activeKeyboard?.metadata?.id) {
-      const {keyboard} = this.activeKeyboard;
       // In this case, the keyboard is loaded; just update the stub.
+      return this.activeKeyboard.keyboard;
+    }
 
-      return {
-        keyboard: Promise.resolve(keyboard),
-        metadata: requestedStub
-      };
+    if (keyboardId === null || keyboardId === undefined || keyboardId === '') {
+      return null;
     }
 
     // Determine if the keyboard was previously loaded but is not active; use the cached, pre-loaded version if so.
-    const keyboard: Keyboard = this.keyboardCache.getKeyboardForStub(requestedStub);
-    if (keyboard) {
-      return {
-        keyboard: Promise.resolve(keyboard),
-        metadata: requestedStub
-      };
+    const previouslyLoadedKeyboard = this.keyboardCache.getKeyboardForStub(metadata);
+    if (previouslyLoadedKeyboard) {
+      return previouslyLoadedKeyboard;
     }
+
+    // `beforeKeyboardChange` - first call
+    this.emit('beforekeyboardchange', metadata);
 
     // It's async time - the keyboard is not preloaded within the cache.  Use the stub's data to load it.
 
-    // `beforeKeyboardChange` - first call
-    this.emit('beforekeyboardchange', requestedStub);
+    await this.engineConfig.deferForInitialization.corePromise;
 
-    const defermentPromise = this.engineConfig.deferForInitialization.then(() => {
-      // Provide a Promise for completion of the async load process.
-      const completionPromise = new ManagedPromise<Error>();
-      this.emit('keyboardasyncload', requestedStub, completionPromise.corePromise);
+    this.emit('keyboardasyncload', metadata);
 
-      const keyboardPromise = this.keyboardCache.fetchKeyboard(requestedStub.KI);
-      const timeoutPromise = new Promise<Keyboard>((resolve, reject) => {
-        const timeoutMsg = `Download of ${requestedStub.KI} for language ${requestedStub.langId} timed out.`;
-        window.setTimeout(() => reject(new Error(timeoutMsg)), ContextManagerBase.TIMEOUT_THRESHOLD);
-      });
+    const keyboardPromise = this.keyboardCache.fetchKeyboard(metadata.KI);
+    const timeout = new TimeoutPromise(ContextManagerBase.TIMEOUT_THRESHOLD);
+    const combinedPromise = Promise.race([keyboardPromise, timeout.then(() => null as Keyboard)]);
 
-      const combinedPromise = Promise.race([keyboardPromise, timeoutPromise]);
 
-      // Ensure the async-load Promise completes properly.
-      combinedPromise.then(() => {
-        completionPromise.resolve(null);
-        // Prevent any 'unhandled Promise rejection' events that may otherwise occur from the timeout promise.
-        timeoutPromise.catch(() => {});
-      });
-      combinedPromise.catch((err) => {
-        completionPromise.resolve(err);
-        throw err;
-      });
+    const activation: PendingActivation = {
+      textStore: this.currentKeyboardSrcTextStore(),
+      keyboard: keyboardPromise,
+      stub: metadata
+    };
 
+    // Invalidate existing requests for the specified textStore.
+    this.findAndPopActivation(activation.textStore);
+    this.pendingActivations.push(activation);
+
+    try {
+      const result = await combinedPromise;
+      timeout.cancel();
+      this.keyboardAsyncLoaded();
+      if(result == null) {
+        // TODO: throw error report to sentry - timeout when loading
+        return null;
+      }
+    } catch(err) {
+      // Any other error we will report back to the consumer
+      timeout.cancel();
+      this.keyboardAsyncLoaded();
+      throw err;
+    }
+
+    // The keyboard-load is complete; is the activation still desired?
+    const activationAfterAwait = this.findAndPopActivation(activation.textStore);
+    if(activationAfterAwait == activation) {
       return combinedPromise;
-    });
+    } else if(activationAfterAwait) {
+      // Restore the popped element; it doesn't match the current activation attempt.
+      this.pendingActivations.push(activationAfterAwait);
+      return null;
+    } else {
+      return null;
+    }
+
+    // TODO: this now happens in the wrong order - the await combinedPromise above resolves the keyboard load, and so
+    // the similar await in deferredKeyboardActivation does not change the state of the variables.
 
     // Now the fun part:  note the original call's parameters as a pending activation.
-    const promise = this.deferredKeyboardActivation(defermentPromise, requestedStub, this.currentKeyboardSrcTextStore());
-    return {
-      keyboard: promise.then(async (activation) => {
-        // Is the activation we requested still pending, or was it cancelled in favor of a
-        // different activation in some manner?
-        if(!activation) {
-          // If the user chose to load a different keyboard afterward that would affect the same
-          // textStore, the activation is no longer valid.
-          return Promise.resolve(null);
-        } else {
-          return defermentPromise;
-        }
-      }),
-      metadata: requestedStub
-    }
+    // Is the activation we requested still pending, or was it cancelled in favor of a
+    // different activation in some manner?
+
+    // const activation = await this.deferredKeyboardActivation(combinedPromise, metadata, this.currentKeyboardSrcTextStore());
+    // if(!activation) {
+    //   // If the user chose to load a different keyboard afterward that would affect the same
+    //   // textStore, the activation is no longer valid.
+    //   return null;
+    // } else {
+    //   return combinedPromise;
+    // }
   }
 }
