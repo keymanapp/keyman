@@ -20,6 +20,7 @@ SUBPROJECT_NAME=engine/predictive-text/wordbreakers
 # /resources/standards-data/unicode-character-database.
 builder_describe "Builds the predictive-text wordbreaker implementation module" \
   "@/common/web/types  build" \
+  "@../templates test" \
   "clean" \
   "configure" \
   "build" \
