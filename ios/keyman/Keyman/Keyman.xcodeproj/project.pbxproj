@@ -147,6 +147,7 @@
 		CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */; };
 		CE80AD33257F2B4A008D2150 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */; };
 		CE80AD34257F2B4B008D2150 /* KeymanEngine.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CEB19A243080041B00514959 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB19A233080041B00514959 /* SceneDelegate.swift */; };
 		CEBD34322654FE3500EB2EA8 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */; };
 		CEBD343B2654FEB400EB2EA8 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */; };
 		CEBD343C2654FEB400EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -336,6 +337,7 @@
 		CEACC90E25F07D58006EAB45 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC90F25F07D5A006EAB45 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC91225F07D77006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEB19A233080041B00514959 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<absolute>"; };
 		CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<absolute>"; };
 		CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<absolute>"; };
@@ -559,6 +561,7 @@
 				16A9229D20325253003CC98E /* Info.plist */,
 				162E2C9420926C8600F40769 /* Classes */,
 				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
+				CEB19A233080041B00514959 /* SceneDelegate.swift */,
 				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
 				29CA9A612B4F9B0B00EAB099 /* KeymanLogger.swift */,
 			);
@@ -1036,6 +1039,7 @@
 			files = (
 				165EB39C2097181D00040A69 /* KMView.swift in Sources */,
 				29CA9A622B4F9B0B00EAB099 /* KeymanLogger.swift in Sources */,
+				CEB19A243080041B00514959 /* SceneDelegate.swift in Sources */,
 				C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */,
 				C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */,
 				CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */,
