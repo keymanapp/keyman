@@ -1,18 +1,18 @@
 (*
   Name:             HTMLColors
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      8 Jun 2012
 
   Modified Date:    8 Jun 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          08 Jun 2012 - mcdurdin - I3310 - V9.0 - Unicode in Delphi fixes
 *)
 unit HTMLColors;
@@ -277,7 +277,7 @@ end;
 function ColorToHex(Color: TColor): string;
 begin
  if Color <> $ then
-  Result := IntToHex(GetRValue(Color), 2) + IntToHex(GetGValue(Color), 2) + IntToHex(GetBValue(Color), 2)
+  Result := IntToHex(GetRValue(LongWord(Color)), 2) + IntToHex(GetGValue(LongWord(Color)), 2) + IntToHex(GetBValue(LongWord(Color)), 2)
  else
   Result := '000000';
 end;

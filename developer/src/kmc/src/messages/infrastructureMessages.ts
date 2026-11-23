@@ -6,11 +6,13 @@ import { CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerM
 const Namespace = CompilerErrorNamespace.Infrastructure;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
 const SevHint = CompilerErrorSeverity.Hint | Namespace;
-// const SevWarn = CompilerErrorSeverity.Warn | Namespace;
+const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
 const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 
 export class InfrastructureMessages {
+  //------------------------------------------------------------------------------|
+
   static FATAL_UnexpectedException = SevFatal | 0x0001;
   static Fatal_UnexpectedException = (o:{e: any}) => CompilerMessageSpecWithException(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
 
@@ -43,9 +45,11 @@ export class InfrastructureMessages {
 
   // 0x0008: ERROR_InvalidProjectFile moved to DeveloperUtilsMessages
 
-  static HINT_FilenameHasDifferingCase = SevHint | 0x0009;
-  static Hint_FilenameHasDifferingCase = (o:{reference:string, filename:string}) => m(this.HINT_FilenameHasDifferingCase,
-    `File on disk '${def(o.filename)}' does not match case of '${def(o.reference)}' in source file; this is an error on platforms with case-sensitive filesystems.`);
+  static WARN_FilenameHasDifferingCase = SevWarn | 0x0009;
+  static Warn_FilenameHasDifferingCase = (o:{reference:string, filename:string}) => m(
+    this.WARN_FilenameHasDifferingCase,
+    `File on disk '${def(o.filename)}' does not match case of '${def(o.reference)}' in source file; this is an error on platforms with case-sensitive filesystems.`,
+  );
 
   static ERROR_UnknownFileFormat = SevError | 0x000A;
   static Error_UnknownFileFormat = (o:{format:string}) => m(this.ERROR_UnknownFileFormat,
@@ -151,8 +155,13 @@ export class InfrastructureMessages {
   static ERROR_CopyRequiresOutPath = SevError | 0x0022;
   static Error_CopyRequiresOutPath = () => m(
     this.ERROR_CopyRequiresOutPath,
-    `The copy command requires the --out-path, -o parameter`
-  );
+    `The 'id' parameter should be provided; if it is not, then the --out-path parameter is required`,
+    `Deprecated usage: you should pass the target id as the second parameter on
+    the command line rather than the final component of the output path. This
+    change was made so that the \`--out-path\` parameter for \`kmc copy\` will have
+    the same meaning as other kmc commands.
+  `);
+  //------------------------------------------------------------------------------|
 
   // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
   static INFO_CopyingProject = SevInfo | 0x0023;
@@ -227,10 +236,46 @@ export class InfrastructureMessages {
     However, as a file already exists with the same name, kmc cannot continue.
   `);
 
-  static ERROR_InvalidTargetVersion = SevError | 0x002D;
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  // We use base filename for shorter starting message; successful completion has relative output filename
+  static INFO_ConvertingFile = SevInfo | 0x002D;
+  static Info_ConvertingFile = (o:{filename:string,relativeFilename:string,outputBaseFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_ConvertingFile,
+    `Converting ${def(o.relativeFilename)} to ${def(o.outputBaseFilename)}`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  // We use relative for output filename here so user can find it
+  static INFO_FileConvertedSuccessfully = SevInfo | 0x002E;
+  static Info_FileConvertedSuccessfully = (o:{filename:string,relativeFilename:string,outputRelativeFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_FileConvertedSuccessfully,
+    `${def(o.relativeFilename)} converted successfully to ${def(o.outputRelativeFilename)}.`,
+  )});
+
+  // For this message, we override the filename with the passed-in file. A bit of a hack but does the job
+  // We use base output filename here for shorter message
+  static INFO_FileNotConvertedSuccessfully = SevInfo | 0x002F;
+  static Info_FileNotConvertedSuccessfully = (o:{filename:string,relativeFilename:string}) => ({filename:o.filename, ...m(
+    this.INFO_FileNotConvertedSuccessfully,
+    `${def(o.relativeFilename)} could not be converted.`,
+  )});
+
+  static WARN_CopyWithoutIdIsDeprecated = SevWarn | 0x0030;
+  static Warn_CopyWithoutIdIsDeprecated = () => m(
+    this.WARN_CopyWithoutIdIsDeprecated,
+    `Deprecated usage: you should pass the target id as the second parameter on the command line rather than the final component of the output path.`, `
+    This change was made so that the \`--out-path\` parameter for \`kmc copy\`
+    will have the same meaning as other kmc commands.
+  `);
+
+  static ERROR_InvalidTargetVersion = SevError | 0x0031;
   static Error_InvalidTargetVersion = (o:{targetVersion:string}) => m(
     this.ERROR_InvalidTargetVersion,
     `Target version parameter '${def(o.targetVersion)}' is not a valid Keyman version.`,
   );
+  
+  //------------------------------------------------------------------------------|
+  // max length of detail message lines (checked by verifyCompilerMessagesObject) |
+  //------------------------------------------------------------------------------|
 }
 
