@@ -369,7 +369,7 @@ export class LDMLKeyboardXMLSourceFileReader implements EventResolver {
       source = new KeymanXMLReader('keyboardTest3')
         .parse(new TextDecoder().decode(file)) as any;
     } catch(e) {
-      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({e}));
+      this.callbacks.reportMessage(DeveloperUtilsMessages.Error_InvalidXml({e, path:''}));
       return null;
     }
     return source;
