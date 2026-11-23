@@ -39,8 +39,7 @@ public final class WebViewUtils {
   // TODO: Keep this version in sync with resources/build/minimum-versions.inc.sh
   public static final String KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME = "95.0";
 
-  private static final String CHROME_INSTALL_PATTERN_FORMATSTR = "^.*Chrome/([\\d.]+).*$";
-  private static final Pattern installPattern = Pattern.compile(CHROME_INSTALL_PATTERN_FORMATSTR);
+  private static final Pattern CHROME_USER_AGENT_PATTERN = Pattern.compile("^.*Chrome/([\\d.]+).*$");
 
   /**
    * Reserved magic domain for loading files from the local device. At runtime
@@ -66,30 +65,23 @@ public final class WebViewUtils {
 
   /**
    * Get the Keyman Engine mode based on the Chrome version.
-   * @param context       - The context
-   * @param webView       - If provided, the Chrome version of webView is used
    * @param chromeVersion - String of the device's Chrome version.
-   *                      If not provided, the device's Chrome version is queried
    * @return EngineWebViewVersionStatus
    */
   public static EngineWebViewVersionStatus getEngineWebViewVersionStatus(
-      Context context, WebView webView, String chromeVersion) {
-    if (context == null) {
-      return EngineWebViewVersionStatus.DISABLED;
-    }
-    if (chromeVersion == null || chromeVersion.isEmpty()) {
-      chromeVersion = getChromeVersion(context, webView);
+      String chromeVersion) {
+
+    int comp = FileUtils.compareVersions(chromeVersion, KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME);
+    if (comp == FileUtils.VERSION_EQUAL || comp == FileUtils.VERSION_GREATER) {
+      return EngineWebViewVersionStatus.FULL;
     }
 
-    if (FileUtils.compareVersions(KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME, chromeVersion)
-        == FileUtils.VERSION_GREATER) {
-      return EngineWebViewVersionStatus.DISABLED;
-    } else if (FileUtils.compareVersions(KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME, chromeVersion)
-        == FileUtils.VERSION_GREATER) {
+    comp = FileUtils.compareVersions(chromeVersion, KEYMAN_MIN_TARGET_VERSION_DEGRADED_ANDROID_CHROME);
+    if (comp == FileUtils.VERSION_EQUAL || comp == FileUtils.VERSION_GREATER) {
       return EngineWebViewVersionStatus.DEGRADED;
     }
 
-    return EngineWebViewVersionStatus.FULL;
+    return EngineWebViewVersionStatus.DISABLED;
   }
 
   /**
@@ -152,26 +144,17 @@ public final class WebViewUtils {
   }
 
   /**
-   * Get the Chrome version. Returns "0.0" if context is null or Chrome not installed.
-   * @param context - The context
-   * @param webView - If provided, the user agent string for the webview is parsed
+   * Get the Chrome version. Returns "0.0" if "Chrome" cannot be found in the user agent.
+   * @param userAgentString - the user agent string from the webview
    * @return String - Version string of Chrome
    */
-  private static String getChromeVersion(Context context, WebView webView) {
-    if (context == null) {
-      KMLog.LogInfo(TAG, "Chrome not installed");
-      return "0.0";
-    }
-
-    WebView mWebView = (webView != null) ? webView : new WebView(context);
-    String userAgentString = mWebView.getSettings().getUserAgentString();
-
-    Matcher matcher = installPattern.matcher(userAgentString);
+  public static String extractChromeVersionFromUserAgentString(String userAgentString) {
+    Matcher matcher = CHROME_USER_AGENT_PATTERN.matcher(userAgentString);
     if (matcher.matches() && matcher.groupCount() >= 1 && matcher.group(1) != null) {
       return matcher.group(1);
     }
 
-    KMLog.LogInfo(TAG, "Chrome not installed");
+    KMLog.LogError(TAG, "Chrome not installed or recognized from user agent string (" + userAgentString + ")");
     return "0.0";
   }
 }

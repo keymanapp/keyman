@@ -104,7 +104,7 @@ function push_to_github_and_create_pr() {
     # There shouldn't be any other commits on ${BRANCH} except the one we want to replace
     # (if any).
     ${NOOP} git push --force origin "${BRANCH}"
-    PR_NUMBER=$(gh pr list --draft --search "${PR_TITLE}" --base "${BASE}" --json number --jq '.[].number')
+    PR_NUMBER=$(gh pr list --draft --search "'${PR_TITLE}'" --base "${BASE}" --json number --jq '.[].number')
     if [[ -n ${PR_NUMBER} ]]; then
       builder_echo "PR #${PR_NUMBER} already exists"
     else
@@ -194,10 +194,20 @@ git commit -m "${COMMIT_MESSAGE}"
 push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH}" "${COMMIT_MESSAGE} 🏠" "Build-bot: skip
 Test-bot: skip"
 
-# Create cherry-pick on master branch
-git checkout -B chore/linux/cherry-pick/changelog origin/master
+# Are we in beta phase? Then use that as base branch for cherry-pick!
+# All changes in the beta branch get merged to master periodically during
+# the beta phase, so we'll eventually end up consistent across stable, 
+# beta, and alpha (master).
+if git branch -a | grep -q origin/beta; then
+  BASE_BRANCH=beta
+else
+  BASE_BRANCH=master
+fi
+
+# Create cherry-pick on base branch
+git checkout -B chore/linux/cherry-pick/changelog origin/${BASE_BRANCH}
 git cherry-pick -x chore/linux/changelog
-push_to_github_and_create_pr chore/linux/cherry-pick/changelog master "${COMMIT_MESSAGE} 🍒" \
+push_to_github_and_create_pr chore/linux/cherry-pick/changelog ${BASE_BRANCH} "${COMMIT_MESSAGE} 🍒" \
   "Cherry-pick-of: #${PR_NUMBER}
 Build-bot: skip
 Test-bot: skip"

@@ -1,7 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import 'mocha';
 import { assert } from 'chai';
-import { Converter } from '../src/main.js';
-import { CompilerOptions, } from "@keymanapp/developer-utils";
+import { Converter, ConverterOptions } from '../src/main.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 describe('converter class', function () {
@@ -18,7 +20,7 @@ describe('converter class', function () {
   it('should start', async function () {
     const converter = new Converter();
     const callbacks = new TestCompilerCallbacks();
-    const options: CompilerOptions = { saveDebug: true, shouldAddCompilerVersion: false };
+    const options: ConverterOptions = { saveDebug: true, shouldAddCompilerVersion: false, target: '.kmn' };
     assert(await converter.init(callbacks, options));
   });
 

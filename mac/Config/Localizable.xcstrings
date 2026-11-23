@@ -23,10 +23,13 @@
     "Checking..." : {
 
     },
+    "Click continue to complete installation" : {
+
+    },
     "Close" : {
 
     },
-    "Configuration" : {
+    "Complete installation" : {
 
     },
     "Continue" : {
@@ -60,9 +63,6 @@
     "Ensure Keyman.app is set to provide it with necessary control in System Settings > Privacy & Security > Accessibility." : {
 
     },
-    "Finish installation" : {
-
-    },
     "Fonts:" : {
 
     },
@@ -73,6 +73,9 @@
 
     },
     "Help not available." : {
+
+    },
+    "Input method has been enabled" : {
 
     },
     "Install" : {
@@ -113,13 +116,13 @@
     "Package Version:" : {
 
     },
-    "Proceed to continue with installation" : {
-
-    },
     "Read me not available." : {
 
     },
-    "Remove Package" : {
+    "Remove Keyboard" : {
+
+    },
+    "Remove Keyboard Package" : {
 
     },
     "Repairs Required" : {
@@ -128,10 +131,13 @@
     "Resolve Issues" : {
 
     },
-    "Restart Computer" : {
+    "Restart Mac" : {
 
     },
-    "Restart your Mac to complete the installation. After restarting, open Keyman Configuration again if it doesn't launch automatically." : {
+    "Restart your Mac to complete the installation." : {
+
+    },
+    "Restart..." : {
 
     },
     "Run Keyman installer" : {

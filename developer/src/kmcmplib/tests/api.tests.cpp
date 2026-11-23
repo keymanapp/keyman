@@ -71,13 +71,17 @@ void test_kmcmp_CompileKeyboard(char *kmn_file) {
   unlink(kmn_file);
 }
 
-extern KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR* buf, int &targets);
+extern KMX_BOOL GetCompileTargetsFromTargetsStore(KMX_WCHAR* buf, int &compileTargets, int &platformTargets);
 
-KMX_BOOL do_GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets, const KMX_WCHAR* expected = nullptr) {
+KMX_BOOL do_GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &compileTargets, int &platformTargets, const KMX_WCHAR* expected = nullptr) {
   KMX_WCHAR* buf;
   buf = new KMX_WCHAR[u16len(store)+1];
   u16cpy(buf, store);
-  KMX_BOOL result = GetCompileTargetsFromTargetsStore(buf, targets);
+
+  compileTargets = 0;
+  platformTargets = 0;
+
+  KMX_BOOL result = GetCompileTargetsFromTargetsStore(buf, compileTargets, platformTargets);
 
   if(expected) {
     test_assert(u16cmp(expected, buf) == 0);
@@ -88,74 +92,87 @@ KMX_BOOL do_GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targe
 }
 
 void test_GetCompileTargetsFromTargetsStore() {
-  int targets = 0;
+  int compileTargets = 0, platformTargets = 0;
 
   setup();
-  test_assert(do_GetCompileTargetsFromTargetsStore(u"any", targets, u"any"));
+  test_assert(do_GetCompileTargetsFromTargetsStore(u"any", compileTargets, platformTargets, u"any"));
   test_assert(error_vec.size() == 0);
-  test_assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  test_assert(compileTargets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  test_assert(platformTargets == PLATFORMTARGETS_ANY);
 
   setup();
-  test_assert(do_GetCompileTargetsFromTargetsStore(u"windows", targets, u"windows"));
+  test_assert(do_GetCompileTargetsFromTargetsStore(u"windows", compileTargets, platformTargets, u"windows"));
   test_assert(error_vec.size() == 0);
-  test_assert(targets == COMPILETARGETS_KMX);
+  test_assert(compileTargets == COMPILETARGETS_KMX);
+  test_assert(platformTargets == PLATFORMTARGETS_WINDOWS);
 
   setup();
-  test_assert(do_GetCompileTargetsFromTargetsStore(u"desktop", targets, u"desktop"));
+  test_assert(do_GetCompileTargetsFromTargetsStore(u"desktop", compileTargets, platformTargets, u"desktop"));
   test_assert(error_vec.size() == 0);
-  test_assert(targets == COMPILETARGETS_KMX);
+  test_assert(compileTargets == COMPILETARGETS_KMX);
+  test_assert(platformTargets == PLATFORMTARGETS_DESKTOP);
 
   setup();
-  test_assert(do_GetCompileTargetsFromTargetsStore(u"mobile", targets, u"mobile"));
+  test_assert(do_GetCompileTargetsFromTargetsStore(u"mobile", compileTargets, platformTargets, u"mobile"));
   test_assert(error_vec.size() == 0);
-  test_assert(targets == COMPILETARGETS_JS);
+  test_assert(compileTargets == COMPILETARGETS_JS);
+  test_assert(platformTargets == PLATFORMTARGETS_MOBILE);
 
   setup();
-  test_assert(do_GetCompileTargetsFromTargetsStore(u"web", targets, u"web"));
+  test_assert(do_GetCompileTargetsFromTargetsStore(u"web", compileTargets, platformTargets, u"web"));
   test_assert(error_vec.size() == 0);
-  test_assert(targets == COMPILETARGETS_JS);
+  test_assert(compileTargets == COMPILETARGETS_JS);
+  test_assert(platformTargets == PLATFORMTARGETS_WEB);
 
   setup();
-  test_assert(do_GetCompileTargetsFromTargetsStore(u"desktop mobile", targets, u"desktop mobile"));
+  test_assert(do_GetCompileTargetsFromTargetsStore(u"desktop mobile", compileTargets, platformTargets, u"desktop mobile"));
   test_assert(error_vec.size() == 0);
-  test_assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  test_assert(compileTargets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  test_assert(platformTargets == (PLATFORMTARGETS_DESKTOP | PLATFORMTARGETS_MOBILE));
 
   setup();
-  test_assert(do_GetCompileTargetsFromTargetsStore(u"desktop   tablet", targets, u"desktop tablet"));
+  test_assert(do_GetCompileTargetsFromTargetsStore(u"desktop   tablet", compileTargets, platformTargets, u"desktop tablet"));
   test_assert(error_vec.size() == 0);
-  test_assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  test_assert(compileTargets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  test_assert(platformTargets == (PLATFORMTARGETS_DESKTOP | PLATFORMTARGETS_TABLET));
 
   setup();
-  test_assert(do_GetCompileTargetsFromTargetsStore(u"  desktop   tablet", targets, u"desktop tablet"));
+  test_assert(do_GetCompileTargetsFromTargetsStore(u"  desktop   tablet", compileTargets, platformTargets, u"desktop tablet"));
   test_assert(error_vec.size() == 0);
-  test_assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  test_assert(compileTargets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  test_assert(platformTargets == (PLATFORMTARGETS_DESKTOP | PLATFORMTARGETS_TABLET));
 
   setup();
-  test_assert(do_GetCompileTargetsFromTargetsStore(u"  windows      androidphone  ", targets, u"windows androidphone"));
+  test_assert(do_GetCompileTargetsFromTargetsStore(u"  windows      androidphone  ", compileTargets, platformTargets, u"windows androidphone"));
   test_assert(error_vec.size() == 0);
-  test_assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  test_assert(compileTargets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  test_assert(platformTargets == (PLATFORMTARGETS_WINDOWS | PLATFORMTARGETS_ANDROIDPHONE));
 
   setup();
-  test_assert(!do_GetCompileTargetsFromTargetsStore(u"foo bar baz", targets));
+  test_assert(!do_GetCompileTargetsFromTargetsStore(u"foo bar baz", compileTargets, platformTargets));
   test_assert(error_vec.size() == 1);
   test_assert(error_vec[0] == KmnCompilerMessages::ERROR_InvalidTarget);
-  test_assert(targets == 0);
+  test_assert(compileTargets == 0);
+  test_assert(platformTargets == 0);
 
   setup();
-  test_assert(!do_GetCompileTargetsFromTargetsStore(u"windows chromeos", targets));
+  test_assert(!do_GetCompileTargetsFromTargetsStore(u"windows chromeos", compileTargets, platformTargets));
   test_assert(error_vec.size() == 1);
   test_assert(error_vec[0] == KmnCompilerMessages::ERROR_InvalidTarget);
-  test_assert(targets == 0);
+  test_assert(compileTargets == 0);
+  test_assert(platformTargets == 0);
 
   setup();
-  test_assert(!do_GetCompileTargetsFromTargetsStore(u" ", targets));
+  test_assert(!do_GetCompileTargetsFromTargetsStore(u" ", compileTargets, platformTargets));
   test_assert(error_vec.size() == 1);
   test_assert(error_vec[0] == KmnCompilerMessages::ERROR_NoTargetsSpecified);
-  test_assert(targets == 0);
+  test_assert(compileTargets == 0);
+  test_assert(platformTargets == 0);
 
   setup();
-  test_assert(!do_GetCompileTargetsFromTargetsStore(u"", targets));
+  test_assert(!do_GetCompileTargetsFromTargetsStore(u"", compileTargets, platformTargets));
   test_assert(error_vec.size() == 1);
   test_assert(error_vec[0] == KmnCompilerMessages::ERROR_NoTargetsSpecified);
-  test_assert(targets == 0);
+  test_assert(compileTargets == 0);
+  test_assert(platformTargets == 0);
 }
