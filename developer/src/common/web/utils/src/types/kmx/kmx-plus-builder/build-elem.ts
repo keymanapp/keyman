@@ -1,4 +1,4 @@
-import { constants } from "@keymanapp/ldml-keyboard-constants";
+import { constants, KMXPlusVersion } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus, LdmlKeyboardTypes } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION, BUILDER_U32CHAR } from "./builder-section.js";
@@ -46,10 +46,12 @@ function binaryElemCompare(a: BUILDER_ELEM_STRING, b: BUILDER_ELEM_STRING): numb
   return 0;
 }
 
-export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS, sect_uset: BUILDER_USET): BUILDER_ELEM {
+export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS, sect_uset: BUILDER_USET, version: KMXPlusVersion): BUILDER_ELEM {
   const result: BUILDER_ELEM = {
-    ident: constants.hex_section_id(constants.section.elem),
-    size: 0,  // finalized below
+    header: {
+      ident: constants.hex_section_id(constants.section.elem),
+      size: 0,  // finalized below
+    },
     _offset: 0,
     count: source_elem.strings.length,
     strings: [], // finalized below
@@ -93,12 +95,12 @@ export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS, sect_uset
       // no length gets a zero offset
       item.offset = 0;
     } else {
-      item.offset = offset;
+      item.offset = offset + constants.headerSizeDelta(version);
       offset += item.length * constants.length_elem_item_element;
     }
   }
 
-  result.size = offset;
+  result.header.size = offset;
   return result;
 }
 

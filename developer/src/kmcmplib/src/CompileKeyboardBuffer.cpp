@@ -31,7 +31,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   }
 
   fk->KeyboardID = 0;
-  fk->version = 0;
+  fk->version = kmcmp::TargetVersion;
   fk->dpStoreArray = NULL;
   fk->dpGroupArray = NULL;
   fk->cxStoreArray = 0;
@@ -39,7 +39,9 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   fk->StartGroup[0] = fk->StartGroup[1] = -1;
   fk->szName[0] = 0;
   fk->szCopyright[0] = 0;
-  fk->dwFlags = KF_AUTOMATICVERSION;
+  // If the targetVersion option is passed in, then we don't use automatic
+  // versioning, and we ignore the &VERSION store
+  fk->dwFlags = kmcmp::TargetVersion == 0 ? KF_AUTOMATICVERSION : 0;
   fk->currentGroup = 0xFFFFFFFF;
   fk->currentStore = 0;
   fk->cxDeadKeyArray = 0;
@@ -52,6 +54,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   fk->extra->stores.clear();
   fk->extra->groups.clear();
   fk->extra->platformTargets = PLATFORMTARGETS_DESKTOP; // technically originally WINDOWS but DESKTOP is documented value
+  fk->extra->targetVersion = VERSION_60;
 /*	fk->szMessage[0] = 0;
   fk->szLanguageName[0] = 0;*/
   fk->dwBitmapSize = 0;
@@ -196,5 +199,7 @@ namespace kmcmp {
       extraGroup.name = string_from_u16string(group->szName);
       fk->extra->groups.push_back(extraGroup);
     }
+
+    fk->extra->targetVersion = fk->version;
   }
 }

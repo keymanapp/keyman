@@ -31,6 +31,7 @@ struct KMCMP_COMPILER_OPTIONS {
   bool warnDeprecatedCode;
   bool shouldAddCompilerVersion;
   int target;                     // CKF_KEYMAN, CKF_KEYMANWEB
+  int targetVersion;              // 0 = unspecified, otherwise Keyman version
 };
 
 //
@@ -99,10 +100,12 @@ struct KMCMP_COMPILER_RESULT_EXTRA {
   int targets; /// COMPILETARGETS__MASK = COMPILETARGETS_KMX | COMPILETARGETS_JS
   std::string kmnFilename;
   std::string kvksFilename;
+  std::string touchLayoutFilename;
   std::string displayMapFilename;
   std::vector<KMCMP_COMPILER_RESULT_EXTRA_STORE> stores;
   std::vector<KMCMP_COMPILER_RESULT_EXTRA_GROUP> groups;
   int platformTargets; /// PLATFORMTARGETS__MASK
+  int targetVersion;
 };
 
 struct KMCMP_COMPILER_RESULT {

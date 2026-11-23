@@ -18,8 +18,8 @@ builder_parse "$@"
 
 source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 WIN32_TARGET="$WIN32_TARGET_PATH/tike.exe"
-KEYMANCORE_DLL=keymancore-2.dll
-KEYMANCORE_PDB=keymancore-2.pdb
+KEYMANCORE_DLL=keymancore-3.dll
+KEYMANCORE_PDB=keymancore-3.pdb
 
 builder_describe_internal_dependency \
   build:project  build:touch-layout-editor
