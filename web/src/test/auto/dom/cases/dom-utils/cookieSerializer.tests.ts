@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { assert } from 'chai';
 

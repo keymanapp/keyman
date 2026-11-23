@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 
 import { createRequire } from 'node:module';
 import { assert } from 'chai';

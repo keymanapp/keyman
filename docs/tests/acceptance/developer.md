@@ -1,5 +1,20 @@
 # Developer Acceptance Tests
 
+### Clean up instructions for manual tests
+For all these acceptance steps to perform a `cleanup` Uninstall Keyman and any third-party applications installed as part for the `Setup` steps.
+
+If an installation becomes corrupted and it is not possible to uninstall `Keyman Developer` through `Add or remove programs`, clean up the files in the following folders if they exist.
+
+- %ProgramFiles(x86)%\Keyman or %ProgramFiles%\Keyman
+- %CommonProgramFiles(x86)%\Keyman or %CommonProgramFiles%\Keyman
+- %ProgramData%\Keyman
+- %AppData%\Keyman
+- %LocalAppData%\Keyman
+
+If still having trouble remove the registry values at
+- HKCU\Software\Keyman
+- HKLM\Software\Wow6432Node\Keyman
+
 **TEST_241**
 
 Test case for Debugger_Starts ,

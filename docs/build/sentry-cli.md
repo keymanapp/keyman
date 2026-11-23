@@ -1,8 +1,11 @@
 # Setting up sentry-cli
 
-Contact the Keyman team if you need access to sentry.keyman.com for development.
+Contact the Keyman team if you need access to keyman.sentry.io for development.
 You will also need to install [sentry-cli](https://docs.sentry.io/cli/installation/) for uploading Debug symbols.
-After setting up your personal [Auth token](http://keyman.sentry.io/settings/account/api/auth-tokens/), add the following to **~/.bashrc**
+Check [minimum-versions.md](../minimum-versions.md) for the required version of `sentry-cli`.
+
+After setting up your personal [Auth token](http://keyman.sentry.io/settings/account/api/auth-tokens/),
+add the following to `~/.bashrc`:
 
 ```bash
 export SENTRY_AUTH_TOKEN={your Sentry auth token}

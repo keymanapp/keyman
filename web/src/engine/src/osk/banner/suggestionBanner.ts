@@ -577,8 +577,10 @@ export class SuggestionBanner extends Banner {
         return;
       }
 
-      const autoselection = this._predictionContext.selected;
-      this._predictionContext.selected = null;
+      const autoselection = this.predictionContext?.selected;
+      if (this.predictionContext) {
+        this.predictionContext.selected = null;
+      }
       // Always clear pre-existing selections when a new banner input/gesture starts.
       this.options.forEach((entry) => {
           entry.highlight(false);
@@ -628,9 +630,13 @@ export class SuggestionBanner extends Banner {
             return;
           }
 
+          if (!this.predictionContext) {
+            return;
+          }
+
           // The suggestions are still current?  Then restore the original
           // auto-correct suggestion and its highlighting.
-          this._predictionContext.selected = autoselection;
+          this.predictionContext.selected = autoselection;
           if(autoselection) {
             for(const entry of this.options) {
               if(entry.suggestion == autoselection) {
@@ -668,11 +674,11 @@ export class SuggestionBanner extends Banner {
           // Invalidate the suggestions internally, but don't visually update;
           // this will avoid banner-flicker.
           this.currentSuggestions = [];
-          this.predictionContext.accept(suggestion.suggestion);
+          this.predictionContext?.accept(suggestion.suggestion);
           // Trigger new predictions, as no input exists to trigger new ones otherwise.
           // Reversions will re-use old suggestions, though.
           if(suggestion.suggestion.tag != 'revert') {
-            this.predictionContext.triggerPredictions();
+            this.predictionContext?.triggerPredictions();
           }
 
           // Reset the scroll state

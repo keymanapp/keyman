@@ -1,5 +1,8 @@
 # macOS Acceptance Tests
 
+### Clean up instructions for manual tests
+For all these acceptance steps to perform a `cleanup` Uninstall Keyman and any third-party applications installed as part for the `Setup` steps.
+
 **TEST_173**
 
 Test case for Chrome_Google_Docs with Amharic,
@@ -45,15 +48,6 @@ Original TestLodge ID: TC113
 12. Type a
 13. Verify it produces ትአት
 14. Verify in each of three cases, the insertion point should end up before the final ት character.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall the Amharic keyboard.
-3. Uninstall the Chrome browser.
 
 </details>
 
@@ -103,15 +97,6 @@ Original TestLodge ID: TC115
 11. Type a
 12. Verify it produces ትአት
 13. Verify in each of three cases, the insertion point should end up before the final ት character.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall the Amharic keyboard.
-3. Uninstall Atom Editor.
 
 </details>
 
@@ -165,15 +150,6 @@ Original TestLodge ID: TC118
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall the Amharic keyboard.
-3. Uninstall Safari browser.
-
-</details>
-
 ---
 
 **TEST_180**
@@ -221,15 +197,6 @@ Original TestLodge ID: TC120
 12. Type a
 13. Verify it produces ትአት
 14. Verify in each of three cases, the insertion point should end up before the final ት character.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall the Amharic keyboard.
-3. Uninstall the Firefox browser.
 
 </details>
 
@@ -283,15 +250,6 @@ Original TestLodge ID: TC123
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall the Amharic keyboard.
-3. Uninstall the Firefox browser.
-
-</details>
-
 ---
 
 **TEST_185**
@@ -341,15 +299,6 @@ Original TestLodge ID: TC125
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall the Amharic keyboard.
-3. Uninstall Notes App.
-
-</details>
-
 ---
 
 **TEST_188**
@@ -396,15 +345,6 @@ Original TestLodge ID: TC128
 11. Type a
 12. Verify it produces ትአት
 13. Verify in each of three cases, the insertion point should end up before the final ት character.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall the Amharic keyboard.
-3. Uninstall LibreOffice 7.0 app.
 
 </details>
 
@@ -466,14 +406,6 @@ Original TestLodge ID: TC130
 24. Verify that the text ‘testing’ has been selected.
 25. Type a
 26. Verify it produces አ
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall Chrome browser.
 
 </details>
 
@@ -539,14 +471,6 @@ Original TestLodge ID: TC133
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall Chrome browser.
-
-</details>
-
 ---
 
 **TEST_195**
@@ -608,13 +532,6 @@ Original TestLodge ID: TC135
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-
-</details>
-
 ---
 
 **TEST_198**
@@ -673,13 +590,6 @@ Original TestLodge ID: TC138
 25. Verify that the text ‘testing’ has been selected.
 26. Type a
 27. Verify it produces አ
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
 
 </details>
 
@@ -747,13 +657,6 @@ Original TestLodge ID: TC140
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-
-</details>
-
 ---
 
 **TEST_203**
@@ -812,13 +715,6 @@ Original TestLodge ID: TC143
 25. Verify that the text ‘testing’ has been selected.
 26. Type a
 27. Verify it produces አ
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
 
 </details>
 
@@ -882,12 +778,6 @@ Original TestLodge ID: TC145
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-
-</details>
 **TEST_208**
 
 Test case for MAIL app with Shortcuts,
@@ -946,13 +836,6 @@ Original TestLodge ID: TC148
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-
-</details>
-
 ---
 
 **TEST_210**
@@ -992,14 +875,6 @@ Original TestLodge ID: TC222
 5. Type `
 6. Verify it produces e.
 7. Verify it produces è
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall Chrome browser.
 
 </details>
 
@@ -1047,14 +922,6 @@ Original TestLodge ID: TC225
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall Chrome browser.
-
-</details>
-
 ---
 
 **TEST_215**
@@ -1091,13 +958,6 @@ Original TestLodge ID: TC235
 3. Type `
 4. Verify it produces e.
 5. Verify it produces è
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the MAC
 
 </details>
 
@@ -1142,14 +1002,6 @@ Original TestLodge ID: TC238
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the MAC
-SUITE_KMX_PROCESSOR_COMPLIANT_GROUP_LINUX:
-
-</details>
-
 ---
 
 **TEST_220**
@@ -1190,14 +1042,6 @@ Original TestLodge ID: TC250
 6. Verify it produces ^.
 7. Press the “right arrow”(->)
 8. Verify it produces e
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall Chrome browser.
 
 </details>
 
@@ -1245,14 +1089,6 @@ Original TestLodge ID: TC253
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the device.
-2. Uninstall Chrome browser.
-
-</details>
-
 ---
 
 **TEST_226**
@@ -1295,14 +1131,6 @@ Original TestLodge ID: TC266
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the macOS
-2. Uninstall the TextEdit app.
-
-</details>
-
 ---
 
 **TEST_228**
@@ -1342,14 +1170,6 @@ Original TestLodge ID: TC268
 5. Press and Release CTRL key.
 6. Type e
 7. Verify it produces ê
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall Keyman build on the macOS
-2. Uninstall the TextEdit app.
 
 </details>
 
@@ -1401,13 +1221,6 @@ Original TestLodge ID: TC286
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall the Keyman build on the macOS.
-
-</details>
-
 ---
 
 **TEST_233**
@@ -1448,13 +1261,6 @@ Original TestLodge ID: TC288
 6. Verify the "Khmer Angkor" keyboard appears on the "Keyman Configuration" dialog.
 7. Click on the "Options" tab.
 8. Verify the "Always show on-screen keyboard" checkbox is gone.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall the Keyman build on the macOS.
 
 </details>
 
@@ -1505,13 +1311,6 @@ Original TestLodge ID: TC291
 
 </details>
 
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall the Keyman build on the macOS.
-
-</details>
-
 ---
 
 **TEST_238**
@@ -1555,13 +1354,6 @@ Original TestLodge ID: TC293
 9. Switch to the keyman keyboard.
 10. Verify the OSK keyboard is change.
 11. Verify the OSK appears in the same bigger size and the OSK position appears in the same place earlier too.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1. Uninstall the Keyman build on the macOS.
 
 </details>
 
@@ -1615,13 +1407,6 @@ TC - fix(mac): handle PackageInfo section in kmp.inf file #13876
 16.    Verify that the "Sanskrit Unicode" keyboard appears in the configuration dialog.
 17.    Verify that the "Sanskrit Unicode" letter appears in the note app.
 18.    Close the keyman's configuration dialog.
-
-</details>
-
-<details>
-<summary>Cleanup</summary>
-
-1.    Uninstall the Keyman build on macOS.
 
 </details>
 

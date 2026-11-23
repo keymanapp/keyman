@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { InputSample, buildGestureMatchInspector, GestureSource, GestureSourceSubview, gestures } from 'keyman/engine/gesture-processor';
 import { ManagedPromise, timedPromise } from 'keyman/common/web-utils';
 

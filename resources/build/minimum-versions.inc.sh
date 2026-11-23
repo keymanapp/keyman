@@ -14,7 +14,7 @@
 KEYMAN_MIN_TARGET_VERSION_ANDROID=5.0         # Lollipop
 KEYMAN_MIN_TARGET_VERSION_IOS=15.6            # iOS 15.6
 KEYMAN_MIN_TARGET_VERSION_WINDOWS=10          # Windows 10
-KEYMAN_MIN_TARGET_VERSION_MAC=10.13           # MacOS 10.13 (High Sierra)
+KEYMAN_MIN_TARGET_VERSION_MAC=13.0           # MacOS 13 (Ventura)
 KEYMAN_MIN_TARGET_VERSION_UBUNTU=22.04        # Ubuntu 22.04 Jammy
 KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME=95.0 # min version of Chrome for Keyman for Android
 
@@ -32,6 +32,7 @@ KEYMAN_MIN_VERSION_EMSCRIPTEN=3.1.64          # Use KEYMAN_USE_EMSDK to automati
 KEYMAN_MIN_VERSION_VISUAL_STUDIO=2022         # Visual Studio 2022, see /docs/build/windows.md for workloads and components
 KEYMAN_MIN_VERSION_MESON=1.0.0                # TODO: rename meson_options.txt to meson.options when updating to >= 1.1, see #15127.
 KEYMAN_VERSION_XCODE=26.2                     # XCode 26.2 is the current supported version; download from https://developer.apple.com/download/all/
+KEYMAN_VERSION_SENTRY_CLI=1.70.0              # sentry-cli used to upload debug information to Sentry during CI
 
 KEYMAN_VERSION_GRADLE=8.12                    # See /android/KMEA/gradle/wrapper/gradle-wrapper.properties
 

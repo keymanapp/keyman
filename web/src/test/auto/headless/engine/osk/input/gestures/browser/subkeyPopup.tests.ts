@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai';
 // @ts-ignore  // Type info unavailable; doing a npm-install for it breaks things much worse in other ways.
 import { JSDOM } from 'jsdom';
@@ -44,6 +47,9 @@ describe('subkey menu width', () => {
     sinon.stub(visualKeyboard, 'isEmbedded').get(() => false);
     sinon.stub(visualKeyboard, 'layerId').get(() => '_default');
     sinon.stub(visualKeyboard, 'width').get(() => oskWidth);
+
+    // Create property. "as any" is required in TS since property is readonly
+    (visualKeyboard as any).layoutKeyboard = {id: "test_keyboard"};
 
     // Create property. "as any" is required in TS since property is readonly
     (visualKeyboard as any).kbdDiv = null;

@@ -151,6 +151,9 @@ function _builder_basic_find_version() {
     export KEYMAN_VERSION_ENVIRONMENT
     export KEYMAN_VERSION_GIT_TAG
     export KEYMAN_VERSION_FOR_FILENAME
+    export KEYMAN_TIER
+    export UPLOAD_SENTRY
+    export BUILDER_OS
 }
 
 function _builder_basic_find_tier() {
