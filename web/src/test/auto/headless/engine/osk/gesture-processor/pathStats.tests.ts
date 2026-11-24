@@ -6,7 +6,7 @@ import { CumulativePathStats, InputSample } from 'keyman/engine/gesture-processo
 
 describe("CumulativePathStats", function() {
   it("Sample count = 0", function() {
-    let stats = new CumulativePathStats();
+    const stats = new CumulativePathStats();
 
     assert.equal(stats.duration, 0);
     assert.equal(stats.angle, undefined);
@@ -74,8 +74,8 @@ describe("CumulativePathStats", function() {
     }
 
     let stats = new CumulativePathStats();
-    let preStats: CumulativePathStats[]  = [];
-    let postStats: CumulativePathStats[] = [];
+    const preStats: CumulativePathStats[]  = [];
+    const postStats: CumulativePathStats[] = [];
 
     for(const sample of samples) {
       const initialValue = stats;
@@ -87,7 +87,7 @@ describe("CumulativePathStats", function() {
 
     // The one not-immutable part:  `.followingSample`.  It's needed for some of the
     // internal mechanisms - for `.deaccumulate`, in particular.
-    for(let obj of postStats) {
+    for(const obj of postStats) {
       // is technically private; we delete it b/c it'd get in the way of the assertion below.
       delete obj['followingSample'];
     }
@@ -150,7 +150,7 @@ describe("CumulativePathStats", function() {
     // Reconstructs the second half by 'deaccumulating' the first half from the full accumulation.
     // (Not including the split-point.)
     // This is pretty core to our segmentation algorithm's efficiency.
-    let deaccumulatedSecondHalfStats = combinedStats.deaccumulate(firstHalfStats);
+    const deaccumulatedSecondHalfStats = combinedStats.deaccumulate(firstHalfStats);
 
     // Base sample will differ because `secondHalfStats` was started independently.
     // This means that the linear, cross, and squaredSums WILL NOT BE EQUAL.

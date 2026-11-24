@@ -8,7 +8,7 @@ import { TransformUtils } from '@keymanapp/lm-worker/test-index';
 describe('TransformUtils', function () {
   describe('isWhitespace', function () {
     it("should not match a string containing standard alphabetic characters", function () {
-      let testTransforms = [{
+      const testTransforms = [{
         insert: "a ",
         deleteLeft: 0
       }, {
@@ -23,7 +23,7 @@ describe('TransformUtils', function () {
     });
 
     it("should match a simple ' ' transform", function() {
-      let transform = {
+      const transform = {
         insert: " ",
         deleteLeft: 0
       };
@@ -32,7 +32,7 @@ describe('TransformUtils', function () {
     });
 
     it("should match a simple ' ' transform with delete-left", function() {
-      let transform = {
+      const transform = {
         insert: " ",
         deleteLeft: 1
       };
@@ -41,7 +41,7 @@ describe('TransformUtils', function () {
     });
 
     it("should match a transform consisting of multiple characters of only whitespace", function() {
-      let transform = {
+      const transform = {
         insert: " \n\r\u00a0\t\u2000 ",
         deleteLeft: 0
       };
@@ -50,7 +50,7 @@ describe('TransformUtils', function () {
     });
 
     it("stress tests", function() {
-      let transform = {
+      const transform = {
         insert: " \n\r\u00a0\ta\u2000 ",  // the 'a' should cause failure.
         deleteLeft: 0
       };
