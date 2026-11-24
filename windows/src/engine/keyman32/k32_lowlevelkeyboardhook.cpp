@@ -25,198 +25,329 @@
 #include "pch.h"
 #include "serialkeyeventserver.h"
 #include "kbd.h"	/* DDK kbdlayout */
+#include <Psapi.h>
 
 // This file is used only in keyman32.dll; it implements our low level keyboard hook
 // in the main keyman.exe process for hotkeys, serial key event server
 #ifndef _WIN64
 
-BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState);
+static DWORD WINAPI ServerThreadProc(_In_ LPVOID lpParameter);
 
-LRESULT _kmnLowLevelKeyboardProc(
-  _In_  int nCode,
-  _In_  WPARAM wParam,
-  _In_  LPARAM lParam
-);
-
-// Local variables only used by single thread -- low level keyboard proc thread
-DWORD FHotkeyShiftState = 0;
-
-LRESULT CALLBACK kmnLowLevelKeyboardProc(
-  _In_  int nCode,
-  _In_  WPARAM wParam,
-  _In_  LPARAM lParam
-) {
-  LRESULT res = 0;
-#ifdef _DEBUG_EXCEPTION
-	res = _kmnLowLevelKeyboardProc(nCode,wParam,lParam);
-#else
-  __try {
-	  res = _kmnLowLevelKeyboardProc(nCode,wParam,lParam);
-	}
-  __except(ExceptionMessage("kmnLowLevelKeyboardProc", GetExceptionInformation())) {
-	}
-#endif
-  return res;
-}
-
-BOOL isModifierKey(DWORD vkCode) {
-  switch (vkCode) {
-    case VK_LCONTROL:
-    case VK_RCONTROL:
-    case VK_CONTROL:
-    case VK_LMENU:
-    case VK_RMENU:
-    case VK_MENU:
-    case VK_LSHIFT:
-    case VK_RSHIFT:
-    case VK_SHIFT:
-      return TRUE;
-  }
-  return FALSE;
-}
-
-BOOL KeyLanguageSwitchPress(WPARAM wParam, BOOL extended, BOOL isUp, DWORD ShiftState);
-int ProcessLanguageSwitchShiftKey(WPARAM wParam, BOOL isUp);
-BOOL IsLanguageSwitchWindowVisible();
-void SendToLanguageSwitchWindow(WPARAM wParam, LPARAM lParam);
-
-LPARAM LLKHFFlagstoWMKeymanKeyEventFlags(PKBDLLHOOKSTRUCT hs) {
-  return (hs->scanCode << 16) |
-    ((hs->flags & LLKHF_EXTENDED) ? KEYEVENTF_EXTENDEDKEY : 0) |
-    ((hs->flags & LLKHF_UP) ? KEYEVENTF_KEYUP : 0);
-}
-
-/*
-  We don't attempt to serialize input to the console windows because they
-  behave somewhat differently to normal windows. For now, this should be
-  sufficient. In the future, we may want to find a way to interrogate the
-  focused process to find out which window actually has focus for posting
-  messages, because we appear to post the messages to the wrong thread
-  for console windows.
-*/
-BOOL IsConsoleWindow(HWND hwnd) {
-  static HWND last_hwnd = 0;
-  static BOOL last_isConsoleWindow = FALSE;
-
-  if (last_hwnd == hwnd) {
-    return last_isConsoleWindow;
-  }
-
-  char buf[64];
-
-  last_hwnd = hwnd;
-  last_isConsoleWindow = GetClassName(hwnd, buf, 64) && !strcmp(buf, "ConsoleWindowClass");
-
-  return last_isConsoleWindow;
-}
-
+BOOL KeymanLowLevelKeyboardHook::m_TouchPanelVisible = FALSE;
+HHOOK KeymanLowLevelKeyboardHook::m_hhook = 0;
+DWORD KeymanLowLevelKeyboardHook::m_idThread = 0;
+BOOL KeymanLowLevelKeyboardHook::m_InLanguageSwitchKeySequence = FALSE;
+HWND KeymanLowLevelKeyboardHook::m_hwndLanguageSwitch = 0;
+Hotkeys* KeymanLowLevelKeyboardHook::m_hotkeys = NULL;
+HANDLE KeymanLowLevelKeyboardHook::m_hReloadEvent              = 0;
+HANDLE KeymanLowLevelKeyboardHook::m_hThread                   = 0;
+HANDLE KeymanLowLevelKeyboardHook::m_hThreadExitEvent          = 0;
 
 /*
  Test for touch panel visibility (#2450). UpdateTouchPanelVisibility is called periodically by
  keyman.exe to refresh the visibility flag.
 */
 
-static BOOL touchPanelVisible;
-
 void WINAPI Keyman_UpdateTouchPanelVisibility(BOOL isVisible) {
-  touchPanelVisible = isVisible;
-  SendDebugMessageFormat("isVisible=%d", touchPanelVisible);
+  KeymanThreadSafety_assertThread(TV_MAIN);
+  KeymanLowLevelKeyboardHook::SetTouchPanelVisible(isVisible);
 }
 
-BOOL IsTouchPanelVisible() {
-  // Note: GetCurrentInputMessageSource does not work in this context
-  // Using IFrameworkInputPaneHandler events only works for a specific window, so not helpful for us.
-  return touchPanelVisible;
+/// PUBLIC METHODS
+
+BOOL KeymanLowLevelKeyboardHook::Startup() {
+  KeymanThreadSafety_assertThread(TV_MAIN);
+
+  if (m_hThread != NULL) {
+    SendDebugMessage("Startup: Low level hook is already running!");
+    return FALSE;
+  }
+
+  m_hThreadExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+  if (!m_hThreadExitEvent) {
+    DebugLastError("CreateEvent");
+    return FALSE;
+  }
+
+  m_hReloadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+  if (!m_hReloadEvent) {
+    DebugLastError("CreateEvent");
+    return FALSE;
+  }
+
+  m_hThread = CreateThread(NULL, 0, ServerThreadProc, NULL, 0, &m_idThread);
+  if (!m_hThread) {
+    DebugLastError("CreateThread");
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
-LRESULT _kmnLowLevelKeyboardProc(
+BOOL KeymanLowLevelKeyboardHook::Shutdown() {
+  KeymanThreadSafety_assertThread(TV_MAIN);
+
+  if (m_hThreadExitEvent != NULL) {
+    if (!SetEvent(m_hThreadExitEvent)) {
+      DebugLastError("SetEvent");
+    }
+
+    if (m_hThread != NULL) {
+      // Wait for the thread to terminate so we know that we'll not receive
+      // additional events after this object is destroyed
+      if (WaitForSingleObject(m_hThread, 5000) != WAIT_OBJECT_0) {
+        DebugLastError("WaitForSingleObject(m_hThread)");
+      }
+
+      if (!CloseHandle(m_hThread)) {
+        DebugLastError("CloseHandle(m_hThread)");
+      }
+      m_hThread = NULL;
+    }
+
+    if (!CloseHandle(m_hThreadExitEvent)) {
+      DebugLastError("CloseHandle(m_hThreadExitEvent)");
+    }
+    m_hThreadExitEvent = NULL;
+  }
+
+  if (m_hReloadEvent != NULL) {
+    if (!CloseHandle(m_hReloadEvent)) {
+      DebugLastError("CloseHandle(m_hReloadEvent)");
+    }
+    m_hReloadEvent = NULL;
+  }
+
+  return TRUE;
+}
+
+void KeymanLowLevelKeyboardHook::ReloadHotkeys() {
+  KeymanThreadSafety_assertThread(TV_MAIN);
+  //SetEvent(m_hReloadEvent);
+}
+
+
+
+BOOL KeymanLowLevelKeyboardHook::Restart() {
+  KeymanThreadSafety_assertThread(TV_MAIN);
+
+  BOOL result = TRUE;
+  /* TODO
+  if (!Shutdown()) {
+    DWORD const error = GetLastError();
+    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_UNINIT_FAILURE), error);
+    SendDebugMessageFormat("Failed to uninstall low level hook.  GetLastError = %d", error);
+    result = FALSE;
+  }
+
+  if (!Startup()) {
+    DWORD const error = GetLastError();
+    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_INIT_FAILURE), error);
+    SendDebugMessageFormat("Failed to install low level hook.  GetLastError = %d", error);
+    result = FALSE;
+  }
+  */
+  return result;
+}
+
+void KeymanLowLevelKeyboardHook::SetTouchPanelVisible(BOOL isVisible) {
+  KeymanThreadSafety_assertThread(TV_MAIN);
+  m_TouchPanelVisible = isVisible;
+  SendDebugMessageFormat("m_TouchPanelVisible=%d", m_TouchPanelVisible);
+}
+
+
+//////////////////////////////////////////////////////
+// Local thread
+//////////////////////////////////////////////////////
+
+/**
+ * Stub callback thread procedure
+ */
+static DWORD WINAPI ServerThreadProc(_In_ LPVOID lpParameter) {
+  UNREFERENCED_PARAMETER(lpParameter);
+  return KeymanLowLevelKeyboardHook::ThreadMain();
+}
+
+/**
+ * Stub callback hook procedure
+ */
+LRESULT CALLBACK kmnLowLevelKeyboardProc(_In_ int nCode, _In_ WPARAM wParam, _In_ LPARAM lParam) {
+  LRESULT res = 0;
+
+#ifdef _DEBUG_EXCEPTION
+  res = KeymanLowLevelKeyboardHook::HookProc(nCode, wParam, lParam);
+#else
+  __try {
+    res = KeymanLowLevelKeyboardHook::HookProc(nCode, wParam, lParam);
+  } __except (ExceptionMessage("kmnLowLevelKeyboardProc", GetExceptionInformation())) {
+  }
+#endif
+  return res;
+}
+
+
+/**
+ *   Thread main procedure
+ */
+DWORD KeymanLowLevelKeyboardHook::ThreadMain() {
+  KeymanThreadSafety::setThreadId(TV_LLKH, m_idThread);
+
+  if (!InitThread()) {
+    return 1;
+  }
+
+  MessageLoop();
+
+  CleanupThread();
+
+  return 0;
+}
+
+/**
+ * Setup the thread to have a message pump and signal as appropriate
+ */
+BOOL KeymanLowLevelKeyboardHook::InitThread() {
+  KeymanThreadSafety_assertThread(TV_LLKH);
+  /* WNDCLASS wndClass = {0};
+  wndClass.lpfnWndProc   = ServerWndProc;
+  wndClass.cbClsExtra    = sizeof(this);
+  wndClass.lpszClassName = LLH_WINDOW_CLASS;
+  wndClass.hInstance     = g_hInstance;
+  if (!RegisterClass(&wndClass)) {
+    DebugLastError("RegisterClass");
+    return FALSE;
+  }
+
+  m_hwnd = CreateWindow(LLH_WINDOW_CLASS, "", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, g_hInstance, NULL);
+  if (m_hwnd == NULL) {
+    DebugLastError("CreateWindow");
+    return FALSE;
+  }
+
+  SetClassLongPtr(m_hwnd, 0, (LONG_PTR)this);*/
+
+  // Setup the
+  m_hotkeys = new Hotkeys();
+  m_hotkeys->Load();
+
+  HINSTANCE hinst = GetModuleHandle(LIBRARY_NAME);
+  m_hhook =
+      SetWindowsHookExW(WH_KEYBOARD_LL, (HOOKPROC)kmnLowLevelKeyboardProc, hinst, Globals::get_FSingleThread());  // I4124
+  SendDebugMessageFormat("Keyboard_LL=%x", m_hhook);
+
+  return m_hhook != NULL;
+}
+
+/**
+ * Cleanup when thread main finishes
+ */
+void KeymanLowLevelKeyboardHook::CleanupThread() {
+  KeymanThreadSafety_assertThread(TV_LLKH);
+  if (m_hhook != NULL) {
+    if(!UnhookWindowsHookEx(m_hhook)) {  // I4124
+      DebugLastError("UnhookWindowsHookEx");
+    }
+
+    m_hhook = NULL;
+  }
+
+  delete m_hotkeys;
+  m_hotkeys = NULL;
+}
+
+/**
+ * Main message loop for thread. Terminates on error or when
+ * m_hThreadExitEvent is signaled. Sleeps until a window message
+ * is received.
+ */
+void KeymanLowLevelKeyboardHook::MessageLoop() {
+  KeymanThreadSafety_assertThread(TV_LLKH);
+  HANDLE events[2] = {m_hThreadExitEvent, m_hReloadEvent};
+  while (TRUE) {
+    switch (MsgWaitForMultipleObjectsEx(2, events, INFINITE, QS_ALLINPUT, 0)) {
+    case WAIT_OBJECT_0:  // m_hThreadExitEvent signaled
+      // Thread has been signalled, return
+      return;
+    case WAIT_OBJECT_0 + 1:  // m_hReloadEvent signaled
+      ReloadHotkeys();
+      break;
+    case WAIT_OBJECT_0 + 2:  // Windows message received
+      MSG msg;
+      while (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {
+        DispatchMessage(&msg);
+      }
+      break;
+    default:
+      DebugLastError("MsgWaitForMultipleObjectsEx");
+      return;
+    }
+  }
+}
+
+
+LRESULT KeymanLowLevelKeyboardHook::HookProc(
   _In_  int nCode,
   _In_  WPARAM wParam,
   _In_  LPARAM lParam
 ) {
+  KeymanThreadSafety_assertThread(TV_LLKH);
 
   if(nCode < 0) {
-    return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
+    return CallNextHookEx(m_hhook, nCode, wParam, lParam);
   }
 
   SendDebugEntry();
 
   LowLevelHookWatchDog::HookIsAlive();
 
-  PKBDLLHOOKSTRUCT hs = (PKBDLLHOOKSTRUCT) lParam;
+  PKBDLLHOOKSTRUCT const hs = reinterpret_cast<PKBDLLHOOKSTRUCT>(lParam);
 
-  BOOL extended = hs->flags & LLKHF_EXTENDED ? TRUE : FALSE;
-  BOOL isUp = hs->flags & LLKHF_UP ? TRUE : FALSE;
-
-  SendDebugMessageFormat("wparam: %x  lparam: %x [vk:%s scan:%x flags:%x extra:%x]", wParam, lParam, Debug_VirtualKey((WORD) hs->vkCode), hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
+  BOOL const extended  = hs->flags & LLKHF_EXTENDED ? TRUE : FALSE;
+  BOOL const isUp      = hs->flags & LLKHF_UP ? TRUE : FALSE;
 
   // #5190: Don't cache modifier state because sometimes we won't receive
   // modifier change events (e.g. on lock screen)
-  FHotkeyShiftState = 0;
-  BOOL AllowRightModifierHotkey = FALSE;
-  Hotkeys* hotkeys  = Hotkeys::Instance();
-  if (hotkeys) {
-    AllowRightModifierHotkey = hotkeys->AllowRightModifierHotkey();
-  }
+  DWORD const hotkeyShiftState = GetCurrentModifierKeyState();
 
-  if (GetKeyState(VK_LCONTROL) < 0) {
-    FHotkeyShiftState |= HK_CTRL;
-  }
+  SendDebugMessageFormat("message:%x  vkCode:%s (%x)  scanCode:%x  flags:%08.8x (extended=%d isUp=%d) dwExtraInfo:%x  hotkeyShiftState:%x",
+    wParam /* wParam is the keyboard message WM_[SYS]KEY(UP|DOWN) */,
+    Debug_VirtualKey((WORD) hs->vkCode), hs->vkCode, hs->scanCode, hs->flags, extended, isUp,
+    hs->dwExtraInfo, hotkeyShiftState);
 
-  if (GetKeyState(VK_RCONTROL) < 0) {
-    FHotkeyShiftState |= AllowRightModifierHotkey ? HK_CTRL : HK_RCTRL_INVALID;
-  }
-
-  if (GetKeyState(VK_LMENU) < 0) {
-    FHotkeyShiftState |= HK_ALT;
-  }
-
-  if (GetKeyState(VK_RMENU) < 0) {
-    FHotkeyShiftState |= AllowRightModifierHotkey ? HK_ALT : HK_RALT_INVALID;
-  }
-
-  if (GetKeyState(VK_LSHIFT) < 0) {
-    FHotkeyShiftState |= HK_SHIFT;
-  }
-
-  if (GetKeyState(VK_RSHIFT) < 0) {
-    FHotkeyShiftState |= AllowRightModifierHotkey ? HK_SHIFT : HK_RSHIFT_INVALID;
-  }
-
-  if(isModifierKey(hs->vkCode)) {
+  if(IsModifierKey(hs->vkCode)) {
     PostVisualKeyboardModifierEvent(hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
   }
-
-  //TODO: #8064. Can remove debug message once issue #8064 is resolved
-  SendDebugMessageFormat("[FHotkeyShiftState:%x]", FHotkeyShiftState);
 
   // #7337 Post the modifier state ensuring the serialized queue is in sync
   // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
   // later in this function. This is intentional, as the WM_KEYMAN_MODIFIER_EVENT
   // message only updates our internal modifier state, and does not do
   // any additional processing or other serialization of the input queue.
-  if (isModifierKey(hs->vkCode) && flag_ShouldSerializeInput) {
-    //TODO: #8064. Can remove debug message once issue #8064 is resolved
-    SendDebugMessageFormat("isModifierKey [hs->vkCode:%x isUp:%d]", hs->vkCode, isUp);
-    PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+  if (IsModifierKey(hs->vkCode) && flag_ShouldSerializeInput) {
+    SendDebugMessage("posting modifier to serial key event server");
+    PostMessageToSerialKeyEventServer(WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
   }
 
-  if(IsLanguageSwitchWindowVisible()) {
-    SendDebugMessageFormat("Sending to language switch window %x %x", wParam, lParam);
-    SendToLanguageSwitchWindow(hs->vkCode, hs->flags);
-    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) {
+  if(LanguageSwitch_IsWindowVisible()) {
+    SendDebugMessage("posting key event to language switch window");
+    LanguageSwitch_PostToWindow(hs->vkCode, hs->flags);
+    if (LanguageSwitch_ProcessModifierKey(hs->vkCode, isUp) == 1) {
+      // Swallow the key event
       return_SendDebugExit(1);
     }
   }
-  else if (KeyLanguageSwitchPress(hs->vkCode, extended, isUp, FHotkeyShiftState)) {
-    SendDebugMessageFormat("KeyLanguageSwitchPress [vkCode:%x extended:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, extended, isUp, FHotkeyShiftState);
-    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) {
+  else if (LanguageSwitch_KeyPress(hs->vkCode, extended, isUp, hotkeyShiftState)) {
+    SendDebugMessage("language switch hotkey pressed");
+    if (LanguageSwitch_ProcessModifierKey(hs->vkCode, isUp) == 1) {
+      // Swallow the key event
       return_SendDebugExit(1);
     }
   }
 
-  if (ProcessHotkey(hs->vkCode, isUp, FHotkeyShiftState)) {
-    SendDebugMessageFormat("ProcessHotkey [vkCode:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, isUp, FHotkeyShiftState);
+  if (ProcessHotkey(hs->vkCode, isUp, hotkeyShiftState)) {
+    SendDebugMessage("general hotkey pressed");
+    // Swallow the key event
     return_SendDebugExit(1);
   }
 
@@ -235,47 +366,108 @@ LRESULT _kmnLowLevelKeyboardProc(
     // dwExtraInfo is set to 0x4321DCBA by mstsc which does prefiltering. So we ignore for anything where dwExtraInfo!=0 because it
     // probably is not hardware generated and may cause more issues to filter it.
     // We also ignore if a Keyman keyboard is not currently active.
-    SendDebugMessageFormat("Pass through [dwExtraInfo:%x scancode:%x vkCode:%x, isKeymanKeyboardActive:%d", hs->dwExtraInfo, hs->scanCode, hs->vkCode, isKeymanKeyboardActive);
-    return_SendDebugExit(CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam));
+    SendDebugMessageFormat("pass through; isKeymanKeyboardActive:%d", isKeymanKeyboardActive);
+    return_SendDebugExit(CallNextHookEx(m_hhook, nCode, wParam, lParam));
   }
 
-  if (IsTouchPanelVisible()) {
+  if (m_TouchPanelVisible) {
+    // Note: GetCurrentInputMessageSource does not work in this context
+    // Using IFrameworkInputPaneHandler events only works for a specific window, so not helpful for us.
+
     // See #2450. The touch panel will close automatically if we reprocess key events
     // So we don't want to reprocess events when it is visible.
     SendDebugMessageFormat("touch panel is visible. Not reprocessing keystrokes");
-    return_SendDebugExit(CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam));
+    return_SendDebugExit(CallNextHookEx(m_hhook, nCode, wParam, lParam));
   }
 
   if (flag_ShouldSerializeInput) {
     GUITHREADINFO gui = { 0 };
     gui.cbSize = sizeof(GUITHREADINFO);
     if (GetGUIThreadInfo(NULL, &gui)) {
-      SendDebugMessageFormat("Active=%x Focus=%x Key=%s flags=%x",
-        gui.hwndActive, gui.hwndFocus, Debug_VirtualKey((WORD)hs->vkCode), LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+      SendDebugMessageFormat("hwndActive=%x hwndFocus=%x", gui.hwndActive, gui.hwndFocus);
 
       HWND hwnd = gui.hwndFocus ? gui.hwndFocus : gui.hwndActive;
       if (!IsConsoleWindow(hwnd)) {
-        PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_KEY_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
-        return_SendDebugExit(1);
+        if(PostMessageToSerialKeyEventServer(WM_KEYMAN_KEY_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs))) {
+          // Swallow the key event
+          return_SendDebugExit(1);
+        }
       }
       //else SendDebugMessageFormat("console window, not serializing"); // too noisy
-    }
-    else {
+    } else {
       SendDebugMessageFormat("Failed to get Gui thread info with error %d", GetLastError());
     }
   }
 
-  return_SendDebugExit(CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam));
+  return_SendDebugExit(CallNextHookEx(m_hhook, nCode, wParam, lParam));
 }
 
-BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
+/// PRIVATE METHODS
 
-  Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
-  if (!hotkeys) {
+DWORD KeymanLowLevelKeyboardHook::GetCurrentModifierKeyState() {
+  KeymanThreadSafety_assertThread(TV_LLKH);
+
+  DWORD hotkeyShiftState = 0;
+  BOOL const allowRightModifierHotkey = m_hotkeys->AllowRightModifierHotkey();
+
+  if (GetKeyState(VK_LCONTROL) < 0) {
+    hotkeyShiftState |= HK_CTRL;
+  }
+
+  if (GetKeyState(VK_RCONTROL) < 0) {
+    hotkeyShiftState |= allowRightModifierHotkey ? HK_CTRL : HK_RCTRL_INVALID;
+  }
+
+  if (GetKeyState(VK_LMENU) < 0) {
+    hotkeyShiftState |= HK_ALT;
+  }
+
+  if (GetKeyState(VK_RMENU) < 0) {
+    hotkeyShiftState |= allowRightModifierHotkey ? HK_ALT : HK_RALT_INVALID;
+  }
+
+  if (GetKeyState(VK_LSHIFT) < 0) {
+    hotkeyShiftState |= HK_SHIFT;
+  }
+
+  if (GetKeyState(VK_RSHIFT) < 0) {
+    hotkeyShiftState |= allowRightModifierHotkey ? HK_SHIFT : HK_RSHIFT_INVALID;
+  }
+
+  return hotkeyShiftState;
+}
+
+BOOL KeymanLowLevelKeyboardHook::PostMessageToSerialKeyEventServer(UINT msg, WPARAM wParam, LPARAM lParam) {
+  KeymanThreadSafety_assertThread(TV_LLKH);
+
+  // Thread safety: we rely on ISerialKeyEventServer to be running; this
+  // contract is fulfilled in Keyman_Initialise.
+
+  ISerialKeyEventServer const* server = ISerialKeyEventServer::GetServer();
+  if (!server) {
+    SendDebugMessage("SerialKeyEventServer is unexpectedly NULL");
     return FALSE;
   }
 
-  Hotkey *hotkey = hotkeys->GetHotkey(ShiftState | vkCode);   // I4641
+  HWND hwnd = server->GetWindow();
+  if (!hwnd) {
+    SendDebugMessage("SerialKeyEventServer->GetWindow() is unexpectedly NULL");
+    return FALSE;
+  }
+
+  if(!PostMessage(hwnd, msg, wParam, lParam)) {
+    DebugLastError("PostMessage");
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+
+BOOL KeymanLowLevelKeyboardHook::ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
+  KeymanThreadSafety_assertThread(TV_LLKH);
+
+  Hotkey *hotkey = m_hotkeys->GetHotkey(ShiftState | vkCode);   // I4641
   if (!hotkey) {
     return FALSE;
   }
@@ -295,5 +487,185 @@ BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
 
   return TRUE;
 }
+
+BOOL KeymanLowLevelKeyboardHook::IsModifierKey(DWORD vkCode) {
+  KeymanThreadSafety_assertThread(TV_ANY);
+
+  switch (vkCode) {
+    case VK_LCONTROL:
+    case VK_RCONTROL:
+    case VK_CONTROL:
+    case VK_LMENU:
+    case VK_RMENU:
+    case VK_MENU:
+    case VK_LSHIFT:
+    case VK_RSHIFT:
+    case VK_SHIFT:
+      return TRUE;
+  }
+  return FALSE;
+}
+
+LPARAM KeymanLowLevelKeyboardHook::LLKHFFlagstoWMKeymanKeyEventFlags(PKBDLLHOOKSTRUCT hs) {
+  KeymanThreadSafety_assertThread(TV_ANY);
+
+  return (hs->scanCode << 16) |
+    ((hs->flags & LLKHF_EXTENDED) ? KEYEVENTF_EXTENDEDKEY : 0) |
+    ((hs->flags & LLKHF_UP) ? KEYEVENTF_KEYUP : 0);
+}
+
+/*
+  We don't attempt to serialize input to the console windows because they
+  behave somewhat differently to normal windows. For now, this should be
+  sufficient. In the future, we may want to find a way to interrogate the
+  focused process to find out which window actually has focus for posting
+  messages, because we appear to post the messages to the wrong thread
+  for console windows.
+*/
+BOOL KeymanLowLevelKeyboardHook::IsConsoleWindow(HWND hwnd) {
+  KeymanThreadSafety_assertThread(TV_LLKH);
+
+  static HWND last_hwnd = 0;
+  static BOOL last_isConsoleWindow = FALSE;
+
+  if (last_hwnd == hwnd) {
+    return last_isConsoleWindow;
+  }
+
+  char buf[64];
+
+  last_hwnd = hwnd;
+  last_isConsoleWindow = GetClassName(hwnd, buf, 64) && !strcmp(buf, "ConsoleWindowClass");
+
+  return last_isConsoleWindow;
+}
+
+BOOL KeymanLowLevelKeyboardHook::ForegroundWindowIsRDP() {  // I4197
+  KeymanThreadSafety_assertThread(TV_LLKH);
+
+  // TODO: Cache result
+  // TODO: also check for HyperV, others??
+  DWORD dwProcessId;
+  HWND hwnd = GetForegroundWindow();
+  if (hwnd == NULL) {
+    return FALSE;
+  }
+  if (GetWindowThreadProcessId(hwnd, &dwProcessId) == 0) {
+    return FALSE;
+  }
+
+  HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, false, dwProcessId);
+  if (hProcess == NULL) {
+    return FALSE;
+  }
+
+  char buf[260];
+  BOOL bResult = GetProcessImageFileName(hProcess, buf, _countof(buf)) > 0;
+
+  CloseHandle(hProcess);
+
+  if (bResult) {
+    char* p = strrchr(buf, '\\');
+    bResult = p && _stricmp(p, "\\mstsc.exe") == 0;
+  }
+
+  return bResult;
+}
+
+BOOL KeymanLowLevelKeyboardHook::LanguageSwitch_KeyPress(WPARAM wParam, BOOL extended, BOOL isUp, DWORD ShiftState) {
+  KeymanThreadSafety_assertThread(TV_LLKH);
+
+  /* Let's avoid the cascaded remote desktop switching issues */
+
+  if (ForegroundWindowIsRDP())
+    return FALSE;  // I4197
+
+  /* This is a special-case hotkey for language switching - ALT+LEFT SHIFT */
+
+  Hotkey* hotkey = m_hotkeys->GetHotkey(HK_ALT | HK_SHIFT);  // I4641
+  if (!hotkey) {
+    hotkey = m_hotkeys->GetHotkey(HK_CTRL | HK_SHIFT);  // I4641
+    if (!hotkey)
+      return FALSE;
+  }
+
+  if ((hotkey->HotkeyValue & HK_CTRL) && (wParam == VK_CONTROL || wParam == VK_LCONTROL || wParam == VK_RCONTROL) && !isUp &&
+      (ShiftState & ~(HK_CTRL | HK_RCTRL_INVALID)) == 0)  // I4124
+  {
+    m_InLanguageSwitchKeySequence = TRUE;
+    return FALSE;
+  } else if (
+      (hotkey->HotkeyValue & HK_ALT) && (wParam == VK_MENU || wParam == VK_LMENU || wParam == VK_RMENU) && !extended && !isUp &&
+      (ShiftState & ~HK_ALT) == 0)  // I4124
+  {
+    m_InLanguageSwitchKeySequence = TRUE;
+    return FALSE;
+  } else if (m_InLanguageSwitchKeySequence) {
+    if (wParam == VK_SHIFT || wParam == VK_LSHIFT || wParam == VK_RSHIFT)  // I4124
+    {
+      if (isUp) {
+        m_InLanguageSwitchKeySequence = FALSE;
+        // ReportActiveKeyboard(_td, PC_UPDATE);
+        Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
+        PostDummyKeyEvent();                                                    // I4124   // I4844
+        keybd_event(VK_SHIFT, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);  // I4203
+        return TRUE;
+      }
+
+      return FALSE;
+    } else
+      m_InLanguageSwitchKeySequence = FALSE;
+    return FALSE;
+  }
+
+  return FALSE;
+}
+
+BOOL KeymanLowLevelKeyboardHook::LanguageSwitch_IsWindowVisible() {
+  KeymanThreadSafety_assertThread(TV_LLKH);
+
+  m_hwndLanguageSwitch = FindWindow("TfrmLanguageSwitch", NULL);
+  if (m_hwndLanguageSwitch == NULL)
+    return FALSE;
+  return IsWindowVisible(m_hwndLanguageSwitch);
+}
+
+void KeymanLowLevelKeyboardHook::LanguageSwitch_PostToWindow(WPARAM wParam, LPARAM lParam) {
+  KeymanThreadSafety_assertThread(TV_LLKH);
+
+  DWORD keyFlags = (DWORD)lParam;                                                                             // I4124
+  PostMessage(m_hwndLanguageSwitch, wm_keyman_control, keyFlags & LLKHF_UP ? KMC_KEYUP : KMC_KEYDOWN, wParam);  // I4124
+}
+
+int KeymanLowLevelKeyboardHook::LanguageSwitch_ProcessModifierKey(WPARAM wParam, BOOL isUp) {
+  KeymanThreadSafety_assertThread(TV_LLKH);
+
+  if (!isUp)
+    return 1;
+
+  /* When a ctrl, shift or alt is released we want to know about it, so we can update shift states etc */
+
+  switch (wParam)  // I4548
+  {
+  case VK_LSHIFT:
+  case VK_RSHIFT:
+  case VK_SHIFT:
+  case VK_CONTROL:
+  case VK_LCONTROL:  // I4124
+  case VK_RCONTROL:  // I4124
+  case VK_MENU:
+  case VK_LMENU:  // I4124
+  case VK_RMENU:  // I4124
+    break;
+  default:
+    return 1;
+  }
+
+  /* Generate a dummy keystroke to block menu activations, etc but let the shift key through */
+  PostDummyKeyEvent();  // I3301 - this is imperfect because we don't deal with HC_NOREMOVE.  But good enough?   // I3534   //
+                        // I4844
+  return 0;
+}
+
 
 #endif

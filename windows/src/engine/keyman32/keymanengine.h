@@ -256,6 +256,8 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "k32_tsf.h"
 #include "k32_visualkeyboardinterface.h"
 #include "LowLevelHookWatchDog.h"
+#include "k32_lowlevelkeyboardhook.h"
+#include "ThreadSafety.h"
 
 void ReportActiveKeyboard(WORD wCommand);   // I3933   // I3949
 void SelectKeyboardHKL(DWORD hkl, BOOL foreground);  // I3933   // I3949   // I4271

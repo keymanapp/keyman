@@ -62,6 +62,7 @@ private:
 public:
 
   SerialKeyEventServer() {
+    KeymanThreadSafety_assertThread(TV_MAIN);
     m_idThread = 0;
     m_hThread = NULL;
     m_hThreadExitEvent = NULL;
@@ -94,6 +95,7 @@ public:
   }
 
   virtual ~SerialKeyEventServer() {
+    KeymanThreadSafety_assertThread(TV_MAIN);
     if (m_hThreadExitEvent != NULL) {
       if (!SetEvent(m_hThreadExitEvent)) {
         DebugLastError("SetEvent");
@@ -123,6 +125,8 @@ public:
 
   virtual HWND GetWindow() const {
     // At destruction time, m_hwnd may be NULL
+    // TODO: this is not actually thread safe?
+    KeymanThreadSafety_assertThread(TV_ANY);
     return m_hwnd;
   }
 
@@ -138,6 +142,8 @@ private:
     even if we haven't completed startup of the local thread.
   */
   BOOL InitSharedData() {
+    KeymanThreadSafety_assertThread(TV_MAIN);
+
     m_hMMF = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE | SEC_COMMIT, 0, sizeof(SerialKeyEventSharedData), GLOBAL_FILE_MAPPING_NAME);
     if (!m_hMMF) {
       DebugLastError("CreateFileMapping");
@@ -181,6 +187,10 @@ private:
   }
 
   BOOL CloseSharedData() {
+    // Note: this is called in an error situation when the thread
+    // does not clean up after itself. Generally, this is TV_SKES
+    KeymanThreadSafety_assertThread(TV_ANY);
+
     BOOL bRet = TRUE;
 
     if (m_hKeyMutex != NULL && !CloseHandle(m_hKeyMutex)) {
@@ -227,6 +237,8 @@ private:
     Thread main procedure
   */
   DWORD ThreadMain() {
+    KeymanThreadSafety::setThreadId(TV_SKES, GetCurrentThreadId());
+
     if (!InitThread()) {
       return 1;
     }
@@ -246,6 +258,8 @@ private:
     buffers
   */
   BOOL InitThread() {
+    KeymanThreadSafety_assertThread(TV_SKES);
+
     m_pInputs = new INPUT[MAX_KEYEVENT_INPUTS];
 
     GetKeyboardState(m_ModifierKeyboardState);
@@ -275,6 +289,8 @@ private:
     Cleanup when thread main finishes
   */
   void CleanupThread() {
+    KeymanThreadSafety_assertThread(TV_SKES);
+
     // Slightly naive way of locking out m_hwnd use
     HWND hwnd = m_hwnd;
     m_hwnd = NULL;
@@ -301,6 +317,8 @@ private:
     a client app.
   */
   void MessageLoop() {
+    KeymanThreadSafety_assertThread(TV_SKES);
+
     HANDLE events[2] = { m_hThreadExitEvent, m_hKeyEvent };
     while (TRUE) {
       switch (MsgWaitForMultipleObjectsEx(2, events, INFINITE, QS_ALLINPUT, 0)) {
@@ -328,6 +346,8 @@ private:
     focused window with the SendInput API.
   */
   BOOL ProcessQueuedKeyEvents() {
+    KeymanThreadSafety_assertThread(TV_SKES);
+
     SendDebugMessage("Processing queued key events");
 
     HANDLE handles[2] = { m_hThreadExitEvent, m_hKeyMutex };
@@ -382,6 +402,8 @@ private:
     events from the shared buffer
   */
   void PrepareInjectedInput() {
+    KeymanThreadSafety_assertThread(TV_SKES);
+
     DWORD nInputs = min(m_pSharedData->nInputs, MAX_KEYEVENT_INPUTS);
 
     m_nInputs = 0;
@@ -415,6 +437,8 @@ private:
     Process window messages for the key event sender window
   */
   LRESULT WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    KeymanThreadSafety_assertThread(TV_SKES);
+
     if (msg == WM_USER) {
       ProcessQueuedKeyEvents();
     }
@@ -552,6 +576,8 @@ private:
    reality.
   */
   void UpdateLocalModifierState(BYTE bVk, BOOL fIsExtendedKey, BYTE bScan, BOOL fIsUp) {
+    KeymanThreadSafety_assertThread(TV_SKES);
+
     switch (bVk) {
     case VK_CONTROL:
       // Left and right control are distinguished by a 0xE0 prefix byte
@@ -585,11 +611,14 @@ private:
 ISerialKeyEventServer *ISerialKeyEventServer::sm_server = NULL;
 
 void ISerialKeyEventServer::Startup() {
+  KeymanThreadSafety_assertThread(TV_MAIN);
   ISerialKeyEventServer::sm_server = new SerialKeyEventServer();
 }
 
 void ISerialKeyEventServer::Shutdown() {
+  KeymanThreadSafety_assertThread(TV_MAIN);
   delete ISerialKeyEventServer::sm_server;
+  ISerialKeyEventServer::sm_server = nullptr;
 }
 
 #endif // !_WIN64

@@ -65,10 +65,6 @@ public:
 	static HHOOK *hhookGetMessage();
 	static HHOOK *hhookCallWndProc();
 
-#ifndef _WIN64
-  static HHOOK *hhookLowLevelKeyboardProc();   // I4124
-#endif
-
   static HWND *hLastActiveWnd();
 	static HWND *hLastFocusWnd();
 
@@ -101,10 +97,6 @@ public:
 
 	static HHOOK get_hhookGetMessage();
 	static HHOOK get_hhookCallWndProc();
-
-#ifndef _WIN64
-  static HHOOK get_hhookLowLevelKeyboardProc();   // I4124
-#endif
 
   static HWND get_hLastActiveWnd();
 	static HWND get_hLastFocusWnd();

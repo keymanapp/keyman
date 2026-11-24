@@ -40,12 +40,9 @@ private:
 	int m_nHotkeys;
 	Hotkey m_hotkeys[MAX_HOTKEYS];
   BOOL m_AllowRightModifierHotkey;
-	void Load();
   void LoadRightModifierHotkeyOption();
 public:
 	Hotkey *GetHotkey(DWORD hotkey);
-  static void Reload();   // I4326
-  static Hotkeys *Instance();   // I4326
-  static void Unload();
   BOOL AllowRightModifierHotkey();
- };
+  void Load();
+};

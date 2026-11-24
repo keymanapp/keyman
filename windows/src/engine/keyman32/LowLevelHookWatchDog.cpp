@@ -19,7 +19,8 @@
  * runs in keyman.exe main thread context. The WH_KEYBOARD_LL hook receives the
  * key event first.
  *
- * This (static) class is only used in the keyman.exe main thread context.
+ * This (static) class is used in the keyman.exe main thread context and the
+ * HookIsAlive function in the Low Level Keyboard Hook thread context.
  *
  * Notification of HookIsAlive is a straightforward call from the low level
  * keyboard hook procedure, but the KeyEventReceivedInGetMessageProc function
@@ -29,10 +30,10 @@
  *
  * The message handler was implemented in UfrmKeyman7Main.pas rather than in
  * kmhook_getmessage.cpp, because it appears that kmnGetMessageProc does not see
- * messages that were posted by it or child functions (this is by observation, not
- * documentation -- I was not able to find documentation on this, but surmise it
- * is to prevent deadlock/infinite loop scenarios, which could easily lockup
- * Windows entirely).
+ * messages that were posted by it or child functions (this is by observation,
+ * not documentation -- I was not able to find documentation on this, but
+ * surmise it is to prevent deadlock/infinite loop scenarios, which could easily
+ * lockup Windows entirely).
  *
  * No key data is passed in the event, only the information that a key was
  * pressed.
@@ -40,26 +41,26 @@
 
 #include "pch.h"
 
+#ifndef _WIN64
+
 /**
  * minimum number of milliseconds between the last LowLevel and GetMessage
  * events before we assume the low level hook has been uninstalled, and we need
  * to reinstall it.
  */
-#define WATCHDOG_THRESHOLD  1000
+#define WATCHDOG_THRESHOLD  5000
 
-static ULONGLONG LastLowLevelEventTick = 0;
-static ULONGLONG LastGetMessageEventTick = 0;
+static volatile __declspec(align(8)) ULONGLONG LastLowLevelEventTick = 0;
+static volatile __declspec(align(8)) ULONGLONG LastGetMessageEventTick = 0;
 
 void LowLevelHookWatchDog::HookIsAlive() {
-  // ULONGLONG Previous = LastLowLevelEventTick;
-  LastLowLevelEventTick = GetTickCount64();
-  // SendDebugMessageFormat("LowLevelHookWatchDog::HookIsAlive currentLL=%llu currentGM=%llu (lastLL=%llu)", LastLowLevelEventTick, LastGetMessageEventTick, Previous);
+  KeymanThreadSafety_assertThread(TV_LLKH);
+  InterlockedExchange64(reinterpret_cast<volatile LONG64*>(&LastLowLevelEventTick), GetTickCount64());
 }
 
 void LowLevelHookWatchDog::KeyEventReceivedInGetMessageProc() {
-  // ULONGLONG Previous = LastGetMessageEventTick;
-  LastGetMessageEventTick = GetTickCount64();
-  // SendDebugMessageFormat("LowLevelHookWatchDog::KeyEventReceivedInGetMessageProc currentLL=%llu currentGM=%llu (lastGM=%llu)", LastLowLevelEventTick, LastGetMessageEventTick, Previous);
+  KeymanThreadSafety_assertThread(TV_MAIN);
+  InterlockedExchange64(reinterpret_cast<volatile LONG64*>(&LastGetMessageEventTick), GetTickCount64());
 
   // This is a good place to check if we are still alive -- shortly after each
   // keystroke event in the GetMessage hook, as this means at worst we'll have
@@ -70,38 +71,47 @@ void LowLevelHookWatchDog::KeyEventReceivedInGetMessageProc() {
 }
 
 bool LowLevelHookWatchDog::CheckIfHookIsAlive() {
-  if(LastGetMessageEventTick < LastLowLevelEventTick) {
+  KeymanThreadSafety_assertThread(TV_MAIN);
+  ULONGLONG l_LastGetMessageEventTick = InterlockedExchangeAdd64(reinterpret_cast<volatile LONG64*>(&LastGetMessageEventTick), 0);
+  ULONGLONG l_LastLowLevelEventTick = InterlockedExchangeAdd64(reinterpret_cast<volatile LONG64*>(&LastLowLevelEventTick), 0);
+  if (l_LastGetMessageEventTick < l_LastLowLevelEventTick) {
     // this shouldn't be possible but rather safe than sorry
     return true;
   }
 
-  return LastGetMessageEventTick - LastLowLevelEventTick < WATCHDOG_THRESHOLD;
+  return l_LastGetMessageEventTick - l_LastLowLevelEventTick < WATCHDOG_THRESHOLD;
 }
 
 void LowLevelHookWatchDog::ReinstallHook() {
+  KeymanThreadSafety_assertThread(TV_MAIN);
+  ULONGLONG l_LastGetMessageEventTick = InterlockedExchangeAdd64(reinterpret_cast<volatile LONG64*>(&LastGetMessageEventTick), 0);
+  ULONGLONG l_LastLowLevelEventTick   = InterlockedExchangeAdd64(reinterpret_cast<volatile LONG64*>(&LastLowLevelEventTick), 0);
+
   //keyman32.cpp:
   SendDebugMessageFormat(
-    "Attempting to reinstall hook because watchdog threshold exceeded at %llu msec (last LL=%llu last GM=%llu)",
-    LastGetMessageEventTick - LastLowLevelEventTick,
-    LastLowLevelEventTick,
-    LastGetMessageEventTick
+    "Watchdog threshold exceeded at %llu msec (last LL=%llu last GM=%llu)",
+    l_LastGetMessageEventTick - l_LastLowLevelEventTick,
+    l_LastLowLevelEventTick,
+    l_LastGetMessageEventTick
   );
 
-  if(!RestartLowLevelHook()) {
-    SendDebugMessage("Attempt to reinstall low level hook may have failed, see previous log messages");
-  } else {
-    SendDebugMessage("Attempt to reinstall low level hook succeeded");
-  }
+  // Disabling watchdog reset, just reporting
+  // if (!KeymanLowLevelKeyboardHook::Restart()) {
+  //   SendDebugMessage("Attempt to reinstall low level hook may have failed, see previous log messages");
+  // } else {
+  //   SendDebugMessage("Attempt to reinstall low level hook succeeded");
+  // }
 
-  Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_TIMING), (LPARAM)(LastGetMessageEventTick - LastLowLevelEventTick));
 
-  // We should assume the hook is alive at this point to avoid repeated resets
+  Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_TIMING), (LPARAM)(l_LastGetMessageEventTick - l_LastLowLevelEventTick));
+
+  // We should assume the hook is alive at this point to avoid repeated events
   HookIsAlive();
 }
 
-#ifndef _WIN64
 extern "C" void __declspec(dllexport) WINAPI Keyman_WatchDogKeyEvent() {
   SendDebugMessageFormat("Keyman_WatchDogKeyEvent");
   LowLevelHookWatchDog::KeyEventReceivedInGetMessageProc();
 }
+
 #endif

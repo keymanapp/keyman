@@ -66,9 +66,6 @@
     <ClCompile Include="kmhook_getmessage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="kmhook_keyboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="kmprocess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -142,6 +139,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RightAltEmulationCheck.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadSafety.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -271,6 +271,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LowLevelHookWatchDog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadSafety.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
