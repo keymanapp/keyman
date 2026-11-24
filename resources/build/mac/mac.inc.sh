@@ -96,7 +96,6 @@ function _mac_generate_xcode_environment_definition_script() {
 
   echo "# Required for successful dSYM upload for Sentry error reporting" >> "$ENVIRONMENT_SH"
   echo "export SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN:-}" >> "$ENVIRONMENT_SH"
-  echo "export SENTRY_URL=${SENTRY_URL:-}" >> "$ENVIRONMENT_SH"
   echo "export SENTRY_ORG=${SENTRY_ORG:-}" >> "$ENVIRONMENT_SH"
 }
 
