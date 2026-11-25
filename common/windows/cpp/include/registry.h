@@ -56,6 +56,7 @@
 #endif
 
 #define REGSZ_KeymanEngineDiag REGSZ_KeymanCU "\\Diag"
+#define REGSZ_KeymanEngineDiagReports REGSZ_KeymanEngineDiag "\\Reports"
 
 #define REGSZ_KeymanInstalledKeyboardsCU	REGSZ_KeymanCU "\\installed keyboards"
 #define REGSZ_KeymanInstalledKeyboardsLM	REGSZ_KeymanLM "\\installed keyboards"

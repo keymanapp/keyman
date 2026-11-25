@@ -305,3 +305,58 @@ extern "C" void _declspec(dllexport) WINAPI Keyman_SendDebugEntry(PWCHAR file, i
 extern "C" void _declspec(dllexport) WINAPI Keyman_SendDebugExit(PWCHAR file, int line, PWCHAR function) {
   SendDebugExit_1(file, line, function);
 }
+
+#define MAX_DIAG_LOG_ENTRIES 128
+
+/**
+ * Logs a diagnostic log message to
+ * `HKCU\Software\Keyman\Keyman Engine\Diag\Reports` for future transmission to
+ * Sentry. Format of log entries in the registry is: `Status|Time|Message`.
+ *
+ * Up to `MAX_DIAG_LOG_ENTRIES` will be written; after that, to prevent flooding
+ * the registry, no more logs will be stored. keyman.exe is responsible for
+ * reading the log entries and sending them on, at startup time.
+ *
+ * This disconnected model allows us to store diagnostic reports without adding
+ * a Sentry dependency into this library, and as reports may happen during
+ * shutdown, this ensures that they will later be sent on by
+ * `TfrmKeyman7Main.LogDiagReports` in keyman.dpr.
+ *
+ * @param function     Name of function, use __WFUNCTION__ macro
+ * @param succeeded    TRUE makes this an INFO message; FALSE makes it an ERROR
+ * @param msg          Text of log message
+ *
+ * @example:
+ * ```
+ *   LogDiagReportToRegistry(__WFUNCTION__, TRUE, L"my message");
+ * ```
+ */
+void LogDiagReportToRegistry(PWCHAR function, BOOL succeeded, PWCHAR msg) {
+  RegistryFullAccess reg(HKEY_CURRENT_USER);
+  if(reg.OpenKey(REGSZ_KeymanEngineDiagReports, TRUE)) {
+    DWORD cValues;
+    if(RegQueryInfoKey(reg.hKey(), NULL, NULL, NULL, NULL, NULL, NULL, &cValues, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
+      if(cValues >= MAX_DIAG_LOG_ENTRIES) {
+        // If there are too many values here, don't attempt to write
+        SendDebugMessageFormat("Too many errors in diag reports (>= %d)", MAX_DIAG_LOG_ENTRIES);
+        return;
+      }
+    }
+    WCHAR keyName[32];
+    wsprintfW(keyName, L"%u", cValues + 1);
+
+    SYSTEMTIME systemTime;
+    GetSystemTime(&systemTime);
+
+    PWCHAR value = new WCHAR[wcslen(msg) + wcslen(function) + 128];
+    wsprintfW(value, L"%s|%04.4d-%02.2d-%02.2d %02.2d:%02.2d:%02.2d.%04.4dZ|%s: %s",
+      succeeded ? L"INFO" : L"ERROR",
+      systemTime.wYear, systemTime.wMonth, systemTime.wDay,
+      systemTime.wHour, systemTime.wMinute, systemTime.wSecond, systemTime.wMilliseconds,
+      function, msg);
+    reg.WriteString(keyName, value);
+    SendDebugMessageW(value);  // also report to logging infrastructure
+
+    delete [] value;
+  }
+}

@@ -278,6 +278,8 @@ type
     function IsSysTrayWindow(AHandle: THandle): Boolean;
     procedure GetTrayIconHandle;   // I4731
     procedure WatchDogKeyEvent;
+    procedure LogWatchdogHookReinstall(WParam: Word; LParam: DWord);
+    procedure LogDiagReports;
 
   protected
     procedure DoInterfaceHotkey(Target: Integer);
@@ -390,6 +392,7 @@ uses
   RegistryKeys,
   klog,
   GetOsVersion,
+  Sentry.Client,
   System.StrUtils,
   System.Win.ComObj,
   VistaMessages,
@@ -485,6 +488,8 @@ end;
 procedure TfrmKeyman7Main.FormCreate(Sender: TObject);
 begin
   TKeymanSentryClient.Breadcrumb('trace', 'TfrmKeyman7Main.FormCreate');
+
+  LogDiagReports;
 
   frmKeymanMenu := TfrmKeymanMenu.Create(Self);
 
@@ -818,11 +823,7 @@ begin
       WatchDogKeyEvent;
 
     KMC_WATCHDOG_HOOK_REINSTALL:
-      case wParam of
-        WHR_TIMING:         TKeymanSentryClient.ReportMessage('Watchdog: low level hook reinstalled, threshold exceeded at '+IntToStr(lParam)+' msec');
-        WHR_INIT_FAILURE:   TKeymanSentryClient.ReportMessage('Watchdog: low level hook install failed with error '+IntToStr(lParam));
-        WHR_UNINIT_FAILURE: TKeymanSentryClient.ReportMessage('Watchdog: low level hook uninstall failed with error '+IntToStr(lParam));
-      end;
+      LogWatchdogHookReinstall(wParam, lParam);
 
     KMC_WATCHDOG_FAKEFREEZE:
       begin
@@ -831,6 +832,21 @@ begin
         TDebugLogClient.Instance.WriteMessage('kmc_fakefreeze end', []);
       end;
   end;
+end;
+
+procedure TfrmKeyman7Main.LogWatchdogHookReinstall(WParam: Word; LParam: DWord);
+var
+  message: string;
+begin
+  case wParam of
+    WHR_TIMING:         message := 'WatchdogHookReinstall: low level hook reinstalled, threshold exceeded at '+IntToStr(lParam)+' msec';
+    WHR_INIT_FAILURE:   message := 'WatchdogHookReinstall: low level hook install failed with error '+IntToStr(lParam);
+    WHR_UNINIT_FAILURE: message := 'WatchdogHookReinstall: low level hook uninstall failed with error '+IntToStr(lParam);
+    else message := 'LogWatchdogHookReinstall: unknown message '+IntToStr(wParam) + ' / ' + IntToStr(lParam);
+  end;
+
+  TDebugLogClient.Instance.WriteMessage(message, []);
+  TKeymanSentryClient.ReportMessage(message);
 end;
 
 procedure TfrmKeyman7Main.WatchDogKeyEvent;
@@ -1837,6 +1853,60 @@ begin
 
   FInUpdateOSKVisibility := False;
 end;
+
+
+(**
+ * Log diagnostic reports from keyman32 (which have been temporarily stored in
+ * the registry), to Sentry. The related function in keyman32 is
+ * `LogDiagReportToRegistry`. Deletes log entries after sending them.
+ *)
+procedure TfrmKeyman7Main.LogDiagReports;
+var
+  r: TRegistryErrorControlled;
+  s: TStringList;
+  i: Integer;
+  log: string;
+  data: TArray<string>;
+  level: TSentryLevel;
+begin
+  r := TRegistryErrorControlled.Create;
+  try
+    if r.OpenKey(SRegKey_KeymanEngineDiagReports_CU, False) then
+    begin
+      s := TStringList.Create;
+      try
+        r.GetValueNames(s);
+        for i := 0 to s.Count - 1 do
+        begin
+          log := r.ReadString(s[i]);
+          r.DeleteValue(s[i]);
+          if TKeymanSentryClient.Enabled then
+          begin
+            data := log.Split(['|']);
+            level := TSentryLevel.SENTRY_LEVEL_WARNING;
+            if Length(data) >= 3 then
+            begin
+              if data[0] = 'INFO' then level := TSentryLevel.SENTRY_LEVEL_INFO
+              else if data[0] = 'ERROR' then level := TSentryLevel.SENTRY_LEVEL_ERROR;
+
+              // Capture the timestamp as a breadcrumb, because it may be before
+              // the time the event is actually sent
+              TKeymanSentryClient.Breadcrumb('timestamp', data[1], 'timestamp');
+
+              log := String.Join('|', data, 2, Length(data)-2);
+            end;
+            TKeymanSentryClient.Client.MessageEvent(level, log, False);
+          end;
+        end;
+      finally
+        s.Free;
+      end;
+    end;
+  finally
+    r.Free;
+  end;
+end;
+
 
 type
   TLangSwitchRefreshWatcher = class(TThread)

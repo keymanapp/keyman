@@ -30,42 +30,6 @@
 // switching and events
 #ifndef _WIN64
 
-Hotkeys *g_Hotkeys = NULL;   // I4326
-
-Hotkeys *Hotkeys::Instance() {   // I4326
-  if(GetCurrentThreadId() != Globals::get_InitialisingThread()) {
-    return NULL;  // Will bork on other threads given current usage :)
-  }
-
-  if(g_Hotkeys == NULL) {
-    g_Hotkeys = new Hotkeys;
-    g_Hotkeys->Load();   // I4390
-  }
-
-  return g_Hotkeys;
-}
-
-void Hotkeys::Unload() {
-  if (GetCurrentThreadId() != Globals::get_InitialisingThread()) {
-    OutputThreadDebugString("Unexpected: no other thread should be attempting to unload hotkeys");
-    return;
-  }
-
-  if (g_Hotkeys != NULL) {
-    delete g_Hotkeys;
-    g_Hotkeys = NULL;
-  }
-}
-
-void Hotkeys::Reload() {   // I4326   // I4390
-  Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
-  if(hotkeys == NULL) {
-    return;
-  }
-
-  hotkeys->Load();   // I4390
-}
-
 void Hotkeys::Load() {   // I4390
 	SendDebugEntry();
 	m_nHotkeys = 0;
@@ -159,10 +123,6 @@ void Hotkeys::LoadRightModifierHotkeyOption() {
 }
 
 BOOL Hotkeys::AllowRightModifierHotkey() {
-  if (GetCurrentThreadId() != Globals::get_InitialisingThread()) {
-    OutputThreadDebugString("Unexpected: no other thread should be attempting read allow right modifier option");
-    return FALSE;
-  }
   return m_AllowRightModifierHotkey;
 }
 

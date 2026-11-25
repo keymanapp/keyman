@@ -975,7 +975,6 @@
     <ClCompile Include="keystate.cpp" />
     <ClCompile Include="kmhook_callwndproc.cpp" />
     <ClCompile Include="kmhook_getmessage.cpp" />
-    <ClCompile Include="kmhook_keyboard.cpp" />
     <ClCompile Include="kmprocess.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\registry.cpp" />
     <ClCompile Include="kmprocessactions.cpp" />
@@ -1003,6 +1002,7 @@
     <ClCompile Include="SharedBuffers.cpp" />
     <ClCompile Include="syskbd.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\unicode.cpp" />
+    <ClCompile Include="ThreadSafety.cpp" />
     <ClCompile Include="versioninfo.cpp" />
     <ClCompile Include="VKScanCodes.cpp" />
   </ItemGroup>
@@ -1169,6 +1169,7 @@
     <ClInclude Include="SharedBuffers.h" />
     <ClInclude Include="syskbd.h" />
     <ClInclude Include="$(KEYMAN_ROOT)\common\windows\cpp\include\unicode.h" />
+    <ClInclude Include="ThreadSafety.h" />
     <ClInclude Include="vkscancodes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -219,11 +219,6 @@ static HHOOK
     f_hhookGetMessage = NULL,				// GETMESSAGE hook handle
     f_hhookCallWndProc = NULL;			// CALLWNDPROC hook handle
 
-#ifndef _WIN64
-static HHOOK
-    f_hhookLowLevelKeyboardProc = NULL;   // I4124
-#endif
-
 static HWND
 	f_hLastActiveWnd = 0,
 	f_hLastFocusWnd = 0;
@@ -297,10 +292,6 @@ HANDLE f_hLockMutex = 0;
 HHOOK *Globals::hhookGetMessage()     { return &f_hhookGetMessage;    }
 HHOOK *Globals::hhookCallWndProc()    { return &f_hhookCallWndProc;   }
 
-#ifndef _WIN64
-HHOOK *Globals::hhookLowLevelKeyboardProc()    { return &f_hhookLowLevelKeyboardProc;   }   // I4124
-#endif
-
 HWND  *Globals::hLastActiveWnd()	    { return &f_hLastActiveWnd;     }
 HWND  *Globals::hLastFocusWnd()	      { return &f_hLastFocusWnd;      }
 
@@ -331,10 +322,6 @@ HWND *Globals::hwndHostARM64()        { return &f_hwndHostARM64;      }
 
 HHOOK Globals::get_hhookCallWndProc()   { return f_hhookCallWndProc;   }
 HHOOK Globals::get_hhookGetMessage()    { return f_hhookGetMessage;    }
-
-#ifndef _WIN64
-HHOOK Globals::get_hhookLowLevelKeyboardProc()   { return f_hhookLowLevelKeyboardProc;   }   // I4124
-#endif
 
 HWND  Globals::get_hLastActiveWnd()     { return f_hLastActiveWnd;     }
 HWND  Globals::get_hLastFocusWnd()      { return f_hLastFocusWnd;      }
@@ -440,9 +427,6 @@ BOOL Globals::ResetControllers()  // I3092
   f_MaxControllerThreads = 0;
   f_hhookCallWndProc = NULL;
   f_hhookGetMessage = NULL;
-#ifndef _WIN64
-  f_hhookLowLevelKeyboardProc = NULL;   // I4124
-#endif
   f_hLastActiveWnd = 0;
   f_hLastFocusWnd = 0;
   f_WindowsVersion = 0;
@@ -465,17 +449,7 @@ BOOL Globals::ResetControllers()  // I3092
 
 BOOL Globals::IsControllerWindow(HWND hwnd)
 {
-  if(!Lock()) return FALSE;
-  DWORD tid = GetWindowThreadProcessId(hwnd, NULL);
-	for(int i = 0; i < f_MaxControllerThreads; i++)
-		if(tid == f_ControllerThreads[i])
-    {
-      Unlock();
-      return TRUE;
-    }
-
-  Unlock();
-	return FALSE;
+  return Globals::IsControllerThread(GetWindowThreadProcessId(hwnd, NULL));
 }
 
 BOOL Globals::IsControllerThread(DWORD tid)
