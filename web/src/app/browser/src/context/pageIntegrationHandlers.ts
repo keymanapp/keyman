@@ -185,7 +185,7 @@ export class PageIntegrationHandlers {
       eventTracker.attachDOMEvent(docBody, 'touchend',   this.touchEndActivationHandler,  false);
     }
 
-    eventTracker.attachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
+    this.engine.hardKeyboard?.on('keyevent', this.engine.hotkeyManager._ProcessKeyEvent.bind(this.engine.hotkeyManager));
   }
 
   public shutdown() {
