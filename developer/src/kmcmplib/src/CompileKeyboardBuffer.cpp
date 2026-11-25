@@ -51,6 +51,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   fk->extra->displayMapFilename = "";
   fk->extra->stores.clear();
   fk->extra->groups.clear();
+  fk->extra->platformTargets = PLATFORMTARGETS_DESKTOP; // technically originally WINDOWS but DESKTOP is documented value
 /*	fk->szMessage[0] = 0;
   fk->szLanguageName[0] = 0;*/
   fk->dwBitmapSize = 0;

@@ -217,7 +217,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
       // process destruction time and really not worth worrying about.
       FNewDisplayState := StrNew(PChar(displayState));
       FNewPath := StrNew(PChar(Path));
-      PostMessage(GlobalProjectStateWndHandle, WM_USER_ProjectUpdateDisplayState, NativeInt(FNewPath), NativeInt(FNewDisplayState));
+      PostMessage(GlobalProjectStateWndHandle, WM_USER_ProjectUpdateDisplayState, NativeUint(FNewPath), NativeUint(FNewDisplayState));
     end;
   end;
 begin

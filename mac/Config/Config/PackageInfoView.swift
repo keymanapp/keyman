@@ -86,7 +86,12 @@ public struct PackageInfoView: View {
         Button {
           showAlertFunction(package)
         } label: {
-          Text("Remove Package")
+          let hasMultipleKeyboards = package.keyboards.count > 1
+          if hasMultipleKeyboards {
+            Text("Remove Keyboard Package")
+          } else {
+            Text("Remove Keyboard")
+          }
         }
         .padding(.horizontal)
       }

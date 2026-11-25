@@ -48,7 +48,7 @@ void KeymanSystemServiceClient::Init() {
     result = sd_bus_default_system(&bus);
   }
   if (result < 0) {
-    g_error("%s: Can't get connection: %s", __FUNCTION__, strerror(-result));
+    g_warning("%s: Can't get connection: %s", __FUNCTION__, strerror(-result));
   }
   initialized = true;
 }
@@ -63,7 +63,7 @@ void KeymanSystemServiceClient::SetCapsLockIndicator(guint32 capsLock) {
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
     KEYMAN_INTERFACE_NAME, "SetCapsLockIndicator", error, &msg, "b", capsLock != 0);
   if (result < 0) {
-    g_error("%s: Failed to call method SetCapsLockIndicator: %s. %s. %s.",
+    g_warning("%s: Failed to call method SetCapsLockIndicator: %s. %s. %s.",
       __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
     sd_bus_error_free(error);
     return;
@@ -80,7 +80,7 @@ gint32 KeymanSystemServiceClient::GetCapsLockIndicator() {
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
     KEYMAN_INTERFACE_NAME, "GetCapsLockIndicator", error, &msg, "");
   if (result < 0) {
-    g_error("%s: Failed to call method GetCapsLockIndicator: %s. %s. %s.",
+    g_warning("%s: Failed to call method GetCapsLockIndicator: %s. %s. %s.",
       __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
     sd_bus_error_free(error);
     return -1;
@@ -89,7 +89,7 @@ gint32 KeymanSystemServiceClient::GetCapsLockIndicator() {
   guint32 capsLock = 0;
   result = sd_bus_message_read(msg, "b", &capsLock);
   if (result < 0) {
-    g_error("%s: Failed to parse response message: %s",
+    g_warning("%s: Failed to parse response message: %s",
       __FUNCTION__, strerror(-result));
     return -1;
   }
@@ -108,7 +108,7 @@ KeymanSystemServiceClient::CallOrderedOutputSentinel() {
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
     KEYMAN_INTERFACE_NAME, "CallOrderedOutputSentinel", error, &msg, "");
   if (result < 0) {
-    g_error("%s: Failed to call method CallOrderedOutputSentinel: %s. %s. %s.",
+    g_warning("%s: Failed to call method CallOrderedOutputSentinel: %s. %s. %s.",
       __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
     sd_bus_error_free(error);
     return;
@@ -125,7 +125,7 @@ void KeymanSystemServiceClient::Ping() {
   int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
     KEYMAN_INTERFACE_NAME, "Ping", error, &msg, "");
   if (result < 0) {
-    g_error("%s: Failed to call method Ping: %s. %s. %s.",
+    g_warning("%s: Failed to call method Ping: %s. %s. %s.",
       __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
     sd_bus_error_free(error);
     return;

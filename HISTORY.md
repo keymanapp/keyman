@@ -1,5 +1,20 @@
 # Keyman Version History
 
+## 20.0.10 alpha 2026-11-18
+
+* docs(common): add dependencies document (#16967)
+
+## 20.0.9 alpha 2026-10-29
+
+* chore(deps): bump brace-expansion from 5.0.9 to 5.0.12 in /developer/src/server/src/win32/trayicon/addon-src (#16798)
+* chore(deps): bump ip-address from 10.7.2 to 10.7.4 in /developer/src/server/src/win32/trayicon/addon-src (#16880)
+* chore(deps): bump serialize-javascript and mocha in /resources/build/pr-build-status (#16899)
+* chore(deps-dev): bump git-diff from 2.0.6 to 2.0.7 (#16919)
+
+## 20.0.8 alpha 2026-10-27
+
+* fix(developer): strip markers correctly in ldml to kvk compiler (#16901)
+
 ## 20.0.7 alpha 2026-10-21
 
 * chore(web): add Keyman header to test files (#16857)
@@ -37,6 +52,117 @@
 * chore(common): move CODE__SIZE declaration to common (#16724)
 * chore(common): remove `clearcontext`,`fix`,`switch`,`key` statements (#16726)
 * chore: move to 20.0-alpha (#16739)
+
+## 19.0.325 beta 2026-11-21
+
+* fix(linux): don't abort on error (#16977)
+
+## 19.0.324 beta 2026-11-20
+
+* fix(linux): automatically load `uinput` kernel module (#16976)
+
+## 19.0.323 beta 2026-11-18
+
+* feat(developer): convert .kvk to .kvks (decompile) (#16931)
+* fix(developer): add <id> parameter for `kmc copy` (#16935)
+* fix(web): provide url for errors in models (#16938)
+
+## 19.0.322 beta 2026-11-17
+
+* fix(linux): allow to specify tests as arguments (#16968)
+
+## 19.0.321 beta 2026-11-16
+
+* chore(mac): update minimum supported version to macOS 13 Ventura (#16942)
+* fix(android): capture all keyboard webview console messages in Engine (#16829)
+* chore(developer): track console messages to Sentry in Server (#16937)
+
+## 19.0.320 beta 2026-11-06
+
+* fix(windows): change init order so threads don't init before Keyman (#16883)
+* fix(windows): reset modifiers when destroying OSK (#16940)
+* refactor(windows): add comment about why OSK close hint only shows in one context (#16941)
+
+## 19.0.319 beta 2026-11-02
+
+* chore(developer): cleanup `kmc --help` (#16801)
+* fix(mac): add timeout for accessibility permissions check (#16878)
+
+## 19.0.318 beta 2026-10-30
+
+* fix(mac): show package disclosure groups in macOS Ventura (#16911)
+* fix(developer): disable http compression in Server to mitigate Node2Shell (#16908)
+* docs(windows): clean api index formatting (#16913)
+* fix(developer): cast as unsigned to avoid ERangeError (#16823)
+* fix(ios): remove Liquid Glass blur effect seen in iOS 27 from system-keyboard mode (#16885)
+
+## 19.0.317 beta 2026-10-29
+
+* fix(ios): add workaround for iOS 27+ blank keyboard (#16873)
+* change(ios): improve styling under iOS's Liquid Glass UI (#16818)
+* chore: logging for pr-build-status (#16918)
+
+## 19.0.316 beta 2026-10-28
+
+* fix(mac): double-click on .kmp begins package installation (#16881)
+* change(mac): use common name for certificate when code-signing installer package (#16915)
+
+## 19.0.315 beta 2026-10-27
+
+* docs(windows): document engine apis MCompileForBaseKeyboard and Install3 (#16877)
+* fix(developer): strip markers correctly in ldml to kvk compiler (#16900)
+
+## 19.0.314 beta 2026-10-23
+
+* fix(windows): attempt to reinitialize Keyman on each keystroke in TIP (#16862)
+* docs(developer): add caution for on-screen to use Fill from layout, add Design and Code view sections, and update images (#16756)
+
+## 19.0.313 beta 2026-10-22
+
+* fix(mac): installer directly launches config app (#16755)
+* fix(android): pass on backspace keyevent when pressed at start of context (#16856)
+
+## 19.0.312 beta 2026-10-21
+
+* change(ios): select suggestion mode based on input context (#16806)
+* fix(ios): prevent clear-text crash under Liquid Glass (#16814)
+
+## 19.0.311 beta 2026-10-20
+
+* fix(android): load sentry earlier so we capture script errors in keymanweb-webview.js (#16826)
+* chore(linux): Update debian changelog (#15812)
+
+## 19.0.310 beta 2026-10-19
+
+* fix(developer): handle xml parser errors in LDML imports (#16808)
+* refactor(developer): remove unused `throws` from LDML test harnesses (#16846)
+* fix(developer): Avoid clearing child window list in destructor to streamline shutdown (#16812)
+* fix(developer): guard access to possibly-nil `FChildWindows` (#16820)
+* fix(ios): load sentry earlier so we capture script errors in keymanweb-webview.js (#16828)
+* chore(linux): quote search team in upload-to-debian.sh so we find existing pull requests (#16850)
+* maint(linux): detect beta phase in `upload-to-debian.sh` (#16853)
+* fix(web): correctly handle base key selection during fat-finger calculation in subkey popup (#16832)
+* fix(web): fix multilayer-multitap correction to non-multitap sequence (#16842)
+* fix(android): selectively disable autocorrect based on context intent (#16644)
+
+## 19.0.309 beta 2026-10-17
+
+* docs(linux): update instructions for building with Java (#16835)
+
+## 19.0.308 beta 2026-10-16
+
+* fix(web): use `key.displayLayer` rather than `key.layer` to look up corrections (#16831)
+
+## 19.0.307 beta 2026-10-15
+
+* fix(developer): address range check error in bitmap editor (#16815)
+* maint(common): remove history-utils.sh (#16796)
+* docs(web): improve documentation on `addKeyboards`/`addKeyboardsForLanguage` (#16020)
+
+## 19.0.306 beta 2026-10-12
+
+* fix(web): don't crash on gestures when banner disabled (#16788)
+* maint(common): add lint for unitTestEndpoints usage (#16769)
 
 ## 19.0.305 beta 2026-10-09
 
@@ -1877,6 +2003,16 @@
 
 * refactor(windows): rename `TKeymanMutex.MutexOwned` to `TakeOwnership` and add `ReleaseOwnership` (#13168)
 * chore: increment to alpha 19.0 (#13187)
+
+## 18.0.255 stable 2026-11-06
+
+* maint(linux): support uninitialized DIST and EXTRA_ARGS variables in debian.sh (#16847)
+* chore(linux): quote search team in upload-to-debian.sh so we find existing pull requests (#16851)
+* chore(linux): Update debian changelog (#15811)
+* fix(developer): handle .gitignore in npm-based installations of kmc-generate (#16869)
+* fix(developer): disable http compression in Server to mitigate Node2Shell (#16905)
+* fix(ios): add workaround for iOS 27+ blank keyboard (#16903)
+* fix(ios): remove Liquid Glass blur effect seen in iOS 27 from system-keyboard mode (#16902)
 
 ## 18.0.254 stable 2026-10-16
 
