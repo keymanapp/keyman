@@ -386,7 +386,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 
 #ifndef _WIN64
   ISerialKeyEventServer::Startup();
-  // After starting up serial key event server
+  // KeymanLowLevelKeyboardHook must be started after SerialKeyEventServer
   KeymanLowLevelKeyboardHook::Startup();
 #endif
 
@@ -444,12 +444,10 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
 	UninitDebugging();
 
 #ifndef _WIN64
-  // Before shutting down serial key event server
+  // KeymanLowLevelKeyboardHook must be stopped before SerialKeyEventServer
   KeymanLowLevelKeyboardHook::Shutdown();
   ISerialKeyEventServer::Shutdown();
 #endif
-
-  //if(RetVal) ;
 
 	return RetVal;
 }
@@ -666,7 +664,7 @@ void LoadKeyboardSettings() {
   if(Globals::get_InitialisingThread() == GetCurrentThreadId()) {
     // TODO - this really doesn't belong here?
 #ifndef _WIN64
-    KeymanLowLevelKeyboardHook::ReloadHotkeys();
+    KeymanLowLevelKeyboardHook::RequestReloadHotkeys();
 #endif
 
     LoadBaseLayoutSettings();   // I4583

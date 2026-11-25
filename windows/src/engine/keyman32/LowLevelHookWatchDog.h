@@ -26,7 +26,7 @@ public:
   static void KeyEventReceivedInGetMessageProc();
 
 private:
-  static bool CheckIfHookIsAlive();
-  static void ReinstallHook();
+  static bool CheckIfHookIsAlive(ULONGLONG l_LastLowLevelEventTick);
+  static void ReinstallHook(ULONGLONG l_LastLowLevelEventTick);
 };
 

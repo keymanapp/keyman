@@ -40,6 +40,7 @@ BOOL KeymanLowLevelKeyboardHook::m_InLanguageSwitchKeySequence = FALSE;
 HWND KeymanLowLevelKeyboardHook::m_hwndLanguageSwitch = 0;
 Hotkeys* KeymanLowLevelKeyboardHook::m_hotkeys = NULL;
 HANDLE KeymanLowLevelKeyboardHook::m_hReloadEvent              = 0;
+HANDLE KeymanLowLevelKeyboardHook::m_hResetEvent               = 0;
 HANDLE KeymanLowLevelKeyboardHook::m_hThread                   = 0;
 HANDLE KeymanLowLevelKeyboardHook::m_hThreadExitEvent          = 0;
 
@@ -71,6 +72,12 @@ BOOL KeymanLowLevelKeyboardHook::Startup() {
 
   m_hReloadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
   if (!m_hReloadEvent) {
+    DebugLastError("CreateEvent");
+    return FALSE;
+  }
+
+  m_hResetEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+  if (!m_hResetEvent) {
     DebugLastError("CreateEvent");
     return FALSE;
   }
@@ -118,38 +125,41 @@ BOOL KeymanLowLevelKeyboardHook::Shutdown() {
     m_hReloadEvent = NULL;
   }
 
+  if (m_hResetEvent != NULL) {
+    if (!CloseHandle(m_hResetEvent)) {
+      DebugLastError("CloseHandle(m_hResetEvent)");
+    }
+    m_hResetEvent = NULL;
+  }
+
   return TRUE;
 }
 
-void KeymanLowLevelKeyboardHook::ReloadHotkeys() {
+/**
+ * Tell the low level keyboard hook thread to reload its hotkey list, after a
+ * configuration change.
+ */
+void KeymanLowLevelKeyboardHook::RequestReloadHotkeys() {
   KeymanThreadSafety_assertThread(TV_MAIN);
-  //SetEvent(m_hReloadEvent);
+  SetEvent(m_hReloadEvent);
 }
 
-
-
-BOOL KeymanLowLevelKeyboardHook::Restart() {
+/**
+ * Tell the low level keyboard hook thread to restart the low level keyboard
+ * hook, e.g. if it was silently unloaded. Thread cleanup will report if an
+ * error was received unhooking, which would indicate that the silent unload has
+ * happened
+ */
+void KeymanLowLevelKeyboardHook::RequestRestart() {
   KeymanThreadSafety_assertThread(TV_MAIN);
-
-  BOOL result = TRUE;
-  /* TODO
-  if (!Shutdown()) {
-    DWORD const error = GetLastError();
-    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_UNINIT_FAILURE), error);
-    SendDebugMessageFormat("Failed to uninstall low level hook.  GetLastError = %d", error);
-    result = FALSE;
-  }
-
-  if (!Startup()) {
-    DWORD const error = GetLastError();
-    Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_INIT_FAILURE), error);
-    SendDebugMessageFormat("Failed to install low level hook.  GetLastError = %d", error);
-    result = FALSE;
-  }
-  */
-  return result;
+  SetEvent(m_hResetEvent);
 }
 
+/**
+ * Update the visiblity state of the Windows touch input panel. This is thread
+ * safe because the variable is atomically updated. The potential race between
+ * showing the touch panel and the next keystroke is considered to be low risk.
+ */
 void KeymanLowLevelKeyboardHook::SetTouchPanelVisible(BOOL isVisible) {
   KeymanThreadSafety_assertThread(TV_MAIN);
   m_TouchPanelVisible = isVisible;
@@ -205,48 +215,34 @@ DWORD KeymanLowLevelKeyboardHook::ThreadMain() {
 }
 
 /**
- * Setup the thread to have a message pump and signal as appropriate
+ * Initialize thread and instanatiate the WH_KEYBOARD_LL hook
  */
 BOOL KeymanLowLevelKeyboardHook::InitThread() {
   KeymanThreadSafety_assertThread(TV_LLKH);
-  /* WNDCLASS wndClass = {0};
-  wndClass.lpfnWndProc   = ServerWndProc;
-  wndClass.cbClsExtra    = sizeof(this);
-  wndClass.lpszClassName = LLH_WINDOW_CLASS;
-  wndClass.hInstance     = g_hInstance;
-  if (!RegisterClass(&wndClass)) {
-    DebugLastError("RegisterClass");
-    return FALSE;
-  }
 
-  m_hwnd = CreateWindow(LLH_WINDOW_CLASS, "", 0, 0, 0, 0, 0, HWND_MESSAGE, 0, g_hInstance, NULL);
-  if (m_hwnd == NULL) {
-    DebugLastError("CreateWindow");
-    return FALSE;
-  }
-
-  SetClassLongPtr(m_hwnd, 0, (LONG_PTR)this);*/
-
-  // Setup the
   m_hotkeys = new Hotkeys();
   m_hotkeys->Load();
 
   HINSTANCE hinst = GetModuleHandle(LIBRARY_NAME);
-  m_hhook =
-      SetWindowsHookExW(WH_KEYBOARD_LL, (HOOKPROC)kmnLowLevelKeyboardProc, hinst, Globals::get_FSingleThread());  // I4124
-  SendDebugMessageFormat("Keyboard_LL=%x", m_hhook);
+  m_hhook = SetWindowsHookExW(WH_KEYBOARD_LL, (HOOKPROC)kmnLowLevelKeyboardProc, hinst, Globals::get_FSingleThread());  // I4124
+  SendDebugMessageFormat("WH_KEYBOARD_LL=%x", m_hhook);
 
   return m_hhook != NULL;
 }
 
 /**
- * Cleanup when thread main finishes
+ * Unhook WH_KEYBOARD_LL hook, reporting on failure, and cleanup
  */
 void KeymanLowLevelKeyboardHook::CleanupThread() {
   KeymanThreadSafety_assertThread(TV_LLKH);
   if (m_hhook != NULL) {
     if(!UnhookWindowsHookEx(m_hhook)) {  // I4124
-      DebugLastError("UnhookWindowsHookEx");
+      DWORD err=GetLastError();
+      WCHAR msg[128];
+      wsprintfW(msg, L"Unhook failed with %d", err);
+      LogDiagReportToRegistry(__WFUNCTION__, FALSE, msg);
+    } else {
+      LogDiagReportToRegistry(__WFUNCTION__, TRUE, L"Unhook succeeded");
     }
 
     m_hhook = NULL;
@@ -263,16 +259,23 @@ void KeymanLowLevelKeyboardHook::CleanupThread() {
  */
 void KeymanLowLevelKeyboardHook::MessageLoop() {
   KeymanThreadSafety_assertThread(TV_LLKH);
-  HANDLE events[2] = {m_hThreadExitEvent, m_hReloadEvent};
+  HANDLE events[3] = {m_hThreadExitEvent, m_hReloadEvent, m_hResetEvent};
   while (TRUE) {
-    switch (MsgWaitForMultipleObjectsEx(2, events, INFINITE, QS_ALLINPUT, 0)) {
-    case WAIT_OBJECT_0:  // m_hThreadExitEvent signaled
+    switch (MsgWaitForMultipleObjectsEx(3, events, INFINITE, QS_ALLINPUT, 0)) {
+    case WAIT_OBJECT_0:      // m_hThreadExitEvent signaled
       // Thread has been signalled, return
       return;
     case WAIT_OBJECT_0 + 1:  // m_hReloadEvent signaled
-      ReloadHotkeys();
+      m_hotkeys->Load();
       break;
-    case WAIT_OBJECT_0 + 2:  // Windows message received
+    case WAIT_OBJECT_0 + 2:  // m_hResetEvent signaled
+      SendDebugMessage("m_hResetEvent set");
+      CleanupThread();
+      if(!InitThread()) {
+        return;
+      }
+      break;
+    case WAIT_OBJECT_0 + 3:  // Windows message received
       MSG msg;
       while (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {
         DispatchMessage(&msg);
@@ -285,7 +288,9 @@ void KeymanLowLevelKeyboardHook::MessageLoop() {
   }
 }
 
-
+/**
+ * WH_KEYBOARD_LL hook procedure
+ */
 LRESULT KeymanLowLevelKeyboardHook::HookProc(
   _In_  int nCode,
   _In_  WPARAM wParam,
@@ -317,16 +322,25 @@ LRESULT KeymanLowLevelKeyboardHook::HookProc(
 
   if(IsModifierKey(hs->vkCode)) {
     PostVisualKeyboardModifierEvent(hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+
+    // #7337 Post the modifier state ensuring the serialized queue is in sync
+    // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
+    // later in this function. This is intentional, as the WM_KEYMAN_MODIFIER_EVENT
+    // message only updates our internal modifier state, and does not do
+    // any additional processing or other serialization of the input queue.
+    if (flag_ShouldSerializeInput) {
+      SendDebugMessage("posting modifier to serial key event server");
+      PostMessageToSerialKeyEventServer(WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+    }
   }
 
-  // #7337 Post the modifier state ensuring the serialized queue is in sync
-  // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
-  // later in this function. This is intentional, as the WM_KEYMAN_MODIFIER_EVENT
-  // message only updates our internal modifier state, and does not do
-  // any additional processing or other serialization of the input queue.
-  if (IsModifierKey(hs->vkCode) && flag_ShouldSerializeInput) {
-    SendDebugMessage("posting modifier to serial key event server");
-    PostMessageToSerialKeyEventServer(WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+  // If the foreground app is a remote desktop app (from our list of known apps)
+  // then we do not want to do any serialization of input nor do we want our
+  // hotkeys to be triggered. Note that updating the OSK and the serialized input
+  // server modifier state are required even in this context
+
+  if (ForegroundWindowIsRemoteDesktop()) {
+    return_SendDebugExit(CallNextHookEx(m_hhook, nCode, wParam, lParam));
   }
 
   if(LanguageSwitch_IsWindowVisible()) {
@@ -488,6 +502,10 @@ BOOL KeymanLowLevelKeyboardHook::ProcessHotkey(UINT vkCode, BOOL isUp, DWORD Shi
   return TRUE;
 }
 
+// ---------------------------------------------------------------------------
+// Utility functions
+// ---------------------------------------------------------------------------
+
 BOOL KeymanLowLevelKeyboardHook::IsModifierKey(DWORD vkCode) {
   KeymanThreadSafety_assertThread(TV_ANY);
 
@@ -514,14 +532,16 @@ LPARAM KeymanLowLevelKeyboardHook::LLKHFFlagstoWMKeymanKeyEventFlags(PKBDLLHOOKS
     ((hs->flags & LLKHF_UP) ? KEYEVENTF_KEYUP : 0);
 }
 
-/*
-  We don't attempt to serialize input to the console windows because they
-  behave somewhat differently to normal windows. For now, this should be
-  sufficient. In the future, we may want to find a way to interrogate the
-  focused process to find out which window actually has focus for posting
-  messages, because we appear to post the messages to the wrong thread
-  for console windows.
-*/
+/**
+ * Check if the window handle is for a console window
+ *
+ * We don't attempt to serialize input to the console windows because they
+ * behave somewhat differently to normal windows. For now, this should be
+ * sufficient. In the future, we may want to find a way to interrogate the
+ * focused process to find out which window actually has focus for posting
+ * messages, because we appear to post the messages to the wrong thread for
+ * console windows.
+ */
 BOOL KeymanLowLevelKeyboardHook::IsConsoleWindow(HWND hwnd) {
   KeymanThreadSafety_assertThread(TV_LLKH);
 
@@ -540,23 +560,36 @@ BOOL KeymanLowLevelKeyboardHook::IsConsoleWindow(HWND hwnd) {
   return last_isConsoleWindow;
 }
 
-BOOL KeymanLowLevelKeyboardHook::ForegroundWindowIsRDP() {  // I4197
+/**
+ * Check if the current foreground window is a recognized remote desktop window,
+ * e.g. RDP Client, Hyper-V Virtual Machine Connection. Caches the result to
+ * avoid repeated process querying.
+ */
+BOOL KeymanLowLevelKeyboardHook::ForegroundWindowIsRemoteDesktop() {  // I4197
   KeymanThreadSafety_assertThread(TV_LLKH);
 
-  // TODO: Cache result
-  // TODO: also check for HyperV, others??
   DWORD dwProcessId;
   HWND hwnd = GetForegroundWindow();
   if (hwnd == NULL) {
     return FALSE;
   }
+
   if (GetWindowThreadProcessId(hwnd, &dwProcessId) == 0) {
     return FALSE;
   }
 
+  static DWORD dwLastProcessId = 0;
+  static BOOL bLastResult = FALSE;
+
+  if(dwLastProcessId == dwProcessId) {
+    return bLastResult;
+  }
+
+  dwLastProcessId = dwProcessId;
+
   HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, false, dwProcessId);
   if (hProcess == NULL) {
-    return FALSE;
+    return bLastResult = FALSE;
   }
 
   char buf[260];
@@ -566,19 +599,24 @@ BOOL KeymanLowLevelKeyboardHook::ForegroundWindowIsRDP() {  // I4197
 
   if (bResult) {
     char* p = strrchr(buf, '\\');
-    bResult = p && _stricmp(p, "\\mstsc.exe") == 0;
+    if(p) {
+      bResult =
+        // This will only work for non-web-based clients
+        // TODO: add vnc clients, others? this
+        _stricmp(p, "\\mstsc.exe") == 0 ||    // mstsc - Microsoft Remote Desktop Client
+        _stricmp(p, "\\vmconnect.exe") == 0;  // vmconnect - Microsoft Virtual Machine Connection
+    }
   }
 
-  return bResult;
+  return bLastResult = bResult;
 }
+
+// ---------------------------------------------------------------------------
+// Language Switch Menu
+// ---------------------------------------------------------------------------
 
 BOOL KeymanLowLevelKeyboardHook::LanguageSwitch_KeyPress(WPARAM wParam, BOOL extended, BOOL isUp, DWORD ShiftState) {
   KeymanThreadSafety_assertThread(TV_LLKH);
-
-  /* Let's avoid the cascaded remote desktop switching issues */
-
-  if (ForegroundWindowIsRDP())
-    return FALSE;  // I4197
 
   /* This is a special-case hotkey for language switching - ALT+LEFT SHIFT */
 

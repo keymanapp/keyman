@@ -195,6 +195,8 @@ BOOL ShouldDebug_1(); // TSDMState state);
 int SendDebugEntry_1(wchar_t* file, int line, wchar_t* function);
 int SendDebugExit_1(wchar_t* file, int line, wchar_t* function);
 
+void LogDiagReportToRegistry(PWCHAR function, BOOL succeeded, PWCHAR msg);
+
 #endif
 
 #ifdef _DEBUG

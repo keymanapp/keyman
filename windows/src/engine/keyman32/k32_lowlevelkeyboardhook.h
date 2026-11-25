@@ -1,3 +1,10 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by mcdurdin on 2026-11-24
+ *
+ * Handle the WH_KEYBOARD_LL hook and its controlling thread
+ */
 #pragma once
 
 #ifndef _WIN64
@@ -5,8 +12,8 @@ class KeymanLowLevelKeyboardHook {
 public:
   static BOOL Startup();
   static BOOL Shutdown();
-  static BOOL Restart();
-  static void ReloadHotkeys();
+  static void RequestRestart();
+  static void RequestReloadHotkeys();
   static void SetTouchPanelVisible(BOOL isVisible);
 
   // Callbacks
@@ -24,6 +31,7 @@ private:
   static BOOL m_TouchPanelVisible;
 
   static HANDLE m_hReloadEvent;
+  static HANDLE m_hResetEvent;
   static HANDLE m_hThreadExitEvent;
 
   // SerialKeyEventServer interface
@@ -31,7 +39,7 @@ private:
 
   // State utilities
   static DWORD GetCurrentModifierKeyState();
-  static BOOL ForegroundWindowIsRDP();
+  static BOOL ForegroundWindowIsRemoteDesktop();
 
   // Pure utilities
   static BOOL IsConsoleWindow(HWND hwnd);

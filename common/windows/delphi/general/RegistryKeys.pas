@@ -93,6 +93,7 @@ const
   SRegKey_KeymanEngine_LM     = SRegKey_KeymanEngineRoot_LM;     // LM
   SRegKey_KeymanEngine_CU     = SRegKey_KeymanEngineRoot_CU;     // CU
   SRegKey_KeymanEngineDiag_CU = SRegKey_KeymanEngine_CU + '\Diag';                     // CU
+  SRegKey_KeymanEngineDiagReports_CU = SRegKey_KeymanEngineDiag_CU + '\Reports';       // CU
 
   SregKey_KeymanHotkeys_CU    = SRegKey_KeymanEngine_CU + '\hotkeys';
 
