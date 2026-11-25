@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { assert } from 'chai';
 
 import { unitTestEndPoints } from 'keyman/app/browser';
@@ -20,15 +23,16 @@ describe("app/browser: hardware event processing", () => {
   describe('preprocessKeyboardEvent', () => {
     describe('positional keyboards', () => {
       it("simple shifted 'a'", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_A,
-          modifierSet: PhysicalInputEventSpec.modifierCodes.Shift,
-          location: 1
-        }) as any as KeyboardEvent, {
-          activeKeyboard: new JSKeyboard({ KM: 0 }),
-          modStateFlags: 0,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_A,
+            modifierSet: PhysicalInputEventSpec.modifierCodes.Shift,
+            location: 1
+          }) as any as KeyboardEvent, {
+            activeKeyboard: new JSKeyboard({ KM: 0 }),
+            modStateFlags: 0,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -43,14 +47,15 @@ describe("app/browser: hardware event processing", () => {
       });
 
       it("simple unshifted 'a'", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_A,
-          modifierSet: 0
-        }) as any as KeyboardEvent, {
-          activeKeyboard: new JSKeyboard({ KM: 0 }),
-          modStateFlags: 0,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_A,
+            modifierSet: 0
+          }) as any as KeyboardEvent, {
+            activeKeyboard: new JSKeyboard({ KM: 0 }),
+            modStateFlags: 0,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -61,16 +66,17 @@ describe("app/browser: hardware event processing", () => {
       });
 
       it("left-alt press", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_ALT,
-          modifierSet: PhysicalInputEventSpec.modifierCodes.Alt,
-          location: 1
-        }) as any as KeyboardEvent, {
-          // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new JSKeyboard({KM: 0}),
-          modStateFlags: 0,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_ALT,
+            modifierSet: PhysicalInputEventSpec.modifierCodes.Alt,
+            location: 1
+          }) as any as KeyboardEvent, {
+            // KMBM:  Keyman Modifier BitMask
+            activeKeyboard: new JSKeyboard({KM: 0}),
+            modStateFlags: 0,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -81,16 +87,17 @@ describe("app/browser: hardware event processing", () => {
       });
 
       it("left-alt release", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_ALT,
-          modifierSet: 0,
-          location: 1
-        }) as any as KeyboardEvent, {
-          // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new JSKeyboard({KM: 0}),
-          modStateFlags: ModifierCodes.ALT,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_ALT,
+            modifierSet: 0,
+            location: 1
+          }) as any as KeyboardEvent, {
+            // KMBM:  Keyman Modifier BitMask
+            activeKeyboard: new JSKeyboard({KM: 0}),
+            modStateFlags: ModifierCodes.ALT,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -103,16 +110,17 @@ describe("app/browser: hardware event processing", () => {
 
     describe('positional+chiral keyboards', () => {
       it("simple shifted 'a'", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_A,
-          modifierSet: PhysicalInputEventSpec.modifierCodes.Shift,
-          location: 1
-        }) as any as KeyboardEvent, {
-          // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new JSKeyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
-          modStateFlags: 0,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_A,
+            modifierSet: PhysicalInputEventSpec.modifierCodes.Shift,
+            location: 1
+          }) as any as KeyboardEvent, {
+            // KMBM:  Keyman Modifier BitMask
+            activeKeyboard: new JSKeyboard({KM:0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+            modStateFlags: 0,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -123,15 +131,16 @@ describe("app/browser: hardware event processing", () => {
       });
 
       it("simple unshifted 'a'", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_A,
-          modifierSet: 0
-        }) as any as KeyboardEvent, {
-          // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new JSKeyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
-          modStateFlags: 0,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_A,
+            modifierSet: 0
+          }) as any as KeyboardEvent, {
+            // KMBM:  Keyman Modifier BitMask
+            activeKeyboard: new JSKeyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+            modStateFlags: 0,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -142,16 +151,17 @@ describe("app/browser: hardware event processing", () => {
       });
 
       it("left-alt press", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_ALT,
-          modifierSet: PhysicalInputEventSpec.modifierCodes.Alt,
-          location: 1
-        }) as any as KeyboardEvent, {
-          // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new JSKeyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
-          modStateFlags: 0,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_ALT,
+            modifierSet: PhysicalInputEventSpec.modifierCodes.Alt,
+            location: 1
+          }) as any as KeyboardEvent, {
+            // KMBM:  Keyman Modifier BitMask
+            activeKeyboard: new JSKeyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+            modStateFlags: 0,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -162,16 +172,17 @@ describe("app/browser: hardware event processing", () => {
       });
 
       it("left-alt release", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_ALT,
-          modifierSet: 0,
-          location: 1
-        }) as any as KeyboardEvent, {
-          // KMBM:  Keyman Modifier BitMask
-          activeKeyboard: new JSKeyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
-          modStateFlags: ModifierCodes.LALT,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_ALT,
+            modifierSet: 0,
+            location: 1
+          }) as any as KeyboardEvent, {
+            // KMBM:  Keyman Modifier BitMask
+            activeKeyboard: new JSKeyboard({KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL}),
+            modStateFlags: ModifierCodes.LALT,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -184,15 +195,16 @@ describe("app/browser: hardware event processing", () => {
 
     describe('mnemonic keyboards', () => {
       it("simple shifted 'a'", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_A,
-          modifierSet: PhysicalInputEventSpec.modifierCodes.Shift,
-          location: 1
-        }) as any as KeyboardEvent, {
-          activeKeyboard: new JSKeyboard({ KM: 1 }),
-          modStateFlags: 0,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_A,
+            modifierSet: PhysicalInputEventSpec.modifierCodes.Shift,
+            location: 1
+          }) as any as KeyboardEvent, {
+            activeKeyboard: new JSKeyboard({ KM: 1 }),
+            modStateFlags: 0,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -203,14 +215,15 @@ describe("app/browser: hardware event processing", () => {
       });
 
       it("simple unshifted 'a'", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_A,
-          modifierSet: 0
-        }) as any as KeyboardEvent, {
-          activeKeyboard: new JSKeyboard({ KM: 1 }),
-          modStateFlags: 0,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_A,
+            modifierSet: 0
+          }) as any as KeyboardEvent, {
+            activeKeyboard: new JSKeyboard({ KM: 1 }),
+            modStateFlags: 0,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -223,15 +236,16 @@ describe("app/browser: hardware event processing", () => {
 
     describe('legacy keyboards', () => {
       it("simple shifted 'a'", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_A,
-          modifierSet: PhysicalInputEventSpec.modifierCodes.Shift,
-          location: 1
-        }) as any as KeyboardEvent, {
-          activeKeyboard: new JSKeyboard({ KM: undefined }),
-          modStateFlags: 0,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_A,
+            modifierSet: PhysicalInputEventSpec.modifierCodes.Shift,
+            location: 1
+          }) as any as KeyboardEvent, {
+            activeKeyboard: new JSKeyboard({ KM: undefined }),
+            modStateFlags: 0,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -242,14 +256,15 @@ describe("app/browser: hardware event processing", () => {
       });
 
       it("simple unshifted 'a'", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_A,
-          modifierSet: 0
-        }) as any as KeyboardEvent, {
-          activeKeyboard: new JSKeyboard({ KM: undefined }),
-          modStateFlags: 0,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_A,
+            modifierSet: 0
+          }) as any as KeyboardEvent, {
+            activeKeyboard: new JSKeyboard({ KM: undefined }),
+            modStateFlags: 0,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
@@ -260,17 +275,18 @@ describe("app/browser: hardware event processing", () => {
       });
 
       it("'a' during left-alt", () => {
-        const processedEvent = preprocessKeyboardEvent(new PhysicalInputEventSpec({
-          keyCode: KeyCodes.K_A,
-          modifierSet: PhysicalInputEventSpec.modifierCodes.Alt,
-          location: 0
-        }) as any as KeyboardEvent, {
-          activeKeyboard: new JSKeyboard({ KM: undefined }),
-          // Internally assumes that the ALT-press event was previously handled, with this as
-          // the resulting modifier state at the time of key-press.
-          modStateFlags: ModifierCodes.LALT,
-          baseLayout: 'us'
-        },
+        const processedEvent = preprocessKeyboardEvent(
+          new PhysicalInputEventSpec({
+            keyCode: KeyCodes.K_A,
+            modifierSet: PhysicalInputEventSpec.modifierCodes.Alt,
+            location: 0
+          }) as any as KeyboardEvent, {
+            activeKeyboard: new JSKeyboard({ KM: undefined }),
+            // Internally assumes that the ALT-press event was previously handled, with this as
+            // the resulting modifier state at the time of key-press.
+            modStateFlags: ModifierCodes.LALT,
+            baseLayout: 'us'
+          },
           DUMMY_DEVICE
         );
 
