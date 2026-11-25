@@ -96,7 +96,14 @@ type
     procedure WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);  // I3349
     procedure WriteToLog(const msg: string);
     procedure RunVersion11To13Upgrade(const KMShellPath: WideString);
-    procedure Version18To19ArmSetRegKey;
+    (**
+      * On native ARM64 Windows, this restores the machine-wide TIP registration 
+      * for kmtiparm64x.dll if they key is absent. This is needed 
+      * when upgrading from Keyman 18 or earlier, which did not support ARM64.
+      * It can run after each successful MSI installation because it leaves an 
+      * existing registration unchanged.
+      *)
+    procedure RegisterKMTIPArm64XIfAbsent;
     procedure ApplyWow64SystemProfilePatch;
   public
     destructor Destroy; override;
@@ -563,7 +570,7 @@ begin
       (res = ERROR_SUCCESS_REBOOT_REQUIRED) or (res = ERROR_SUCCESS_REBOOT_INITIATED) or (res = ERROR_SUCCESS));
 
     if (res = ERROR_SUCCESS) or (res = ERROR_SUCCESS_REBOOT_REQUIRED) or (res = ERROR_SUCCESS_REBOOT_INITIATED) then
-      Version18To19ArmSetRegKey;
+      RegisterKMTIPArm64XIfAbsent;
 
     case res of
       ERROR_SUCCESS: ;
@@ -929,10 +936,7 @@ begin
   TUtilExecute.WaitForProcess('"'+KMShellPath+'" -upgradekeyboards=13,admin', ExtractFilePath(KMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
 end;
 
-// This repair is required only for an ARM64 upgrade from Keyman 18, which
-// did not support ARM64.  This can run after every successful MSI
-// installation because it does nothing when the expected registration exists.
-procedure TRunTools.Version18To19ArmSetRegKey;
+procedure TRunTools.RegisterKMTIPArm64XIfAbsent;
 var
   engineRootPath: string;
   kmtipArm64Path: string;

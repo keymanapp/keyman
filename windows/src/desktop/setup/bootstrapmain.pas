@@ -146,7 +146,6 @@ procedure TSetupBootstrap.Run;
 var
   FTempPath: string;
   frmDownloadProgress: TfrmDownloadProgress;
-  msiLocation: TInstallInfoFileLocation;
   FResult: Boolean;
 BEGIN
   CoInitializeEx(nil, COINIT_APARTMENTTHREADED);
