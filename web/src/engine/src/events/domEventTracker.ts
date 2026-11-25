@@ -1,21 +1,25 @@
-class DomEventTracking {
-  Pelem: EventTarget;
-  Peventname: string;
-  Phandler: (arg0: Object) => boolean;
-  PuseCapture?: boolean
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 
-  constructor(Pelem: EventTarget, Peventname: string, Phandler: (arg0: Object) => boolean, PuseCapture?: boolean) {
-    this.Pelem = Pelem;
-    this.Peventname = Peventname.toLowerCase();
-    this.Phandler = Phandler;
-    this.PuseCapture = PuseCapture;
+class DomEventTracking {
+  elem: EventTarget;
+  eventName: string;
+  handler: (arg0: Object) => boolean;
+  useCapture?: boolean
+
+  constructor(elem: EventTarget, eventName: string, handler: (arg0: Object) => boolean, useCapture?: boolean) {
+    this.elem = elem;
+    this.eventName = eventName.toLowerCase();
+    this.handler = handler;
+    this.useCapture = useCapture;
   }
 
   equals(other: DomEventTracking): boolean {
-    return this.Pelem == other.Pelem && this.Peventname == other.Peventname &&
-      this.Phandler == other.Phandler && this.PuseCapture == other.PuseCapture;
+    return this.elem == other.elem && this.eventName == other.eventName &&
+      this.handler == other.handler && this.useCapture == other.useCapture;
   }
-};
+}
 
 /**
  * Facilitates adding and removing event listeners to and from DOM elements in a manner
@@ -28,75 +32,76 @@ export class DomEventTracker {
   private domEvents: DomEventTracking[] = [];
 
   /**
-   * Function     attachDOMEvent: Note for most browsers, adds an event to a chain, doesn't stop existing events
-   * Scope        Public
-   * @param       {Object}    Pelem       Element (or IFrame-internal Document) to which event is being attached
-   * @param       {string}    Peventname  Name of event without 'on' prefix
-   * @param       {function(Object)}  Phandler    Event handler for event
-   * @param       {boolean=}  PuseCapture True only if event to be handled on way to target element
-   * Description  Attaches event handler to element DOM event
+   * Attaches event handler to element DOM event
+   *
+   * Note: for most browsers, adds an event to a chain, doesn't stop existing events
+   *
+   * @param  elem        Element (or IFrame-internal Document) to which
+   *                     event is being attached
+   * @param  eventName   Name of event without 'on' prefix
+   * @param  handler     Event handler for event
+   * @param  useCapture  True only if event to be handled on way to target element
    */
-  attachDOMEvent<K extends keyof WindowEventMap>(
-    Pelem: Window,
-    Peventname: K,
-    Phandler: (ev: WindowEventMap[K]) => any,
-    PuseCapture?: boolean
+  public attachDOMEvent<K extends keyof WindowEventMap>(
+    elem: Window,
+    eventName: K,
+    handler: (ev: WindowEventMap[K]) => any,
+    useCapture?: boolean
   ): void;
-  attachDOMEvent<K extends keyof DocumentEventMap>(
-    Pelem: Document,
-    Peventname: K,
-    Phandler: (ev: DocumentEventMap[K]) => any,
-    PuseCapture?: boolean
+  public attachDOMEvent<K extends keyof DocumentEventMap>(
+    elem: Document,
+    eventName: K,
+    handler: (ev: DocumentEventMap[K]) => any,
+    useCapture?: boolean
   ): void;
-  attachDOMEvent<K extends keyof HTMLElementEventMap>(
-    Pelem: HTMLElement,
-    Peventname: K,
-    Phandler: (ev: HTMLElementEventMap[K]) => any,
-    PuseCapture?: boolean
+  public attachDOMEvent<K extends keyof HTMLElementEventMap>(
+    elem: HTMLElement,
+    eventName: K,
+    handler: (ev: HTMLElementEventMap[K]) => any,
+    useCapture?: boolean
   ): void;
-  attachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (arg0: Object) => boolean, PuseCapture?: boolean): void {
+  public attachDOMEvent(elem: EventTarget, eventName: string, handler: (arg0: Object) => boolean, useCapture?: boolean): void {
     // @ts-ignore // Since the trickery unfortunately don't also clear things up for anything we call within.
     // It's possible to fix, but that gets way more complex to spec out completely.
-    this.detachDOMEvent(Pelem, Peventname, Phandler, PuseCapture);
-    Pelem.addEventListener(Peventname, Phandler, PuseCapture ? true : false);
+    this.detachDOMEvent(elem, eventName, handler, useCapture);
+    elem.addEventListener(eventName, handler, !!useCapture);
 
     // Since we're attaching to the DOM, these events should be tracked for detachment during shutdown.
-    const event = new DomEventTracking(Pelem, Peventname, Phandler, PuseCapture);
+    const event = new DomEventTracking(elem, eventName, handler, useCapture);
     this.domEvents.push(event);
   }
 
   /**
-   * Function     detachDOMEvent
-   * Scope        Public
-   * @param       {Object}    Pelem       Element from which event is being detached
-   * @param       {string}    Peventname  Name of event without 'on' prefix
-   * @param       {function(Object)}  Phandler    Event handler for event
-   * @param       {boolean=}  PuseCapture True if event was being handled on way to target element
-   * Description Detaches event handler from element [to prevent memory leaks]
+   * Detaches event handler from element [to prevent memory leaks]
+   *
+   * @param  elem        Element from which event is being detached
+   * @param  eventName   Name of event without 'on' prefix
+   * @param  handler     Event handler for event
+   * @param  useCapture  True if event was being handled on way to target element
    */
-  detachDOMEvent<K extends keyof WindowEventMap>(
-    Pelem: Window,
-    Peventname: K,
-    Phandler: (ev: WindowEventMap[K]) => any,
-    PuseCapture?: boolean
+  public detachDOMEvent<K extends keyof WindowEventMap>(
+    elem: Window,
+    eventName: K,
+    handler: (ev: WindowEventMap[K]) => any,
+    useCapture?: boolean
   ): void;
-  detachDOMEvent<K extends keyof DocumentEventMap>(
-    Pelem: Document,
-    Peventname: K,
-    Phandler: (ev: DocumentEventMap[K]) => any,
-    PuseCapture?: boolean
+  public detachDOMEvent<K extends keyof DocumentEventMap>(
+    elem: Document,
+    eventName: K,
+    handler: (ev: DocumentEventMap[K]) => any,
+    useCapture?: boolean
   ): void;
-  detachDOMEvent<K extends keyof HTMLElementEventMap>(
-    Pelem: HTMLElement,
-    Peventname: K,
-    Phandler: (ev: HTMLElementEventMap[K]) => any,
-    PuseCapture?: boolean
+  public detachDOMEvent<K extends keyof HTMLElementEventMap>(
+    elem: HTMLElement,
+    eventName: K,
+    handler: (ev: HTMLElementEventMap[K]) => any,
+    useCapture?: boolean
   ): void;
-  detachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (arg0: Object) => boolean, PuseCapture?: boolean): void {
-    Pelem.removeEventListener(Peventname, Phandler, PuseCapture);
+  public detachDOMEvent(elem: EventTarget, eventName: string, handler: (arg0: Object) => boolean, useCapture?: boolean): void {
+    elem.removeEventListener(eventName, handler, useCapture);
 
     // Since we're detaching, we should drop the tracking data from the old event.
-    const event = new DomEventTracking(Pelem, Peventname, Phandler, PuseCapture);
+    const event = new DomEventTracking(elem, eventName, handler, useCapture);
     for(let i = 0; i < this.domEvents.length; i++) {
       if(this.domEvents[i].equals(event)) {
         this.domEvents.splice(i, 1);
@@ -105,13 +110,15 @@ export class DomEventTracker {
     }
   }
 
-  shutdown() {
-    // Remove all events linking to elements of the original, unaltered page.
-    // This should sever any still-existing page ties to this instance of KMW,
-    // allowing browser GC to do its thing.
+  /**
+   * Remove all events linking to elements of the original, unaltered page.
+   * This should sever any still-existing page ties to this instance of KMW,
+   * allowing browser GC to do its thing.
+   */
+  public shutdown() {
     for(const event of this.domEvents) {
       // @ts-ignore // since it's simpler this way and doesn't earn us much to re-check types.
-      this.detachDOMEvent(event.Pelem, event.Peventname, event.Phandler, event.PuseCapture);
+      this.detachDOMEvent(event.elem, event.eventName, event.handler, event.useCapture);
     }
   }
 }

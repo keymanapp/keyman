@@ -1,4 +1,7 @@
-import { _GetEventKeyCode } from "./hardwareEventKeyboard.js";
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import { _GetEventKeyCode } from './hardwareEventKeyboard.js';
 
 class Hotkey {
   code: number;
@@ -20,14 +23,13 @@ export class HotkeyManager {
   hotkeys: Hotkey[] = [];
 
   /**
-   * Function     addHotkey
-   * Scope        Public
+   * Add hot key handler to array of document-level hotkeys triggered by key up event
+   *
    * @param       {number}            keyCode
    * @param       {number}            shiftState
    * @param       {function(Object)}  handler
-   * Description  Add hot key handler to array of document-level hotkeys triggered by key up event
    */
-  addHotKey(keyCode: number, shiftState: number, handler: () => void) {
+  public addHotKey(keyCode: number, shiftState: number, handler: () => void) {
     // Test if existing handler for this code and replace it if so
     for(let i=0; i<this.hotkeys.length; i++) {
       if(this.hotkeys[i].code == keyCode && this.hotkeys[i].shift == shiftState) {
@@ -41,13 +43,13 @@ export class HotkeyManager {
   }
 
   /**
-   * Function     removeHotkey
-   * Scope        Public
+   * Remove a hot key handler from array of document-level hotkeys triggered
+   * by key up event
+   *
    * @param       {number}        keyCode
    * @param       {number}        shiftState
-   * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
    */
-  removeHotkey(keyCode: number, shiftState: number) {
+  public removeHotkey(keyCode: number, shiftState: number) {
     for(let i=0; i<this.hotkeys.length; i++) {
       if(this.hotkeys[i].matches(keyCode, shiftState)) {
         this.hotkeys.splice(i,1);
@@ -57,16 +59,16 @@ export class HotkeyManager {
   }
 
   /**
-   * Function     _Process
-   * Scope        Private
+   * Passes control to handlers according to the hotkey pressed
+   *
    * @param       {Event}       e       event
-   * Description  Passes control to handlers according to the hotkey pressed
    */
-  _Process: (e: KeyboardEvent) => boolean = (e: KeyboardEvent) => {
+  public _Process: (e: KeyboardEvent) => boolean = (e: KeyboardEvent) => {
     if(!e) {
       e = window.event as KeyboardEvent;
     }
 
+    console.log(`HotkeyManager._Process: ${e.type} keyCode=${e.keyCode} code=${e.code} key=${e.key} shift=${e.shiftKey} ctrl=${e.ctrlKey} alt=${e.altKey} meta=${e.metaKey}`);
     const _Lcode = _GetEventKeyCode(e);
     if(_Lcode == null) {
       return false;

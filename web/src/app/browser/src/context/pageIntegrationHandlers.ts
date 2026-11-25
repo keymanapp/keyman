@@ -1,6 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { DomEventTracker } from 'keyman/engine/events';
 
-import { KeymanEngine } from "../keymanEngine.js";
+import { KeymanEngine } from '../keymanEngine.js';
 import { FocusAssistant } from './focusAssistant.js';
 import { RotationProcessor } from '../utils/rotationProcessor.js';
 

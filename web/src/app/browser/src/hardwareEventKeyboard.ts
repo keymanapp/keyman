@@ -366,13 +366,14 @@ export class HardwareEventKeyboard extends HardKeyboardBase {
   }
 
   /**
-   * Function     keyDown
-   * Scope        Public
-   * Description  Processes keydown event and passes data to keyboard.
+   * Processes keydown event and passes data to keyboard.
    *
    * Note that the test-case oriented 'recorder' stubs this method to facilitate keystroke
    * recording for use in test cases.  If changing this function, please ensure the recorder is
    * not affected.
+   *
+   * @param  e  KeyboardEvent
+   * @return True if the event should be allowed to propagate, false if it should be suppressed.
    */
   private keyDown(e: KeyboardEvent): boolean {
     this.swallowKeypress = false;
