@@ -42,6 +42,24 @@ describe("getSourceRules() Tests", () => {
     const sourceRules = getSourceRules(sourceBuffer);
     assert.deepEqual({ dummy: "STRING" }, sourceRules);
   });
+  it("can handle multiple rules", () => {
+    const sourceBuffer = `
+      class FirstRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new TokenRule(TokenType.STRING);
+        }
+      }
+
+      class SecondRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new TokenRule(TokenType.U_CHAR);
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ first: "STRING", second: "U_CHAR" }, sourceRules);
+  });
   it("can handle a rule with one variable", () => {
     const sourceBuffer = `
       class DummyRule extends SingleChildRule {
