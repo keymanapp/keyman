@@ -99,6 +99,7 @@ export const KMN_SCAN_RECOGNIZERS = [
   // https://help.keyman.com/developer/language/reference/caps
   {tokenType: TokenType.SHIFTFREESCAPS,       regExp: /&shiftfreescaps(?![a-z0-9_\.-])/iy,                                emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
+  // TODO-NG-COMPILER: consider warning if anything other than single space used between words
   {tokenType: TokenType.CAPSALWAYSOFF_HEADER, regExp: /caps[^\S\r\n]+always[^\S\r\n]+off/iy,                              emit: true},
   // https://help.keyman.com/developer/language/reference/_keywordsbytype
   {tokenType: TokenType.CAPSONONLY_HEADER,    regExp: /caps[^\S\r\n]+on[^\S\r\n]+only/iy,                                 emit: true},
