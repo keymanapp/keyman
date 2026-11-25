@@ -8,6 +8,7 @@ import { processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { PhysicalInputEventSpec } from '@keymanapp/recorder-core';
 import { DeviceSpec } from 'keyman/common/web-utils';
 import { Codes, JSKeyboard, KeyEvent } from 'keyman/engine/keyboard';
+import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 const ModifierCodes = Codes.modifierCodes;
 const KeyCodes = Codes.keyCodes;
@@ -103,9 +104,115 @@ describe("app/browser: hardware event processing", () => {
 
         assert.isTrue(processedEvent.LisVirtualKey);
         assert.equal(processedEvent.Lcode, KeyCodes.K_ALT);
-        assert.equal(processedEvent.Lmodifiers, 0);
+        assert.equal(processedEvent.Lmodifiers, ModifierCodes.ALT);
         assert.equal(processedEvent.Lstates, ModifierCodes.NO_CAPS | ModifierCodes.NO_NUM_LOCK | ModifierCodes.NO_SCROLL_LOCK);
       });
+
+      it('left-ctrl keydown non-chiral', () => {
+        const processedEvent = preprocessKeyboardEvent(
+          {
+            type: 'keydown',
+            keyCode: KeyCodes.K_CONTROL,
+            key: 'Control',
+            code: 'ControlLeft',
+            altKey: false,
+            ctrlKey: false,
+            metaKey: false,
+            shiftKey: false,
+            isComposing: false,
+            location: 1,
+            getModifierState: (key: string) => {
+              switch (key) {
+                case 'NumLock':
+                  return true;
+                default:
+                  return false;
+              }
+            }
+          } as any as KeyboardEvent, {
+          activeKeyboard: new JSKeyboard({ KM: 0 }),
+          modStateFlags: ModifierKeyConstants.NOTSCROLLFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.NOTCAPITALFLAG,
+          baseLayout: 'us'
+        },
+          DUMMY_DEVICE
+        );
+
+        assert.equal(processedEvent.Lcode, KeyCodes.K_CONTROL);
+        assert.equal(processedEvent.Lstates, ModifierKeyConstants.NOTSCROLLFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.NOTCAPITALFLAG);
+        assert.equal(processedEvent.Lmodifiers, ModifierKeyConstants.K_CTRLFLAG);
+      });
+
+      it('left-ctrl keyup non-chiral', () => {
+        const processedEvent = preprocessKeyboardEvent(
+          {
+            type: 'keyup',
+            keyCode: KeyCodes.K_CONTROL,
+            key: 'Control',
+            code: 'ControlLeft',
+            altKey: false,
+            ctrlKey: true,
+            metaKey: false,
+            shiftKey: false,
+            isComposing: false,
+            location: 1,
+            getModifierState: (key: string) => {
+              switch (key) {
+                case 'Control':
+                case 'NumLock':
+                  return true;
+                default:
+                  return false;
+              }
+            }
+          } as any as KeyboardEvent, {
+          activeKeyboard: new JSKeyboard({ KM: 0 }),
+          modStateFlags: ModifierKeyConstants.NOTSCROLLFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.LCTRLFLAG,
+          baseLayout: 'us'
+        },
+          DUMMY_DEVICE
+        );
+
+        assert.equal(processedEvent.Lcode, KeyCodes.K_CONTROL);
+        assert.equal(processedEvent.Lstates, ModifierKeyConstants.NOTSCROLLFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.NOTCAPITALFLAG);
+        assert.equal(processedEvent.Lmodifiers, ModifierKeyConstants.K_CTRLFLAG);
+      });
+
+      it('ctrl+shift slash keydown', () => {
+        const processedEvent = preprocessKeyboardEvent(
+          {
+            type: 'keydown',
+            keyCode: KeyCodes.K_SLASH,
+            key: '?',
+            code: 'Slash',
+            altKey: false,
+            ctrlKey: true,
+            metaKey: false,
+            shiftKey: true,
+            isComposing: false,
+            location: 0,
+            getModifierState: (key: string) => {
+              switch (key) {
+                case 'Control':
+                case 'Shift':
+                case 'NumLock':
+                  return true;
+                default:
+                  return false;
+              }
+            }
+          } as any as KeyboardEvent, {
+          activeKeyboard: new JSKeyboard({ KM: 0 }),
+          modStateFlags: ModifierKeyConstants.NOTSCROLLFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.K_SHIFTFLAG,
+          baseLayout: 'us'
+        },
+          DUMMY_DEVICE
+        );
+
+        assert.equal(processedEvent.Lcode, KeyCodes.K_SLASH);
+        assert.equal(processedEvent.Lstates, ModifierKeyConstants.NOTSCROLLFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.NOTCAPITALFLAG);
+        assert.equal(processedEvent.Lmodifiers, ModifierKeyConstants.K_CTRLFLAG | ModifierKeyConstants.K_SHIFTFLAG);
+      });
+
     });
 
     describe('positional+chiral keyboards', () => {
@@ -188,9 +295,79 @@ describe("app/browser: hardware event processing", () => {
 
         assert.isTrue(processedEvent.LisVirtualKey);
         assert.equal(processedEvent.Lcode, KeyCodes.K_ALT);
-        assert.equal(processedEvent.Lmodifiers, 0);
+        assert.equal(processedEvent.Lmodifiers, ModifierCodes.LALT);
         assert.equal(processedEvent.Lstates, ModifierCodes.NO_CAPS | ModifierCodes.NO_NUM_LOCK | ModifierCodes.NO_SCROLL_LOCK);
       });
+
+      it('right-ctrl keydown chiral', () => {
+        const processedEvent = preprocessKeyboardEvent(
+          {
+            type: 'keydown',
+            keyCode: KeyCodes.K_CONTROL,
+            key: 'Control',
+            code: 'ControlRight',
+            altKey: false,
+            ctrlKey: false,
+            metaKey: false,
+            shiftKey: false,
+            isComposing: false,
+            location: 2,
+            getModifierState: (key: string) => {
+              switch (key) {
+                case 'NumLock':
+                  return true;
+                default:
+                  return false;
+              }
+            }
+          } as any as KeyboardEvent, {
+            activeKeyboard: new JSKeyboard({ KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL }),
+            modStateFlags: ModifierKeyConstants.NOTSCROLLFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.NOTCAPITALFLAG,
+            baseLayout: 'us'
+          },
+          DUMMY_DEVICE
+        );
+
+        assert.equal(processedEvent.Lcode, KeyCodes.K_CONTROL);
+        assert.equal(processedEvent.Lstates, ModifierKeyConstants.NOTSCROLLFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.NOTCAPITALFLAG);
+        assert.equal(processedEvent.Lmodifiers, ModifierKeyConstants.RCTRLFLAG);
+      });
+
+      it('left-control A keydown', () => {
+        const processedEvent = preprocessKeyboardEvent(
+          {
+            type: 'keydown',
+            keyCode: KeyCodes.K_A,
+            key: 'a',
+            code: 'a',
+            altKey: false,
+            ctrlKey: true,
+            metaKey: false,
+            shiftKey: false,
+            isComposing: false,
+            location: 0,
+            getModifierState: (key: string) => {
+              switch (key) {
+                case 'Control':
+                case 'NumLock':
+                  return true;
+                default:
+                  return false;
+              }
+            }
+          } as any as KeyboardEvent, {
+            activeKeyboard: new JSKeyboard({ KM: 0, KMBM: Codes.modifierBitmasks.CHIRAL }),
+            modStateFlags: ModifierKeyConstants.NOTSCROLLFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.LCTRLFLAG,
+            baseLayout: 'us'
+          },
+          DUMMY_DEVICE
+        );
+
+        assert.equal(processedEvent.Lcode, KeyCodes.K_A);
+        assert.equal(processedEvent.Lstates, ModifierKeyConstants.NOTSCROLLFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.NOTCAPITALFLAG);
+        assert.equal(processedEvent.Lmodifiers, ModifierKeyConstants.LCTRLFLAG);
+      });
+
     });
 
     describe('mnemonic keyboards', () => {
