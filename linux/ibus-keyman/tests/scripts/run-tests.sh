@@ -132,7 +132,7 @@ while (( $# )); do
       fi
       REMOTE_DEBUG="gdbserver ${REMOTE_HOST}"
       ;;
-    --) shift && break ;;
+    --) break ;;
     *) echo "Error: Unexpected argument \"$1\". Exiting." ; exit 4 ;;
   esac
   shift || (echo "Error: The last argument is missing a value. Exiting."; false) || exit 5

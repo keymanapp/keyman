@@ -42,6 +42,24 @@ describe("getSourceRules() Tests", () => {
     const sourceRules = getSourceRules(sourceBuffer);
     assert.deepEqual({ dummy: "STRING" }, sourceRules);
   });
+  it("can handle multiple rules", () => {
+    const sourceBuffer = `
+      class FirstRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new TokenRule(TokenType.STRING);
+        }
+      }
+
+      class SecondRule extends SingleChildRule {
+        public constructor() {
+          super();
+          this.rule = new TokenRule(TokenType.U_CHAR);
+        }
+      }`;
+    const sourceRules = getSourceRules(sourceBuffer);
+    assert.deepEqual({ first: "STRING", second: "U_CHAR" }, sourceRules);
+  });
   it("can handle a rule with one variable", () => {
     const sourceBuffer = `
       class DummyRule extends SingleChildRule {
@@ -272,9 +290,7 @@ function visitRules(
   sourceFile: ts.SourceFile,
   rules: Dictionary
 ): void {
-  if ((ts.isClassDeclaration(node) || ts.isClassExpression(node)) &&
-    node.name?.text.endsWith("Rule")
-  ) {
+  if (ts.isClassDeclaration(node) && node.name?.text.endsWith("Rule")) {
     const name = baseName(node.name.text);
     const expr = inspectRuleExpression(node, sourceFile);
 
@@ -291,13 +307,13 @@ function baseName(text: string): string {
 }
 
 type RuleContext = {
-  variables: Map<string, ts.Expression>;
+  variables:  Map<string, ts.Expression>;
   properties: Map<string, ts.Expression>;
   sourceFile: ts.SourceFile;
 };
 
 function inspectRuleExpression(
-  cls: ts.ClassDeclaration | ts.ClassExpression,
+  cls: ts.ClassDeclaration,
   sourceFile: ts.SourceFile
 ): string | undefined {
   const constructor = getConstructor(cls);
@@ -306,13 +322,14 @@ function inspectRuleExpression(
     return undefined;
   }
 
-  // It is assumed parent constructors do not use local variables in property
+  // it is assumed parent constructors do not use local variables in property
   // assignments, as the Maps do not record constructor context
   const variables  = new Map<string, ts.Expression>();
   const properties = new Map<string, ts.Expression>();
 
   const context: RuleContext = { variables, properties, sourceFile };
 
+  // accumulate variables
   for (const statement of constructor.body.statements) {
     if (!ts.isVariableStatement(statement)) continue;
 
@@ -323,10 +340,11 @@ function inspectRuleExpression(
     }
   }
 
-  let currentClass: ts.ClassDeclaration | ts.ClassExpression | undefined = cls;
+  let currentClass: ts.ClassDeclaration | undefined = cls;
 
   const visited = new Set<string>();
 
+  // accumulate properties
   while (currentClass) {
     const className = currentClass.name?.text;
 
@@ -342,12 +360,12 @@ function inspectRuleExpression(
 
     if (currentConstructor?.body) {
       for (const statement of currentConstructor.body.statements) {
-        const assignment = getThisPropertyAssignment(statement);
+        const assignment = getPropertyAssignment(statement);
 
         if (assignment) {
           const propertyName = (assignment.left as ts.PropertyAccessExpression).name.text;
           // child supercedes parent; doesn't handle multiple assignments in same constructor
-          if (!properties.has(propertyName)) { 
+          if (!properties.has(propertyName)) {
             properties.set(propertyName, assignment.right);
           }
         }
@@ -367,7 +385,7 @@ function inspectRuleExpression(
     return alternateTokens;
   }
 
-  const assignment = findThisPropertyAssignment(constructor.body.statements, "rule");
+  const assignment = findRulePropertyAssignment(constructor.body.statements);
 
   if (!assignment) {
     return undefined;
@@ -376,14 +394,12 @@ function inspectRuleExpression(
   return describeExpression(assignment.right, context);
 }
 
-function getConstructor(
-  cls: ts.ClassDeclaration | ts.ClassExpression
-): ts.ConstructorDeclaration | undefined {
+function getConstructor(cls: ts.ClassDeclaration): ts.ConstructorDeclaration | undefined {
   return cls.members.find(ts.isConstructorDeclaration);
 }
 
 function getParentClassName(
-  cls: ts.ClassDeclaration | ts.ClassExpression,
+  cls: ts.ClassDeclaration,
   sourceFile: ts.SourceFile
 ): string | undefined {
   const clause = cls.heritageClauses?.find(
@@ -393,7 +409,7 @@ function getParentClassName(
   return clause?.types[0]?.expression.getText(sourceFile);
 }
 
-function getThisPropertyAssignment(
+function getPropertyAssignment(
   statement: ts.Statement
 ): ts.BinaryExpression | undefined {
   if (!ts.isExpressionStatement(statement)) {
@@ -414,17 +430,16 @@ function getThisPropertyAssignment(
   return expression;
 }
 
-function findThisPropertyAssignment(
-  statements: ts.NodeArray<ts.Statement>,
-  propertyName: string
+function findRulePropertyAssignment(
+  statements: ts.NodeArray<ts.Statement>
 ): ts.BinaryExpression | undefined {
   for (const statement of statements) {
-    const assignment = getThisPropertyAssignment(statement);
+    const assignment = getPropertyAssignment(statement);
 
     if (
       assignment &&
       ts.isPropertyAccessExpression(assignment.left) &&
-      assignment.left.name.text === propertyName
+      assignment.left.name.text === "rule"
     ) {
       return assignment;
     }
@@ -433,9 +448,7 @@ function findThisPropertyAssignment(
   return undefined;
 }
 
-function inspectAlternateTokenRule(
-  cls: ts.ClassDeclaration | ts.ClassExpression
-): string | undefined {
+function inspectAlternateTokenRule(cls: ts.ClassDeclaration): string | undefined {
   const extendsAlternateTokenRule = cls.heritageClauses?.some(clause =>
     clause.token === ts.SyntaxKind.ExtendsKeyword &&
     clause.types.some(type => type.expression.getText() === "AlternateTokenRule")
@@ -468,9 +481,7 @@ function inspectAlternateTokenRule(
     .join("|");
 }
 
-function getSuperCall(
-  statements: ts.NodeArray<ts.Statement>
-): ts.CallExpression | undefined {
+function getSuperCall(statements: ts.NodeArray<ts.Statement>): ts.CallExpression | undefined {
   for (const statement of statements) {
     if (
       ts.isExpressionStatement(statement) &&
@@ -500,10 +511,7 @@ const ruleDescriptions = new Map<string, RuleDescription>([
   ["OptionalRule",  { suffix: "?" }],
 ]);
 
-function describeExpression(
-  node: ts.Expression,
-  context: RuleContext
-): string {
+function describeExpression(node: ts.Expression, context: RuleContext): string {
   if (
     ts.isPropertyAccessExpression(node) &&
     node.expression.kind === ts.SyntaxKind.ThisKeyword

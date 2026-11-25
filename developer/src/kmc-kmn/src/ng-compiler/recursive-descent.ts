@@ -112,7 +112,7 @@ export abstract class MultiChildRule extends Rule {
 
 /**
  * SequenceRule represents sequential rules in the recursive-descent
- * syntax analyzer (rules eparated by spaces in the BNF).
+ * syntax analyzer (rules separated by spaces in the BNF).
  */
 export class SequenceRule extends MultiChildRule {
   /**
@@ -147,7 +147,7 @@ export class SequenceRule extends MultiChildRule {
 
 /**
  * AlternateRule represents alternative rules in the recursive-descent
- * syntax analyzer (rules eparated by '|' in the BNF).
+ * syntax analyzer (rules separated by '|' in the BNF).
  */
 export class AlternateRule extends MultiChildRule {
   /**

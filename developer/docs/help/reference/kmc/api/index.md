@@ -15,6 +15,7 @@ Module Name                                      | NPM Package                  
 -------------------------------------------------|-------------------------------------------------------|------------------------------------|---------------
 [kmc](../cli)                                    | [@keymanapp/kmc][kmc-npm]                             | [GitHub][kmc-github]               | The official command-line interface for all of the various compilers in Keyman Developer.
 [kmc-analyze](../../api/kmc-analyze)             | [@keymanapp/kmc-analyze][kmc-analyze-npm]             | [GitHub][kmc-analyze-github]       | Provides Keyman keyboard analysis tools.
+[kmc-convert](../../api/kmc-convert)             | [@keymanapp/kmc-convert][kmc-convert-npm]             | [GitHub][kmc-convert-github]       | Converts between keyboard layouts (e.g. .keylayout -> .kmn)
 [kmc-keyboard-info](../../api/kmc-keyboard-info) | [@keymanapp/kmc-keyboard-info][kmc-keyboard-info-npm] | [GitHub][kmc-keyboard-info-github] | Builds a .keyboard_info file from a Keyman keyboard project.
 [kmc-kmn](../../api/kmc-kmn)                     | [@keymanapp/kmc-kmn][kmc-kmn-npm]                     | [GitHub][kmc-kmn-github]           | Builds .kmn keyboards into .kmx binary keyboard files.
 [kmc-ldml](../../api/kmc-ldml)                   | [@keymanapp/kmc-ldml][kmc-ldml-npm]                   | [GitHub][kmc-ldml-github]          | Builds LDML .xml keyboards into Keyman .kmx binary keyboard files.
@@ -24,6 +25,7 @@ Module Name                                      | NPM Package                  
 
 [kmc-npm]: https://npmjs.com/package/@keymanapp/kmc
 [kmc-analyze-npm]: https://npmjs.com/package/@keymanapp/kmc-analyze
+[kmc-convert-npm]: https://npmjs.com/package/@keymanapp/kmc-convert
 [kmc-keyboard-info-npm]: https://npmjs.com/package/@keymanapp/kmc-keyboard-info
 [kmc-kmn-npm]: https://npmjs.com/package/@keymanapp/kmc-kmn
 [kmc-ldml-npm]: https://npmjs.com/package/@keymanapp/kmc-ldml
@@ -34,6 +36,7 @@ Module Name                                      | NPM Package                  
 
 [kmc-github]: https://github.com/keymanapp/keyman/tree/master/developer/src/kmc
 [kmc-analyze-github]: https://github.com/keymanapp/keyman/tree/master/developer/src/kmc-analyze
+[kmc-convert-github]: https://github.com/keymanapp/keyman/tree/master/developer/src/kmc-convert
 [kmc-keyboard-info-github]: https://github.com/keymanapp/keyman/tree/master/developer/src/kmc-keyboard-info
 [kmc-kmn-github]: https://github.com/keymanapp/keyman/tree/master/developer/src/kmc-kmn
 [kmc-ldml-github]: https://github.com/keymanapp/keyman/tree/master/developer/src/kmc-ldml
