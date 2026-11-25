@@ -11,8 +11,11 @@ uses
 type
   TDebugLogClient = class
   private
+    LogToFile: Boolean;
+    LogFileHandle: THandle;
     FRegHandle: TRegHandle;
     class var FInstance: TDebugLogClient;
+    procedure WriteMessageToLogFile(const sMsg: string);
   public
     constructor Create;
     destructor Destroy; override;
@@ -26,7 +29,9 @@ implementation
 
 uses
   System.SysUtils,
+  System.Win.Registry,
 
+  RegistryKeys,
   Keyman.System.DebugLogCommon;
 
 { TDebugLogClient }
@@ -47,6 +52,8 @@ const
 constructor TDebugLogClient.Create;
 var
   status: ULONG;
+  reg: TRegistry;
+  LogFilename: string;
 begin
   if ShouldDebug then
   begin
@@ -56,6 +63,20 @@ begin
       FRegHandle := 0;
       RaiseLastOSError(status, 'EventRegister');
     end;
+  end;
+
+  reg := TRegistry.Create;
+  try
+    LogToFile := reg.OpenKeyReadOnly(SRegKey_KeymanEngineDiag_CU) and reg.ValueExists(SRegValue_KeymanExeDebugLogfile);
+    if LogToFile then
+      LogFilename := reg.ReadString(SRegValue_KeymanExeDebugLogfile);
+  finally
+    reg.Free;
+  end;
+
+  if LogToFile then
+  begin
+    LogFileHandle := CreateFile(PChar(LogFilename), GENERIC_READ or GENERIC_WRITE, FILE_SHARE_READ, nil, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL or FILE_FLAG_WRITE_THROUGH, 0);
   end;
 end;
 
@@ -68,6 +89,11 @@ begin
     status := EventUnregister(FRegHandle);
     if ERROR_SUCCESS <> status then
       OutputDebugString(PChar('EventUnregister failed with '+IntToStr(status)));
+  end;
+
+  if LogToFile then
+  begin
+    CloseHandle(LogFileHandle);
   end;
 
   inherited Destroy;
@@ -90,6 +116,22 @@ begin
   FLastError := GetLastError;
   FLastErrorString := SysErrorMessage(GetLastError);
   WriteMessage('ERROR %d in %s [%s]: %s %s', [FLastError, FailingMethod, ParentMethod, FLastErrorString, Message]);
+end;
+
+procedure TDebugLogClient.WriteMessageToLogFile(const sMsg: string);
+var
+  st: TSystemTime;
+  logMessage: string;
+  logMessageUTF8: RawByteString;
+  written: Cardinal;
+begin
+  if not LogToFile then
+    Exit;
+
+  DateTimeToSystemTime(Now, st);
+  logMessage := System.SysUtils.Format('%04.4d-%02.2d-%02.2d %02.2d:%02.2d:%02.2d.%04.4d ', [st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds]) + sMsg + #13#10;
+  logMessageUTF8 := UTF8Encode(logMessage);
+  WriteFile(LogFileHandle, PAnsiChar(logMessageUTF8)^, Length(logMessageUTF8), written, nil);
 end;
 
 procedure TDebugLogClient.WriteMessage(const Format: string;
@@ -115,6 +157,8 @@ begin
   dwDummy := 0;
   sProcessName := 'keyman[host]';
   sMsg := System.SysUtils.Format(Format, Args);
+
+  WriteMessageToLogFile(sMsg);
 
   // These must match the manifest template in keyman-debug-etw.man
   EventDataDescCreate(Descriptors[0], @dwPlatform, sizeof(DWORD)); // <data name = "Platform" inType = "Platform" / >

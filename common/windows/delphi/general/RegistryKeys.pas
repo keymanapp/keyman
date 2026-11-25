@@ -106,6 +106,7 @@ const
   SRegValue_Legacy_Default_UnknownLayoutID = '000005FE';   // I4220
 
   SRegValue_KeymanDebug             = 'debug';                                      // CU
+  SRegValue_KeymanExeDebugLogfile   = 'keyman.exe debug logfile';                   // CU
 
   SRegValue_DefaultCustomisation    = 'default customisation';                      // LM
 
