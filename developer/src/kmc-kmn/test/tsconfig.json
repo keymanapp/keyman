@@ -2,6 +2,7 @@
   "extends": "../../kmc/tsconfig.kmc-base.json",
 
   "compilerOptions": {
+      "types": ["node"],
       "rootDir": ".",
       "rootDirs": ["./", "../src/"],
       "outDir": "../build/test",

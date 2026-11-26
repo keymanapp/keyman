@@ -20,13 +20,10 @@ export class ASTNode {
 
   /**
    * Construct an ASTNode
-   *
-   * @param nodeType the node type
-   * @param token a token from the input (or null)
    */
   public constructor(
-    /** the node type */
-    public readonly nodeType: NodeType,
+    /** the node type (default TMP) */
+    public readonly nodeType: NodeType=NodeType.TMP,
     /** a token (if appropriate) from the input */
     public readonly token: Token=null
   ) {
@@ -137,6 +134,15 @@ export class ASTNode {
   }
 
   /**
+   * Check if this node has one and only one child.
+   *
+   * @returns true if there is one and only one child
+   */
+  public hasSoleChild(): boolean  {
+    return this.getChildren().length == 1;
+  }
+
+  /**
    * Check if this node has one and only one child of a given type.
    *
    * @param requiredType the required type
@@ -173,7 +179,7 @@ export class ASTNode {
    * @returns the sole child node or null
    */
   public getSoleChild(): ASTNode {
-    const children: ASTNode[] = this.getChildren();
+    const children = this.getChildren();
     return (children.length == 1) ? children[0] : null;
   }
 
@@ -183,7 +189,7 @@ export class ASTNode {
    * @returns the sole child node or null
    */
   public getSoleChildOfType(requiredType: NodeType): ASTNode {
-    const children: ASTNode[] = this.getChildrenOfType(requiredType);
+    const children = this.getChildrenOfType(requiredType);
     return (children.length == 1) ? children[0] : null;
   }
 
@@ -211,7 +217,7 @@ export class ASTNode {
    * @returns an array of child nodes
    */
   public removeChildren(): ASTNode[] {
-    const list: ASTNode[] = this.getChildren();
+    const list = this.getChildren();
     this.children = [];
     return list;
   }
@@ -223,6 +229,15 @@ export class ASTNode {
    */
   public removeFirstChild(): ASTNode {
     return this.hasChildren() ? this.children.shift() : null;
+  }
+
+  /**
+   * Remove the sole child node, if there is one and only one.
+   *
+   * @returns the sole child node or null
+   */
+  public removeSoleChild(): ASTNode {
+    return this.hasSoleChild() ? this.removeChildren()[0] : null;
   }
 
   /**

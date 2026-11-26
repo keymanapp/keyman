@@ -19,6 +19,8 @@ export const PATH_TO_REPOSITORY = '../../../../keyboards/';
 let repositoryKeyboardNamesCache: string[] = null;
 export const repositoryKeyboardNames = () => repositoryKeyboardNamesCache ??= findKeyboardNames(PATH_TO_REPOSITORY);
 
+const EXCLUDED_REPOSITORY_FILES: string[] = [];
+
 /**
  * Find the names of all the .kmn keyboard files in a directory
  * tree, excluding those in or below extras or legacy directories.
@@ -42,7 +44,10 @@ function findKeyboardNames(dir: string, baseLength: number = dir.length, names: 
     if (statSync(filePath).isDirectory() && !/(extras|legacy)$/.test(filePath)) {
       findKeyboardNames(filePath, baseLength, names);
     } else if (/\.kmn$/.test(file)) {
-      names.push(filePath.slice(baseLength, -4)); // remove base directory and file type
+      const fileName: string = filePath.slice(baseLength, -4); // remove base directory and file type
+      if (EXCLUDED_REPOSITORY_FILES.indexOf(fileName) == -1) {
+        names.push(fileName);
+      }
     }
   });
 
