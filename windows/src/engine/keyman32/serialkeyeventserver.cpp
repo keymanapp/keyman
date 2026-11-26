@@ -399,6 +399,8 @@ private:
     // Reset the shared buffer and ensure the data is written out of cache for
     // multiprocessor systems
     //
+    // TODO(lowpri): this resets to 0 but PrepareInjectedInput may not drain the queue.
+    //               Lowpri because we haven't observed bugs resulting from this.
     m_pSharedData->nInputs = 0;
     MemoryBarrier();
 
@@ -421,14 +423,35 @@ private:
   }
 
   /**
-    Add modifier state adjustment events and then copy the new input
-    events from the shared buffer
-  */
-  void PrepareInjectedInput() {
-    DWORD nInputs = min(m_pSharedData->nInputs, MAX_KEYEVENT_INPUTS);
+   * Check for events in the incoming key event data that are not Unicode
+   * characters, and thus are plain virtual keys
+   */
+  BOOL DoesSharedDataQueueIncludeVirtualKeys(DWORD nInputs) {
+    for(DWORD i = 0; i < nInputs; i++) {
+      if(!(m_pSharedData->inputs[i].dwFlags & KEYEVENTF_UNICODE)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
 
+  /**
+   * Add modifier state adjustment events and then copy the new input events
+   * from the shared buffer
+   */
+  void PrepareInjectedInput() {
+    DWORD const nInputs = min(m_pSharedData->nInputs, MAX_KEYEVENT_INPUTS);
+    BOOL const hasVirtualKeys = DoesSharedDataQueueIncludeVirtualKeys(nInputs);
     m_nInputs = 0;
-    keybd_shift(m_pInputs, &m_nInputs, FALSE, m_ModifierKeyboardState);
+
+    // If we do not have any virtual keys in the queue -- i.e. each event has
+    // KEYEVENTF_UNICODE flag set and so is emitting characters, then it should
+    // be safe to emit key events without resetting modifier state. This will
+    // both be faster (fewer key events), and safer (no unneccesary changes to
+    // modifier state). This should be a reasonable mitigation for #16948.
+    if(hasVirtualKeys) {
+      keybd_shift(m_pInputs, &m_nInputs, FALSE, m_ModifierKeyboardState);
+    }
 
     for (DWORD i = 0; i < nInputs && m_nInputs < MAX_KEYEVENT_INPUTS - MAX_KEYEVENT_INPUTS_MODIFIERS; i++, m_nInputs++) {
       m_pInputs[m_nInputs].type = INPUT_KEYBOARD;
@@ -439,7 +462,9 @@ private:
       m_pInputs[m_nInputs].ki.dwExtraInfo = (ULONG_PTR)m_pSharedData->inputs[i].extraInfo;
     }
 
-    keybd_shift(m_pInputs, &m_nInputs, TRUE, m_ModifierKeyboardState);
+    if(hasVirtualKeys) {
+      keybd_shift(m_pInputs, &m_nInputs, TRUE, m_ModifierKeyboardState);
+    }
   }
 
   /**
