@@ -117,7 +117,7 @@ export enum DwHotKey {
   HK_SHIFT = 0x00040000,
 };
 
-export enum VKeyNames {
+export enum VKeyName {
   K_$00       = "K_$00",				// 0x0
   K_LBUTTON   = "K_LBUTTON",		// 0x1
   K_RBUTTON   = "K_RBUTTON",	  // 0x2
