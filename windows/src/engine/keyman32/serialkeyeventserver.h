@@ -11,6 +11,7 @@ private:
 public:
   virtual ~ISerialKeyEventServer() {}
   virtual HWND GetWindow() const = 0;
+  virtual void RequestModifierReset() = 0;
 
   static ISerialKeyEventServer *GetServer() {
     return sm_server;
