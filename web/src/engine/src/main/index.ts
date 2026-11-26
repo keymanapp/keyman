@@ -2,7 +2,7 @@ export { EngineConfiguration, InitOptionDefaults, InitOptionSpec } from './engin
 export { ContextManagerBase, ContextManagerConfiguration, type KeyboardInfoPair } from './contextManagerBase.js';
 export { HardKeyboardBase, processForMnemonicsAndLegacy } from './hardKeyboardBase.js';
 export { KeyboardInterfaceBase } from './keyboardInterfaceBase.js';
-export { KeymanEngineBase } from './keymanEngineBase.js';
+export { type KeyEventFullResultCallback, type KeyEventFullHandler, KeymanEngineBase } from './keymanEngineBase.js';
 export { LegacyAPIEvents } from './legacyAPIEvents.js';
 export { VariableStoreCookieSerializer } from './variableStoreCookieSerializer.js';
 export { LanguageProcessor } from './headless/languageProcessor.js';

@@ -1,13 +1,16 @@
-import { EventEmitter } from "eventemitter3";
-import { JSKeyboard, Keyboard, KeyMapping, KeyEvent, Codes, type ProcessorAction } from "keyman/engine/keyboard";
-import { KeyEventSourceInterface } from 'keyman/engine/osk';
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import { EventEmitter } from 'eventemitter3';
+import { JSKeyboard, Keyboard, KeyMapping, KeyEvent, Codes } from 'keyman/engine/keyboard';
+import { KeyEventHandler, KeyEventSourceInterface } from 'keyman/engine/osk';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 interface EventMap {
   /**
    * Designed to pass key events off to any consuming modules/libraries.
    */
-  'keyevent': (event: KeyEvent, callback?: (result: ProcessorAction, error?: Error) => void) => void
+  'keyevent': KeyEventHandler;
 }
 
 export class HardKeyboardBase extends EventEmitter<EventMap> implements KeyEventSourceInterface<EventMap> { }

@@ -1,4 +1,10 @@
-import { _GetEventKeyCode } from "./hardwareEventKeyboard.js";
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+import { _GetEventKeyCode } from './hardwareEventKeyboard.js';
+import { KeyEventFullResultCallback } from 'keyman/engine/main';
+import { KeyEvent } from 'keyman/engine/keyboard';
+import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 class Hotkey {
   code: number;
@@ -20,14 +26,13 @@ export class HotkeyManager {
   hotkeys: Hotkey[] = [];
 
   /**
-   * Function     addHotkey
-   * Scope        Public
+   * Add hot key handler to array of document-level hotkeys triggered by key up event
+   *
    * @param       {number}            keyCode
    * @param       {number}            shiftState
    * @param       {function(Object)}  handler
-   * Description  Add hot key handler to array of document-level hotkeys triggered by key up event
    */
-  addHotKey(keyCode: number, shiftState: number, handler: () => void) {
+  public addHotKey(keyCode: number, shiftState: number, handler: () => void) {
     // Test if existing handler for this code and replace it if so
     for(let i=0; i<this.hotkeys.length; i++) {
       if(this.hotkeys[i].code == keyCode && this.hotkeys[i].shift == shiftState) {
@@ -41,13 +46,13 @@ export class HotkeyManager {
   }
 
   /**
-   * Function     removeHotkey
-   * Scope        Public
+   * Remove a hot key handler from array of document-level hotkeys triggered
+   * by key up event
+   *
    * @param       {number}        keyCode
    * @param       {number}        shiftState
-   * Description  Remove a hot key handler from array of document-level hotkeys triggered by key up event
    */
-  removeHotkey(keyCode: number, shiftState: number) {
+  public removeHotkey(keyCode: number, shiftState: number) {
     for(let i=0; i<this.hotkeys.length; i++) {
       if(this.hotkeys[i].matches(keyCode, shiftState)) {
         this.hotkeys.splice(i,1);
@@ -57,16 +62,16 @@ export class HotkeyManager {
   }
 
   /**
-   * Function     _Process
-   * Scope        Private
+   * Passes control to handlers according to the hotkey pressed
+   *
    * @param       {Event}       e       event
-   * Description  Passes control to handlers according to the hotkey pressed
    */
-  _Process: (e: KeyboardEvent) => boolean = (e: KeyboardEvent) => {
+  public _Process: (e: KeyboardEvent) => boolean = (e: KeyboardEvent) => {
     if(!e) {
       e = window.event as KeyboardEvent;
     }
 
+    console.log(`HotkeyManager._Process: ${e.type} keyCode=${e.keyCode} code=${e.code} key=${e.key} shift=${e.shiftKey} ctrl=${e.ctrlKey} alt=${e.altKey} meta=${e.metaKey}`);
     const _Lcode = _GetEventKeyCode(e);
     if(_Lcode == null) {
       return false;
@@ -74,21 +79,35 @@ export class HotkeyManager {
 
     // Removed testing of e.shiftKey==null  I3363 (Build 301)
     const _Lmodifiers =
-      (e.shiftKey ? 0x10 : 0) |
-      (e.ctrlKey ? 0x20 : 0) |
-      (e.altKey ? 0x40 : 0);
+      (e.shiftKey ? ModifierKeyConstants.K_SHIFTFLAG : 0) |
+      (e.ctrlKey ? ModifierKeyConstants.K_CTRLFLAG : 0) |
+      (e.altKey ? ModifierKeyConstants.K_ALTFLAG : 0);
 
     for(let i=0; i<this.hotkeys.length; i++) {
       if(this.hotkeys[i].matches(_Lcode, _Lmodifiers)) {
         this.hotkeys[i].handler();
         e.returnValue = false;
-        if(e && e.preventDefault) {
-          e.preventDefault();
-        }
+        e?.preventDefault();
         e.cancelBubble = true;
+        e.stopImmediatePropagation();
         return false;
       }
     }
     return true;
   }
+
+  public _ProcessKeyEvent: (event: KeyEvent, callback: KeyEventFullResultCallback) => void = (event: KeyEvent, callback: KeyEventFullResultCallback): void => {
+    const keyboardEvent = new KeyboardEvent('keydown', {
+      keyCode: event.Lcode,
+      key: event.kName,
+      altKey: (event.Lmodifiers & (ModifierKeyConstants.K_ALTFLAG | ModifierKeyConstants.LALTFLAG | ModifierKeyConstants.RALTFLAG)) != 0,
+      ctrlKey: (event.Lmodifiers & (ModifierKeyConstants.K_CTRLFLAG | ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG)) != 0,
+      metaKey: (event.Lmodifiers & ModifierKeyConstants.K_METAFLAG) != 0,
+      shiftKey: (event.Lmodifiers & ModifierKeyConstants.K_SHIFTFLAG) != 0,
+      isComposing: false
+    });
+
+    this._Process(keyboardEvent);
+  }
+
 }

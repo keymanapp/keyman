@@ -1,6 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { DomEventTracker } from 'keyman/engine/events';
 
-import { KeymanEngine } from "../keymanEngine.js";
+import { KeymanEngine } from '../keymanEngine.js';
 import { FocusAssistant } from './focusAssistant.js';
 import { RotationProcessor } from '../utils/rotationProcessor.js';
 
@@ -182,7 +185,7 @@ export class PageIntegrationHandlers {
       eventTracker.attachDOMEvent(docBody, 'touchend',   this.touchEndActivationHandler,  false);
     }
 
-    eventTracker.attachDOMEvent(document, 'keyup', this.engine.hotkeyManager._Process, false);
+    this.engine.hardKeyboard?.on('keyevent', this.engine.hotkeyManager._ProcessKeyEvent.bind(this.engine.hotkeyManager));
   }
 
   public shutdown() {
