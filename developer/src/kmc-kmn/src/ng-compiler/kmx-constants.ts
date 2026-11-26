@@ -31,7 +31,7 @@ export enum DwFileVersion {
   VERSION_190 = 0x00001300,
 };
 
-export const DW_FILE_VERSION_MAP = new Map<Number, DwFileVersion>([
+export const DW_FILE_VERSION_MAP = new Map<number, DwFileVersion>([
   [3.0,  DwFileVersion.VERSION_30],
   [3.1,  DwFileVersion.VERSION_31],
   [3.2,  DwFileVersion.VERSION_32],
@@ -388,7 +388,7 @@ export enum VKeyName {
   K_$FF       = "K_$FF",				// 0xFF
 };
 
-export const VKEY_NAME_MAP = new Map<VKeyName, Number>([
+export const VKEY_NAME_MAP = new Map<VKeyName, number>([
   [VKeyName.K_$00,        0x0],
   [VKeyName.K_LBUTTON,    0x1],
   [VKeyName.K_RBUTTON,    0x2],

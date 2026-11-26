@@ -7,8 +7,9 @@
  */
 
 import { ASTNode } from './tree-construction.js';
-import { DwFileVersion, DwSystemID, DW_FILE_VERSION_MAP, KMX_FILEID_COMPILED, DwFlags, DwHotKey } from './kmx-constants.js';
+import { DwFileVersion, DwSystemID, DW_FILE_VERSION_MAP, KMX_FILEID_COMPILED, DwFlags, DwHotKey, VKEY_NAME_MAP } from './kmx-constants.js';
 import { NodeType } from './node-type.js';
+import { VKeyName } from './kmx-constants.js'
 
 /**
  * The Next Generation Semantic Model Builder for the Keyman Keyboard Language.
@@ -87,11 +88,14 @@ export class KmxBuilder {
     //TODO-NG-COMPILER: code to handle anything but a single virtual key argument
     const hotKeyNode = this.root.getDescendents(NodeType.HOTKEY)[0];
     if (hotKeyNode) {
-      const hotKeyName    = hotKeyNode.getText() ?? '';
-      const source        = hotKeyNode.getTextOfType(NodeType.SOURCE);
-      this.model.dwHotKey = 0x0; //TODO-NG-COMPILER: keycode needed
-      const modifierNodes = hotKeyNode.getDescendents(NodeType.MODIFIER);
-      const modifiers     = modifierNodes.map((node) => node.getText());
+      const hotKeyName      = hotKeyNode.getText() ?? '';
+      const source          = hotKeyNode.getTextOfType(NodeType.SOURCE);
+      const virtualKeyNode  = hotKeyNode.getSoleChildOfType(NodeType.VIRTUAL_KEY);
+      const keyCodeName     = virtualKeyNode.getTextOfType(NodeType.KEY_CODE);
+      //TODO-NG-COMPILER: handle undefined key code
+      this.model.dwHotKey = this.getVKeyCode(keyCodeName);
+      const modifierNodes   = virtualKeyNode.getChildrenOfType(NodeType.MODIFIER);
+      const modifiers       = modifierNodes.map((node) => node.getText());
       if (modifiers.some((modifier) => ['ALT', 'LALT', 'RALT'].includes(modifier))) {
         this.model.dwHotKey |= DwHotKey.HK_ALT;
       }
@@ -112,6 +116,17 @@ export class KmxBuilder {
   private versionToDwFileVersion(text: string): DwFileVersion {
     text = this.stripQuoteMarks(text);
     return DW_FILE_VERSION_MAP.get(Number(text));
+  }
+
+  private getVKeyCode(name: string): number | undefined {
+    //TODO-NG-COMPILER: handle ISO9995
+    const normalisedName = name.replace(/\?/g, "$").toUpperCase();
+
+    if (!Object.values(VKeyName).includes(normalisedName as VKeyName)) {
+      return undefined;
+    }
+
+    return VKEY_NAME_MAP.get(normalisedName as VKeyName);
   }
 }
 

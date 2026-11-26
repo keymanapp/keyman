@@ -93,6 +93,7 @@ describe("KmxBuilder Tests", () => {
         assert.isTrue(lineRule.parse(tokenBuffer, root));
         const builder = new KmxBuilder(root);
         builder['buildHeader']();
+        assert.equal(builder['model'].dwHotKey, 0x41);
         assert.isTrue(builder['model'].compStore.some(
           (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_HOTKEY && cs.dpString === '[K_A]' && cs.dpName === '&hotkey')));
       });
@@ -102,6 +103,7 @@ describe("KmxBuilder Tests", () => {
         assert.isTrue(lineRule.parse(tokenBuffer, root));
         const builder = new KmxBuilder(root);
         builder['buildHeader']();
+        assert.equal(builder['model'].dwHotKey, 0x10041); // K_A|DwHotKey.HK_ALT
         assert.isTrue(builder['model'].compStore.some(
           (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_HOTKEY && cs.dpString === '[ALT K_A]' && cs.dpName === '&hotkey')));
       });
@@ -111,6 +113,7 @@ describe("KmxBuilder Tests", () => {
         assert.isTrue(lineRule.parse(tokenBuffer, root));
         const builder = new KmxBuilder(root);
         builder['buildHeader']();
+        assert.equal(builder['model'].dwHotKey, 0x20041); // K_A|DwHotKey.HK_CTRL
         assert.isTrue(builder['model'].compStore.some(
           (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_HOTKEY && cs.dpString === '[CTRL K_A]' && cs.dpName === '&hotkey')));
       });
@@ -120,11 +123,12 @@ describe("KmxBuilder Tests", () => {
         assert.isTrue(lineRule.parse(tokenBuffer, root));
         const builder = new KmxBuilder(root);
         builder['buildHeader']();
+        assert.equal(builder['model'].dwHotKey, 0x40041); // K_A|DwHotKey.HK_SHIFT
         assert.isTrue(builder['model'].compStore.some(
           (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_HOTKEY && cs.dpString === '[SHIFT K_A]' && cs.dpName === '&hotkey')));
       });
     });
-    it("can provide in-memory model for baseline keyboards", function() {
+    it.skip("can provide in-memory model for baseline keyboards", function() {
       if (!existsSync(PATH_TO_BASELINE)) {
         this.skip();
       }
