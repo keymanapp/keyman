@@ -110,22 +110,31 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
    * `e.location != 0` if true matches condition 1 and matches condition 2 if false.
    */
 
+  const activeKeyboard = keyboardState.activeKeyboard;
   let curModState = 0x0000;
   curModState |= (e.getModifierState("Shift") ? ModifierKeyConstants.K_SHIFTFLAG : 0);
 
-  if(e.getModifierState("Control")) {
-    curModState |= ((e.location != DOM_KEY_LOCATION.STANDARD && ctrlEvent)
-      ? (e.location == DOM_KEY_LOCATION.LEFT
+  if (e.getModifierState("Control") || ctrlEvent) {
+    if (ctrlEvent) { // Condition 1
+      curModState |= (e.location == DOM_KEY_LOCATION.LEFT
         ? ModifierKeyConstants.LCTRLFLAG
-        : ModifierKeyConstants.RCTRLFLAG) // Condition 1
-      : prevModState & (ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG)); // Condition 2
+        : ModifierKeyConstants.RCTRLFLAG);
+    } else {         // Condition 2
+      curModState |= (activeKeyboard?.isChiral
+        ? (prevModState & (ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG))
+        : ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG);
+    }
   }
-  if(e.getModifierState("Alt")) {
-    curModState |= ((e.location != DOM_KEY_LOCATION.STANDARD && altEvent)
-      ? (e.location == DOM_KEY_LOCATION.LEFT
+  if (e.getModifierState("Alt") || altEvent) {
+    if (altEvent) { // Condition 1
+      curModState |= (e.location == DOM_KEY_LOCATION.LEFT
         ? ModifierKeyConstants.LALTFLAG
-        : ModifierKeyConstants.RALTFLAG)   // Condition 1
-      : prevModState & (ModifierKeyConstants.LALTFLAG | ModifierKeyConstants.RALTFLAG));  // Condition 2
+        : ModifierKeyConstants.RALTFLAG);
+    } else {        // Condition 2
+      curModState |= (activeKeyboard?.isChiral
+        ? (prevModState & (ModifierKeyConstants.LALTFLAG | ModifierKeyConstants.RALTFLAG))
+        : ModifierKeyConstants.LALTFLAG | ModifierKeyConstants.RALTFLAG);
+    }
   }
 
   // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
@@ -160,7 +169,6 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
 
   // Stage 4 - map the modifier set to the appropriate keystroke's modifiers.
   const modifierBitmasks = Codes.modifierBitmasks;
-  const activeKeyboard = keyboardState.activeKeyboard;
   let Lmodifiers: number;
   if(activeKeyboard?.isChiral) {
     Lmodifiers = curModState & modifierBitmasks.CHIRAL;
@@ -210,8 +218,10 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     isSynthetic: false
   });
 
-  // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
-  const LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (Lmodifiers & 0x6F) != 0));
+  const CtrlAltMask = ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG
+    | ModifierKeyConstants.K_CTRLFLAG | ModifierKeyConstants.LALTFLAG
+    | ModifierKeyConstants.RALTFLAG | ModifierKeyConstants.K_ALTFLAG;
+  const LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null && (e.charCode == 0 || (Lmodifiers & CtrlAltMask) != 0));
   s.LisVirtualKey = LisVirtualKeyCode || e.type != 'keypress';
 
   s = processForMnemonicsAndLegacy(s, activeKeyboard, keyboardState.baseLayout);
