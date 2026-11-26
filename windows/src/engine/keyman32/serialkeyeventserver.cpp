@@ -65,7 +65,7 @@ public:
     m_idThread = 0;
     m_hThread = NULL;
     m_hThreadExitEvent = NULL;
-    ResetModifierState();
+    memset(m_ModifierKeyboardState, 0, 256);
     m_hResetEvent = NULL;
     m_hKeyEvent = NULL;
     m_hKeyMutex = NULL;
@@ -348,7 +348,21 @@ private:
    * reset.
    */
   void ResetModifierState() {
-    SendDebugMessage("ResetModifierState");
+    SendDebugMessageFormat("Before reset: m_ModifierKeyboardState=[LS:%x LC:%x LA:%x RS:%x RC:%x RA:%x]",
+      m_ModifierKeyboardState[VK_LSHIFT], m_ModifierKeyboardState[VK_LCONTROL], m_ModifierKeyboardState[VK_LMENU],
+      m_ModifierKeyboardState[VK_RSHIFT], m_ModifierKeyboardState[VK_RCONTROL], m_ModifierKeyboardState[VK_RMENU]);
+
+    m_nInputs = 0;
+    keybd_shift(m_pInputs, &m_nInputs, FALSE, m_ModifierKeyboardState);
+    SendDebugMessageFormat("Sending %d events", m_nInputs);
+    if(m_nInputs > 0) {
+      if (SendInput(m_nInputs, m_pInputs, sizeof(INPUT)) == 0) {
+        DebugLastError("SendInput");
+      }
+      m_nInputs = 0;
+    }
+
+    // And now clear the modifier state to start fresh
     memset(m_ModifierKeyboardState, 0, 256);
   }
 
