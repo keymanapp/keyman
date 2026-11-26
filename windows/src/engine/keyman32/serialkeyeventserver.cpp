@@ -49,7 +49,7 @@ private:
 
   // Thread Local data
   BYTE m_ModifierKeyboardState[256];
-  HANDLE m_hKeyEvent, m_hKeyMutex, m_hMMF;
+  HANDLE m_hKeyEvent, m_hKeyMutex, m_hMMF, m_hResetEvent;
   HWND m_hwnd;
   int m_nInputs;
   PINPUT m_pInputs;
@@ -65,7 +65,8 @@ public:
     m_idThread = 0;
     m_hThread = NULL;
     m_hThreadExitEvent = NULL;
-    memset(m_ModifierKeyboardState, 0, 256);
+    ResetModifierState();
+    m_hResetEvent = NULL;
     m_hKeyEvent = NULL;
     m_hKeyMutex = NULL;
     m_hMMF = NULL;
@@ -83,6 +84,12 @@ public:
 
     m_hThreadExitEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
     if (!m_hThreadExitEvent) {
+      DebugLastError("CreateEvent");
+      return;
+    }
+
+    m_hResetEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    if(!m_hResetEvent) {
       DebugLastError("CreateEvent");
       return;
     }
@@ -124,6 +131,10 @@ public:
   virtual HWND GetWindow() const {
     // At destruction time, m_hwnd may be NULL
     return m_hwnd;
+  }
+
+  virtual void RequestModifierReset() {
+    SetEvent(m_hResetEvent);
   }
 
 private:
@@ -206,6 +217,12 @@ private:
       bRet = FALSE;
     }
     m_hMMF = NULL;
+
+    if (m_hResetEvent != NULL && !CloseHandle(m_hResetEvent)) {
+      DebugLastError("CloseHandle(m_hResetEvent)");
+      bRet = FALSE;
+    }
+    m_hResetEvent = NULL;
 
     return bRet;
   }
@@ -301,16 +318,19 @@ private:
     a client app.
   */
   void MessageLoop() {
-    HANDLE events[2] = { m_hThreadExitEvent, m_hKeyEvent };
+    HANDLE events[3] = { m_hThreadExitEvent, m_hKeyEvent, m_hResetEvent };
     while (TRUE) {
-      switch (MsgWaitForMultipleObjectsEx(2, events, INFINITE, QS_ALLINPUT, 0)) {
+      switch (MsgWaitForMultipleObjectsEx(3, events, INFINITE, QS_ALLINPUT, 0)) {
       case WAIT_OBJECT_0: // m_hThreadExitEvent signaled
         // Thread has been signalled, return
         return;
       case WAIT_OBJECT_0 + 1: // m_hKeyEvent signaled
         PostMessage(m_hwnd, WM_USER, 0, 0);
         break;
-      case WAIT_OBJECT_0 + 2: // Windows message received
+      case WAIT_OBJECT_0 + 2: // m_hResetEvent signaled
+        ResetModifierState();
+        break;
+      case WAIT_OBJECT_0 + 3: // Windows message received
         MSG msg;
         while (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {
           DispatchMessage(&msg);
@@ -321,6 +341,15 @@ private:
         return;
       }
     }
+  }
+
+  /**
+   * Reset the keyboard modifiers to 0, e.g. after a unhook/sethook
+   * reset.
+   */
+  void ResetModifierState() {
+    SendDebugMessage("ResetModifierState");
+    memset(m_ModifierKeyboardState, 0, 256);
   }
 
   /**

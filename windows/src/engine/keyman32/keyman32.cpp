@@ -295,8 +295,12 @@ BOOL InitLowLevelHook() {
 
 BOOL UninitLowLevelHook() {
   BOOL RetVal = TRUE;
-  if(Globals::get_hhookLowLevelKeyboardProc() && !UnhookWindowsHookEx(Globals::get_hhookLowLevelKeyboardProc()))    // I4124
+  if(Globals::get_hhookLowLevelKeyboardProc() && !UnhookWindowsHookEx(Globals::get_hhookLowLevelKeyboardProc())) {   // I4124
+    DWORD err = GetLastError();
+    SendDebugMessageFormat("Failed to uninstall low level hook.  GetLastError = %d", err);
+    SetLastError(err);
     RetVal = FALSE;
+  }
 
   *Globals::hhookLowLevelKeyboardProc() = NULL;
   return RetVal;
@@ -508,6 +512,12 @@ BOOL RestartLowLevelHook() {
     SendDebugMessageFormat("Failed to uninstall low level hook.  GetLastError = %d", error);
     result = FALSE;
   }
+
+  auto server = ISerialKeyEventServer::GetServer();
+  if(server) {
+    server->RequestModifierReset();
+  }
+
   if(!InitLowLevelHook()) {
     DWORD error = GetLastError();
     Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_WATCHDOG_HOOK_REINSTALL, WHR_INIT_FAILURE), error);
