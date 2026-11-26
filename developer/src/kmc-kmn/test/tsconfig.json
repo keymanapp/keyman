@@ -2,6 +2,7 @@
   "extends": "../../kmc/tsconfig.kmc-base.json",
 
   "compilerOptions": {
+      "types": ["node"],
       "rootDir": ".",
       "rootDirs": ["./", "../src/"],
       "outDir": "../build/test",
@@ -11,7 +12,8 @@
   "include": [
       "**/*.tests.ts",
       "./helpers/index.ts",
-      "./kmw/util.ts"
+      "./kmw/util.ts",
+      "./ng-compiler/keyboard-names.ts"
   ],
   "references": [
       { "path": "../../../../common/web/keyman-version/" },
