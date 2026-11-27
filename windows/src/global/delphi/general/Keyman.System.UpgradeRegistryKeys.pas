@@ -96,6 +96,13 @@ const
 
   SRegValue_UpgradeRunKeyman = 'Upgrade - Start Keyman with Windows';
 
+  { KMTIP registry paths }
+  SRegKey_clsidKMTipTextService = '{FE0420F1-38D1-4B4C-96BF-E7E20A74CFB7}';
+  SRegKey_KeymanTIP_LM = 'Software\Classes\CLSID\'+SRegKey_clsidKMTipTextService;
+  SRegKey_KeymanTIP_InprocServer32_LM = SRegKey_KeymanTIP_LM+'\InprocServer32';
+  SRegKey_KeymanTIP_x64_Name_LM = 'Keyman Engine Text Service x64';
+  SRegKey_KeymanTIP_arm64_Name_LM = 'Keyman Engine Text Service ARM64';
+
 const
   SFolderTavultesoft_                = 'Tavultesoft';                              // PF, PFC, AD, CAD
 

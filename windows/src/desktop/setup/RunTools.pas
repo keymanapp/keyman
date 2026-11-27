@@ -96,6 +96,14 @@ type
     procedure WaitFor(hProcess: THandle; var Waiting, Cancelled: Boolean);  // I3349
     procedure WriteToLog(const msg: string);
     procedure RunVersion11To13Upgrade(const KMShellPath: WideString);
+    (**
+      * On native ARM64 Windows, this restores the machine-wide TIP registration 
+      * for kmtiparm64x.dll if they key is absent. This is needed 
+      * when upgrading from Keyman 18 or earlier, which did not support ARM64.
+      * It can run after each successful MSI installation because it leaves an 
+      * existing registration unchanged.
+      *)
+    procedure RegisterKMTIPArm64XIfAbsent;
     procedure ApplyWow64SystemProfilePatch;
   public
     destructor Destroy; override;
@@ -152,6 +160,7 @@ uses
   utildir,
   utilsystem,
   utilexecute,
+  utilwow64,
   VersionInfo;
 
 var
@@ -560,6 +569,9 @@ begin
     FinishCacheMSIFile(msiLocation,  // I3476
       (res = ERROR_SUCCESS_REBOOT_REQUIRED) or (res = ERROR_SUCCESS_REBOOT_INITIATED) or (res = ERROR_SUCCESS));
 
+    if (res = ERROR_SUCCESS) or (res = ERROR_SUCCESS_REBOOT_REQUIRED) or (res = ERROR_SUCCESS_REBOOT_INITIATED) then
+      RegisterKMTIPArm64XIfAbsent;
+
     case res of
       ERROR_SUCCESS: ;
       ERROR_SUCCESS_REBOOT_REQUIRED, ERROR_SUCCESS_REBOOT_INITIATED:
@@ -922,6 +934,72 @@ begin
   // We run this after installation; it is idempotent and will upgrade all keyboards
   // from earlier versions to version 14+
   TUtilExecute.WaitForProcess('"'+KMShellPath+'" -upgradekeyboards=13,admin', ExtractFilePath(KMShellPath), SW_SHOWNORMAL, WaitFor);  // I3349
+end;
+
+procedure TRunTools.RegisterKMTIPArm64XIfAbsent;
+var
+  engineRootPath: string;
+  kmtipArm64Path: string;
+  reg: TRegistryErrorControlled;
+begin
+
+  if not IsNativeMachineArm64 then
+    Exit;
+
+  try
+    try
+      engineRootPath := TKeymanPaths.KeymanEngineInstallPath('');
+    except
+      on E:EKeymanPath do
+      begin
+        engineRootPath := '';
+      end;
+    end;
+
+    if engineRootPath = '' then
+    begin
+      LogInfo('Unable to restore Keyman ARM64 TIP registration: the Keyman Engine root path key is missing.');
+      Exit;
+    end;
+
+    kmtipArm64Path := IncludeTrailingPathDelimiter(engineRootPath) + 'kmtiparm64x.dll';
+    if not FileExists(kmtipArm64Path) then
+    begin
+      LogInfo('Unable to restore ARM64 Keyman text service registration: '+kmtipArm64Path+' is missing.');
+      Exit;
+    end;
+
+    // Explicitly select because setup.exe is a 32-bit process on ARM64 Windows.
+    reg := TRegistryErrorControlled.Create(KEY_READ or KEY_WRITE or KEY_WOW64_64KEY);
+    try
+      reg.RootKey := HKEY_LOCAL_MACHINE;
+      if reg.KeyExists(SRegKey_KeymanTIP_InprocServer32_LM) then
+        Exit;
+
+      if not reg.OpenKey(SRegKey_KeymanTIP_LM, True) then
+      begin
+        LogInfo('Unable to create the ARM64 Keyman text service registry key.');
+        Exit;
+      end;
+
+      reg.WriteString('', SRegKey_KeymanTIP_arm64_Name_LM);
+
+      if not reg.OpenKey('InprocServer32', True) then
+      begin
+        LogInfo('Unable to create the ARM64 Keyman text service InprocServer32 registry key.');
+        Exit;
+      end;
+
+      reg.WriteString('', kmtipArm64Path);
+      reg.WriteString('ThreadingModel', 'Apartment');
+      LogInfo('Restored ARM64 Keyman text service registration.');
+    finally
+      reg.Free;
+    end;
+  except
+    on E: Exception do
+      LogInfo('Unable to restore ARM64 Keyman text service registration: '+E.Message);
+  end;
 end;
 
 procedure TRunTools.DeleteBackupPath;  // I2747
