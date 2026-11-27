@@ -4,12 +4,8 @@ interface
 
 type
   TBuildLangTags = class
-    class procedure Build(const LangTagsFile, DestinationFile: string);
+    class function Build(const LangTagsFile, DestinationFile: string): Boolean;
   end;
-
-const
-  { Index of the _version record in the langtags.json file }
-  IndexOfVersionRecord = 3;
 
 implementation
 
@@ -24,8 +20,8 @@ uses
 
 { TBuildLangTags }
 
-class procedure TBuildLangTags.Build(const LangTagsFile,
-  DestinationFile: string);
+class function TBuildLangTags.Build(const LangTagsFile,
+  DestinationFile: string): Boolean;
 var
   stream: TMemoryStream;
   FResult: TStringList;
@@ -40,6 +36,7 @@ var
   FTagMapCount: Integer;
   Tags: TJSONArray;
   full, base: string;
+  IndexOfVersionRecord: Integer;
 
   function Escape(const s: string): string;
   begin
@@ -89,13 +86,22 @@ begin
   end;
 
   try
-    for i := 0 to IndexOfVersionRecord do
+    IndexOfVersionRecord := -1;
+    for i := 0 to FLangTags.Count - 1 do
     begin
       if (FLangTags.Items[i] as TJSONObject).Values['tag'].Value = '_version' then
       begin
         versionApi := (FLangTags.Items[i] as TJSONObject).Values['api'].Value;
         versionDate := (FLangTags.Items[i] as TJSONObject).Values['date'].Value;
+        IndexOfVersionRecord := i;
+        break;
       end;
+    end;
+
+    if IndexOfVersionRecord = -1 then
+    begin
+      writeln('Error: could not find _version record');
+      Exit(False);
     end;
 
     FResult := TStringList.Create;
@@ -257,6 +263,8 @@ begin
   finally
     FLangTags.Free;
   end;
+
+  Result := True;
 end;
 
 end.

@@ -708,7 +708,7 @@ describe('keyboard-info-compiler', function () {
     const result = await compiler['fillLanguages'](KHMER_ANGKOR_KPS, keyboard_info, kmpJsonData);
     assert.isTrue(result);
     const languages = <{[bcp47: string]: KeyboardInfoFileLanguage}>keyboard_info.languages;
-    assert.isTrue(languages[bcp47_tag].displayName == "Albanian, Arbëreshë");
+    assert.equal(languages[bcp47_tag].displayName, "Albanian, Arbereshe: Campo Marino");
     assert.isUndefined(languages[bcp47_tag].regionName);
     assert.isUndefined(languages[bcp47_tag].scriptName);
   });
