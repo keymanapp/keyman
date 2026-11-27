@@ -226,6 +226,8 @@ type
     FInputPane: TFrameworkInputPane;
     FIsInputPaneVisible: Boolean;
 
+    LastLowLevelHookInstallResult, LastLowLevelHookUninstallResult: DWORD;
+
     //TOUCH      FCurrentContext: string;
 
     function AddTaskbarIcon: Boolean;
@@ -278,6 +280,7 @@ type
     function IsSysTrayWindow(AHandle: THandle): Boolean;
     procedure GetTrayIconHandle;   // I4731
     procedure WatchDogKeyEvent;
+    procedure LogWatchdogHookReinstall(WParam: Word; LParam: DWord);
 
   protected
     procedure DoInterfaceHotkey(Target: Integer);
@@ -818,11 +821,7 @@ begin
       WatchDogKeyEvent;
 
     KMC_WATCHDOG_HOOK_REINSTALL:
-      case wParam of
-        WHR_TIMING:         TKeymanSentryClient.ReportMessage('Watchdog: low level hook reinstalled, threshold exceeded at '+IntToStr(lParam)+' msec');
-        WHR_INIT_FAILURE:   TKeymanSentryClient.ReportMessage('Watchdog: low level hook install failed with error '+IntToStr(lParam));
-        WHR_UNINIT_FAILURE: TKeymanSentryClient.ReportMessage('Watchdog: low level hook uninstall failed with error '+IntToStr(lParam));
-      end;
+      LogWatchdogHookReinstall(wParam, lParam);
 
     KMC_WATCHDOG_FAKEFREEZE:
       begin
@@ -831,6 +830,33 @@ begin
         TDebugLogClient.Instance.WriteMessage('kmc_fakefreeze end', []);
       end;
   end;
+end;
+
+procedure TfrmKeyman7Main.LogWatchdogHookReinstall(WParam: Word; LParam: DWord);
+var
+  message: string;
+begin
+  if wParam = WHR_TIMING then
+  begin
+    message := Format('WatchdogHookReinstall: low level hook reinstalled, threshold exceeded at %d msec; hook uninstall result = %d; hook install result = %d', [lParam, LastLowLevelHookUninstallResult, LastLowLevelHookInstallResult]);
+    LastLowLevelHookUninstallResult := 0;
+    LastLowLevelHookInstallResult := 0;
+  end
+  else if wParam = WHR_INIT_FAILURE then
+  begin
+    message := Format('ERROR: WatchdogHookReinstall: low level hook install failed with error %d', [lParam]);
+    LastLowLevelHookInstallResult := lParam;
+  end
+  else if wParam = WHR_UNINIT_FAILURE then
+  begin
+    message := Format('ERROR: WatchdogHookReinstall: low level hook uninstall failed with error %d', [lParam]);
+    LastLowLevelHookUninstallResult := lParam;
+  end
+  else
+    message := Format('ERROR: LogWatchdogHookReinstall: unknown message %d / %d', [wParam, lParam]);
+
+  TDebugLogClient.Instance.WriteMessage(message, []);
+  TKeymanSentryClient.ReportMessage(message);
 end;
 
 procedure TfrmKeyman7Main.WatchDogKeyEvent;

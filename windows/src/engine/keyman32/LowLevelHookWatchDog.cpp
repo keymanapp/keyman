@@ -45,7 +45,7 @@
  * events before we assume the low level hook has been uninstalled, and we need
  * to reinstall it.
  */
-#define WATCHDOG_THRESHOLD  1000
+#define WATCHDOG_THRESHOLD  5000
 
 static ULONGLONG LastLowLevelEventTick = 0;
 static ULONGLONG LastGetMessageEventTick = 0;
