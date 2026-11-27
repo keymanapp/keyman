@@ -33,7 +33,7 @@ fi
 
 function help() {
   echo "Usage:"
-  echo "  $0 [-k] [--tap] [--surrounding-text] [--no-surrounding-text] [--no-wayland] [--no-x11] [[--] TEST...]"
+  echo "  $0 [-k] [--tap] [--surrounding-text] [--no-surrounding-text] [--no-wayland] [--no-x11] [-- TEST...]"
   echo
   echo "Arguments:"
   echo "  --help, -h, -?          Display this help"
@@ -76,7 +76,7 @@ function run_tests() {
   fi
   echo ""
 
-  if [[ $# -gt 0 ]]; then
+  if [[ ! -z ${*:-} ]]; then
     #shellcheck disable=SC2206
     TESTFILES=($@)
   else
@@ -100,7 +100,7 @@ function run_tests() {
   #shellcheck disable=SC2086
   ${REMOTE_DEBUG:-} "${G_TEST_BUILDDIR:-../../build/$(arch)/${CONFIG}/tests}/ibus-keyman-tests" ${ARG_K-} ${ARG_TAP-} \
     ${ARG_VERBOSE-} ${ARG_DEBUG-} ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} \
-    --directory "${TESTDIR}" "${DISPLAY_SERVER}" ${TESTFILES[@]}
+    --directory "${TESTDIR}" "${DISPLAY_SERVER}" ${TESTFILES[@]:-} || true
   echo "# Finished tests."
 
   cleanup "${CLEANUP_FILE}" "${DISPLAY_SERVER:-}"
@@ -109,17 +109,30 @@ function run_tests() {
 USE_WAYLAND=1
 USE_X11=1
 
-while (( $# )); do
-  case $1 in
-    --help|-h|-\?) help ;;
-    -k) ARG_K=$1 ;;
-    --tap) ARG_TAP=$1 ;;
-    --surrounding-text) ARG_SURROUNDING_TEXT=$1 ;;
-    --no-surrounding-text) ARG_NO_SURROUNDING_TEXT=$1 ;;
-    --no-wayland) USE_WAYLAND=0;;
-    --no-x11) USE_X11=0;;
-    --verbose|-v) ARG_VERBOSE=--verbose;;
-    --debug) ARG_DEBUG=--debug-log;;
+declare -i I=1
+for PARAM in "${@:1}"
+do
+  case $PARAM in
+    --help|-h|-\?)
+      help ;;
+    -k)
+      ARG_K=$PARAM ;;
+    --tap)
+      ARG_TAP=$PARAM ;;
+    --surrounding-text)
+      ARG_SURROUNDING_TEXT=$PARAM ;;
+    --no-surrounding-text)
+      ARG_NO_SURROUNDING_TEXT=$PARAM ;;
+    --no-wayland)
+      shift
+      USE_WAYLAND=0;;
+    --no-x11)
+      shift
+      USE_X11=0;;
+    --verbose|-v)
+      ARG_VERBOSE=--verbose;;
+    --debug)
+      ARG_DEBUG=--debug-log;;
     --remote-debug)
       if [[ -z "${DOCKER_RUNNING:-}" ]]; then
         REMOTE_HOST="$(ip route get 8.8.8.8 | sed -E 's/.*src (\S+) .*/\1/;t;d'):2345"
@@ -132,13 +145,15 @@ while (( $# )); do
       fi
       REMOTE_DEBUG="gdbserver ${REMOTE_HOST}"
       ;;
-    --) break ;;
-    *) echo "Error: Unexpected argument \"$1\". Exiting." ; exit 4 ;;
+    --)
+      ARG_TESTFILES=("${@:$I}")
+      break ;;
+    *) echo "Error: Unexpected argument \"$PARAM\". Exiting." ; exit 4 ;;
   esac
-  shift || (echo "Error: The last argument is missing a value. Exiting."; false) || exit 5
+  ((I++))
 done
 
-if ! can_run_wayland && [[ "${USE_WAYLAND}" == "0" ]]; then
+if ! can_run_wayland && [[ "${USE_WAYLAND}" == "1" ]]; then
   # support for --headless got added in mutter 40.x
   echo "# WARNING: mutter doesn't support running headless. Skipping Wayland tests."
   USE_WAYLAND=0
@@ -159,11 +174,17 @@ if [[ ! -f "${G_TEST_BUILDDIR}/ibus-keyman-tests" ]]; then
 fi
 
 if [[ "${USE_WAYLAND}" == "1" ]] && [[ "${USE_X11}" == "1" ]]; then
-  # Restart script to first run Wayland tests
-  "$0" --no-x11 "$@"
-  # and now X11 tests
-  "$0" --no-wayland "$@"
-  exit 0
+  if [[ -z "${REMOTE_DEBUG:-}" ]]
+  then
+    # Restart script to first run Wayland tests
+    "$0" --no-x11 "$@"
+    # and now X11 tests
+    "$0" --no-wayland "$@"
+    exit 0
+  else
+    echo "# Wayland and X11 cannot be run simultaneously with remote debugging. Please choose only one of them, use --no-wayland or --no-x11."
+    exit 7
+  fi
 fi
 
 echo > "${CLEANUP_FILE}"
@@ -171,9 +192,9 @@ echo > "${PID_FILE}"
 trap local_cleanup EXIT SIGINT
 
 if [[ "${USE_WAYLAND}" == "1" ]]; then
-  run_tests --wayland "$@"
+  run_tests --wayland "${ARG_TESTFILES[@]:-}"
 fi
 
 if [[ "${USE_X11}" == "1" ]]; then
-  run_tests --x11 "$@"
+  run_tests --x11 "${ARG_TESTFILES[@]:-}"
 fi
