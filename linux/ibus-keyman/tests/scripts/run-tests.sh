@@ -108,31 +108,20 @@ function run_tests() {
 
 USE_WAYLAND=1
 USE_X11=1
+# shellcheck disable=SC2206
+ALL_ARGS=($@)
 
-declare -i I=1
-for PARAM in "${@:1}"
-do
-  case $PARAM in
-    --help|-h|-\?)
-      help ;;
-    -k)
-      ARG_K=$PARAM ;;
-    --tap)
-      ARG_TAP=$PARAM ;;
-    --surrounding-text)
-      ARG_SURROUNDING_TEXT=$PARAM ;;
-    --no-surrounding-text)
-      ARG_NO_SURROUNDING_TEXT=$PARAM ;;
-    --no-wayland)
-      shift
-      USE_WAYLAND=0;;
-    --no-x11)
-      shift
-      USE_X11=0;;
-    --verbose|-v)
-      ARG_VERBOSE=--verbose;;
-    --debug)
-      ARG_DEBUG=--debug-log;;
+while (( $# )); do
+  case $1 in
+    --help|-h|-\?) help ;;
+    -k) ARG_K=$1 ;;
+    --tap) ARG_TAP=$1 ;;
+    --surrounding-text) ARG_SURROUNDING_TEXT=$1 ;;
+    --no-surrounding-text) ARG_NO_SURROUNDING_TEXT=$1 ;;
+    --no-wayland) USE_WAYLAND=0;;
+    --no-x11) USE_X11=0;;
+    --verbose|-v) ARG_VERBOSE=--verbose;;
+    --debug) ARG_DEBUG=--debug-log;;
     --remote-debug)
       if [[ -z "${DOCKER_RUNNING:-}" ]]; then
         REMOTE_HOST="$(ip route get 8.8.8.8 | sed -E 's/.*src (\S+) .*/\1/;t;d'):2345"
@@ -145,12 +134,10 @@ do
       fi
       REMOTE_DEBUG="gdbserver ${REMOTE_HOST}"
       ;;
-    --)
-      ARG_TESTFILES=("${@:$I}")
-      break ;;
-    *) echo "Error: Unexpected argument \"$PARAM\". Exiting." ; exit 4 ;;
+    --) shift; break ;;
+    *) echo "Error: Unexpected argument \"$1\". Exiting." ; exit 4 ;;
   esac
-  ((I++))
+  shift
 done
 
 if ! can_run_wayland && [[ "${USE_WAYLAND}" == "1" ]]; then
@@ -177,9 +164,11 @@ if [[ "${USE_WAYLAND}" == "1" ]] && [[ "${USE_X11}" == "1" ]]; then
   if [[ -z "${REMOTE_DEBUG:-}" ]]
   then
     # Restart script to first run Wayland tests
-    "$0" --no-x11 "$@"
+    # shellcheck disable=SC2068
+    "$0" --no-x11 ${ALL_ARGS[@]}
     # and now X11 tests
-    "$0" --no-wayland "$@"
+    # shellcheck disable=SC2068
+    "$0" --no-wayland ${ALL_ARGS[@]}
     exit 0
   else
     echo "# Wayland and X11 cannot be run simultaneously with remote debugging. Please choose only one of them, use --no-wayland or --no-x11."
@@ -192,9 +181,11 @@ echo > "${PID_FILE}"
 trap local_cleanup EXIT SIGINT
 
 if [[ "${USE_WAYLAND}" == "1" ]]; then
-  run_tests --wayland "${ARG_TESTFILES[@]:-}"
+  # shellcheck disable=SC2068
+  run_tests --wayland $@
 fi
 
 if [[ "${USE_X11}" == "1" ]]; then
-  run_tests --x11 "${ARG_TESTFILES[@]:-}"
+  # shellcheck disable=SC2068
+  run_tests --x11 $@
 fi
