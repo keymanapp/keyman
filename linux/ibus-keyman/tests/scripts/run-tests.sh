@@ -33,7 +33,7 @@ fi
 
 function help() {
   echo "Usage:"
-  echo "  $0 [-k] [--tap] [--surrounding-text] [--no-surrounding-text] [--no-wayland] [--no-x11] [[--] TEST...]"
+  echo "  $0 [-k] [--tap] [--surrounding-text] [--no-surrounding-text] [--no-wayland] [--no-x11] [-- [TEST...]]"
   echo
   echo "Arguments:"
   echo "  --help, -h, -?          Display this help"
@@ -100,7 +100,7 @@ function run_tests() {
   #shellcheck disable=SC2086
   ${REMOTE_DEBUG:-} "${G_TEST_BUILDDIR:-../../build/$(arch)/${CONFIG}/tests}/ibus-keyman-tests" ${ARG_K-} ${ARG_TAP-} \
     ${ARG_VERBOSE-} ${ARG_DEBUG-} ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} \
-    --directory "${TESTDIR}" "${DISPLAY_SERVER}" ${TESTFILES[@]}
+    --directory "${TESTDIR}" "${DISPLAY_SERVER}" ${TESTFILES[@]:-} || true
   echo "# Finished tests."
 
   cleanup "${CLEANUP_FILE}" "${DISPLAY_SERVER:-}"
@@ -108,6 +108,8 @@ function run_tests() {
 
 USE_WAYLAND=1
 USE_X11=1
+# shellcheck disable=SC2206
+ALL_ARGS=($@)
 
 while (( $# )); do
   case $1 in
@@ -132,13 +134,13 @@ while (( $# )); do
       fi
       REMOTE_DEBUG="gdbserver ${REMOTE_HOST}"
       ;;
-    --) break ;;
+    --) shift; break ;;
     *) echo "Error: Unexpected argument \"$1\". Exiting." ; exit 4 ;;
   esac
-  shift || (echo "Error: The last argument is missing a value. Exiting."; false) || exit 5
+  shift
 done
 
-if ! can_run_wayland && [[ "${USE_WAYLAND}" == "0" ]]; then
+if ! can_run_wayland && [[ "${USE_WAYLAND}" == "1" ]]; then
   # support for --headless got added in mutter 40.x
   echo "# WARNING: mutter doesn't support running headless. Skipping Wayland tests."
   USE_WAYLAND=0
@@ -159,11 +161,19 @@ if [[ ! -f "${G_TEST_BUILDDIR}/ibus-keyman-tests" ]]; then
 fi
 
 if [[ "${USE_WAYLAND}" == "1" ]] && [[ "${USE_X11}" == "1" ]]; then
-  # Restart script to first run Wayland tests
-  "$0" --no-x11 "$@"
-  # and now X11 tests
-  "$0" --no-wayland "$@"
-  exit 0
+  if [[ -z "${REMOTE_DEBUG:-}" ]]
+  then
+    # Restart script to first run Wayland tests
+    # shellcheck disable=SC2068
+    "$0" --no-x11 ${ALL_ARGS[@]}
+    # and now X11 tests
+    # shellcheck disable=SC2068
+    "$0" --no-wayland ${ALL_ARGS[@]}
+    exit 0
+  else
+    echo "# Wayland and X11 cannot be run simultaneously with remote debugging. Please choose only one of them, use --no-wayland or --no-x11."
+    exit 7
+  fi
 fi
 
 echo > "${CLEANUP_FILE}"
@@ -171,9 +181,11 @@ echo > "${PID_FILE}"
 trap local_cleanup EXIT SIGINT
 
 if [[ "${USE_WAYLAND}" == "1" ]]; then
-  run_tests --wayland "$@"
+  # shellcheck disable=SC2068
+  run_tests --wayland $@
 fi
 
 if [[ "${USE_X11}" == "1" ]]; then
-  run_tests --x11 "$@"
+  # shellcheck disable=SC2068
+  run_tests --x11 $@
 fi
