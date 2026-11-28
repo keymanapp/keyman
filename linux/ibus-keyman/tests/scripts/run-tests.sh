@@ -33,7 +33,7 @@ fi
 
 function help() {
   echo "Usage:"
-  echo "  $0 [-k] [--tap] [--surrounding-text] [--no-surrounding-text] [--no-wayland] [--no-x11] [-- TEST...]"
+  echo "  $0 [-k] [--tap] [--surrounding-text] [--no-surrounding-text] [--no-wayland] [--no-x11] [-- [TEST...]]"
   echo
   echo "Arguments:"
   echo "  --help, -h, -?          Display this help"
