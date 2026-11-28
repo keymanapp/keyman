@@ -54,7 +54,8 @@ begin
   else if ParamStr(1) = 'langtags' then
   begin
     writeln('Building '+ParamStr(3));
-    TBuildLangTags.Build(ParamStr(2), ParamStr(3));
+    if not TBuildLangTags.Build(ParamStr(2), ParamStr(3)) then
+      Halt(4);
   end
   else
   begin
