@@ -88,22 +88,23 @@ export class KmxBuilder {
     //TODO-NG-COMPILER: code to handle anything but a single virtual key argument
     const hotKeyNode = this.root.getDescendents(NodeType.HOTKEY)[0];
     if (hotKeyNode) {
-      const hotKeyName      = hotKeyNode.getText() ?? '';
-      const source          = hotKeyNode.getTextOfType(NodeType.SOURCE);
-      const virtualKeyNode  = hotKeyNode.getSoleChildOfType(NodeType.VIRTUAL_KEY);
-      const keyCodeName     = virtualKeyNode.getTextOfType(NodeType.KEY_CODE);
-      //TODO-NG-COMPILER: handle undefined key code
-      this.model.dwHotKey = this.getVKeyCode(keyCodeName);
-      const modifierNodes   = virtualKeyNode.getChildrenOfType(NodeType.MODIFIER);
-      const modifiers       = modifierNodes.map((node) => node.getText());
-      if (modifiers.some((modifier) => ['ALT', 'LALT', 'RALT'].includes(modifier))) {
-        this.model.dwHotKey |= DwHotKey.HK_ALT;
-      }
-      if (modifiers.some((modifier) => ['CTRL', 'LCTRL', 'RCTRL'].includes(modifier))) {
-        this.model.dwHotKey |= DwHotKey.HK_CTRL;
-      }
-      if (modifiers.includes('SHIFT')) {
-        this.model.dwHotKey |= DwHotKey.HK_SHIFT;
+      const hotKeyName     = hotKeyNode.getText() ?? '';
+      const source         = hotKeyNode.getTextOfType(NodeType.SOURCE);
+      const virtualKeyNode = hotKeyNode.getSoleChildOfType(NodeType.VIRTUAL_KEY);
+      if (virtualKeyNode) {
+        const keyCodeName   = virtualKeyNode.getTextOfType(NodeType.KEY_CODE);
+        this.model.dwHotKey = this.getVKeyCode(keyCodeName);
+        const modifierNodes = virtualKeyNode.getChildrenOfType(NodeType.MODIFIER);
+        const modifiers     = modifierNodes.map((node) => node.getText());
+        if (modifiers.some((modifier) => ['ALT', 'LALT', 'RALT'].includes(modifier))) {
+          this.model.dwHotKey |= DwHotKey.HK_ALT;
+        }
+        if (modifiers.some((modifier) => ['CTRL', 'LCTRL', 'RCTRL'].includes(modifier))) {
+          this.model.dwHotKey |= DwHotKey.HK_CTRL;
+        }
+        if (modifiers.includes('SHIFT')) {
+          this.model.dwHotKey |= DwHotKey.HK_SHIFT;
+        }
       }
       this.model.compStore.push(new CompStore(DwSystemID.TSS_HOTKEY, source, hotKeyName));
     }
@@ -118,12 +119,12 @@ export class KmxBuilder {
     return DW_FILE_VERSION_MAP.get(Number(text));
   }
 
-  private getVKeyCode(name: string): number | undefined {
+  private getVKeyCode(name: string): number {
     //TODO-NG-COMPILER: handle ISO9995
     const normalisedName = name.replace(/\?/g, "$").toUpperCase();
 
     if (!Object.values(VKeyName).includes(normalisedName as VKeyName)) {
-      return undefined;
+      return VKEY_NAME_MAP.get(VKeyName.K_$00);
     }
 
     return VKEY_NAME_MAP.get(normalisedName as VKeyName);

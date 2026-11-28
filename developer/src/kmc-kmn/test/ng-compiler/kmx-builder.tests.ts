@@ -128,7 +128,7 @@ describe("KmxBuilder Tests", () => {
           (cs: CompStore) => (cs.dwSystemID === DwSystemID.TSS_HOTKEY && cs.dpString === '[SHIFT K_A]' && cs.dpName === '&hotkey')));
       });
     });
-    it.skip("can provide in-memory model for baseline keyboards", function() {
+    it("can provide in-memory model for baseline keyboards", function() {
       if (!existsSync(PATH_TO_BASELINE)) {
         this.skip();
       }

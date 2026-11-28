@@ -15,9 +15,10 @@ import { IndexStatementRule, LayerStatementRule, NotanyStatementRule, OutsStatem
 import { CapsLockHeaderRule, HeaderAssignRule, NormalStoreAssignRule, ResetStoreRule } from "./store-analyzer.js";
 import { SetNormalStoreRule, SetSystemStoreRule, SystemStoreAssignRule } from "./store-analyzer.js";
 import { NodeType, SYSTEM_STORES_NODETYPES } from "./node-type.js";
-import { ASTNode } from "./tree-construction.js";
+import { ASTNode, tokenBoundsSlice } from "./tree-construction.js";
 import { TokenBuffer } from "./token-buffer.js";
-import { AddSystemStoreSource, ASTRebuild, GivenNode, NewNode, NewNodeOrTree } from "./ast-rebuild.js";
+import { ASTRebuild, GivenNode, NewNode, NewNodeOrTree } from "./ast-rebuild.js";
+import { Token } from "./lexer.js";
 
 /**
  * The Next Generation Parser for the Keyman Keyboard Language.
@@ -133,6 +134,27 @@ export class LineRule extends SingleChildRuleWithASTRebuild {
     const optContent       = new OptionalRule(new ContentRule());
     const newline          = new TokenRule(TokenType.NEWLINE, true);
     this.rule = new SequenceRule([optCompileTarget, optContent, newline]);
+  }
+}
+
+class AddSystemStoreSource extends ASTRebuild {
+  public constructor() {
+    super();
+  }
+
+  public apply(node: ASTNode): ASTNode {
+    for (const nodeType of SYSTEM_STORES_NODETYPES) {
+      if (node.hasSoleChildOfType(nodeType)) {
+        const systemStoreNode = node.getSoleChildOfType(nodeType);
+        const bounds          = systemStoreNode.getTokenBounds();
+        const lineNode        = node.getSoleChildOfType(NodeType.LINE);
+        const source          = tokenBoundsSlice(lineNode.token.line, lineNode.token.lineNum, bounds);
+        const token           = new Token(TokenType.STRING, source, bounds.firstLine, bounds.firstChar);
+        systemStoreNode.addNewChildWithToken(NodeType.SOURCE, token);
+        return node;
+      }
+    }
+    return node;
   }
 }
 
