@@ -3,9 +3,9 @@
  *
  * Created by Dr Mark C. Sinclair on 2025-11-10
  *
- * Tests for KMC KMN Next Generation Parser
+ * KMC KMN Next Generation Parser
  *
- * NodeTypes for the Recursive Descent Parser
+ * Tests for NodeTypes for the Recursive Descent Parser
  */
 
 import 'mocha';

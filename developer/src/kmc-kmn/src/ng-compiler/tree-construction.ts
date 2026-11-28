@@ -9,6 +9,13 @@
 import { Token } from "./lexer.js";
 import { NodeType } from "./node-type.js";
 
+export interface TokenBounds {
+  firstLine: number | null;
+  firstChar: number | null;
+  lastLine: number  | null;
+  lastChar: number  | null;
+}
+
 /**
  * ASTNode objects form the abstract syntax tree created by the recursive-
  * descent parser. The class provides methods used for building, testing
@@ -157,7 +164,7 @@ export class ASTNode {
    *
    * @returns token text or an empty string
    */
-  public getText(): String {
+  public getText(): string {
     return this.token?.text ?? '';
   }
 
@@ -168,7 +175,7 @@ export class ASTNode {
    * @param requiredType the required type
    * @returns token text or an empty string
    */
-  public getTextOfType(requiredType: NodeType): String  {
+  public getTextOfType(requiredType: NodeType): string  {
     const child: ASTNode = this.getSoleChildOfType(requiredType);
     return child?.getText() ?? '';
   }
@@ -320,6 +327,41 @@ export class ASTNode {
     return blocks;
   }
 
+  public getTokenBounds(): TokenBounds {
+    let firstLine = Infinity;
+    let firstChar = Infinity;
+    let lastLine  = -Infinity;
+    let lastChar  = -Infinity;
+
+    const visit = (node: ASTNode) => {
+      const token = node.token;
+
+      if (token) {
+        const start = [token.lineNum, token.charNum];
+        const end   = [token.lineNum, token.charNum + token.text.length];
+
+        if (start[0] < firstLine || (start[0] === firstLine && start[1] < firstChar)) {
+          [firstLine, firstChar] = start;
+        }
+
+        if (end[0] > lastLine || (end[0] === lastLine && end[1] > lastChar)) {
+          [lastLine, lastChar] = end;
+        }
+      }
+
+      node.children.forEach(visit);
+    };
+
+    this.children.forEach(visit); // do not include root
+
+    return {
+      firstLine: firstLine === Infinity ? null : firstLine,
+      firstChar: firstLine === Infinity ? null : firstChar,
+      lastLine:  lastLine === -Infinity ? null : lastLine,
+      lastChar:  lastLine === -Infinity ? null : lastChar,
+    };
+  }
+
   public toString(): string {
     let buf: string = `[${this.nodeType}`;
     if (this.token != null) {
@@ -358,3 +400,51 @@ export class ASTNode {
     return text;
   }
 }
+
+export function tokenBoundsSlice(line: string, lineNum: number, bounds: TokenBounds): string {
+  const { firstLine, firstChar, lastLine, lastChar } = bounds;
+
+  if (
+    firstLine === null || firstChar === null ||
+    lastLine  === null || lastChar  === null ||
+    firstLine < lineNum   || firstChar < 1 ||
+    lastLine  < firstLine || lastChar < 1
+  ) {
+    // TODO-NG-COMPILER: fatal compiler error
+    return "";
+  }
+
+  // record the starting string index of each line
+  const lineStarts = [0];
+
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === "\r") {
+      if (line[i + 1] === "\n") {
+        i++; // treat CRLF as a single line ending
+      }
+      lineStarts.push(i + 1);
+    } else if (line[i] === "\n") {
+      lineStarts.push(i + 1);
+    }
+  }
+
+  const firstIndex = firstLine - lineNum;
+  const lastIndex  = lastLine  - lineNum;
+
+  if (lastIndex >= lineStarts.length) {
+    // TODO-NG-COMPILER: fatal compiler error
+    return "";
+  }
+
+  // restore zero indexing before slice
+  const start = lineStarts[firstIndex] + firstChar - 1;
+  const end   = lineStarts[lastIndex]  + lastChar  - 1;
+
+  if (start > line.length || end > line.length || end < start) {
+    // TODO-NG-COMPILER: fatal compiler error
+    return "";
+  }
+
+  return line.slice(start, end);
+}
+

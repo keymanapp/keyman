@@ -9,11 +9,14 @@
  */
 
 import { TokenType } from "./token-type.js";
-import { PermittedKeywordRule, TextRule } from "./kmn-analyzer.js";
+import { PermittedKeywordRule, TextRule, VirtualKeyRule } from "./kmn-analyzer.js";
 import { AlternateRule, AlternateTokenRule, ManyRule, OneOrManyRule, OptionalRule } from "./recursive-descent.js";
 import { SingleChildRule, SingleChildRuleWithASTRebuild, SequenceRule, TokenRule } from "./recursive-descent.js";
 import { NodeType } from "./node-type.js";
-import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-rebuild.js";
+import { ASTRebuild, FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-rebuild.js";
+import { ASTNode } from "./tree-construction.js";
+import { TokenBuffer } from "./token-buffer.js";
+import { Lexer, Token } from "./lexer.js";
 
 /**
  * (BNF) systemStoreAssign: systemStore text*
@@ -24,11 +27,48 @@ import { FirstNode, GivenNode, NewNodeOrTree, StackedPair } from "./ast-rebuild.
  */
 export class SystemStoreAssignRule extends SingleChildRuleWithASTRebuild {
   public constructor() {
-    super(new FirstNode());
+    super(new SystemStoreAssignRebuild());
     const systemStore = new SystemStoreRule();
     const manyText    = new ManyRule(new TextRule());
     this.rule         = new SequenceRule([systemStore, manyText]);
   }
+}
+
+export class SystemStoreAssignRebuild extends ASTRebuild {
+  public apply(node: ASTNode): ASTNode {
+    if (node.hasChildren()) {
+      const firstNode = node.removeFirstChild();
+      firstNode.addChildren(node.removeChildren());
+      node.addChild(firstNode);
+      // correct a HOTKEY store with a string argument containing a virtual key
+      if (firstNode.nodeType === NodeType.HOTKEY && firstNode.hasSoleChildOfType(NodeType.STRING)) {
+        const stringNode  = firstNode.getSoleChildOfType(NodeType.STRING);
+        const value       = stringNode.getText().slice(1, -1);
+        const lexer       = new Lexer(value);
+        const tokens      = lexer.parse();
+        const tokenBuffer = new TokenBuffer(tokens);
+        const virtualKey  = new VirtualKeyRule();
+        const root        = new ASTNode();
+        if (virtualKey.parse(tokenBuffer, root)) {
+          const virtualKeyNode = root.getSoleChildOfType(NodeType.VIRTUAL_KEY);
+          const children       = virtualKeyNode.removeChildren();
+          // create new tokens with lineNum and charNum from original source code
+          children.forEach(child => {
+            virtualKeyNode.addNewChildWithToken(child.nodeType, new Token(
+              child.token.tokenType,
+              child.token.text,
+              stringNode.token.lineNum,
+              stringNode.token.charNum + child.token.charNum,
+              child.token.line,
+              stringNode.token.filename
+            ));
+          });
+          firstNode.addChild(virtualKeyNode);
+        }
+      }
+    }
+    return node;
+  };
 }
 
 /**
