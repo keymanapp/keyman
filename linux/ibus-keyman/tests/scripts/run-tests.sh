@@ -76,7 +76,7 @@ function run_tests() {
   fi
   echo ""
 
-  if [[ ! -z ${*:-} ]]; then
+  if [[ $# -gt 0 ]]; then
     #shellcheck disable=SC2206
     TESTFILES=($@)
   else
